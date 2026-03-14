@@ -4,10 +4,9 @@ go 1.26.0
 
 // replace github.com/datakit-dev/dtkt-sdk/sdk-go => ../sdk-go
 
-require (
-	github.com/datakit-dev/dtkt-sdk/sdk-go v0.0.0-20260314204816-2037f4ce2b24
-	google.golang.org/protobuf v1.36.10
-)
+require github.com/datakit-dev/dtkt-sdk/sdk-go v0.0.0-20260314232710-8ee97f8c7b3a
+
+require google.golang.org/protobuf v1.36.10
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.10-20250912141014-52f32327d4b0.1 // indirect

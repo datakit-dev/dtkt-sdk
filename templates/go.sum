@@ -49,8 +49,8 @@ github.com/charmbracelet/x/cellbuf v0.0.13-0.20250311204145-2c3ea96c31dd h1:vy0G
 github.com/charmbracelet/x/cellbuf v0.0.13-0.20250311204145-2c3ea96c31dd/go.mod h1:xe0nKWGd3eJgtqZRaN9RjMtK7xUYchjzPr7q6kcvCCs=
 github.com/charmbracelet/x/term v0.2.1 h1:AQeHeLZ1OqSXhrAWpYUtZyX1T3zVxfpZuEQMIQaGIAQ=
 github.com/charmbracelet/x/term v0.2.1/go.mod h1:oQ4enTYFV7QN4m0i9mzHrViD7TQKvNEEkHUMCmsxdUg=
-github.com/datakit-dev/dtkt-sdk/sdk-go v0.0.0-20260314204816-2037f4ce2b24 h1:/sEqm3CteegquOKxkpqRl2ATAHar5EA1IDgxJnAQpYs=
-github.com/datakit-dev/dtkt-sdk/sdk-go v0.0.0-20260314204816-2037f4ce2b24/go.mod h1:I5G+CG/FLgVCK/Y3b/Pm9E6fCBhNlXV+iU+p8HdhzTI=
+github.com/datakit-dev/dtkt-sdk/sdk-go v0.0.0-20260314232710-8ee97f8c7b3a h1:c33geP0dNLsCef5c1xjkwnfif0F9cDQ8yjRy6b4DVcc=
+github.com/datakit-dev/dtkt-sdk/sdk-go v0.0.0-20260314232710-8ee97f8c7b3a/go.mod h1:I5G+CG/FLgVCK/Y3b/Pm9E6fCBhNlXV+iU+p8HdhzTI=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
