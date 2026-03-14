@@ -1,0 +1,28 @@
+{
+  "$id": "dtkt.catalog.v1beta2.Int64Value.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Nullable wrapper message for `int64`.",
+  "properties": {
+    "valid": {
+      "default": false,
+      "description": "Valid is true if value is not NULL.",
+      "type": "boolean"
+    },
+    "value": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The int64 value."
+    }
+  },
+  "title": "Int64 Value",
+  "type": "object"
+}

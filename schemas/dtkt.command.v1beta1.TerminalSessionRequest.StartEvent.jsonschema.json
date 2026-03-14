@@ -1,0 +1,30 @@
+{
+  "$id": "dtkt.command.v1beta1.TerminalSessionRequest.StartEvent.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Configuration for starting a terminal session.",
+  "properties": {
+    "dimensions": {
+      "$ref": "dtkt.command.v1beta1.TerminalSessionRequest.Dimensions.jsonschema.json",
+      "description": "Terminal dimensions"
+    },
+    "env": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "workdir": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "required": [
+    "dimensions"
+  ],
+  "title": "Start Event",
+  "type": "object"
+}

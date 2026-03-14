@@ -1,0 +1,23 @@
+{
+  "$id": "dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "OutputsEvent provides output values from a flow.",
+  "properties": {
+    "values": {
+      "additionalProperties": {
+        "$ref": "google.protobuf.Any.jsonschema.json"
+      },
+      "description": "Map of output node id =\u003e any proto wrapper.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "values"
+  ],
+  "title": "Outputs Event",
+  "type": "object"
+}

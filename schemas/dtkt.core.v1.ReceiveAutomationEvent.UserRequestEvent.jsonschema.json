@@ -1,0 +1,28 @@
+{
+  "$id": "dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "UserRequestEvent is emitted upon execution requiring elicitation from a user.",
+  "patternProperties": {
+    "^(user_action)$": {
+      "$ref": "dtkt.flow.v1beta1.UserAction.jsonschema.json",
+      "description": "User action node which defines the data being requested."
+    }
+  },
+  "properties": {
+    "id": {
+      "description": "Flow action node id containing user action.",
+      "type": "string"
+    },
+    "userAction": {
+      "$ref": "dtkt.flow.v1beta1.UserAction.jsonschema.json",
+      "description": "User action node which defines the data being requested."
+    }
+  },
+  "required": [
+    "id",
+    "userAction"
+  ],
+  "title": "User Request Event",
+  "type": "object"
+}

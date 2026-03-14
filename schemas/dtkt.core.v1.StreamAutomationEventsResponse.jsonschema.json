@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.StreamAutomationEventsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "event": {
+      "$ref": "dtkt.core.v1.ReceiveAutomationEvent.jsonschema.json",
+      "description": "The received event."
+    }
+  },
+  "required": [
+    "event"
+  ],
+  "title": "Stream Automation Events Response",
+  "type": "object"
+}

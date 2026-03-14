@@ -1,0 +1,18 @@
+{
+  "$id": "dtkt.protoform.v1beta1.InputElement.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Input element with multi-line text option",
+  "patternProperties": {
+    "^(multiline_text)$": {
+      "type": "boolean"
+    }
+  },
+  "properties": {
+    "multilineText": {
+      "type": "boolean"
+    }
+  },
+  "title": "Input Element",
+  "type": "object"
+}

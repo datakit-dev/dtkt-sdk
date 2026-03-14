@@ -1,0 +1,44 @@
+{
+  "$id": "dtkt.catalog.v1beta1.Query.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a query and its associated details.",
+  "properties": {
+    "dialect": {
+      "default": "",
+      "description": "The query dialect used.",
+      "type": "string"
+    },
+    "error": {
+      "default": "",
+      "description": "Error message, if any.",
+      "type": "string"
+    },
+    "fields": {
+      "description": "List of fields returned by the query.",
+      "items": {
+        "$ref": "dtkt.shared.v1beta1.Field.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "params": {
+      "description": "Parameters used in the query, if any.",
+      "items": {
+        "$ref": "dtkt.shared.v1beta1.Param.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "query": {
+      "default": "",
+      "description": "The query string.",
+      "type": "string"
+    },
+    "valid": {
+      "default": false,
+      "description": "Indicates if the query is valid.",
+      "type": "boolean"
+    }
+  },
+  "title": "Query",
+  "type": "object"
+}

@@ -1,0 +1,66 @@
+{
+  "$id": "dtkt.catalog.v1beta2.Catalog.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a catalog resource specifying a query dialect, supported data types\n and additional metadata (if any).",
+  "patternProperties": {
+    "^(catalog_id)$": {
+      "default": "",
+      "description": "Catalog identifier.",
+      "type": "string"
+    },
+    "^(data_types)$": {
+      "description": "List of supported data types.",
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.Type.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "^(query_dialect)$": {
+      "default": "",
+      "description": "Supported query dialect (e.g., Trino, GoogleSQL, Postgres, etc.).",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "catalogId": {
+      "default": "",
+      "description": "Catalog identifier.",
+      "type": "string"
+    },
+    "dataTypes": {
+      "description": "List of supported data types.",
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.Type.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "description": {
+      "default": "",
+      "description": "Description of the catalog.",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Additional metadata, if any.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "name": {
+      "default": "",
+      "description": "Catalog resource name, format: `catalogs/{catalog}` (e.g. catalogs/google-project-id, catalogs/postgres_database, etc.)",
+      "type": "string"
+    },
+    "queryDialect": {
+      "default": "",
+      "description": "Supported query dialect (e.g., Trino, GoogleSQL, Postgres, etc.).",
+      "type": "string"
+    }
+  },
+  "title": "Catalog",
+  "type": "object"
+}

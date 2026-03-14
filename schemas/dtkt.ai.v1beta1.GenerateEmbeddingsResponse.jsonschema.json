@@ -1,0 +1,17 @@
+{
+  "$id": "dtkt.ai.v1beta1.GenerateEmbeddingsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response containing the generated embeddings for the input text.",
+  "properties": {
+    "outputs": {
+      "description": "List of embedding outputs corresponding to the inputs.",
+      "items": {
+        "$ref": "dtkt.ai.v1beta1.EmbeddingOutput.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Generate Embeddings Response",
+  "type": "object"
+}

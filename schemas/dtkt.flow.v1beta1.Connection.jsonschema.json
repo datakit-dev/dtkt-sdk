@@ -1,0 +1,26 @@
+{
+  "$id": "dtkt.flow.v1beta1.Connection.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "minLength": 1,
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_]+$",
+      "type": "string"
+    },
+    "package": {
+      "$ref": "dtkt.shared.v1beta1.Package.Identity.jsonschema.json"
+    },
+    "services": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "title": "Connection",
+  "type": "object"
+}

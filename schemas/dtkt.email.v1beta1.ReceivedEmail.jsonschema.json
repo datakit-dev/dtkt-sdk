@@ -1,0 +1,21 @@
+{
+  "$id": "dtkt.email.v1beta1.ReceivedEmail.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a received Email",
+  "properties": {
+    "at": {
+      "default": "",
+      "type": "string"
+    },
+    "email": {
+      "$ref": "dtkt.email.v1beta1.Email.jsonschema.json"
+    },
+    "id": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Received Email",
+  "type": "object"
+}

@@ -1,0 +1,13 @@
+{
+  "$id": "dtkt.replication.v1beta1.GetSourceResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response for replication Source of given provider.",
+  "properties": {
+    "source": {
+      "$ref": "dtkt.replication.v1beta1.Source.jsonschema.json"
+    }
+  },
+  "title": "Get Source Response",
+  "type": "object"
+}

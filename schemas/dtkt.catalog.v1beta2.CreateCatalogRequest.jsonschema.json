@@ -1,0 +1,28 @@
+{
+  "$id": "dtkt.catalog.v1beta2.CreateCatalogRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Create catalog request.",
+  "patternProperties": {
+    "^(catalog_id)$": {
+      "description": "Catalog identifier, e.g. final segment in resource name: `catalogs/{catalog}`",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "catalog": {
+      "$ref": "dtkt.catalog.v1beta2.Catalog.jsonschema.json",
+      "description": "Catalog to create."
+    },
+    "catalogId": {
+      "description": "Catalog identifier, e.g. final segment in resource name: `catalogs/{catalog}`",
+      "type": "string"
+    }
+  },
+  "required": [
+    "catalogId",
+    "catalog"
+  ],
+  "title": "Create Catalog Request",
+  "type": "object"
+}

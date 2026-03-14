@@ -1,0 +1,36 @@
+{
+  "$id": "dtkt.core.v1.CreateDeploymentRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(deployment_id)$": {
+      "description": "Client-provided ID for deployment resource.",
+      "minLength": 1,
+      "pattern": "^[a-z0-9-]+$",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "deployment": {
+      "$ref": "dtkt.core.v1.Deployment.jsonschema.json",
+      "description": "Deployment to create (name ignored; server sets it)."
+    },
+    "deploymentId": {
+      "description": "Client-provided ID for deployment resource.",
+      "minLength": 1,
+      "pattern": "^[a-z0-9-]+$",
+      "type": "string"
+    },
+    "parent": {
+      "description": "Parent resource name: organizations/{organization} or users/{user}.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "parent",
+    "deploymentId",
+    "deployment"
+  ],
+  "title": "Create Deployment Request",
+  "type": "object"
+}

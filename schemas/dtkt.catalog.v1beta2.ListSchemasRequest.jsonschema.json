@@ -1,0 +1,56 @@
+{
+  "$id": "dtkt.catalog.v1beta2.ListSchemasRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request message for listing schemas.",
+  "patternProperties": {
+    "^(page_size)$": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0
+    },
+    "^(page_token)$": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "filter": {
+      "default": "",
+      "type": "string"
+    },
+    "pageSize": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0
+    },
+    "pageToken": {
+      "default": "",
+      "type": "string"
+    },
+    "parent": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "List Schemas Request",
+  "type": "object"
+}

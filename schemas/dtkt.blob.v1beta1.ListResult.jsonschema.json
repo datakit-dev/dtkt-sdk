@@ -1,0 +1,52 @@
+{
+  "$id": "dtkt.blob.v1beta1.ListResult.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(is_dir)$": {
+      "default": false,
+      "description": "IsDir indicates that this result represents a \"directory\" in the\n hierarchical namespace, ending in ListOptions.Delimiter. Key can be\n passed as ListOptions.Prefix to list items in the \"directory\".\n Fields other than Key and IsDir will not be set if IsDir is true.",
+      "type": "boolean"
+    },
+    "^(mod_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "ModTime is the time the blob was last modified."
+    }
+  },
+  "properties": {
+    "isDir": {
+      "default": false,
+      "description": "IsDir indicates that this result represents a \"directory\" in the\n hierarchical namespace, ending in ListOptions.Delimiter. Key can be\n passed as ListOptions.Prefix to list items in the \"directory\".\n Fields other than Key and IsDir will not be set if IsDir is true.",
+      "type": "boolean"
+    },
+    "key": {
+      "default": "",
+      "description": "Key for this blob result.",
+      "type": "string"
+    },
+    "md5": {
+      "default": "",
+      "description": "MD5 is an MD5 hash of the blob contents or nil if not available.",
+      "type": "string"
+    },
+    "modTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "ModTime is the time the blob was last modified."
+    },
+    "size": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Size is the size of the blob's content in bytes."
+    }
+  },
+  "title": "List Result",
+  "type": "object"
+}

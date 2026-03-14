@@ -1,0 +1,23 @@
+{
+  "$id": "dtkt.action.v1beta1.ExecuteActionRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "input": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "The input data to pass to the action. The required fields depend on the action's input schema."
+    },
+    "name": {
+      "default": "",
+      "description": "The action to run, e.g. `actions/send-email`. Select from the list of available actions.",
+      "minLength": 3,
+      "type": "string"
+    },
+    "timeout": {
+      "$ref": "google.protobuf.Duration.jsonschema.json",
+      "description": "How long to wait for the action to complete before cancelling. Leave unset to use the server default."
+    }
+  },
+  "title": "Execute Action Request",
+  "type": "object"
+}

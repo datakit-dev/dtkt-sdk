@@ -1,0 +1,33 @@
+{
+  "$id": "dtkt.core.v1.DeploymentMetadata.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "DeploymentMetadata contains metadata for deployment operations.",
+  "patternProperties": {
+    "^(start_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Start time."
+    },
+    "^(stop_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Stop time."
+    }
+  },
+  "properties": {
+    "message": {
+      "default": "",
+      "description": "Status message.",
+      "type": "string"
+    },
+    "startTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Start time."
+    },
+    "stopTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Stop time."
+    }
+  },
+  "title": "Deployment Metadata",
+  "type": "object"
+}

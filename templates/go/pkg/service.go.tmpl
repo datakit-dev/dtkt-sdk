@@ -1,0 +1,48 @@
+{{- $pkg := getPkgBySvcName $.SVC_NAME -}}
+{{- $goPkg := $pkg | goPkg -}}
+{{- $svcMethods := svcMethods $pkg $.SVC_NAME -}}
+{{- $import := $pkg | goImport -}}
+
+package pkg
+
+import (
+  "context"
+  codes "google.golang.org/grpc/codes"
+  status "google.golang.org/grpc/status"
+  grpc "google.golang.org/grpc"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk/v1beta1"
+  {{ $import }}
+)
+
+type {{ $.SVC_NAME }} struct {
+  {{ $goPkg }}.Unimplemented{{ $.SVC_NAME }}Server
+  mux v1beta1.InstanceMux[*Instance]
+}
+
+func New{{ $.SVC_NAME }}(mux v1beta1.InstanceMux[*Instance]) *{{ $.SVC_NAME }} {
+  return &{{ $.SVC_NAME }}{
+    mux: mux,
+  }
+}
+
+{{- range $method := $svcMethods }}
+{{ if and (ne $.SVC_NAME "ActionService") (ne $.SVC_NAME "BaseService") (ne $.SVC_NAME "EventService")  }}
+{{- if and $method.Unary (ne $method.Name "GetPackage") }}
+func (s *{{ $.SVC_NAME }}) {{ $method.Name }}(ctx context.Context, req *{{ $goPkg }}.{{ $method.InputName }}) (*{{ $goPkg }}.{{ $method.OutputName }}, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method {{ $method.Name }} not implemented")
+}
+{{- else if $method.ServerStream }}
+func (s *{{ $.SVC_NAME }}) {{ $method.Name }}(req *{{ $goPkg }}.{{ $method.InputName }}, stream grpc.ServerStreamingServer[{{ $goPkg }}.{{ $method.OutputName }}]) error {
+	return status.Errorf(codes.Unimplemented, "method {{ $method.Name }} not implemented")
+}
+{{- else if $method.ClientStream }}
+func (s *{{ $.SVC_NAME }}) {{ $method.Name }}(stream grpc.ClientStreamingServer[{{ $goPkg }}.{{ $method.InputName }}, {{ $goPkg }}.{{ $method.OutputName }}]) error {
+  return status.Errorf(codes.Unimplemented, "method {{ $method.Name }} not implemented")
+}
+{{- else if $method.BidiStream }}
+func (s *{{ $.SVC_NAME }}) {{ $method.Name }}(stream grpc.BidiStreamingServer[{{ $goPkg }}.{{ $method.InputName }}, {{ $goPkg }}.{{ $method.OutputName }}]) error {
+	return status.Errorf(codes.Unimplemented, "method {{ $method.Name }} not implemented")
+}
+{{- end }}
+{{- end }}
+{{- end }}

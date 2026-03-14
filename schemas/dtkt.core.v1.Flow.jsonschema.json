@@ -1,0 +1,75 @@
+{
+  "$id": "dtkt.core.v1.Flow.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Flow is a versioned workflow spec with parsed graph representation.",
+  "patternProperties": {
+    "^(create_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Flow create time."
+    },
+    "^(spec_etag)$": {
+      "default": "",
+      "description": "Flow spec checksum for concurrency control.",
+      "type": "string"
+    },
+    "^(spec_uri)$": {
+      "default": "",
+      "description": "Flow spec URI (optional).",
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    },
+    "^(update_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Flow update time."
+    }
+  },
+  "properties": {
+    "createTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Flow create time."
+    },
+    "graph": {
+      "$ref": "dtkt.core.v1.FlowGraphMetadata.jsonschema.json",
+      "description": "Flow graph metadata (versioned)."
+    },
+    "name": {
+      "type": "string"
+    },
+    "spec": {
+      "$ref": "dtkt.core.v1.FlowSpecMetadata.jsonschema.json",
+      "description": "Flow spec metadata (versioned)."
+    },
+    "specEtag": {
+      "default": "",
+      "description": "Flow spec checksum for concurrency control.",
+      "type": "string"
+    },
+    "specUri": {
+      "default": "",
+      "description": "Flow spec URI (optional).",
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    },
+    "uid": {
+      "description": "Server-assigned unique ID (UUID).",
+      "minLength": 1,
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "type": "string"
+    },
+    "updateTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Flow update time."
+    }
+  },
+  "required": [
+    "name",
+    "uid",
+    "spec",
+    "graph",
+    "createTime",
+    "updateTime"
+  ],
+  "title": "Flow",
+  "type": "object"
+}

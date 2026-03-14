@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package dtkt.email.v1beta1;
+
+import "dtkt/email/v1beta1/messages.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/email/v1beta1";
+
+// EmailService provides operations for sending emails.
+service EmailService {
+  // Sends an email message.
+  rpc SendEmail(SendEmailRequest) returns (SendEmailResponse);
+
+  // Sends a stream of email messages.
+  rpc SendEmails(stream SendEmailsRequest) returns (stream SendEmailsResponse);
+
+  // Sends a batch of email messages.
+  rpc SendBatchEmail(SendBatchEmailRequest) returns (SendBatchEmailResponse);
+
+  // Sends an email message with a template.
+  rpc SendEmailWithTemplate(SendEmailWithTemplateRequest) returns (SendEmailWithTemplateResponse);
+
+  // Sends a stream of email messages with a template.
+  rpc SendEmailsWithTemplate(stream SendEmailsWithTemplateRequest) returns (stream SendEmailsWithTemplateResponse);
+
+  // Sends a batch of email messages with a template.
+  rpc SendBatchEmailWithTemplate(SendBatchEmailWithTemplateRequest) returns (SendBatchEmailWithTemplateResponse);
+
+  // Get the list of email templates.
+  rpc ListEmailTemplates(ListEmailTemplatesRequest) returns (ListEmailTemplatesResponse);
+
+  // Get an email template by ID.
+  rpc GetEmailTemplate(GetEmailTemplateRequest) returns (GetEmailTemplateResponse);
+
+  // Creates an email template.
+  rpc CreateEmailTemplate(CreateEmailTemplateRequest) returns (CreateEmailTemplateResponse);
+
+  // Updates an email template.
+  rpc UpdateEmailTemplate(UpdateEmailTemplateRequest) returns (UpdateEmailTemplateResponse);
+
+  // Deletes an email template.
+  rpc DeleteEmailTemplate(DeleteEmailTemplateRequest) returns (DeleteEmailTemplateResponse);
+}

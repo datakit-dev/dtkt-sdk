@@ -1,0 +1,15 @@
+{
+  "$id": "dtkt.flow.v1beta1.Groups.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "groups": {
+      "items": {
+        "$ref": "dtkt.flow.v1beta1.Groups.Group.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Groups",
+  "type": "object"
+}

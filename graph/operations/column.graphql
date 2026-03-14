@@ -1,0 +1,62 @@
+fragment ColumnRefFragment on ColumnRef {
+  id
+  name
+  alias
+  description
+  dtype
+  ordinal
+  nullable
+  repeated
+  primaryKey
+  fields {
+    name
+    description
+    type {
+      nativeType
+      jsonType
+      geoType
+      metadata
+    }
+    nullable
+    repeated
+  }
+  createdAt
+  updatedAt
+  deletedAt
+  tableID
+}
+
+query GetColumn($id: ID!) {
+  column(id: $id) {
+    ...ColumnRefFragment
+  }
+}
+
+query ListColumns($orderBy: [ColumnRefOrder!], $where: ColumnRefWhereInput) {
+  columns(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...ColumnRefFragment
+      }
+    }
+    totalCount
+  }
+}
+
+mutation CreateColumn($input: CreateColumnInput!) {
+  createColumn(input: $input) {
+    created
+    error
+    columnRef {
+      ...ColumnRefFragment
+    }
+  }
+}
+
+mutation DeleteColumn($id: ID!, $softDelete: Boolean) {
+  deleteColumn(id: $id, softDelete: $softDelete) {
+    deleted
+    error
+    id
+  }
+}

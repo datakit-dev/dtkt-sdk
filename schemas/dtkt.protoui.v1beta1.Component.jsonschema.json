@@ -1,0 +1,97 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Component.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A Block represents a component in the UI that displays data from a message or field.",
+  "patternProperties": {
+    "^(code_block)$": {
+      "$ref": "dtkt.protoui.v1beta1.CodeBlock.jsonschema.json",
+      "description": "Render the data as a code block.  Only valid for string type data.\n Optionally, a language can be specified for syntax highlighting."
+    },
+    "^(description_list)$": {
+      "$ref": "dtkt.protoui.v1beta1.DescriptionList.jsonschema.json",
+      "description": "Render the data as a description list (key-value pairs)."
+    }
+  },
+  "properties": {
+    "avatar": {
+      "$ref": "dtkt.protoui.v1beta1.Avatar.jsonschema.json",
+      "description": "Render the data as an avatar."
+    },
+    "badge": {
+      "$ref": "dtkt.protoui.v1beta1.Badge.jsonschema.json",
+      "description": "Render the data as a badge.  Only valid for string type data."
+    },
+    "card": {
+      "$ref": "dtkt.protoui.v1beta1.Card.jsonschema.json",
+      "description": "Render the data as a card.  Can contain other components."
+    },
+    "codeBlock": {
+      "$ref": "dtkt.protoui.v1beta1.CodeBlock.jsonschema.json",
+      "description": "Render the data as a code block.  Only valid for string type data.\n Optionally, a language can be specified for syntax highlighting."
+    },
+    "custom": {
+      "$ref": "google.protobuf.Any.jsonschema.json",
+      "description": "Custom component.  The data will be passed to the custom component as is."
+    },
+    "description": {
+      "$ref": "dtkt.protoui.v1beta1.Description.jsonschema.json"
+    },
+    "descriptionList": {
+      "$ref": "dtkt.protoui.v1beta1.DescriptionList.jsonschema.json",
+      "description": "Render the data as a description list (key-value pairs)."
+    },
+    "divider": {
+      "$ref": "dtkt.protoui.v1beta1.Divider.jsonschema.json",
+      "description": "Render the data as a divider/separator."
+    },
+    "error": {
+      "$ref": "dtkt.protoui.v1beta1.Error.jsonschema.json"
+    },
+    "heading": {
+      "$ref": "dtkt.protoui.v1beta1.Heading.jsonschema.json",
+      "description": "Render as a heading.  Only valid for string type data."
+    },
+    "id": {
+      "type": "string"
+    },
+    "label": {
+      "$ref": "dtkt.protoui.v1beta1.Label.jsonschema.json",
+      "description": "Render as a label.  Only valid for string type data."
+    },
+    "list": {
+      "$ref": "dtkt.protoui.v1beta1.List.jsonschema.json",
+      "description": "Render the data as a list.  Only valid for repeated scalar fields."
+    },
+    "markdown": {
+      "$ref": "dtkt.protoui.v1beta1.Markdown.jsonschema.json",
+      "description": "Render as markdown.  Only valid for string type data."
+    },
+    "metadata": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "Arbitrary metadata that can be used by the UI renderer."
+    },
+    "progress": {
+      "$ref": "dtkt.protoui.v1beta1.Progress.jsonschema.json",
+      "description": "Render the data as progress.  Only valid for numeric type data."
+    },
+    "secret": {
+      "$ref": "dtkt.protoui.v1beta1.Secret.jsonschema.json",
+      "description": "Render the data as a secret (masked text with reveal option)."
+    },
+    "table": {
+      "$ref": "dtkt.protoui.v1beta1.Table.jsonschema.json",
+      "description": "Render the data as a table.  Only valid for repeated Message fields."
+    },
+    "text": {
+      "$ref": "dtkt.protoui.v1beta1.Text.jsonschema.json",
+      "description": "Render the data as text with optional styling."
+    },
+    "tree": {
+      "$ref": "dtkt.protoui.v1beta1.Tree.jsonschema.json",
+      "description": "Render the data as a tree structure.  Only valid for hierarchical data."
+    }
+  },
+  "title": "Component",
+  "type": "object"
+}

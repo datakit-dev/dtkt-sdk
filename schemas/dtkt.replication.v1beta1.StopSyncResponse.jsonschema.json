@@ -1,0 +1,13 @@
+{
+  "$id": "dtkt.replication.v1beta1.StopSyncResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "source": {
+      "$ref": "dtkt.replication.v1beta1.Source.jsonschema.json",
+      "description": "The returned Source."
+    }
+  },
+  "title": "Stop Sync Response",
+  "type": "object"
+}

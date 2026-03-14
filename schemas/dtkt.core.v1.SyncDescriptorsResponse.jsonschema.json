@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.SyncDescriptorsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "file": {
+      "$ref": "dtkt.core.v1.File.jsonschema.json",
+      "description": "File containing protobuf descriptors."
+    }
+  },
+  "required": [
+    "file"
+  ],
+  "title": "Sync Descriptors Response",
+  "type": "object"
+}

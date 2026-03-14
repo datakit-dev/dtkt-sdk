@@ -1,0 +1,15 @@
+{
+  "$id": "dtkt.catalog.v1beta2.GetCatalogRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request to retrieve a catalog by name.",
+  "properties": {
+    "name": {
+      "default": "",
+      "description": "Catalog resource to retreve.",
+      "type": "string"
+    }
+  },
+  "title": "Get Catalog Request",
+  "type": "object"
+}

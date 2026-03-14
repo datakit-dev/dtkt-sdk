@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@dtkt/sdk",
+  "version": "0.0.1",
+  "private": true,
+  "description": "DataKit TypeScript SDK.",
+  "keywords": [],
+  "homepage": "https://github.com/datakit-dev/dtkt-sdk",
+  "license": "BUSL-1.1",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "type": "module",
+  "exports": {
+    "./cloud/*": "./src/cloud/*.ts",
+    "./proto/*": "./src/proto/*.ts",
+    "./protoformsdk/*": "./src/protoformsdk/*.ts"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "format": "eslint --fix .",
+    "graphql-codegen": "graphql-codegen --config codegen.ts",
+    "postinstall": "printf '\\n📦 DataKit TypeScript SDK installed.\\n🔗 Developer docs: https://withdatakit.com/developers\\n🖥️  Happy coding!\\n'",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "catalog:proto",
+    "@bufbuild/protoplugin": "catalog:proto",
+    "@bufbuild/protovalidate": "catalog:proto",
+    "@connectrpc/connect": "catalog:proto",
+    "@connectrpc/connect-fastify": "catalog:proto",
+    "@connectrpc/connect-node": "catalog:proto",
+    "@connectrpc/connect-web": "catalog:proto",
+    "@connectrpc/validate": "catalog:proto",
+    "cors": "^2.8.6",
+    "fastify": "^5.7.1",
+    "pino": "catalog:observability"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "catalog:proto",
+    "@dtkt/eslint-config": "workspace:*",
+    "@dtkt/typescript-config": "workspace:*",
+    "@graphql-codegen/cli": "catalog:graphql",
+    "@graphql-codegen/typescript": "catalog:graphql",
+    "@graphql-codegen/typescript-generic-sdk": "catalog:graphql",
+    "@graphql-codegen/typescript-operations": "catalog:graphql",
+    "@graphql-typed-document-node/core": "catalog:graphql",
+    "@types/node": "catalog:default",
+    "@types/relay-runtime": "catalog:graphql",
+    "@vitest/coverage-v8": "catalog:test",
+    "eslint": "catalog:default",
+    "graphql": "catalog:graphql",
+    "graphql-tag": "catalog:graphql",
+    "relay-runtime": "catalog:graphql",
+    "tsdown": "catalog:default",
+    "typescript": "catalog:default",
+    "vitest": "catalog:test"
+  },
+  "publishConfig": {
+    "dependencies": {},
+    "devDependencies": {},
+    "exports": {
+      "./cloud/*": "./dist/cloud/*.mjs",
+      "./proto/*": "./dist/proto/*.mjs",
+      "./protoformsdk/*": "./dist/protoformsdk/*.mjs"
+    }
+  }
+}

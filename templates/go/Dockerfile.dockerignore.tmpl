@@ -1,0 +1,19 @@
+# Ignore everything
+*
+
+# Allow only what this Dockerfile needs
+!dtkt-integrations/packages/{{ $.PKG_SLUG }}/go.mod
+!dtkt-integrations/packages/{{ $.PKG_SLUG }}/go.sum
+!dtkt-integrations/packages/{{ $.PKG_SLUG }}/package.dtkt.yaml
+!dtkt-integrations/packages/{{ $.PKG_SLUG }}/main.go
+!dtkt-integrations/packages/{{ $.PKG_SLUG }}/pkg
+!dtkt-sdk/sdk-go
+
+# Re-ignore Go build/test artifacts in allowed dirs
+**/bin
+**/cover.out
+**/test.log
+**/*_test.go
+**/test
+**/testdata
+**/mocks

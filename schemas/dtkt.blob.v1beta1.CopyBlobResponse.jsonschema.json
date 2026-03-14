@@ -1,0 +1,47 @@
+{
+  "$id": "dtkt.blob.v1beta1.CopyBlobResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(destination_key)$": {
+      "default": "",
+      "description": "Destination key of the copied blob.",
+      "type": "string"
+    },
+    "^(mod_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Modification time reported after copy."
+    }
+  },
+  "properties": {
+    "destinationKey": {
+      "default": "",
+      "description": "Destination key of the copied blob.",
+      "type": "string"
+    },
+    "etag": {
+      "default": "",
+      "description": "ETag assigned at destination.",
+      "type": "string"
+    },
+    "modTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Modification time reported after copy."
+    },
+    "size": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Size of the copied blob."
+    }
+  },
+  "title": "Copy Blob Response",
+  "type": "object"
+}

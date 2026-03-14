@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package {{ $.PROTO_PKG }};
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-integrations/{{ $.PKG_SLUG }}/pkg/{{ $.PROTO_PATH }}";
+
+message Config {
+  string greeting = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 256
+  ];
+
+{{- if hasPkg "action" "v1beta1" }}
+  string echo_prefix = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 256
+  ];
+{{- end }}
+}

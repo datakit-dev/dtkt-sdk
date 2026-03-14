@@ -1,0 +1,44 @@
+name: Lint, Build, & Test TypeScript SDK
+
+on:
+  pull_request:
+    branches:
+    - main
+    paths:
+    - sdk-ts/**
+    - .github/workflows/sdk-ts.yaml
+
+jobs:
+  lint-build-test:
+    name: Lint, Build, & Test
+    runs-on: ${{ vars.RUNNER }}
+
+    steps:
+    - uses: datakit-dev/dtkt-dev/.github/actions/setup-monorepo@main
+      with:
+        dtkt-core-sparse-checkout: packages
+        dtkt-github-actions-app-id: ${{ vars.DTKT_GITHUB_ACTIONS_APP_ID }}
+        dtkt-github-actions-private-key: ${{ secrets.DTKT_GITHUB_ACTIONS_PRIVATE_KEY }}
+
+    - uses: datakit-dev/dtkt-dev/.github/actions/setup@main
+      with:
+        task: true
+        node: true
+        versions: ${{ vars.VERSIONS }}
+        pnpm-cache-dependency-path: ./dtkt-universe/pnpm-lock.yaml
+
+    - name: Setup
+      run: task setup
+      working-directory: ./dtkt-universe/dtkt-sdk/sdk-ts
+
+    - name: Lint
+      run: task lint
+      working-directory: ./dtkt-universe/dtkt-sdk/sdk-ts
+
+    - name: Build
+      run: task build
+      working-directory: ./dtkt-universe/dtkt-sdk/sdk-ts
+
+    - name: Test
+      run: task test
+      working-directory: ./dtkt-universe/dtkt-sdk/sdk-ts

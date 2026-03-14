@@ -1,0 +1,14 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Description.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Render as a form description/help text.\n Maps to description/help text in form components\n Example expr: `this.help_text` or `\"This field is \" + (this.required ? \"required\" : \"optional\")`",
+  "properties": {
+    "content": {
+      "$ref": "dtkt.protoui.v1beta1.Data.jsonschema.json",
+      "description": "The description text. Can be plain text, a CEL expression, or a template.\n Context: `this` is the message or field being rendered."
+    }
+  },
+  "title": "Description",
+  "type": "object"
+}

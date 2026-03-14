@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package dtkt.action.v1beta1;
+
+import "buf/validate/validate.proto";
+import "dtkt/protoform/v1beta1/protoform.proto";
+import "dtkt/shared/v1beta1/messages.proto";
+import "google/api/resource.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/duration.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/action/v1beta1";
+
+message Action {
+  option (google.api.resource) = {
+    type: "Action"
+    singular: "action"
+    plural: "actions"
+    pattern: "actions/{action}"
+  };
+
+  // Unique identifier for this action, e.g. `actions/send-email`.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // The name shown to users in the UI, e.g. "Send Email".
+  string display_name = 2;
+
+  // A short explanation of what this action does, shown to users when selecting or reviewing it.
+  string description = 3;
+
+  // Describes the shape of data the user must provide when executing this action.
+  dtkt.shared.v1beta1.TypeSchema input = 4;
+
+  // Describes the shape of data returned to the user after execution.
+  dtkt.shared.v1beta1.TypeSchema output = 5;
+}
+
+message ListActionsRequest {
+  // Number of actions to return per page. Leave empty for the server default.
+  int32 page_size = 1 [
+    (buf.validate.field).int32.gte = 0,
+    (buf.validate.field).int32.lte = 1000
+  ];
+
+  // Token from a previous response's `next_page_token` to retrieve the next page of results.
+  string page_token = 2;
+
+  // Optional filter expression to narrow results. Supported fields: `display_name`, `version`, `labels.<key>`, `disabled`.
+  string filter = 3;
+}
+
+message ListActionsResponse {
+  // The list of actions matching the request.
+  repeated Action actions = 1;
+
+  // Pass this value as `page_token` in your next request to retrieve the following page. Empty when there are no more results.
+  string next_page_token = 2;
+}
+
+message GetActionRequest {
+  // The action to retrieve, e.g. `actions/send-email`.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).title = "Select an action",
+    (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.action.v1beta1.ActionService.ListActions",
+    (dtkt.protoform.v1beta1.field).select.key_expr = "this.actions.map(i, i.display_name)",
+    (dtkt.protoform.v1beta1.field).select.val_expr = "this.actions.map(i, i.name)"
+  ];
+}
+
+message GetActionResponse {
+  // The requested action, including its input/output schema and metadata.
+  Action action = 1;
+}
+
+message ExecuteActionRequest {
+  // The action to run, e.g. `actions/send-email`. Select from the list of available actions.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).title = "Select an action to execute",
+    (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.action.v1beta1.ActionService.ListActions",
+    (dtkt.protoform.v1beta1.field).select.key_expr = "this.actions.map(i, i.display_name)",
+    (dtkt.protoform.v1beta1.field).select.val_expr = "this.actions.map(i, i.name)"
+  ];
+
+  // The input data to pass to the action. The required fields depend on the action's input schema.
+  google.protobuf.Any input = 2;
+
+  // How long to wait for the action to complete before cancelling. Leave unset to use the server default.
+  google.protobuf.Duration timeout = 3;
+}
+
+message ExecuteActionResponse {
+  // The name of the action that was executed.
+  string name = 1;
+
+  // A unique ID for this execution run, useful for looking up logs or reporting issues.
+  string run_id = 2;
+
+  // An alternate binary encoding of the output, if provided by the action.
+  google.protobuf.Any output = 3;
+
+  // A human-readable summary of the result or any relevant status information.
+  string message = 20;
+}

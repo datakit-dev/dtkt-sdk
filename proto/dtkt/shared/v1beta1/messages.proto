@@ -1,0 +1,281 @@
+/**
+ * Shared types used across various services in the DataKit SDK.
+ * This file defines commonly used messages and structures.
+ */
+syntax = "proto3";
+
+package dtkt.shared.v1beta1;
+
+import "buf/validate/validate.proto";
+import "dtkt/protoform/v1beta1/protoform.proto";
+import "dtkt/protoui/v1beta1/protoui.proto";
+import "dtkt/shared/v1beta1/enums.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1";
+
+// Package provides an identity and metadata for a DataKit Integration.
+message Package {
+  option (dtkt.protoui.v1beta1.message) = {
+    components: [
+      {
+        text: {
+          content: {expr: "this.identity.name+'@'+this.identity.version"}
+        }
+      }
+    ]
+  };
+
+  message Identity {
+    string name = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
+    ];
+    string version = 2 [(buf.validate.field).string.pattern = "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"];
+  }
+
+  // Identity name (camel, snake, or pascal case) and version (semver) of integration.
+  Identity identity = 1 [(buf.validate.field).required = true];
+
+  // A helpful description of features and capabilities.
+  string description = 2;
+
+  // An icon image uri (optional).
+  string icon = 3 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^https://|^data:image/[a-z]+;base64,.+"
+  ];
+
+  // Source language & SDK of integration (required).
+  PackageType type = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+
+  // Compatible target runtimes of integration (optional; defaults to all runtimes).
+  repeated Runtime runtimes = 5;
+
+  // Compatible target platforms of integration (optional; defaults to all platforms).
+  repeated Platform platforms = 6;
+
+  // TODO: Add compatible networks.
+
+  message BuildConfig {
+    // Build environment variables.
+    map<string, string> env = 1 [(buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE];
+
+    message BinaryArtifact {}
+
+    message ImageArtifact {}
+
+    oneof artifact {
+      BinaryArtifact binary = 10;
+      ImageArtifact image = 11;
+    }
+  }
+
+  // Build configuration.
+  BuildConfig build = 7;
+
+  message DeployConfig {
+    // TODO: Default network
+
+    // Deploy environment variables.
+    map<string, string> env = 1 [(buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE];
+
+    message Port {
+      string name = 1 [(buf.validate.field).required = true];
+      string description = 2 [(buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE];
+      string protocol = 3 [(buf.validate.field).required = true];
+      string port = 4 [(buf.validate.field).required = true];
+    }
+
+    // Ports exposed by package (excluding assigned gRPC bind address).
+    repeated Port ports = 2 [(buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE];
+  }
+
+  // Deploy configuration.
+  DeployConfig deploy = 8;
+}
+
+// Operating system and CPU architecture pair.
+message Platform {
+  OS os = 2 [(buf.validate.field).required = true];
+  Arch arch = 3 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).enum.defined_only = true
+  ];
+}
+
+// Represents a field within a table, query, input/output, etc.
+message Field {
+  // Name of the field.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Data type of the field.
+  DataType type = 2 [(buf.validate.field).required = true];
+
+  // Description of the field.
+  string description = 3;
+
+  // Indicates if the field allows null values (i.e. is not required).
+  bool nullable = 4;
+
+  // Indicates if the field contains repeated values (i.e. an array of the given type).
+  bool repeated = 5;
+
+  // Nested fields, if the field is a complex type (i.e. the type represents an object or map type).
+  repeated Field fields = 6;
+
+  // Protoform field element for runtime UI configuration.
+  dtkt.protoform.v1beta1.FieldElement element = 7;
+}
+
+// Represents a parameterized value used in a query, input/output, etc.
+message Param {
+  // Field describing the param data.
+  Field field = 1;
+
+  // Value of the parameter, if any.
+  google.protobuf.Any value = 2;
+}
+
+// Represents a list of strings as a message.
+message StringList {
+  repeated string values = 1;
+}
+
+// Represents a map of string keys to arbitrary protobuf values.
+message AnyMap {
+  map<string, google.protobuf.Any> values = 1;
+}
+
+// TypeSchema provides a URI, JSON Schema, and fully qualified proto type name.
+message TypeSchema {
+  // URI of this type.
+  string uri = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uri = true
+  ];
+
+  // JSON Schema of referenced type; $id field within schema must be prefixed by
+  // uri field above.
+  google.protobuf.Struct json_schema = 2 [(buf.validate.field).required = true];
+
+  // Fully qualified Proto Type name (e.g., "dtkt.email.v1beta1.SendEmailRequest")
+  // which resolves to a protobuf message or enum type which must be compatible
+  // with above JSON Schema.
+  string proto_name = 3 [(buf.validate.field).required = true];
+
+  // Last modified time.
+  google.protobuf.Timestamp mod_time = 10 [(buf.validate.field).required = true];
+}
+
+// Represents a native data type with json, geo, and metadata details.
+message DataType {
+  // Name of the native type.
+  string native_type = 1;
+
+  // Corresponding JSON type representation, if any.
+  JSONType json_type = 2;
+
+  // Corresponding Geo type representation, if any.
+  GeoType geo_type = 3;
+
+  // Additional metadata, if any.
+  google.protobuf.Struct metadata = 4;
+}
+
+// -----------------------------------------------------------------------------
+// OAuth config (maps to oauth2.Config; secrets flow TO Integration only)
+// -----------------------------------------------------------------------------
+
+message OAuthConfig {
+  string client_id = 1 [(buf.validate.field).string.min_len = 1];
+  string client_secret = 2; // inbound-only; never returned
+
+  OAuthEndpoint endpoint = 3;
+
+  // Optional redirect URL (can also be supplied per-request).
+  string redirect_url = 4 [(buf.validate.field).string.uri = true];
+
+  // Requested permissions.
+  repeated string scopes = 5 [(buf.validate.field).repeated.unique = true];
+
+  // Optional: how to auth against token endpoint.
+  AuthStyle auth_style = 6;
+
+  // Provider-specific extra params (e.g., access_type=offline, prompt=consent).
+  map<string, string> params = 7;
+}
+
+message OAuthEndpoint {
+  string auth_url = 1 [(buf.validate.field).string.uri = true];
+  string token_url = 2 [(buf.validate.field).string.uri = true];
+  string device_auth_url = 3 [(buf.validate.field).string.uri = true]; // optional; device flow
+}
+
+// -----------------------------------------------------------------------------
+// Step 1: request an authorization URL (3-legged OAuth)
+// -----------------------------------------------------------------------------
+
+message OAuthCodeRequest {
+  // CSRF protection (highly recommended).
+  string state = 1;
+
+  // Must match provider registration (may also live in OAuthConfig).
+  string redirect_url = 2 [(buf.validate.field).string.uri = true];
+
+  // PKCE (optional but recommended).
+  string code_challenge = 3;
+  CodeChallengeMethod code_challenge_method = 4;
+
+  // Optional: override/augment scopes or pass extra params.
+  repeated string scopes = 5 [(buf.validate.field).repeated.unique = true];
+  map<string, string> params = 6;
+}
+
+// -----------------------------------------------------------------------------
+// Step 2: exchange authorization code for tokens
+// -----------------------------------------------------------------------------
+
+message OAuthTokenRequest {
+  string code = 1 [(buf.validate.field).string.min_len = 1];
+  string redirect_url = 2 [(buf.validate.field).string.uri = true];
+
+  // PKCE verifier if PKCE was used.
+  string code_verifier = 3;
+
+  map<string, string> params = 10; // provider extras
+}
+
+// -----------------------------------------------------------------------------
+// Step 3: refresh credentials
+// -----------------------------------------------------------------------------
+
+message OAuthRefreshRequest {
+  // Typically empty: integration uses its stored refresh token.
+  // Allow optional override to support migrations or manual repairs.
+  string refresh_token = 1;
+  map<string, string> params = 10;
+}
+
+// -----------------------------------------------------------------------------
+// Token (inbound-only; never returned by BaseService)
+// -----------------------------------------------------------------------------
+
+message OAuthToken {
+  string access_token = 1;
+  string token_type = 2;
+  string refresh_token = 3; // inbound-only
+  google.protobuf.Timestamp expiry = 4;
+  int64 expires_in = 5; // wire convenience; libs should derive expiry from this when present
+}
+
+message PageToken {
+  int64 id = 1 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp time = 2 [(buf.validate.field).required = true];
+}

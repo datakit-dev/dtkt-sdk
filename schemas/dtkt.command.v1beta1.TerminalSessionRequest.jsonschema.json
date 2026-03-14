@@ -1,0 +1,19 @@
+{
+  "$id": "dtkt.command.v1beta1.TerminalSessionRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The request for a terminal session and streaming in input.",
+  "properties": {
+    "input": {
+      "$ref": "dtkt.command.v1beta1.CommandInput.jsonschema.json"
+    },
+    "resize": {
+      "$ref": "dtkt.command.v1beta1.TerminalSessionRequest.ResizeEvent.jsonschema.json"
+    },
+    "start": {
+      "$ref": "dtkt.command.v1beta1.TerminalSessionRequest.StartEvent.jsonschema.json"
+    }
+  },
+  "title": "Terminal Session Request",
+  "type": "object"
+}

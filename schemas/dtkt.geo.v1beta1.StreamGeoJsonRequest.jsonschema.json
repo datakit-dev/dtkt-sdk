@@ -1,0 +1,37 @@
+{
+  "$id": "dtkt.geo.v1beta1.StreamGeoJsonRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(geo_field)$": {
+      "default": "",
+      "type": "string"
+    },
+    "^(prop_fields)$": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "properties": {
+    "bounds": {
+      "$ref": "dtkt.geo.v1beta1.Bounds.jsonschema.json"
+    },
+    "geoField": {
+      "default": "",
+      "type": "string"
+    },
+    "propFields": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "source": {
+      "$ref": "dtkt.geo.v1beta1.GeoSource.jsonschema.json"
+    }
+  },
+  "title": "Stream Geo Json Request",
+  "type": "object"
+}

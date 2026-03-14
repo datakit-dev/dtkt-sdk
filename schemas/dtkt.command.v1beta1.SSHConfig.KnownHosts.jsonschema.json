@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.command.v1beta1.SSHConfig.KnownHosts.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Known hosts configuration",
+  "patternProperties": {
+    "^(file_paths)$": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "properties": {
+    "filePaths": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Known Hosts",
+  "type": "object"
+}

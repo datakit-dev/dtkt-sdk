@@ -1,0 +1,17 @@
+{
+  "$id": "dtkt.core.v1.EncryptResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "EncryptResponse returns the encrypted resource.",
+  "properties": {
+    "resource": {
+      "$ref": "dtkt.core.v1.Resource.jsonschema.json",
+      "description": "Resource with encrypted data."
+    }
+  },
+  "required": [
+    "resource"
+  ],
+  "title": "Encrypt Response",
+  "type": "object"
+}

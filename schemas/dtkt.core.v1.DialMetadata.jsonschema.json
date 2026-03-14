@@ -1,0 +1,41 @@
+{
+  "$id": "dtkt.core.v1.DialMetadata.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "message": {
+      "default": "",
+      "description": "Connection dial message.",
+      "type": "string"
+    },
+    "state": {
+      "anyOf": [
+        {
+          "pattern": "^STATE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "STATE_CONNECTED",
+            "STATE_FAILED"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Connection dial state.",
+      "title": "State"
+    },
+    "time": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Connection dial time."
+    }
+  },
+  "title": "Dial Metadata",
+  "type": "object"
+}

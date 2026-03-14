@@ -1,0 +1,22 @@
+{
+  "$id": "dtkt.catalog.v1beta2.WriteRowsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request message for writing to a table.",
+  "properties": {
+    "row": {
+      "$ref": "dtkt.catalog.v1beta2.Row.jsonschema.json",
+      "description": "A single row to be written to table and conforming to the description found\n in value.proto."
+    },
+    "table": {
+      "description": "Table resource name to write row.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "table",
+    "row"
+  ],
+  "title": "Write Rows Request",
+  "type": "object"
+}

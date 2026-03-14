@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/geo/v1beta1";
+
+package dtkt.geo.v1beta1;
+
+import "google/protobuf/duration.proto";
+import "dtkt/catalog/v1beta1/messages.proto";
+import "dtkt/geojson/v1beta1/messages.proto";
+import "dtkt/geo/v1beta1/enums.proto";
+
+message GeoSource {
+  string id = 1;
+  repeated string geo_fields = 2;
+  repeated PropertyField prop_fields = 3;
+  google.protobuf.Duration update_freq = 4;
+  oneof source {
+    dtkt.catalog.v1beta1.Table table = 5;
+    dtkt.catalog.v1beta1.Query query = 6;
+  }
+}
+
+message PropertyField {
+  string name = 1;
+  PropertyType type = 2;
+}
+
+message Bounds {
+  BoundsType type = 1;
+  dtkt.geojson.v1beta1.Geometry geom = 2;
+  bool centroid = 3;
+}
+
+message ListGeoSourcesRequest {
+  oneof scope {
+    dtkt.catalog.v1beta1.Catalog catalog = 1;
+    dtkt.catalog.v1beta1.Schema schema = 2;
+  }
+}
+
+message ListGeoSourcesResponse {
+  GeoSource geo_source = 1;
+}
+
+message StreamGeoJsonRequest {
+  GeoSource source = 1;
+  Bounds bounds = 2;
+  string geo_field = 3;
+  repeated string prop_fields = 4;
+}
+
+message StreamGeoJsonResponse {
+  dtkt.geojson.v1beta1.GeoJSON result = 1;
+}

@@ -1,0 +1,22 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Confirm.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Confirmation dialog with accept, decline, and cancel options.\n Maps to dialog/confirmation components with buttons\n Example expr: accept: `\"Yes, \" + this.action`, decline: `\"No, cancel \" + this.action`",
+  "properties": {
+    "accept": {
+      "$ref": "dtkt.protoui.v1beta1.Data.jsonschema.json",
+      "description": "Accept button text. Can be plain text, a CEL expression, or a template.\n Context: `this` is the message or field being rendered."
+    },
+    "cancel": {
+      "$ref": "dtkt.protoui.v1beta1.Data.jsonschema.json",
+      "description": "Cancel button text. Can be plain text, a CEL expression, or a template.\n Context: `this` is the message or field being rendered."
+    },
+    "decline": {
+      "$ref": "dtkt.protoui.v1beta1.Data.jsonschema.json",
+      "description": "Decline button text. Can be plain text, a CEL expression, or a template.\n Context: `this` is the message or field being rendered."
+    }
+  },
+  "title": "Confirm",
+  "type": "object"
+}

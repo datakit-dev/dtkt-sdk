@@ -1,0 +1,18 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Input.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Input element with multi-line text option\n Maps to Input or Textarea in @dtkt/ui/input or @dtkt/ui/textarea",
+  "patternProperties": {
+    "^(multiline_text)$": {
+      "type": "boolean"
+    }
+  },
+  "properties": {
+    "multilineText": {
+      "type": "boolean"
+    }
+  },
+  "title": "Input",
+  "type": "object"
+}

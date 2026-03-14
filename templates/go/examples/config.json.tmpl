@@ -1,0 +1,8 @@
+{
+{{- if $.PROTO_ENABLED }}
+  "greeting": "Hello",
+{{- end }}
+{{- if hasPkg "action" "v1beta1" }}
+  "echo_prefix": "Echo: "
+{{- end }}
+}

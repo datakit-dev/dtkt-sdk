@@ -1,0 +1,77 @@
+{
+  "$id": "dtkt.core.v1.Auth.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Auth contains authentication information for API requests.",
+  "patternProperties": {
+    "^(access_token)$": {
+      "default": "",
+      "description": "Access token (JWT) or Personal Access Token (PAT).",
+      "type": "string"
+    },
+    "^(expires_at)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Token expiration timestamp."
+    },
+    "^(refresh_token)$": {
+      "default": "",
+      "description": "Refresh token (for token renewal).",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "accessToken": {
+      "default": "",
+      "description": "Access token (JWT) or Personal Access Token (PAT).",
+      "type": "string"
+    },
+    "expiresAt": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Token expiration timestamp."
+    },
+    "method": {
+      "anyOf": [
+        {
+          "enum": [
+            "AUTH_METHOD_OAUTH",
+            "AUTH_METHOD_DEVICE",
+            "AUTH_METHOD_BEARER"
+          ],
+          "type": "string"
+        },
+        {
+          "exclusiveMaximum": 0,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "exclusiveMinimum": 0,
+          "maximum": 2147483647,
+          "type": "integer"
+        }
+      ],
+      "description": "Authentication method used.",
+      "title": "Auth Method"
+    },
+    "org": {
+      "description": "Scope requests to an organization (if applicable).",
+      "minLength": 1,
+      "type": "string"
+    },
+    "refreshToken": {
+      "default": "",
+      "description": "Refresh token (for token renewal).",
+      "type": "string"
+    },
+    "space": {
+      "description": "Scope requests to a space (if applicable).",
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "method"
+  ],
+  "title": "Auth",
+  "type": "object"
+}

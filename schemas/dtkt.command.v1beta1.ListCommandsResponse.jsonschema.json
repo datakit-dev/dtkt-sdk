@@ -1,0 +1,15 @@
+{
+  "$id": "dtkt.command.v1beta1.ListCommandsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "commands": {
+      "items": {
+        "$ref": "dtkt.command.v1beta1.Command.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "List Commands Response",
+  "type": "object"
+}

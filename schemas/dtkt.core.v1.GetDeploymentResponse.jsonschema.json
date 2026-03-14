@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.GetDeploymentResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "deployment": {
+      "$ref": "dtkt.core.v1.Deployment.jsonschema.json",
+      "description": "The requested deployment."
+    }
+  },
+  "required": [
+    "deployment"
+  ],
+  "title": "Get Deployment Response",
+  "type": "object"
+}

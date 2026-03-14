@@ -1,0 +1,21 @@
+{
+  "$id": "dtkt.core.v1.DeleteDeploymentRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "etag": {
+      "description": "Etag must match current deployment etag for delete to succeed (ensures\n deployment is up-to-date and prevents lost deletes).",
+      "type": "string"
+    },
+    "name": {
+      "description": "Name of deployment to delete.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "etag"
+  ],
+  "title": "Delete Deployment Request",
+  "type": "object"
+}

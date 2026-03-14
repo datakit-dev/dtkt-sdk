@@ -1,0 +1,14 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Error.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Render as a form error message.\n Maps to error message display in form components\n Example expr: `this.error` or `this.field_name + \" is invalid\"`",
+  "properties": {
+    "content": {
+      "$ref": "dtkt.protoui.v1beta1.Data.jsonschema.json",
+      "description": "The error message. Can be plain text, a CEL expression, or a template.\n Context: `this` is the message or field being rendered."
+    }
+  },
+  "title": "Error",
+  "type": "object"
+}

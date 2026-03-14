@@ -1,0 +1,32 @@
+{
+  "$id": "google.longrunning.Operation.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "This resource represents a long-running operation that is the result of a\n network API call.",
+  "properties": {
+    "done": {
+      "default": false,
+      "description": "If the value is `false`, it means the operation is still in progress.\n If `true`, the operation is completed, and either `error` or `response` is\n available.",
+      "type": "boolean"
+    },
+    "error": {
+      "$ref": "google.rpc.Status.jsonschema.json",
+      "description": "The error result of the operation in case of failure or cancellation."
+    },
+    "metadata": {
+      "$ref": "google.protobuf.Any.jsonschema.json",
+      "description": "Service-specific metadata associated with the operation.  It typically\n contains progress information and common metadata such as create time.\n Some services might not provide such metadata.  Any method that returns a\n long-running operation should document the metadata type, if any."
+    },
+    "name": {
+      "default": "",
+      "description": "The server-assigned name, which is only unique within the same service that\n originally returns it. If you use the default HTTP mapping, the\n `name` should be a resource name ending with `operations/{unique_id}`.",
+      "type": "string"
+    },
+    "response": {
+      "$ref": "google.protobuf.Any.jsonschema.json",
+      "description": "The normal, successful response of the operation.  If the original\n method returns no data on success, such as `Delete`, the response is\n `google.protobuf.Empty`.  If the original method is standard\n `Get`/`Create`/`Update`, the response should be the resource.  For other\n methods, the response should have the type `XxxResponse`, where `Xxx`\n is the original method name.  For example, if the original method name\n is `TakeSnapshot()`, the inferred response type is\n `TakeSnapshotResponse`."
+    }
+  },
+  "title": "Operation",
+  "type": "object"
+}

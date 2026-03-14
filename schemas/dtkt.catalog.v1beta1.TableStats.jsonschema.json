@@ -1,0 +1,64 @@
+{
+  "$id": "dtkt.catalog.v1beta1.TableStats.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "TableStats contains statistics about a table.",
+  "patternProperties": {
+    "^(total_bytes)$": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The total size of the table in bytes."
+    },
+    "^(total_rows)$": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The total number of rows in the table."
+    }
+  },
+  "properties": {
+    "totalBytes": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The total size of the table in bytes."
+    },
+    "totalRows": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The total number of rows in the table."
+    }
+  },
+  "title": "Table Stats",
+  "type": "object"
+}

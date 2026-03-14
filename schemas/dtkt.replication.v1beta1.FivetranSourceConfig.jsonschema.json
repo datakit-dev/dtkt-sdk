@@ -1,0 +1,96 @@
+{
+  "$id": "dtkt.replication.v1beta1.FivetranSourceConfig.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(daily_sync_time)$": {
+      "default": "",
+      "description": "The optional parameter that defines the sync start time when the sync\n frequency is already set or being set by the current request to 1440.\n It can be specified in one hour increments starting from 00:00 to 23:00.\n If not specified, we will use the baseline sync start time. This parameter\n has no effect on the 0 to 60 minutes offset used to determine the actual sync start time.",
+      "type": "string"
+    },
+    "^(group_id)$": {
+      "default": "",
+      "description": "The unique identifier for the group within the Fivetran system",
+      "type": "string"
+    },
+    "^(pause_after_trial)$": {
+      "default": false,
+      "description": "Specifies whether the connector should be paused after the free trial period has ended.",
+      "type": "boolean"
+    },
+    "^(run_setup_tests)$": {
+      "default": false,
+      "description": "Specifies whether setup tests should be run automatically.",
+      "type": "boolean"
+    },
+    "^(schedule_type)$": {
+      "default": "",
+      "description": "The connector schedule configuration type. Supported values: auto, manual.",
+      "type": "string"
+    },
+    "^(sync_frequency)$": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The connector sync frequency in minutes."
+    }
+  },
+  "properties": {
+    "dailySyncTime": {
+      "default": "",
+      "description": "The optional parameter that defines the sync start time when the sync\n frequency is already set or being set by the current request to 1440.\n It can be specified in one hour increments starting from 00:00 to 23:00.\n If not specified, we will use the baseline sync start time. This parameter\n has no effect on the 0 to 60 minutes offset used to determine the actual sync start time.",
+      "type": "string"
+    },
+    "groupId": {
+      "default": "",
+      "description": "The unique identifier for the group within the Fivetran system",
+      "type": "string"
+    },
+    "pauseAfterTrial": {
+      "default": false,
+      "description": "Specifies whether the connector should be paused after the free trial period has ended.",
+      "type": "boolean"
+    },
+    "paused": {
+      "default": false,
+      "description": "Specifies whether the connector is paused.",
+      "type": "boolean"
+    },
+    "runSetupTests": {
+      "default": false,
+      "description": "Specifies whether setup tests should be run automatically.",
+      "type": "boolean"
+    },
+    "scheduleType": {
+      "default": "",
+      "description": "The connector schedule configuration type. Supported values: auto, manual.",
+      "type": "string"
+    },
+    "syncFrequency": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The connector sync frequency in minutes."
+    }
+  },
+  "title": "Fivetran Source Config",
+  "type": "object"
+}

@@ -1,0 +1,26 @@
+apiVersion: skaffold/v4beta12
+kind: Config
+metadata:
+  name: {{ $.PKG_SLUG }}
+build:
+  local:
+    useBuildkit: true
+  artifacts:
+  - image: {{ $.PKG_IMAGE_NAME }}
+    context: ../../../
+    docker:
+      dockerfile: dtkt-integrations/packages/{{ $.PKG_SLUG }}/Dockerfile
+manifests:
+  kustomize:
+    buildArgs:
+    - --enable-alpha-plugins
+    - --enable-exec
+    paths:
+    - infra/kustomize/overlays/dev
+deploy:
+  kubectl: {}
+# portForward:
+# - resourceType: service
+#   resourceName: {{ $.PKG_SLUG }}
+#   port: 80
+#   localPort: 8200

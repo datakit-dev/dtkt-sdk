@@ -1,0 +1,26 @@
+{
+  "$id": "dtkt.core.v1.UpdateIntegrationRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(update_mask)$": {
+      "$ref": "google.protobuf.FieldMask.jsonschema.json",
+      "description": "Fields to update (e.g., \"config,spec\")."
+    }
+  },
+  "properties": {
+    "integration": {
+      "$ref": "dtkt.core.v1.Integration.jsonschema.json",
+      "description": "Integration with updated fields. Must include `name`."
+    },
+    "updateMask": {
+      "$ref": "google.protobuf.FieldMask.jsonschema.json",
+      "description": "Fields to update (e.g., \"config,spec\")."
+    }
+  },
+  "required": [
+    "integration"
+  ],
+  "title": "Update Integration Request",
+  "type": "object"
+}

@@ -1,0 +1,22 @@
+{
+  "$id": "dtkt.core.v1.Address.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Address contains a supported network and compatible target.",
+  "properties": {
+    "network": {
+      "description": "Network protocol (e.g., \"tcp\", \"unix\").",
+      "type": "string"
+    },
+    "target": {
+      "description": "Target address for the network.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "network",
+    "target"
+  ],
+  "title": "Address",
+  "type": "object"
+}

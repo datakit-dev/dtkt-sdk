@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.cli.v1beta1.Plugins.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "List of installed plugins",
+  "properties": {
+    "plugins": {
+      "items": {
+        "$ref": "dtkt.cli.v1beta1.Plugin.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Plugins",
+  "type": "object"
+}

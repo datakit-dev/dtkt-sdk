@@ -1,0 +1,13 @@
+{
+  "$id": "dtkt.core.v1.FlowRuntimeMetadata.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "FlowRuntimeMetadata wraps versioned executor runtime metadata.",
+  "properties": {
+    "v1beta1": {
+      "$ref": "dtkt.flow.v1beta1.Runtime.jsonschema.json"
+    }
+  },
+  "title": "Flow Runtime Metadata",
+  "type": "object"
+}

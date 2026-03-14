@@ -1,0 +1,22 @@
+{
+  "$id": "dtkt.core.v1.BatchCreateAutomationsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "parent": {
+      "description": "Parent resource name shared by all automations this batch.\n Format is one of:\n - `users/{user}`\n - `organizations/{organization}`",
+      "type": "string"
+    },
+    "requests": {
+      "items": {
+        "$ref": "dtkt.core.v1.CreateAutomationRequest.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "parent"
+  ],
+  "title": "Batch Create Automations Request",
+  "type": "object"
+}

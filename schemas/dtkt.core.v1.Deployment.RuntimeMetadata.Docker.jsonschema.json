@@ -1,0 +1,22 @@
+{
+  "$id": "dtkt.core.v1.Deployment.RuntimeMetadata.Docker.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(container_id)$": {
+      "description": "Container ID of docker container.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "containerId": {
+      "description": "Container ID of docker container.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "containerId"
+  ],
+  "title": "Docker",
+  "type": "object"
+}

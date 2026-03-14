@@ -1,0 +1,22 @@
+{
+  "$id": "dtkt.catalog.v1beta2.StreamQueryResultsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request to stream query results.",
+  "properties": {
+    "params": {
+      "description": "Parameters used in the query.",
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.Param.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "query": {
+      "default": "",
+      "description": "The query to execute.",
+      "type": "string"
+    }
+  },
+  "title": "Stream Query Results Request",
+  "type": "object"
+}

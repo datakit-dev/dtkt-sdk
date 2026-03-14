@@ -1,0 +1,20 @@
+{
+  "$id": "dtkt.core.v1.SendAutomationEventRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "event": {
+      "$ref": "dtkt.core.v1.SendAutomationEvent.jsonschema.json",
+      "description": "Event to send."
+    },
+    "name": {
+      "description": "Name of Automation resource to send event.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Send Automation Event Request",
+  "type": "object"
+}

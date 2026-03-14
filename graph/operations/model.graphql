@@ -1,0 +1,66 @@
+fragment ModelFragment on Model {
+  id
+  name
+  metadata
+  autoSync
+  syncStatus
+  syncError
+  syncedAt
+  typeID
+  catalogID
+  createdAt
+  updatedAt
+}
+
+query GetModel($id: ID!) {
+  model(id: $id) {
+    ...ModelFragment
+  }
+}
+
+query ListModels($orderBy: ModelOrder, $where: ModelWhereInput) {
+  models(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...ModelFragment
+      }
+    }
+    totalCount
+  }
+}
+
+mutation CreateModel($input: CreateModelInput!) {
+  createModel(input: $input) {
+    created
+    error
+    model {
+      ...ModelFragment
+    }
+  }
+}
+
+mutation SyncModel($id: ID!) {
+  syncModel(id: $id) {
+    model {
+      ...ModelFragment
+    }
+  }
+}
+
+mutation UpdateModel($id: ID!, $input: UpdateModelInput!) {
+  updateModel(id: $id, input: $input) {
+    updated
+    error
+    model {
+      ...ModelFragment
+    }
+  }
+}
+
+mutation DeleteModel($id: ID!) {
+  deleteModel(id: $id) {
+    deleted
+    error
+    id
+  }
+}

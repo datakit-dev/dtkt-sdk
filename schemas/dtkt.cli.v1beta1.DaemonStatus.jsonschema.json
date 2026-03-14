@@ -1,0 +1,37 @@
+{
+  "$id": "dtkt.cli.v1beta1.DaemonStatus.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "daemon": {
+      "$ref": "dtkt.cli.v1beta1.Daemon.jsonschema.json"
+    },
+    "message": {
+      "default": "",
+      "description": "Additional status message",
+      "type": "string"
+    },
+    "pid": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Process ID of the daemon (if running)"
+    },
+    "running": {
+      "default": false,
+      "description": "Whether or not the daemon is running",
+      "type": "boolean"
+    }
+  },
+  "title": "Daemon Status",
+  "type": "object"
+}

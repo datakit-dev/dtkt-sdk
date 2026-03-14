@@ -1,0 +1,56 @@
+fragment OrganizationFragment on Organization {
+  id
+  name
+  slug
+  tzName
+  createdAt
+  updatedAt
+}
+
+query GetOrganization($id: ID, $slug: String) {
+  organization(id: $id, slug: $slug) {
+    ...OrganizationFragment
+  }
+}
+
+query ListOrganizations(
+  $orderBy: OrganizationOrder
+  $where: OrganizationWhereInput
+) {
+  organizations(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...OrganizationFragment
+      }
+    }
+    totalCount
+  }
+}
+
+mutation CreateOrganization($input: CreateOrganizationInput!) {
+  createOrganization(input: $input) {
+    created
+    error
+    organization {
+      ...OrganizationFragment
+    }
+  }
+}
+
+mutation UpdateOrganization($id: ID!, $input: UpdateOrganizationInput!) {
+  updateOrganization(id: $id, input: $input) {
+    updated
+    error
+    organization {
+      ...OrganizationFragment
+    }
+  }
+}
+
+mutation DeleteOrganization($id: ID!) {
+  deleteOrganization(id: $id) {
+    deleted
+    error
+    id
+  }
+}

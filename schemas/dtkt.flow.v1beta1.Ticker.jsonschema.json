@@ -1,0 +1,23 @@
+{
+  "$id": "dtkt.flow.v1beta1.Ticker.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "every": {
+      "$ref": "google.protobuf.Duration.jsonschema.json"
+    },
+    "initial": {
+      "$ref": "google.protobuf.Duration.jsonschema.json"
+    },
+    "value": {
+      "default": "",
+      "pattern": "^\\s?=\\s?",
+      "type": "string"
+    }
+  },
+  "required": [
+    "every"
+  ],
+  "title": "Ticker",
+  "type": "object"
+}

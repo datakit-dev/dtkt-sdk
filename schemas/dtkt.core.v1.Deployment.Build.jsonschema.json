@@ -1,0 +1,25 @@
+{
+  "$id": "dtkt.core.v1.Deployment.Build.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "context": {
+      "$ref": "dtkt.core.v1.Context.jsonschema.json",
+      "description": "Context of where the build was performed (optional if build performed\n within the same control plane as deployment)."
+    },
+    "integration": {
+      "description": "Name of integration resource this build belongs to.",
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "dtkt.core.v1.PackageBuildMetadata.jsonschema.json",
+      "description": "Build metadata including artifact, platform, and runtime information."
+    }
+  },
+  "required": [
+    "integration",
+    "metadata"
+  ],
+  "title": "Build",
+  "type": "object"
+}

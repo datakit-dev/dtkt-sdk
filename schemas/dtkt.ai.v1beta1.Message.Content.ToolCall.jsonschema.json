@@ -1,0 +1,43 @@
+{
+  "$id": "dtkt.ai.v1beta1.Message.Content.ToolCall.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(provider_executed)$": {
+      "default": false,
+      "description": "If the tool is executed by the provider or the client\n TODO: This is if ChatGPT calls our tool or if we call it for ChatGPT.",
+      "type": "boolean"
+    },
+    "^(tool_call_id)$": {
+      "default": "",
+      "type": "string"
+    },
+    "^(tool_name)$": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "json": {
+      "$ref": "google.protobuf.Struct.jsonschema.json"
+    },
+    "proto": {
+      "$ref": "google.protobuf.Any.jsonschema.json"
+    },
+    "providerExecuted": {
+      "default": false,
+      "description": "If the tool is executed by the provider or the client\n TODO: This is if ChatGPT calls our tool or if we call it for ChatGPT.",
+      "type": "boolean"
+    },
+    "toolCallId": {
+      "default": "",
+      "type": "string"
+    },
+    "toolName": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Tool Call",
+  "type": "object"
+}

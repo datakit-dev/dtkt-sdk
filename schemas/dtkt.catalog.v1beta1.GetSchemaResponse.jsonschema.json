@@ -1,0 +1,14 @@
+{
+  "$id": "dtkt.catalog.v1beta1.GetSchemaResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response message for getting a schema.",
+  "properties": {
+    "schema": {
+      "$ref": "dtkt.catalog.v1beta1.Schema.jsonschema.json",
+      "description": "The retrieved schema."
+    }
+  },
+  "title": "Get Schema Response",
+  "type": "object"
+}

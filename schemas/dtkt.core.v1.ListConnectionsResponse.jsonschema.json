@@ -1,0 +1,28 @@
+{
+  "$id": "dtkt.core.v1.ListConnectionsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(next_page_token)$": {
+      "default": "",
+      "description": "Token for retrieving the next page.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "connections": {
+      "description": "The list of connections.",
+      "items": {
+        "$ref": "dtkt.core.v1.Connection.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "nextPageToken": {
+      "default": "",
+      "description": "Token for retrieving the next page.",
+      "type": "string"
+    }
+  },
+  "title": "List Connections Response",
+  "type": "object"
+}

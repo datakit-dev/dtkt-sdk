@@ -1,0 +1,75 @@
+{
+  "$id": "dtkt.core.v1.Integration.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Integration describes a software package which uses the DataKit SDK and can\n be deployed to a runtime environment using a Deployment resource. An Integration\n can represent a software package in development with a local runtime environment\n or a released software package in a registry with a remote runtime environment.\n Integrations provide a way to manage software packages and their deployment\n lifecycle within the DataKit ecosystem, enabling users to easily deploy and\n run their software packages in compatible runtime environments.",
+  "patternProperties": {
+    "^(create_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Integration create time."
+    },
+    "^(source_etag)$": {
+      "description": "Package source checksum or git commit hash for concurrency control\n (only present after successful build \u0026 update).",
+      "type": "string"
+    },
+    "^(source_uri)$": {
+      "description": "Package source URI (only present after successful build \u0026 update).",
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    },
+    "^(spec_etag)$": {
+      "description": "Package spec checksum for concurrency control.",
+      "type": "string"
+    },
+    "^(update_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Integration update time."
+    }
+  },
+  "properties": {
+    "createTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Integration create time."
+    },
+    "name": {
+      "type": "string"
+    },
+    "sourceEtag": {
+      "description": "Package source checksum or git commit hash for concurrency control\n (only present after successful build \u0026 update).",
+      "type": "string"
+    },
+    "sourceUri": {
+      "description": "Package source URI (only present after successful build \u0026 update).",
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    },
+    "spec": {
+      "$ref": "dtkt.core.v1.PackageSpecMetadata.jsonschema.json",
+      "description": "Package spec metadata."
+    },
+    "specEtag": {
+      "description": "Package spec checksum for concurrency control.",
+      "type": "string"
+    },
+    "uid": {
+      "description": "Server-assigned unique ID (UUID).",
+      "minLength": 1,
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "type": "string"
+    },
+    "updateTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Integration update time."
+    }
+  },
+  "required": [
+    "name",
+    "uid",
+    "spec",
+    "specEtag",
+    "createTime",
+    "updateTime"
+  ],
+  "title": "Integration",
+  "type": "object"
+}

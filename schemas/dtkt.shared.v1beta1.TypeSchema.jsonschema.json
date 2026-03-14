@@ -1,0 +1,48 @@
+{
+  "$id": "dtkt.shared.v1beta1.TypeSchema.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "TypeSchema provides a URI, JSON Schema, and fully qualified proto type name.",
+  "patternProperties": {
+    "^(json_schema)$": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "JSON Schema of referenced type; $id field within schema must be prefixed by\n uri field above."
+    },
+    "^(mod_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Last modified time."
+    },
+    "^(proto_name)$": {
+      "description": "Fully qualified Proto Type name (e.g., \"dtkt.email.v1beta1.SendEmailRequest\")\n which resolves to a protobuf message or enum type which must be compatible\n with above JSON Schema.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "jsonSchema": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "JSON Schema of referenced type; $id field within schema must be prefixed by\n uri field above."
+    },
+    "modTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Last modified time."
+    },
+    "protoName": {
+      "description": "Fully qualified Proto Type name (e.g., \"dtkt.email.v1beta1.SendEmailRequest\")\n which resolves to a protobuf message or enum type which must be compatible\n with above JSON Schema.",
+      "type": "string"
+    },
+    "uri": {
+      "description": "URI of this type.",
+      "minLength": 1,
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "uri",
+    "jsonSchema",
+    "protoName",
+    "modTime"
+  ],
+  "title": "Type Schema",
+  "type": "object"
+}

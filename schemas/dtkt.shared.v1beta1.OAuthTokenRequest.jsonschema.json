@@ -1,0 +1,45 @@
+{
+  "$id": "dtkt.shared.v1beta1.OAuthTokenRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(code_verifier)$": {
+      "default": "",
+      "description": "PKCE verifier if PKCE was used.",
+      "type": "string"
+    },
+    "^(redirect_url)$": {
+      "default": "",
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "code": {
+      "default": "",
+      "minLength": 1,
+      "type": "string"
+    },
+    "codeVerifier": {
+      "default": "",
+      "description": "PKCE verifier if PKCE was used.",
+      "type": "string"
+    },
+    "params": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "redirectUrl": {
+      "default": "",
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    }
+  },
+  "title": "O Auth Token Request",
+  "type": "object"
+}

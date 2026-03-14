@@ -1,0 +1,48 @@
+{
+  "$id": "dtkt.geojson.v1beta1.Geometry.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Union type for Geometry using oneof",
+  "patternProperties": {
+    "^(geometry_collection)$": {
+      "$ref": "dtkt.geojson.v1beta1.GeometryCollection.jsonschema.json"
+    },
+    "^(line_string)$": {
+      "$ref": "dtkt.geojson.v1beta1.LineString.jsonschema.json"
+    },
+    "^(multi_line_string)$": {
+      "$ref": "dtkt.geojson.v1beta1.MultiLineString.jsonschema.json"
+    },
+    "^(multi_point)$": {
+      "$ref": "dtkt.geojson.v1beta1.MultiPoint.jsonschema.json"
+    },
+    "^(multi_polygon)$": {
+      "$ref": "dtkt.geojson.v1beta1.MultiPolygon.jsonschema.json"
+    }
+  },
+  "properties": {
+    "geometryCollection": {
+      "$ref": "dtkt.geojson.v1beta1.GeometryCollection.jsonschema.json"
+    },
+    "lineString": {
+      "$ref": "dtkt.geojson.v1beta1.LineString.jsonschema.json"
+    },
+    "multiLineString": {
+      "$ref": "dtkt.geojson.v1beta1.MultiLineString.jsonschema.json"
+    },
+    "multiPoint": {
+      "$ref": "dtkt.geojson.v1beta1.MultiPoint.jsonschema.json"
+    },
+    "multiPolygon": {
+      "$ref": "dtkt.geojson.v1beta1.MultiPolygon.jsonschema.json"
+    },
+    "point": {
+      "$ref": "dtkt.geojson.v1beta1.Point.jsonschema.json"
+    },
+    "polygon": {
+      "$ref": "dtkt.geojson.v1beta1.Polygon.jsonschema.json"
+    }
+  },
+  "title": "Geometry",
+  "type": "object"
+}

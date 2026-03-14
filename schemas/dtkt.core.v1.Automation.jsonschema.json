@@ -1,0 +1,95 @@
+{
+  "$id": "dtkt.core.v1.Automation.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Automation is a runnable instance of a Flow with a tagged spec version and\n runtime configuration.",
+  "patternProperties": {
+    "^(create_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Automation create time."
+    },
+    "^(spec_etag)$": {
+      "description": "Checksum of flow spec must match when resolving spec (concurrency control).",
+      "type": "string"
+    },
+    "^(update_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Automation update time."
+    }
+  },
+  "properties": {
+    "batch": {
+      "description": "Server-assigned batch name if created within a batch (optional).",
+      "type": "string"
+    },
+    "connections": {
+      "additionalProperties": {
+        "$ref": "dtkt.core.v1.FlowConnectionMetadata.jsonschema.json"
+      },
+      "description": "Connections configuration as map of connection node id to connection\n resource name and context (control plane).\n Examples:\n ```\n - \"storage\": {\n      \"name\": \"users/bob/connections/localblob\",\n      \"context\": {\n        \"name\": \"users/bob\",\n        ...\n      },\n    }\n ```",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "createTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Automation create time."
+    },
+    "flow": {
+      "description": "Name of flow resource to resolve spec.",
+      "type": "string"
+    },
+    "groups": {
+      "$ref": "dtkt.core.v1.FlowGroupsMetadata.jsonschema.json",
+      "description": "Execution groups metadata of resolved Flow spec (versioned)."
+    },
+    "inputs": {
+      "additionalProperties": {
+        "$ref": "google.protobuf.Any.jsonschema.json"
+      },
+      "description": "Initial inputs configuration as map of input node id to valid data of input\n node's declared type (well-known type wrappers used for scalar values).\n Format:\n ```\n - \"bucketName\": \"my-storage-bucket\"\n - \"adSettings\": { \"bid\": 100 }\n ```",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "name": {
+      "type": "string"
+    },
+    "runtime": {
+      "$ref": "dtkt.core.v1.FlowRuntimeMetadata.jsonschema.json",
+      "description": "Executor runtime metadata of resolved Flow spec (versioned)."
+    },
+    "specEtag": {
+      "description": "Checksum of flow spec must match when resolving spec (concurrency control).",
+      "type": "string"
+    },
+    "timeout": {
+      "$ref": "google.protobuf.Duration.jsonschema.json",
+      "description": "Execution is stopped if total time exceeds given duration.\n Default: 0 (no timeout)."
+    },
+    "uid": {
+      "description": "Server-assigned unique ID (UUID).",
+      "minLength": 1,
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "type": "string"
+    },
+    "updateTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Automation update time."
+    }
+  },
+  "required": [
+    "name",
+    "uid",
+    "flow",
+    "specEtag",
+    "runtime",
+    "groups",
+    "createTime",
+    "updateTime"
+  ],
+  "title": "Automation",
+  "type": "object"
+}

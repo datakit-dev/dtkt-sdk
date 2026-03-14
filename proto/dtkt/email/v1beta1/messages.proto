@@ -1,0 +1,207 @@
+syntax = "proto3";
+
+package dtkt.email.v1beta1;
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/email/v1beta1";
+
+message EmailAddress {
+  // The email address.
+  string address = 1;
+
+  // The name associated with the email address.
+  string name = 2;
+}
+
+message EmailSendStatus {
+  string id = 1;
+  bool success = 2;
+  string error = 3;
+}
+
+// Represents an email message.
+message Email {
+  EmailAddress from = 1;
+  EmailAddress reply_to = 2;
+  repeated EmailAddress to = 3;
+  repeated EmailAddress cc = 4;
+  repeated EmailAddress bcc = 5;
+
+  EmailAddress return_path = 6;
+
+  string subject = 7;
+  string text_body = 8;
+  string html_body = 9;
+}
+
+enum TemplateLanguage {
+  TEMPLATE_LANGUAGE_UNSPECIFIED = 0;
+  TEMPLATE_LANGUAGE_GO_TEMPLATE = 1; // https://golang.org/pkg/text/template and https://pkg.go.dev/html/template
+  TEMPLATE_LANGUAGE_MUSTACHIO = 2; // https://postmarkapp.com/support/article/1077-template-syntax
+}
+
+// Represents an email template.
+message EmailTemplate {
+  string id = 1;
+  TemplateLanguage language = 2;
+
+  string subject = 3;
+  string text_body = 4;
+  string html_body = 5;
+}
+
+// Represents an email message.
+message EmailWithTemplate {
+  EmailAddress from = 1;
+  EmailAddress reply_to = 2;
+  repeated EmailAddress to = 3;
+  repeated EmailAddress cc = 4;
+  repeated EmailAddress bcc = 5;
+
+  EmailAddress return_path = 6;
+
+  string template_id = 7;
+  map<string, string> template_params = 8;
+}
+
+// Represents an email sending request.
+message SendEmailRequest {
+  // The email to be sent.
+  Email email = 1;
+}
+
+// Represents an email sending response.
+message SendEmailResponse {
+  // The email sending status.
+  EmailSendStatus send_status = 1;
+}
+
+// Represents a stream of email sending requests.
+message SendEmailsRequest {
+  // The email to be sent.
+  Email email = 1;
+}
+
+// Represents a stream of email sending responses.
+message SendEmailsResponse {
+  // The email sending status.
+  EmailSendStatus send_status = 1;
+}
+
+// Represents a batch email sending request.
+message SendBatchEmailRequest {
+  // The list of emails to be sent.
+  repeated Email emails = 1;
+}
+
+// Represents a batch email sending response.
+message SendBatchEmailResponse {
+  // The list of email sending statuses.
+  repeated EmailSendStatus send_status = 1;
+}
+
+// Represents an email sending request sent with a template.
+message SendEmailWithTemplateRequest {
+  // The email to be sent.
+  EmailWithTemplate email = 1;
+}
+
+// Represents an email sending response sent with a template.
+message SendEmailWithTemplateResponse {
+  // The email sending status.
+  EmailSendStatus send_status = 1;
+}
+
+// Represents a stream of email sending requests sent with a template.
+message SendEmailsWithTemplateRequest {
+  // The email to be sent.
+  EmailWithTemplate email = 1;
+}
+
+// Represents a stream of email sending responses sent with a template.
+message SendEmailsWithTemplateResponse {
+  // The email sending status.
+  EmailSendStatus send_status = 1;
+}
+
+// Represents a batch email sending request sent with a template.
+message SendBatchEmailWithTemplateRequest {
+  // The list of emails to be sent.
+  repeated EmailWithTemplate emails = 1;
+}
+
+// Represents a batch email sending response sent with a template.
+message SendBatchEmailWithTemplateResponse {
+  // The list of email sending statuses.
+  repeated EmailSendStatus send_status = 1;
+}
+
+// Represents a request to get an email template by ID.
+message GetEmailTemplateRequest {
+  string id = 1;
+}
+
+// Represents a response to get an email template by ID.
+message GetEmailTemplateResponse {
+  EmailTemplate template = 1;
+}
+
+// Represents a request to list email templates.
+message ListEmailTemplatesRequest {
+  // The maximum number of email templates to return. The service may return fewer than
+  // this value.
+  // If unspecified, at most 50 templates will be returned.
+  // The maximum value is 1000; values above 1000 will be coerced to 1000.
+  int32 page_size = 1;
+
+  // A page token, received from a previous `ListEmailTemplates` call.
+  // Provide this to retrieve the subsequent page.
+  //
+  // When paginating, all other parameters provided to `ListEmailTemplates` must match
+  // the call that provided the page token.
+  string page_token = 2;
+}
+
+// Represents a response to list email templates.
+message ListEmailTemplatesResponse {
+  repeated EmailTemplate templates = 1;
+  string next_page_token = 2;
+}
+
+// Represents a request to create an email template.
+message CreateEmailTemplateRequest {
+  EmailTemplate template = 1;
+}
+
+// Represents a response to create an email template.
+message CreateEmailTemplateResponse {
+  EmailTemplate template = 1;
+}
+
+// Represents a request to update an email template.
+message UpdateEmailTemplateRequest {
+  string id = 1;
+  EmailTemplate template = 2;
+}
+
+// Represents a response to update an email template.
+message UpdateEmailTemplateResponse {
+  EmailTemplate template = 1;
+}
+
+// Represents a request to delete an email template.
+message DeleteEmailTemplateRequest {
+  string id = 1;
+}
+
+// Represents a response to delete an email template.
+message DeleteEmailTemplateResponse {
+  string id = 1;
+}
+
+// Represents a received Email
+message ReceivedEmail {
+  string id = 1;
+  string at = 2;
+
+  Email email = 3;
+}

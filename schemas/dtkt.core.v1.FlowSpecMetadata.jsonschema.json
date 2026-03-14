@@ -1,0 +1,13 @@
+{
+  "$id": "dtkt.core.v1.FlowSpecMetadata.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "FlowSpecMetadata wraps versioned flow specification.",
+  "properties": {
+    "v1beta1": {
+      "$ref": "dtkt.flow.v1beta1.Flow.jsonschema.json"
+    }
+  },
+  "title": "Flow Spec Metadata",
+  "type": "object"
+}

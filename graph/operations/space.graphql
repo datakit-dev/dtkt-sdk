@@ -1,0 +1,54 @@
+fragment SpaceFragment on Space {
+  id
+  slug
+  name
+  tzName
+  createdAt
+  updatedAt
+  organizationID
+}
+
+query GetSpace($spaceId: ID, $slug: String) {
+  space(id: $spaceId, slug: $slug) {
+    ...SpaceFragment
+  }
+}
+
+query ListSpaces($orderBy: SpaceOrder, $where: SpaceWhereInput) {
+  spaces(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...SpaceFragment
+      }
+    }
+    totalCount
+  }
+}
+
+mutation CreateSpace($input: CreateSpaceInput!) {
+  createSpace(input: $input) {
+    created
+    error
+    space {
+      ...SpaceFragment
+    }
+  }
+}
+
+mutation UpdateSpace($id: ID!, $input: UpdateSpaceInput!) {
+  updateSpace(id: $id, input: $input) {
+    updated
+    error
+    space {
+      ...SpaceFragment
+    }
+  }
+}
+
+mutation DeleteSpace($id: ID!) {
+  deleteSpace(id: $id) {
+    deleted
+    error
+    id
+  }
+}

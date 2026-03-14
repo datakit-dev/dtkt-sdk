@@ -1,0 +1,102 @@
+version: "3"
+
+tasks:
+  setup:
+    desc: Setup the dev environment
+    cmds:
+    - pnpm install
+
+  generate:
+    cmds:
+    - pnpm graphql-codegen
+
+  lint:
+    cmds:
+    - pnpm run lint
+    - pnpm run typecheck
+
+  test:
+    cmds:
+    - pnpm run test
+
+  legal:license-notices-md:
+    desc: Generate license notices in markdown format (excludes permissive licenses without notice requirements)
+    cmds:
+    - |
+      pnpm licenses list --filter @dtkt/sdk --json | jq -r '
+        to_entries
+        | map(select(.key | test("(^(MIT|MIT-0|BSD-2-Clause|BSD-3-Clause|Unlicense|0BSD|ISC|BlueOak-1\\.0\\.0|CC0-1\\.0)$|\\bMIT\\b)") | not))
+        | map(.value[])
+        | flatten
+        | group_by(.name)
+        | map({
+            name: .[0].name,
+            versions: (map(.versions[]) | unique | sort),
+            license: (map(.license) | unique | join(", ")),
+            homepage: .[0].homepage
+          })
+        | sort_by(.name | ascii_downcase)
+        | .[]
+        | "- **\(.name)** (\(.versions | join(", "))) - [\(.license)](\(.homepage // ""))"
+      '
+
+  legal:license-notices-jsonl:
+    desc: Generate license notices in JSONL format for copying license files
+    cmds:
+    - |
+      pnpm licenses list --filter @dtkt/sdk --json | jq -c '
+        to_entries
+        | map(select(.key | test("(^(MIT|MIT-0|BSD-2-Clause|BSD-3-Clause|Unlicense|0BSD|ISC|BlueOak-1\\.0\\.0|CC0-1\\.0)$|\\bMIT\\b)") | not))
+        | map(.value[])
+        | flatten
+        | .[]
+        | {name: .name, version: .versions[0], path: .paths[0]}
+      '
+
+  legal:update-license-notices:
+    desc: Update license notices in the NOTICE file and legal directory
+    cmds:
+    - rm -rf legal/3rd-party-license-notices
+    - for: { var: JSONL_LICENSE_NOTICES, as: RECORD }
+      silent: true
+      cmd: |
+        pkgName=$(echo '{{.RECORD}}' | jq -r '.name')
+        pkgVersion=$(echo '{{.RECORD}}' | jq -r '.version')
+        pkgPath=$(echo '{{.RECORD}}' | jq -r '.path')
+        targetDir="legal/3rd-party-license-notices/${pkgName}@${pkgVersion}"
+        # Try common license file names
+        for licenseFile in LICENSE LICENSE.md LICENSE.txt license license.md license.txt LICENCE LICENCE.md LICENCE.txt COPYING; do
+          if [ -f "$pkgPath/$licenseFile" ]; then
+            echo "Copying license for $pkgName@$pkgVersion"
+            mkdir -p "$targetDir"
+            cp "$pkgPath/$licenseFile" "$targetDir/"
+            break
+          fi
+        done
+    - task legal:license-notices-md > /tmp/sdk-ts-licenses.md
+    - |
+      awk '
+        /^### sdk-ts$/ {
+          print
+          print ""
+          while ((getline line < "/tmp/sdk-ts-licenses.md") > 0) print line
+          while ((getline) > 0 && !/^### /) {}
+          if (/^### /) { print ""; print }
+          next
+        }
+        { print }
+      ' "{{.NOTICE_FILE}}" > "{{.NOTICE_FILE}}.tmp"
+      mv "{{.NOTICE_FILE}}.tmp" "{{.NOTICE_FILE}}"
+    - rm -f /tmp/sdk-ts-licenses.md
+    vars:
+      NOTICE_FILE: ../NOTICE
+      JSONL_LICENSE_NOTICES:
+        sh: task legal:license-notices-jsonl
+
+  publish:
+    cmds:
+    - cp ../LICENSE .
+    # Extract header + sdk-ts section only (skip sdk-go section)
+    - awk '/^### sdk-go$/{skip=1} /^### sdk-ts$/{skip=0} !skip{print}' ../NOTICE > NOTICE
+    - pnpm publish
+    - rm LICENSE NOTICE

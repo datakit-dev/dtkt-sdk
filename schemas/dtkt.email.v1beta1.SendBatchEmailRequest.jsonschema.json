@@ -1,0 +1,17 @@
+{
+  "$id": "dtkt.email.v1beta1.SendBatchEmailRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a batch email sending request.",
+  "properties": {
+    "emails": {
+      "description": "The list of emails to be sent.",
+      "items": {
+        "$ref": "dtkt.email.v1beta1.Email.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Send Batch Email Request",
+  "type": "object"
+}

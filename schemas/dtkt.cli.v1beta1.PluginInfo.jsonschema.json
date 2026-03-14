@@ -1,0 +1,39 @@
+{
+  "$id": "dtkt.cli.v1beta1.PluginInfo.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(executable_file_path)$": {
+      "default": "",
+      "description": "File system path to plugin executable",
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "properties": {
+    "description": {
+      "default": "",
+      "description": "Plugin description",
+      "type": "string"
+    },
+    "executableFilePath": {
+      "default": "",
+      "description": "File system path to plugin executable",
+      "minLength": 1,
+      "type": "string"
+    },
+    "name": {
+      "default": "",
+      "description": "Plugin name (must start with 'dtkt-')",
+      "pattern": "^dtkt-[\\w-]+$",
+      "type": "string"
+    },
+    "version": {
+      "default": "",
+      "description": "Plugin version",
+      "type": "string"
+    }
+  },
+  "title": "Plugin Info",
+  "type": "object"
+}

@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package dtkt.base.v1beta1;
+
+import "buf/validate/validate.proto";
+import "dtkt/shared/v1beta1/enums.proto";
+import "dtkt/shared/v1beta1/messages.proto";
+import "google/protobuf/any.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/base/v1beta1";
+
+// Request for getting package spec and config schema.
+message GetPackageRequest {}
+
+// Response for getting package spec and config schema.
+message GetPackageResponse {
+  // Embedded package spec (package.dtkt.yaml).
+  dtkt.shared.v1beta1.Package package = 1 [(buf.validate.field).required = true];
+
+  // Integration config schema used to validate CheckConfig.
+  dtkt.shared.v1beta1.TypeSchema config_schema = 2 [(buf.validate.field).required = true];
+}
+
+// Request for checking config.
+message CheckConfigRequest {
+  // Connection resource of provided config.
+  string connection = 1 [(buf.validate.field).required = true];
+
+  // Config to validate.
+  google.protobuf.Any config_data = 2 [(buf.validate.field).required = true];
+
+  // Hash of provided config.
+  string config_hash = 3 [(buf.validate.field).required = true];
+
+  // Generation of provided config.
+  uint64 config_gen = 4 [(buf.validate.field).required = true];
+}
+
+// Response for checking config.
+message CheckConfigResponse {
+  // True if config is valid.
+  bool valid = 1;
+
+  // Human-readable summary.
+  string message = 5;
+}
+
+// Request for checking auth (3-legged OAuth over gRPC).
+message CheckAuthRequest {
+  // The auth check type.
+  dtkt.shared.v1beta1.AuthCheck type = 1;
+
+  // If auth type response is OAuth.
+  oneof oauth {
+    // When check type is auth code url.
+    dtkt.shared.v1beta1.OAuthCodeRequest code_request = 2;
+
+    // When check type is callback.
+    dtkt.shared.v1beta1.OAuthTokenRequest token_request = 3;
+
+    // When check type is refresh.
+    dtkt.shared.v1beta1.OAuthRefreshRequest refresh_request = 4;
+  }
+}
+
+// Response for checking auth.
+message CheckAuthResponse {
+  // The auth type.
+  dtkt.shared.v1beta1.AuthType type = 1;
+
+  // Indicates if the auth check was successful.
+  bool success = 2;
+
+  // Error message if success is false.
+  string error = 3;
+
+  // Present when type is OAuth.
+  oneof oauth {
+    // Returned when check is code.
+    string auth_code_url = 4;
+
+    // Returned when check type is token or refresh.
+    dtkt.shared.v1beta1.OAuthToken token = 5;
+  }
+}
+
+// Request for listing custom types.
+message ListTypesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+// Response for listing custom types.
+message ListTypesResponse {
+  // Custom types registered to integration.
+  repeated dtkt.shared.v1beta1.TypeSchema types = 1;
+
+  string next_page_token = 2;
+}
+
+// Request for getting custom type schema.
+message GetTypeRequest {
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+// Response for getting custom type schema.
+message GetTypeResponse {
+  dtkt.shared.v1beta1.TypeSchema type = 1 [(buf.validate.field).required = true];
+}

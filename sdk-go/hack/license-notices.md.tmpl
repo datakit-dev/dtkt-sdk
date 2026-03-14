@@ -1,0 +1,11 @@
+{{- range . }}
+  {{- if and (not (or
+    (eq .LicenseName "MIT")
+    (eq .LicenseName "BSD-2-Clause")
+    (eq .LicenseName "BSD-2-Clause-FreeBSD")
+    (eq .LicenseName "BSD-3-Clause")
+    (eq .LicenseName "Unlicense")))
+  }}
+- **{{ .Name }}** - [{{ .LicenseName }}]({{ .LicenseURL }})
+  {{- end }}
+{{- end }}

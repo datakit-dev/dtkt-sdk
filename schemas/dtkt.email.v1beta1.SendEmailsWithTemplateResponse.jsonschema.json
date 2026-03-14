@@ -1,0 +1,20 @@
+{
+  "$id": "dtkt.email.v1beta1.SendEmailsWithTemplateResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a stream of email sending responses sent with a template.",
+  "patternProperties": {
+    "^(send_status)$": {
+      "$ref": "dtkt.email.v1beta1.EmailSendStatus.jsonschema.json",
+      "description": "The email sending status."
+    }
+  },
+  "properties": {
+    "sendStatus": {
+      "$ref": "dtkt.email.v1beta1.EmailSendStatus.jsonschema.json",
+      "description": "The email sending status."
+    }
+  },
+  "title": "Send Emails With Template Response",
+  "type": "object"
+}

@@ -1,0 +1,42 @@
+{
+  "$id": "dtkt.catalog.v1beta1.WriteTableResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response message for rows written to a table.",
+  "patternProperties": {
+    "^(rows_written)$": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Number of rows successfully written."
+    }
+  },
+  "properties": {
+    "rowsWritten": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Number of rows successfully written."
+    },
+    "table": {
+      "$ref": "dtkt.catalog.v1beta1.Table.jsonschema.json",
+      "description": "Reference to the table where rows were written."
+    }
+  },
+  "title": "Write Table Response",
+  "type": "object"
+}

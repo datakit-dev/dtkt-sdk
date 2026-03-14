@@ -1,0 +1,50 @@
+{
+  "$id": "dtkt.flow.v1beta1.Action.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(on_error)$": {
+      "default": "",
+      "pattern": "^\\s?=\\s?",
+      "type": "string"
+    },
+    "^(run_if)$": {
+      "default": "",
+      "pattern": "^\\s?=\\s?",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "cache": {
+      "default": false,
+      "description": "When cache is true action always returns its first non-null memoized value.",
+      "type": "boolean"
+    },
+    "call": {
+      "$ref": "dtkt.flow.v1beta1.MethodCall.jsonschema.json"
+    },
+    "id": {
+      "minLength": 1,
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_]+$",
+      "type": "string"
+    },
+    "onError": {
+      "default": "",
+      "pattern": "^\\s?=\\s?",
+      "type": "string"
+    },
+    "runIf": {
+      "default": "",
+      "pattern": "^\\s?=\\s?",
+      "type": "string"
+    },
+    "user": {
+      "$ref": "dtkt.flow.v1beta1.UserAction.jsonschema.json"
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "title": "Action",
+  "type": "object"
+}

@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.DialConnectionResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "dial": {
+      "$ref": "dtkt.core.v1.DialMetadata.jsonschema.json",
+      "description": "Dial metadata."
+    }
+  },
+  "required": [
+    "dial"
+  ],
+  "title": "Dial Connection Response",
+  "type": "object"
+}

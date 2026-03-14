@@ -1,0 +1,28 @@
+{
+  "$id": "dtkt.base.v1beta1.GetPackageResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response for getting package spec and config schema.",
+  "patternProperties": {
+    "^(config_schema)$": {
+      "$ref": "dtkt.shared.v1beta1.TypeSchema.jsonschema.json",
+      "description": "Integration config schema used to validate CheckConfig."
+    }
+  },
+  "properties": {
+    "configSchema": {
+      "$ref": "dtkt.shared.v1beta1.TypeSchema.jsonschema.json",
+      "description": "Integration config schema used to validate CheckConfig."
+    },
+    "package": {
+      "$ref": "dtkt.shared.v1beta1.Package.jsonschema.json",
+      "description": "Embedded package spec (package.dtkt.yaml)."
+    }
+  },
+  "required": [
+    "package",
+    "configSchema"
+  ],
+  "title": "Get Package Response",
+  "type": "object"
+}

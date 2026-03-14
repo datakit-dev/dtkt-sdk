@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.catalog.v1beta1.DeleteTableResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response message for deleting a table.",
+  "properties": {
+    "deleted": {
+      "default": false,
+      "description": "Indicates if the table was successfully deleted.",
+      "type": "boolean"
+    },
+    "error": {
+      "default": "",
+      "description": "Error message, if any.",
+      "type": "string"
+    },
+    "table": {
+      "$ref": "dtkt.catalog.v1beta1.Table.jsonschema.json",
+      "description": "The deleted table."
+    }
+  },
+  "title": "Delete Table Response",
+  "type": "object"
+}

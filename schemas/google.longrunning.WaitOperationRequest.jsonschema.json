@@ -1,0 +1,19 @@
+{
+  "$id": "google.longrunning.WaitOperationRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The request message for\n [Operations.WaitOperation][google.longrunning.Operations.WaitOperation].",
+  "properties": {
+    "name": {
+      "default": "",
+      "description": "The name of the operation resource to wait on.",
+      "type": "string"
+    },
+    "timeout": {
+      "$ref": "google.protobuf.Duration.jsonschema.json",
+      "description": "The maximum duration to wait before timing out. If left blank, the wait\n will be at most the time permitted by the underlying HTTP/RPC protocol.\n If RPC context deadline is also specified, the shorter one will be used."
+    }
+  },
+  "title": "Wait Operation Request",
+  "type": "object"
+}

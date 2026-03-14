@@ -1,0 +1,18 @@
+{
+  "$id": "cel.expr.MapValue.Entry.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "key": {
+      "$ref": "cel.expr.Value.jsonschema.json",
+      "description": "Must be unique with in the map.\n Currently only boolean, int, uint, and string values can be keys.",
+      "title": "The key."
+    },
+    "value": {
+      "$ref": "cel.expr.Value.jsonschema.json",
+      "description": "The value."
+    }
+  },
+  "title": "Entry",
+  "type": "object"
+}

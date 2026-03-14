@@ -1,0 +1,84 @@
+{
+  "$id": "dtkt.shared.v1beta1.Package.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Package provides an identity and metadata for a DataKit Integration.",
+  "properties": {
+    "build": {
+      "$ref": "dtkt.shared.v1beta1.Package.BuildConfig.jsonschema.json",
+      "description": "Build configuration."
+    },
+    "deploy": {
+      "$ref": "dtkt.shared.v1beta1.Package.DeployConfig.jsonschema.json",
+      "description": "Deploy configuration."
+    },
+    "description": {
+      "default": "",
+      "description": "A helpful description of features and capabilities.",
+      "type": "string"
+    },
+    "icon": {
+      "default": "",
+      "description": "An icon image uri (optional).",
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    },
+    "identity": {
+      "$ref": "dtkt.shared.v1beta1.Package.Identity.jsonschema.json",
+      "description": "Identity name (camel, snake, or pascal case) and version (semver) of integration."
+    },
+    "platforms": {
+      "description": "Compatible target platforms of integration (optional; defaults to all platforms).",
+      "items": {
+        "$ref": "dtkt.shared.v1beta1.Platform.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "runtimes": {
+      "description": "Compatible target runtimes of integration (optional; defaults to all runtimes).",
+      "items": {
+        "anyOf": [
+          {
+            "enum": [
+              "RUNTIME_UNSPECIFIED",
+              "RUNTIME_NATIVE",
+              "RUNTIME_DOCKER"
+            ],
+            "type": "string"
+          },
+          {
+            "maximum": 2147483647,
+            "minimum": -2147483648,
+            "type": "integer"
+          }
+        ],
+        "title": "Runtime"
+      },
+      "type": "array"
+    },
+    "type": {
+      "anyOf": [
+        {
+          "enum": [
+            "PACKAGE_TYPE_GO",
+            "PACKAGE_TYPE_NODE"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2,
+          "minimum": 1,
+          "type": "integer"
+        }
+      ],
+      "description": "Source language \u0026 SDK of integration (required).",
+      "title": "Package Type"
+    }
+  },
+  "required": [
+    "identity",
+    "type"
+  ],
+  "title": "Package",
+  "type": "object"
+}

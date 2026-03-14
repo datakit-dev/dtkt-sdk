@@ -1,0 +1,46 @@
+{
+  "$id": "dtkt.catalog.v1beta2.ReadRowsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request message for reading rows from a table.",
+  "patternProperties": {
+    "^(selected_fields)$": {
+      "description": "Selected fields to read from the table.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "properties": {
+    "offset": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Offset for reading rows."
+    },
+    "selectedFields": {
+      "description": "Selected fields to read from the table.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "table": {
+      "description": "Table resource name to read row.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "table"
+  ],
+  "title": "Read Rows Request",
+  "type": "object"
+}

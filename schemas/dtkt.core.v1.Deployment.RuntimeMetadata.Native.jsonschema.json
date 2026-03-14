@@ -1,0 +1,38 @@
+{
+  "$id": "dtkt.core.v1.Deployment.RuntimeMetadata.Native.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(process_id)$": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "description": "PID of native process."
+    }
+  },
+  "properties": {
+    "processId": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "description": "PID of native process."
+    }
+  },
+  "required": [
+    "processId"
+  ],
+  "title": "Native",
+  "type": "object"
+}

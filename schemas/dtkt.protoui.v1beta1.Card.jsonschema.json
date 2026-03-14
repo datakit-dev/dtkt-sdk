@@ -1,0 +1,22 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Card.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Render as a card with optional header and footer sections.\n Maps to Card in @dtkt/ui/card\n Supports text, CEL expressions, and templates for each section.\n The message or field is available as `this` in expression/template context.\n Example: header: `this.title`, content: `this.body`",
+  "properties": {
+    "content": {
+      "$ref": "dtkt.protoui.v1beta1.Data.jsonschema.json",
+      "description": "Card content - the main body. Can be plain text, a CEL expression, or a template.\n Context: `this` is the message or field being rendered."
+    },
+    "footer": {
+      "$ref": "dtkt.protoui.v1beta1.Data.jsonschema.json",
+      "description": "Optional card footer. Can be plain text, a CEL expression, or a template.\n Context: `this` is the message or field being rendered."
+    },
+    "header": {
+      "$ref": "dtkt.protoui.v1beta1.Data.jsonschema.json",
+      "description": "Optional card header. Can be plain text, a CEL expression, or a template.\n Context: `this` is the message or field being rendered."
+    }
+  },
+  "title": "Card",
+  "type": "object"
+}

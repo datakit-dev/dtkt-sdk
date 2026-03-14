@@ -1,0 +1,27 @@
+{
+  "$id": "dtkt.catalog.v1beta1.SchemaPermission.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents permissions for a schema.",
+  "properties": {
+    "alias": {
+      "default": "",
+      "description": "Alias for the schema.",
+      "type": "string"
+    },
+    "name": {
+      "default": "",
+      "description": "Name of the schema.",
+      "type": "string"
+    },
+    "tables": {
+      "description": "Table-level permissions.",
+      "items": {
+        "$ref": "dtkt.catalog.v1beta1.TablePermission.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Schema Permission",
+  "type": "object"
+}

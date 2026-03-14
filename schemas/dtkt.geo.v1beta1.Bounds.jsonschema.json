@@ -1,0 +1,39 @@
+{
+  "$id": "dtkt.geo.v1beta1.Bounds.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "centroid": {
+      "default": false,
+      "type": "boolean"
+    },
+    "geom": {
+      "$ref": "dtkt.geojson.v1beta1.Geometry.jsonschema.json"
+    },
+    "type": {
+      "anyOf": [
+        {
+          "pattern": "^BOUNDS_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "BOUNDS_TYPE_COVERS",
+            "BOUNDS_TYPE_INTERSECTS",
+            "BOUNDS_TYPE_WITHIN"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "title": "Bounds Type"
+    }
+  },
+  "title": "Bounds",
+  "type": "object"
+}

@@ -1,0 +1,71 @@
+version: v2
+
+clean: true
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: github.com/datakit-dev/dtkt-sdk/sdk-go/proto
+    - file_option: java_package_prefix
+      value: proto
+  disable:
+    - file_option: go_package
+      module: buf.build/bufbuild/protovalidate
+    - file_option: go_package
+      module: buf.build/google/cel-spec
+    - file_option: go_package
+      module: buf.build/googleapis/googleapis
+
+inputs:
+  - directory: proto
+  - module: buf.build/googleapis/googleapis
+    paths:
+      - google/longrunning
+
+plugins:
+  # Go
+  - remote: buf.build/protocolbuffers/go:v1.36.10
+    out: sdk-go/proto
+    opt: paths=source_relative
+  - remote: buf.build/grpc/go:v1.5.1
+    out: sdk-go/proto
+    opt: paths=source_relative
+  - remote: buf.build/connectrpc/go:v1.19.1
+    out: sdk-go/proto
+    opt: paths=source_relative
+    # Only generate Connect for googleapis longrunning
+    include_imports: false
+  - local: protoc-gen-gosrcinfo
+    out: sdk-go/proto
+    opt: paths=source_relative
+
+  # TypeScript
+  - remote: buf.build/bufbuild/es:v2.10.1
+    opt:
+      - target=ts
+      - valid_types=protovalidate_required
+    out: sdk-ts/src/proto
+    include_imports: true
+    include_wkt: true
+  - remote: buf.build/connectrpc/query-es:v2.2.0
+    out: sdk-ts/src/proto
+    opt:
+      - target=ts
+
+  # JSON Schemas
+  # - remote: buf.build/bufbuild/protoschema-jsonschema
+  #   out: schemas
+  #   opt:
+  #     - target=json
+
+  # Python
+  # - remote: buf.build/protocolbuffers/python
+  #   out: sdk-py/proto
+  # - remote: buf.build/grpc/python
+  #   out: sdk-py/proto
+
+  # Java
+  # - remote: buf.build/grpc/java
+  #   out: sdk-java/src/main
+  # - remote: buf.build/protocolbuffers/java
+  #   out: sdk-java/src/main

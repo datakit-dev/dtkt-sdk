@@ -1,0 +1,27 @@
+{
+  "$id": "dtkt.shared.v1beta1.PageToken.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ]
+    },
+    "time": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json"
+    }
+  },
+  "required": [
+    "id",
+    "time"
+  ],
+  "title": "Page Token",
+  "type": "object"
+}

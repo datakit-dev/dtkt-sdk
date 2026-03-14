@@ -1,0 +1,39 @@
+{
+  "$id": "dtkt.catalog.v1beta1.Table.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a table within a schema.",
+  "properties": {
+    "description": {
+      "default": "",
+      "description": "Description of the table.",
+      "type": "string"
+    },
+    "fields": {
+      "description": "List of fields contained by the table.",
+      "items": {
+        "$ref": "dtkt.shared.v1beta1.Field.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "metadata": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "Additional metadata, if any."
+    },
+    "name": {
+      "default": "",
+      "description": "Name of the table.",
+      "type": "string"
+    },
+    "schema": {
+      "$ref": "dtkt.catalog.v1beta1.Schema.jsonschema.json",
+      "description": "Reference to the schema containing the table."
+    },
+    "stats": {
+      "$ref": "dtkt.catalog.v1beta1.TableStats.jsonschema.json",
+      "description": "Statistics about the table (e.g., row count), if any."
+    }
+  },
+  "title": "Table",
+  "type": "object"
+}

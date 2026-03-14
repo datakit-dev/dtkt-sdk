@@ -1,0 +1,36 @@
+{
+  "$id": "dtkt.core.v1.CreateConnectionRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(connection_id)$": {
+      "description": "Client-provided ID for connection resource.",
+      "minLength": 1,
+      "pattern": "^[a-z0-9-]+$",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "connection": {
+      "$ref": "dtkt.core.v1.Connection.jsonschema.json",
+      "description": "Connection to create."
+    },
+    "connectionId": {
+      "description": "Client-provided ID for connection resource.",
+      "minLength": 1,
+      "pattern": "^[a-z0-9-]+$",
+      "type": "string"
+    },
+    "parent": {
+      "description": "Parent resource name.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "parent",
+    "connectionId",
+    "connection"
+  ],
+  "title": "Create Connection Request",
+  "type": "object"
+}

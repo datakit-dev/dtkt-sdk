@@ -1,0 +1,107 @@
+{
+  "$id": "dtkt.shared.v1beta1.OAuthConfig.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(auth_style)$": {
+      "anyOf": [
+        {
+          "pattern": "^AUTH_STYLE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "AUTH_STYLE_IN_PARAMS",
+            "AUTH_STYLE_IN_HEADER"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Optional: how to auth against token endpoint.",
+      "title": "Auth Style"
+    },
+    "^(client_id)$": {
+      "default": "",
+      "minLength": 1,
+      "type": "string"
+    },
+    "^(client_secret)$": {
+      "default": "",
+      "type": "string"
+    },
+    "^(redirect_url)$": {
+      "default": "",
+      "description": "Optional redirect URL (can also be supplied per-request).",
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "authStyle": {
+      "anyOf": [
+        {
+          "pattern": "^AUTH_STYLE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "AUTH_STYLE_IN_PARAMS",
+            "AUTH_STYLE_IN_HEADER"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Optional: how to auth against token endpoint.",
+      "title": "Auth Style"
+    },
+    "clientId": {
+      "default": "",
+      "minLength": 1,
+      "type": "string"
+    },
+    "clientSecret": {
+      "default": "",
+      "type": "string"
+    },
+    "endpoint": {
+      "$ref": "dtkt.shared.v1beta1.OAuthEndpoint.jsonschema.json"
+    },
+    "params": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Provider-specific extra params (e.g., access_type=offline, prompt=consent).",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "redirectUrl": {
+      "default": "",
+      "description": "Optional redirect URL (can also be supplied per-request).",
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    },
+    "scopes": {
+      "description": "Requested permissions.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "title": "O Auth Config",
+  "type": "object"
+}

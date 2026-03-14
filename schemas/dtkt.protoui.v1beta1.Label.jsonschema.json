@@ -1,0 +1,14 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Label.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Render as a form label.\n Maps to Label in @dtkt/ui/components/label or fieldset\n Example expr: `this.field_name` or `\"Enter your \" + this.label`",
+  "properties": {
+    "content": {
+      "$ref": "dtkt.protoui.v1beta1.Data.jsonschema.json",
+      "description": "The label text. Can be plain text, a CEL expression, or a template.\n Context: `this` is the message or field being rendered."
+    }
+  },
+  "title": "Label",
+  "type": "object"
+}

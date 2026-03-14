@@ -1,0 +1,44 @@
+{
+  "$id": "dtkt.ai.v1beta1.GenerateEmbeddingsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request to generate embeddings for input text using a specified model.",
+  "patternProperties": {
+    "^(model_id)$": {
+      "default": "",
+      "description": "ID of the embedding model to use.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "dimensions": {
+      "anyOf": [
+        {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Desired number of dimensions for the embedding."
+    },
+    "inputs": {
+      "description": "List of text inputs to generate embeddings for.",
+      "items": {
+        "$ref": "dtkt.ai.v1beta1.EmbeddingInput.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "modelId": {
+      "default": "",
+      "description": "ID of the embedding model to use.",
+      "type": "string"
+    }
+  },
+  "title": "Generate Embeddings Request",
+  "type": "object"
+}

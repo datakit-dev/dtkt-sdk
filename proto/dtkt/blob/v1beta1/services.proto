@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package dtkt.blob.v1beta1;
+
+import "dtkt/blob/v1beta1/messages.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/blob/v1beta1";
+
+// BlobService provides operations to interact with blobs within a storage location.
+service BlobService {
+  // Retrieves a list of files provided by service.
+  rpc ListBlobs(ListBlobsRequest) returns (ListBlobsResponse) {
+    option (google.api.http) = {
+      get: "/v1beta1/{bucket=blobBuckets/*}/blobs"
+      additional_bindings: {get: "/v1beta1/blobs"}
+    };
+  }
+
+  // Retrieves attributes for the blob stored at key.
+  rpc GetBlob(GetBlobRequest) returns (GetBlobResponse) {
+    option (google.api.http) = {
+      get: "/v1beta1/{bucket=blobBuckets/*}/blobs/{key=**}"
+      additional_bindings: {get: "/v1beta1/blobs/{key=**}"}
+    };
+  }
+
+  // Writes or overwrites the blob stored at key.
+  rpc WriteBlob(WriteBlobRequest) returns (WriteBlobResponse) {
+    option (google.api.http) = {
+      put: "/v1beta1/{bucket=blobBuckets/*}/blobs/{key=**}"
+      body: "*"
+      additional_bindings: {
+        put: "/v1beta1/blobs/{key=**}"
+        body: "*"
+      }
+    };
+  }
+
+  // Deletes the blob stored at key.
+  rpc DeleteBlob(DeleteBlobRequest) returns (DeleteBlobResponse) {
+    option (google.api.http) = {
+      delete: "/v1beta1/{bucket=blobBuckets/*}/blobs/{key=**}"
+      additional_bindings: {delete: "/v1beta1/blobs/{key=**}"}
+    };
+  }
+
+  // Copies a blob from source to destination key.
+  rpc CopyBlob(CopyBlobRequest) returns (CopyBlobResponse) {
+    option (google.api.http) = {
+      post: "/v1beta1/{destination_bucket=blobBuckets/*}/blobs:copy"
+      body: "*"
+      additional_bindings: {
+        post: "/v1beta1/blobs:copy"
+        body: "*"
+      }
+    };
+  }
+
+  // Generates a signed URL for accessing the blob.
+  rpc GenerateSignedURL(GenerateSignedURLRequest) returns (GenerateSignedURLResponse) {
+    option (google.api.http) = {
+      post: "/v1beta1/{bucket=blobBuckets/*}/blobs/{key=**}:signUrl"
+      body: "*"
+      additional_bindings: {
+        post: "/v1beta1/blobs/{key=**}:signUrl"
+        body: "*"
+      }
+    };
+  }
+
+  // ReadBlobLines streams lines of blob with requested key and options.
+  rpc ReadBlobLines(ReadBlobLinesRequest) returns (stream ReadBlobLinesResponse);
+
+  // ReadBlobRange streams chunks of blob with requested key and options.
+  rpc ReadBlobRange(ReadBlobRangeRequest) returns (stream ReadBlobRangeResponse);
+
+  // WriteBlobLines streams lines into blob with requested key and options.
+  rpc WriteBlobLines(stream WriteBlobLinesRequest) returns (WriteBlobLinesResponse);
+}

@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+package dtkt.flow.v1beta1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1";
+
+message Bool {
+  optional bool default = 1;
+  bool nullable = 2;
+}
+
+message Bytes {
+  optional bytes default = 1;
+  bool nullable = 2;
+}
+
+message Double {
+  optional double default = 1;
+  bool nullable = 2;
+}
+
+message Float {
+  optional float default = 1;
+  bool nullable = 2;
+}
+
+message Int64 {
+  optional int64 default = 1;
+  bool nullable = 2;
+}
+
+message Uint64 {
+  optional uint64 default = 1;
+  bool nullable = 2;
+}
+
+message Int32 {
+  optional int32 default = 1;
+  bool nullable = 2;
+}
+
+message Uint32 {
+  optional uint32 default = 1;
+  bool nullable = 2;
+}
+
+message String {
+  optional string default = 1;
+  bool nullable = 2;
+}
+
+message List {
+  // Type of list items: scalar type, nested list/map, or message type
+  string items = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+
+  bool nullable = 2;
+
+  google.protobuf.ListValue default = 3;
+}
+
+message Map {
+  // Key type: bool, int32, int64, uint32, uint64, or string (default)
+  string key = 1 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.in = "bool",
+    (buf.validate.field).string.in = "int32",
+    (buf.validate.field).string.in = "int64",
+    (buf.validate.field).string.in = "uint32",
+    (buf.validate.field).string.in = "uint64",
+    (buf.validate.field).string.in = "string"
+  ];
+
+  // Value type: scalar type, nested list/map, or message type
+  string value = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+
+  bool nullable = 3;
+
+  google.protobuf.Struct default = 4;
+}
+
+// Proto message type
+message Message {
+  // Fully qualified message name: "google.protobuf.Struct", "google.protobuf.Timestamp", etc.
+  string type = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_.]+$"
+  ];
+
+  bool nullable = 2;
+
+  google.protobuf.Struct default = 3;
+}

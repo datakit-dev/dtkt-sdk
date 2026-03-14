@@ -1,0 +1,23 @@
+{
+  "$id": "dtkt.ai.v1beta1.TranscribeRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(provider_options)$": {
+      "$ref": "google.protobuf.Struct.jsonschema.json"
+    }
+  },
+  "properties": {
+    "audio": {
+      "$ref": "dtkt.ai.v1beta1.Blob.jsonschema.json"
+    },
+    "providerOptions": {
+      "$ref": "google.protobuf.Struct.jsonschema.json"
+    }
+  },
+  "required": [
+    "audio"
+  ],
+  "title": "Transcribe Request",
+  "type": "object"
+}

@@ -1,0 +1,36 @@
+{
+  "$id": "dtkt.geo.v1beta1.PropertyField.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "default": "",
+      "type": "string"
+    },
+    "type": {
+      "anyOf": [
+        {
+          "pattern": "^PROPERTY_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "PROPERTY_TYPE_STRING",
+            "PROPERTY_TYPE_BOOLEAN",
+            "PROPERTY_TYPE_NUMBER"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "title": "Property Type"
+    }
+  },
+  "title": "Property Field",
+  "type": "object"
+}

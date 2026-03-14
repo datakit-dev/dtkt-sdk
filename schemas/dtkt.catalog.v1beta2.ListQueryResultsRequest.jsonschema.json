@@ -1,0 +1,64 @@
+{
+  "$id": "dtkt.catalog.v1beta2.ListQueryResultsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request to retrieve query results.",
+  "patternProperties": {
+    "^(page_size)$": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Number of rows per page."
+    },
+    "^(page_token)$": {
+      "default": "",
+      "description": "Token for the desired page (empty for first page).",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "pageSize": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Number of rows per page."
+    },
+    "pageToken": {
+      "default": "",
+      "description": "Token for the desired page (empty for first page).",
+      "type": "string"
+    },
+    "params": {
+      "description": "Parameters used in the query.",
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.Param.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "query": {
+      "default": "",
+      "description": "The query to execute.",
+      "type": "string"
+    }
+  },
+  "title": "List Query Results Request",
+  "type": "object"
+}

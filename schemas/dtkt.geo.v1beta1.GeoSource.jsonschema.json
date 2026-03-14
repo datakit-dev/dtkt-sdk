@@ -1,0 +1,51 @@
+{
+  "$id": "dtkt.geo.v1beta1.GeoSource.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(geo_fields)$": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "^(prop_fields)$": {
+      "items": {
+        "$ref": "dtkt.geo.v1beta1.PropertyField.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "^(update_freq)$": {
+      "$ref": "google.protobuf.Duration.jsonschema.json"
+    }
+  },
+  "properties": {
+    "geoFields": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "id": {
+      "default": "",
+      "type": "string"
+    },
+    "propFields": {
+      "items": {
+        "$ref": "dtkt.geo.v1beta1.PropertyField.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "query": {
+      "$ref": "dtkt.catalog.v1beta1.Query.jsonschema.json"
+    },
+    "table": {
+      "$ref": "dtkt.catalog.v1beta1.Table.jsonschema.json"
+    },
+    "updateFreq": {
+      "$ref": "google.protobuf.Duration.jsonschema.json"
+    }
+  },
+  "title": "Geo Source",
+  "type": "object"
+}

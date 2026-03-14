@@ -1,0 +1,27 @@
+{
+  "$id": "dtkt.catalog.v1beta2.CatalogPermission.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents permissions for a catalog.",
+  "properties": {
+    "alias": {
+      "default": "",
+      "description": "Alias for the catalog.",
+      "type": "string"
+    },
+    "name": {
+      "default": "",
+      "description": "Name of the catalog.",
+      "type": "string"
+    },
+    "schemas": {
+      "description": "Schema-level permissions.",
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.SchemaPermission.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Catalog Permission",
+  "type": "object"
+}

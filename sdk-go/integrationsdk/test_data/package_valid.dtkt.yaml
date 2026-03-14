@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=http://localhost:9900/schemas/types/dtkt.integrationsdk.v1beta1.Package.jsonschema.json
+
+kind: Package
+apiVersion: v1beta1
+spec:
+  identity:
+    name: TestIntegration
+    version: 0.4.0
+  description: Test integration
+  icon: https://example.com/icon.png
+  type: PACKAGE_TYPE_GO

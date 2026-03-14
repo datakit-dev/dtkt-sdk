@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.geojson.v1beta1.LineStringCoords.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Helper types for nested coordinates",
+  "properties": {
+    "positions": {
+      "items": {
+        "$ref": "dtkt.geojson.v1beta1.Position.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Line String Coords",
+  "type": "object"
+}

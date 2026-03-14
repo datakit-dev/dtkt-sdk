@@ -1,0 +1,33 @@
+fragment ModelTypeFragment on ModelType {
+  id
+  slug
+  name
+  description
+  category
+  sourceURL
+  sourceVersion
+  minSources
+  minPerType
+  maxPerType
+  modeler
+  configTemplate
+  createdAt
+  updatedAt
+}
+
+query GetModelType($modelTypeId: ID, $slug: String) {
+  modelType(id: $modelTypeId, slug: $slug) {
+    ...ModelTypeFragment
+  }
+}
+
+query ListModelTypes($orderBy: ModelTypeOrder, $where: ModelTypeWhereInput) {
+  modelTypes(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...ModelTypeFragment
+      }
+    }
+    totalCount
+  }
+}

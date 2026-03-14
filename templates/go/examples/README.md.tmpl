@@ -1,0 +1,82 @@
+# Examples
+
+These examples depend on a running instance of the {{ $.PKG_NAME }} integration package.
+
+## Connections
+
+{{ $.PKG_NAME }} connections for use in examples.
+
+### {{ $.PKG_NAME }}
+
+Create the {{ $.PKG_SLUG }} connection.
+
+```shell
+dtkt conn create \
+  --intgr {{ $.PKG_SLUG }} \
+  --config-path examples/config.json
+```
+
+<img alt="connection demo with VHS" src="./connection/vhs.gif" width="800" />
+
+## Services
+{{- if $.PROTO_ENABLED }}
+### GreetService.Greet
+
+Run the Greet RPC.
+
+```shell
+dtkt call Greet -d '{"name": "World"}'
+```
+
+<img alt="greet-rpc demo with VHS" src="./greet-rpc/vhs.gif" width="800" />
+{{- else }}
+No example services.
+{{- end }}
+
+## Actions
+{{- if hasPkg "action" "v1beta1" }}
+### Echo Action
+
+Run the echo action.
+
+```shell
+dtkt call ExecuteAction -d '{
+  "name": "actions/echo",
+  "input": {
+    "message": "Hello, World!"
+  }
+}'
+```
+
+<img alt="echo-action demo with VHS" src="./echo-action/vhs.gif" width="800" />
+{{- else }}
+No example actions.
+{{- end }}
+
+## Flows
+{{- if $.PROTO_ENABLED }}
+### Greet Flow
+
+Run the greet flow.
+
+```shell
+cat ./greet-flow/inputs.jsonl | dtkt flow run ./greet-flow/flow.dtkt.yaml
+```
+
+<img alt="greet-flow demo with VHS" src="./greet-flow/vhs.gif" width="800" />
+{{- end }}
+{{- if hasPkg "action" "v1beta1" }}
+
+### Echo Flow
+
+Run the echo flow.
+
+```shell
+cat ./echo-flow/inputs.jsonl | dtkt flow run ./echo-flow/flow.dtkt.yaml
+```
+
+<img alt="echo-flow demo with VHS" src="./echo-flow/vhs.gif" width="800" />
+{{- end }}
+{{- if not (or $.PROTO_ENABLED (hasPkg "action" "v1beta1")) }}
+No example flows.
+{{- end }}

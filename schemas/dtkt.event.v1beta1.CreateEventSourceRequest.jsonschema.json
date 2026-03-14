@@ -1,0 +1,42 @@
+{
+  "$id": "dtkt.event.v1beta1.CreateEventSourceRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request to create a new event source.",
+  "patternProperties": {
+    "^(event_source)$": {
+      "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+      "description": "Event source to create."
+    },
+    "^(pull_freq)$": {
+      "$ref": "google.protobuf.Duration.jsonschema.json",
+      "description": "Pull frequency of the event source, if any (only supported when strategy is PULL)."
+    },
+    "^(push_url)$": {
+      "default": "",
+      "description": "Push URL of the event source, if any (only supported when strategy is PUSH).",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "config": {
+      "$ref": "google.protobuf.Any.jsonschema.json",
+      "description": "Configuration of the event source."
+    },
+    "eventSource": {
+      "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+      "description": "Event source to create."
+    },
+    "pullFreq": {
+      "$ref": "google.protobuf.Duration.jsonschema.json",
+      "description": "Pull frequency of the event source, if any (only supported when strategy is PULL)."
+    },
+    "pushUrl": {
+      "default": "",
+      "description": "Push URL of the event source, if any (only supported when strategy is PUSH).",
+      "type": "string"
+    }
+  },
+  "title": "Create Event Source Request",
+  "type": "object"
+}

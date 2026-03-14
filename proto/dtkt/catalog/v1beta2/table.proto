@@ -1,0 +1,172 @@
+syntax = "proto3";
+
+package dtkt.catalog.v1beta2;
+
+import "buf/validate/validate.proto";
+import "dtkt/catalog/v1beta2/type.proto";
+import "dtkt/catalog/v1beta2/value.proto";
+import "google/protobuf/field_mask.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta2";
+
+service TableService {
+  // List tables.
+  rpc ListTables(ListTablesRequest) returns (ListTablesResponse);
+
+  // Get table.
+  rpc GetTable(GetTableRequest) returns (GetTableResponse);
+
+  // Create a table.
+  rpc CreateTable(CreateTableRequest) returns (CreateTableResponse);
+
+  // Update a table.
+  rpc UpdateTable(UpdateTableRequest) returns (UpdateTableResponse);
+
+  // Delete a table.
+  rpc DeleteTable(DeleteTableRequest) returns (DeleteTableResponse);
+
+  // Write rows to table(s).
+  rpc WriteRows(stream WriteRowsRequest) returns (WriteRowsResponse);
+
+  // Read rows from table(s).
+  rpc ReadRows(ReadRowsRequest) returns (stream ReadRowsResponse);
+}
+
+// Represents a table within a table.
+message Table {
+  // Table resource name, format: `catalogs/{catalog}/schemas/{schema}/tables/{table}`.
+  string name = 1;
+
+  // Table identifier.
+  string table_id = 2;
+
+  // Description of the table.
+  string description = 3;
+
+  // List of fields defined by the table.
+  repeated Field fields = 34;
+
+  // Statistics about the table (e.g., row count), if any.
+  TableStats stats = 5;
+
+  // Additional metadata, if any.
+  map<string, string> metadata = 10;
+}
+
+// TableStats contains statistics about a table.
+message TableStats {
+  // The total number of rows in the table.
+  int64 total_rows = 1;
+
+  // The total size of the table in bytes.
+  int64 total_bytes = 2;
+}
+
+// Request message for listing Tables.
+message ListTablesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string parent = 3;
+  string filter = 4;
+}
+
+// Response message for listing Tables.
+message ListTablesResponse {
+  repeated Table tables = 1;
+  string next_page_token = 2;
+}
+
+// Get Table request.
+message GetTableRequest {
+  // Table resource name to retrieve.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Metadata of the Table, if any.
+  map<string, string> metadata = 2;
+}
+
+// Get Table response.
+message GetTableResponse {
+  // The retrieved Table.
+  Table table = 1;
+}
+
+// Create Table request.
+message CreateTableRequest {
+  // Parent catalog resource name.
+  string parent = 1 [(buf.validate.field).required = true];
+
+  // Table identifier, e.g. final segment in resource name: `.../tables/{table}`
+  string table_id = 2 [(buf.validate.field).required = true];
+
+  // Table to create.
+  Table table = 3 [(buf.validate.field).required = true];
+}
+
+// Create Table response.
+message CreateTableResponse {
+  // Table created.
+  Table table = 1;
+}
+
+// Update Table request.
+message UpdateTableRequest {
+  // Table with updated fields
+  Table table = 1 [(buf.validate.field).required = true];
+
+  // Fields to update.
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+// Update Table response.
+message UpdateTableResponse {
+  // The updated Table.
+  Table table = 1;
+}
+
+// Request message for deleting a table.
+message DeleteTableRequest {
+  // Name of table to delete.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for deleting a table.
+message DeleteTableResponse {}
+
+// Request message for writing to a table.
+message WriteRowsRequest {
+  // Table resource name to write row.
+  string table = 1 [(buf.validate.field).required = true];
+
+  // A single row to be written to table and conforming to the description found
+  // in value.proto.
+  Row row = 2 [(buf.validate.field).required = true];
+}
+
+// Response message for rows written to a table.
+message WriteRowsResponse {
+  // Map of table resource name to total rows written.
+  map<string, int64> table_rows_written = 1;
+}
+
+// Request message for reading rows from a table.
+message ReadRowsRequest {
+  // Table resource name to read row.
+  string table = 1 [(buf.validate.field).required = true];
+
+  // Offset for reading rows.
+  int64 offset = 2;
+
+  // Selected fields to read from the table.
+  repeated string selected_fields = 3;
+}
+
+// Response message for reading rows from a table.
+message ReadRowsResponse {
+  // Table resource name to read row.
+  string table = 1;
+
+  // A list of rows read from table with each row representing a subset of a
+  // table's fields and each value conforming to the description found in value.proto.
+  repeated Row rows = 6;
+}

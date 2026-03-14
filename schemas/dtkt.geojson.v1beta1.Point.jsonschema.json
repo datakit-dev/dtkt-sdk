@@ -1,0 +1,20 @@
+{
+  "$id": "dtkt.geojson.v1beta1.Point.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "GeoJSON Geometry types",
+  "properties": {
+    "bbox": {
+      "$ref": "dtkt.geojson.v1beta1.BBox.jsonschema.json"
+    },
+    "coordinates": {
+      "$ref": "dtkt.geojson.v1beta1.Position.jsonschema.json"
+    },
+    "type": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Point",
+  "type": "object"
+}

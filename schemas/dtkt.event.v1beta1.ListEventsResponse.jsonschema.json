@@ -1,0 +1,17 @@
+{
+  "$id": "dtkt.event.v1beta1.ListEventsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response containing a list of events.",
+  "properties": {
+    "events": {
+      "description": "List of available events.",
+      "items": {
+        "$ref": "dtkt.event.v1beta1.Event.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "List Events Response",
+  "type": "object"
+}

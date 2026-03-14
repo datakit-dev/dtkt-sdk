@@ -1,0 +1,15 @@
+{
+  "$id": "dtkt.core.v1.Deployment.RuntimeMetadata.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "docker": {
+      "$ref": "dtkt.core.v1.Deployment.RuntimeMetadata.Docker.jsonschema.json"
+    },
+    "native": {
+      "$ref": "dtkt.core.v1.Deployment.RuntimeMetadata.Native.jsonschema.json"
+    }
+  },
+  "title": "Runtime Metadata",
+  "type": "object"
+}

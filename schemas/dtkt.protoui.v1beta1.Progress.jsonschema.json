@@ -1,0 +1,14 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Progress.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Render as a progress bar.\n Maps to Progress in @dtkt/ui/components/progress\n Use CEL expressions to calculate progress value (0-100).\n The message or field is available as `this` in the expression context.\n Example: `double(this.completed) / double(this.total) * 100.0` or `this.progress_percentage`",
+  "properties": {
+    "value": {
+      "description": "CEL expression that evaluates to a numeric value representing progress (0-100).\n Context: `this` is the message or field being rendered.\n If not specified, uses the field value directly.",
+      "type": "string"
+    }
+  },
+  "title": "Progress",
+  "type": "object"
+}

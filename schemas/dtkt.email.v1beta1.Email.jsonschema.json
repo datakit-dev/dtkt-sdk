@@ -1,0 +1,65 @@
+{
+  "$id": "dtkt.email.v1beta1.Email.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents an email message.",
+  "patternProperties": {
+    "^(html_body)$": {
+      "default": "",
+      "type": "string"
+    },
+    "^(reply_to)$": {
+      "$ref": "dtkt.email.v1beta1.EmailAddress.jsonschema.json"
+    },
+    "^(return_path)$": {
+      "$ref": "dtkt.email.v1beta1.EmailAddress.jsonschema.json"
+    },
+    "^(text_body)$": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "bcc": {
+      "items": {
+        "$ref": "dtkt.email.v1beta1.EmailAddress.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "cc": {
+      "items": {
+        "$ref": "dtkt.email.v1beta1.EmailAddress.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "from": {
+      "$ref": "dtkt.email.v1beta1.EmailAddress.jsonschema.json"
+    },
+    "htmlBody": {
+      "default": "",
+      "type": "string"
+    },
+    "replyTo": {
+      "$ref": "dtkt.email.v1beta1.EmailAddress.jsonschema.json"
+    },
+    "returnPath": {
+      "$ref": "dtkt.email.v1beta1.EmailAddress.jsonschema.json"
+    },
+    "subject": {
+      "default": "",
+      "type": "string"
+    },
+    "textBody": {
+      "default": "",
+      "type": "string"
+    },
+    "to": {
+      "items": {
+        "$ref": "dtkt.email.v1beta1.EmailAddress.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Email",
+  "type": "object"
+}

@@ -1,0 +1,48 @@
+version: "3"
+
+includes:
+  go:
+    taskfile: ./sdk-go/Taskfile.yaml
+    dir: ./sdk-go
+
+  ts:
+    taskfile: ./sdk-ts/Taskfile.yaml
+    dir: ./sdk-ts
+
+tasks:
+  setup:
+    desc: Setup the dev environment
+    cmds:
+      - go install github.com/bufbuild/buf/cmd/buf@latest
+      - go install github.com/jhump/protoreflect/v2/sourceinfo/cmd/protoc-gen-gosrcinfo@latest
+      - task: go:setup
+      - task: ts:setup
+
+  generate:
+    cmds:
+      - task: go:pregenerate
+      - buf generate
+      - task: go:generate
+      - task: ts:generate
+      - task: docs
+
+  docs:
+    cmds:
+      - buf build --as-file-descriptor-set -o docs/protos.binpb
+
+  test:
+    deps:
+      - task: go:test
+      - task: ts:test
+
+  lint:
+    cmds:
+      - buf lint
+      - task: go:lint
+      - task: ts:lint
+
+  git-clean-ignored:
+    desc: Delete all files listed in .gitignore files
+    prompt: Are you sure you want to delete all files and directories listed in .gitignore files?
+    cmds:
+      - git clean -fdX

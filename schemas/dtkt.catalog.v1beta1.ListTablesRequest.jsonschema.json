@@ -1,0 +1,14 @@
+{
+  "$id": "dtkt.catalog.v1beta1.ListTablesRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request message for getting tables in a schema.",
+  "properties": {
+    "schema": {
+      "$ref": "dtkt.catalog.v1beta1.Schema.jsonschema.json",
+      "description": "Reference to the schema containing the tables."
+    }
+  },
+  "title": "List Tables Request",
+  "type": "object"
+}

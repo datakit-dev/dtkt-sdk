@@ -1,0 +1,38 @@
+{
+  "$id": "dtkt.ai.v1beta1.Message.Content.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(provider_options)$": {
+      "$ref": "google.protobuf.Struct.jsonschema.json"
+    },
+    "^(tool_call)$": {
+      "$ref": "dtkt.ai.v1beta1.Message.Content.ToolCall.jsonschema.json"
+    },
+    "^(tool_result)$": {
+      "$ref": "dtkt.ai.v1beta1.Message.Content.ToolResult.jsonschema.json"
+    }
+  },
+  "properties": {
+    "blob": {
+      "$ref": "dtkt.ai.v1beta1.Blob.jsonschema.json"
+    },
+    "providerOptions": {
+      "$ref": "google.protobuf.Struct.jsonschema.json"
+    },
+    "source": {
+      "$ref": "dtkt.ai.v1beta1.Message.Content.Source.jsonschema.json"
+    },
+    "text": {
+      "$ref": "dtkt.ai.v1beta1.Message.Content.Text.jsonschema.json"
+    },
+    "toolCall": {
+      "$ref": "dtkt.ai.v1beta1.Message.Content.ToolCall.jsonschema.json"
+    },
+    "toolResult": {
+      "$ref": "dtkt.ai.v1beta1.Message.Content.ToolResult.jsonschema.json"
+    }
+  },
+  "title": "Content",
+  "type": "object"
+}

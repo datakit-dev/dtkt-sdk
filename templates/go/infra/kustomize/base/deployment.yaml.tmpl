@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $.PKG_SLUG }}
+spec:
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels: {}
+  template:
+    spec:
+      serviceAccountName: {{ $.PKG_SLUG }}
+      containers:
+      - image: {{ $.PKG_SLUG }}
+        name: {{ $.PKG_SLUG }}
+        env:
+        - name: DTKT_NETWORK
+          value: tcp
+        - name: DTKT_ADDRESS
+          value: "0.0.0.0:9090"
+        envFrom:
+        - configMapRef:
+            name: {{ $.PKG_SLUG }}
+        ports:
+        - containerPort: 9090
+          name: http-grpc
+        resources:
+          requests:
+            cpu: 500m
+          limits:
+            memory: 512Mi
+        livenessProbe:
+          grpc:
+            port: 9090
+        readinessProbe:
+          grpc:
+            port: 9090

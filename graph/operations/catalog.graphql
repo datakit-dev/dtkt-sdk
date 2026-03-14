@@ -1,0 +1,70 @@
+fragment CatalogFragment on Catalog {
+  id
+  name
+  description
+  alias
+  label
+  queryDialect
+  autoSync
+  syncStatus
+  syncError
+  syncedAt
+  createdAt
+  updatedAt
+  deletedAt
+  connectionID
+  organizationID
+}
+
+query GetCatalog($id: ID!) {
+  catalog(id: $id) {
+    ...CatalogFragment
+  }
+}
+
+query ListCatalogs($orderBy: CatalogOrder, $where: CatalogWhereInput) {
+  catalogs(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...CatalogFragment
+      }
+    }
+    totalCount
+  }
+}
+
+mutation CreateCatalog($input: CreateCatalogInput!) {
+  createCatalog(input: $input) {
+    created
+    error
+    catalog {
+      ...CatalogFragment
+    }
+  }
+}
+
+mutation SyncCatalog($id: ID!) {
+  syncCatalog(id: $id) {
+    updated
+    error
+    catalog {
+      ...CatalogFragment
+    }
+  }
+}
+
+mutation UpdateCatalog($id: ID!, $input: UpdateCatalogInput!) {
+  updateCatalog(id: $id, input: $input) {
+    updated
+    error
+    catalog {
+      ...CatalogFragment
+    }
+  }
+}
+
+mutation Mutation($id: ID!, $softDelete: Boolean) {
+  deleteCatalog(id: $id, softDelete: $softDelete) {
+    id
+  }
+}

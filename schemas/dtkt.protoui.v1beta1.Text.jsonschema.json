@@ -1,0 +1,33 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Text.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Render as styled text with color options.\n Maps to Text in @dtkt/ui/text\n Supports text, CEL expressions, and templates for generating content.\n The message or field is available as `this` in expression/template context.\n Example expr: `this.message` or `\"Updated: \" + string(this.updated_at)`",
+  "properties": {
+    "color": {
+      "anyOf": [
+        {
+          "enum": [
+            "COLOR_UNSPECIFIED",
+            "COLOR_DARK_ZINC",
+            "COLOR_LIGHT",
+            "COLOR_WHITE"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "title": "Color"
+    },
+    "content": {
+      "$ref": "dtkt.protoui.v1beta1.Data.jsonschema.json",
+      "description": "The text content. Can be plain text, a CEL expression, or a template.\n Context: `this` is the message or field being rendered."
+    }
+  },
+  "title": "Text",
+  "type": "object"
+}

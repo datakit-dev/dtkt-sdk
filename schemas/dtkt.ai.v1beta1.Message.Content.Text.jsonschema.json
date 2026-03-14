@@ -1,0 +1,15 @@
+{
+  "$id": "dtkt.ai.v1beta1.Message.Content.Text.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "text": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "text"
+  ],
+  "title": "Text",
+  "type": "object"
+}

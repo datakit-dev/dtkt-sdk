@@ -1,0 +1,29 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Heading.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Render as a heading with specified level.\n Maps to Heading in @dtkt/ui/heading\n Use CEL expressions to generate heading text.\n The message or field is available as `this` in the expression context.\n Example: `this.title` or `\"Section \" + string(this.section_num) + \": \" + this.name`",
+  "properties": {
+    "content": {
+      "description": "CEL expression that evaluates to a string for the heading text.\n Context: `this` is the message or field being rendered.\n If not specified, uses the field value directly.",
+      "type": "string"
+    },
+    "level": {
+      "anyOf": [
+        {
+          "maximum": 6,
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Heading level (1-6)."
+    }
+  },
+  "title": "Heading",
+  "type": "object"
+}

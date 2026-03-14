@@ -1,0 +1,19 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Table.Action.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "href": {
+      "default": "",
+      "description": "CEL expression for the action command.\n Context: `this` is the current row item.",
+      "type": "string"
+    },
+    "label": {
+      "default": "",
+      "description": "Action label to be displayed (e.g., Edit).",
+      "type": "string"
+    }
+  },
+  "title": "Action",
+  "type": "object"
+}

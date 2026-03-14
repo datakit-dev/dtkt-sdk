@@ -1,0 +1,14 @@
+{
+  "$id": "dtkt.catalog.v1beta2.UpdateCatalogResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Update catalog response.",
+  "properties": {
+    "catalog": {
+      "$ref": "dtkt.catalog.v1beta2.Catalog.jsonschema.json",
+      "description": "The updated catalog."
+    }
+  },
+  "title": "Update Catalog Response",
+  "type": "object"
+}

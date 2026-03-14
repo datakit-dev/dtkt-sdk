@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.GetTypeResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "type": {
+      "$ref": "dtkt.core.v1.Type.jsonschema.json",
+      "description": "The requested type."
+    }
+  },
+  "required": [
+    "type"
+  ],
+  "title": "Get Type Response",
+  "type": "object"
+}

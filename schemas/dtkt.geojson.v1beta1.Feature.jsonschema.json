@@ -1,0 +1,52 @@
+{
+  "$id": "dtkt.geojson.v1beta1.Feature.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(id_num)$": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ]
+    },
+    "^(id_str)$": {
+      "type": "string"
+    }
+  },
+  "properties": {
+    "bbox": {
+      "$ref": "dtkt.geojson.v1beta1.BBox.jsonschema.json"
+    },
+    "geometry": {
+      "$ref": "dtkt.geojson.v1beta1.Geometry.jsonschema.json"
+    },
+    "idNum": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ]
+    },
+    "idStr": {
+      "type": "string"
+    },
+    "properties": {
+      "$ref": "google.protobuf.Struct.jsonschema.json"
+    },
+    "type": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Feature",
+  "type": "object"
+}

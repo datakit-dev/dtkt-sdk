@@ -1,0 +1,78 @@
+{
+  "$id": "dtkt.action.v1beta1.Action.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(deprecation_note)$": {
+      "default": "",
+      "description": "Explains why this action is deprecated and what users should use instead.",
+      "type": "string"
+    },
+    "^(display_name)$": {
+      "default": "",
+      "description": "The name shown to users in the UI, e.g. \"Send Email\".",
+      "type": "string"
+    },
+    "^(updated_at)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "When this action definition was last changed."
+    }
+  },
+  "properties": {
+    "deprecationNote": {
+      "default": "",
+      "description": "Explains why this action is deprecated and what users should use instead.",
+      "type": "string"
+    },
+    "description": {
+      "default": "",
+      "description": "A short explanation of what this action does, shown to users when selecting or reviewing it.",
+      "type": "string"
+    },
+    "disabled": {
+      "default": false,
+      "description": "When true, this action is not available for execution. Users will see an error if they attempt to run it.",
+      "type": "boolean"
+    },
+    "displayName": {
+      "default": "",
+      "description": "The name shown to users in the UI, e.g. \"Send Email\".",
+      "type": "string"
+    },
+    "input": {
+      "$ref": "dtkt.shared.v1beta1.TypeSchema.jsonschema.json",
+      "description": "Describes the shape of data the user must provide when executing this action."
+    },
+    "labels": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Key/value tags for filtering and organizing actions in the UI.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "name": {
+      "default": "",
+      "description": "Unique identifier for this action, e.g. `actions/send-email`.",
+      "minLength": 3,
+      "type": "string"
+    },
+    "output": {
+      "$ref": "dtkt.shared.v1beta1.TypeSchema.jsonschema.json",
+      "description": "Describes the shape of data returned to the user after execution."
+    },
+    "updatedAt": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "When this action definition was last changed."
+    },
+    "version": {
+      "default": "",
+      "description": "The version of this action definition, e.g. \"1.0.0\".",
+      "type": "string"
+    }
+  },
+  "title": "Action",
+  "type": "object"
+}

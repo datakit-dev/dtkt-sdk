@@ -1,0 +1,23 @@
+{
+  "$id": "dtkt.ai.v1beta1.GenerateObjectRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(provider_options)$": {
+      "$ref": "google.protobuf.Struct.jsonschema.json"
+    }
+  },
+  "properties": {
+    "messages": {
+      "items": {
+        "$ref": "dtkt.ai.v1beta1.Message.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "providerOptions": {
+      "$ref": "google.protobuf.Struct.jsonschema.json"
+    }
+  },
+  "title": "Generate Object Request",
+  "type": "object"
+}

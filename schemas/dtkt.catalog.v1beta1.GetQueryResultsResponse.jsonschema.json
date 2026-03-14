@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.catalog.v1beta1.GetQueryResultsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response containing query results.",
+  "patternProperties": {
+    "^(results_page)$": {
+      "$ref": "dtkt.catalog.v1beta1.QueryResultsPage.jsonschema.json",
+      "description": "Results page containing rows."
+    }
+  },
+  "properties": {
+    "query": {
+      "$ref": "dtkt.catalog.v1beta1.Query.jsonschema.json",
+      "description": "Details of the executed query."
+    },
+    "resultsPage": {
+      "$ref": "dtkt.catalog.v1beta1.QueryResultsPage.jsonschema.json",
+      "description": "Results page containing rows."
+    }
+  },
+  "title": "Get Query Results Response",
+  "type": "object"
+}

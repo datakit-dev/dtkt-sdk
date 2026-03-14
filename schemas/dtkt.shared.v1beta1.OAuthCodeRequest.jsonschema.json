@@ -1,0 +1,98 @@
+{
+  "$id": "dtkt.shared.v1beta1.OAuthCodeRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(code_challenge)$": {
+      "default": "",
+      "description": "PKCE (optional but recommended).",
+      "type": "string"
+    },
+    "^(code_challenge_method)$": {
+      "anyOf": [
+        {
+          "pattern": "^CODE_CHALLENGE_METHOD_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "CODE_CHALLENGE_METHOD_PLAIN",
+            "CODE_CHALLENGE_METHOD_S256"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "title": "Code Challenge Method"
+    },
+    "^(redirect_url)$": {
+      "default": "",
+      "description": "Must match provider registration (may also live in OAuthConfig).",
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "codeChallenge": {
+      "default": "",
+      "description": "PKCE (optional but recommended).",
+      "type": "string"
+    },
+    "codeChallengeMethod": {
+      "anyOf": [
+        {
+          "pattern": "^CODE_CHALLENGE_METHOD_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "CODE_CHALLENGE_METHOD_PLAIN",
+            "CODE_CHALLENGE_METHOD_S256"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "title": "Code Challenge Method"
+    },
+    "params": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "redirectUrl": {
+      "default": "",
+      "description": "Must match provider registration (may also live in OAuthConfig).",
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    },
+    "scopes": {
+      "description": "Optional: override/augment scopes or pass extra params.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "state": {
+      "default": "",
+      "description": "CSRF protection (highly recommended).",
+      "type": "string"
+    }
+  },
+  "title": "O Auth Code Request",
+  "type": "object"
+}

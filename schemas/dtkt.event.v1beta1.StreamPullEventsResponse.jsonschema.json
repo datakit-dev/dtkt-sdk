@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.event.v1beta1.StreamPullEventsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response for pulling events.",
+  "patternProperties": {
+    "^(event_source)$": {
+      "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+      "description": "Pull event source from request."
+    }
+  },
+  "properties": {
+    "event": {
+      "$ref": "dtkt.event.v1beta1.Event.jsonschema.json",
+      "description": "Event delivered by source."
+    },
+    "eventSource": {
+      "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+      "description": "Pull event source from request."
+    }
+  },
+  "title": "Stream Pull Events Response",
+  "type": "object"
+}

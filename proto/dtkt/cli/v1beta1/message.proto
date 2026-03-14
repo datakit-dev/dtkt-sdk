@@ -1,0 +1,209 @@
+syntax = "proto3";
+
+package dtkt.cli.v1beta1;
+
+import "buf/validate/validate.proto";
+import "dtkt/core/v1/messages.proto";
+import "dtkt/protoui/v1beta1/protoui.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/cli/v1beta1;cliv1beta1";
+
+// Telemetry configuration options
+enum Telemetry {
+  TELEMETRY_UNSPECIFIED = 0;
+  TELEMETRY_ON = 1;
+  TELEMETRY_OFF = 2;
+}
+
+// Legal configuration
+message Legal {
+  // Timestamp when BSL license was accepted
+  optional google.protobuf.Timestamp bsl_accepted_at = 1;
+}
+
+// Daemon configuration
+message DaemonConfigFile {
+  // Daemon TCP address
+  string tcp_address = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.host_and_port = true
+  ];
+
+  // Telemetry opt-in/out setting
+  Telemetry telemetry = 2 [(buf.validate.field).enum.defined_only = true];
+
+  // Docker registry for pushing/pulling integration images (e.g. "us-docker.pkg.dev/datakit-prd/us-docker-virtual")
+  string docker_registry = 3;
+}
+
+message DaemonConfig {
+  DaemonConfigFile config_file = 1;
+
+  // Data directory
+  string data_dir = 2 [(buf.validate.field).string.min_len = 1];
+
+  // Build artifacts directory
+  string build_dir = 3 [(buf.validate.field).string.min_len = 1];
+
+  // Cache directory
+  string cache_dir = 4 [(buf.validate.field).string.min_len = 1];
+
+  // Log directory
+  string log_dir = 5 [(buf.validate.field).string.min_len = 1];
+
+  // Runtime directory (contains socket and PID files)
+  string run_dir = 6 [(buf.validate.field).string.min_len = 1];
+
+  // Socket file path
+  string socket_path = 7 [(buf.validate.field).required = true];
+
+  // Process ID file path
+  string pid_file_path = 8 [(buf.validate.field).string.min_len = 1];
+}
+
+message DaemonStatus {
+  // Whether or not the daemon is running
+  bool running = 1;
+
+  // Process ID of the daemon (if running)
+  int32 pid = 2;
+
+  DaemonConfig daemon = 3;
+
+  // Additional status message
+  string message = 4;
+}
+
+// Daemon configuration and runtime paths
+message DaemonPaths {
+  // Mode (user or system)
+  string mode = 1;
+  // Path to daemon configuration file
+  string config_file = 2;
+  // Unix socket path
+  string socket_path = 3;
+  // TCP address
+  string tcp_address = 4;
+  // Data directory
+  string data_dir = 5;
+  // Build artifacts directory
+  string build_dir = 6;
+  // Cache directory
+  string cache_dir = 7;
+  // Log directory
+  string log_dir = 8;
+  // PID file path
+  string pid_file_path = 9;
+  // Runtime directory (contains socket and PID files)
+  string run_dir = 10;
+}
+
+message ConfigFile {
+  // Map of context label to context configuration
+  map<string, dtkt.core.v1.Context> contexts = 1 [(buf.validate.field).map = {
+    keys: {
+      string: {
+        min_len: 1
+        pattern: "^[a-z][a-z0-9_-]*$"
+      }
+    }
+  }];
+
+  // Legal acceptance tracking
+  Legal legal = 2 [(buf.validate.field).required = true];
+
+  // Disable interactive prompts
+  bool non_interactive = 3;
+
+  // Telemetry opt-in/out setting
+  Telemetry telemetry = 4 [(buf.validate.field).enum.defined_only = true];
+}
+
+// Configuration profile
+message Config {
+  // Configuration profile name
+  string name = 1;
+  // Whether this is the active configuration
+  bool is_active = 2;
+  // Configuration file contents
+  ConfigFile config_file = 3;
+}
+
+// List of configuration profiles
+message Configs {
+  option (dtkt.protoui.v1beta1.message) = {
+    components: [
+      {
+        table: {
+          columns: [
+            {label: "Config"},
+            {label: "Active"}]
+          rows: "this.configs.map(c, [c.name, c.is_active ? '✅' : ''])"
+        }
+      }
+    ]
+  };
+
+  repeated Config configs = 1;
+}
+
+// Client configuration paths
+message ConfigPaths {
+  // Configuration name
+  string name = 1;
+  // Directory containing all configuration files
+  string config_dir = 2;
+  // Path to the configuration file
+  string config_file = 3;
+  // Path to the active configuration marker file
+  string active_file = 4;
+}
+
+message Context {
+  string label = 1;
+  dtkt.core.v1.Context context = 2;
+}
+
+// CLI plugin metadata
+message Plugin {
+  // Plugin name (must start with 'dtkt-')
+  string name = 1 [(buf.validate.field).string.pattern = "^dtkt-[\\w-]+$"];
+  // File system path to plugin executable
+  string path = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+message PluginInfo {
+  // Plugin name (must start with 'dtkt-')
+  string name = 1 [(buf.validate.field).string.pattern = "^dtkt-[\\w-]+$"];
+  // Plugin version
+  string version = 2;
+  // Plugin description
+  string description = 3;
+  // File system path to plugin executable
+  string executable_file_path = 4 [(buf.validate.field).string.min_len = 1];
+}
+
+// List of installed plugins
+message Plugins {
+  option (dtkt.protoui.v1beta1.message) = {};
+
+  repeated Plugin plugins = 1 [(dtkt.protoui.v1beta1.field) = {
+    components: [
+      {
+        table: {
+          columns: [
+            {
+              field: "name"
+              label: "Plugin"
+            },
+            {
+              field: "path"
+              label: "Path"
+            }
+          ]
+        }
+      }
+    ]
+  }];
+}

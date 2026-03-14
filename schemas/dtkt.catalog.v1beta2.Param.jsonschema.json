@@ -1,0 +1,18 @@
+{
+  "$id": "dtkt.catalog.v1beta2.Param.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a parameterized value used in a query, input/output, etc.",
+  "properties": {
+    "field": {
+      "$ref": "dtkt.catalog.v1beta2.Field.jsonschema.json",
+      "description": "Field describing the param data."
+    },
+    "value": {
+      "$ref": "dtkt.catalog.v1beta2.Value.jsonschema.json",
+      "description": "Value of the parameter, if any."
+    }
+  },
+  "title": "Param",
+  "type": "object"
+}

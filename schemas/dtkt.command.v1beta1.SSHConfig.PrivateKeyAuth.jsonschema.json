@@ -1,0 +1,30 @@
+{
+  "$id": "dtkt.command.v1beta1.SSHConfig.PrivateKeyAuth.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Private key authentication",
+  "patternProperties": {
+    "^(key_data)$": {
+      "description": "Private key in raw bytes (PEM or OpenSSH format)",
+      "pattern": "^[A-Za-z0-9+/]*={0,2}$",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "keyData": {
+      "description": "Private key in raw bytes (PEM or OpenSSH format)",
+      "pattern": "^[A-Za-z0-9+/]*={0,2}$",
+      "type": "string"
+    },
+    "passphrase": {
+      "default": "",
+      "description": "Passphrase to decrypt encrypted private key (empty if not encrypted)",
+      "type": "string"
+    }
+  },
+  "required": [
+    "keyData"
+  ],
+  "title": "Private Key Auth",
+  "type": "object"
+}

@@ -1,0 +1,71 @@
+{
+  "$id": "dtkt.email.v1beta1.EmailWithTemplate.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents an email message.",
+  "patternProperties": {
+    "^(reply_to)$": {
+      "$ref": "dtkt.email.v1beta1.EmailAddress.jsonschema.json"
+    },
+    "^(return_path)$": {
+      "$ref": "dtkt.email.v1beta1.EmailAddress.jsonschema.json"
+    },
+    "^(template_id)$": {
+      "default": "",
+      "type": "string"
+    },
+    "^(template_params)$": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    }
+  },
+  "properties": {
+    "bcc": {
+      "items": {
+        "$ref": "dtkt.email.v1beta1.EmailAddress.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "cc": {
+      "items": {
+        "$ref": "dtkt.email.v1beta1.EmailAddress.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "from": {
+      "$ref": "dtkt.email.v1beta1.EmailAddress.jsonschema.json"
+    },
+    "replyTo": {
+      "$ref": "dtkt.email.v1beta1.EmailAddress.jsonschema.json"
+    },
+    "returnPath": {
+      "$ref": "dtkt.email.v1beta1.EmailAddress.jsonschema.json"
+    },
+    "templateId": {
+      "default": "",
+      "type": "string"
+    },
+    "templateParams": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "to": {
+      "items": {
+        "$ref": "dtkt.email.v1beta1.EmailAddress.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Email With Template",
+  "type": "object"
+}

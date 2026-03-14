@@ -1,0 +1,49 @@
+{
+  "$id": "dtkt.core.v1.Type.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Type message for documentation and reflection indexing.",
+  "patternProperties": {
+    "^(create_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Type create time."
+    },
+    "^(update_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Type update time."
+    }
+  },
+  "properties": {
+    "createTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Type create time."
+    },
+    "name": {
+      "description": "Type resource name, one of:\n - System (no parent): \"types/{type}\"\n - Connection: e.g. \"users/foo/connections/foobar/types/{type}\"\n - Deployment: e.g. \"users/foo/deployments/default/types/{type}\"",
+      "type": "string"
+    },
+    "schema": {
+      "$ref": "dtkt.core.v1.TypeSchema.jsonschema.json",
+      "description": "Type schema."
+    },
+    "uid": {
+      "description": "Server-assigned unique ID (UUID).",
+      "minLength": 1,
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "type": "string"
+    },
+    "updateTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Type update time."
+    }
+  },
+  "required": [
+    "name",
+    "uid",
+    "schema",
+    "createTime",
+    "updateTime"
+  ],
+  "title": "Type",
+  "type": "object"
+}

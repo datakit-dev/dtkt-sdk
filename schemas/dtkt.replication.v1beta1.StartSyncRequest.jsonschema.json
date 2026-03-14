@@ -1,0 +1,49 @@
+{
+  "$id": "dtkt.replication.v1beta1.StartSyncRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(destination_id)$": {
+      "default": "",
+      "description": "Unique identifier of Destination.",
+      "type": "string"
+    },
+    "^(service_config)$": {
+      "$ref": "dtkt.replication.v1beta1.ServiceConfig.jsonschema.json",
+      "description": "The configured replication service."
+    },
+    "^(source_config_id)$": {
+      "default": "",
+      "description": "Unique identifier of source config from replication service.",
+      "type": "string"
+    },
+    "^(source_id)$": {
+      "default": "",
+      "description": "Unique identifier of Source.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "destinationId": {
+      "default": "",
+      "description": "Unique identifier of Destination.",
+      "type": "string"
+    },
+    "serviceConfig": {
+      "$ref": "dtkt.replication.v1beta1.ServiceConfig.jsonschema.json",
+      "description": "The configured replication service."
+    },
+    "sourceConfigId": {
+      "default": "",
+      "description": "Unique identifier of source config from replication service.",
+      "type": "string"
+    },
+    "sourceId": {
+      "default": "",
+      "description": "Unique identifier of Source.",
+      "type": "string"
+    }
+  },
+  "title": "Start Sync Request",
+  "type": "object"
+}

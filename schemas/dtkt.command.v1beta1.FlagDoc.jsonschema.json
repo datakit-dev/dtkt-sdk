@@ -1,0 +1,32 @@
+{
+  "$id": "dtkt.command.v1beta1.FlagDoc.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Describes a command flag.",
+  "patternProperties": {
+    "^(default_value)$": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "defaultValue": {
+      "default": "",
+      "type": "string"
+    },
+    "name": {
+      "default": "",
+      "type": "string"
+    },
+    "shorthand": {
+      "default": "",
+      "type": "string"
+    },
+    "usage": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Flag Doc",
+  "type": "object"
+}

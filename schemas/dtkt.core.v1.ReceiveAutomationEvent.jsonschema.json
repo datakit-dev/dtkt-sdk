@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.core.v1.ReceiveAutomationEvent.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "ReceiveAutomationEvent represents an event received from an automation.",
+  "patternProperties": {
+    "^(outputs_event)$": {
+      "$ref": "dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.jsonschema.json"
+    },
+    "^(user_request_event)$": {
+      "$ref": "dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent.jsonschema.json"
+    }
+  },
+  "properties": {
+    "outputsEvent": {
+      "$ref": "dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.jsonschema.json"
+    },
+    "userRequestEvent": {
+      "$ref": "dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent.jsonschema.json"
+    }
+  },
+  "title": "Receive Automation Event",
+  "type": "object"
+}

@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.command.v1beta1.TerminalSessionRequest.ResizeEvent.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "dimensions": {
+      "$ref": "dtkt.command.v1beta1.TerminalSessionRequest.Dimensions.jsonschema.json",
+      "description": "New terminal dimensions"
+    }
+  },
+  "required": [
+    "dimensions"
+  ],
+  "title": "Resize Event",
+  "type": "object"
+}

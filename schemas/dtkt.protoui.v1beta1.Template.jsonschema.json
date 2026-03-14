@@ -1,0 +1,34 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Template.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "language": {
+      "anyOf": [
+        {
+          "pattern": "^LANGUAGE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "LANGUAGE_GO_TEMPLATE"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "title": "Language"
+    },
+    "template": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Template",
+  "type": "object"
+}

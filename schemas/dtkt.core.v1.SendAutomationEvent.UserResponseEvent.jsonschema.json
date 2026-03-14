@@ -1,0 +1,28 @@
+{
+  "$id": "dtkt.core.v1.SendAutomationEvent.UserResponseEvent.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "UserResponseEvent is received upon a fulfilled user elicitation.",
+  "properties": {
+    "id": {
+      "description": "Flow action node id containing user action.",
+      "type": "string"
+    },
+    "values": {
+      "additionalProperties": {
+        "$ref": "google.protobuf.Any.jsonschema.json"
+      },
+      "description": "Map of user action input id =\u003e any proto wrapper (e.g., \"ping\" =\u003e Any(\"pong\")).",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "id",
+    "values"
+  ],
+  "title": "User Response Event",
+  "type": "object"
+}

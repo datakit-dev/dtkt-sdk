@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.base.v1beta1.GetTypeRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request for getting custom type schema.",
+  "properties": {
+    "name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Get Type Request",
+  "type": "object"
+}

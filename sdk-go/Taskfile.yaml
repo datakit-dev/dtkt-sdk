@@ -1,0 +1,77 @@
+version: "3"
+
+env:
+  GOEXPERIMENT: jsonv2
+
+includes:
+  go:
+    taskfile: ${TASK_PATH}/Taskfile.go.yaml
+
+tasks:
+  setup:
+    cmds:
+      - task: go:setup
+
+  pregenerate:
+    cmds:
+      - go run ./lib/fivetran/protogen.go ../proto/dtkt
+
+  generate:
+    cmds:
+      - task: go:generate
+
+  lint:
+    cmds:
+      - task: go:lint
+
+  test:
+    cmds:
+      - task: go:test
+
+  legal:license-notices-md:
+    desc: Generate license notices in markdown format (excludes permissive licenses without notice requirements)
+    cmds:
+    - |
+      go tool go-licenses report ./... \
+        --template ./hack/license-notices.md.tmpl \
+        --ignore github.com/datakit-dev \
+        2>/dev/null
+
+  legal:license-notices-jsonl:
+    desc: Generate license notices in JSONL format
+    cmds:
+    - |
+      go tool go-licenses report ./... \
+        --template ./hack/license-notices.jsonl.tmpl \
+        --ignore github.com/datakit-dev \
+        2>/dev/null | jq -c
+
+  legal:update-license-notices:
+    desc: Update license notices in the NOTICE file and legal directory
+    cmds:
+    - rm -rf legal/3rd-party-license-notices
+    - for: { var: JSONL_LICENSE_NOTICES, as: RECORD }
+      silent: true
+      cmd: |
+        licensePath=legal/3rd-party-license-notices/$(echo '{{.RECORD}}' | jq -r '.path')
+        licenseCopyPath=$(echo '{{.RECORD}}' | jq -r '.licensePath')
+        echo "Copying license from $licenseCopyPath to $licensePath"
+        mkdir -p $licensePath
+        cp $licenseCopyPath $licensePath/
+    - task legal:license-notices-md > /tmp/sdk-go-licenses.md
+    - |
+      awk '
+        /^### sdk-go$/ {
+          print
+          while ((getline line < "/tmp/sdk-go-licenses.md") > 0) print line
+          while ((getline) > 0 && !/^### /) {}
+          print ""
+        }
+        { print }
+      ' "{{.NOTICE_FILE}}" > "{{.NOTICE_FILE}}.tmp"
+      mv "{{.NOTICE_FILE}}.tmp" "{{.NOTICE_FILE}}"
+    - rm -f /tmp/sdk-go-licenses.md
+    vars:
+      NOTICE_FILE: ../NOTICE
+      JSONL_LICENSE_NOTICES:
+        sh: task legal:license-notices-jsonl

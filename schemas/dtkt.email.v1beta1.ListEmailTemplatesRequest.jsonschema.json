@@ -1,0 +1,54 @@
+{
+  "$id": "dtkt.email.v1beta1.ListEmailTemplatesRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a request to list email templates.",
+  "patternProperties": {
+    "^(page_size)$": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The maximum number of email templates to return. The service may return fewer than\n this value.\n If unspecified, at most 50 templates will be returned.\n The maximum value is 1000; values above 1000 will be coerced to 1000."
+    },
+    "^(page_token)$": {
+      "default": "",
+      "description": "When paginating, all other parameters provided to `ListEmailTemplates` must match\n the call that provided the page token.",
+      "title": "A page token, received from a previous `ListEmailTemplates` call.\n Provide this to retrieve the subsequent page.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "pageSize": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The maximum number of email templates to return. The service may return fewer than\n this value.\n If unspecified, at most 50 templates will be returned.\n The maximum value is 1000; values above 1000 will be coerced to 1000."
+    },
+    "pageToken": {
+      "default": "",
+      "description": "When paginating, all other parameters provided to `ListEmailTemplates` must match\n the call that provided the page token.",
+      "title": "A page token, received from a previous `ListEmailTemplates` call.\n Provide this to retrieve the subsequent page.",
+      "type": "string"
+    }
+  },
+  "title": "List Email Templates Request",
+  "type": "object"
+}

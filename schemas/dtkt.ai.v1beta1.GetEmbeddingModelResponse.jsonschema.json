@@ -1,0 +1,14 @@
+{
+  "$id": "dtkt.ai.v1beta1.GetEmbeddingModelResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response containing details of a specific embedding model.",
+  "properties": {
+    "model": {
+      "$ref": "dtkt.ai.v1beta1.EmbeddingModel.jsonschema.json",
+      "description": "Details of the requested embedding model."
+    }
+  },
+  "title": "Get Embedding Model Response",
+  "type": "object"
+}

@@ -1,0 +1,26 @@
+{
+  "$id": "dtkt.catalog.v1beta2.ListSchemasResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response message for listing schemas.",
+  "patternProperties": {
+    "^(next_page_token)$": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "nextPageToken": {
+      "default": "",
+      "type": "string"
+    },
+    "schemas": {
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.Schema.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "List Schemas Response",
+  "type": "object"
+}

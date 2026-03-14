@@ -1,0 +1,25 @@
+{
+  "$id": "dtkt.shared.v1beta1.Package.BuildConfig.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "binary": {
+      "$ref": "dtkt.shared.v1beta1.Package.BuildConfig.BinaryArtifact.jsonschema.json"
+    },
+    "env": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Build environment variables.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "image": {
+      "$ref": "dtkt.shared.v1beta1.Package.BuildConfig.ImageArtifact.jsonschema.json"
+    }
+  },
+  "title": "Build Config",
+  "type": "object"
+}

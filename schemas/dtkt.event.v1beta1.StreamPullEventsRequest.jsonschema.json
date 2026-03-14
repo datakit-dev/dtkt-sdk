@@ -1,0 +1,32 @@
+{
+  "$id": "dtkt.event.v1beta1.StreamPullEventsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request to pull events from a PULL event source.",
+  "patternProperties": {
+    "^(event_source)$": {
+      "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+      "description": "Pull event source."
+    },
+    "^(pull_freq)$": {
+      "$ref": "google.protobuf.Duration.jsonschema.json",
+      "description": "Pull frequency of the event source."
+    }
+  },
+  "properties": {
+    "config": {
+      "$ref": "google.protobuf.Any.jsonschema.json",
+      "description": "Configuration of the event source."
+    },
+    "eventSource": {
+      "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+      "description": "Pull event source."
+    },
+    "pullFreq": {
+      "$ref": "google.protobuf.Duration.jsonschema.json",
+      "description": "Pull frequency of the event source."
+    }
+  },
+  "title": "Stream Pull Events Request",
+  "type": "object"
+}

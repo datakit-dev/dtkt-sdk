@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.event.v1beta1.StreamPushEventsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response of a valid event from a PUSH event source.",
+  "patternProperties": {
+    "^(event_source)$": {
+      "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+      "description": "Push event source."
+    }
+  },
+  "properties": {
+    "event": {
+      "$ref": "dtkt.event.v1beta1.Event.jsonschema.json",
+      "description": "Event delivered."
+    },
+    "eventSource": {
+      "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+      "description": "Push event source."
+    }
+  },
+  "title": "Stream Push Events Response",
+  "type": "object"
+}

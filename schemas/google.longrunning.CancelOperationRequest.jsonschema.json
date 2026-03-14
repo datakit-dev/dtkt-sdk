@@ -1,0 +1,15 @@
+{
+  "$id": "google.longrunning.CancelOperationRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The request message for\n [Operations.CancelOperation][google.longrunning.Operations.CancelOperation].",
+  "properties": {
+    "name": {
+      "default": "",
+      "description": "The name of the operation resource to be cancelled.",
+      "type": "string"
+    }
+  },
+  "title": "Cancel Operation Request",
+  "type": "object"
+}

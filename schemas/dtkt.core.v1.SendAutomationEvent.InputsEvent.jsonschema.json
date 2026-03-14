@@ -1,0 +1,20 @@
+{
+  "$id": "dtkt.core.v1.SendAutomationEvent.InputsEvent.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "InputsEvent provides initial input values for a flow.",
+  "properties": {
+    "values": {
+      "additionalProperties": {
+        "$ref": "google.protobuf.Any.jsonschema.json"
+      },
+      "description": "Map of flow input node id =\u003e any proto wrapper (e.g., \"ping\" =\u003e Any(\"pong\")).",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    }
+  },
+  "title": "Inputs Event",
+  "type": "object"
+}

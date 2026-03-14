@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.CreateIntegrationResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "integration": {
+      "$ref": "dtkt.core.v1.Integration.jsonschema.json",
+      "description": "The created integration."
+    }
+  },
+  "required": [
+    "integration"
+  ],
+  "title": "Create Integration Response",
+  "type": "object"
+}

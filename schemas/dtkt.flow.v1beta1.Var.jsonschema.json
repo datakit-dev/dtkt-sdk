@@ -1,0 +1,32 @@
+{
+  "$id": "dtkt.flow.v1beta1.Var.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Var is an intermediate value in a Flow used to transform and/or memoize the result of a computation for reuse.",
+  "properties": {
+    "cache": {
+      "default": false,
+      "description": "When cache is true var always returns its first non-null memoized value.",
+      "type": "boolean"
+    },
+    "id": {
+      "minLength": 1,
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_]+$",
+      "type": "string"
+    },
+    "switch": {
+      "$ref": "dtkt.flow.v1beta1.Switch.jsonschema.json",
+      "description": "Given switch statement's first matching case (otherwise default) evaluates to var's memoized value."
+    },
+    "value": {
+      "description": "Given expression evaluates to var's memoized value, example: \"= inputs.foo.getValue()\"",
+      "pattern": "^\\s?=\\s?",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "title": "Var",
+  "type": "object"
+}

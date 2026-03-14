@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.GetIntegrationRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "description": "Integration resource name, one of:\n - `organizations/{organization}/integrations/{integration}`\n - `users/{user}/integrations/{integration}`",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Get Integration Request",
+  "type": "object"
+}

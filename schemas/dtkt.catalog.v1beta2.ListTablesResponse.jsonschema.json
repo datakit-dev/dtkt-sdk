@@ -1,0 +1,26 @@
+{
+  "$id": "dtkt.catalog.v1beta2.ListTablesResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response message for listing Tables.",
+  "patternProperties": {
+    "^(next_page_token)$": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "nextPageToken": {
+      "default": "",
+      "type": "string"
+    },
+    "tables": {
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.Table.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "List Tables Response",
+  "type": "object"
+}

@@ -1,0 +1,60 @@
+name: Build, Lint, & Test {{ $.PKG_NAME }} Integration Package
+
+on:
+  pull_request:
+    branches:
+    - main
+    paths:
+    - packages/{{ $.PKG_SLUG }}/**
+    - .github/workflows/{{ $.PKG_SLUG }}.yaml
+
+env:
+  PKG_SLUG: {{ $.PKG_SLUG }}
+
+jobs:
+  build-lint-test:
+    name: Build, Lint, & Test
+    runs-on: {{`${{ vars.RUNNER }}`}}
+
+    permissions:
+      contents: read
+      pull-requests: read
+      checks: write
+
+    steps:
+    - uses: datakit-dev/dtkt-dev/.github/actions/setup-monorepo@main
+      with:
+        dtkt-sdk-sparse-checkout: sdk-go
+        dtkt-github-actions-app-id: {{`${{ vars.DTKT_GITHUB_ACTIONS_APP_ID }}`}}
+        dtkt-github-actions-private-key: {{`${{ secrets.DTKT_GITHUB_ACTIONS_PRIVATE_KEY }}`}}
+
+    - uses: datakit-dev/dtkt-dev/.github/actions/setup@main
+      with:
+        task: true
+        go: true
+        versions: {{`${{ vars.VERSIONS }}`}}
+        go-cache-dependency-path: |
+          ./dtkt-universe/dtkt-integrations/packages/{{`${{ env.PKG_SLUG }}`}}/go.sum
+          ./dtkt-universe/dtkt-sdk/sdk-go/go.sum
+
+    - run: task setup-local
+      working-directory: ./dtkt-universe/dtkt-integrations/packages/{{`${{ env.PKG_SLUG }}`}}
+
+    - name: Build
+      run: task build
+      working-directory: ./dtkt-universe/dtkt-integrations/packages/{{`${{ env.PKG_SLUG }}`}}
+
+    # - name: Lint
+    #   run: task lint
+    #   working-directory: ./dtkt-universe/dtkt-integrations/packages/{{`${{ env.PKG_SLUG }}`}}
+    - name: Lint
+      uses: golangci/golangci-lint-action@v7
+      with:
+        version: {{`${{ fromJSON(vars.VERSIONS).golangci-lint }}`}}
+        working-directory: ./dtkt-universe/dtkt-integrations/packages/{{`${{ env.PKG_SLUG }}`}}
+        args: --timeout=5m
+
+    - name: Test
+      run: task test
+      continue-on-error: true
+      working-directory: ./dtkt-universe/dtkt-integrations/packages/{{`${{ env.PKG_SLUG }}`}}

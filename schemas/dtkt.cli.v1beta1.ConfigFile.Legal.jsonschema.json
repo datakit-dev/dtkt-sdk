@@ -1,0 +1,20 @@
+{
+  "$id": "dtkt.cli.v1beta1.ConfigFile.Legal.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Legal configuration",
+  "patternProperties": {
+    "^(bsl_accepted_at)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Timestamp when BSL license was accepted"
+    }
+  },
+  "properties": {
+    "bslAcceptedAt": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Timestamp when BSL license was accepted"
+    }
+  },
+  "title": "Legal",
+  "type": "object"
+}

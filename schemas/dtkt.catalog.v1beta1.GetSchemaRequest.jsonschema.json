@@ -1,0 +1,23 @@
+{
+  "$id": "dtkt.catalog.v1beta1.GetSchemaRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request message for retrieving a specific schema.",
+  "properties": {
+    "catalog": {
+      "$ref": "dtkt.catalog.v1beta1.Catalog.jsonschema.json",
+      "description": "The catalog request containing catalog information."
+    },
+    "metadata": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "Metadata of the schema, if any."
+    },
+    "name": {
+      "default": "",
+      "description": "The name of the schema to retrieve.",
+      "type": "string"
+    }
+  },
+  "title": "Get Schema Request",
+  "type": "object"
+}

@@ -1,0 +1,17 @@
+{
+  "$id": "dtkt.catalog.v1beta2.DeleteTableRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request message for deleting a table.",
+  "properties": {
+    "name": {
+      "description": "Name of table to delete.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Delete Table Request",
+  "type": "object"
+}

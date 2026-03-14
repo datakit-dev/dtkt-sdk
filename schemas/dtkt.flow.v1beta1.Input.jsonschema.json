@@ -1,0 +1,57 @@
+{
+  "$id": "dtkt.flow.v1beta1.Input.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bool": {
+      "$ref": "dtkt.flow.v1beta1.Bool.jsonschema.json"
+    },
+    "bytes": {
+      "$ref": "dtkt.flow.v1beta1.Bytes.jsonschema.json"
+    },
+    "cache": {
+      "default": false,
+      "type": "boolean"
+    },
+    "double": {
+      "$ref": "dtkt.flow.v1beta1.Double.jsonschema.json"
+    },
+    "float": {
+      "$ref": "dtkt.flow.v1beta1.Float.jsonschema.json"
+    },
+    "id": {
+      "minLength": 1,
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_]+$",
+      "type": "string"
+    },
+    "int32": {
+      "$ref": "dtkt.flow.v1beta1.Int32.jsonschema.json"
+    },
+    "int64": {
+      "$ref": "dtkt.flow.v1beta1.Int64.jsonschema.json"
+    },
+    "list": {
+      "$ref": "dtkt.flow.v1beta1.List.jsonschema.json"
+    },
+    "map": {
+      "$ref": "dtkt.flow.v1beta1.Map.jsonschema.json"
+    },
+    "message": {
+      "$ref": "dtkt.flow.v1beta1.Message.jsonschema.json"
+    },
+    "string": {
+      "$ref": "dtkt.flow.v1beta1.String.jsonschema.json"
+    },
+    "uint32": {
+      "$ref": "dtkt.flow.v1beta1.Uint32.jsonschema.json"
+    },
+    "uint64": {
+      "$ref": "dtkt.flow.v1beta1.Uint64.jsonschema.json"
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "title": "Input",
+  "type": "object"
+}

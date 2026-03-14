@@ -1,0 +1,17 @@
+{
+  "$id": "dtkt.geo.v1beta1.ListGeoSourcesResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(geo_source)$": {
+      "$ref": "dtkt.geo.v1beta1.GeoSource.jsonschema.json"
+    }
+  },
+  "properties": {
+    "geoSource": {
+      "$ref": "dtkt.geo.v1beta1.GeoSource.jsonschema.json"
+    }
+  },
+  "title": "List Geo Sources Response",
+  "type": "object"
+}

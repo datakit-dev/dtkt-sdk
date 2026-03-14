@@ -1,0 +1,16 @@
+# Files to ignore in file watching in addition to a .gitignore if present
+
+/.github
+/.vscode
+
+/examples
+/infra
+/proto
+
+/.golangci.yaml
+/bug.gen.yaml
+/buf.yaml
+/Dockerfile
+/Readme.md
+/skaffold.yaml
+/Taskfile.yaml

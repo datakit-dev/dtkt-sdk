@@ -1,0 +1,28 @@
+{
+  "$id": "dtkt.action.v1beta1.ListActionsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(next_page_token)$": {
+      "default": "",
+      "description": "Pass this value as `page_token` in your next request to retrieve the following page. Empty when there are no more results.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "actions": {
+      "description": "The list of actions matching the request.",
+      "items": {
+        "$ref": "dtkt.action.v1beta1.Action.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "nextPageToken": {
+      "default": "",
+      "description": "Pass this value as `page_token` in your next request to retrieve the following page. Empty when there are no more results.",
+      "type": "string"
+    }
+  },
+  "title": "List Actions Response",
+  "type": "object"
+}

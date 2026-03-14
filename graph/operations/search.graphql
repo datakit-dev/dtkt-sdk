@@ -1,0 +1,29 @@
+query Search(
+  $q: String!
+  $limit: Int!
+  $offset: Int!
+  $stype: SearchType!
+  $by: SearchByInput
+  $where: SearchWhereInput
+  $view: SearchView
+) {
+  search(
+    q: $q
+    limit: $limit
+    offset: $offset
+    by: $by
+    type: $stype
+    where: $where
+    view: $view
+  ) {
+    totalCount
+    results {
+      rank
+      text
+      node {
+        type: __typename
+        id
+      }
+    }
+  }
+}

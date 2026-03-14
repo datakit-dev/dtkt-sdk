@@ -1,0 +1,52 @@
+{
+  "$id": "dtkt.core.v1.BatchRunOperationMetadata.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "BatchRunOperationMetadata contains metadata for batch run operations.",
+  "patternProperties": {
+    "^(failed_requests)$": {
+      "additionalProperties": {
+        "$ref": "google.rpc.Status.jsonschema.json"
+      },
+      "description": "Map of request index to failure status.",
+      "propertyNames": {
+        "anyOf": [
+          {
+            "maximum": 2147483647,
+            "minimum": -2147483648,
+            "type": "integer"
+          },
+          {
+            "pattern": "^-?[0-9]+$",
+            "type": "string"
+          }
+        ]
+      },
+      "type": "object"
+    }
+  },
+  "properties": {
+    "failedRequests": {
+      "additionalProperties": {
+        "$ref": "google.rpc.Status.jsonschema.json"
+      },
+      "description": "Map of request index to failure status.",
+      "propertyNames": {
+        "anyOf": [
+          {
+            "maximum": 2147483647,
+            "minimum": -2147483648,
+            "type": "integer"
+          },
+          {
+            "pattern": "^-?[0-9]+$",
+            "type": "string"
+          }
+        ]
+      },
+      "type": "object"
+    }
+  },
+  "title": "Batch Run Operation Metadata",
+  "type": "object"
+}

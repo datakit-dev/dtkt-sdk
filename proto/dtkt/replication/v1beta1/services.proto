@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package dtkt.replication.v1beta1;
+
+import "dtkt/replication/v1beta1/messages.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/replication/v1beta1";
+
+// DestinationService provides operations for managing replication destinations.
+service DestinationService {
+  // Retrieves a list of destination types supported by this integration.
+  rpc ListDestinationTypes(ListDestinationTypesRequest) returns (ListDestinationTypesResponse);
+
+  // Retrieves replication Destination details.
+  rpc GetDestination(GetDestinationRequest) returns (GetDestinationResponse);
+
+  // Creates a new destination.
+  rpc CreateDestination(CreateDestinationRequest) returns (CreateDestinationResponse);
+
+  // Updates an existing destination.
+  rpc UpdateDestination(UpdateDestinationRequest) returns (UpdateDestinationResponse);
+
+  // Deletes a destination.
+  rpc DeleteDestination(DeleteDestinationRequest) returns (DeleteDestinationResponse);
+}
+
+// SourceService provides operations for managing replication sources.
+service SourceService {
+  // Retrieves a list of source types supported by this integration.
+  rpc ListSourceTypes(ListSourceTypesRequest) returns (ListSourceTypesResponse);
+
+  // Checks source auth status for source.
+  rpc CheckSourceAuth(CheckSourceAuthRequest) returns (CheckSourceAuthResponse);
+
+  // Retrieves replication source details.
+  rpc GetSource(GetSourceRequest) returns (GetSourceResponse);
+
+  // Creates a new source.
+  rpc CreateSource(CreateSourceRequest) returns (CreateSourceResponse);
+
+  // Updates an existing source.
+  rpc UpdateSource(UpdateSourceRequest) returns (UpdateSourceResponse);
+
+  // Deletes a source.
+  rpc DeleteSource(DeleteSourceRequest) returns (DeleteSourceResponse);
+
+  // Starts a sync from a source to a destination.
+  rpc StartSync(StartSyncRequest) returns (StartSyncResponse);
+
+  // Stops a sync from a source to a destination.
+  rpc StopSync(StopSyncRequest) returns (StopSyncResponse);
+}

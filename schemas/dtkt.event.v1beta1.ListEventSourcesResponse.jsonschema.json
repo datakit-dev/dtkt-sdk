@@ -1,0 +1,26 @@
+{
+  "$id": "dtkt.event.v1beta1.ListEventSourcesResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "List of event sources supported by or configured for this service.",
+  "patternProperties": {
+    "^(event_sources)$": {
+      "description": "List of event sources.",
+      "items": {
+        "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "properties": {
+    "eventSources": {
+      "description": "List of event sources.",
+      "items": {
+        "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "List Event Sources Response",
+  "type": "object"
+}

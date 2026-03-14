@@ -1,0 +1,15 @@
+{
+  "$id": "dtkt.cli.v1beta1.Contexts.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "contexts": {
+      "items": {
+        "$ref": "dtkt.cli.v1beta1.Contexts.ContextItem.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Contexts",
+  "type": "object"
+}

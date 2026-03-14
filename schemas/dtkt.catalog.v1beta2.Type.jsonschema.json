@@ -1,0 +1,163 @@
+{
+  "$id": "dtkt.catalog.v1beta2.Type.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Type encodes a catalog implementation's native data type with a corresponding\n kind and additional JSON, Geospatial, and type parameters.",
+  "patternProperties": {
+    "^(geo_type)$": {
+      "anyOf": [
+        {
+          "pattern": "^GEO_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "GEO_TYPE_GEO_JSON",
+            "GEO_TYPE_WKT",
+            "GEO_TYPE_WKB"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Corresponding Geo type representation, if any.",
+      "title": "Geo Type"
+    },
+    "^(json_type)$": {
+      "anyOf": [
+        {
+          "pattern": "^JSON_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "JSON_TYPE_STRING",
+            "JSON_TYPE_NUMBER",
+            "JSON_TYPE_INTEGER",
+            "JSON_TYPE_BOOLEAN",
+            "JSON_TYPE_OBJECT",
+            "JSON_TYPE_ARRAY",
+            "JSON_TYPE_NULL"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Corresponding JSON type representation, if any.",
+      "title": "JSON Type"
+    }
+  },
+  "properties": {
+    "geoType": {
+      "anyOf": [
+        {
+          "pattern": "^GEO_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "GEO_TYPE_GEO_JSON",
+            "GEO_TYPE_WKT",
+            "GEO_TYPE_WKB"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Corresponding Geo type representation, if any.",
+      "title": "Geo Type"
+    },
+    "jsonType": {
+      "anyOf": [
+        {
+          "pattern": "^JSON_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "JSON_TYPE_STRING",
+            "JSON_TYPE_NUMBER",
+            "JSON_TYPE_INTEGER",
+            "JSON_TYPE_BOOLEAN",
+            "JSON_TYPE_OBJECT",
+            "JSON_TYPE_ARRAY",
+            "JSON_TYPE_NULL"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Corresponding JSON type representation, if any.",
+      "title": "JSON Type"
+    },
+    "kind": {
+      "anyOf": [
+        {
+          "pattern": "^TYPE_KIND_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "TYPE_KIND_BOOL",
+            "TYPE_KIND_BYTES",
+            "TYPE_KIND_DOUBLE",
+            "TYPE_KIND_ENUM",
+            "TYPE_KIND_FLOAT",
+            "TYPE_KIND_INT32",
+            "TYPE_KIND_INT64",
+            "TYPE_KIND_STRING",
+            "TYPE_KIND_UINT32",
+            "TYPE_KIND_UINT64",
+            "TYPE_KIND_JSON",
+            "TYPE_KIND_OBJECT",
+            "TYPE_KIND_DURATION",
+            "TYPE_KIND_TIMESTAMP"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Kind of the type as defined in this package.",
+      "title": "Type Kind"
+    },
+    "name": {
+      "default": "",
+      "description": "Name of the implementation's native type: (e.g. VARCHAR, BIGINT, etc.).",
+      "type": "string"
+    },
+    "parameters": {
+      "description": "Type parameters, if any: e.g. (parametric types such as VARCHAR(10), DECIMAL(22, 5), etc.)",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Type",
+  "type": "object"
+}

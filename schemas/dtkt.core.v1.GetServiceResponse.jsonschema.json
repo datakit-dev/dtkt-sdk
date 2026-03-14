@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.GetServiceResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "service": {
+      "$ref": "dtkt.core.v1.Service.jsonschema.json",
+      "description": "The requested service."
+    }
+  },
+  "required": [
+    "service"
+  ],
+  "title": "Get Service Response",
+  "type": "object"
+}

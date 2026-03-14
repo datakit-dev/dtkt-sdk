@@ -1,0 +1,21 @@
+{
+  "$id": "dtkt.flow.v1beta1.Graph.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "edges": {
+      "items": {
+        "$ref": "dtkt.flow.v1beta1.Edge.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "nodes": {
+      "items": {
+        "$ref": "dtkt.flow.v1beta1.Node.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Graph",
+  "type": "object"
+}

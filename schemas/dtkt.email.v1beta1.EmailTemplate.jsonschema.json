@@ -1,0 +1,58 @@
+{
+  "$id": "dtkt.email.v1beta1.EmailTemplate.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents an email template.",
+  "patternProperties": {
+    "^(html_body)$": {
+      "default": "",
+      "type": "string"
+    },
+    "^(text_body)$": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "htmlBody": {
+      "default": "",
+      "type": "string"
+    },
+    "id": {
+      "default": "",
+      "type": "string"
+    },
+    "language": {
+      "anyOf": [
+        {
+          "pattern": "^TEMPLATE_LANGUAGE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "TEMPLATE_LANGUAGE_GO_TEMPLATE",
+            "TEMPLATE_LANGUAGE_MUSTACHIO"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "title": "Template Language"
+    },
+    "subject": {
+      "default": "",
+      "type": "string"
+    },
+    "textBody": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Email Template",
+  "type": "object"
+}

@@ -1,0 +1,26 @@
+fragment IoSchemaFragment on IOSchema {
+  id
+  nodeType
+  nodeID
+  inputSchema
+  outputSchema
+  createdAt
+  updatedAt
+  organizationID
+}
+
+query GetIoSchema($nodeType: String!, $nodeId: ID!) {
+  ioSchema(type: $nodeType, id: $nodeId) {
+    ...IoSchemaFragment
+  }
+}
+
+query ListIoSchemas($orderBy: IOSchemaOrder, $where: IOSchemaWhereInput) {
+  ioSchemas(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...IoSchemaFragment
+      }
+    }
+  }
+}

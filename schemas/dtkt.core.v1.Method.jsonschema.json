@@ -1,0 +1,79 @@
+{
+  "$id": "dtkt.core.v1.Method.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Method message for documentation and reflection indexing.",
+  "patternProperties": {
+    "^(create_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Method create time."
+    },
+    "^(request_streaming)$": {
+      "default": false,
+      "description": "Whether request is streaming.",
+      "type": "boolean"
+    },
+    "^(response_streaming)$": {
+      "default": false,
+      "description": "Whether response is streaming.",
+      "type": "boolean"
+    },
+    "^(update_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Method update time."
+    }
+  },
+  "properties": {
+    "createTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Method create time."
+    },
+    "description": {
+      "default": "",
+      "description": "Method description.",
+      "type": "string"
+    },
+    "name": {
+      "description": "Method resource name.",
+      "type": "string"
+    },
+    "request": {
+      "description": "Request message type.",
+      "type": "string"
+    },
+    "requestStreaming": {
+      "default": false,
+      "description": "Whether request is streaming.",
+      "type": "boolean"
+    },
+    "response": {
+      "description": "Response message type.",
+      "type": "string"
+    },
+    "responseStreaming": {
+      "default": false,
+      "description": "Whether response is streaming.",
+      "type": "boolean"
+    },
+    "uid": {
+      "description": "Server-assigned unique ID (UUID).",
+      "minLength": 1,
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "type": "string"
+    },
+    "updateTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Method update time."
+    }
+  },
+  "required": [
+    "name",
+    "uid",
+    "request",
+    "response",
+    "createTime",
+    "updateTime"
+  ],
+  "title": "Method",
+  "type": "object"
+}

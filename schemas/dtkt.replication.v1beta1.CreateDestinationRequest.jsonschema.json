@@ -1,0 +1,39 @@
+{
+  "$id": "dtkt.replication.v1beta1.CreateDestinationRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request to create configured destination.",
+  "patternProperties": {
+    "^(config_id)$": {
+      "default": "",
+      "description": "Unique identifier of destination config from replication service.",
+      "type": "string"
+    },
+    "^(service_config)$": {
+      "$ref": "dtkt.replication.v1beta1.ServiceConfig.jsonschema.json",
+      "description": "The configured replication service."
+    }
+  },
+  "properties": {
+    "config": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "Destination config overrides."
+    },
+    "configId": {
+      "default": "",
+      "description": "Unique identifier of destination config from replication service.",
+      "type": "string"
+    },
+    "name": {
+      "default": "",
+      "description": "Name assigned to Destination.",
+      "type": "string"
+    },
+    "serviceConfig": {
+      "$ref": "dtkt.replication.v1beta1.ServiceConfig.jsonschema.json",
+      "description": "The configured replication service."
+    }
+  },
+  "title": "Create Destination Request",
+  "type": "object"
+}

@@ -1,0 +1,22 @@
+{
+  "$id": "google.protobuf.ServiceDescriptorProto.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Describes a service.",
+  "properties": {
+    "method": {
+      "items": {
+        "$ref": "google.protobuf.MethodDescriptorProto.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "name": {
+      "type": "string"
+    },
+    "options": {
+      "$ref": "google.protobuf.ServiceOptions.jsonschema.json"
+    }
+  },
+  "title": "Service Descriptor Proto",
+  "type": "object"
+}

@@ -1,0 +1,20 @@
+{
+  "$id": "dtkt.catalog.v1beta2.EnumValue.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Nullable wrapper message for ENUM values.",
+  "properties": {
+    "valid": {
+      "default": false,
+      "description": "Valid is true if value is not NULL.",
+      "type": "boolean"
+    },
+    "value": {
+      "default": "",
+      "description": "The string representation of the ENUM value.",
+      "type": "string"
+    }
+  },
+  "title": "Enum Value",
+  "type": "object"
+}

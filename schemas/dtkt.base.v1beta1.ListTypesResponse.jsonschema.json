@@ -1,0 +1,27 @@
+{
+  "$id": "dtkt.base.v1beta1.ListTypesResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response for listing custom types.",
+  "patternProperties": {
+    "^(next_page_token)$": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "nextPageToken": {
+      "default": "",
+      "type": "string"
+    },
+    "types": {
+      "description": "Custom types registered to integration.",
+      "items": {
+        "$ref": "dtkt.shared.v1beta1.TypeSchema.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "List Types Response",
+  "type": "object"
+}

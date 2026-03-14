@@ -1,0 +1,48 @@
+{
+  "$id": "dtkt.shared.v1beta1.Field.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a field within a table, query, input/output, etc.",
+  "properties": {
+    "description": {
+      "default": "",
+      "description": "Description of the field.",
+      "type": "string"
+    },
+    "element": {
+      "$ref": "dtkt.protoform.v1beta1.FieldElement.jsonschema.json",
+      "description": "Protoform field element for runtime UI configuration."
+    },
+    "fields": {
+      "description": "Nested fields, if the field is a complex type (i.e. the type represents an object or map type).",
+      "items": {
+        "$ref": "#"
+      },
+      "type": "array"
+    },
+    "name": {
+      "description": "Name of the field.",
+      "type": "string"
+    },
+    "nullable": {
+      "default": false,
+      "description": "Indicates if the field allows null values (i.e. is not required).",
+      "type": "boolean"
+    },
+    "repeated": {
+      "default": false,
+      "description": "Indicates if the field contains repeated values (i.e. an array of the given type).",
+      "type": "boolean"
+    },
+    "type": {
+      "$ref": "dtkt.shared.v1beta1.DataType.jsonschema.json",
+      "description": "Data type of the field."
+    }
+  },
+  "required": [
+    "name",
+    "type"
+  ],
+  "title": "Field",
+  "type": "object"
+}

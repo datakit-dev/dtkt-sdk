@@ -1,0 +1,48 @@
+{
+  "$id": "dtkt.catalog.v1beta2.Field.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Field encodes a named type (see above) definition of a value found in\n the context of a table read/write or query param/result.",
+  "properties": {
+    "description": {
+      "default": "",
+      "description": "Description of the field.",
+      "type": "string"
+    },
+    "element": {
+      "$ref": "dtkt.protoform.v1beta1.FieldElement.jsonschema.json",
+      "description": "Protoform field element for runtime dynamic form UI."
+    },
+    "fields": {
+      "description": "Fields are nested named type definitions if this field type's kind\n corresponds with either an object or a JSON value.",
+      "items": {
+        "$ref": "#"
+      },
+      "type": "array"
+    },
+    "name": {
+      "description": "Name of the field.",
+      "type": "string"
+    },
+    "nullable": {
+      "default": false,
+      "description": "Indicates if the field allows null values (i.e. a corresponding value is\n allowed to be null in the context of a table or query).",
+      "type": "boolean"
+    },
+    "repeated": {
+      "default": false,
+      "description": "Indicates if the field contains repeated values (i.e. value's kind is\n expected to be a ListValue with each value conforming to this field's\n type.",
+      "type": "boolean"
+    },
+    "type": {
+      "$ref": "dtkt.catalog.v1beta2.Type.jsonschema.json",
+      "description": "Type of the field."
+    }
+  },
+  "required": [
+    "name",
+    "type"
+  ],
+  "title": "Field",
+  "type": "object"
+}

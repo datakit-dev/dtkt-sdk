@@ -1,0 +1,74 @@
+{
+  "$id": "google.longrunning.ListOperationsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The request message for\n [Operations.ListOperations][google.longrunning.Operations.ListOperations].",
+  "patternProperties": {
+    "^(page_size)$": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The standard list page size."
+    },
+    "^(page_token)$": {
+      "default": "",
+      "description": "The standard list page token.",
+      "type": "string"
+    },
+    "^(return_partial_success)$": {
+      "default": false,
+      "description": "This can only be `true` when reading across collections e.g. when `parent`\n is set to `\"projects/example/locations/-\"`.\n\n This field is not by default supported and will result in an\n `UNIMPLEMENTED` error if set unless explicitly documented otherwise in\n service or product specific documentation.",
+      "title": "When set to `true`, operations that are reachable are returned as normal,\n and those that are unreachable are returned in the\n [ListOperationsResponse.unreachable] field.",
+      "type": "boolean"
+    }
+  },
+  "properties": {
+    "filter": {
+      "default": "",
+      "description": "The standard list filter.",
+      "type": "string"
+    },
+    "name": {
+      "default": "",
+      "description": "The name of the operation's parent resource.",
+      "type": "string"
+    },
+    "pageSize": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The standard list page size."
+    },
+    "pageToken": {
+      "default": "",
+      "description": "The standard list page token.",
+      "type": "string"
+    },
+    "returnPartialSuccess": {
+      "default": false,
+      "description": "This can only be `true` when reading across collections e.g. when `parent`\n is set to `\"projects/example/locations/-\"`.\n\n This field is not by default supported and will result in an\n `UNIMPLEMENTED` error if set unless explicitly documented otherwise in\n service or product specific documentation.",
+      "title": "When set to `true`, operations that are reachable are returned as normal,\n and those that are unreachable are returned in the\n [ListOperationsResponse.unreachable] field.",
+      "type": "boolean"
+    }
+  },
+  "title": "List Operations Request",
+  "type": "object"
+}

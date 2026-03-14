@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/geojson/v1beta1";
+
+package dtkt.geojson.v1beta1;
+
+import "google/protobuf/struct.proto";
+
+// GeoJSON Root object union
+message GeoJSON {
+  oneof geojson {
+    Geometry geometry = 1;
+    Feature feature = 2;
+    FeatureCollection feature_collection = 3;
+  }
+}
+
+// Union type for Geometry using oneof
+message Geometry {
+  oneof geometry {
+    Point point = 1;
+    MultiPoint multi_point = 2;
+    LineString line_string = 3;
+    MultiLineString multi_line_string = 4;
+    Polygon polygon = 5;
+    MultiPolygon multi_polygon = 6;
+    GeometryCollection geometry_collection = 7;
+  }
+}
+
+message Feature {
+  string type = 1; // always Feature
+  Geometry geometry = 2; // may be null
+  google.protobuf.Struct properties = 3;
+  oneof id {
+    string id_str = 4;
+    int64 id_num = 5;
+  }
+  BBox bbox = 6;
+}
+
+message FeatureCollection {
+  string type = 1; // always FeatureCollection
+  repeated Feature features = 2;
+  BBox bbox = 3;
+}
+
+// Represents a GeoJSON Bounding Box
+message BBox {
+  repeated double coordinates = 1; // length 4 or 6
+}
+
+// Represents a GeoJSON Position (array of numbers: length 2 or 3)
+message Position {
+  repeated double values = 1; // length 2 or 3
+}
+
+// GeoJSON Geometry types
+message Point {
+  string type = 1; // always Point
+  Position coordinates = 2;
+  BBox bbox = 3;
+}
+
+message MultiPoint {
+  string type = 1; // always MultiPoint
+  repeated Position coordinates = 2;
+  BBox bbox = 3;
+}
+
+message LineString {
+  string type = 1; // always LineString
+  repeated Position coordinates = 2;
+  BBox bbox = 3;
+}
+
+message MultiLineString {
+  string type = 1; // always MultiLineString
+  repeated LineStringCoords coordinates = 2;
+  BBox bbox = 3;
+}
+
+message Polygon {
+  string type = 1; // always Polygon
+  repeated LinearRing coordinates = 2;
+  BBox bbox = 3;
+}
+
+message MultiPolygon {
+  string type = 1; // always MultiPolygon
+  repeated PolygonCoords coordinates = 2;
+  BBox bbox = 3;
+}
+
+message GeometryCollection {
+  string type = 1; // always GeometryCollection
+  repeated Geometry geometries = 2;
+  BBox bbox = 3;
+}
+
+// Helper types for nested coordinates
+message LineStringCoords {
+  repeated Position positions = 1;
+}
+
+message LinearRing {
+  repeated Position positions = 1;
+}
+
+message PolygonCoords {
+  repeated LinearRing linear_rings = 1;
+}

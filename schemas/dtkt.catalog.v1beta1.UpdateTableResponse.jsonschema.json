@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.catalog.v1beta1.UpdateTableResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response message for updating a table.",
+  "properties": {
+    "error": {
+      "default": "",
+      "description": "Error message, if any.",
+      "type": "string"
+    },
+    "table": {
+      "$ref": "dtkt.catalog.v1beta1.Table.jsonschema.json",
+      "description": "The updated table."
+    },
+    "updated": {
+      "default": false,
+      "description": "Indicates if the table was successfully updated.",
+      "type": "boolean"
+    }
+  },
+  "title": "Update Table Response",
+  "type": "object"
+}

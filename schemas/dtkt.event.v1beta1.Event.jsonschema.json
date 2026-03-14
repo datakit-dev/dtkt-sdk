@@ -1,0 +1,88 @@
+{
+  "$id": "dtkt.event.v1beta1.Event.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents an event type deliverable by an EventSource.",
+  "patternProperties": {
+    "^(action_type)$": {
+      "anyOf": [
+        {
+          "pattern": "^ACTION_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "ACTION_TYPE_CREATE",
+            "ACTION_TYPE_UPDATE",
+            "ACTION_TYPE_DELETE",
+            "ACTION_TYPE_WRITE",
+            "ACTION_TYPE_READ",
+            "ACTION_TYPE_VIEW"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Type of action associated with event.",
+      "title": "Action Type"
+    },
+    "^(payload_schema)$": {
+      "$ref": "dtkt.shared.v1beta1.TypeSchema.jsonschema.json",
+      "description": "Schema describing the payload of the event."
+    }
+  },
+  "properties": {
+    "actionType": {
+      "anyOf": [
+        {
+          "pattern": "^ACTION_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "ACTION_TYPE_CREATE",
+            "ACTION_TYPE_UPDATE",
+            "ACTION_TYPE_DELETE",
+            "ACTION_TYPE_WRITE",
+            "ACTION_TYPE_READ",
+            "ACTION_TYPE_VIEW"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Type of action associated with event.",
+      "title": "Action Type"
+    },
+    "description": {
+      "default": "",
+      "description": "Description of the event.",
+      "type": "string"
+    },
+    "payload": {
+      "$ref": "google.protobuf.Any.jsonschema.json",
+      "description": "Payload when event is delivered."
+    },
+    "payloadSchema": {
+      "$ref": "dtkt.shared.v1beta1.TypeSchema.jsonschema.json",
+      "description": "Schema describing the payload of the event."
+    },
+    "type": {
+      "default": "",
+      "description": "Type of the event.",
+      "type": "string"
+    }
+  },
+  "title": "Event",
+  "type": "object"
+}

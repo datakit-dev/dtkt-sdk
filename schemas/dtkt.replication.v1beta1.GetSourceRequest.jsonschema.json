@@ -1,0 +1,35 @@
+{
+  "$id": "dtkt.replication.v1beta1.GetSourceRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request for replication Source of given provider.",
+  "patternProperties": {
+    "^(config_id)$": {
+      "default": "",
+      "description": "Unique identifier of source config from replication service.",
+      "type": "string"
+    },
+    "^(service_config)$": {
+      "$ref": "dtkt.replication.v1beta1.ServiceConfig.jsonschema.json",
+      "description": "The configured replication service."
+    }
+  },
+  "properties": {
+    "configId": {
+      "default": "",
+      "description": "Unique identifier of source config from replication service.",
+      "type": "string"
+    },
+    "id": {
+      "default": "",
+      "description": "Unique identifier of Source.",
+      "type": "string"
+    },
+    "serviceConfig": {
+      "$ref": "dtkt.replication.v1beta1.ServiceConfig.jsonschema.json",
+      "description": "The configured replication service."
+    }
+  },
+  "title": "Get Source Request",
+  "type": "object"
+}

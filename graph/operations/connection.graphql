@@ -1,0 +1,70 @@
+fragment ConnectionFragment on Connection {
+  id
+  slug
+  name
+  visibility
+  createdAt
+  updatedAt
+  integrationID
+  organizationID
+}
+
+query GetConnection($connectionId: ID, $slug: String) {
+  connection(id: $connectionId, slug: $slug) {
+    ...ConnectionFragment
+  }
+}
+
+query ListConnections($orderBy: ConnectionOrder, $where: ConnectionWhereInput) {
+  connections(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...ConnectionFragment
+      }
+    }
+    totalCount
+  }
+}
+
+query CheckConnection($id: ID, $slug: String) {
+  checkConnection(id: $id, slug: $slug) {
+    authCheck {
+      type
+      required
+      success
+      error
+    }
+    configCheck {
+      success
+      error
+    }
+  }
+}
+
+mutation CreateConnection($input: CreateConnectionInput!) {
+  createConnection(input: $input) {
+    created
+    error
+    connection {
+      ...ConnectionFragment
+    }
+  }
+}
+
+mutation UpdateConnection($id: ID!, $input: UpdateConnectionInput!) {
+  updateConnection(id: $id, input: $input) {
+    updated
+    error
+    connection {
+      ...ConnectionFragment
+    }
+  }
+}
+
+mutation DeleteConnection($id: ID!) {
+  deleteConnection(id: $id) {
+    deleted
+    error
+    id
+  }
+}

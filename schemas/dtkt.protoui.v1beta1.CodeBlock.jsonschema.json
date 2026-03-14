@@ -1,0 +1,40 @@
+{
+  "$id": "dtkt.protoui.v1beta1.CodeBlock.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Render as a code block with optional syntax highlighting.\n Maps to Code/CodeBlock in @dtkt/ui/text or syntax highlighter components\n Supports text, CEL expressions, and templates for generating code content.\n The message or field is available as `this` in expression/template context.\n Example expr: `this.code` or `this.function_body`\n Example template: Use Go templates to format code",
+  "patternProperties": {
+    "^(highlight_lines)$": {
+      "description": "Highlight specific lines (e.g., \"1-3,5,7-9\").",
+      "type": "string"
+    },
+    "^(show_line_numbers)$": {
+      "description": "Show line numbers.",
+      "type": "boolean"
+    }
+  },
+  "properties": {
+    "content": {
+      "$ref": "dtkt.protoui.v1beta1.Data.jsonschema.json",
+      "description": "The code content. Can be plain text, a CEL expression, or a template.\n Context: `this` is the message or field being rendered."
+    },
+    "filename": {
+      "description": "Optional filename to display.",
+      "type": "string"
+    },
+    "highlightLines": {
+      "description": "Highlight specific lines (e.g., \"1-3,5,7-9\").",
+      "type": "string"
+    },
+    "language": {
+      "description": "Language for syntax highlighting (e.g., \"go\", \"python\", \"javascript\").",
+      "type": "string"
+    },
+    "showLineNumbers": {
+      "description": "Show line numbers.",
+      "type": "boolean"
+    }
+  },
+  "title": "Code Block",
+  "type": "object"
+}

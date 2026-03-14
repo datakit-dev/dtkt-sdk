@@ -1,0 +1,12 @@
+{
+  "$id": "dtkt.geo.v1beta1.StreamGeoJsonResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "result": {
+      "$ref": "dtkt.geojson.v1beta1.GeoJSON.jsonschema.json"
+    }
+  },
+  "title": "Stream Geo Json Response",
+  "type": "object"
+}

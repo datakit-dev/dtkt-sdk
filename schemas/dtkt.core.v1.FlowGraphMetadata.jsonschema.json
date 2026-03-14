@@ -1,0 +1,13 @@
+{
+  "$id": "dtkt.core.v1.FlowGraphMetadata.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "FlowGraphMetadata wraps versioned flow graph representation.",
+  "properties": {
+    "v1beta1": {
+      "$ref": "dtkt.flow.v1beta1.Graph.jsonschema.json"
+    }
+  },
+  "title": "Flow Graph Metadata",
+  "type": "object"
+}

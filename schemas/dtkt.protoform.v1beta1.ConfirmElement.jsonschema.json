@@ -1,0 +1,28 @@
+{
+  "$id": "dtkt.protoform.v1beta1.ConfirmElement.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Confirm element (approve/decline)",
+  "patternProperties": {
+    "^(default_selected)$": {
+      "default": false,
+      "type": "boolean"
+    }
+  },
+  "properties": {
+    "approve": {
+      "default": "",
+      "type": "string"
+    },
+    "decline": {
+      "default": "",
+      "type": "string"
+    },
+    "defaultSelected": {
+      "default": false,
+      "type": "boolean"
+    }
+  },
+  "title": "Confirm Element",
+  "type": "object"
+}

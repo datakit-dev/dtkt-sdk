@@ -1,0 +1,34 @@
+{
+  "$id": "dtkt.core.v1.CreateAutomationRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(automation_id)$": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9-]+$",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "automation": {
+      "$ref": "dtkt.core.v1.Automation.jsonschema.json",
+      "description": "Automation to create."
+    },
+    "automationId": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9-]+$",
+      "type": "string"
+    },
+    "parent": {
+      "description": "Parent resource name.\n Format is one of:\n - `users/{user}`\n - `organizations/{organization}`",
+      "type": "string"
+    }
+  },
+  "required": [
+    "parent",
+    "automationId",
+    "automation"
+  ],
+  "title": "Create Automation Request",
+  "type": "object"
+}

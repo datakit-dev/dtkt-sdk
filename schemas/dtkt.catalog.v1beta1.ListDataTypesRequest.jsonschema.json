@@ -1,0 +1,9 @@
+{
+  "$id": "dtkt.catalog.v1beta1.ListDataTypesRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request for retrieving data types.",
+  "properties": {},
+  "title": "List Data Types Request",
+  "type": "object"
+}

@@ -1,0 +1,13 @@
+{
+  "$id": "dtkt.core.v1.PackageSpecMetadata.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "PackageSpecMetadata wraps versioned package specification.",
+  "properties": {
+    "v1beta1": {
+      "$ref": "dtkt.shared.v1beta1.Package.jsonschema.json"
+    }
+  },
+  "title": "Package Spec Metadata",
+  "type": "object"
+}

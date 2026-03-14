@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.GetMethodResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "method": {
+      "$ref": "dtkt.core.v1.Method.jsonschema.json",
+      "description": "The requested method."
+    }
+  },
+  "required": [
+    "method"
+  ],
+  "title": "Get Method Response",
+  "type": "object"
+}

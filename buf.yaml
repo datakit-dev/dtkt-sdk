@@ -1,0 +1,25 @@
+# For details on buf.yaml configuration, visit https://buf.build/docs/configuration/v2/buf-yaml
+version: v2
+modules:
+  - path: proto
+deps:
+  - buf.build/bufbuild/protovalidate
+  - buf.build/google/cel-spec:v0.24.0
+  - buf.build/googleapis/googleapis:72c8614f3bd0466ea67931ef2c43d608
+lint:
+  use:
+    - STANDARD
+  ignore_only:
+    ENUM_VALUE_PREFIX:
+      - proto/dtkt/core/v1/messages.proto
+    SERVICE_SUFFIX:
+      - proto/dtkt/core/v1/services.proto
+    RPC_REQUEST_RESPONSE_UNIQUE:
+      - proto/dtkt/core/v1/services.proto
+    RPC_RESPONSE_STANDARD_NAME:
+      - proto/dtkt/core/v1/services.proto
+    RPC_REQUEST_STANDARD_NAME:
+      - proto/dtkt/core/v1/services.proto
+breaking:
+  use:
+    - FILE

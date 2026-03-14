@@ -1,0 +1,64 @@
+{
+  "$id": "dtkt.replication.v1beta1.CheckSourceAuthResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response for checking source auth.",
+  "patternProperties": {
+    "^(auth_code_url)$": {
+      "description": "Returned when check is code.",
+      "type": "string"
+    },
+    "^(config_data)$": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "Data for source config."
+    }
+  },
+  "properties": {
+    "authCodeUrl": {
+      "description": "Returned when check is code.",
+      "type": "string"
+    },
+    "configData": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "Data for source config."
+    },
+    "error": {
+      "default": "",
+      "description": "Error message if success is false.",
+      "type": "string"
+    },
+    "success": {
+      "default": false,
+      "description": "Indicates if the auth check was successful.",
+      "type": "boolean"
+    },
+    "token": {
+      "$ref": "dtkt.shared.v1beta1.OAuthToken.jsonschema.json",
+      "description": "Returned when check type is token or refresh."
+    },
+    "type": {
+      "anyOf": [
+        {
+          "pattern": "^AUTH_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "AUTH_TYPE_OAUTH"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "The auth type of this source.",
+      "title": "Auth Type"
+    }
+  },
+  "title": "Check Source Auth Response",
+  "type": "object"
+}

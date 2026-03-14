@@ -1,0 +1,20 @@
+{
+  "$id": "dtkt.replication.v1beta1.ListDestinationConfigsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request to retrieve a list of supported destinations.",
+  "patternProperties": {
+    "^(service_config)$": {
+      "$ref": "dtkt.replication.v1beta1.ServiceConfig.jsonschema.json",
+      "description": "The configured replication service."
+    }
+  },
+  "properties": {
+    "serviceConfig": {
+      "$ref": "dtkt.replication.v1beta1.ServiceConfig.jsonschema.json",
+      "description": "The configured replication service."
+    }
+  },
+  "title": "List Destination Configs Request",
+  "type": "object"
+}

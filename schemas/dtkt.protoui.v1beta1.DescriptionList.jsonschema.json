@@ -1,0 +1,14 @@
+{
+  "$id": "dtkt.protoui.v1beta1.DescriptionList.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Render as a description list (key-value pairs).\n Maps to DescriptionList in @dtkt/ui/description-list\n Use CEL expressions to generate a list of [term, description] tuples.\n The message or field is available as `this` in the expression context.\n Example: `[[\"Name\", this.name], [\"Email\", this.email], [\"Status\", this.is_active ? \"Active\" : \"Inactive\"]]`",
+  "properties": {
+    "items": {
+      "description": "CEL expression that evaluates to a list of 2-element lists (tuples) where:\n - First element is the term/label (string)\n - Second element is the description/value (string)\n Context: `this` is the message or field being rendered.\n If not specified, uses the field value directly (expects map or message).",
+      "type": "string"
+    }
+  },
+  "title": "Description List",
+  "type": "object"
+}

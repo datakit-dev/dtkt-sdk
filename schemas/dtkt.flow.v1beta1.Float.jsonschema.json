@@ -1,0 +1,33 @@
+{
+  "$id": "dtkt.flow.v1beta1.Float.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "default": {
+      "anyOf": [
+        {
+          "maximum": 3.4028234663852886e+38,
+          "minimum": -3.4028234663852886e+38,
+          "type": "number"
+        },
+        {
+          "enum": [
+            "Infinity",
+            "-Infinity",
+            "NaN"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "nullable": {
+      "default": false,
+      "type": "boolean"
+    }
+  },
+  "title": "Float",
+  "type": "object"
+}

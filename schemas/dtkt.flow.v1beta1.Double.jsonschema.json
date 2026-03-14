@@ -1,0 +1,31 @@
+{
+  "$id": "dtkt.flow.v1beta1.Double.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "default": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "enum": [
+            "Infinity",
+            "-Infinity",
+            "NaN"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "nullable": {
+      "default": false,
+      "type": "boolean"
+    }
+  },
+  "title": "Double",
+  "type": "object"
+}

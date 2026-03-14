@@ -1,0 +1,33 @@
+{
+  "$id": "dtkt.protostore.v1beta1.Field.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "immutable": {
+      "type": "boolean"
+    },
+    "name": {
+      "type": "string"
+    },
+    "nillable": {
+      "type": "boolean"
+    },
+    "optional": {
+      "type": "boolean"
+    },
+    "primary": {
+      "type": "boolean"
+    },
+    "sensitive": {
+      "type": "boolean"
+    },
+    "skip": {
+      "type": "boolean"
+    },
+    "unique": {
+      "type": "boolean"
+    }
+  },
+  "title": "Field",
+  "type": "object"
+}

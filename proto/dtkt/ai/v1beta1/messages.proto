@@ -1,0 +1,308 @@
+syntax = "proto3";
+
+package dtkt.ai.v1beta1;
+
+import "buf/validate/validate.proto";
+import "dtkt/protoform/v1beta1/protoform.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/ai/v1beta1";
+
+// Represents an embedding model, including its ID, name, and supported dimensions.
+message EmbeddingModel {
+  // Unique identifier for the embedding model.
+  string id = 1;
+
+  // Name of the embedding model.
+  string name = 2;
+
+  // Minimum number of dimensions supported by the model.
+  uint32 min_dimensions = 3;
+
+  // Maximum number of dimensions supported by the model.
+  uint32 max_dimensions = 4;
+}
+
+// Represents an input for generating embeddings.
+message EmbeddingInput {
+  // Unique identifier for the input.
+  string id = 1;
+
+  // Text data to generate embeddings for.
+  string text = 2;
+}
+
+// Represents the output of an embedding operation.
+message EmbeddingOutput {
+  // The input data for which the embedding was generated.
+  EmbeddingInput input = 1;
+
+  // The generated embedding vector.
+  repeated double vector = 2;
+
+  // Indicates if the embedding generation was successful.
+  bool success = 3;
+
+  // Error message, if any.
+  string error = 4;
+}
+
+// Request to retrieve a list of available embedding models.
+message ListEmbeddingModelsRequest {}
+
+// Response containing a list of available embedding models.
+message ListEmbeddingModelsResponse {
+  // List of embedding models.
+  repeated EmbeddingModel models = 1;
+}
+
+// Request to retrieve details of a specific embedding model.
+message GetEmbeddingModelRequest {
+  // ID of the embedding model to retrieve.
+  string id = 1;
+}
+
+// Response containing details of a specific embedding model.
+message GetEmbeddingModelResponse {
+  // Details of the requested embedding model.
+  EmbeddingModel model = 1;
+}
+
+// Request to generate embeddings for input text using a specified model.
+message GenerateEmbeddingsRequest {
+  // ID of the embedding model to use.
+  string model_id = 1 [
+    (dtkt.protoform.v1beta1.field).title = "Select an embedding model",
+    (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.ai.v1beta1.EmbeddingService.ListEmbeddingModels",
+    (dtkt.protoform.v1beta1.field).select.key_expr = "this.models.map(i, i.name)",
+    (dtkt.protoform.v1beta1.field).select.val_expr = "this.models.map(i, i.id)"
+  ];
+
+  // Desired number of dimensions for the embedding.
+  uint32 dimensions = 2;
+
+  // List of text inputs to generate embeddings for.
+  repeated EmbeddingInput inputs = 3;
+}
+
+// Response containing the generated embeddings for the input text.
+message GenerateEmbeddingsResponse {
+  // List of embedding outputs corresponding to the inputs.
+  repeated EmbeddingOutput outputs = 1;
+}
+
+// ---------------------------------------------------------
+
+message Blob {
+  // Media Type type/subtype or with parameters type/subtype;parameter=value;parameter2=value2
+  string media_type = 1 [(buf.validate.field).string.pattern = "^[a-zA-Z0-9]+/[a-zA-Z0-9.+-]+( ?;[a-zA-Z0-9.+-]+=.+)*$"];
+  bytes data = 2;
+  optional string name = 3;
+}
+
+message Message {
+  message Content {
+    message Text {
+      string text = 1 [(buf.validate.field).required = true];
+    }
+
+    message Reasoning {
+      string text = 1 [(buf.validate.field).required = true];
+    }
+
+    message Source {
+      oneof type {
+        string url = 1;
+        Blob blob = 2;
+      }
+    }
+
+    message ToolCall {
+      string tool_call_id = 1;
+      string tool_name = 2;
+
+      oneof input {
+        google.protobuf.Struct json = 3;
+        google.protobuf.Any proto = 4;
+      }
+
+      // If the tool is executed by the provider or the client
+      // TODO: This is if ChatGPT calls our tool or if we call it for ChatGPT.
+      bool provider_executed = 5;
+    }
+
+    message ToolResult {
+      string tool_call_id = 1;
+      string tool_name = 2;
+
+      oneof result {
+        google.protobuf.Struct json = 3;
+        google.protobuf.Any proto = 4;
+      }
+
+      bool is_error = 5;
+    }
+
+    google.protobuf.Struct provider_options = 10;
+
+    oneof type {
+      Text text = 2;
+      Blob blob = 3;
+      Source source = 4;
+      ToolCall tool_call = 5;
+      ToolResult tool_result = 6;
+    }
+  }
+
+  google.protobuf.Struct provider_options = 10;
+  string role = 2;
+  repeated Content content = 3;
+}
+
+message GenerateTextRequest {
+  repeated Message messages = 1;
+  google.protobuf.Struct provider_options = 10;
+}
+
+message GenerateTextResponse {
+  google.protobuf.Struct provider_metadata = 10;
+}
+
+message StreamTextRequest {
+  repeated Message messages = 1;
+  google.protobuf.Struct provider_options = 10;
+}
+
+message StreamTextResponse {
+  google.protobuf.Struct provider_metadata = 10;
+}
+
+message GenerateObjectRequest {
+  repeated Message messages = 1;
+  google.protobuf.Struct provider_options = 10;
+}
+
+message GenerateObjectResponse {
+  google.protobuf.Struct provider_metadata = 10;
+}
+
+message StreamObjectsRequest {
+  repeated Message messages = 1;
+  google.protobuf.Struct provider_options = 10;
+}
+
+message StreamObjectsResponse {
+  google.protobuf.Struct provider_metadata = 10;
+}
+
+message GenerateImageRequest {
+  repeated Message messages = 1;
+  google.protobuf.Struct provider_options = 10;
+}
+
+message GenerateImageResponse {
+  google.protobuf.Struct provider_metadata = 10;
+}
+
+message GenerateImagesRequest {
+  repeated Message messages = 1;
+  google.protobuf.Struct provider_options = 10;
+}
+
+message GenerateImagesResponse {
+  google.protobuf.Struct provider_metadata = 10;
+}
+
+message GenerateBatchImagesRequest {
+  repeated Message messages = 1;
+  google.protobuf.Struct provider_options = 10;
+}
+
+message GenerateBatchImagesResponse {
+  google.protobuf.Struct provider_metadata = 10;
+}
+
+message TranscribeRequest {
+  Blob audio = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "audio.media_type"
+      message: "media_type must be an audio type"
+      expression: "this.media_type.startsWith('audio/')"
+    }
+  ];
+  google.protobuf.Struct provider_options = 10;
+}
+message TranscribeResponse {
+  message Segment {
+    string text = 1;
+    google.protobuf.Timestamp start_time = 2;
+    google.protobuf.Timestamp end_time = 3;
+  }
+
+  string text = 1;
+  repeated Segment segments = 2;
+  google.protobuf.Duration duration = 3;
+
+  // Detected language; an ISO-639-1 language code
+  string language = 4;
+
+  google.protobuf.Struct provider_metadata = 10;
+}
+
+message GenerateSpeechRequest {
+  string text = 1 [(buf.validate.field).required = true];
+
+  // The input messages / prompts to be synthesized into speech
+  repeated Message messages = 2;
+
+  // Provider specific voice identifier
+  optional string voice = 3;
+
+  // Output media type, e.g., "audio/mpeg", "audio/wav", "audio/ogg"
+  optional string media_type = 4 [(buf.validate.field).string.prefix = "audio/"];
+
+  // Speech synthesis speed; range and meaning may vary by provider.
+  optional float speed = 5;
+
+  // The language (input and output); an ISO-639-1 language code or 'auto' to auto-detect.
+  // Provider support may vary.
+  optional string language = 6;
+
+  google.protobuf.Struct provider_options = 10;
+}
+message GenerateSpeechResponse {
+  Blob audio = 1;
+
+  google.protobuf.Struct provider_metadata = 10;
+}
+
+message StreamSpeechRequest {
+  string text = 1 [(buf.validate.field).required = true];
+
+  // The input messages / prompts to be synthesized into speech
+  repeated Message messages = 2;
+
+  // Provider specific voice identifier
+  optional string voice = 3;
+
+  // Output media type, e.g., "audio/mpeg", "audio/wav", "audio/ogg"
+  optional string output_media_type = 4 [(buf.validate.field).string.prefix = "audio/"];
+
+  // Speech synthesis speed; range and meaning may vary by provider.
+  optional float speed = 5;
+
+  // The language (input and output); an ISO-639-1 language code or 'auto' to auto-detect.
+  // Provider support may vary.
+  optional string language = 6;
+
+  google.protobuf.Struct provider_options = 10;
+}
+message StreamSpeechResponse {
+  Blob audio = 1;
+
+  google.protobuf.Struct provider_metadata = 10;
+}

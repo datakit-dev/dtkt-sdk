@@ -1,0 +1,22 @@
+{
+  "$id": "dtkt.geojson.v1beta1.GeometryCollection.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bbox": {
+      "$ref": "dtkt.geojson.v1beta1.BBox.jsonschema.json"
+    },
+    "geometries": {
+      "items": {
+        "$ref": "dtkt.geojson.v1beta1.Geometry.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "type": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Geometry Collection",
+  "type": "object"
+}

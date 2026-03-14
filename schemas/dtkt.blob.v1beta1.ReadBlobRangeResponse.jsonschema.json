@@ -1,0 +1,20 @@
+{
+  "$id": "dtkt.blob.v1beta1.ReadBlobRangeResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "data": {
+      "default": null,
+      "description": "Data of blob range.",
+      "pattern": "^[A-Za-z0-9+/]*={0,2}$",
+      "type": "string"
+    },
+    "key": {
+      "default": "",
+      "description": "Key of blob read.",
+      "type": "string"
+    }
+  },
+  "title": "Read Blob Range Response",
+  "type": "object"
+}

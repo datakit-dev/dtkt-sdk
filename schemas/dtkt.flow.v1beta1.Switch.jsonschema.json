@@ -1,0 +1,29 @@
+{
+  "$id": "dtkt.flow.v1beta1.Switch.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "case": {
+      "items": {
+        "$ref": "dtkt.flow.v1beta1.Switch.Case.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "default": {
+      "minLength": 1,
+      "pattern": "^\\s?=\\s?",
+      "type": "string"
+    },
+    "value": {
+      "minLength": 1,
+      "pattern": "^\\s?=\\s?",
+      "type": "string"
+    }
+  },
+  "required": [
+    "value",
+    "default"
+  ],
+  "title": "Switch",
+  "type": "object"
+}

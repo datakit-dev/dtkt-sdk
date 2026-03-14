@@ -1,0 +1,38 @@
+{
+  "$id": "dtkt.event.v1beta1.ListEventSourcesRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request for retrieving event source types supported by this service.",
+  "properties": {
+    "configured": {
+      "default": false,
+      "description": "Indicates whether to list only configured event sources.",
+      "type": "boolean"
+    },
+    "strategy": {
+      "anyOf": [
+        {
+          "pattern": "^EVENT_SOURCE_STRATEGY_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "EVENT_SOURCE_STRATEGY_PUSH",
+            "EVENT_SOURCE_STRATEGY_PULL"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "The strategy used by the event source.",
+      "title": "Event Source Strategy"
+    }
+  },
+  "title": "List Event Sources Request",
+  "type": "object"
+}

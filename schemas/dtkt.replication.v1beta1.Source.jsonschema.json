@@ -1,0 +1,128 @@
+{
+  "$id": "dtkt.replication.v1beta1.Source.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a configured replication Source.",
+  "patternProperties": {
+    "^(config_id)$": {
+      "default": "",
+      "description": "Unique identifier of source config from replication service.",
+      "type": "string"
+    },
+    "^(destination_id)$": {
+      "default": "",
+      "description": "Unique identifier of Destination.",
+      "type": "string"
+    },
+    "^(sync_error)$": {
+      "default": "",
+      "description": "Sync error message when sync status is failed.",
+      "type": "string"
+    },
+    "^(sync_status)$": {
+      "anyOf": [
+        {
+          "pattern": "^SYNC_STATUS_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "SYNC_STATUS_SCHEDULED",
+            "SYNC_STATUS_RUNNING",
+            "SYNC_STATUS_SUCCESS",
+            "SYNC_STATUS_FAILED"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Sync status of the Source.",
+      "title": "Sync Status"
+    }
+  },
+  "properties": {
+    "config": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "Config for Source."
+    },
+    "configId": {
+      "default": "",
+      "description": "Unique identifier of source config from replication service.",
+      "type": "string"
+    },
+    "destinationId": {
+      "default": "",
+      "description": "Unique identifier of Destination.",
+      "type": "string"
+    },
+    "id": {
+      "default": "",
+      "description": "Unique identifier returned by Source.",
+      "type": "string"
+    },
+    "name": {
+      "default": "",
+      "description": "Name returned by Source.",
+      "type": "string"
+    },
+    "service": {
+      "anyOf": [
+        {
+          "pattern": "^SERVICE_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "SERVICE_TYPE_FIVETRAN"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Replication service of Source.",
+      "title": "Service Type"
+    },
+    "syncError": {
+      "default": "",
+      "description": "Sync error message when sync status is failed.",
+      "type": "string"
+    },
+    "syncStatus": {
+      "anyOf": [
+        {
+          "pattern": "^SYNC_STATUS_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "SYNC_STATUS_SCHEDULED",
+            "SYNC_STATUS_RUNNING",
+            "SYNC_STATUS_SUCCESS",
+            "SYNC_STATUS_FAILED"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Sync status of the Source.",
+      "title": "Sync Status"
+    }
+  },
+  "title": "Source",
+  "type": "object"
+}

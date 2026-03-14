@@ -1,0 +1,30 @@
+{
+  "$id": "dtkt.catalog.v1beta2.Int32Value.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Nullable wrapper message for `int32`.",
+  "properties": {
+    "valid": {
+      "default": false,
+      "description": "Valid is true if value is not NULL.",
+      "type": "boolean"
+    },
+    "value": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The int32 value."
+    }
+  },
+  "title": "Int32 Value",
+  "type": "object"
+}

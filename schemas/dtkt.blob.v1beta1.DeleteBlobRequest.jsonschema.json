@@ -1,0 +1,21 @@
+{
+  "$id": "dtkt.blob.v1beta1.DeleteBlobRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bucket": {
+      "default": "",
+      "description": "Bucket to write blob (may be optional).",
+      "type": "string"
+    },
+    "key": {
+      "description": "Key of blob to delete.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "key"
+  ],
+  "title": "Delete Blob Request",
+  "type": "object"
+}

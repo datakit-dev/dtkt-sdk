@@ -1,0 +1,13 @@
+{
+  "$id": "dtkt.core.v1.FlowGroupsMetadata.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "FlowGroupsMetadata wraps versioned execution groups metadata.",
+  "properties": {
+    "v1beta1": {
+      "$ref": "dtkt.flow.v1beta1.Groups.jsonschema.json"
+    }
+  },
+  "title": "Flow Groups Metadata",
+  "type": "object"
+}

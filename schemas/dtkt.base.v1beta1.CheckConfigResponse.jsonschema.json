@@ -1,0 +1,20 @@
+{
+  "$id": "dtkt.base.v1beta1.CheckConfigResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response for checking config.",
+  "properties": {
+    "message": {
+      "default": "",
+      "description": "Human-readable summary.",
+      "type": "string"
+    },
+    "valid": {
+      "default": false,
+      "description": "True if config is valid.",
+      "type": "boolean"
+    }
+  },
+  "title": "Check Config Response",
+  "type": "object"
+}

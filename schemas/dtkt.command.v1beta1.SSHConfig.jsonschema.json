@@ -1,0 +1,96 @@
+{
+  "$id": "dtkt.command.v1beta1.SSHConfig.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Configuration for remote SSH execution.",
+  "patternProperties": {
+    "^(config_file_path)$": {
+      "default": "",
+      "description": "Path to SSH config file for default settings\n If unset, defaults to ~/.ssh/config\n Explicit settings above take precedence over config file values",
+      "type": "string"
+    },
+    "^(identity_file)$": {
+      "$ref": "dtkt.command.v1beta1.SSHConfig.IdentityFileAuth.jsonschema.json",
+      "description": "Identity file authentication"
+    },
+    "^(insecure_skip_verify)$": {
+      "description": "Skip verification (INSECURE)",
+      "type": "boolean"
+    },
+    "^(known_hosts)$": {
+      "$ref": "dtkt.command.v1beta1.SSHConfig.KnownHosts.jsonschema.json",
+      "description": "Verify against known_hosts files (uses default locations if empty)"
+    },
+    "^(private_key)$": {
+      "$ref": "dtkt.command.v1beta1.SSHConfig.PrivateKeyAuth.jsonschema.json",
+      "description": "Private key authentication"
+    },
+    "^(proxy_command)$": {
+      "default": "",
+      "description": "ProxyCommand to tunnel SSH connection through another command\n Example: `cloudflared access ssh --hostname %h`\n Supports variable expansion: `%h=hostname`, `%p=port`, `%r=remote-user`\n Takes precedence over config_file_path ProxyCommand if both are set",
+      "type": "string"
+    },
+    "^(tofu_file_path)$": {
+      "description": "Trust On First Use: Accept any key on first connection, store it,\n then verify against stored key on subsequent connections.\n Specifies custom path for storing trusted keys.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "address": {
+      "description": "Hostname or IP address and port of the SSH server",
+      "minLength": 1,
+      "pattern": "^([A-Za-z0-9][A-Za-z0-9-]{0,63}(\\.[A-Za-z0-9-][A-Za-z0-9-]{0,63})*|((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|\\[(([0-9a-fA-F]{1,4}::?){1,7}([0-9a-fA-F]{1,4})|([0-9a-fA-F]{1,4}:){1,7}:|:((([0-9a-fA-F]{1,4}:){1,6})?[0-9a-fA-F]{1,4})?|::)\\]):([1-9][0-9]{0,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$",
+      "type": "string"
+    },
+    "configFilePath": {
+      "default": "",
+      "description": "Path to SSH config file for default settings\n If unset, defaults to ~/.ssh/config\n Explicit settings above take precedence over config file values",
+      "type": "string"
+    },
+    "fingerprint": {
+      "description": "Verify against specific fingerprint (SHA256 or MD5 format)\n Examples: \"SHA256:abc123...\" or \"MD5:12:34:56:...\"\n Get fingerprint: `ssh-keyscan -p \u003cport\u003e \u003chost\u003e 2\u003e/dev/null | ssh-keygen -lf -`",
+      "type": "string"
+    },
+    "identityFile": {
+      "$ref": "dtkt.command.v1beta1.SSHConfig.IdentityFileAuth.jsonschema.json",
+      "description": "Identity file authentication"
+    },
+    "insecureSkipVerify": {
+      "description": "Skip verification (INSECURE)",
+      "type": "boolean"
+    },
+    "knownHosts": {
+      "$ref": "dtkt.command.v1beta1.SSHConfig.KnownHosts.jsonschema.json",
+      "description": "Verify against known_hosts files (uses default locations if empty)"
+    },
+    "password": {
+      "description": "Password authentication (not recommended - use key-based auth)",
+      "type": "string"
+    },
+    "privateKey": {
+      "$ref": "dtkt.command.v1beta1.SSHConfig.PrivateKeyAuth.jsonschema.json",
+      "description": "Private key authentication"
+    },
+    "proxyCommand": {
+      "default": "",
+      "description": "ProxyCommand to tunnel SSH connection through another command\n Example: `cloudflared access ssh --hostname %h`\n Supports variable expansion: `%h=hostname`, `%p=port`, `%r=remote-user`\n Takes precedence over config_file_path ProxyCommand if both are set",
+      "type": "string"
+    },
+    "tofuFilePath": {
+      "description": "Trust On First Use: Accept any key on first connection, store it,\n then verify against stored key on subsequent connections.\n Specifies custom path for storing trusted keys.",
+      "type": "string"
+    },
+    "user": {
+      "default": "",
+      "description": "Username for SSH authentication",
+      "maxLength": 255,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "address"
+  ],
+  "title": "SSH Config",
+  "type": "object"
+}

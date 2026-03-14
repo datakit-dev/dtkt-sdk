@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/oapi-codegen/oapi-codegen/HEAD/configuration-schema.json
+package: oapigen
+output: oapigen/openapi.go
+generate:
+  models: true
+output-options:
+  skip-prune: true
+  nullable-type: true
+  overlay:
+    path: oapigen_overlay.yaml

@@ -1,0 +1,48 @@
+{
+  "$id": "dtkt.blob.v1beta1.ReadBlobRangeRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bucket": {
+      "default": "",
+      "description": "Bucket to write blob (may be optional).",
+      "type": "string"
+    },
+    "key": {
+      "description": "Key of blob to read.",
+      "type": "string"
+    },
+    "length": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Read at most length bytes if greater than 0. If less than 0, reads the whole blob."
+    },
+    "offset": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Read starting at offset."
+    }
+  },
+  "required": [
+    "key"
+  ],
+  "title": "Read Blob Range Request",
+  "type": "object"
+}

@@ -1,0 +1,26 @@
+{
+  "$id": "dtkt.catalog.v1beta2.ListCatalogsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "List catalogs response.",
+  "patternProperties": {
+    "^(next_page_token)$": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "catalogs": {
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.Catalog.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "nextPageToken": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "List Catalogs Response",
+  "type": "object"
+}

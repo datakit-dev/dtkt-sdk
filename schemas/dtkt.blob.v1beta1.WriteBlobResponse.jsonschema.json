@@ -1,0 +1,42 @@
+{
+  "$id": "dtkt.blob.v1beta1.WriteBlobResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(mod_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Modification time reported by the provider."
+    }
+  },
+  "properties": {
+    "etag": {
+      "default": "",
+      "description": "ETag assigned by the provider.",
+      "type": "string"
+    },
+    "key": {
+      "default": "",
+      "description": "Key of the written blob.",
+      "type": "string"
+    },
+    "modTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Modification time reported by the provider."
+    },
+    "size": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Size of the stored blob."
+    }
+  },
+  "title": "Write Blob Response",
+  "type": "object"
+}

@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package dtkt.ai.v1beta1;
+
+import "dtkt/ai/v1beta1/messages.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/ai/v1beta1";
+
+// TextService provides operations to generate and stream text using AI models.
+service TextService {
+  // // Retrieves a list of available text models.
+  // rpc ListTextModels(ListTextModelsRequest) returns (ListTextModelsResponse);
+
+  // // Retrieves details of a specific text model by its ID.
+  // rpc GetTextModel(GetTextModelRequest) returns (GetTextModelResponse);
+
+  // Generates text for the provided input using a specified model.
+  rpc GenerateText(GenerateTextRequest) returns (GenerateTextResponse);
+
+  // Streams text for the provided input using a specified model.
+  rpc StreamText(StreamTextRequest) returns (stream StreamTextResponse);
+}
+
+// ObjectService provides operations to generate and stream objects using AI models.
+service ObjectService {
+  // // Retrieves a list of available object models.
+  // rpc ListObjectModels(ListObjectModelsRequest) returns (ListObjectModelsResponse);
+
+  // // Retrieves details of a specific object model by its ID.
+  // rpc GetObjectModel(GetObjectModelRequest) returns (GetObjectModelResponse);
+
+  // Generates an object for the provided input using a specified model.
+  rpc GenerateObject(GenerateObjectRequest) returns (GenerateObjectResponse);
+
+  // Streams objects for the provided input using a specified model.
+  rpc StreamObjects(StreamObjectsRequest) returns (stream StreamObjectsResponse);
+}
+
+// EmbeddingService provides operations to generate and stream embeddings using AI models.
+service EmbeddingService {
+  // Retrieves a list of available embedding models.
+  rpc ListEmbeddingModels(ListEmbeddingModelsRequest) returns (ListEmbeddingModelsResponse);
+
+  // Retrieves details of a specific embedding model by its ID.
+  rpc GetEmbeddingModel(GetEmbeddingModelRequest) returns (GetEmbeddingModelResponse);
+
+  // Generates embeddings for the provided input text using a specified model.
+  rpc GenerateEmbeddings(GenerateEmbeddingsRequest) returns (GenerateEmbeddingsResponse);
+}
+
+// ImageService provides operations to generate images using AI models.
+service ImageService {
+  // // Retrieves a list of available image models.
+  // rpc ListImageModels(ListImageModelsRequest) returns (ListImageModelsResponse);
+
+  // // Retrieves details of a specific image model by its ID.
+  // rpc GetImageModel(GetImageModelRequest) returns (GetImageModelResponse);
+
+  // Generates an image for the provided input using a specified model.
+  rpc GenerateImage(GenerateImageRequest) returns (GenerateImageResponse);
+
+  // Generates images for the provided input using a specified model.
+  rpc GenerateImages(GenerateImagesRequest) returns (GenerateImagesResponse);
+
+  // Generate a batch of images for the provided input using a specified model.
+  rpc GenerateBatchImages(GenerateBatchImagesRequest) returns (GenerateBatchImagesResponse);
+}
+
+// TranscriptionService provides operations to transcribe audio to text using AI models.
+service TranscriptionService {
+  // Transcribes audio to text  for the provided input using a specified model.
+  rpc Transcribe(TranscribeRequest) returns (TranscribeResponse);
+}
+
+// SpeechService provides operations to generate and stream speech using AI models.
+service SpeechService {
+  // Generates speech for the provided text input using a specified model.
+  rpc GenerateSpeech(GenerateSpeechRequest) returns (GenerateSpeechResponse);
+
+  // Streams speech for the provided text input using a specified model.
+  rpc StreamSpeech(StreamSpeechRequest) returns (stream StreamSpeechResponse);
+}

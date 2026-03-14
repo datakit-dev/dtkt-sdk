@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.GetFlowResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "flow": {
+      "$ref": "dtkt.core.v1.Flow.jsonschema.json",
+      "description": "The requested flow."
+    }
+  },
+  "required": [
+    "flow"
+  ],
+  "title": "Get Flow Response",
+  "type": "object"
+}

@@ -1,0 +1,26 @@
+{
+  "$id": "dtkt.core.v1.Context.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Context provides the name and address of a control plane for client\n construction and resource tracing across network boundaries. Context is used\n to resolve resources by name and provide necessary information for\n authentication, encryption, auditing, tracing, and observability when sending\n data across network boundaries.",
+  "properties": {
+    "address": {
+      "$ref": "dtkt.core.v1.Address.jsonschema.json",
+      "description": "Address of control plane."
+    },
+    "auth": {
+      "$ref": "dtkt.core.v1.Auth.jsonschema.json",
+      "description": "Authentication information for control plane."
+    },
+    "name": {
+      "description": "Name of root control plane resource (e.g., \"users/bob\" or \"organizations/acme\").",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "address"
+  ],
+  "title": "Context",
+  "type": "object"
+}

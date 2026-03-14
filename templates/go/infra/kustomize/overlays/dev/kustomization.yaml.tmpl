@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base
+configMapGenerator:
+- name: {{ $.PKG_SLUG }}
+  envs:
+  - configs/intgr.env
+labels:
+- includeSelectors: true
+  pairs:
+    app.kubernetes.io/name: {{ $.PKG_SLUG }}
+    app.kubernetes.io/instance: {{ $.PKG_SLUG }}
+- includeSelectors: false
+  pairs:
+    app.kubernetes.io/version: v{{ $.PKG_VERSION }}
+    app.kubernetes.io/component: {{ $.PKG_SLUG }}
+    app.kubernetes.io/part-of: dtkt-integrations-{{ $.PKG_SLUG }}
+    app.kubernetes.io/managed-by: kustomize

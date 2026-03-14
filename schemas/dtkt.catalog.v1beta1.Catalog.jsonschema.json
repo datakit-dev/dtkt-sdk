@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.catalog.v1beta1.Catalog.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a catalog, which organizes schemas and tables.",
+  "properties": {
+    "description": {
+      "default": "",
+      "description": "Description of the catalog.",
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "Additional metadata, if any."
+    },
+    "name": {
+      "default": "",
+      "description": "Name of the catalog.",
+      "type": "string"
+    }
+  },
+  "title": "Catalog",
+  "type": "object"
+}

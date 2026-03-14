@@ -1,0 +1,35 @@
+{
+  "$id": "dtkt.cli.v1beta1.Config.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Configuration profile",
+  "patternProperties": {
+    "^(config_file)$": {
+      "$ref": "dtkt.cli.v1beta1.ConfigFile.jsonschema.json",
+      "description": "Configuration file contents"
+    },
+    "^(is_active)$": {
+      "default": false,
+      "description": "Whether this is the active configuration",
+      "type": "boolean"
+    }
+  },
+  "properties": {
+    "configFile": {
+      "$ref": "dtkt.cli.v1beta1.ConfigFile.jsonschema.json",
+      "description": "Configuration file contents"
+    },
+    "isActive": {
+      "default": false,
+      "description": "Whether this is the active configuration",
+      "type": "boolean"
+    },
+    "name": {
+      "default": "",
+      "description": "Configuration profile name",
+      "type": "string"
+    }
+  },
+  "title": "Config",
+  "type": "object"
+}

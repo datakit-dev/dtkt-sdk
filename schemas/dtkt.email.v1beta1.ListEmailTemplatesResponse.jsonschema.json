@@ -1,0 +1,26 @@
+{
+  "$id": "dtkt.email.v1beta1.ListEmailTemplatesResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a response to list email templates.",
+  "patternProperties": {
+    "^(next_page_token)$": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "nextPageToken": {
+      "default": "",
+      "type": "string"
+    },
+    "templates": {
+      "items": {
+        "$ref": "dtkt.email.v1beta1.EmailTemplate.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "List Email Templates Response",
+  "type": "object"
+}

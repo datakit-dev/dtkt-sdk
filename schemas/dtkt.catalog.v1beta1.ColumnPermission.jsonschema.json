@@ -1,0 +1,25 @@
+{
+  "$id": "dtkt.catalog.v1beta1.ColumnPermission.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents permissions for a column.",
+  "properties": {
+    "alias": {
+      "default": "",
+      "description": "Alias for the column.",
+      "type": "string"
+    },
+    "name": {
+      "default": "",
+      "description": "Name of the column.",
+      "type": "string"
+    },
+    "type": {
+      "default": "",
+      "description": "Data type of the column.",
+      "type": "string"
+    }
+  },
+  "title": "Column Permission",
+  "type": "object"
+}

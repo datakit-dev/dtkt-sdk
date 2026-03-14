@@ -1,0 +1,27 @@
+{
+  "$id": "dtkt.catalog.v1beta2.GetTableRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Get Table request.",
+  "properties": {
+    "metadata": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Metadata of the Table, if any.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "name": {
+      "description": "Table resource name to retrieve.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Get Table Request",
+  "type": "object"
+}

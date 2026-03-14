@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.command.v1beta1.ExecuteBatchCommandsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The response for executing a batch of commands.",
+  "properties": {
+    "results": {
+      "items": {
+        "$ref": "dtkt.command.v1beta1.BatchResult.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Execute Batch Commands Response",
+  "type": "object"
+}

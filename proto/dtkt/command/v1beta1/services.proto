@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package dtkt.command.v1beta1;
+
+import "dtkt/command/v1beta1/messages.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/command/v1beta1";
+
+// CommandService provides operations for executing commands.
+service CommandService {
+  // Execute a single command
+  rpc ExecuteCommand(ExecuteCommandRequest) returns (ExecuteCommandResponse);
+
+  // Execute a single command with streaming input and output
+  rpc ExecuteStreamedCommand(stream ExecuteStreamedCommandRequest) returns (stream ExecuteStreamedCommandResponse);
+
+  // Execute a stream of commands
+  rpc ExecuteCommands(stream ExecuteCommandsRequest) returns (stream ExecuteCommandsResponse);
+
+  // Execute multiple commands as a batch
+  rpc ExecuteBatchCommands(ExecuteBatchCommandsRequest) returns (ExecuteBatchCommandsResponse);
+
+  // Execute a single shell command
+  rpc ExecuteShellCommand(ExecuteShellCommandRequest) returns (ExecuteShellCommandResponse);
+
+  // Execute a single shell command with streaming input and output
+  rpc ExecuteStreamedShellCommand(stream ExecuteStreamedShellCommandRequest) returns (stream ExecuteStreamedShellCommandResponse);
+
+  // Execute a stream of shell commands
+  rpc ExecuteShellCommands(stream ExecuteShellCommandsRequest) returns (stream ExecuteShellCommandsResponse);
+
+  // Execute multiple shell commands as a batch
+  rpc ExecuteBatchShellCommands(ExecuteBatchShellCommandsRequest) returns (ExecuteBatchShellCommandsResponse);
+
+  // Start a terminal session and stream raw input/output
+  rpc TerminalSession(stream TerminalSessionRequest) returns (stream TerminalSessionResponse);
+}

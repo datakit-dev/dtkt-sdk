@@ -1,0 +1,130 @@
+{
+  "$id": "dtkt.shared.v1beta1.DataType.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a native data type with json, geo, and metadata details.",
+  "patternProperties": {
+    "^(geo_type)$": {
+      "anyOf": [
+        {
+          "pattern": "^GEO_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "GEO_TYPE_JSON",
+            "GEO_TYPE_WKT",
+            "GEO_TYPE_WKB"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Corresponding Geo type representation, if any.",
+      "title": "Geo Type"
+    },
+    "^(json_type)$": {
+      "anyOf": [
+        {
+          "pattern": "^JSON_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "JSON_TYPE_STRING",
+            "JSON_TYPE_NUMBER",
+            "JSON_TYPE_INTEGER",
+            "JSON_TYPE_BOOLEAN",
+            "JSON_TYPE_OBJECT",
+            "JSON_TYPE_ARRAY",
+            "JSON_TYPE_NULL"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Corresponding JSON type representation, if any.",
+      "title": "JSON Type"
+    },
+    "^(native_type)$": {
+      "default": "",
+      "description": "Name of the native type.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "geoType": {
+      "anyOf": [
+        {
+          "pattern": "^GEO_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "GEO_TYPE_JSON",
+            "GEO_TYPE_WKT",
+            "GEO_TYPE_WKB"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Corresponding Geo type representation, if any.",
+      "title": "Geo Type"
+    },
+    "jsonType": {
+      "anyOf": [
+        {
+          "pattern": "^JSON_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "JSON_TYPE_STRING",
+            "JSON_TYPE_NUMBER",
+            "JSON_TYPE_INTEGER",
+            "JSON_TYPE_BOOLEAN",
+            "JSON_TYPE_OBJECT",
+            "JSON_TYPE_ARRAY",
+            "JSON_TYPE_NULL"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Corresponding JSON type representation, if any.",
+      "title": "JSON Type"
+    },
+    "metadata": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "Additional metadata, if any."
+    },
+    "nativeType": {
+      "default": "",
+      "description": "Name of the native type.",
+      "type": "string"
+    }
+  },
+  "title": "Data Type",
+  "type": "object"
+}

@@ -1,0 +1,30 @@
+{
+  "$id": "dtkt.event.v1beta1.CreateEventSourceResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response for creating an event source.",
+  "patternProperties": {
+    "^(event_source)$": {
+      "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+      "description": "The created event source."
+    }
+  },
+  "properties": {
+    "created": {
+      "default": false,
+      "description": "Indicates if the creation was successful.",
+      "type": "boolean"
+    },
+    "error": {
+      "default": "",
+      "description": "Error message, if any.",
+      "type": "string"
+    },
+    "eventSource": {
+      "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+      "description": "The created event source."
+    }
+  },
+  "title": "Create Event Source Response",
+  "type": "object"
+}

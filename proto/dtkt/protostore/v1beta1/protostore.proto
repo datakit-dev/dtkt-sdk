@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package dtkt.protostore.v1beta1;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protostore/v1beta1";
+
+extend google.protobuf.MessageOptions {
+  // repeated Index
+  repeated Edge edges = 50006;
+}
+
+extend google.protobuf.FieldOptions {
+  optional Field field = 50005;
+}
+
+message Field {
+  optional string name = 1;
+  optional bool optional = 2;
+  optional bool nillable = 3;
+  optional bool unique = 4;
+  optional bool sensitive = 5;
+  optional bool immutable = 6;
+  optional bool skip = 7;
+  optional bool primary = 8;
+}
+
+message Edge {
+  optional bool unique = 1;
+  optional string ref = 2;
+  optional bool required = 3;
+  optional string field = 4;
+}
+
+// message Index {
+//   oneof type {
+//     string semantic_expression = 1;
+//     string lexical_expression = 2;
+//   }
+// }

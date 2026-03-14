@@ -1,0 +1,60 @@
+{
+  "$id": "dtkt.base.v1beta1.CheckAuthRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request for checking auth (3-legged OAuth over gRPC).",
+  "patternProperties": {
+    "^(code_request)$": {
+      "$ref": "dtkt.shared.v1beta1.OAuthCodeRequest.jsonschema.json",
+      "description": "When check type is auth code url."
+    },
+    "^(refresh_request)$": {
+      "$ref": "dtkt.shared.v1beta1.OAuthRefreshRequest.jsonschema.json",
+      "description": "When check type is refresh."
+    },
+    "^(token_request)$": {
+      "$ref": "dtkt.shared.v1beta1.OAuthTokenRequest.jsonschema.json",
+      "description": "When check type is callback."
+    }
+  },
+  "properties": {
+    "codeRequest": {
+      "$ref": "dtkt.shared.v1beta1.OAuthCodeRequest.jsonschema.json",
+      "description": "When check type is auth code url."
+    },
+    "refreshRequest": {
+      "$ref": "dtkt.shared.v1beta1.OAuthRefreshRequest.jsonschema.json",
+      "description": "When check type is refresh."
+    },
+    "tokenRequest": {
+      "$ref": "dtkt.shared.v1beta1.OAuthTokenRequest.jsonschema.json",
+      "description": "When check type is callback."
+    },
+    "type": {
+      "anyOf": [
+        {
+          "pattern": "^AUTH_CHECK_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "AUTH_CHECK_OAUTH_CODE",
+            "AUTH_CHECK_OAUTH_CALLBACK",
+            "AUTH_CHECK_OAUTH_REFRESH"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "The auth check type.",
+      "title": "Auth Check"
+    }
+  },
+  "title": "Check Auth Request",
+  "type": "object"
+}

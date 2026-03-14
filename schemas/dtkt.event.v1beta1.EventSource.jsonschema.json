@@ -1,0 +1,85 @@
+{
+  "$id": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents an event source supported by the service.",
+  "patternProperties": {
+    "^(config_schema)$": {
+      "$ref": "dtkt.shared.v1beta1.TypeSchema.jsonschema.json",
+      "description": "Schema for configuring the event source."
+    },
+    "^(pull_freq)$": {
+      "$ref": "google.protobuf.Duration.jsonschema.json",
+      "description": "Pull frequency of the event source, if any (only available when strategy is PULL, requires_creation is true, and it has been created)."
+    },
+    "^(push_url)$": {
+      "default": "",
+      "description": "Push URL of the event source, if any (only available when strategy is PUSH, requires_creation is true, and it has been created).",
+      "type": "string"
+    },
+    "^(requires_creation)$": {
+      "default": false,
+      "description": "Specifies if creation is required before using the event source.",
+      "type": "boolean"
+    }
+  },
+  "properties": {
+    "config": {
+      "$ref": "google.protobuf.Any.jsonschema.json",
+      "description": "Configuration of the event source, if any (only available when requires_creation is true and it has been created)."
+    },
+    "configSchema": {
+      "$ref": "dtkt.shared.v1beta1.TypeSchema.jsonschema.json",
+      "description": "Schema for configuring the event source."
+    },
+    "description": {
+      "default": "",
+      "description": "Description of the event source.",
+      "type": "string"
+    },
+    "name": {
+      "default": "",
+      "description": "Name of the event source.",
+      "type": "string"
+    },
+    "pullFreq": {
+      "$ref": "google.protobuf.Duration.jsonschema.json",
+      "description": "Pull frequency of the event source, if any (only available when strategy is PULL, requires_creation is true, and it has been created)."
+    },
+    "pushUrl": {
+      "default": "",
+      "description": "Push URL of the event source, if any (only available when strategy is PUSH, requires_creation is true, and it has been created).",
+      "type": "string"
+    },
+    "requiresCreation": {
+      "default": false,
+      "description": "Specifies if creation is required before using the event source.",
+      "type": "boolean"
+    },
+    "strategy": {
+      "anyOf": [
+        {
+          "pattern": "^EVENT_SOURCE_STRATEGY_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "EVENT_SOURCE_STRATEGY_PUSH",
+            "EVENT_SOURCE_STRATEGY_PULL"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "The strategy used by the event source.",
+      "title": "Event Source Strategy"
+    }
+  },
+  "title": "Event Source",
+  "type": "object"
+}

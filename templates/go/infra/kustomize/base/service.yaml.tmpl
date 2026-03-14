@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $.PKG_SLUG }}
+spec:
+  ports:
+  - name: http-grpc
+    port: 80
+    targetPort: http-grpc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $.PKG_SLUG }}-headless
+spec:
+  clusterIP: None
+  ports:
+  - name: http-grpc
+    port: 9090
+    targetPort: http-grpc

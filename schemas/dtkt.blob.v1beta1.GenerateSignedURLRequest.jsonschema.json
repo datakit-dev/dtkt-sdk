@@ -1,0 +1,96 @@
+{
+  "$id": "dtkt.blob.v1beta1.GenerateSignedURLRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(content_type)$": {
+      "default": "",
+      "description": "Expected content type when using the signed URL.",
+      "type": "string"
+    },
+    "^(expires_in)$": {
+      "$ref": "google.protobuf.Duration.jsonschema.json",
+      "description": "Duration the signed URL remains valid."
+    },
+    "^(query_parameters)$": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Additional query parameters enforced by the signed URL.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    }
+  },
+  "properties": {
+    "bucket": {
+      "default": "",
+      "description": "Bucket to write blob (may be optional).",
+      "type": "string"
+    },
+    "contentType": {
+      "default": "",
+      "description": "Expected content type when using the signed URL.",
+      "type": "string"
+    },
+    "expiresIn": {
+      "$ref": "google.protobuf.Duration.jsonschema.json",
+      "description": "Duration the signed URL remains valid."
+    },
+    "headers": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Additional headers enforced by the signed URL.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "key": {
+      "description": "Key of blob to sign.",
+      "type": "string"
+    },
+    "method": {
+      "anyOf": [
+        {
+          "pattern": "^SIGNED_URL_METHOD_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "SIGNED_URL_METHOD_GET",
+            "SIGNED_URL_METHOD_PUT",
+            "SIGNED_URL_METHOD_POST",
+            "SIGNED_URL_METHOD_DELETE"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "HTTP method the signed URL will permit.",
+      "title": "SignedURL Method"
+    },
+    "queryParameters": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Additional query parameters enforced by the signed URL.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "key"
+  ],
+  "title": "Generate SignedURL Request",
+  "type": "object"
+}

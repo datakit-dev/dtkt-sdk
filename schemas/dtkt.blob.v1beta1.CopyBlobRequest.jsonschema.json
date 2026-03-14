@@ -1,0 +1,66 @@
+{
+  "$id": "dtkt.blob.v1beta1.CopyBlobRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(destination_bucket)$": {
+      "default": "",
+      "description": "Destination bucket name",
+      "type": "string"
+    },
+    "^(destination_key)$": {
+      "description": "Destination key to copy to.",
+      "type": "string"
+    },
+    "^(source_bucket)$": {
+      "default": "",
+      "description": "Source bucket name. If empty, defaults to destination bucket.",
+      "type": "string"
+    },
+    "^(source_key)$": {
+      "description": "Source key to copy from.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "destinationBucket": {
+      "default": "",
+      "description": "Destination bucket name",
+      "type": "string"
+    },
+    "destinationKey": {
+      "description": "Destination key to copy to.",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Replacement metadata (optional).",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "overwrite": {
+      "default": false,
+      "description": "Overwrite the destination blob when it already exists.",
+      "type": "boolean"
+    },
+    "sourceBucket": {
+      "default": "",
+      "description": "Source bucket name. If empty, defaults to destination bucket.",
+      "type": "string"
+    },
+    "sourceKey": {
+      "description": "Source key to copy from.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "sourceKey",
+    "destinationKey"
+  ],
+  "title": "Copy Blob Request",
+  "type": "object"
+}

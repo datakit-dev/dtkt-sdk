@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package dtkt.geo.v1beta1;
+
+import "dtkt/geo/v1beta1/messages.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/geo/v1beta1";
+
+// GeoService provides operations for managing geospatial data.
+service GeoService {
+  // Lists GeoSource results for given request.
+  rpc ListGeoSources(ListGeoSourcesRequest) returns (stream ListGeoSourcesResponse);
+  // Streams GeoJson results for given request.
+  rpc StreamGeoJson(StreamGeoJsonRequest) returns (stream StreamGeoJsonResponse);
+}

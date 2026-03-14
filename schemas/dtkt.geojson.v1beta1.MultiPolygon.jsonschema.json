@@ -1,0 +1,22 @@
+{
+  "$id": "dtkt.geojson.v1beta1.MultiPolygon.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bbox": {
+      "$ref": "dtkt.geojson.v1beta1.BBox.jsonschema.json"
+    },
+    "coordinates": {
+      "items": {
+        "$ref": "dtkt.geojson.v1beta1.PolygonCoords.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "type": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Multi Polygon",
+  "type": "object"
+}

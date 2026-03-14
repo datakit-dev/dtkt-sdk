@@ -1,0 +1,19 @@
+{
+  "$id": "dtkt.core.v1.Deployment.Cloud.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "config": {
+      "$ref": "dtkt.core.v1.EncryptedAny.jsonschema.json"
+    },
+    "context": {
+      "$ref": "dtkt.core.v1.Context.jsonschema.json"
+    }
+  },
+  "required": [
+    "context",
+    "config"
+  ],
+  "title": "Cloud",
+  "type": "object"
+}

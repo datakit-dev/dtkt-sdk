@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package dtkt.catalog.v1beta2;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta2";
+
+service SchemaService {
+  // Create a new schema.
+  rpc CreateSchema(CreateSchemaRequest) returns (CreateSchemaResponse);
+
+  // Delete a schema.
+  rpc DeleteSchema(DeleteSchemaRequest) returns (DeleteSchemaResponse);
+
+  // Get a schema.
+  rpc GetSchema(GetSchemaRequest) returns (GetSchemaResponse);
+
+  // List schemas.
+  rpc ListSchemas(ListSchemasRequest) returns (ListSchemasResponse);
+
+  // Update a schema.
+  rpc UpdateSchema(UpdateSchemaRequest) returns (UpdateSchemaResponse);
+}
+
+// Schema resource containing tables.
+message Schema {
+  // Schema resource name, format: `catalogs/{catalog}/schemas/{schema}`.
+  string name = 1;
+
+  // Schema identifier.
+  string schema_id = 2;
+
+  // Description of the schema.
+  string description = 3;
+
+  // Additional metadata, if any.
+  map<string, string> metadata = 4;
+}
+
+// Request message for listing schemas.
+message ListSchemasRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string parent = 3;
+  string filter = 4;
+}
+
+// Response message for listing schemas.
+message ListSchemasResponse {
+  repeated Schema schemas = 1;
+  string next_page_token = 2;
+}
+
+// Get schema request.
+message GetSchemaRequest {
+  // Schema resource name to retrieve.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Metadata of the schema, if any.
+  map<string, string> metadata = 2;
+}
+
+// Get schema response.
+message GetSchemaResponse {
+  // The retrieved schema.
+  Schema schema = 1;
+}
+
+// Create schema request.
+message CreateSchemaRequest {
+  // Parent catalog resource name.
+  string parent = 1 [(buf.validate.field).required = true];
+
+  // Schema identifier, e.g. final segment in resource name: `.../schemas/{schema}`
+  string schema_id = 2 [(buf.validate.field).required = true];
+
+  // Schema to create.
+  Schema schema = 3 [(buf.validate.field).required = true];
+}
+
+// Create schema response.
+message CreateSchemaResponse {
+  // Schema created.
+  Schema schema = 1;
+}
+
+// Update schema request.
+message UpdateSchemaRequest {
+  // Schema with updated fields
+  Schema schema = 1 [(buf.validate.field).required = true];
+
+  // Fields to update.
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+// Update schema response.
+message UpdateSchemaResponse {
+  // The updated schema.
+  Schema schema = 1;
+}
+
+// Request message for deleting a schema.
+message DeleteSchemaRequest {
+  // Name of schema to delete.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // If set to true, any tables in this schema will also be deleted.
+  // (Otherwise, the request will only work if the schema has no tables.)
+  bool force = 2;
+}
+
+// Response message for deleting a schema.
+message DeleteSchemaResponse {}

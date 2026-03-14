@@ -1,0 +1,36 @@
+package pkg
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk/v1beta1"
+
+	{{ $.PROTO_IMPORT }} "github.com/datakit-dev/dtkt-integrations/{{ $.PKG_SLUG }}/pkg/proto/{{ $.PROTO_PATH }}"
+)
+
+type (
+	GreetService struct {
+		{{ $.PROTO_IMPORT }}.UnimplementedGreetServiceServer
+		mux v1beta1.InstanceMux[*Instance]
+	}
+)
+
+func NewGreetService(mux v1beta1.InstanceMux[*Instance]) *GreetService {
+	return &GreetService{
+		mux: mux,
+	}
+}
+
+func (s *GreetService) Greet(ctx context.Context, req *{{ $.PROTO_IMPORT }}.GreetRequest) (*{{ $.PROTO_IMPORT }}.GreetResponse, error) {
+	inst, err := s.mux.GetInstance(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	greeting := inst.config.GetGreeting()
+
+	return &{{ $.PROTO_IMPORT }}.GreetResponse{
+		Message: fmt.Sprintf("%s, %s!", greeting, req.GetName()),
+	}, nil
+}

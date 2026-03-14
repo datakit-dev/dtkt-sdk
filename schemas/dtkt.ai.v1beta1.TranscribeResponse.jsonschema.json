@@ -1,0 +1,35 @@
+{
+  "$id": "dtkt.ai.v1beta1.TranscribeResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(provider_metadata)$": {
+      "$ref": "google.protobuf.Struct.jsonschema.json"
+    }
+  },
+  "properties": {
+    "duration": {
+      "$ref": "google.protobuf.Duration.jsonschema.json"
+    },
+    "language": {
+      "default": "",
+      "description": "Detected language; an ISO-639-1 language code",
+      "type": "string"
+    },
+    "providerMetadata": {
+      "$ref": "google.protobuf.Struct.jsonschema.json"
+    },
+    "segments": {
+      "items": {
+        "$ref": "dtkt.ai.v1beta1.TranscribeResponse.Segment.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "text": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Transcribe Response",
+  "type": "object"
+}

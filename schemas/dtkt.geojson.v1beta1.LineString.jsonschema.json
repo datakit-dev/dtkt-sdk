@@ -1,0 +1,22 @@
+{
+  "$id": "dtkt.geojson.v1beta1.LineString.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bbox": {
+      "$ref": "dtkt.geojson.v1beta1.BBox.jsonschema.json"
+    },
+    "coordinates": {
+      "items": {
+        "$ref": "dtkt.geojson.v1beta1.Position.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "type": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Line String",
+  "type": "object"
+}

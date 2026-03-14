@@ -1,0 +1,26 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Avatar.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Render as an avatar with image or initials.\n Maps to Avatar in @dtkt/ui/avatar\n Use CEL expressions to generate src URL, initials, and alt text.\n The message or field is available as `this` in the expression context.\n Example src: `this.avatar_url`, initials: `this.first_name.substring(0, 1) + this.last_name.substring(0, 1)`, alt: `this.first_name + \" \" + this.last_name`",
+  "properties": {
+    "alt": {
+      "description": "Optional CEL expression for alternative text.\n Context: `this` is the message or field being rendered.",
+      "type": "string"
+    },
+    "initials": {
+      "description": "Optional CEL expression for initials to display when no image is available.\n Context: `this` is the message or field being rendered.",
+      "type": "string"
+    },
+    "square": {
+      "description": "Whether to render as square instead of circle.",
+      "type": "boolean"
+    },
+    "src": {
+      "description": "Optional CEL expression for the source URL of the avatar image.\n Context: `this` is the message or field being rendered.",
+      "type": "string"
+    }
+  },
+  "title": "Avatar",
+  "type": "object"
+}

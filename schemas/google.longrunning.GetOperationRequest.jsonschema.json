@@ -1,0 +1,15 @@
+{
+  "$id": "google.longrunning.GetOperationRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The request message for\n [Operations.GetOperation][google.longrunning.Operations.GetOperation].",
+  "properties": {
+    "name": {
+      "default": "",
+      "description": "The name of the operation resource.",
+      "type": "string"
+    }
+  },
+  "title": "Get Operation Request",
+  "type": "object"
+}

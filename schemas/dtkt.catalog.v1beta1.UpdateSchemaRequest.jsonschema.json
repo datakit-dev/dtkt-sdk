@@ -1,0 +1,28 @@
+{
+  "$id": "dtkt.catalog.v1beta1.UpdateSchemaRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request message for updating a schema.",
+  "properties": {
+    "catalog": {
+      "$ref": "dtkt.catalog.v1beta1.Catalog.jsonschema.json",
+      "description": "Reference to the catalog containing the schema."
+    },
+    "description": {
+      "default": "",
+      "description": "New description of the schema.",
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "Metadata of the schema, if any."
+    },
+    "name": {
+      "default": "",
+      "description": "Name of the schema to update.",
+      "type": "string"
+    }
+  },
+  "title": "Update Schema Request",
+  "type": "object"
+}

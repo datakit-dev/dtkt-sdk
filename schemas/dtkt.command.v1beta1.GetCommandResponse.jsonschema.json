@@ -1,0 +1,15 @@
+{
+  "$id": "dtkt.command.v1beta1.GetCommandResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "command": {
+      "items": {
+        "$ref": "dtkt.command.v1beta1.Command.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Get Command Response",
+  "type": "object"
+}

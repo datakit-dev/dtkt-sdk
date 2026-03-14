@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.replication.v1beta1.ListDestinationConfigsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "List of Destinations.",
+  "patternProperties": {
+    "^(destination_configs)$": {
+      "items": {
+        "$ref": "dtkt.replication.v1beta1.DestinationConfig.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "properties": {
+    "destinationConfigs": {
+      "items": {
+        "$ref": "dtkt.replication.v1beta1.DestinationConfig.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "List Destination Configs Response",
+  "type": "object"
+}

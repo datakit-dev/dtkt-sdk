@@ -1,0 +1,18 @@
+{
+  "$id": "dtkt.catalog.v1beta2.StreamQueryResultsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response containing streamed query results.",
+  "properties": {
+    "query": {
+      "$ref": "dtkt.catalog.v1beta2.Query.jsonschema.json",
+      "description": "Details of the executed query."
+    },
+    "row": {
+      "$ref": "dtkt.catalog.v1beta2.Row.jsonschema.json",
+      "description": "A single query result row conforming to the fields defined in query."
+    }
+  },
+  "title": "Stream Query Results Response",
+  "type": "object"
+}

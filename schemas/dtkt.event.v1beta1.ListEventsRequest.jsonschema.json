@@ -1,0 +1,9 @@
+{
+  "$id": "dtkt.event.v1beta1.ListEventsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request for retrieving events.",
+  "properties": {},
+  "title": "List Events Request",
+  "type": "object"
+}

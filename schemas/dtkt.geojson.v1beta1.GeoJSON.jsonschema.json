@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.geojson.v1beta1.GeoJSON.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "GeoJSON Root object union",
+  "patternProperties": {
+    "^(feature_collection)$": {
+      "$ref": "dtkt.geojson.v1beta1.FeatureCollection.jsonschema.json"
+    }
+  },
+  "properties": {
+    "feature": {
+      "$ref": "dtkt.geojson.v1beta1.Feature.jsonschema.json"
+    },
+    "featureCollection": {
+      "$ref": "dtkt.geojson.v1beta1.FeatureCollection.jsonschema.json"
+    },
+    "geometry": {
+      "$ref": "dtkt.geojson.v1beta1.Geometry.jsonschema.json"
+    }
+  },
+  "title": "GeoJSON",
+  "type": "object"
+}

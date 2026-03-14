@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.DeleteConnectionRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "description": "Name of connection to delete.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Delete Connection Request",
+  "type": "object"
+}

@@ -1,0 +1,31 @@
+{
+  "$id": "dtkt.geojson.v1beta1.BBox.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a GeoJSON Bounding Box",
+  "properties": {
+    "coordinates": {
+      "items": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "enum": [
+              "Infinity",
+              "-Infinity",
+              "NaN"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "string"
+          }
+        ]
+      },
+      "type": "array"
+    }
+  },
+  "title": "B Box",
+  "type": "object"
+}

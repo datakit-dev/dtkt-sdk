@@ -1,0 +1,17 @@
+{
+  "$id": "dtkt.core.v1.DecryptResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "DecryptResponse returns the decrypted resource.",
+  "properties": {
+    "resource": {
+      "$ref": "dtkt.core.v1.Resource.jsonschema.json",
+      "description": "Resource with decrypted data."
+    }
+  },
+  "required": [
+    "resource"
+  ],
+  "title": "Decrypt Response",
+  "type": "object"
+}

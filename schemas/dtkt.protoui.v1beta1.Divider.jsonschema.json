@@ -1,0 +1,14 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Divider.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Render as a horizontal divider/separator.\n Maps to Divider in @dtkt/ui/divider\n Simple visual separator with soft styling option.",
+  "properties": {
+    "soft": {
+      "description": "Whether to use softer border color.",
+      "type": "boolean"
+    }
+  },
+  "title": "Divider",
+  "type": "object"
+}

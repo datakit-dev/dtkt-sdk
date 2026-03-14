@@ -1,0 +1,15 @@
+{
+  "$id": "dtkt.ai.v1beta1.Message.Content.Source.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "blob": {
+      "$ref": "dtkt.ai.v1beta1.Blob.jsonschema.json"
+    },
+    "url": {
+      "type": "string"
+    }
+  },
+  "title": "Source",
+  "type": "object"
+}

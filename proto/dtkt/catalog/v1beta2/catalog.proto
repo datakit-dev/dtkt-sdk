@@ -1,0 +1,117 @@
+syntax = "proto3";
+
+package dtkt.catalog.v1beta2;
+
+import "buf/validate/validate.proto";
+import "dtkt/catalog/v1beta2/type.proto";
+import "google/protobuf/field_mask.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta2";
+
+// CatalogService provides operations for managing catalogs, schemas, tables, and query validation.
+service CatalogService {
+  // Create a catalog.
+  rpc CreateCatalog(CreateCatalogRequest) returns (CreateCatalogResponse);
+
+  // Delete a catalog.
+  rpc DeleteCatalog(DeleteCatalogRequest) returns (DeleteCatalogResponse);
+
+  // Get a catalog.
+  rpc GetCatalog(GetCatalogRequest) returns (GetCatalogResponse);
+
+  // List catalogs.
+  rpc ListCatalogs(ListCatalogsRequest) returns (ListCatalogsResponse);
+
+  // Update a catalog.
+  rpc UpdateCatalog(UpdateCatalogRequest) returns (UpdateCatalogResponse);
+}
+
+// Represents a catalog resource specifying a query dialect, supported data types
+// and additional metadata (if any).
+message Catalog {
+  // Catalog resource name, format: `catalogs/{catalog}` (e.g. catalogs/google-project-id, catalogs/postgres_database, etc.)
+  string name = 1;
+
+  // Catalog identifier.
+  string catalog_id = 2;
+
+  // Description of the catalog.
+  string description = 3;
+
+  // Supported query dialect (e.g., Trino, GoogleSQL, Postgres, etc.).
+  string query_dialect = 4;
+
+  // List of supported data types.
+  repeated Type data_types = 5;
+
+  // Additional metadata, if any.
+  map<string, string> metadata = 10;
+}
+
+// Create catalog request.
+message CreateCatalogRequest {
+  // Catalog identifier, e.g. final segment in resource name: `catalogs/{catalog}`
+  string catalog_id = 2 [(buf.validate.field).required = true];
+
+  // Catalog to create.
+  Catalog catalog = 3 [(buf.validate.field).required = true];
+}
+
+// Create catalog response.
+message CreateCatalogResponse {
+  // Catalog created.
+  Catalog catalog = 1;
+}
+
+// Request to retrieve a catalog by name.
+message GetCatalogRequest {
+  // Catalog resource to retreve.
+  string name = 1;
+}
+
+// Response containing catalog details.
+message GetCatalogResponse {
+  // The requested catalog.
+  Catalog catalog = 1;
+}
+
+// List catalogs request.
+message ListCatalogsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string filter = 4;
+}
+
+// List catalogs response.
+message ListCatalogsResponse {
+  repeated Catalog catalogs = 1;
+  string next_page_token = 2;
+}
+
+// Update catalog request.
+message UpdateCatalogRequest {
+  // Catalog with updated fields
+  Catalog catalog = 1 [(buf.validate.field).required = true];
+
+  // Fields to update.
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+// Update catalog response.
+message UpdateCatalogResponse {
+  // The updated catalog.
+  Catalog catalog = 1;
+}
+
+// Delete catalog request.
+message DeleteCatalogRequest {
+  // Name of catalog to delete.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // If set to true, any schemas in this catalog will also be deleted.
+  // (Otherwise, the request will only work if the catalog has no schemas.)
+  bool force = 2;
+}
+
+// Delete catalog response.
+message DeleteCatalogResponse {}

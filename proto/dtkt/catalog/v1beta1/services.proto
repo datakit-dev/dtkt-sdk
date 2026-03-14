@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package dtkt.catalog.v1beta1;
+
+import "dtkt/catalog/v1beta1/messages.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta1";
+
+// CatalogService provides operations for managing catalogs, schemas, tables, and query validation.
+// Streaming endpoints are provided for table reads, writes, and query results.
+// It also provides destination and source configuration for supported replication providers.
+service CatalogService {
+  // Retrieves data types supported by the service.
+  rpc ListDataTypes(ListDataTypesRequest) returns (ListDataTypesResponse);
+
+  // Retrieves details of a specific catalog.
+  rpc GetCatalog(GetCatalogRequest) returns (GetCatalogResponse);
+}
+
+service SchemaService {
+  // Streams all schemas in a specified catalog.
+  rpc ListSchemas(ListSchemasRequest) returns (stream ListSchemasResponse);
+
+  // Retrieves details of a specific schema in a catalog.
+  rpc GetSchema(GetSchemaRequest) returns (GetSchemaResponse);
+
+  // Creates a new schema in a catalog.
+  rpc CreateSchema(CreateSchemaRequest) returns (CreateSchemaResponse);
+
+  // Updates details of an existing schema in a catalog.
+  rpc UpdateSchema(UpdateSchemaRequest) returns (UpdateSchemaResponse);
+
+  // Deletes a schema from a catalog.
+  rpc DeleteSchema(DeleteSchemaRequest) returns (DeleteSchemaResponse);
+}
+
+service TableService {
+  // Streams all tables in a specified schema.
+  rpc ListTables(ListTablesRequest) returns (stream ListTablesResponse);
+
+  // Retrieves details of a specific table in a schema.
+  rpc GetTable(GetTableRequest) returns (GetTableResponse);
+
+  // Creates a new table in a schema.
+  rpc CreateTable(CreateTableRequest) returns (CreateTableResponse);
+
+  // Updates details of an existing table in a schema.
+  rpc UpdateTable(UpdateTableRequest) returns (UpdateTableResponse);
+
+  // Deletes a table from a schema.
+  rpc DeleteTable(DeleteTableRequest) returns (DeleteTableResponse);
+
+  // Stream row writes to tables.
+  rpc WriteTables(stream WriteTablesRequest) returns (WriteTablesResponse);
+
+  // Streams rows from a table in a schema.
+  rpc ReadTable(ReadTableRequest) returns (stream ReadTableResponse);
+}
+
+service QueryService {
+  // Retrieves the query dialect used by the service.
+  rpc GetQueryDialect(GetQueryDialectRequest) returns (GetQueryDialectResponse);
+
+  // Validates the provided query against the accessible catalogs.
+  rpc ValidateQuery(ValidateQueryRequest) returns (ValidateQueryResponse);
+
+  // Executes a query and retrieves the results.
+  rpc GetQueryResults(GetQueryResultsRequest) returns (GetQueryResultsResponse);
+
+  // Streams results of a query.
+  rpc StreamQueryResults(StreamQueryResultsRequest) returns (stream StreamQueryResultsResponse);
+}

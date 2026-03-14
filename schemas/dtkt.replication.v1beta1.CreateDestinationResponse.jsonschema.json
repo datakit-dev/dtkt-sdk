@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.replication.v1beta1.CreateDestinationResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response from create configured destination.",
+  "properties": {
+    "created": {
+      "default": false,
+      "description": "Indicates whether destination was successfully created.",
+      "type": "boolean"
+    },
+    "destination": {
+      "$ref": "dtkt.replication.v1beta1.Destination.jsonschema.json",
+      "description": "The returned destination if created is true."
+    },
+    "error": {
+      "default": "",
+      "description": "An error message if created is false.",
+      "type": "string"
+    }
+  },
+  "title": "Create Destination Response",
+  "type": "object"
+}

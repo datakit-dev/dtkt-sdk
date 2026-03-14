@@ -1,0 +1,21 @@
+{
+  "$id": "dtkt.core.v1.SyncDescriptorsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "etag": {
+      "default": "",
+      "description": "Build etag must match current file etag for idempotent syncs and to ensure\n descriptors are up-to-date with the latest connection or deployment config/build.\n May be an empty string if no descriptors have been synced yet.",
+      "type": "string"
+    },
+    "parent": {
+      "description": "Name of parent resource.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "parent"
+  ],
+  "title": "Sync Descriptors Request",
+  "type": "object"
+}

@@ -1,0 +1,18 @@
+{
+  "$id": "dtkt.catalog.v1beta1.ReadTableResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response message for reading rows from a table.",
+  "properties": {
+    "row": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "A row read from the table."
+    },
+    "table": {
+      "$ref": "dtkt.catalog.v1beta1.Table.jsonschema.json",
+      "description": "Reference to the table from which rows were read."
+    }
+  },
+  "title": "Read Table Response",
+  "type": "object"
+}

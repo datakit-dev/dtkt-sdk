@@ -1,0 +1,45 @@
+{
+  "$id": "dtkt.core.v1.BuildIntegrationRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(source_etag)$": {
+      "description": "Package source checksum or git commit hash.",
+      "type": "string"
+    },
+    "^(source_uri)$": {
+      "description": "URI of package source to build integration from (e.g. git://repo_url or file://path/to/source).",
+      "minLength": 1,
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "build": {
+      "$ref": "dtkt.core.v1.PackageBuildMetadata.jsonschema.json",
+      "description": "Build metadata for this build operation."
+    },
+    "name": {
+      "description": "Name of integration resource to build.",
+      "type": "string"
+    },
+    "sourceEtag": {
+      "description": "Package source checksum or git commit hash.",
+      "type": "string"
+    },
+    "sourceUri": {
+      "description": "URI of package source to build integration from (e.g. git://repo_url or file://path/to/source).",
+      "minLength": 1,
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "sourceUri",
+    "sourceEtag",
+    "build"
+  ],
+  "title": "Build Integration Request",
+  "type": "object"
+}

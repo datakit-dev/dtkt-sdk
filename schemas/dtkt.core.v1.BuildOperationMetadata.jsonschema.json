@@ -1,0 +1,61 @@
+{
+  "$id": "dtkt.core.v1.BuildOperationMetadata.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "BuildOperationMetadata contains metadata for build operations.",
+  "patternProperties": {
+    "^(finish_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Build finish time."
+    },
+    "^(start_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Build start time."
+    }
+  },
+  "properties": {
+    "finishTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Build finish time."
+    },
+    "message": {
+      "default": "",
+      "description": "Build status message.",
+      "type": "string"
+    },
+    "startTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Build start time."
+    },
+    "state": {
+      "anyOf": [
+        {
+          "enum": [
+            "STATE_PENDING",
+            "STATE_RUNNING",
+            "STATE_SUCCEEDED",
+            "STATE_FAILED"
+          ],
+          "type": "string"
+        },
+        {
+          "exclusiveMaximum": 0,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "exclusiveMinimum": 0,
+          "maximum": 2147483647,
+          "type": "integer"
+        }
+      ],
+      "description": "Build state.",
+      "title": "State"
+    }
+  },
+  "required": [
+    "state"
+  ],
+  "title": "Build Operation Metadata",
+  "type": "object"
+}

@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.replication.v1beta1.UpdateSourceResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response from update configured Source.",
+  "properties": {
+    "error": {
+      "default": "",
+      "description": "An error message if updated is false.",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "dtkt.replication.v1beta1.Source.jsonschema.json",
+      "description": "The returned Source if updated is true."
+    },
+    "updated": {
+      "default": false,
+      "description": "Indicates whether Source was successfully updated.",
+      "type": "boolean"
+    }
+  },
+  "title": "Update Source Response",
+  "type": "object"
+}

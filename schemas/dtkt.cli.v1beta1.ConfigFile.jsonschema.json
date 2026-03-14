@@ -1,0 +1,97 @@
+{
+  "$id": "dtkt.cli.v1beta1.ConfigFile.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(build_dir)$": {
+      "default": "",
+      "description": "Directory containing build artifacts",
+      "minLength": 1,
+      "type": "string"
+    },
+    "^(data_dir)$": {
+      "default": "",
+      "description": "Directory containing data storage",
+      "minLength": 1,
+      "type": "string"
+    },
+    "^(non_interactive)$": {
+      "default": false,
+      "description": "Disable interactive prompts",
+      "type": "boolean"
+    }
+  },
+  "properties": {
+    "buildDir": {
+      "default": "",
+      "description": "Directory containing build artifacts",
+      "minLength": 1,
+      "type": "string"
+    },
+    "cloud": {
+      "$ref": "dtkt.cli.v1beta1.ConfigFile.Cloud.jsonschema.json",
+      "description": "DataKit Cloud configuration"
+    },
+    "contexts": {
+      "additionalProperties": {
+        "$ref": "dtkt.core.v1.Context.jsonschema.json"
+      },
+      "description": "Map of context names to their configurations",
+      "propertyNames": {
+        "minLength": 1,
+        "pattern": "^[a-z][a-z0-9_-]*$",
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "daemon": {
+      "$ref": "dtkt.cli.v1beta1.Daemon.jsonschema.json",
+      "description": "Local daemon configuration"
+    },
+    "dataDir": {
+      "default": "",
+      "description": "Directory containing data storage",
+      "minLength": 1,
+      "type": "string"
+    },
+    "legal": {
+      "$ref": "dtkt.cli.v1beta1.ConfigFile.Legal.jsonschema.json",
+      "description": "Legal acceptance tracking"
+    },
+    "nonInteractive": {
+      "default": false,
+      "description": "Disable interactive prompts",
+      "type": "boolean"
+    },
+    "telemetry": {
+      "anyOf": [
+        {
+          "pattern": "^TELEMETRY_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "TELEMETRY_ON",
+            "TELEMETRY_OFF"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2,
+          "minimum": 0,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Telemetry opt-in/out setting",
+      "title": "Telemetry"
+    }
+  },
+  "required": [
+    "cloud",
+    "daemon",
+    "legal"
+  ],
+  "title": "Config File",
+  "type": "object"
+}

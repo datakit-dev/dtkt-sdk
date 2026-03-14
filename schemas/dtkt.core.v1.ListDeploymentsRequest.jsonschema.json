@@ -1,0 +1,59 @@
+{
+  "$id": "dtkt.core.v1.ListDeploymentsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(page_size)$": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Maximum number of deployments to return."
+    },
+    "^(page_token)$": {
+      "default": "",
+      "description": "Token for retrieving the next page.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "filter": {
+      "description": "Filter expression.",
+      "type": "string"
+    },
+    "pageSize": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Maximum number of deployments to return."
+    },
+    "pageToken": {
+      "default": "",
+      "description": "Token for retrieving the next page.",
+      "type": "string"
+    },
+    "parent": {
+      "description": "Parent resource name: `organizations/{organization}` or `users/{user}`.",
+      "type": "string"
+    }
+  },
+  "title": "List Deployments Request",
+  "type": "object"
+}

@@ -1,0 +1,26 @@
+{
+  "$id": "dtkt.flow.v1beta1.Int32.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "default": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ]
+    },
+    "nullable": {
+      "default": false,
+      "type": "boolean"
+    }
+  },
+  "title": "Int32",
+  "type": "object"
+}

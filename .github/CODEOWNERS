@@ -1,0 +1,22 @@
+# Workflows and Release
+
+.github/workflows/ @datakit-dev/dev-sec-ops @datakit-dev/platform
+**/Taskfile.yaml @datakit-dev/dev-sec-ops @datakit-dev/platform
+Dockerfile* @datakit-dev/dev-sec-ops @datakit-dev/platform
+hack @datakit-dev/dev-sec-ops @datakit-dev/platform
+infra @datakit-dev/dev-sec-ops @datakit-dev/platform
+
+# Security
+
+SECURITY.md @datakit-dev/dev-sec-ops
+
+# Legal and licensing
+
+**/legal/ @datakit-dev/legal
+**/LICENSE @datakit-dev/legal
+**/CHANGE_LICENSE @datakit-dev/legal
+**/NOTICE @datakit-dev/legal
+
+# Default owner for everything else
+
+* @datakit-dev/platform

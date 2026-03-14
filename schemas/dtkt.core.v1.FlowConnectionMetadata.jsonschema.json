@@ -1,0 +1,23 @@
+{
+  "$id": "dtkt.core.v1.FlowConnectionMetadata.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "FlowConnectionMetadata contains connection configuration for a flow automation.",
+  "properties": {
+    "context": {
+      "$ref": "dtkt.core.v1.Context.jsonschema.json",
+      "description": "Optional context to resolve connection resource by name.\n If unspecified, defaults to the context where the flow automation runs."
+    },
+    "name": {
+      "description": "Name of connection resource.",
+      "minLength": 1,
+      "pattern": ".*/connections/.*",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Flow Connection Metadata",
+  "type": "object"
+}

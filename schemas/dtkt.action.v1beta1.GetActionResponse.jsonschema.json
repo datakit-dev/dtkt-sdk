@@ -1,0 +1,13 @@
+{
+  "$id": "dtkt.action.v1beta1.GetActionResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "$ref": "dtkt.action.v1beta1.Action.jsonschema.json",
+      "description": "The requested action, including its input/output schema and metadata."
+    }
+  },
+  "title": "Get Action Response",
+  "type": "object"
+}

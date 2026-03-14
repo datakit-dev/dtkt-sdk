@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+package dtkt.protoform.v1beta1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protoform/v1beta1";
+
+// extend google.protobuf.MessageOptions {
+//   optional MessageOptions message = 50000;
+// }
+
+extend google.protobuf.FieldOptions {
+  optional FieldElement field = 50000;
+}
+
+// message MessageOptions {
+//   // Bindings is a declarative map of message-level data to be resolved at
+//   // runtime and used by one or more fields within the message. This provides
+//   // individual field elements access to the same data avoiding duplicate
+//   // declarations.
+//   map<string, ValueBinding> bindings = 1;
+// }
+
+// message ValueBinding {
+//   // A fully-qualified method name
+//   string method_name = 1;
+//   string value_expr = 2;
+// }
+
+message FieldElement {
+  optional string title = 1;
+  optional string description = 2;
+  optional bool hidden = 3;
+
+  oneof type {
+    ConfirmElement confirm = 4;
+    InputElement input = 5;
+    FileElement file = 6;
+    SelectElement select = 7;
+    MultiSelectElement multi_select = 8;
+  }
+}
+
+// Confirm element (approve/decline)
+message ConfirmElement {
+  string approve = 1;
+  string decline = 2;
+  bool default_selected = 3;
+}
+
+// Input element with multi-line text option
+message InputElement {
+  optional bool multiline_text = 1;
+}
+
+// File element
+message FileElement {
+  repeated string allowed_types = 2;
+}
+
+// Select element
+message SelectElement {
+  // A fully-qualified method name to call at runtime to retrieve options for
+  // this select element. The method must return a message containing a repeated
+  // field to be used as the options for this select element.
+  string method_name = 1 [(buf.validate.field).required = true];
+  // CEL expression to extract the key for each option from the method response.
+  // The method response will be available as `this` in the CEL expression context.
+  // Example key_expr: "this.options.map(i, i.name)" if the method response has a repeated
+  // field `options` with a `name` field to be used as the option key.
+  string key_expr = 2;
+  // CEL expression to extract the value for each option from the method response.
+  // The method response will be available as `this` in the CEL expression context.
+  // Example val_expr: "this.options.map(i, i.display_name)" if the method response has a repeated
+  // field `options` with a `display_name` field to be used as the option value.
+  string val_expr = 3;
+}
+
+// Multi-select element
+message MultiSelectElement {
+  // A fully-qualified method name to call at runtime to retrieve options for
+  // this select element. The method must return a message containing a repeated
+  // field to be used as the options for this select element.
+  string method_name = 1 [(buf.validate.field).required = true];
+  // CEL expression to extract the key for each option from the method response.
+  // The method response will be available as `this` in the CEL expression context.
+  // Example key_expr: "this.options.map(i, i.name)" if the method response has a repeated
+  // field `options` with a `name` field to be used as the option key.
+  string key_expr = 2;
+  // CEL expression to extract the value for each option from the method response.
+  // The method response will be available as `this` in the CEL expression context.
+  // Example val_expr: "this.options.map(i, i.display_name)" if the method response has a repeated
+  // field `options` with a `display_name` field to be used as the option value.
+  string val_expr = 3;
+}

@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.GetMethodRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "description": "Method resource name, one of:\n - System: \"methods/{method}\"\n - Organization/User: e.g. \"organizations/bar/methods/{method}\" or \"users/foo/methods/{method}\"\n - Connection: e.g. \"users/foo/connections/foobar/methods/{method}\"\n - Deployment: e.g. \"users/foo/deployments/default/methods/{method}\"",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Get Method Request",
+  "type": "object"
+}

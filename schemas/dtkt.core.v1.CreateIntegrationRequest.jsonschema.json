@@ -1,0 +1,36 @@
+{
+  "$id": "dtkt.core.v1.CreateIntegrationRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(integration_id)$": {
+      "description": "Client-provided ID for integration resource.",
+      "minLength": 1,
+      "pattern": "^[a-z0-9-]+$",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "integration": {
+      "$ref": "dtkt.core.v1.Integration.jsonschema.json",
+      "description": "Integration to create."
+    },
+    "integrationId": {
+      "description": "Client-provided ID for integration resource.",
+      "minLength": 1,
+      "pattern": "^[a-z0-9-]+$",
+      "type": "string"
+    },
+    "parent": {
+      "description": "Parent resource name: organizations/{organization} or users/{user}.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "parent",
+    "integrationId",
+    "integration"
+  ],
+  "title": "Create Integration Request",
+  "type": "object"
+}

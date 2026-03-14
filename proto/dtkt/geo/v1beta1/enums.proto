@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/geo/v1beta1";
+
+package dtkt.geo.v1beta1;
+
+enum BoundsType {
+  BOUNDS_TYPE_UNSPECIFIED = 0;
+  BOUNDS_TYPE_COVERS = 1;
+  BOUNDS_TYPE_INTERSECTS = 2;
+  BOUNDS_TYPE_WITHIN = 3;
+}
+
+enum PropertyType {
+  PROPERTY_TYPE_UNSPECIFIED = 0;
+  PROPERTY_TYPE_STRING = 1;
+  PROPERTY_TYPE_BOOLEAN = 2;
+  PROPERTY_TYPE_NUMBER = 3;
+}

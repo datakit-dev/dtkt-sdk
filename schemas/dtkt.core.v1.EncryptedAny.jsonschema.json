@@ -1,0 +1,29 @@
+{
+  "$id": "dtkt.core.v1.EncryptedAny.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "EncryptedAny is an encrypted representation of google.protobuf.Any.",
+  "patternProperties": {
+    "^(type_url)$": {
+      "description": "Type URL of the encrypted message.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "typeUrl": {
+      "description": "Type URL of the encrypted message.",
+      "type": "string"
+    },
+    "value": {
+      "description": "Encrypted message value.",
+      "pattern": "^[A-Za-z0-9+/]*={0,2}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "typeUrl",
+    "value"
+  ],
+  "title": "Encrypted Any",
+  "type": "object"
+}

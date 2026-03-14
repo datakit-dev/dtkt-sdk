@@ -1,0 +1,14 @@
+name: Stale
+
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: '0 0 * * *'
+
+jobs:
+  stale:
+    permissions:
+      issues: write
+      pull-requests: write
+
+    uses: datakit-dev/.github/.github/workflows/stale.yaml@main

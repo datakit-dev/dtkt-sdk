@@ -1,0 +1,84 @@
+fragment SourceFragment on Source {
+  id
+  name
+  # metadata
+  # config
+  externalReports {
+    provider
+    id
+    url
+    dataSource {
+      provider
+      id
+      url
+    }
+  }
+  autoSync
+  syncStatus
+  syncError
+  syncedAt
+  syncFreq
+  syncTime
+  createdAt
+  updatedAt
+  deletedAt
+  providerID
+  destinationID
+  catalogID
+  connectionID
+}
+
+query GetSource($id: ID!) {
+  source(id: $id) {
+    ...SourceFragment
+  }
+}
+
+query ListSources($orderBy: SourceOrder, $where: SourceWhereInput) {
+  sources(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...SourceFragment
+      }
+    }
+    totalCount
+  }
+}
+
+mutation CreateSource($input: CreateSourceInput!) {
+  createSource(input: $input) {
+    created
+    error
+    source {
+      ...SourceFragment
+    }
+  }
+}
+
+mutation SyncSource($id: ID!) {
+  syncSource(id: $id) {
+    updated
+    error
+    source {
+      ...SourceFragment
+    }
+  }
+}
+
+mutation UpdateSource($id: ID!, $input: UpdateSourceInput!) {
+  updateSource(id: $id, input: $input) {
+    updated
+    error
+    source {
+      ...SourceFragment
+    }
+  }
+}
+
+mutation DeleteSource($id: ID!, $softDelete: Boolean) {
+  deleteSource(id: $id, softDelete: $softDelete) {
+    deleted
+    error
+    id
+  }
+}

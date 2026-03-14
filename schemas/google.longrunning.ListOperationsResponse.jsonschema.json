@@ -1,0 +1,36 @@
+{
+  "$id": "google.longrunning.ListOperationsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The response message for\n [Operations.ListOperations][google.longrunning.Operations.ListOperations].",
+  "patternProperties": {
+    "^(next_page_token)$": {
+      "default": "",
+      "description": "The standard List next-page token.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "nextPageToken": {
+      "default": "",
+      "description": "The standard List next-page token.",
+      "type": "string"
+    },
+    "operations": {
+      "description": "A list of operations that matches the specified filter in the request.",
+      "items": {
+        "$ref": "google.longrunning.Operation.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "unreachable": {
+      "description": "Unordered list. Unreachable resources. Populated when the request sets\n `ListOperationsRequest.return_partial_success` and reads across\n collections e.g. when attempting to list all resources across all supported\n locations.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "title": "List Operations Response",
+  "type": "object"
+}

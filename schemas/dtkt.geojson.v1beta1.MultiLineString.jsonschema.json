@@ -1,0 +1,22 @@
+{
+  "$id": "dtkt.geojson.v1beta1.MultiLineString.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bbox": {
+      "$ref": "dtkt.geojson.v1beta1.BBox.jsonschema.json"
+    },
+    "coordinates": {
+      "items": {
+        "$ref": "dtkt.geojson.v1beta1.LineStringCoords.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "type": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Multi Line String",
+  "type": "object"
+}

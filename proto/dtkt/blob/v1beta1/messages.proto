@@ -1,0 +1,344 @@
+syntax = "proto3";
+
+package dtkt.blob.v1beta1;
+
+import "buf/validate/validate.proto";
+import "dtkt/blob/v1beta1/enums.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/blob/v1beta1";
+
+message ListResult {
+  // Key for this blob result.
+  string key = 1;
+
+  // ModTime is the time the blob was last modified.
+  google.protobuf.Timestamp mod_time = 2;
+
+  // Size is the size of the blob's content in bytes.
+  int64 size = 3;
+
+  // MD5 is an MD5 hash of the blob contents or nil if not available.
+  string md5 = 4;
+
+  // IsDir indicates that this result represents a "directory" in the
+  // hierarchical namespace, ending in ListOptions.Delimiter. Key can be
+  // passed as ListOptions.Prefix to list items in the "directory".
+  // Fields other than Key and IsDir will not be set if IsDir is true.
+  bool is_dir = 5;
+}
+
+message ListBlobsRequest {
+  // Prefix indicates that only blobs with a key starting with this prefix
+  // should be returned.
+  string prefix = 1;
+
+  // The maximum number of blobs to return. The service may return fewer than
+  // this value.
+  // If unspecified, at most 50 blobs will be returned.
+  // The maximum value is 1000; values above 1000 will be coerced to 1000.
+  int32 page_size = 2 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.lte = 1000
+  ];
+
+  // A page token, received from a previous `ListBlobs` call.
+  // Provide this to retrieve the subsequent page.
+  //
+  // When paginating, all other parameters provided to `ListBlobs` must match
+  // the call that provided the page token.
+  string page_token = 3;
+
+  // Bucket to write blob (may be optional).
+  string bucket = 4;
+}
+
+message ListBlobsResponse {
+  // The results from the specified prefix.
+  repeated ListResult results = 1;
+
+  // A token that can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+}
+
+message GetBlobRequest {
+  // Key of blob to retrieve attributes.
+  string key = 1 [(buf.validate.field).required = true];
+
+  // Bucket to write blob (may be optional).
+  string bucket = 2;
+}
+
+message GetBlobResponse {
+  // Key of blob of retrieved attributes.
+  string key = 1;
+
+  // CacheControl specifies caching attributes that services may use
+  // when serving the blob.
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
+  string cache_control = 2;
+
+  // ContentDisposition specifies whether the blob content is expected to be
+  // displayed inline or as an attachment.
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
+  string content_disposition = 3;
+
+  // ContentEncoding specifies the encoding used for the blob's content, if any.
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding
+  string content_encoding = 4;
+
+  // ContentLanguage specifies the language used in the blob's content, if any.
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Language
+  string content_language = 5;
+
+  // ContentType is the MIME type of the blob. It will not be empty.
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type
+  string content_type = 6;
+
+  // Metadata holds key/value pairs associated with the blob.
+  // Keys are guaranteed to be in lowercase, even if the backend service
+  // has case-sensitive keys (although note that Metadata written via
+  // this package will always be lowercased). If there are duplicate
+  // case-insensitive keys (e.g., "foo" and "FOO"), only one value
+  // will be kept, and it is undefined which one.
+  map<string, string> metadata = 7;
+
+  // CreateTime is the time the blob was created, if available. If not available,
+  // CreateTime will be the zero time.
+  google.protobuf.Timestamp create_time = 8;
+
+  // ModTime is the time the blob was last modified.
+  google.protobuf.Timestamp mod_time = 9;
+
+  // Size is the size of the blob's content in bytes.
+  int64 size = 10;
+
+  // MD5 is an MD5 hash of the blob contents or nil if not available.
+  string md5 = 11;
+
+  // ETag for the blob; see https://en.wikipedia.org/wiki/HTTP_ETag.
+  string etag = 12;
+}
+
+message ReadBlobLinesRequest {
+  // Key of blob to read.
+  string key = 1 [(buf.validate.field).required = true];
+
+  // Line delimiter; default: \n.
+  string delimiter = 2;
+
+  // Max size (in bytes) of individual line.
+  int64 max_size = 3;
+
+  // Bucket to read blob (may be optional).
+  string bucket = 4;
+
+  // Format of lines to read (default: LINE_FORMAT_RAW if unspecified).
+  LineFormat line_format = 5;
+
+  // JSON array mode: if true (when line_format is JSON), expects root JSON array; if false, expects newline-delimited JSON (default).
+  bool json_array_mode = 6;
+}
+
+message ReadBlobLinesResponse {
+  // Key of blob read.
+  string key = 1;
+
+  oneof line {
+    // Raw line data.
+    bytes data = 2;
+
+    // JSON parsed line data.
+    google.protobuf.Value json = 3;
+  }
+}
+
+message ReadBlobRangeRequest {
+  // Key of blob to read.
+  string key = 1 [(buf.validate.field).required = true];
+
+  // Bucket to write blob (may be optional).
+  string bucket = 2;
+
+  // Read starting at offset.
+  uint64 offset = 3;
+
+  // Read at most length bytes if greater than 0. If less than 0, reads the whole blob.
+  int64 length = 4;
+}
+
+message ReadBlobRangeResponse {
+  // Key of blob read.
+  string key = 1;
+
+  // Data of blob range.
+  bytes data = 2;
+}
+
+message WriteBlobRequest {
+  // Key of blob to write.
+  string key = 1 [(buf.validate.field).required = true];
+
+  // Bucket to write blob (may be optional).
+  string bucket = 2;
+
+  // Raw blob payload.
+  bytes data = 3;
+
+  // MIME type for the blob payload.
+  string content_type = 4;
+
+  // Language for the blob payload.
+  string content_language = 5;
+
+  // Content encoding for the blob payload.
+  string content_encoding = 6;
+
+  // Cache control directives.
+  string cache_control = 7;
+
+  // Content disposition for the blob payload.
+  string content_disposition = 8;
+
+  // Blob metadata (all keys lower-case).
+  map<string, string> metadata = 9;
+
+  // Require the blob to match the provided ETag before writing.
+  string if_match = 10;
+
+  // Require the blob to *not* match the provided ETag before writing.
+  string if_none_match = 11;
+
+  // Require the blob does not already exist before writing.
+  bool if_not_exist = 12;
+}
+
+message WriteBlobResponse {
+  // Key of the written blob.
+  string key = 1;
+
+  // Size of the stored blob.
+  int64 size = 2;
+
+  // Modification time reported by the provider.
+  google.protobuf.Timestamp mod_time = 3;
+
+  // ETag assigned by the provider.
+  string etag = 4;
+}
+
+message WriteBlobLinesRequest {
+  // Key of blob to write.
+  string key = 1 [(buf.validate.field).required = true];
+
+  // Bucket to write blob (may be optional).
+  string bucket = 2;
+
+  // Data of blob line.
+  bytes data = 3;
+}
+
+message WriteBlobLinesResponse {
+  message KeyResult {
+    // Key of blob to write.
+    string key = 1;
+
+    // Size of the stored blob.
+    int64 size = 2;
+
+    // Modification time reported by the provider.
+    google.protobuf.Timestamp mod_time = 3;
+
+    // ETag assigned by the provider.
+    string etag = 4;
+
+    // Total lines written.
+    int64 lines_written = 5;
+  }
+
+  repeated KeyResult results = 1;
+}
+
+message DeleteBlobRequest {
+  // Key of blob to delete.
+  string key = 1 [(buf.validate.field).required = true];
+
+  // Bucket to write blob (may be optional).
+  string bucket = 2;
+}
+
+message DeleteBlobResponse {
+  // Indicates if the delete operation succeeded.
+  bool deleted = 1;
+
+  // ETag of the deleted blob if reported.
+  string etag = 2;
+}
+
+message CopyBlobRequest {
+  // Source bucket name. If empty, defaults to destination bucket.
+  string source_bucket = 1;
+
+  // Source key to copy from.
+  string source_key = 2 [(buf.validate.field).required = true];
+
+  // Destination bucket name
+  string destination_bucket = 3;
+
+  // Destination key to copy to.
+  string destination_key = 4 [(buf.validate.field).required = true];
+
+  // Overwrite the destination blob when it already exists.
+  bool overwrite = 5;
+
+  // Replacement metadata (optional).
+  map<string, string> metadata = 6;
+}
+
+message CopyBlobResponse {
+  // Destination key of the copied blob.
+  string destination_key = 1;
+
+  // Size of the copied blob.
+  int64 size = 2;
+
+  // Modification time reported after copy.
+  google.protobuf.Timestamp mod_time = 3;
+
+  // ETag assigned at destination.
+  string etag = 4;
+}
+
+message GenerateSignedURLRequest {
+  // Key of blob to sign.
+  string key = 1 [(buf.validate.field).required = true];
+
+  // Bucket to write blob (may be optional).
+  string bucket = 2;
+
+  // HTTP method the signed URL will permit.
+  SignedURLMethod method = 3;
+
+  // Duration the signed URL remains valid.
+  google.protobuf.Duration expires_in = 4;
+
+  // Expected content type when using the signed URL.
+  string content_type = 5;
+
+  // Additional query parameters enforced by the signed URL.
+  map<string, string> query_parameters = 6;
+
+  // Additional headers enforced by the signed URL.
+  map<string, string> headers = 7;
+}
+
+message GenerateSignedURLResponse {
+  // Fully qualified signed URL.
+  string url = 1;
+
+  // Expiration timestamp when the signed URL becomes invalid.
+  google.protobuf.Timestamp expires_at = 2;
+}

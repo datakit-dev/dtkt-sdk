@@ -1,0 +1,48 @@
+{
+  "$id": "dtkt.replication.v1beta1.FivetranConfig.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents Fivetran replication service config.",
+  "patternProperties": {
+    "^(api_key)$": {
+      "default": "",
+      "type": "string"
+    },
+    "^(api_secret)$": {
+      "default": "",
+      "type": "string"
+    },
+    "^(destination_config)$": {
+      "$ref": "dtkt.replication.v1beta1.FivetranDestinationConfig.jsonschema.json"
+    },
+    "^(source_config)$": {
+      "$ref": "dtkt.replication.v1beta1.FivetranSourceConfig.jsonschema.json"
+    },
+    "^(webhook_secret)$": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "apiKey": {
+      "default": "",
+      "type": "string"
+    },
+    "apiSecret": {
+      "default": "",
+      "type": "string"
+    },
+    "destinationConfig": {
+      "$ref": "dtkt.replication.v1beta1.FivetranDestinationConfig.jsonschema.json"
+    },
+    "sourceConfig": {
+      "$ref": "dtkt.replication.v1beta1.FivetranSourceConfig.jsonschema.json"
+    },
+    "webhookSecret": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Fivetran Config",
+  "type": "object"
+}

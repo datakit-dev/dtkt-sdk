@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package dtkt.replication.v1beta1;
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/replication/v1beta1";
+
+enum SyncStatus {
+  // Unspecified sync status.
+  SYNC_STATUS_UNSPECIFIED = 0;
+
+  // Scheduled sync status.
+  SYNC_STATUS_SCHEDULED = 1;
+
+  // Running sync status.
+  SYNC_STATUS_RUNNING = 2;
+
+  // Success sync status.
+  SYNC_STATUS_SUCCESS = 3;
+
+  // Failed sync status.
+  SYNC_STATUS_FAILED = 4;
+}

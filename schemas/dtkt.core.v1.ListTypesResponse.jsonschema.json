@@ -1,0 +1,28 @@
+{
+  "$id": "dtkt.core.v1.ListTypesResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(next_page_token)$": {
+      "default": "",
+      "description": "Token for retrieving the next page.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "nextPageToken": {
+      "default": "",
+      "description": "Token for retrieving the next page.",
+      "type": "string"
+    },
+    "types": {
+      "description": "The list of types.",
+      "items": {
+        "$ref": "dtkt.core.v1.Type.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "List Types Response",
+  "type": "object"
+}

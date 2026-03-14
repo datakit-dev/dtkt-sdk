@@ -1,0 +1,24 @@
+# genqlient documentation:
+# https://github.com/Khan/genqlient/blob/main/docs/genqlient.yaml
+schema: ../graph/schema.graphqls
+operations:
+- ../graph/**/*.graphql
+generated: cloud/graph/generated.go
+client_getter: github.com/datakit-dev/dtkt-sdk/sdk-go/cloud.GetGraphClient
+optional: pointer
+use_struct_references: true
+bindings:
+  ID:
+    type: github.com/google/uuid.UUID
+  Time:
+    type: time.Time
+  DateTime:
+    type: time.Time
+  Map:
+    type: map[string]any
+  Any:
+    type: any
+  Int64:
+    type: encoding/json.Number
+  Bytes:
+    type: "[]byte"

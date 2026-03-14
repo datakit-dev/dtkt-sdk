@@ -1,0 +1,13 @@
+{
+  "$id": "dtkt.email.v1beta1.CreateEmailTemplateRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a request to create an email template.",
+  "properties": {
+    "template": {
+      "$ref": "dtkt.email.v1beta1.EmailTemplate.jsonschema.json"
+    }
+  },
+  "title": "Create Email Template Request",
+  "type": "object"
+}

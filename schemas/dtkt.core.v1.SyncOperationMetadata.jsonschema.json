@@ -1,0 +1,133 @@
+{
+  "$id": "dtkt.core.v1.SyncOperationMetadata.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "SyncOperationMetadata contains metadata for sync operations.",
+  "patternProperties": {
+    "^(methods_count)$": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0
+    },
+    "^(services_count)$": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0
+    },
+    "^(start_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Sync start time."
+    },
+    "^(stop_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Sync stop time."
+    },
+    "^(types_count)$": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0
+    }
+  },
+  "properties": {
+    "message": {
+      "default": "",
+      "description": "Sync status message.",
+      "type": "string"
+    },
+    "methodsCount": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0
+    },
+    "servicesCount": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0
+    },
+    "startTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Sync start time."
+    },
+    "state": {
+      "anyOf": [
+        {
+          "enum": [
+            "STATE_PENDING",
+            "STATE_RUNNING",
+            "STATE_SUCCEEDED",
+            "STATE_FAILED"
+          ],
+          "type": "string"
+        },
+        {
+          "exclusiveMaximum": 0,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "exclusiveMinimum": 0,
+          "maximum": 2147483647,
+          "type": "integer"
+        }
+      ],
+      "description": "Sync state.",
+      "title": "State"
+    },
+    "stopTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Sync stop time."
+    },
+    "typesCount": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0
+    }
+  },
+  "required": [
+    "state"
+  ],
+  "title": "Sync Operation Metadata",
+  "type": "object"
+}

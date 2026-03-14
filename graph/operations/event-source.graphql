@@ -1,0 +1,61 @@
+fragment EventSourceFragment on EventSource {
+  id
+  slug
+  name
+  status
+  error
+  strategy
+  pullFreq
+  pushUrl
+  createdAt
+  updatedAt
+  connectionID
+}
+
+query GetEventSource($id: ID!) {
+  eventSource(id: $id) {
+    ...EventSourceFragment
+  }
+}
+
+query ListEventSources(
+  $orderBy: EventSourceOrder
+  $where: EventSourceWhereInput
+) {
+  eventSources(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...EventSourceFragment
+      }
+    }
+    totalCount
+  }
+}
+
+mutation CreateEventSource($input: CreateEventSourceInput!) {
+  createEventSource(input: $input) {
+    created
+    error
+    eventSource {
+      ...EventSourceFragment
+    }
+  }
+}
+
+mutation UpdateEventSource($id: ID!, $input: UpdateEventSourceInput!) {
+  updateEventSource(id: $id, input: $input) {
+    updated
+    error
+    eventSource {
+      ...EventSourceFragment
+    }
+  }
+}
+
+mutation DeleteEventSource($id: ID!) {
+  deleteEventSource(id: $id) {
+    deleted
+    error
+    id
+  }
+}

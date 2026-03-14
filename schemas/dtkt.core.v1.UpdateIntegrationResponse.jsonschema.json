@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.UpdateIntegrationResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "integration": {
+      "$ref": "dtkt.core.v1.Integration.jsonschema.json",
+      "description": "The updated integration."
+    }
+  },
+  "required": [
+    "integration"
+  ],
+  "title": "Update Integration Response",
+  "type": "object"
+}

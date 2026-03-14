@@ -1,0 +1,27 @@
+{
+  "$id": "dtkt.blob.v1beta1.WriteBlobLinesRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bucket": {
+      "default": "",
+      "description": "Bucket to write blob (may be optional).",
+      "type": "string"
+    },
+    "data": {
+      "default": null,
+      "description": "Data of blob line.",
+      "pattern": "^[A-Za-z0-9+/]*={0,2}$",
+      "type": "string"
+    },
+    "key": {
+      "description": "Key of blob to write.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "key"
+  ],
+  "title": "Write Blob Lines Request",
+  "type": "object"
+}

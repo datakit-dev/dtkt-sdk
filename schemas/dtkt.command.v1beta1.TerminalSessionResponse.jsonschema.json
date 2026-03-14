@@ -1,0 +1,13 @@
+{
+  "$id": "dtkt.command.v1beta1.TerminalSessionResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The response for a terminal session.",
+  "properties": {
+    "output": {
+      "$ref": "dtkt.command.v1beta1.CommandOutput.jsonschema.json"
+    }
+  },
+  "title": "Terminal Session Response",
+  "type": "object"
+}

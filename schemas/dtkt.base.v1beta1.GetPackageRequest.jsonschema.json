@@ -1,0 +1,9 @@
+{
+  "$id": "dtkt.base.v1beta1.GetPackageRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request for getting package spec and config schema.",
+  "properties": {},
+  "title": "Get Package Request",
+  "type": "object"
+}

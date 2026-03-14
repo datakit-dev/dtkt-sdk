@@ -1,0 +1,18 @@
+{
+  "$id": "dtkt.core.v1.DialConnectionRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "address": {
+      "description": "Address of connection to dial.",
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    },
+    "name": {
+      "description": "Name of connection to dial.",
+      "type": "string"
+    }
+  },
+  "title": "Dial Connection Request",
+  "type": "object"
+}

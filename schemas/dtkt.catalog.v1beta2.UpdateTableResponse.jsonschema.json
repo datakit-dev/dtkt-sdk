@@ -1,0 +1,14 @@
+{
+  "$id": "dtkt.catalog.v1beta2.UpdateTableResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Update Table response.",
+  "properties": {
+    "table": {
+      "$ref": "dtkt.catalog.v1beta2.Table.jsonschema.json",
+      "description": "The updated Table."
+    }
+  },
+  "title": "Update Table Response",
+  "type": "object"
+}

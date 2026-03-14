@@ -1,0 +1,14 @@
+{
+  "$id": "dtkt.email.v1beta1.SendEmailsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a stream of email sending requests.",
+  "properties": {
+    "email": {
+      "$ref": "dtkt.email.v1beta1.Email.jsonschema.json",
+      "description": "The email to be sent."
+    }
+  },
+  "title": "Send Emails Request",
+  "type": "object"
+}

@@ -1,0 +1,52 @@
+{
+  "$id": "dtkt.core.v1.File.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "File represents runtime artifacts related to a Connection or Deployment, such\n as proto file descriptors used for dynamic client construction and reflection.",
+  "patternProperties": {
+    "^(create_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "File create time."
+    },
+    "^(update_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "File update time."
+    }
+  },
+  "properties": {
+    "createTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "File create time."
+    },
+    "etag": {
+      "description": "Checksum of file contents for concurrency control.",
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "protos": {
+      "$ref": "google.protobuf.FileDescriptorSet.jsonschema.json",
+      "description": "Proto file descriptor set."
+    },
+    "uid": {
+      "description": "Server-assigned unique ID (UUID).",
+      "minLength": 1,
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "type": "string"
+    },
+    "updateTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "File update time."
+    }
+  },
+  "required": [
+    "name",
+    "uid",
+    "etag",
+    "createTime",
+    "updateTime"
+  ],
+  "title": "File",
+  "type": "object"
+}

@@ -1,0 +1,41 @@
+{{ define "protostore" }}
+{{/* Add the base header for the generated file */}}
+{{ $pkg := base $.Config.Package }}
+{{ template "header" $ }}
+
+// Hello from Protostore SDK!
+
+import (
+  "github.com/datakit-dev/dtkt-sdk/sdk-go/protostoresdk/entprotostore"
+	{{- range $n := $.Nodes }}
+    {{- if $n.Annotations.Protostore }}
+		{{ $n.PackageAlias }} "{{ $.Config.Package }}/{{ $n.PackageDir }}"
+		{{- /* Import external packages */}}
+		{{- template "import/types" $n }}
+    {{- end }}
+	{{- end }}
+)
+
+func init() {
+  {{- range $n := $.Nodes }}
+    {{- if $n.Annotations.Protostore }}
+    {{- $pkg := $n.Package -}}
+    {{- $fields := $n.Fields -}}
+    {{- range $i, $f := $fields }}
+      {{- if $a := $f.Annotations.Protostore }}
+      {{- $valuescan := print $pkg ".ProtostoreScanner." $f.StructField -}}
+      {{- if $a.IsList }}
+        {{ $valuescan }} = entprotostore.ListValueScanner[{{ $f.Type }}]("{{$a.ID}}")
+      {{- else if $a.IsMap }}
+        {{ $valuescan }} = entprotostore.MapValueScanner[{{ $f.Type }}]("{{$a.ID}}")
+      {{- else if $a.IsEnum }}
+        {{ $valuescan }} = entprotostore.EnumValueScanner[{{ $f.Type }}]("{{$a.ID}}")
+      {{- else if $a.IsMessage }}
+        {{ $valuescan }} = entprotostore.MessageValueScanner[{{ $f.Type }}]("{{$a.ID}}")
+      {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
+}
+{{ end }}

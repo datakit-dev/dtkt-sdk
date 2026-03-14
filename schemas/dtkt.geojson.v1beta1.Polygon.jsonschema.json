@@ -1,0 +1,22 @@
+{
+  "$id": "dtkt.geojson.v1beta1.Polygon.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bbox": {
+      "$ref": "dtkt.geojson.v1beta1.BBox.jsonschema.json"
+    },
+    "coordinates": {
+      "items": {
+        "$ref": "dtkt.geojson.v1beta1.LinearRing.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "type": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Polygon",
+  "type": "object"
+}

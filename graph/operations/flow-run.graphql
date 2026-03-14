@@ -1,0 +1,62 @@
+fragment FlowRunFragment on FlowRun {
+  id
+  status
+  error
+  runTimeout
+  stopTimeout
+  config {
+    inputs
+    resources {
+      type
+      id
+      nodeId
+    }
+  }
+  createdAt
+  updatedAt
+  flowID
+  revisionID
+}
+
+query GetFlowRun($id: ID!) {
+  flowRun(id: $id) {
+    ...FlowRunFragment
+  }
+}
+
+query ListFlowRuns($orderBy: FlowRunOrder, $where: FlowRunWhereInput) {
+  flowRuns(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...FlowRunFragment
+      }
+    }
+    totalCount
+  }
+}
+
+mutation CreateFlowRun($input: CreateFlowRunInput!) {
+  createFlowRun(input: $input) {
+    created
+    error
+    flowRun {
+      ...FlowRunFragment
+    }
+  }
+}
+
+mutation StartFlowRun($id: ID!, $timeout: String) {
+  startFlowRun(id: $id, timeout: $timeout) {
+    flowRun {
+      ...FlowRunFragment
+    }
+  }
+}
+
+mutation StopFlowRun($id: ID!, $timeout: String!) {
+  stopFlowRun(id: $id, timeout: $timeout) {
+    flowRun {
+      ...FlowRunFragment
+    }
+  }
+}

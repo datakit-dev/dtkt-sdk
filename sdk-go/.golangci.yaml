@@ -1,0 +1,15 @@
+version: "2"
+linters:
+  enable:
+    - sloglint # https://golangci-lint.run/usage/linters/#sloglint
+  settings:
+    sloglint:
+      attr-only: true
+      # static-msg: true
+      # no-raw-keys: true
+      # key-naming-case: snake
+      forbidden-keys:
+        - time
+        - level
+        - msg
+        - source

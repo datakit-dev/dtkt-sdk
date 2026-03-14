@@ -1,0 +1,48 @@
+fragment IntegrationFragment on Integration {
+  id
+  slug
+  name
+  apiVersion
+  version
+  description
+  icon
+  serviceNames
+  configSchema
+  serverConfig
+  published {
+    ...IntegrationPackageFragment
+  }
+  organizationID
+  createdAt
+  updatedAt
+}
+
+query GetIntegration($id: ID, $slug: String) {
+  integration(id: $id, slug: $slug) {
+    ...IntegrationFragment
+  }
+}
+
+query ListIntegrations(
+  $orderBy: IntegrationOrder
+  $where: IntegrationWhereInput
+) {
+  integrations(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...IntegrationFragment
+      }
+    }
+    totalCount
+  }
+}
+
+mutation CreateIntegration($input: CreateIntegrationInput!) {
+  createIntegration(input: $input) {
+    created
+    error
+    integration {
+      ...IntegrationFragment
+    }
+  }
+}

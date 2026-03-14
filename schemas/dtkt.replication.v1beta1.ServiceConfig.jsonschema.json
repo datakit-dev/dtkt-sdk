@@ -1,0 +1,39 @@
+{
+  "$id": "dtkt.replication.v1beta1.ServiceConfig.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Supported service config.",
+  "patternProperties": {
+    "^(fivetran_config)$": {
+      "$ref": "dtkt.replication.v1beta1.FivetranConfig.jsonschema.json"
+    }
+  },
+  "properties": {
+    "fivetranConfig": {
+      "$ref": "dtkt.replication.v1beta1.FivetranConfig.jsonschema.json"
+    },
+    "service": {
+      "anyOf": [
+        {
+          "pattern": "^SERVICE_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "SERVICE_TYPE_FIVETRAN"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "title": "Service Type"
+    }
+  },
+  "title": "Service Config",
+  "type": "object"
+}

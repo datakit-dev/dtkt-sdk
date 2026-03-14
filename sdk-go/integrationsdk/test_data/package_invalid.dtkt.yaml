@@ -1,0 +1,8 @@
+kind: Package
+apiVersion: v1beta
+spec:
+  name: TestIntegration
+  description: Test integration
+  icon: https://example.com/icon.png
+  type: perl
+  version: 4.0

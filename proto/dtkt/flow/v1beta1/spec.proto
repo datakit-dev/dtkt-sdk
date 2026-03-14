@@ -1,0 +1,255 @@
+syntax = "proto3";
+
+package dtkt.flow.v1beta1;
+
+import "buf/validate/validate.proto";
+import "dtkt/flow/v1beta1/type.proto";
+import "dtkt/protoform/v1beta1/protoform.proto";
+import "dtkt/shared/v1beta1/messages.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1";
+
+message Flow {
+  string name = 1 [(buf.validate.field).required = true];
+  string description = 2 [(dtkt.protoform.v1beta1.field).input.multiline_text = true];
+
+  repeated Connection connections = 3;
+  repeated Input inputs = 4;
+  repeated Var vars = 5;
+  repeated Action actions = 7;
+  repeated Output outputs = 9;
+  repeated Stream streams = 10;
+}
+
+message Connection {
+  option (buf.validate.message).oneof = {
+    fields: [
+      "package",
+      "services"
+    ]
+    required: true
+  };
+
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
+  ];
+  dtkt.shared.v1beta1.Package.Identity package = 2;
+  repeated string services = 3;
+}
+
+message Input {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
+  ];
+
+  oneof type {
+    option (buf.validate.oneof).required = true;
+
+    Bool bool = 3;
+    Bytes bytes = 4;
+    Double double = 5;
+    Float float = 6;
+    Int64 int64 = 7;
+    Uint64 uint64 = 8;
+    Int32 int32 = 9;
+    Uint32 uint32 = 10;
+    String string = 11;
+    List list = 12;
+    Map map = 13;
+    Message message = 14;
+  }
+
+  bool cache = 20;
+}
+
+// Var is an intermediate value in a Flow used to transform and/or memoize the result of a computation for reuse.
+message Var {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
+  ];
+
+  // When cache is true var always returns its first non-null memoized value.
+  bool cache = 2;
+
+  oneof type {
+    option (buf.validate.oneof).required = true;
+    // Given expression evaluates to var's memoized value, example: "= inputs.foo.getValue()"
+    string value = 3 [
+      (buf.validate.field).string.pattern = "^\\s?=\\s?",
+      (buf.validate.field).string.example = " = inputs.foo.getValue()"
+    ];
+
+    // Given switch statement's first matching case (otherwise default) evaluates to var's memoized value.
+    Switch switch = 4;
+  }
+}
+
+message Action {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
+  ];
+
+  string run_if = 2 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  string on_error = 3 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // When cache is true action always returns its first non-null memoized value.
+  bool cache = 10;
+
+  oneof type {
+    option (buf.validate.oneof).required = true;
+    MethodCall call = 4;
+    UserAction user = 5;
+  }
+}
+
+message Output {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
+  ];
+
+  string value = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+}
+
+message Stream {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
+  ];
+
+  // Start stream when expression evaluates to true; optional.
+  string start_if = 10 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // Stop stream when expression evaluates to true; optional.
+  string stop_if = 11 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  oneof type {
+    option (buf.validate.oneof).required = true;
+    MethodCall call = 2;
+    Ticker generate = 3;
+  }
+}
+
+message MethodCall {
+  string connection = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
+  ];
+
+  string method = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "[a-zA-Z._/]+"
+  ];
+
+  google.protobuf.Value request = 3;
+
+  string response = 4 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+}
+
+message UserAction {
+  message ConfirmBinding {
+    bool value = 1 [
+      (dtkt.protoform.v1beta1.field).confirm.approve = "Approve",
+      (dtkt.protoform.v1beta1.field).confirm.decline = "Decline"
+    ];
+  }
+
+  message InputBinding {
+    string value = 1 [(dtkt.protoform.v1beta1.field).input = {}];
+  }
+
+  message FileBinding {
+    bytes value = 1 [(dtkt.protoform.v1beta1.field).file = {}];
+  }
+
+  message SelectBinding {
+    google.protobuf.Any value = 1 [(dtkt.protoform.v1beta1.field).select = {}];
+  }
+
+  message MultiSelectBinding {
+    repeated google.protobuf.Any value = 1 [(dtkt.protoform.v1beta1.field).multi_select = {}];
+  }
+
+  message Input {
+    string id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
+    ];
+
+    string title = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^\\s?(=)?\\s?(.*)$"
+    ];
+
+    optional string description = 3 [(buf.validate.field).string.pattern = "^\\s?(=)?\\s?(.*)$"];
+
+    oneof element {
+      option (buf.validate.oneof).required = true;
+      dtkt.protoform.v1beta1.ConfirmElement confirm = 4;
+      dtkt.protoform.v1beta1.InputElement input = 5;
+      dtkt.protoform.v1beta1.FileElement file = 6;
+      dtkt.protoform.v1beta1.SelectElement select = 7;
+      dtkt.protoform.v1beta1.MultiSelectElement multi_select = 8;
+    }
+  }
+
+  repeated Input inputs = 1;
+}
+
+message Switch {
+  message Case {
+    string value = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^\\s?=\\s?"
+    ];
+    string return = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^\\s?=\\s?"
+    ];
+  }
+
+  string value = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+  repeated Case case = 2;
+  string default = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+}
+
+message Ticker {
+  google.protobuf.Duration every = 1 [(buf.validate.field).required = true];
+  google.protobuf.Duration initial = 2;
+  string value = 3 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+}

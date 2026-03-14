@@ -1,0 +1,30 @@
+{
+  "$id": "dtkt.event.v1beta1.UpdateEventSourceResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response for updating an event source.",
+  "patternProperties": {
+    "^(event_source)$": {
+      "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+      "description": "The updated event source."
+    }
+  },
+  "properties": {
+    "error": {
+      "default": "",
+      "description": "Error message, if any.",
+      "type": "string"
+    },
+    "eventSource": {
+      "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+      "description": "The updated event source."
+    },
+    "updated": {
+      "default": false,
+      "description": "Indicates if the update was successful.",
+      "type": "boolean"
+    }
+  },
+  "title": "Update Event Source Response",
+  "type": "object"
+}

@@ -1,0 +1,14 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Markdown.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Render as markdown. Supports text, CEL expressions, and templates for generating markdown content.\n Maps to markdown rendering in @dtkt/mdx\n The message or field is available as `this` in expression/template context.\n Example expr: `\"# \" + this.title + \"\\n\\n\" + this.body`\n Example template: Use Go templates with access to message fields",
+  "properties": {
+    "content": {
+      "$ref": "dtkt.protoui.v1beta1.Data.jsonschema.json",
+      "description": "The markdown content. Can be plain text, a CEL expression, or a template.\n Context: `this` is the message or field being rendered."
+    }
+  },
+  "title": "Markdown",
+  "type": "object"
+}

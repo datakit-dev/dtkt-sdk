@@ -1,0 +1,17 @@
+{
+  "$id": "dtkt.email.v1beta1.UpdateEmailTemplateRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a request to update an email template.",
+  "properties": {
+    "id": {
+      "default": "",
+      "type": "string"
+    },
+    "template": {
+      "$ref": "dtkt.email.v1beta1.EmailTemplate.jsonschema.json"
+    }
+  },
+  "title": "Update Email Template Request",
+  "type": "object"
+}

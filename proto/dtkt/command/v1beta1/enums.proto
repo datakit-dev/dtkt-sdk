@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package dtkt.command.v1beta1;
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/command/v1beta1";
+
+enum Signal {
+  // Unspecified signal
+  SIGNAL_UNSPECIFIED = 0;
+
+  // Interrupt signal; typically sent when the user wants to stop a process
+  SIGNAL_SIGINT = 1;
+
+  // Termination signal; used to request a process to terminate
+  SIGNAL_SIGTERM = 2;
+
+  // Kill signal; used to forcibly terminate a process
+  SIGNAL_SIGKILL = 3;
+}

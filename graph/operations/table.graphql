@@ -1,0 +1,80 @@
+fragment TableRefFragment on TableRef {
+  id
+  name
+  alias
+  description
+  fields {
+    name
+    description
+    type {
+      nativeType
+      jsonType
+      geoType
+      metadata
+    }
+    nullable
+    repeated
+  }
+  tableType
+  totalRows
+  totalBytes
+  autoSync
+  syncStatus
+  syncError
+  syncedAt
+  createdAt
+  updatedAt
+  deletedAt
+  schemaID
+}
+
+query GetTable($id: ID!) {
+  table(id: $id) {
+    ...TableRefFragment
+  }
+}
+
+query ListTables($orderBy: [TableRefOrder!], $where: TableRefWhereInput) {
+  tables(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...TableRefFragment
+      }
+    }
+    totalCount
+  }
+}
+
+query TablesDeleted {
+  tablesDeleted {
+    ...TableRefFragment
+  }
+}
+
+mutation CreateTable($input: CreateTableInput!) {
+  createTable(input: $input) {
+    created
+    error
+    tableRef {
+      ...TableRefFragment
+    }
+  }
+}
+
+mutation SyncTable($id: ID!) {
+  syncTable(id: $id) {
+    updated
+    error
+    tableRef {
+      ...TableRefFragment
+    }
+  }
+}
+
+mutation DeleteTable($id: ID!, $softDelete: Boolean) {
+  deleteTable(id: $id, softDelete: $softDelete) {
+    deleted
+    error
+    id
+  }
+}

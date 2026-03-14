@@ -1,0 +1,15 @@
+{
+  "editor.rulers": [
+    80,
+    120
+  ],
+  "editor.tabSize": 2,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "editor.formatOnSave": true,
+  "go.toolsEnvVars": {
+    "GOEXPERIMENT": "jsonv2",
+    "GODEBUG": "embedfollowsymlinks=1"
+  }
+}

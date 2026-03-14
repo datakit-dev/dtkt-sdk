@@ -1,0 +1,21 @@
+{
+  "$id": "dtkt.catalog.v1beta2.ValidateQueryResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response for query validation.",
+  "properties": {
+    "accessed": {
+      "description": "Permissions accessed by the query.",
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.CatalogPermission.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "query": {
+      "$ref": "dtkt.catalog.v1beta2.Query.jsonschema.json",
+      "description": "Validated query details."
+    }
+  },
+  "title": "Validate Query Response",
+  "type": "object"
+}

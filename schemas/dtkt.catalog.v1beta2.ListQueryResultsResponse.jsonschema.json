@@ -1,0 +1,33 @@
+{
+  "$id": "dtkt.catalog.v1beta2.ListQueryResultsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response containing query results.",
+  "patternProperties": {
+    "^(next_page_token)$": {
+      "default": "",
+      "description": "Next page token (empty for last page)",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "nextPageToken": {
+      "default": "",
+      "description": "Next page token (empty for last page)",
+      "type": "string"
+    },
+    "query": {
+      "$ref": "dtkt.catalog.v1beta2.Query.jsonschema.json",
+      "description": "Details of the executed query."
+    },
+    "rows": {
+      "description": "A list of query result rows with each row conforming to the fields defined\n in query.",
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.Row.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "List Query Results Response",
+  "type": "object"
+}

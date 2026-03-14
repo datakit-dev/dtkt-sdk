@@ -1,0 +1,17 @@
+{
+  "$id": "cel.expr.ListValue.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Wrapped in a message so 'not set' and empty can be differentiated, which is\n required for use in a 'oneof'.",
+  "properties": {
+    "values": {
+      "description": "The ordered values in the list.",
+      "items": {
+        "$ref": "cel.expr.Value.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "A list.",
+  "type": "object"
+}

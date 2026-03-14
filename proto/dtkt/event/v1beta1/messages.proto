@@ -1,0 +1,245 @@
+syntax = "proto3";
+
+package dtkt.event.v1beta1;
+
+import "buf/validate/validate.proto";
+import "dtkt/protoform/v1beta1/protoform.proto";
+import "dtkt/shared/v1beta1/enums.proto";
+import "dtkt/shared/v1beta1/messages.proto";
+import "google/api/resource.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/duration.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/event/v1beta1";
+
+// Represents an event deliverable by an event source with its associated
+// metadata including a schema of the event payload.
+message Event {
+  option (google.api.resource) = {
+    type: "Event"
+    singular: "event"
+    plural: "events"
+    pattern: "events/{event}"
+  };
+
+  // Unique identifier for this event, e.g. `events/new-email-received`.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // The name shown to users in the UI, e.g. "New Email Received".
+  string display_name = 2;
+
+  // A short explanation of the event, shown to users when selecting or reviewing it.
+  string description = 3;
+
+  // Schema describing the payload of the event.
+  dtkt.shared.v1beta1.TypeSchema payload_schema = 4;
+}
+
+// Represents an event source supported by the service.
+message EventSource {
+  option (google.api.resource) = {
+    type: "EventSource"
+    singular: "event_source"
+    plural: "event_sources"
+    pattern: "event_sources/{event_source}"
+  };
+
+  enum State {
+    // Unspecified state.
+    STATE_UNSPECIFIED = 0;
+
+    // Event source is properly configured and active.
+    STATE_ACTIVE = 1;
+
+    // Event source is not properly configured and inactive.
+    STATE_INACTIVE = 2;
+  }
+
+  // Unique identifier for this event source, e.g. `event_sources/new-email-received-source`.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // The name shown to users in the UI, e.g. "New Email Received".
+  string display_name = 2;
+
+  // A short explanation of the event, shown to users when selecting or reviewing it.
+  string description = 3;
+
+  // Schema for configuring the event source.
+  dtkt.shared.v1beta1.TypeSchema config_schema = 4;
+
+  // Specifies if configuration is required before using the event source.
+  bool requires_config = 5;
+
+  // Specifies if the event source should continue delivering events even if
+  // errors are encountered.
+  bool continue_on_error = 6;
+
+  // Configuration of the event source.
+  google.protobuf.Any config = 7;
+
+  // Current state of the event source.
+  State state = 8;
+
+  oneof strategy {
+    // Pull frequency of the event source.
+    google.protobuf.Duration pull_freq = 9;
+
+    // Push URL of the event source.
+    string push_url = 10;
+  }
+}
+
+// Request for retrieving events.
+message ListEventsRequest {
+  // Number of events to return per page. Leave empty for the server default.
+  int32 page_size = 1 [
+    (buf.validate.field).int32.gte = 0,
+    (buf.validate.field).int32.lte = 1000
+  ];
+
+  // Token from a previous response's `next_page_token` to retrieve the next page of results.
+  string page_token = 2;
+
+  // Optional filter expression to narrow results..
+  string filter = 3;
+}
+
+// Response containing a list of events.
+message ListEventsResponse {
+  // List of events.
+  repeated Event events = 1;
+
+  // Pass this value as `page_token` in your next request to retrieve the following page. Empty when there are no more results.
+  string next_page_token = 2;
+}
+
+// Request for retrieving event source types supported by this service.
+message ListEventSourcesRequest {
+  // Number of event sources to return per page. Leave empty for the server default.
+  int32 page_size = 1 [
+    (buf.validate.field).int32.gte = 0,
+    (buf.validate.field).int32.lte = 1000
+  ];
+
+  // Token from a previous response's `next_page_token` to retrieve the next page of results.
+  string page_token = 2;
+
+  // Optional filter expression to narrow results..
+  string filter = 3;
+}
+
+// List of event sources supported by or configured for this service.
+message ListEventSourcesResponse {
+  // List of event sources.
+  repeated EventSource event_sources = 1;
+
+  // Pass this value as `page_token` in your next request to retrieve the following page. Empty when there are no more results.
+  string next_page_token = 2;
+}
+
+// Request to pull events from a PULL event source.
+message StreamPullEventsRequest {
+  // Name of pull event source.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).title = "Select a pull event source",
+    (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.event.v1beta1.EventService.ListEventSources",
+    (dtkt.protoform.v1beta1.field).select.key_expr = "this.event_sources.map(i, i.display_name)",
+    (dtkt.protoform.v1beta1.field).select.val_expr = "this.event_sources.map(i, i.name)"
+  ];
+
+  // Configuration of the event source.
+  google.protobuf.Any config = 2;
+
+  // Pull frequency of the event source.
+  google.protobuf.Duration pull_freq = 3;
+}
+
+// Response from pulling events.
+message StreamPullEventsResponse {
+  // Name of pull event source from request.
+  string event_source = 1;
+
+  // Name of event delivered by event source.
+  string event = 2;
+
+  // Payload of the event.
+  google.protobuf.Any payload = 3;
+
+  // Type of action associated with event.
+  optional dtkt.shared.v1beta1.ActionType action = 4;
+}
+
+// Request to validate an event from a push event source.
+message StreamPushEventsRequest {
+  // Name of push event source.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).title = "Select a push event source",
+    (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.event.v1beta1.EventService.ListEventSources",
+    (dtkt.protoform.v1beta1.field).select.key_expr = "this.event_sources.map(i, i.display_name)",
+    (dtkt.protoform.v1beta1.field).select.val_expr = "this.event_sources.map(i, i.name)"
+  ];
+
+  // Headers of the event (if any).
+  map<string, dtkt.shared.v1beta1.StringList> headers = 2;
+
+  // Body of the event.
+  bytes body = 3;
+}
+
+// Response of a valid event from a push event source.
+message StreamPushEventsResponse {
+  // Name of push event source from request.
+  string event_source = 1;
+
+  // Name of event delivered by event source.
+  string event = 2;
+
+  // Payload of the event.
+  google.protobuf.Any payload = 3;
+
+  // Type of action associated with event.
+  optional dtkt.shared.v1beta1.ActionType action = 4;
+}
+
+// Request to create a new event source.
+message CreateEventSourceRequest {
+  // ID of event source to create (e.g. `new-email-received-source`). This will
+  // be combined with the prefix `event_sources/` to form the full name of the
+  // event source (e.g. `event_sources/new-email-received-source`).
+  string event_source_id = 1 [(buf.validate.field).required = true];
+
+  // Configuration of the event source.
+  EventSource event_source = 2;
+}
+
+// Response for creating an event source.
+message CreateEventSourceResponse {
+  // The created event source.
+  EventSource event_source = 1;
+}
+
+// Request to update an event source.
+message UpdateEventSourceRequest {
+  // The event source to update, identified by its full name (e.g. `event_sources/new-email-received-source`).
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Event source to update.
+  EventSource event_source = 2;
+}
+
+// Response for updating an event source.
+message UpdateEventSourceResponse {
+  // The updated event source.
+  EventSource event_source = 3;
+}
+
+// Request to delete an event source.
+message DeleteEventSourceRequest {
+  // The event source to delete, identified by its full name (e.g. `event_sources/new-email-received-source`).
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+// Response for deleting an event source.
+message DeleteEventSourceResponse {}

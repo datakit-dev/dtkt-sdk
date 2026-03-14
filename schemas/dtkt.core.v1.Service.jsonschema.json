@@ -1,0 +1,49 @@
+{
+  "$id": "dtkt.core.v1.Service.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Service message for documentation and reflection indexing.",
+  "patternProperties": {
+    "^(create_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Service create time."
+    },
+    "^(update_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Service update time."
+    }
+  },
+  "properties": {
+    "createTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Service create time."
+    },
+    "description": {
+      "default": "",
+      "description": "Service description.",
+      "type": "string"
+    },
+    "name": {
+      "description": "Service resource name.",
+      "type": "string"
+    },
+    "uid": {
+      "description": "Server-assigned unique ID (UUID).",
+      "minLength": 1,
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "type": "string"
+    },
+    "updateTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Service update time."
+    }
+  },
+  "required": [
+    "name",
+    "uid",
+    "createTime",
+    "updateTime"
+  ],
+  "title": "Service",
+  "type": "object"
+}

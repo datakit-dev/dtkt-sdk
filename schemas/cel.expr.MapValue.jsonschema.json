@@ -1,0 +1,18 @@
+{
+  "$id": "cel.expr.MapValue.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Wrapped in a message so 'not set' and empty can be differentiated, which is\n required for use in a 'oneof'.",
+  "properties": {
+    "entries": {
+      "description": "CEL has fewer restrictions on keys, so a protobuf map representation\n cannot be used.",
+      "items": {
+        "$ref": "cel.expr.MapValue.Entry.jsonschema.json"
+      },
+      "title": "The set of map entries.",
+      "type": "array"
+    }
+  },
+  "title": "A map.",
+  "type": "object"
+}

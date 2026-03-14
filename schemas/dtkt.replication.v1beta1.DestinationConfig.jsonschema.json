@@ -1,0 +1,74 @@
+{
+  "$id": "dtkt.replication.v1beta1.DestinationConfig.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a supported destination config.",
+  "patternProperties": {
+    "^(config_schema)$": {
+      "default": "",
+      "description": "Schema for destination config.",
+      "type": "string"
+    },
+    "^(icon_url)$": {
+      "default": "",
+      "description": "Icon URL of destination config.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "category": {
+      "default": "",
+      "description": "Category of destination config.",
+      "type": "string"
+    },
+    "configSchema": {
+      "default": "",
+      "description": "Schema for destination config.",
+      "type": "string"
+    },
+    "description": {
+      "default": "",
+      "description": "Description of destination config.",
+      "type": "string"
+    },
+    "iconUrl": {
+      "default": "",
+      "description": "Icon URL of destination config.",
+      "type": "string"
+    },
+    "id": {
+      "default": "",
+      "description": "Unique identifier for destination config.",
+      "type": "string"
+    },
+    "name": {
+      "default": "",
+      "description": "Name of destination config.",
+      "type": "string"
+    },
+    "service": {
+      "anyOf": [
+        {
+          "pattern": "^SERVICE_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "SERVICE_TYPE_FIVETRAN"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Replication service of destination config.",
+      "title": "Service Type"
+    }
+  },
+  "title": "Destination Config",
+  "type": "object"
+}

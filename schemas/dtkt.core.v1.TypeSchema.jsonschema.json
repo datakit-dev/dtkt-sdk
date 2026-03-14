@@ -1,0 +1,13 @@
+{
+  "$id": "dtkt.core.v1.TypeSchema.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "TypeSchema wraps versioned type schema definitions.",
+  "properties": {
+    "v1beta1": {
+      "$ref": "dtkt.shared.v1beta1.TypeSchema.jsonschema.json"
+    }
+  },
+  "title": "Type Schema",
+  "type": "object"
+}

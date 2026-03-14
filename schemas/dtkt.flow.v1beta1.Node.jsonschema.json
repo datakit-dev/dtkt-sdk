@@ -1,0 +1,98 @@
+{
+  "$id": "dtkt.flow.v1beta1.Node.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(call_count)$": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0
+    },
+    "^(curr_value)$": {
+      "$ref": "cel.expr.Value.jsonschema.json"
+    },
+    "^(prev_value)$": {
+      "$ref": "cel.expr.Value.jsonschema.json"
+    }
+  },
+  "properties": {
+    "action": {
+      "$ref": "dtkt.flow.v1beta1.Action.jsonschema.json"
+    },
+    "callCount": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0
+    },
+    "connection": {
+      "$ref": "dtkt.flow.v1beta1.Connection.jsonschema.json"
+    },
+    "currValue": {
+      "$ref": "cel.expr.Value.jsonschema.json"
+    },
+    "id": {
+      "minLength": 1,
+      "pattern": "^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$",
+      "type": "string"
+    },
+    "input": {
+      "$ref": "dtkt.flow.v1beta1.Input.jsonschema.json"
+    },
+    "output": {
+      "$ref": "dtkt.flow.v1beta1.Output.jsonschema.json"
+    },
+    "prevValue": {
+      "$ref": "cel.expr.Value.jsonschema.json"
+    },
+    "state": {
+      "anyOf": [
+        {
+          "pattern": "^STATE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "STATE_PENDING",
+            "STATE_SUCCESS",
+            "STATE_ERROR"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "title": "State"
+    },
+    "stream": {
+      "$ref": "dtkt.flow.v1beta1.Stream.jsonschema.json"
+    },
+    "var": {
+      "$ref": "dtkt.flow.v1beta1.Var.jsonschema.json"
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "title": "Node",
+  "type": "object"
+}

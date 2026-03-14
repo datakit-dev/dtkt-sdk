@@ -1,0 +1,32 @@
+{
+  "$id": "dtkt.core.v1.Resource.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Resource is a named reference to resource from a context with optional\n address and associated data payload. Resource is used for tracing data origin\n across network boundaries and can represent resources such as connections,\n deployments, etc. which may contain encrypted or decrypted data payloads\n related to the resource (such as data plane message payloads, config data,\n secret data, metrics data, etc.).",
+  "properties": {
+    "address": {
+      "$ref": "dtkt.core.v1.Address.jsonschema.json",
+      "description": "Address of resource (optional; may be used for direct access to resource\n across network boundaries when available)."
+    },
+    "context": {
+      "$ref": "dtkt.core.v1.Context.jsonschema.json",
+      "description": "Context of resource for tracing data origin."
+    },
+    "decrypted": {
+      "$ref": "google.protobuf.Any.jsonschema.json"
+    },
+    "encrypted": {
+      "$ref": "dtkt.core.v1.EncryptedAny.jsonschema.json"
+    },
+    "name": {
+      "description": "Name of resource within context where data originated.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "context",
+    "name"
+  ],
+  "title": "Resource",
+  "type": "object"
+}

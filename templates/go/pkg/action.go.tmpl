@@ -1,0 +1,33 @@
+package pkg
+
+import (
+	"context"
+
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk/v1beta1"
+)
+
+type (
+  EchoInput struct {
+    Message string `json:"message,omitempty"`
+  }
+  EchoOutput struct {
+    Message string `json:"message,omitempty"`
+  }
+)
+
+var Actions = []v1beta1.RegisterActionFunc[*Instance]{
+  v1beta1.NewAction(
+    "Echo",
+    "An example action to echo back a request as a response after transforming it with an optional prefix string from the instance configuration.",
+		func(ctx context.Context, mux v1beta1.InstanceMux[*Instance], input *EchoInput) (*EchoOutput, error) {
+      inst, err := mux.GetInstance(ctx)
+      if err != nil {
+        return nil, err
+      }
+
+      return &EchoOutput{
+        Message: inst.config.EchoPrefix + input.Message,
+      }, nil
+    },
+  ),
+}

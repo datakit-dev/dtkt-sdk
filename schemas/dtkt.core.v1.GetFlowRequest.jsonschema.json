@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.GetFlowRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "description": "Flow resource name, one of:\n - `organizations/{organization}/flows/{flow}`\n - `users/{user}/flows/{flow}`",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Get Flow Request",
+  "type": "object"
+}

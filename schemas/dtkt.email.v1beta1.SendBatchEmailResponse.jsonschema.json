@@ -1,0 +1,26 @@
+{
+  "$id": "dtkt.email.v1beta1.SendBatchEmailResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a batch email sending response.",
+  "patternProperties": {
+    "^(send_status)$": {
+      "description": "The list of email sending statuses.",
+      "items": {
+        "$ref": "dtkt.email.v1beta1.EmailSendStatus.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "properties": {
+    "sendStatus": {
+      "description": "The list of email sending statuses.",
+      "items": {
+        "$ref": "dtkt.email.v1beta1.EmailSendStatus.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Send Batch Email Response",
+  "type": "object"
+}

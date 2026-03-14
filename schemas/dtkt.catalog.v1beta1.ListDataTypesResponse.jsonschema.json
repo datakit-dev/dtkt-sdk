@@ -1,0 +1,17 @@
+{
+  "$id": "dtkt.catalog.v1beta1.ListDataTypesResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response containing supported data types.",
+  "properties": {
+    "types": {
+      "description": "List of supported data types.",
+      "items": {
+        "$ref": "dtkt.shared.v1beta1.DataType.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "List Data Types Response",
+  "type": "object"
+}

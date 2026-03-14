@@ -1,0 +1,19 @@
+{
+  "$id": "dtkt.catalog.v1beta1.DeleteSchemaRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request message for deleting a schema.",
+  "properties": {
+    "catalog": {
+      "$ref": "dtkt.catalog.v1beta1.Catalog.jsonschema.json",
+      "description": "Reference to the catalog containing the schema."
+    },
+    "name": {
+      "default": "",
+      "description": "Name of the schema to delete.",
+      "type": "string"
+    }
+  },
+  "title": "Delete Schema Request",
+  "type": "object"
+}

@@ -1,0 +1,19 @@
+{
+  "$id": "dtkt.catalog.v1beta1.GetCatalogRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request to retrieve a catalog by name.",
+  "properties": {
+    "metadata": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "Metadata of the catalog, if any."
+    },
+    "name": {
+      "default": "",
+      "description": "Name of the catalog.",
+      "type": "string"
+    }
+  },
+  "title": "Get Catalog Request",
+  "type": "object"
+}

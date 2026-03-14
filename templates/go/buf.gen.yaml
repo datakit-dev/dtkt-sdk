@@ -1,0 +1,17 @@
+version: v2
+
+clean: true
+
+inputs:
+- directory: proto
+
+plugins:
+- remote: buf.build/protocolbuffers/go
+  out: ./pkg/proto
+  opt: paths=source_relative
+- remote: buf.build/grpc/go
+  out: ./pkg/proto
+  opt: paths=source_relative
+- local: protoc-gen-gosrcinfo
+  out: ./pkg/proto
+  opt: paths=source_relative

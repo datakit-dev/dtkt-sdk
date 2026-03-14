@@ -1,0 +1,42 @@
+{
+  "$id": "dtkt.protoform.v1beta1.ValueAccessor.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Value accessor",
+  "patternProperties": {
+    "^(item_field)$": {
+      "type": "string"
+    },
+    "^(item_index)$": {
+      "type": "boolean"
+    },
+    "^(item_value)$": {
+      "type": "boolean"
+    },
+    "^(map_key)$": {
+      "type": "boolean"
+    },
+    "^(map_value)$": {
+      "type": "boolean"
+    }
+  },
+  "properties": {
+    "itemField": {
+      "type": "string"
+    },
+    "itemIndex": {
+      "type": "boolean"
+    },
+    "itemValue": {
+      "type": "boolean"
+    },
+    "mapKey": {
+      "type": "boolean"
+    },
+    "mapValue": {
+      "type": "boolean"
+    }
+  },
+  "title": "Value Accessor",
+  "type": "object"
+}

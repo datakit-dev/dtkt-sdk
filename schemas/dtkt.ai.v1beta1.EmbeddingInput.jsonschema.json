@@ -1,0 +1,20 @@
+{
+  "$id": "dtkt.ai.v1beta1.EmbeddingInput.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents an input for generating embeddings.",
+  "properties": {
+    "id": {
+      "default": "",
+      "description": "Unique identifier for the input.",
+      "type": "string"
+    },
+    "text": {
+      "default": "",
+      "description": "Text data to generate embeddings for.",
+      "type": "string"
+    }
+  },
+  "title": "Embedding Input",
+  "type": "object"
+}

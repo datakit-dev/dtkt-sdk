@@ -1,0 +1,46 @@
+{
+  "$id": "dtkt.ai.v1beta1.EmbeddingOutput.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents the output of an embedding operation.",
+  "properties": {
+    "error": {
+      "default": "",
+      "description": "Error message, if any.",
+      "type": "string"
+    },
+    "input": {
+      "$ref": "dtkt.ai.v1beta1.EmbeddingInput.jsonschema.json",
+      "description": "The input data for which the embedding was generated."
+    },
+    "success": {
+      "default": false,
+      "description": "Indicates if the embedding generation was successful.",
+      "type": "boolean"
+    },
+    "vector": {
+      "description": "The generated embedding vector.",
+      "items": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "enum": [
+              "Infinity",
+              "-Infinity",
+              "NaN"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "string"
+          }
+        ]
+      },
+      "type": "array"
+    }
+  },
+  "title": "Embedding Output",
+  "type": "object"
+}

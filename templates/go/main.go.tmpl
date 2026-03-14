@@ -1,0 +1,49 @@
+package main
+
+import (
+	"log"
+	"embed"
+
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk"
+
+	"github.com/datakit-dev/dtkt-integrations/{{ $.PKG_SLUG }}/pkg"
+{{- if $.PROTO_ENABLED }}
+	{{ $.PROTO_IMPORT }} "github.com/datakit-dev/dtkt-integrations/{{ $.PKG_SLUG }}/pkg/proto/{{ $.PROTO_PATH }}"
+{{- end }}
+
+{{ range $pkg, $_ := $.API_SERVICES }}
+	{{ $pkg | goImport }}
+{{ end }}
+)
+
+//go:embed package.dtkt.yaml
+var spec embed.FS
+
+func main() {
+	intgr, err := integrationsdk.NewFS(spec, pkg.NewInstance)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+{{ if $.PROTO_ENABLED }}
+	integrationsdk.RegisterService(intgr, &{{ $.PROTO_IMPORT }}.GreetService_ServiceDesc, pkg.NewGreetService)
+{{- end }}
+{{- range $pkg, $_ := $.API_SERVICES }}
+{{- range $svcName := $pkg | svcNames }}
+{{- if and (ne $svcName "BaseService") (ne $svcName "ActionService") (ne $svcName "EventService") }}
+	{{- $goPkg := $pkg | goPkg }}
+	integrationsdk.RegisterService(intgr, &{{ $goPkg }}.{{ $svcName }}_ServiceDesc, pkg.New{{ $svcName }})
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if hasPkg "action" "v1beta1" }}
+	integrationsdk.RegisterManagedActionService(intgr, pkg.NewActionService, pkg.Actions...)
+{{- end }}
+{{- if hasPkg "event" "v1beta1" }}
+	integrationsdk.RegisterManagedEventService(intgr, pkg.NewEventService, pkg.Events, pkg.EventSources...)
+{{- end }}
+
+	if err := intgr.Serve(); err != nil {
+		log.Fatal(err)
+	}
+}

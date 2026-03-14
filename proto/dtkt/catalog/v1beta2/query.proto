@@ -1,0 +1,164 @@
+syntax = "proto3";
+
+package dtkt.catalog.v1beta2;
+
+import "dtkt/catalog/v1beta2/type.proto";
+import "dtkt/catalog/v1beta2/value.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta2";
+
+service QueryService {
+  // Validates the provided query against the accessible catalogs.
+  rpc ValidateQuery(ValidateQueryRequest) returns (ValidateQueryResponse);
+
+  // Executes a query and retrieves the results.
+  rpc ListQueryResults(ListQueryResultsRequest) returns (ListQueryResultsResponse);
+
+  // Streams results of a query.
+  rpc StreamQueryResults(StreamQueryResultsRequest) returns (stream StreamQueryResultsResponse);
+}
+
+// Represents a query and its associated details.
+message Query {
+  // Indicates if the query is valid.
+  bool valid = 1;
+
+  // Error message, if any.
+  string error = 2;
+
+  // The query dialect used.
+  string dialect = 3;
+
+  // The query string.
+  string query = 4;
+
+  // Parameters used in the query, if any.
+  repeated Param params = 5;
+
+  // List of fields returned by the query.
+  repeated Field fields = 6;
+}
+
+// Request to validate a query.
+message ValidateQueryRequest {
+  // The query to validate.
+  string query = 1;
+
+  // Parameters used in the query.
+  repeated Param params = 2;
+
+  // Accessible catalogs for validation.
+  repeated CatalogPermission accessible = 3;
+}
+
+// Response for query validation.
+message ValidateQueryResponse {
+  // Validated query details.
+  Query query = 1;
+
+  // Permissions accessed by the query.
+  repeated CatalogPermission accessed = 2;
+}
+
+// Request to retrieve query results.
+message ListQueryResultsRequest {
+  // The query to execute.
+  string query = 1;
+
+  // Number of rows per page.
+  int32 page_size = 2;
+
+  // Token for the desired page (empty for first page).
+  string page_token = 3;
+
+  // Parameters used in the query.
+  repeated Param params = 10;
+}
+
+// Response containing query results.
+message ListQueryResultsResponse {
+  // Details of the executed query.
+  Query query = 1;
+
+  // A list of query result rows with each row conforming to the fields defined
+  // in query.
+  repeated Row rows = 2;
+
+  // Next page token (empty for last page)
+  string next_page_token = 10;
+}
+
+// Request to stream query results.
+message StreamQueryResultsRequest {
+  // The query to execute.
+  string query = 1;
+
+  // Parameters used in the query.
+  repeated Param params = 2;
+}
+
+// Response containing streamed query results.
+message StreamQueryResultsResponse {
+  // Details of the executed query.
+  Query query = 1;
+
+  // A single query result row conforming to the fields defined in query.
+  Row row = 2;
+}
+
+// Represents a parameterized value used in a query, input/output, etc.
+message Param {
+  // Field describing the param data.
+  Field field = 1;
+
+  // Value of the parameter, if any.
+  Value value = 2;
+}
+
+// Represents permissions for a catalog.
+message CatalogPermission {
+  // Name of the catalog.
+  string name = 1;
+
+  // Alias for the catalog.
+  string alias = 2;
+
+  // Schema-level permissions.
+  repeated SchemaPermission schemas = 3;
+}
+
+// Represents permissions for a schema.
+message SchemaPermission {
+  // Name of the schema.
+  string name = 1;
+
+  // Alias for the schema.
+  string alias = 2;
+
+  // Table-level permissions.
+  repeated TablePermission tables = 3;
+}
+
+// Represents permissions for a table.
+message TablePermission {
+  // Name of the table.
+  string name = 1;
+
+  // Alias for the table.
+  string alias = 2;
+
+  // Column-level permissions.
+  repeated ColumnPermission columns = 3;
+}
+
+// Represents permissions for a column.
+message ColumnPermission {
+  // Name of the column.
+  string name = 1;
+
+  // Alias for the column.
+  string alias = 2;
+
+  // Data type of the column.
+  string type = 3;
+}

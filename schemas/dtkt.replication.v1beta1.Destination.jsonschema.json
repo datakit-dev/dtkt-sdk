@@ -1,0 +1,58 @@
+{
+  "$id": "dtkt.replication.v1beta1.Destination.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a replication Destination.",
+  "patternProperties": {
+    "^(config_id)$": {
+      "default": "",
+      "description": "Unique identifier of destination config from replication service.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "config": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "Config for Destination."
+    },
+    "configId": {
+      "default": "",
+      "description": "Unique identifier of destination config from replication service.",
+      "type": "string"
+    },
+    "id": {
+      "default": "",
+      "description": "Unique identifier of Destination.",
+      "type": "string"
+    },
+    "name": {
+      "default": "",
+      "description": "Name assigned to Destination.",
+      "type": "string"
+    },
+    "service": {
+      "anyOf": [
+        {
+          "pattern": "^SERVICE_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "SERVICE_TYPE_FIVETRAN"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Replication service of this Destination.",
+      "title": "Service Type"
+    }
+  },
+  "title": "Destination",
+  "type": "object"
+}

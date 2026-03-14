@@ -1,0 +1,27 @@
+{
+  "$id": "dtkt.core.v1.PackageBuildMetadata.Runtime.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "v1beta1": {
+      "anyOf": [
+        {
+          "enum": [
+            "RUNTIME_UNSPECIFIED",
+            "RUNTIME_NATIVE",
+            "RUNTIME_DOCKER"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "title": "Runtime"
+    }
+  },
+  "title": "Runtime",
+  "type": "object"
+}

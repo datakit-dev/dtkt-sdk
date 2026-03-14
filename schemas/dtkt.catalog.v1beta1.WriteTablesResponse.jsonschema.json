@@ -1,0 +1,17 @@
+{
+  "$id": "dtkt.catalog.v1beta1.WriteTablesResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response message for writing rows to multiple tables.",
+  "properties": {
+    "tables": {
+      "description": "Results for each table written.",
+      "items": {
+        "$ref": "dtkt.catalog.v1beta1.WriteTableResponse.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Write Tables Response",
+  "type": "object"
+}

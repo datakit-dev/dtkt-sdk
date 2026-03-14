@@ -1,0 +1,102 @@
+{
+  "$id": "dtkt.catalog.v1beta2.Value.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Value represents a wide range of native and well-known protobuf types (except\n signed and unsigned fixed length encodings) with additional nullable semantics\n intended to provide maximum adaptability and representation for native types\n found in OLTP databases as well as OLAP data warehouses/query engines.",
+  "patternProperties": {
+    "^(bool_value)$": {
+      "$ref": "dtkt.catalog.v1beta2.BoolValue.jsonschema.json"
+    },
+    "^(bytes_value)$": {
+      "$ref": "dtkt.catalog.v1beta2.BytesValue.jsonschema.json"
+    },
+    "^(double_value)$": {
+      "$ref": "dtkt.catalog.v1beta2.DoubleValue.jsonschema.json"
+    },
+    "^(duration_value)$": {
+      "$ref": "google.protobuf.Duration.jsonschema.json"
+    },
+    "^(enum_value)$": {
+      "$ref": "dtkt.catalog.v1beta2.EnumValue.jsonschema.json"
+    },
+    "^(float_value)$": {
+      "$ref": "dtkt.catalog.v1beta2.FloatValue.jsonschema.json"
+    },
+    "^(int32_value)$": {
+      "$ref": "dtkt.catalog.v1beta2.Int32Value.jsonschema.json"
+    },
+    "^(int64_value)$": {
+      "$ref": "dtkt.catalog.v1beta2.Int64Value.jsonschema.json"
+    },
+    "^(json_value)$": {
+      "$ref": "google.protobuf.Value.jsonschema.json"
+    },
+    "^(list_value)$": {
+      "$ref": "dtkt.catalog.v1beta2.ListValue.jsonschema.json"
+    },
+    "^(object_value)$": {
+      "$ref": "google.protobuf.Any.jsonschema.json"
+    },
+    "^(string_value)$": {
+      "$ref": "dtkt.catalog.v1beta2.StringValue.jsonschema.json"
+    },
+    "^(timestamp_value)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json"
+    },
+    "^(uint32_value)$": {
+      "$ref": "dtkt.catalog.v1beta2.UInt32Value.jsonschema.json"
+    },
+    "^(uint64_value)$": {
+      "$ref": "dtkt.catalog.v1beta2.UInt64Value.jsonschema.json"
+    }
+  },
+  "properties": {
+    "boolValue": {
+      "$ref": "dtkt.catalog.v1beta2.BoolValue.jsonschema.json"
+    },
+    "bytesValue": {
+      "$ref": "dtkt.catalog.v1beta2.BytesValue.jsonschema.json"
+    },
+    "doubleValue": {
+      "$ref": "dtkt.catalog.v1beta2.DoubleValue.jsonschema.json"
+    },
+    "durationValue": {
+      "$ref": "google.protobuf.Duration.jsonschema.json"
+    },
+    "enumValue": {
+      "$ref": "dtkt.catalog.v1beta2.EnumValue.jsonschema.json"
+    },
+    "floatValue": {
+      "$ref": "dtkt.catalog.v1beta2.FloatValue.jsonschema.json"
+    },
+    "int32Value": {
+      "$ref": "dtkt.catalog.v1beta2.Int32Value.jsonschema.json"
+    },
+    "int64Value": {
+      "$ref": "dtkt.catalog.v1beta2.Int64Value.jsonschema.json"
+    },
+    "jsonValue": {
+      "$ref": "google.protobuf.Value.jsonschema.json"
+    },
+    "listValue": {
+      "$ref": "dtkt.catalog.v1beta2.ListValue.jsonschema.json"
+    },
+    "objectValue": {
+      "$ref": "google.protobuf.Any.jsonschema.json"
+    },
+    "stringValue": {
+      "$ref": "dtkt.catalog.v1beta2.StringValue.jsonschema.json"
+    },
+    "timestampValue": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json"
+    },
+    "uint32Value": {
+      "$ref": "dtkt.catalog.v1beta2.UInt32Value.jsonschema.json"
+    },
+    "uint64Value": {
+      "$ref": "dtkt.catalog.v1beta2.UInt64Value.jsonschema.json"
+    }
+  },
+  "title": "Value",
+  "type": "object"
+}

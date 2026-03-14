@@ -1,0 +1,15 @@
+{
+  "$id": "dtkt.command.v1beta1.GetCommandRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Get Command Request",
+  "type": "object"
+}

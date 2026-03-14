@@ -1,0 +1,38 @@
+{
+  "$id": "dtkt.protoform.v1beta1.FieldElement.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(multi_select)$": {
+      "$ref": "dtkt.protoform.v1beta1.MultiSelectElement.jsonschema.json"
+    }
+  },
+  "properties": {
+    "confirm": {
+      "$ref": "dtkt.protoform.v1beta1.ConfirmElement.jsonschema.json"
+    },
+    "description": {
+      "type": "string"
+    },
+    "file": {
+      "$ref": "dtkt.protoform.v1beta1.FileElement.jsonschema.json"
+    },
+    "hidden": {
+      "type": "boolean"
+    },
+    "input": {
+      "$ref": "dtkt.protoform.v1beta1.InputElement.jsonschema.json"
+    },
+    "multiSelect": {
+      "$ref": "dtkt.protoform.v1beta1.MultiSelectElement.jsonschema.json"
+    },
+    "select": {
+      "$ref": "dtkt.protoform.v1beta1.SelectElement.jsonschema.json"
+    },
+    "title": {
+      "type": "string"
+    }
+  },
+  "title": "Field Element",
+  "type": "object"
+}

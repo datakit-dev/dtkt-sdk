@@ -1,0 +1,15 @@
+{
+  "$id": "dtkt.geojson.v1beta1.LinearRing.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "positions": {
+      "items": {
+        "$ref": "dtkt.geojson.v1beta1.Position.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Linear Ring",
+  "type": "object"
+}

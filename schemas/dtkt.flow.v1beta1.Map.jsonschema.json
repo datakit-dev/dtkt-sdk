@@ -1,0 +1,37 @@
+{
+  "$id": "dtkt.flow.v1beta1.Map.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "default": {
+      "$ref": "google.protobuf.Struct.jsonschema.json"
+    },
+    "key": {
+      "default": "",
+      "description": "Key type: bool, int32, int64, uint32, uint64, or string (default)",
+      "enum": [
+        "bool",
+        "int32",
+        "int64",
+        "uint32",
+        "uint64",
+        "string"
+      ],
+      "type": "string"
+    },
+    "nullable": {
+      "default": false,
+      "type": "boolean"
+    },
+    "value": {
+      "description": "Value type: scalar type, nested list/map, or message type",
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "value"
+  ],
+  "title": "Map",
+  "type": "object"
+}

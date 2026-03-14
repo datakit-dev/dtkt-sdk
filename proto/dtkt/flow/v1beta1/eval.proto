@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package dtkt.flow.v1beta1;
+
+import "buf/validate/validate.proto";
+import "cel/expr/value.proto";
+import "dtkt/flow/v1beta1/spec.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1";
+
+message Runtime {
+  message Done {
+    string id = 1;
+    string reason = 2;
+    bool is_error = 3;
+  }
+  message EOF {}
+
+  map<string, Node> connections = 1;
+  map<string, Node> inputs = 2;
+  map<string, Node> vars = 3;
+  map<string, Node> actions = 5;
+  map<string, Node> streams = 8;
+  map<string, Node> outputs = 7;
+}
+
+message Graph {
+  repeated Node nodes = 1;
+  repeated Edge edges = 2;
+}
+
+message Groups {
+  message Group {
+    repeated string ids = 1 [(buf.validate.field).repeated = {min_items: 1}];
+  }
+
+  repeated Group groups = 1 [(buf.validate.field).repeated = {min_items: 1}];
+}
+
+message Edge {
+  string source = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$"
+  ];
+  string target = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$"
+  ];
+}
+
+message Node {
+  enum State {
+    // Unspecified indicates evaluation is idle.
+    STATE_UNSPECIFIED = 0;
+    // Pending indicates evaluation is pending completion.
+    STATE_PENDING = 1;
+    // Success indicates evaluation completed successfully.
+    STATE_SUCCESS = 2;
+    // Error indicates evaluation resulted in an error.
+    STATE_ERROR = 3;
+  }
+
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$"
+  ];
+
+  State state = 2;
+
+  uint64 call_count = 4;
+
+  cel.expr.Value prev_value = 5;
+  cel.expr.Value curr_value = 6;
+
+  oneof type {
+    option (buf.validate.oneof).required = true;
+    Connection connection = 7;
+    Input input = 8;
+    Var var = 9;
+    Action action = 11;
+    Output output = 13;
+    Stream stream = 14;
+  }
+}

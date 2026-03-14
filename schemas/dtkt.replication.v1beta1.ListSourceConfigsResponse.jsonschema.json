@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.replication.v1beta1.ListSourceConfigsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response to retrieve a list of supported replication Sources.",
+  "patternProperties": {
+    "^(source_configs)$": {
+      "items": {
+        "$ref": "dtkt.replication.v1beta1.SourceConfig.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "properties": {
+    "sourceConfigs": {
+      "items": {
+        "$ref": "dtkt.replication.v1beta1.SourceConfig.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "List Source Configs Response",
+  "type": "object"
+}

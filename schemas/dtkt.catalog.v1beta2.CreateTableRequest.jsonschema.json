@@ -1,0 +1,33 @@
+{
+  "$id": "dtkt.catalog.v1beta2.CreateTableRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Create Table request.",
+  "patternProperties": {
+    "^(table_id)$": {
+      "description": "Table identifier, e.g. final segment in resource name: `.../tables/{table}`",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "parent": {
+      "description": "Parent catalog resource name.",
+      "type": "string"
+    },
+    "table": {
+      "$ref": "dtkt.catalog.v1beta2.Table.jsonschema.json",
+      "description": "Table to create."
+    },
+    "tableId": {
+      "description": "Table identifier, e.g. final segment in resource name: `.../tables/{table}`",
+      "type": "string"
+    }
+  },
+  "required": [
+    "parent",
+    "tableId",
+    "table"
+  ],
+  "title": "Create Table Request",
+  "type": "object"
+}

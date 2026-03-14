@@ -1,0 +1,13 @@
+docs:
+- changed-files:
+  - any-glob-to-any-file: docs/**
+
+legal:
+- changed-files:
+  - any-glob-to-any-file:
+    - legal/**
+    - LICENSE
+    - NOTICE
+
+feature:
+- head-branch: feature

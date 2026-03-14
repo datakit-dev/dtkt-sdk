@@ -1,0 +1,15 @@
+{
+  "$id": "dtkt.action.v1beta1.GetActionRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "default": "",
+      "description": "The action to retrieve, e.g. `actions/send-email`.",
+      "minLength": 3,
+      "type": "string"
+    }
+  },
+  "title": "Get Action Request",
+  "type": "object"
+}

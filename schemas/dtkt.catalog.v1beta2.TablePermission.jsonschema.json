@@ -1,0 +1,27 @@
+{
+  "$id": "dtkt.catalog.v1beta2.TablePermission.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents permissions for a table.",
+  "properties": {
+    "alias": {
+      "default": "",
+      "description": "Alias for the table.",
+      "type": "string"
+    },
+    "columns": {
+      "description": "Column-level permissions.",
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.ColumnPermission.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "name": {
+      "default": "",
+      "description": "Name of the table.",
+      "type": "string"
+    }
+  },
+  "title": "Table Permission",
+  "type": "object"
+}

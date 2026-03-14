@@ -1,0 +1,19 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Table.Column.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Column definition for the table.",
+  "properties": {
+    "field": {
+      "default": "",
+      "description": "Field name to be used as the column value (for proto message row data).\n Not needed when using positional list-of-lists format.",
+      "type": "string"
+    },
+    "label": {
+      "description": "Column label to be used in the table header. If not specified, the field name will be used.",
+      "type": "string"
+    }
+  },
+  "title": "Column",
+  "type": "object"
+}

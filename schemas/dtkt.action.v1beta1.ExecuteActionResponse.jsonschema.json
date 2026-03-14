@@ -1,0 +1,39 @@
+{
+  "$id": "dtkt.action.v1beta1.ExecuteActionResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(run_id)$": {
+      "default": "",
+      "description": "A unique ID for this execution run, useful for looking up logs or reporting issues.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "json": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "The output data produced by the action, structured according to the action's output schema."
+    },
+    "message": {
+      "default": "",
+      "description": "A human-readable summary of the result or any relevant status information.",
+      "type": "string"
+    },
+    "name": {
+      "default": "",
+      "description": "The name of the action that was executed.",
+      "type": "string"
+    },
+    "proto": {
+      "$ref": "google.protobuf.Any.jsonschema.json",
+      "description": "An alternate binary encoding of the output, if provided by the action."
+    },
+    "runId": {
+      "default": "",
+      "description": "A unique ID for this execution run, useful for looking up logs or reporting issues.",
+      "type": "string"
+    }
+  },
+  "title": "Execute Action Response",
+  "type": "object"
+}

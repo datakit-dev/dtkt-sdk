@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.catalog.v1beta2.ListValue.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "List of values for repeated fields.",
+  "properties": {
+    "values": {
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.Value.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "List Value",
+  "type": "object"
+}

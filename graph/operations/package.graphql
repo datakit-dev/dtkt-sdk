@@ -1,0 +1,36 @@
+fragment IntegrationPackageFragment on IntegrationPackage {
+  id
+  checksum
+  spec
+  configSchema
+  serviceNames
+  integrationID
+  authorID
+  createdAt
+  updatedAt
+}
+
+query ListPackages(
+  $orderBy: IntegrationPackageOrder
+  $where: IntegrationPackageWhereInput
+) {
+  packages(orderBy: $orderBy, where: $where) {
+    totalCount
+    edges {
+      node {
+        ...IntegrationPackageFragment
+      }
+    }
+  }
+}
+
+mutation SyncPackage($input: SyncPackageInput!) {
+  syncPackage(input: $input) {
+    integrationPackage {
+      ...IntegrationPackageFragment
+      integration {
+        ...IntegrationFragment
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.protoui.v1beta1.FieldOption.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Determines how a Field should be displayed in the UI.",
+  "properties": {
+    "components": {
+      "items": {
+        "$ref": "dtkt.protoui.v1beta1.Component.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Field Option",
+  "type": "object"
+}

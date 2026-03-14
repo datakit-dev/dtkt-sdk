@@ -1,0 +1,119 @@
+{
+  "$id": "dtkt.blob.v1beta1.WriteBlobRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(cache_control)$": {
+      "default": "",
+      "description": "Cache control directives.",
+      "type": "string"
+    },
+    "^(content_disposition)$": {
+      "default": "",
+      "description": "Content disposition for the blob payload.",
+      "type": "string"
+    },
+    "^(content_encoding)$": {
+      "default": "",
+      "description": "Content encoding for the blob payload.",
+      "type": "string"
+    },
+    "^(content_language)$": {
+      "default": "",
+      "description": "Language for the blob payload.",
+      "type": "string"
+    },
+    "^(content_type)$": {
+      "default": "",
+      "description": "MIME type for the blob payload.",
+      "type": "string"
+    },
+    "^(if_match)$": {
+      "default": "",
+      "description": "Require the blob to match the provided ETag before writing.",
+      "type": "string"
+    },
+    "^(if_none_match)$": {
+      "default": "",
+      "description": "Require the blob to *not* match the provided ETag before writing.",
+      "type": "string"
+    },
+    "^(if_not_exist)$": {
+      "default": false,
+      "description": "Require the blob does not already exist before writing.",
+      "type": "boolean"
+    }
+  },
+  "properties": {
+    "bucket": {
+      "default": "",
+      "description": "Bucket to write blob (may be optional).",
+      "type": "string"
+    },
+    "cacheControl": {
+      "default": "",
+      "description": "Cache control directives.",
+      "type": "string"
+    },
+    "contentDisposition": {
+      "default": "",
+      "description": "Content disposition for the blob payload.",
+      "type": "string"
+    },
+    "contentEncoding": {
+      "default": "",
+      "description": "Content encoding for the blob payload.",
+      "type": "string"
+    },
+    "contentLanguage": {
+      "default": "",
+      "description": "Language for the blob payload.",
+      "type": "string"
+    },
+    "contentType": {
+      "default": "",
+      "description": "MIME type for the blob payload.",
+      "type": "string"
+    },
+    "data": {
+      "default": null,
+      "description": "Raw blob payload.",
+      "pattern": "^[A-Za-z0-9+/]*={0,2}$",
+      "type": "string"
+    },
+    "ifMatch": {
+      "default": "",
+      "description": "Require the blob to match the provided ETag before writing.",
+      "type": "string"
+    },
+    "ifNoneMatch": {
+      "default": "",
+      "description": "Require the blob to *not* match the provided ETag before writing.",
+      "type": "string"
+    },
+    "ifNotExist": {
+      "default": false,
+      "description": "Require the blob does not already exist before writing.",
+      "type": "boolean"
+    },
+    "key": {
+      "description": "Key of blob to write.",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Blob metadata (all keys lower-case).",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "key"
+  ],
+  "title": "Write Blob Request",
+  "type": "object"
+}

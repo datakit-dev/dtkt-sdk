@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package dtkt.blob.v1beta1;
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/blob/v1beta1";
+
+// Supported HTTP verbs for signed URL generation.
+enum SignedURLMethod {
+  SIGNED_URL_METHOD_UNSPECIFIED = 0;
+  SIGNED_URL_METHOD_GET = 1;
+  SIGNED_URL_METHOD_PUT = 2;
+  SIGNED_URL_METHOD_POST = 3;
+  SIGNED_URL_METHOD_DELETE = 4;
+}
+
+// LineFormat specifies the format of lines read from a blob.
+enum LineFormat {
+  LINE_FORMAT_UNSPECIFIED = 0;
+  LINE_FORMAT_RAW = 1;
+  LINE_FORMAT_JSON = 2;
+}

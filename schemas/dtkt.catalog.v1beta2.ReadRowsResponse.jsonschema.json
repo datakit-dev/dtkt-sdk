@@ -1,0 +1,22 @@
+{
+  "$id": "dtkt.catalog.v1beta2.ReadRowsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response message for reading rows from a table.",
+  "properties": {
+    "rows": {
+      "description": "A list of rows read from table with each row representing a subset of a\n table's fields and each value conforming to the description found in value.proto.",
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.Row.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "table": {
+      "default": "",
+      "description": "Table resource name to read row.",
+      "type": "string"
+    }
+  },
+  "title": "Read Rows Response",
+  "type": "object"
+}

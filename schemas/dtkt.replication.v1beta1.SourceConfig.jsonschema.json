@@ -1,0 +1,74 @@
+{
+  "$id": "dtkt.replication.v1beta1.SourceConfig.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a supported replication source config.",
+  "patternProperties": {
+    "^(config_schema)$": {
+      "default": "",
+      "description": "Schema for source config.",
+      "type": "string"
+    },
+    "^(icon_url)$": {
+      "default": "",
+      "description": "Icon URL of source config.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "category": {
+      "default": "",
+      "description": "Category of source config.",
+      "type": "string"
+    },
+    "configSchema": {
+      "default": "",
+      "description": "Schema for source config.",
+      "type": "string"
+    },
+    "description": {
+      "default": "",
+      "description": "Description of source config.",
+      "type": "string"
+    },
+    "iconUrl": {
+      "default": "",
+      "description": "Icon URL of source config.",
+      "type": "string"
+    },
+    "id": {
+      "default": "",
+      "description": "Unique identifier for source config.",
+      "type": "string"
+    },
+    "name": {
+      "default": "",
+      "description": "Name of source config.",
+      "type": "string"
+    },
+    "service": {
+      "anyOf": [
+        {
+          "pattern": "^SERVICE_TYPE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "SERVICE_TYPE_FIVETRAN"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Replication service of source config.",
+      "title": "Service Type"
+    }
+  },
+  "title": "Source Config",
+  "type": "object"
+}

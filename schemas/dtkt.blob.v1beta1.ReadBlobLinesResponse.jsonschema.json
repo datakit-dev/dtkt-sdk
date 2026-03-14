@@ -1,0 +1,23 @@
+{
+  "$id": "dtkt.blob.v1beta1.ReadBlobLinesResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "data": {
+      "description": "Raw line data.",
+      "pattern": "^[A-Za-z0-9+/]*={0,2}$",
+      "type": "string"
+    },
+    "json": {
+      "$ref": "google.protobuf.Value.jsonschema.json",
+      "description": "JSON parsed line data."
+    },
+    "key": {
+      "default": "",
+      "description": "Key of blob read.",
+      "type": "string"
+    }
+  },
+  "title": "Read Blob Lines Response",
+  "type": "object"
+}

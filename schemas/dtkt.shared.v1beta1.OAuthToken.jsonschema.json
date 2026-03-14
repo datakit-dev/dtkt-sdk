@@ -1,0 +1,62 @@
+{
+  "$id": "dtkt.shared.v1beta1.OAuthToken.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(access_token)$": {
+      "default": "",
+      "type": "string"
+    },
+    "^(expires_in)$": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0
+    },
+    "^(refresh_token)$": {
+      "default": "",
+      "type": "string"
+    },
+    "^(token_type)$": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "accessToken": {
+      "default": "",
+      "type": "string"
+    },
+    "expiresIn": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0
+    },
+    "expiry": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json"
+    },
+    "refreshToken": {
+      "default": "",
+      "type": "string"
+    },
+    "tokenType": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "O Auth Token",
+  "type": "object"
+}

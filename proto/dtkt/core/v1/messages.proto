@@ -1,0 +1,1668 @@
+syntax = "proto3";
+
+package dtkt.core.v1;
+
+import "buf/validate/validate.proto";
+import "dtkt/flow/v1beta1/eval.proto";
+import "dtkt/flow/v1beta1/spec.proto";
+import "dtkt/protoform/v1beta1/protoform.proto";
+import "dtkt/shared/v1beta1/enums.proto";
+import "dtkt/shared/v1beta1/messages.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "google/rpc/status.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1";
+
+// Address contains a supported network and compatible target.
+message Address {
+  // Network protocol (e.g., "tcp", "unix").
+  string network = 1 [(buf.validate.field).required = true];
+
+  // Target address for the network.
+  string target = 2 [(buf.validate.field).required = true];
+}
+
+// Auth contains authentication information for API requests.
+message Auth {
+  // Authentication method used.
+  enum AuthMethod {
+    AUTH_METHOD_UNSPECIFIED = 0;
+    AUTH_METHOD_OAUTH = 1; // OAuth 2.1 (Auth Code + PKCE)
+    AUTH_METHOD_DEVICE = 2; // Device Authorization (RFC 8628)
+    AUTH_METHOD_BEARER = 3; // Static bearer token (CI/CD)
+  }
+
+  // Authentication method used.
+  AuthMethod method = 1 [(buf.validate.field).required = true];
+
+  // Access token (JWT) or Personal Access Token (PAT).
+  string access_token = 2 [debug_redact = true];
+
+  // Refresh token (for token renewal).
+  string refresh_token = 3 [debug_redact = true];
+
+  // Token expiration timestamp.
+  google.protobuf.Timestamp expires_at = 4;
+
+  // TODO REMOVE?
+
+  // Scope requests to an organization (if applicable).
+  optional string org = 5 [(buf.validate.field).string.min_len = 1];
+
+  // Scope requests to a space (if applicable).
+  optional string space = 6 [(buf.validate.field).string.min_len = 1];
+}
+
+// Context provides the name and address of a control plane for client
+// construction and resource tracing across network boundaries. Context is used
+// to resolve resources by name and provide necessary information for
+// authentication, encryption, auditing, tracing, and observability when sending
+// data across network boundaries.
+message Context {
+  // Name of root control plane resource (e.g., "users/bob" or "organizations/acme").
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Address of control plane.
+  Address address = 2 [(buf.validate.field).required = true];
+
+  // Authentication information for control plane.
+  Auth auth = 3;
+}
+
+// Resource is a named reference to resource from a context with optional
+// address and associated data payload. Resource is used for tracing data origin
+// across network boundaries and can represent resources such as connections,
+// deployments, etc. which may contain encrypted or decrypted data payloads
+// related to the resource (such as data plane message payloads, config data,
+// secret data, metrics data, etc.).
+message Resource {
+  // Context of resource for tracing data origin.
+  Context context = 1 [(buf.validate.field).required = true];
+
+  // Name of resource within context where data originated.
+  string name = 2 [(buf.validate.field).required = true];
+
+  // Address of resource (optional; may be used for direct access to resource
+  // across network boundaries when available).
+  Address address = 3;
+
+  // Data payload, either encrypted or decrypted.
+  // Notes:
+  //  - data is not the resource itself, but a payload related to or originating
+  //    from the resource. (e.g. config data, secret data, metrics data, etc.)
+  //  - information about the type of data is provided by a field of this type.
+  //    (e.g. Deployment cloud field indicates data originated from a cloud deployment)
+  oneof data {
+    option (buf.validate.oneof).required = true;
+    EncryptedAny encrypted = 10 [debug_redact = true];
+    google.protobuf.Any decrypted = 11 [debug_redact = true];
+  }
+}
+
+// Automation is a runnable instance of a Flow with a tagged spec version and
+// runtime configuration.
+message Automation {
+  option (google.api.resource) = {
+    type: "Automation"
+    singular: "automation"
+    plural: "automations"
+    pattern: "organizations/{organization}/automations/{automation}"
+    pattern: "users/{user}/automations/{automation}"
+  };
+
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Name of flow resource to resolve spec.
+  string flow = 3 [
+    (buf.validate.field).required = true,
+    (google.api.resource_reference).type = "Flow",
+    (dtkt.protoform.v1beta1.field).title = "Flow",
+    (dtkt.protoform.v1beta1.field).description = "Select a flow.",
+    (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.core.v1.FlowService.ListFlows",
+    (dtkt.protoform.v1beta1.field).select.key_expr = "this.flows.map(i, i.name)",
+    (dtkt.protoform.v1beta1.field).select.val_expr = "this.flows.map(i, i.name)"
+  ];
+
+  // Checksum of flow spec must match when resolving spec (concurrency control).
+  string spec_etag = 4 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = INPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Executor runtime metadata of resolved Flow spec (versioned).
+  FlowRuntimeMetadata runtime = 5 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Execution groups metadata of resolved Flow spec (versioned).
+  FlowGroupsMetadata groups = 6 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Connections configuration as map of connection node id to connection
+  // resource name and context (control plane).
+  // Examples:
+  // ```
+  // - "storage": {
+  //      "name": "users/bob/connections/localblob",
+  //      "context": {
+  //        "name": "users/bob",
+  //        ...
+  //      },
+  //    }
+  // ```
+  map<string, FlowConnectionMetadata> connections = 7;
+
+  // Initial inputs configuration as map of input node id to valid data of input
+  // node's declared type (well-known type wrappers used for scalar values).
+  // Format:
+  // ```
+  // - "bucketName": "my-storage-bucket"
+  // - "adSettings": { "bid": 100 }
+  // ```
+  map<string, google.protobuf.Any> inputs = 8;
+
+  // Execution is stopped if total time exceeds given duration.
+  // Default: 0 (no timeout).
+  google.protobuf.Duration timeout = 9;
+
+  // Server-assigned batch name if created within a batch (optional).
+  optional string batch = 10 [(dtkt.protoform.v1beta1.field).hidden = true];
+
+  // Automation create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Automation update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+}
+
+// Flow is a versioned workflow spec with parsed graph representation.
+message Flow {
+  option (google.api.resource) = {
+    type: "Flow"
+    singular: "flow"
+    plural: "flows"
+    pattern: "organizations/{organization}/flows/{flow}"
+    pattern: "users/{user}/flows/{flow}"
+  };
+
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Flow spec URI (optional).
+  string spec_uri = 3 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.uri = true
+  ];
+
+  // Flow spec checksum for concurrency control.
+  string spec_etag = 4 [(buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE];
+
+  // Flow spec metadata (versioned).
+  FlowSpecMetadata spec = 5 [(buf.validate.field).required = true];
+
+  // Flow graph metadata (versioned).
+  FlowGraphMetadata graph = 6 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Flow create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Flow update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+// Connection combines necessary components of a configured client to one of:
+// - Deployment server with first-class configuration support using a DataKit SDK
+// - Any reachable gRPC server with DIY configuration, one of:
+//   - Custom proto file descriptors as a URI resolving to source .proto files
+//   - Custom proto file descriptors using gRPC reflection (must be enabled on server)
+message Connection {
+  option (google.api.resource) = {
+    type: "Connection"
+    singular: "connection"
+    plural: "connections"
+    pattern: "organizations/{organization}/connections/{connection}"
+    pattern: "users/{user}/connections/{connection}"
+  };
+
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  oneof type {
+    option (buf.validate.oneof).required = true;
+
+    // Name of a deployment resource.
+    string deployment = 3 [
+      (google.api.resource_reference).type = "Deployment",
+      (dtkt.protoform.v1beta1.field).title = "Deployment",
+      (dtkt.protoform.v1beta1.field).description = "Select a deployment.",
+      (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.core.v1.DeploymentService.ListDeployments",
+      (dtkt.protoform.v1beta1.field).select.key_expr = "this.deployments.map(i, i.name)",
+      (dtkt.protoform.v1beta1.field).select.val_expr = "this.deployments.map(i, i.name)"
+    ];
+
+    // Custom proto descriptors URI.
+    string custom_protos = 4 [
+      (buf.validate.field).string.uri = true,
+      (dtkt.protoform.v1beta1.field).title = "Custom Proto Descriptors",
+      (dtkt.protoform.v1beta1.field).description = "Custom connection to a server using a file path or URI to .proto source files.",
+      (dtkt.protoform.v1beta1.field).input = {}
+    ];
+
+    // Custom using gRPC reflection.
+    bool custom_grpc = 5 [
+      (dtkt.protoform.v1beta1.field).title = "Custom gRPC Reflection",
+      (dtkt.protoform.v1beta1.field).description = "Custom connection to a server with gRPC reflection service.",
+      (dtkt.protoform.v1beta1.field).confirm = {
+        approve: "Yes"
+        decline: "No/Unsure (check for me)"
+        default_selected: true
+      }
+    ];
+  }
+
+  // Address of gRPC server.
+  Address address = 6;
+  option (buf.validate.message).cel_expression = "(has(this.custom_protos) || has(this.custom_grpc)) ? has(this.address) : has(this.deployment)";
+
+  oneof config {
+    // Config data compatible with integration config schema.
+    google.protobuf.Any decrypted_config = 7 [
+      (google.api.field_behavior) = INPUT_ONLY,
+      debug_redact = true
+    ];
+    // Encrypted config data.
+    EncryptedAny encrypted_config = 8 [
+      (google.api.field_behavior) = OUTPUT_ONLY,
+      (dtkt.protoform.v1beta1.field).hidden = true
+    ];
+  }
+  option (buf.validate.message).cel_expression = "has(this.deployment) ? has(this.decrypted_config) || has(this.encrypted_config) : true";
+
+  // Hash of config data.
+  string config_hash = 11 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true,
+    debug_redact = true
+  ];
+
+  // Generation of config data.
+  uint64 config_gen = 12 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true,
+    debug_redact = true
+  ];
+
+  // Config source uri (optional).
+  string config_uri = 13 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.uri = true,
+    (google.api.field_behavior) = INPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).description = "Config data URI (optional)",
+    (dtkt.protoform.v1beta1.field).file = {}
+  ];
+
+  // Headers applied when dialing connection.
+  map<string, string> headers = 14 [debug_redact = true];
+  option (buf.validate.message).cel_expression = "has(this.headers) ? has(this.custom_protos) || has(this.custom_grpc) : false";
+
+  // Connection create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Connection update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+}
+
+// Deployment is a running instance of an Integration with context aware build
+// and runtime configuration. Deployments provide a way to run and manage software
+// packages represented by Integrations in compatible runtime environments, enabling
+// users to easily deploy and run their software packages in a consistent and
+// traceable manner within the DataKit ecosystem.
+message Deployment {
+  option (google.api.resource) = {
+    type: "Deployment"
+    singular: "deployment"
+    plural: "deployments"
+    pattern: "organizations/{organization}/deployments/{deployment}"
+    pattern: "users/{user}/deployments/{deployment}"
+  };
+
+  // Name of deployment resource.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  enum State {
+    STATE_UNSPECIFIED = 0;
+    PENDING = 1;
+    RUNNING = 2;
+    STOPPING = 3;
+    STOPPED = 4;
+    FAILED = 5;
+  }
+
+  State state = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Bind address of deployment gRPC server.
+  Address address = 4 [(buf.validate.field).required = true];
+
+  // Env vars applied at runtime.
+  map<string, string> env = 5 [debug_redact = true];
+
+  // Port mappings applied at runtime.
+  map<string, string> ports = 6;
+
+  message Build {
+    // Name of integration resource this build belongs to.
+    string integration = 1 [
+      (buf.validate.field).required = true,
+      (google.api.resource_reference).type = "Integration"
+    ];
+
+    // Build metadata including artifact, platform, and runtime information.
+    PackageBuildMetadata metadata = 2 [(buf.validate.field).required = true];
+    option (buf.validate.message).cel_expression = "has(this.metadata.artifact_etag) && this.metadata.artifact_etag != ''";
+
+    // Context of where the build was performed (optional if build performed
+    // within the same control plane as deployment).
+    Context context = 3;
+  }
+
+  // Build context for deployment, including reference to integration and build
+  // metadata (must include artifact etag for a successful build). This enables
+  // cross-control plane deployments where the integration resource is defined
+  // in a different control plane than where it is deployed (e.g. integration
+  // defined in shared cloud control plane and deployed to a user control plane,
+  // or vice versa).
+  Build build = 7 [(buf.validate.field).required = true];
+
+  message Cloud {
+    Context context = 1 [
+      (buf.validate.field).required = true,
+      (google.api.field_behavior) = INPUT_ONLY,
+      (dtkt.protoform.v1beta1.field).hidden = true
+    ];
+
+    EncryptedAny config = 3 [
+      (buf.validate.field).required = true,
+      (google.api.field_behavior) = OUTPUT_ONLY,
+      debug_redact = true
+    ];
+    option (buf.validate.message).cel_expression = "has(this.config) && this.config.type_url.endsWith('/google.protobuf.BytesValue')";
+  }
+
+  // Cloud context with encrypted config for binding deployment to DataKit Cloud
+  // and only present when address's network is "cloud".
+  Cloud cloud = 8;
+
+  // Package config metadata fetched at runtime from server.
+  TypeSchema config_schema = 9 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Package spec metadata fetched at runtime from server.
+  PackageSpecMetadata package_spec = 10 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  message RuntimeMetadata {
+    message Native {
+      // PID of native process.
+      int64 process_id = 1 [(buf.validate.field).required = true];
+    }
+
+    message Docker {
+      // Container ID of docker container.
+      string container_id = 1 [(buf.validate.field).required = true];
+    }
+
+    oneof type {
+      option (buf.validate.oneof).required = true;
+
+      Native native = 1;
+      Docker docker = 2;
+    }
+  }
+
+  // Runtime metadata of deployment, including runtime-specific information such as process ID or container ID.
+  RuntimeMetadata runtime = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Etag for concurrency control of deployment updates (must match current etag
+  // to update or delete).
+  string etag = 18 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true,
+    debug_redact = true
+  ];
+
+  // Deployment create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Deployment update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+// Integration describes a software package which uses the DataKit SDK and can
+// be deployed to a runtime environment using a Deployment resource. An Integration
+// can represent a software package in development with a local runtime environment
+// or a released software package in a registry with a remote runtime environment.
+// Integrations provide a way to manage software packages and their deployment
+// lifecycle within the DataKit ecosystem, enabling users to easily deploy and
+// run their software packages in compatible runtime environments.
+message Integration {
+  option (google.api.resource) = {
+    type: "Integration"
+    singular: "integration"
+    plural: "integrations"
+    pattern: "organizations/{organization}/integrations/{integration}"
+    pattern: "users/{user}/integrations/{integration}"
+  };
+
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Package spec metadata.
+  PackageSpecMetadata spec = 3 [(buf.validate.field).required = true];
+
+  // Package spec checksum for concurrency control.
+  string spec_etag = 4 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Package source URI (only present after successful build & update).
+  optional string source_uri = 5 [(buf.validate.field).string.uri = true];
+
+  // Package source checksum or git commit hash for concurrency control
+  // (only present after successful build & update).
+  optional string source_etag = 6;
+
+  // Integration create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Integration update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+// File represents runtime artifacts related to a Connection or Deployment, such
+// as proto file descriptors used for dynamic client construction and reflection.
+message File {
+  option (google.api.resource) = {
+    type: "File"
+    singular: "file"
+    plural: "files"
+    pattern: "organizations/{organization}/connections/{connection}/files/{file}"
+    pattern: "users/{user}/connections/{connection}/files/{file}"
+    pattern: "organizations/{organization}/deployments/{deployment}/files/{file}"
+    pattern: "users/{user}/deployments/{deployment}/files/{file}"
+  };
+
+  // File resource name.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Checksum of file contents for concurrency control.
+  string etag = 3 [(buf.validate.field).required = true];
+
+  // URI of file contents (e.g. source .proto files for proto descriptors).
+  optional string uri = 4 [(buf.validate.field).string.uri = true];
+
+  oneof type {
+    option (buf.validate.oneof).required = true;
+
+    // Proto file descriptor set.
+    google.protobuf.FileDescriptorSet protos = 10;
+
+    // Potentially support other file types in the future (e.g. OpenAPI specs, etc.)
+  }
+
+  // File create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // File update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+// Service message for documentation and reflection indexing.
+message Service {
+  option (google.api.resource) = {
+    type: "Service"
+    singular: "service"
+    plural: "services"
+    pattern: "services/{service}"
+    pattern: "organizations/{organization}/connections/{connection}/services/{service}"
+    pattern: "users/{user}/connections/{connection}/services/{service}"
+    pattern: "organizations/{organization}/deployments/{deployment}/services/{service}"
+    pattern: "users/{user}/deployments/{deployment}/services/{service}"
+  };
+
+  // Service resource name.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 10 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Service description.
+  string description = 2;
+
+  // Service create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Service update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+// Method message for documentation and reflection indexing.
+message Method {
+  option (google.api.resource) = {
+    type: "Method"
+    singular: "method"
+    plural: "methods"
+    pattern: "methods/{method}"
+    pattern: "organizations/{organization}/connections/{connection}/methods/{method}"
+    pattern: "users/{user}/connections/{connection}/methods/{method}"
+    pattern: "organizations/{organization}/deployments/{deployment}/methods/{method}"
+    pattern: "users/{user}/deployments/{deployment}/methods/{method}"
+  };
+
+  // Method resource name.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 10 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Method description.
+  string description = 2;
+
+  // Request message type.
+  string request = 3 [(buf.validate.field).required = true];
+
+  // Response message type.
+  string response = 4 [(buf.validate.field).required = true];
+
+  // Whether request is streaming.
+  bool request_streaming = 5;
+
+  // Whether response is streaming.
+  bool response_streaming = 6;
+
+  // Method create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Method update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+// Type message for documentation and reflection indexing.
+message Type {
+  option (google.api.resource) = {
+    type: "Type"
+    singular: "type"
+    plural: "types"
+    pattern: "types/{type}"
+    pattern: "organizations/{organization}/connections/{connection}/types/{type}"
+    pattern: "users/{user}/connections/{connection}/types/{type}"
+    pattern: "organizations/{organization}/deployments/{deployment}/types/{type}"
+    pattern: "users/{user}/deployments/{deployment}/types/{type}"
+  };
+
+  // Type resource name.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Type schema.
+  TypeSchema schema = 2 [(buf.validate.field).required = true];
+
+  // Type create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Type update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+// TypeSchema wraps versioned type schema definitions.
+message TypeSchema {
+  oneof version {
+    option (buf.validate.oneof).required = true;
+    dtkt.shared.v1beta1.TypeSchema v1beta1 = 1;
+  }
+}
+
+// DeploymentMetadata contains metadata for deployment operations.
+message DeploymentMetadata {
+  // Status message.
+  string message = 10;
+
+  // Start time.
+  google.protobuf.Timestamp start_time = 20;
+
+  // Stop time.
+  google.protobuf.Timestamp stop_time = 21;
+}
+
+// FlowConnectionMetadata contains connection configuration for a flow automation.
+message FlowConnectionMetadata {
+  // Name of connection resource.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.contains = "/connections/",
+    (dtkt.protoform.v1beta1.field).title = "Connection",
+    (dtkt.protoform.v1beta1.field).description = "Select a connection.",
+    (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.core.v1.ConnectionService.ListConnections",
+    (dtkt.protoform.v1beta1.field).select.key_expr = "this.connections.map(i, i.name)",
+    (dtkt.protoform.v1beta1.field).select.val_expr = "this.connections.map(i, i.name)"
+  ];
+
+  // Optional context to resolve connection resource by name.
+  // If unspecified, defaults to the context where the flow automation runs.
+  Context context = 2;
+}
+
+// FlowRuntimeMetadata wraps versioned executor runtime metadata.
+message FlowRuntimeMetadata {
+  oneof version {
+    option (buf.validate.oneof).required = true;
+    dtkt.flow.v1beta1.Runtime v1beta1 = 1;
+  }
+}
+
+// FlowGroupsMetadata wraps versioned execution groups metadata.
+message FlowGroupsMetadata {
+  oneof version {
+    option (buf.validate.oneof).required = true;
+    dtkt.flow.v1beta1.Groups v1beta1 = 1;
+  }
+}
+
+// FlowSpecMetadata wraps versioned flow specification.
+message FlowSpecMetadata {
+  oneof version {
+    option (buf.validate.oneof).required = true;
+    dtkt.flow.v1beta1.Flow v1beta1 = 1;
+  }
+}
+
+// FlowGraphMetadata wraps versioned flow graph representation.
+message FlowGraphMetadata {
+  oneof version {
+    option (buf.validate.oneof).required = true;
+    dtkt.flow.v1beta1.Graph v1beta1 = 1;
+  }
+}
+
+// PackageSpecMetadata wraps versioned package specification.
+message PackageSpecMetadata {
+  oneof version {
+    option (buf.validate.oneof).required = true;
+    dtkt.shared.v1beta1.Package v1beta1 = 1;
+  }
+}
+
+// PackageBuildMetadata contains build metadata for a software package, which
+// may be used to build a deployment artifact for a compatible runtime environment.
+message PackageBuildMetadata {
+  message Runtime {
+    oneof version {
+      option (buf.validate.oneof).required = true;
+      dtkt.shared.v1beta1.Runtime v1beta1 = 1;
+    }
+  }
+
+  message Platform {
+    oneof version {
+      option (buf.validate.oneof).required = true;
+      dtkt.shared.v1beta1.Platform v1beta1 = 1;
+    }
+  }
+
+  // Target runtime of build artifact.
+  Runtime runtime = 1 [(buf.validate.field).required = true];
+
+  // Target platform of build artifact.
+  Platform platform = 2 [(buf.validate.field).required = true];
+
+  // Build environment variables.
+  map<string, string> env = 3 [debug_redact = true];
+
+  // URI of build artifact. (e.g. file://path/to/artifact or docker://image:tag)
+  string artifact_uri = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uri = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Checksum of build artifact (present if build is successful).
+  string artifact_etag = 5 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+// BuildOperationMetadata contains metadata for build operations.
+message BuildOperationMetadata {
+  enum State {
+    STATE_UNSPECIFIED = 0;
+    STATE_PENDING = 1;
+    STATE_RUNNING = 2;
+    STATE_SUCCEEDED = 3;
+    STATE_FAILED = 4;
+  }
+
+  // Build state.
+  State state = 1 [(buf.validate.field).required = true];
+
+  // Build status message.
+  string message = 2;
+
+  // Build start time.
+  google.protobuf.Timestamp start_time = 20;
+
+  // Build finish time.
+  google.protobuf.Timestamp finish_time = 21;
+}
+
+// RunOperationMetadata contains metadata for run operations.
+message RunOperationMetadata {
+  enum State {
+    STATE_UNSPECIFIED = 0;
+    STATE_PENDING = 1;
+    STATE_RUNNING = 2;
+    STATE_STOPPED = 3;
+    STATE_FAILED = 4;
+  }
+
+  // Run state.
+  State state = 1 [(buf.validate.field).required = true];
+
+  // Run status message.
+  string message = 2;
+
+  // Run start time.
+  google.protobuf.Timestamp start_time = 20;
+
+  // Run stop time.
+  google.protobuf.Timestamp stop_time = 21;
+}
+
+// SyncOperationMetadata contains metadata for sync operations.
+message SyncOperationMetadata {
+  enum State {
+    STATE_UNSPECIFIED = 0;
+    STATE_PENDING = 1;
+    STATE_RUNNING = 2;
+    STATE_SUCCEEDED = 3;
+    STATE_FAILED = 4;
+  }
+
+  // Sync state.
+  State state = 1 [(buf.validate.field).required = true];
+
+  // Sync status message.
+  string message = 2;
+
+  int64 services_count = 9;
+  int64 methods_count = 10;
+  int64 types_count = 11;
+
+  // Sync start time.
+  google.protobuf.Timestamp start_time = 20;
+
+  // Sync stop time.
+  google.protobuf.Timestamp stop_time = 21;
+}
+
+message DialMetadata {
+  enum State {
+    STATE_UNSPECIFIED = 0;
+    STATE_CONNECTED = 1;
+    STATE_FAILED = 2;
+  }
+
+  // Connection dial state.
+  State state = 1;
+
+  // Connection dial message.
+  string message = 2;
+
+  // Connection dial time.
+  google.protobuf.Timestamp time = 3;
+}
+
+// BatchRunOperationMetadata contains metadata for batch run operations.
+message BatchRunOperationMetadata {
+  // Map of request index to failure status.
+  map<int32, google.rpc.Status> failed_requests = 1;
+}
+
+// EncryptedAny is an encrypted representation of google.protobuf.Any.
+message EncryptedAny {
+  // Type URL of the encrypted message.
+  string type_url = 1 [(buf.validate.field).required = true];
+
+  // Encrypted message value.
+  bytes value = 2 [(buf.validate.field).required = true];
+}
+
+// EncryptRequest requests encryption of a resource with decrypted data.
+message EncryptRequest {
+  // Resource with decrypted data to encrypt.
+  Resource resource = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel_expression = "has(this.decrypted)"
+  ];
+}
+
+// EncryptResponse returns the encrypted resource.
+message EncryptResponse {
+  // Resource with encrypted data.
+  Resource resource = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel_expression = "has(this.encrypted)"
+  ];
+}
+
+// DecryptRequest requests decryption of a resource with encrypted data.
+message DecryptRequest {
+  // Resource with encrypted data to decrypt.
+  Resource resource = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel_expression = "has(this.encrypted)"
+  ];
+}
+
+// DecryptResponse returns the decrypted resource.
+message DecryptResponse {
+  // Resource with decrypted data.
+  Resource resource = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel_expression = "has(this.decrypted)"
+  ];
+}
+
+message GetAutomationRequest {
+  // Name of Automation resource to get.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetAutomationResponse {
+  // The requested automation.
+  Automation automation = 1 [(buf.validate.field).required = true];
+}
+
+message CreateAutomationRequest {
+  // Parent resource name.
+  string parent = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  string automation_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-z0-9-]+$",
+    (dtkt.protoform.v1beta1.field).description = "Automation ID"
+  ];
+
+  // Automation to create.
+  Automation automation = 3 [(buf.validate.field).required = true];
+}
+
+message CreateAutomationResponse {
+  // The created automation.
+  Automation automation = 1 [(buf.validate.field).required = true];
+}
+
+message BatchCreateAutomationsRequest {
+  option (buf.validate.message).cel = {
+    id: "batch_create_automations.requests"
+    message: "requests must use the same parent"
+    expression: "size(this.requests.filter(r, r.parent == this.parent)) == size(this.requests)"
+  };
+
+  // Parent resource name shared by all automations this batch.
+  string parent = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  repeated CreateAutomationRequest requests = 2 [(buf.validate.field).repeated.min_items = 2];
+}
+
+message BatchCreateAutomationsResponse {
+  // The created automations.
+  repeated Automation automations = 1 [(buf.validate.field).required = true];
+}
+
+message ListAutomationsRequest {
+  // Maximum number of automations to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name: `organizations/{organization}` or `users/{user}`.
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListAutomationsResponse {
+  // The list of automations.
+  repeated Automation automations = 1 [(buf.validate.field).required = true];
+
+  // Token for retrieving the next page.
+  string next_page_token = 2;
+}
+
+// SendAutomationEvent represents an event sent to an automation.
+message SendAutomationEvent {
+  // InputsEvent provides initial input values for a flow.
+  message InputsEvent {
+    // Map of flow input node id => any proto wrapper (e.g., "ping" => Any("pong")).
+    map<string, google.protobuf.Any> values = 1;
+  }
+
+  // UserResponseEvent is received upon a fulfilled user elicitation.
+  message UserResponseEvent {
+    // Flow action node id containing user action.
+    string id = 1 [(buf.validate.field).required = true];
+
+    // Map of user action input id => any proto wrapper (e.g., "ping" => Any("pong")).
+    map<string, google.protobuf.Any> values = 2 [(buf.validate.field).required = true];
+  }
+
+  oneof type {
+    InputsEvent inputs_event = 1;
+    UserResponseEvent user_response_event = 2;
+  }
+}
+
+// ReceiveAutomationEvent represents an event received from an automation.
+message ReceiveAutomationEvent {
+  // OutputsEvent provides output values from a flow.
+  message OutputsEvent {
+    // Map of output node id => any proto wrapper.
+    map<string, google.protobuf.Any> values = 1 [(buf.validate.field).required = true];
+  }
+
+  // UserRequestEvent is emitted upon execution requiring elicitation from a user.
+  message UserRequestEvent {
+    // Flow action node id containing user action.
+    string id = 1 [(buf.validate.field).required = true];
+
+    // User action node which defines the data being requested.
+    dtkt.flow.v1beta1.UserAction user_action = 2 [(buf.validate.field).required = true];
+  }
+
+  oneof type {
+    OutputsEvent outputs_event = 1;
+    UserRequestEvent user_request_event = 2;
+  }
+}
+
+message SendAutomationEventRequest {
+  // Name of Automation resource to send event.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Event to send.
+  SendAutomationEvent event = 2;
+}
+
+message ReceiveAutomationEventsRequest {
+  // Name of Automation resource to receive events.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message ReceiveAutomationEventsResponse {
+  // The received event.
+  ReceiveAutomationEvent event = 2 [(buf.validate.field).required = true];
+}
+
+message StreamAutomationEventsRequest {
+  // Name of Automation resource to send event.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Event to send.
+  SendAutomationEvent event = 2;
+}
+
+message StreamAutomationEventsResponse {
+  // The received event.
+  ReceiveAutomationEvent event = 1 [(buf.validate.field).required = true];
+}
+
+message ListConnectionsRequest {
+  // Maximum number of connections to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name: `organizations/{organization}` or `users/{user}`.
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListConnectionsResponse {
+  // The list of connections.
+  repeated Connection connections = 1;
+
+  // Token for retrieving the next page.
+  string next_page_token = 2;
+}
+
+message GetConnectionRequest {
+  // Name of connection to get.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetConnectionResponse {
+  // The requested connection.
+  Connection connection = 1 [(buf.validate.field).required = true];
+}
+
+message CreateConnectionRequest {
+  // Parent resource name.
+  string parent = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Client-provided ID for connection resource.
+  string connection_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-z0-9-]+$",
+    (dtkt.protoform.v1beta1.field).description = "Connection ID"
+  ];
+
+  // Connection to create.
+  Connection connection = 3 [(buf.validate.field).required = true];
+}
+
+message CreateConnectionResponse {
+  // The created connection.
+  Connection connection = 1 [(buf.validate.field).required = true];
+}
+
+message UpdateConnectionRequest {
+  // The connection with updated fields. Must include `name`.
+  Connection connection = 1 [(buf.validate.field).required = true];
+
+  // Fields to update (e.g., "config_data,integration").
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message UpdateConnectionResponse {
+  // The updated connection.
+  Connection connection = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteConnectionRequest {
+  // Name of connection to delete.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteConnectionResponse {}
+
+message DialConnectionRequest {
+  oneof target {
+    // Name of connection to dial.
+    string name = 1;
+    // Address of connection to dial.
+    string address = 2 [(buf.validate.field).string.uri = true];
+  }
+}
+
+message DialConnectionResponse {
+  // Dial metadata.
+  DialMetadata dial = 1 [(buf.validate.field).required = true];
+}
+
+message SyncDescriptorsRequest {
+  // Name of parent resource.
+  string parent = 1 [(buf.validate.field).required = true];
+
+  // Build etag must match current file etag for idempotent syncs and to ensure
+  // descriptors are up-to-date with the latest connection or deployment config/build.
+  // May be an empty string if no descriptors have been synced yet.
+  string etag = 2;
+}
+
+message SyncDescriptorsResponse {
+  // File containing descriptors.
+  File file = 1 [(buf.validate.field).required = true];
+}
+
+message GetDescriptorsRequest {
+  // Name of parent resource.
+  string parent = 1 [(buf.validate.field).required = true];
+}
+
+message GetDescriptorsResponse {
+  // File containing descriptors.
+  File file = 1 [(buf.validate.field).required = true];
+}
+
+message ListDeploymentsRequest {
+  // Maximum number of deployments to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name.
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListDeploymentsResponse {
+  // The list of deployments.
+  repeated Deployment deployments = 1;
+
+  // Token for retrieving the next page.
+  string next_page_token = 2;
+}
+
+message GetDeploymentRequest {
+  // Name of deployment to get.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetDeploymentResponse {
+  // The requested deployment.
+  Deployment deployment = 1 [(buf.validate.field).required = true];
+}
+
+message CreateDeploymentRequest {
+  // Parent resource name.
+  string parent = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Client-provided ID for deployment resource.
+  string deployment_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-z0-9-]+$"
+  ];
+
+  // Deployment to create (name ignored; server sets it).
+  Deployment deployment = 3 [(buf.validate.field).required = true];
+}
+
+message UpdateDeploymentRequest {
+  // Deployment with updated fields. Must include `name`.
+  Deployment deployment = 1 [(buf.validate.field).required = true];
+
+  // Fields to update (e.g., "config,address").
+  google.protobuf.FieldMask update_mask = 2;
+
+  // Desired state of deployment after update.
+  optional Deployment.State desired_state = 3 [(buf.validate.field).enum = {
+    in: [
+      2,
+      4
+    ]
+  } /* RUNNING or STOPPED */];
+}
+
+message DeleteDeploymentRequest {
+  // Name of deployment to delete.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Etag must match current deployment etag for delete to succeed (ensures
+  // deployment is up-to-date and prevents lost deletes).
+  string etag = 2 [(buf.validate.field).required = true];
+}
+
+message ListFlowsRequest {
+  // Maximum number of flows to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name: `organizations/{organization}` or `users/{user}`.
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListFlowsResponse {
+  // The list of flows.
+  repeated Flow flows = 1;
+
+  // Token for retrieving the next page.
+  string next_page_token = 2;
+}
+
+message GetFlowRequest {
+  // Flow resource name, one of.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetFlowResponse {
+  // The requested flow.
+  Flow flow = 1 [(buf.validate.field).required = true];
+}
+
+message CreateFlowRequest {
+  // Parent resource name.
+  string parent = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Client-provided ID for flow resource.
+  string flow_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-z0-9-]+$"
+  ];
+
+  // Flow to create.
+  Flow flow = 3 [(buf.validate.field).required = true];
+}
+
+message CreateFlowResponse {
+  // The created flow.
+  Flow flow = 1 [(buf.validate.field).required = true];
+}
+
+message UpdateFlowRequest {
+  // Flow with updated fields. Must include `name`.
+  Flow flow = 1 [(buf.validate.field).required = true];
+
+  // Fields to update (e.g., "spec").
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message UpdateFlowResponse {
+  // The updated flow.
+  Flow flow = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteFlowRequest {
+  // Name of flow to delete.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteFlowResponse {}
+
+message ListIntegrationsRequest {
+  // Maximum number of integrations to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name: `organizations/{organization}` or `users/{user}`.
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListIntegrationsResponse {
+  repeated Integration integrations = 1;
+
+  string next_page_token = 2;
+}
+
+message GetIntegrationRequest {
+  // Integration resource name, one of:
+  // - `organizations/{organization}/integrations/{integration}`
+  // - `users/{user}/integrations/{integration}`
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetIntegrationResponse {
+  // The requested integration.
+  Integration integration = 1 [(buf.validate.field).required = true];
+}
+
+message CreateIntegrationRequest {
+  // Parent resource name.
+  string parent = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Client-provided ID for integration resource.
+  string integration_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-z0-9-]+$"
+  ];
+
+  // Integration to create.
+  Integration integration = 3 [(buf.validate.field).required = true];
+}
+
+message CreateIntegrationResponse {
+  // The created integration.
+  Integration integration = 1 [(buf.validate.field).required = true];
+}
+
+message BuildIntegrationRequest {
+  // Name of integration resource to build.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // URI of package source to build integration from (e.g. git://repo_url or file://path/to/source).
+  string source_uri = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uri = true
+  ];
+
+  // Package source checksum or git commit hash.
+  string source_etag = 3 [(buf.validate.field).required = true];
+
+  // Build metadata for this build operation.
+  PackageBuildMetadata build = 4 [(buf.validate.field).required = true];
+}
+
+message BuildIntegrationResponse {
+  // Integration resource of build.
+  Integration integration = 1 [(buf.validate.field).required = true];
+
+  // Package build metadata (must include artifact etag for a successful build).
+  PackageBuildMetadata build = 2 [(buf.validate.field).required = true];
+  option (buf.validate.message).cel_expression = "has(this.build.artifact_etag) && this.build.artifact_etag != ''";
+}
+
+message UpdateIntegrationRequest {
+  // Integration with updated fields. Must include `name`.
+  Integration integration = 1 [(buf.validate.field).required = true];
+
+  // Fields to update (e.g., "config,spec").
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message UpdateIntegrationResponse {
+  // The updated integration.
+  Integration integration = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteIntegrationRequest {
+  // Name of integration to delete.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteIntegrationResponse {}
+
+message GetTypeRequest {
+  // Type resource name, one of:
+  // - System: "types/{type}"
+  // - Organization/User: e.g. "organizations/bar/types/{type}" or "users/foo/types/{type}"
+  // - Connection: e.g. "users/foo/connections/foobar/types/{type}"
+  // - Deployment: e.g. "users/foo/deployments/default/types/{type}"
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetTypeResponse {
+  // The requested type.
+  Type type = 1 [(buf.validate.field).required = true];
+}
+
+message ListTypesRequest {
+  // Maximum number of types to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name, one of:
+  // - System (no parent): nil | ""
+  // - Organization/User: e.g. "organizations/bar" or "users/foo"
+  // - Connection: e.g. "users/foo/connections/foobar"
+  // - Deployment: e.g. "users/foo/deployments/default"
+  // - Integration (aggregates deployments): e.g. "users/foo/integrations/bar"
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListTypesResponse {
+  // The list of types.
+  repeated Type types = 1;
+
+  // Token for retrieving the next page.
+  string next_page_token = 2;
+}
+
+message GetMethodRequest {
+  // Method resource name, one of:
+  // - System: "methods/{method}"
+  // - Organization/User: e.g. "organizations/bar/methods/{method}" or "users/foo/methods/{method}"
+  // - Connection: e.g. "users/foo/connections/foobar/methods/{method}"
+  // - Deployment: e.g. "users/foo/deployments/default/methods/{method}"
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetMethodResponse {
+  // The requested method.
+  Method method = 1 [(buf.validate.field).required = true];
+}
+
+message GetServiceRequest {
+  // Service resource name, one of:
+  // - System: "services/{service}"
+  // - Organization/User: e.g. "organizations/bar/services/{service}" or "users/foo/services/{service}"
+  // - Connection: e.g. "users/foo/connections/foobar/services/{service}"
+  // - Deployment: e.g. "users/foo/deployments/default/services/{service}"
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetServiceResponse {
+  // The requested service.
+  Service service = 1 [(buf.validate.field).required = true];
+}
+
+message ListServicesRequest {
+  // Maximum number of services to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name, one of (blank will return all):
+  // - Return all: nil
+  // - Organization/User: e.g. "organizations/bar" or "users/foo"
+  // - Connection: e.g. "users/foo/connections/foobar"
+  // - Deployment: e.g. "users/foo/deployments/default"
+  // - Integration (aggregates deployments): e.g. "users/foo/integrations/bar"
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListServicesResponse {
+  repeated Service services = 1;
+
+  string next_page_token = 2;
+}
+
+message ListMethodsRequest {
+  // Maximum number of methods to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name, one of (blank will return all):
+  // - Return all: nil
+  // - Organization/User: e.g. "organizations/bar" or "users/foo"
+  // - Connection: e.g. "users/foo/connections/foobar"
+  // - Deployment: e.g. "users/foo/deployments/default"
+  // - Integration (aggregates deployments): e.g. "users/foo/integrations/bar"
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListMethodsResponse {
+  repeated Method methods = 1;
+
+  string next_page_token = 2;
+}

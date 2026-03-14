@@ -1,0 +1,37 @@
+{
+  "$id": "dtkt.catalog.v1beta2.FloatValue.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Nullable wrapper message for `float`.",
+  "properties": {
+    "valid": {
+      "default": false,
+      "description": "Valid is true if value is not NULL.",
+      "type": "boolean"
+    },
+    "value": {
+      "anyOf": [
+        {
+          "maximum": 3.4028234663852886e+38,
+          "minimum": -3.4028234663852886e+38,
+          "type": "number"
+        },
+        {
+          "enum": [
+            "Infinity",
+            "-Infinity",
+            "NaN"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The float value."
+    }
+  },
+  "title": "Float Value",
+  "type": "object"
+}

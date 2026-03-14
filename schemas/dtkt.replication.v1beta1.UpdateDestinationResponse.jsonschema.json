@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.replication.v1beta1.UpdateDestinationResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response from update configured destination.",
+  "properties": {
+    "destination": {
+      "$ref": "dtkt.replication.v1beta1.Destination.jsonschema.json",
+      "description": "The returned destination if updated is true."
+    },
+    "error": {
+      "default": "",
+      "description": "An error message if updated is false.",
+      "type": "string"
+    },
+    "updated": {
+      "default": false,
+      "description": "Indicates whether destination was successfully updated.",
+      "type": "boolean"
+    }
+  },
+  "title": "Update Destination Response",
+  "type": "object"
+}

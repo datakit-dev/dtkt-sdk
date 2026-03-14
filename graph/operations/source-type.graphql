@@ -1,0 +1,29 @@
+fragment SourceTypeFragment on SourceType {
+  id
+  slug
+  name
+  description
+  category
+  iconURL
+  configSchema
+  createdAt
+  updatedAt
+  providerID
+}
+
+query GetSourceType($id: ID, $slug: String) {
+  sourceType(id: $id, slug: $slug) {
+    ...SourceTypeFragment
+  }
+}
+
+query ListSourceTypes($orderBy: SourceTypeOrder, $where: SourceTypeWhereInput) {
+  sourceTypes(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...SourceTypeFragment
+      }
+    }
+    totalCount
+  }
+}

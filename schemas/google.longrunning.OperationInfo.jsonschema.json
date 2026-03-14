@@ -1,0 +1,36 @@
+{
+  "$id": "google.longrunning.OperationInfo.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Example:\n\n     rpc Export(ExportRequest) returns (google.longrunning.Operation) {\n       option (google.longrunning.operation_info) = {\n         response_type: \"ExportResponse\"\n         metadata_type: \"ExportMetadata\"\n       };\n     }",
+  "patternProperties": {
+    "^(metadata_type)$": {
+      "default": "",
+      "description": "If the response is in a different package from the rpc, a fully-qualified\n message name must be used (e.g. `google.protobuf.Struct`).\n\n Note: Altering this value constitutes a breaking change.",
+      "title": "Required. The message name of the metadata type for this long-running\n operation.",
+      "type": "string"
+    },
+    "^(response_type)$": {
+      "default": "",
+      "description": "If the response is in a different package from the rpc, a fully-qualified\n message name must be used (e.g. `google.protobuf.Struct`).\n\n Note: Altering this value constitutes a breaking change.",
+      "title": "Required. The message name of the primary return type for this\n long-running operation.\n This type will be used to deserialize the LRO's response.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "metadataType": {
+      "default": "",
+      "description": "If the response is in a different package from the rpc, a fully-qualified\n message name must be used (e.g. `google.protobuf.Struct`).\n\n Note: Altering this value constitutes a breaking change.",
+      "title": "Required. The message name of the metadata type for this long-running\n operation.",
+      "type": "string"
+    },
+    "responseType": {
+      "default": "",
+      "description": "If the response is in a different package from the rpc, a fully-qualified\n message name must be used (e.g. `google.protobuf.Struct`).\n\n Note: Altering this value constitutes a breaking change.",
+      "title": "Required. The message name of the primary return type for this\n long-running operation.\n This type will be used to deserialize the LRO's response.",
+      "type": "string"
+    }
+  },
+  "title": "A message representing the message types used by a long-running operation.",
+  "type": "object"
+}

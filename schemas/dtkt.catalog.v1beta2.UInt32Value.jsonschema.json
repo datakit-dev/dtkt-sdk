@@ -1,0 +1,30 @@
+{
+  "$id": "dtkt.catalog.v1beta2.UInt32Value.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Nullable wrapper message for `uint32`.",
+  "properties": {
+    "valid": {
+      "default": false,
+      "description": "Valid is true if value is not NULL.",
+      "type": "boolean"
+    },
+    "value": {
+      "anyOf": [
+        {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The uint32 value."
+    }
+  },
+  "title": "U Int32 Value",
+  "type": "object"
+}

@@ -1,0 +1,38 @@
+name: Test Go SDK
+
+on:
+  pull_request:
+    branches:
+    - main
+    paths:
+    - sdk-go/**
+    - .github/workflows/sdk-go.yaml
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{ vars.RUNNER }}
+
+    steps:
+    - uses: datakit-dev/dtkt-dev/.github/actions/setup-monorepo@main
+      with:
+        dtkt-github-actions-app-id: ${{ vars.DTKT_GITHUB_ACTIONS_APP_ID }}
+        dtkt-github-actions-private-key: ${{ secrets.DTKT_GITHUB_ACTIONS_PRIVATE_KEY }}
+
+    - uses: datakit-dev/dtkt-dev/.github/actions/setup@main
+      with:
+        task: true
+        go: true
+        versions: ${{ vars.VERSIONS }}
+
+    - name: Setup
+      run: task setup
+      working-directory: ./dtkt-universe/dtkt-sdk/sdk-go
+
+    - name: Lint
+      run: task lint
+      working-directory: ./dtkt-universe/dtkt-sdk/sdk-go
+
+    - name: Test
+      run: task test
+      working-directory: ./dtkt-universe/dtkt-sdk/sdk-go

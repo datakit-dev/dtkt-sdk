@@ -1,0 +1,20 @@
+{
+  "$id": "dtkt.event.v1beta1.DeleteEventSourceRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request to delete an event source.",
+  "patternProperties": {
+    "^(event_source)$": {
+      "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+      "description": "The event source to delete."
+    }
+  },
+  "properties": {
+    "eventSource": {
+      "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+      "description": "The event source to delete."
+    }
+  },
+  "title": "Delete Event Source Request",
+  "type": "object"
+}

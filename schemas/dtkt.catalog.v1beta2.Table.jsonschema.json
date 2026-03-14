@@ -1,0 +1,53 @@
+{
+  "$id": "dtkt.catalog.v1beta2.Table.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a table within a table.",
+  "patternProperties": {
+    "^(table_id)$": {
+      "default": "",
+      "description": "Table identifier.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "description": {
+      "default": "",
+      "description": "Description of the table.",
+      "type": "string"
+    },
+    "fields": {
+      "description": "List of fields defined by the table.",
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.Field.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "metadata": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Additional metadata, if any.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "name": {
+      "default": "",
+      "description": "Table resource name, format: `catalogs/{catalog}/schemas/{schema}/tables/{table}`.",
+      "type": "string"
+    },
+    "stats": {
+      "$ref": "dtkt.catalog.v1beta2.TableStats.jsonschema.json",
+      "description": "Statistics about the table (e.g., row count), if any."
+    },
+    "tableId": {
+      "default": "",
+      "description": "Table identifier.",
+      "type": "string"
+    }
+  },
+  "title": "Table",
+  "type": "object"
+}

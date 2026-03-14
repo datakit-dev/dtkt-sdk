@@ -1,0 +1,46 @@
+{
+  "$id": "dtkt.replication.v1beta1.FivetranDestinationConfig.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(daylight_saving_time_enabled)$": {
+      "default": false,
+      "description": "Shift my UTC offset with daylight savings time (US Only)",
+      "type": "boolean"
+    },
+    "^(run_setup_tests)$": {
+      "default": false,
+      "description": "Specifies whether setup tests should be run automatically.",
+      "type": "boolean"
+    },
+    "^(time_zone_offset)$": {
+      "default": "",
+      "description": "Determines the time zone for the Fivetran sync schedule.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "daylightSavingTimeEnabled": {
+      "default": false,
+      "description": "Shift my UTC offset with daylight savings time (US Only)",
+      "type": "boolean"
+    },
+    "region": {
+      "default": "",
+      "description": "Data processing location. This is where Fivetran will operate and run computation on data.",
+      "type": "string"
+    },
+    "runSetupTests": {
+      "default": false,
+      "description": "Specifies whether setup tests should be run automatically.",
+      "type": "boolean"
+    },
+    "timeZoneOffset": {
+      "default": "",
+      "description": "Determines the time zone for the Fivetran sync schedule.",
+      "type": "string"
+    }
+  },
+  "title": "Fivetran Destination Config",
+  "type": "object"
+}

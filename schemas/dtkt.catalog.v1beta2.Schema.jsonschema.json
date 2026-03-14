@@ -1,0 +1,42 @@
+{
+  "$id": "dtkt.catalog.v1beta2.Schema.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Schema resource containing tables.",
+  "patternProperties": {
+    "^(schema_id)$": {
+      "default": "",
+      "description": "Schema identifier.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "description": {
+      "default": "",
+      "description": "Description of the schema.",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Additional metadata, if any.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "name": {
+      "default": "",
+      "description": "Schema resource name, format: `catalogs/{catalog}/schemas/{schema}`.",
+      "type": "string"
+    },
+    "schemaId": {
+      "default": "",
+      "description": "Schema identifier.",
+      "type": "string"
+    }
+  },
+  "title": "Schema",
+  "type": "object"
+}

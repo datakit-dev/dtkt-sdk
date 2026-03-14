@@ -1,0 +1,23 @@
+{
+  "$id": "dtkt.geojson.v1beta1.PolygonCoords.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(linear_rings)$": {
+      "items": {
+        "$ref": "dtkt.geojson.v1beta1.LinearRing.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "properties": {
+    "linearRings": {
+      "items": {
+        "$ref": "dtkt.geojson.v1beta1.LinearRing.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Polygon Coords",
+  "type": "object"
+}

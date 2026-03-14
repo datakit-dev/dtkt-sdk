@@ -1,0 +1,36 @@
+{
+  "$id": "dtkt.protoui.v1beta1.List.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Render as a list (bulleted or numbered).\n Maps to HTML list elements (ul/ol)\n Use CEL expressions to generate a list of items.\n The message or field is available as `this` in the expression context.\n Example: `this.tags` or `this.items.map(i, i.name)` or `this.permissions.filter(p, p.enabled).map(p, p.label)`",
+  "properties": {
+    "items": {
+      "description": "CEL expression that evaluates to a repeated/list value.\n Context: `this` is the message or field being rendered.\n If not specified, uses the field value directly.",
+      "type": "string"
+    },
+    "style": {
+      "anyOf": [
+        {
+          "pattern": "^STYLE_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "STYLE_BULLETED",
+            "STYLE_NUMBERED"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "title": "Style"
+    }
+  },
+  "title": "List",
+  "type": "object"
+}

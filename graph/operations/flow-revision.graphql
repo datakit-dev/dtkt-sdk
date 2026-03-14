@@ -1,0 +1,42 @@
+fragment FlowRevisionFragment on FlowRevision {
+  id
+  checksum
+  body(format: YAML) {
+    raw
+  }
+  createdAt
+  updatedAt
+  flowID
+}
+
+query ListFlowRevisions(
+  $orderBy: FlowRevisionOrder
+  $where: FlowRevisionWhereInput
+) {
+  flowRevisions(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...FlowRevisionFragment
+      }
+    }
+    totalCount
+  }
+}
+
+mutation CreateFlowRevision($input: CreateFlowRevisionInput!) {
+  createFlowRevision(input: $input) {
+    created
+    error
+    flowRevision {
+      ...FlowRevisionFragment
+    }
+  }
+}
+
+mutation DeleteFlowRevision($id: ID!) {
+  deleteFlowRevision(id: $id) {
+    deleted
+    error
+    id
+  }
+}

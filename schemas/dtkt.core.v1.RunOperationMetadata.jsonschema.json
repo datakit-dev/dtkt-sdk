@@ -1,0 +1,61 @@
+{
+  "$id": "dtkt.core.v1.RunOperationMetadata.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "RunOperationMetadata contains metadata for run operations.",
+  "patternProperties": {
+    "^(start_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Run start time."
+    },
+    "^(stop_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Run stop time."
+    }
+  },
+  "properties": {
+    "message": {
+      "default": "",
+      "description": "Run status message.",
+      "type": "string"
+    },
+    "startTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Run start time."
+    },
+    "state": {
+      "anyOf": [
+        {
+          "enum": [
+            "STATE_PENDING",
+            "STATE_RUNNING",
+            "STATE_STOPPED",
+            "STATE_FAILED"
+          ],
+          "type": "string"
+        },
+        {
+          "exclusiveMaximum": 0,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "exclusiveMinimum": 0,
+          "maximum": 2147483647,
+          "type": "integer"
+        }
+      ],
+      "description": "Run state.",
+      "title": "State"
+    },
+    "stopTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Run stop time."
+    }
+  },
+  "required": [
+    "state"
+  ],
+  "title": "Run Operation Metadata",
+  "type": "object"
+}

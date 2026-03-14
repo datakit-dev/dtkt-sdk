@@ -1,0 +1,9 @@
+{
+  "$id": "dtkt.ai.v1beta1.ListEmbeddingModelsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request to retrieve a list of available embedding models.",
+  "properties": {},
+  "title": "List Embedding Models Request",
+  "type": "object"
+}

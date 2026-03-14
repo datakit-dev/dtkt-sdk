@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.shared.v1beta1.StringList.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a list of strings as a message.",
+  "properties": {
+    "values": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "title": "String List",
+  "type": "object"
+}

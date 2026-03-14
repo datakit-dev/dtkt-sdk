@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.catalog.v1beta2.Row.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Row represents a list of values with each value's type defined by a field of\n the same index in the context of a table read/write operation or a query\n input param or result operation.",
+  "properties": {
+    "values": {
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.Value.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Row",
+  "type": "object"
+}

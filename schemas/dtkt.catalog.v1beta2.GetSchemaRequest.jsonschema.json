@@ -1,0 +1,27 @@
+{
+  "$id": "dtkt.catalog.v1beta2.GetSchemaRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Get schema request.",
+  "properties": {
+    "metadata": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Metadata of the schema, if any.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "name": {
+      "description": "Schema resource name to retrieve.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Get Schema Request",
+  "type": "object"
+}

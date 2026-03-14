@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.CreateConnectionResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "connection": {
+      "$ref": "dtkt.core.v1.Connection.jsonschema.json",
+      "description": "The created connection."
+    }
+  },
+  "required": [
+    "connection"
+  ],
+  "title": "Create Connection Response",
+  "type": "object"
+}

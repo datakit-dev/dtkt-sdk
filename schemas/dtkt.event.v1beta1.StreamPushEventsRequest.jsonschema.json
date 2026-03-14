@@ -1,0 +1,36 @@
+{
+  "$id": "dtkt.event.v1beta1.StreamPushEventsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request to validate an event from a PUSH event source.",
+  "patternProperties": {
+    "^(event_source)$": {
+      "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+      "description": "Push event source."
+    }
+  },
+  "properties": {
+    "body": {
+      "default": null,
+      "description": "Body of the event.",
+      "pattern": "^[A-Za-z0-9+/]*={0,2}$",
+      "type": "string"
+    },
+    "eventSource": {
+      "$ref": "dtkt.event.v1beta1.EventSource.jsonschema.json",
+      "description": "Push event source."
+    },
+    "headers": {
+      "additionalProperties": {
+        "$ref": "dtkt.shared.v1beta1.StringList.jsonschema.json"
+      },
+      "description": "Headers of the event.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    }
+  },
+  "title": "Stream Push Events Request",
+  "type": "object"
+}

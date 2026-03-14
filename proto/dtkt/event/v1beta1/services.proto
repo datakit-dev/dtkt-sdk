@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package dtkt.event.v1beta1;
+
+import "dtkt/event/v1beta1/messages.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/event/v1beta1";
+
+// EventService provides operations for managing and interacting with events and event sources (PULL and PUSH).
+service EventService {
+  // Retrieves a list of events supported by service.
+  rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {
+    option (google.api.http) = {get: "/v1beta1/events"};
+  }
+
+  // Retrieves a list of event sources supported by service.
+  rpc ListEventSources(ListEventSourcesRequest) returns (ListEventSourcesResponse) {
+    option (google.api.http) = {get: "/v1beta1/event_sources"};
+  }
+
+  // Creates a new event source.
+  rpc CreateEventSource(CreateEventSourceRequest) returns (CreateEventSourceResponse) {
+    option (google.api.http) = {
+      post: "/v1beta1/event_sources"
+      body: "*"
+    };
+  }
+
+  // Updates an existing event source.
+  rpc UpdateEventSource(UpdateEventSourceRequest) returns (UpdateEventSourceResponse) {
+    option (google.api.http) = {
+      patch: "/v1beta1/{event_source.name=event_sources/*}"
+      body: "*"
+    };
+  }
+
+  // Deletes an existing event source.
+  rpc DeleteEventSource(DeleteEventSourceRequest) returns (DeleteEventSourceResponse) {
+    option (google.api.http) = {delete: "/v1beta1/{event_source.name=event_sources/*}"};
+  }
+
+  // Create a server side stream of events for a PULL event source (e.g., cron jobs).
+  rpc StreamPullEvents(StreamPullEventsRequest) returns (stream StreamPullEventsResponse);
+
+  // Creates a bidirectional stream of events from a PUSH event source
+  // (e.g. webhooks) which are validated (e.g. a signing secret) and returned
+  // to the client if valid.
+  rpc StreamPushEvents(stream StreamPushEventsRequest) returns (stream StreamPushEventsResponse);
+}

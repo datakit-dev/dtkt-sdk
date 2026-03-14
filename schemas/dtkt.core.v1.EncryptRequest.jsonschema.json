@@ -1,0 +1,17 @@
+{
+  "$id": "dtkt.core.v1.EncryptRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "EncryptRequest requests encryption of a resource with decrypted data.",
+  "properties": {
+    "resource": {
+      "$ref": "dtkt.core.v1.Resource.jsonschema.json",
+      "description": "Resource with decrypted data to encrypt."
+    }
+  },
+  "required": [
+    "resource"
+  ],
+  "title": "Encrypt Request",
+  "type": "object"
+}

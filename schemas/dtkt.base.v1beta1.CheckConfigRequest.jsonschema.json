@@ -1,0 +1,64 @@
+{
+  "$id": "dtkt.base.v1beta1.CheckConfigRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request for checking config.",
+  "patternProperties": {
+    "^(config_data)$": {
+      "$ref": "google.protobuf.Any.jsonschema.json",
+      "description": "Config to validate."
+    },
+    "^(config_gen)$": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "description": "Generation of provided config."
+    },
+    "^(config_hash)$": {
+      "description": "Hash of provided config.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "configData": {
+      "$ref": "google.protobuf.Any.jsonschema.json",
+      "description": "Config to validate."
+    },
+    "configGen": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "description": "Generation of provided config."
+    },
+    "configHash": {
+      "description": "Hash of provided config.",
+      "type": "string"
+    },
+    "connection": {
+      "description": "Connection resource of provided config.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "connection",
+    "configData",
+    "configHash",
+    "configGen"
+  ],
+  "title": "Check Config Request",
+  "type": "object"
+}

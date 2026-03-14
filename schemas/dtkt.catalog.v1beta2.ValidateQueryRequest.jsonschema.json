@@ -1,0 +1,29 @@
+{
+  "$id": "dtkt.catalog.v1beta2.ValidateQueryRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request to validate a query.",
+  "properties": {
+    "accessible": {
+      "description": "Accessible catalogs for validation.",
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.CatalogPermission.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "params": {
+      "description": "Parameters used in the query.",
+      "items": {
+        "$ref": "dtkt.catalog.v1beta2.Param.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "query": {
+      "default": "",
+      "description": "The query to validate.",
+      "type": "string"
+    }
+  },
+  "title": "Validate Query Request",
+  "type": "object"
+}

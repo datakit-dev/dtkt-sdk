@@ -1,0 +1,49 @@
+{
+  "$id": "dtkt.flow.v1beta1.Stream.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(start_if)$": {
+      "default": "",
+      "description": "Start stream when expression evaluates to true; optional.",
+      "pattern": "^\\s?=\\s?",
+      "type": "string"
+    },
+    "^(stop_if)$": {
+      "default": "",
+      "description": "Stop stream when expression evaluates to true; optional.",
+      "pattern": "^\\s?=\\s?",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "call": {
+      "$ref": "dtkt.flow.v1beta1.MethodCall.jsonschema.json"
+    },
+    "generate": {
+      "$ref": "dtkt.flow.v1beta1.Ticker.jsonschema.json"
+    },
+    "id": {
+      "minLength": 1,
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_]+$",
+      "type": "string"
+    },
+    "startIf": {
+      "default": "",
+      "description": "Start stream when expression evaluates to true; optional.",
+      "pattern": "^\\s?=\\s?",
+      "type": "string"
+    },
+    "stopIf": {
+      "default": "",
+      "description": "Stop stream when expression evaluates to true; optional.",
+      "pattern": "^\\s?=\\s?",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "title": "Stream",
+  "type": "object"
+}

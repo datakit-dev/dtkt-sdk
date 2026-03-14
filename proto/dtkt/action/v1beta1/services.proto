@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package dtkt.action.v1beta1;
+
+import "dtkt/action/v1beta1/messages.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/action/v1beta1";
+
+// Allows users to browse and run custom actions provided by an integration.
+// Actions are discrete operations (e.g. "Send Email", "Query Report") that accept
+// structured input and return structured output.
+service ActionService {
+  // Returns the list of actions available to the user for this integration.
+  rpc ListActions(ListActionsRequest) returns (ListActionsResponse) {
+    option (google.api.http) = {get: "/v1beta1/actions"};
+  }
+
+  // Returns the full details of a single action, including its input/output schema.
+  rpc GetAction(GetActionRequest) returns (GetActionResponse) {
+    option (google.api.http) = {get: "/v1beta1/{name=actions/*}"};
+  }
+
+  // Runs the specified action with the provided input data and returns the result.
+  rpc ExecuteAction(ExecuteActionRequest) returns (ExecuteActionResponse) {
+    option (google.api.http) = {
+      post: "/v1beta1/{name=actions/*}:execute"
+      body: "*"
+    };
+  }
+}

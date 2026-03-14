@@ -1,0 +1,173 @@
+syntax = "proto3";
+
+package dtkt.core.v1;
+
+import "dtkt/core/v1/messages.proto";
+import "google/longrunning/operations.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1";
+
+// AutomationService provides operations for managing and running automations.
+service AutomationService {
+  // List automations with filtering options.
+  rpc ListAutomations(ListAutomationsRequest) returns (ListAutomationsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Get a single automation by name.
+  rpc GetAutomation(GetAutomationRequest) returns (GetAutomationResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create a new automation and start its execution.
+  rpc CreateAutomation(CreateAutomationRequest) returns (CreateAutomationResponse);
+  // TODO: Batch create automations and start their executions.
+  // rpc BatchCreateAutomations(BatchCreateAutomationsRequest) returns (google.longrunning.Operation) {
+  //   option (google.longrunning.operation_info) = {
+  //     metadata_type: "BatchRunOperationMetadata"
+  //     response_type: "BatchCreateAutomationsResponse"
+  //   };
+  // }
+  // Send input events and user action responses and receive output events and user action requests bi-directionally.
+  rpc StreamAutomationEvents(stream StreamAutomationEventsRequest) returns (stream StreamAutomationEventsResponse);
+  // Receive a stream of output events or user action requests (for environments with server streaming but not client streaming, e.g. web browsers).
+  rpc ReceiveAutomationEvents(ReceiveAutomationEventsRequest) returns (stream ReceiveAutomationEventsResponse);
+  // Send an input event or user action response (for environments without client streaming, e.g. web browsers).
+  rpc SendAutomationEvent(SendAutomationEventRequest) returns (google.protobuf.Empty);
+}
+
+// ConnectionService provides operations for managing connections.
+service ConnectionService {
+  // Dial a connection to validate connectivity.
+  rpc DialConnection(DialConnectionRequest) returns (DialConnectionResponse);
+  // List connections.
+  rpc ListConnections(ListConnectionsRequest) returns (ListConnectionsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Get a single connection by name.
+  rpc GetConnection(GetConnectionRequest) returns (GetConnectionResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create a new connection.
+  rpc CreateConnection(CreateConnectionRequest) returns (CreateConnectionResponse);
+  // Update an existing connection.
+  rpc UpdateConnection(UpdateConnectionRequest) returns (UpdateConnectionResponse);
+  // Delete a connection by name.
+  rpc DeleteConnection(DeleteConnectionRequest) returns (DeleteConnectionResponse);
+}
+
+// DeploymentService provides operations for managing deployments.
+service DeploymentService {
+  // List deployments.
+  rpc ListDeployments(ListDeploymentsRequest) returns (ListDeploymentsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Get a single deployment by name.
+  rpc GetDeployment(GetDeploymentRequest) returns (GetDeploymentResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create a new deployment.
+  rpc CreateDeployment(CreateDeploymentRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      metadata_type: "DeploymentMetadata"
+      response_type: "Deployment"
+    };
+  }
+  // Update an existing deployment.
+  rpc UpdateDeployment(UpdateDeploymentRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      metadata_type: "DeploymentMetadata"
+      response_type: "Deployment"
+    };
+  }
+  // Delete a deployment.
+  rpc DeleteDeployment(DeleteDeploymentRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      metadata_type: "DeploymentMetadata"
+      response_type: "google.protobuf.Empty"
+    };
+  }
+}
+
+// FlowService provides operations for managing automation flow specs.
+service FlowService {
+  // List flow specs.
+  rpc ListFlows(ListFlowsRequest) returns (ListFlowsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Get a single flow spec by name.
+  rpc GetFlow(GetFlowRequest) returns (GetFlowResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create a new flow spec.
+  rpc CreateFlow(CreateFlowRequest) returns (CreateFlowResponse);
+  // Update an existing flow spec.
+  rpc UpdateFlow(UpdateFlowRequest) returns (UpdateFlowResponse);
+  // Delete a flow spec by name.
+  rpc DeleteFlow(DeleteFlowRequest) returns (DeleteFlowResponse);
+}
+
+// IntegrationService provides operations for managing integration specs.
+service IntegrationService {
+  // List integrations.
+  rpc ListIntegrations(ListIntegrationsRequest) returns (ListIntegrationsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Get a single integration by name.
+  rpc GetIntegration(GetIntegrationRequest) returns (GetIntegrationResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create a new integration.
+  rpc CreateIntegration(CreateIntegrationRequest) returns (CreateIntegrationResponse);
+  // Update an existing integration.
+  rpc UpdateIntegration(UpdateIntegrationRequest) returns (UpdateIntegrationResponse);
+  // Delete an integration by name.
+  rpc DeleteIntegration(DeleteIntegrationRequest) returns (DeleteIntegrationResponse);
+  // Build an integration.
+  rpc BuildIntegration(BuildIntegrationRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      metadata_type: "BuildOperationMetadata"
+      response_type: "BuildIntegrationResponse"
+    };
+  }
+  // TODO: Batch build integrations.
+  // rpc BatchBuildIntegrations(BatchBuildIntegrationsRequest) returns (google.longrunning.Operation) {
+  //   option (google.longrunning.operation_info) = {
+  //     metadata_type: "BuildOperationMetadata"
+  //     response_type: "BuildIntegrationResponse"
+  //   };
+  // }
+}
+
+// ReflectService provides operations for reflecting on protobuf descriptors, services, methods, and types.
+service ReflectService {
+  // Get file descriptors for a connection or deployment resource.
+  rpc GetDescriptors(GetDescriptorsRequest) returns (GetDescriptorsResponse);
+  // Sync file descriptors for a connection or deployment resource. This can be
+  // used to update descriptors after changes.
+  rpc SyncDescriptors(SyncDescriptorsRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      response_type: "SyncDescriptorsResponse"
+      metadata_type: "SyncOperationMetadata"
+    };
+  }
+  // Get a service descriptor.
+  rpc GetService(GetServiceRequest) returns (GetServiceResponse);
+  // Get a method descriptor.
+  rpc GetMethod(GetMethodRequest) returns (GetMethodResponse);
+  // Get a type descriptor.
+  rpc GetType(GetTypeRequest) returns (GetTypeResponse);
+  // List service descriptors.
+  rpc ListServices(ListServicesRequest) returns (ListServicesResponse);
+  // List method descriptors.
+  rpc ListMethods(ListMethodsRequest) returns (ListMethodsResponse);
+  // List type descriptors.
+  rpc ListTypes(ListTypesRequest) returns (ListTypesResponse);
+}
+
+// EncryptionService provides data encryption and decryption operations.
+service EncryptionService {
+  // Encrypt data.
+  rpc Encrypt(EncryptRequest) returns (EncryptResponse);
+  // Decrypt data.
+  rpc Decrypt(DecryptRequest) returns (DecryptResponse);
+}

@@ -1,0 +1,19 @@
+{
+  "$id": "dtkt.blob.v1beta1.DeleteBlobResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "deleted": {
+      "default": false,
+      "description": "Indicates if the delete operation succeeded.",
+      "type": "boolean"
+    },
+    "etag": {
+      "default": "",
+      "description": "ETag of the deleted blob if reported.",
+      "type": "string"
+    }
+  },
+  "title": "Delete Blob Response",
+  "type": "object"
+}

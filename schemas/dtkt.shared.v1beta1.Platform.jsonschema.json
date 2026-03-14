@@ -1,0 +1,77 @@
+{
+  "$id": "dtkt.shared.v1beta1.Platform.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Operating system and CPU architecture pair.",
+  "properties": {
+    "arch": {
+      "anyOf": [
+        {
+          "pattern": "^ARCH_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "ARCH_X86",
+            "ARCH_AMD64",
+            "ARCH_ARM",
+            "ARCH_ARM64",
+            "ARCH_LOONG64",
+            "ARCH_MIPS",
+            "ARCH_MIPS64",
+            "ARCH_MIPS64LE",
+            "ARCH_MIPSLE",
+            "ARCH_PPC64",
+            "ARCH_PPC64LE",
+            "ARCH_RISCV64",
+            "ARCH_S390X",
+            "ARCH_WASM"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 14,
+          "minimum": 0,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "title": "Arch"
+    },
+    "os": {
+      "anyOf": [
+        {
+          "enum": [
+            "OS_LINUX",
+            "OS_DARWIN",
+            "OS_WINDOWS",
+            "OS_IOS",
+            "OS_ANDROID",
+            "OS_FREEBSD",
+            "OS_NETBSD",
+            "OS_OPENBSD",
+            "OS_SOLARIS",
+            "OS_ILLUMOS"
+          ],
+          "type": "string"
+        },
+        {
+          "exclusiveMaximum": 0,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "exclusiveMinimum": 0,
+          "maximum": 2147483647,
+          "type": "integer"
+        }
+      ],
+      "title": "OS"
+    }
+  },
+  "required": [
+    "os"
+  ],
+  "title": "Platform",
+  "type": "object"
+}

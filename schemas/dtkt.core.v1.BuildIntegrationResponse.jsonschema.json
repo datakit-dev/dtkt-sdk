@@ -1,0 +1,21 @@
+{
+  "$id": "dtkt.core.v1.BuildIntegrationResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "build": {
+      "$ref": "dtkt.core.v1.PackageBuildMetadata.jsonschema.json",
+      "description": "Package build metadata (must include artifact etag for a successful build)."
+    },
+    "integration": {
+      "$ref": "dtkt.core.v1.Integration.jsonschema.json",
+      "description": "Integration resource of build."
+    }
+  },
+  "required": [
+    "integration",
+    "build"
+  ],
+  "title": "Build Integration Response",
+  "type": "object"
+}

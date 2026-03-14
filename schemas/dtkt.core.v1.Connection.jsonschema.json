@@ -1,0 +1,145 @@
+{
+  "$id": "dtkt.core.v1.Connection.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Connection combines necessary components of a configured client to one of:\n - Deployment server with first-class configuration support using a DataKit SDK\n - Any reachable gRPC server with DIY configuration, one of:\n   - Custom proto file descriptors as a URI resolving to source .proto files\n   - Custom proto file descriptors using gRPC reflection (must be enabled on server)",
+  "patternProperties": {
+    "^(config_gen)$": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Generation of config data."
+    },
+    "^(config_hash)$": {
+      "default": "",
+      "description": "Hash of config data.",
+      "type": "string"
+    },
+    "^(config_uri)$": {
+      "default": "",
+      "description": "Config source uri (optional).",
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    },
+    "^(create_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Connection create time."
+    },
+    "^(custom_grpc)$": {
+      "description": "Custom using gRPC reflection.",
+      "type": "boolean"
+    },
+    "^(custom_protos)$": {
+      "description": "Custom proto descriptors URI.",
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    },
+    "^(decrypted_config)$": {
+      "$ref": "google.protobuf.Any.jsonschema.json",
+      "description": "Config data compatible with integration config schema."
+    },
+    "^(encrypted_config)$": {
+      "$ref": "dtkt.core.v1.EncryptedAny.jsonschema.json",
+      "description": "Encrypted config data."
+    },
+    "^(update_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Connection update time."
+    }
+  },
+  "properties": {
+    "address": {
+      "$ref": "dtkt.core.v1.Address.jsonschema.json",
+      "description": "Address of gRPC server."
+    },
+    "configGen": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Generation of config data."
+    },
+    "configHash": {
+      "default": "",
+      "description": "Hash of config data.",
+      "type": "string"
+    },
+    "configUri": {
+      "default": "",
+      "description": "Config source uri (optional).",
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    },
+    "createTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Connection create time."
+    },
+    "customGrpc": {
+      "description": "Custom using gRPC reflection.",
+      "type": "boolean"
+    },
+    "customProtos": {
+      "description": "Custom proto descriptors URI.",
+      "pattern": "^(?:(?:[a-zA-Z][a-zA-Z\\d+\\-.]*):)?(?://(?:[A-Za-z0-9\\-\\.]+(?::\\d+)?))?(/[^\\?#]*)?(?:\\?([^\\#]*))?(?:\\#(.*))?$",
+      "type": "string"
+    },
+    "decryptedConfig": {
+      "$ref": "google.protobuf.Any.jsonschema.json",
+      "description": "Config data compatible with integration config schema."
+    },
+    "deployment": {
+      "description": "Name of a deployment resource.",
+      "type": "string"
+    },
+    "encryptedConfig": {
+      "$ref": "dtkt.core.v1.EncryptedAny.jsonschema.json",
+      "description": "Encrypted config data."
+    },
+    "headers": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Headers applied when dialing connection.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "name": {
+      "type": "string"
+    },
+    "uid": {
+      "description": "Server-assigned unique ID (UUID).",
+      "minLength": 1,
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "type": "string"
+    },
+    "updateTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Connection update time."
+    }
+  },
+  "required": [
+    "name",
+    "uid",
+    "createTime",
+    "updateTime"
+  ],
+  "title": "Connection",
+  "type": "object"
+}

@@ -1,0 +1,17 @@
+{
+  "$id": "dtkt.command.v1beta1.ExecuteShellCommandsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The request for executing a stream of shell commands.",
+  "properties": {
+    "command": {
+      "$ref": "dtkt.command.v1beta1.ShellCommand.jsonschema.json",
+      "description": "Shell command to execute"
+    }
+  },
+  "required": [
+    "command"
+  ],
+  "title": "Execute Shell Commands Request",
+  "type": "object"
+}

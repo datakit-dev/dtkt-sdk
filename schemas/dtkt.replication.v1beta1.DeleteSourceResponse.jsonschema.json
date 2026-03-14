@@ -1,0 +1,20 @@
+{
+  "$id": "dtkt.replication.v1beta1.DeleteSourceResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response for delete configured Source.",
+  "properties": {
+    "deleted": {
+      "default": false,
+      "description": "Indicates whether Source was successfully deleted.",
+      "type": "boolean"
+    },
+    "error": {
+      "default": "",
+      "description": "An error message if deleted is false.",
+      "type": "string"
+    }
+  },
+  "title": "Delete Source Response",
+  "type": "object"
+}

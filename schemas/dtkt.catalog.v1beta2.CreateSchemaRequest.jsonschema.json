@@ -1,0 +1,33 @@
+{
+  "$id": "dtkt.catalog.v1beta2.CreateSchemaRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Create schema request.",
+  "patternProperties": {
+    "^(schema_id)$": {
+      "description": "Schema identifier, e.g. final segment in resource name: `.../schemas/{schema}`",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "parent": {
+      "description": "Parent catalog resource name.",
+      "type": "string"
+    },
+    "schema": {
+      "$ref": "dtkt.catalog.v1beta2.Schema.jsonschema.json",
+      "description": "Schema to create."
+    },
+    "schemaId": {
+      "description": "Schema identifier, e.g. final segment in resource name: `.../schemas/{schema}`",
+      "type": "string"
+    }
+  },
+  "required": [
+    "parent",
+    "schemaId",
+    "schema"
+  ],
+  "title": "Create Schema Request",
+  "type": "object"
+}

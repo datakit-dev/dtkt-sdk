@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package {{ $.PROTO_PKG }};
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-integrations/{{ $.PKG_SLUG }}/pkg/{{ $.PROTO_PATH }}";
+
+service GreetService {
+  rpc Greet(GreetRequest) returns (GreetResponse);
+}
+
+message GreetRequest {
+  string name = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message GreetResponse {
+  string message = 1;
+  google.protobuf.Timestamp timestamp = 2;
+}

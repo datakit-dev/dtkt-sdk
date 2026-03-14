@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.command.v1beta1.ExecuteShellCommandsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The response for executing a stream of shell commands.",
+  "properties": {
+    "output": {
+      "$ref": "dtkt.command.v1beta1.CommandOutput.jsonschema.json"
+    },
+    "result": {
+      "$ref": "dtkt.command.v1beta1.CommandResult.jsonschema.json"
+    }
+  },
+  "title": "Execute Shell Commands Response",
+  "type": "object"
+}

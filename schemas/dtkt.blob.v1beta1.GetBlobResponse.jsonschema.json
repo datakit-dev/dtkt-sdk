@@ -1,0 +1,115 @@
+{
+  "$id": "dtkt.blob.v1beta1.GetBlobResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(cache_control)$": {
+      "default": "",
+      "description": "CacheControl specifies caching attributes that services may use\n when serving the blob.\n https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control",
+      "type": "string"
+    },
+    "^(content_disposition)$": {
+      "default": "",
+      "description": "ContentDisposition specifies whether the blob content is expected to be\n displayed inline or as an attachment.\n https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition",
+      "type": "string"
+    },
+    "^(content_encoding)$": {
+      "default": "",
+      "description": "ContentEncoding specifies the encoding used for the blob's content, if any.\n https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding",
+      "type": "string"
+    },
+    "^(content_language)$": {
+      "default": "",
+      "description": "ContentLanguage specifies the language used in the blob's content, if any.\n https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Language",
+      "type": "string"
+    },
+    "^(content_type)$": {
+      "default": "",
+      "description": "ContentType is the MIME type of the blob. It will not be empty.\n https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type",
+      "type": "string"
+    },
+    "^(create_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "CreateTime is the time the blob was created, if available. If not available,\n CreateTime will be the zero time."
+    },
+    "^(mod_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "ModTime is the time the blob was last modified."
+    }
+  },
+  "properties": {
+    "cacheControl": {
+      "default": "",
+      "description": "CacheControl specifies caching attributes that services may use\n when serving the blob.\n https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control",
+      "type": "string"
+    },
+    "contentDisposition": {
+      "default": "",
+      "description": "ContentDisposition specifies whether the blob content is expected to be\n displayed inline or as an attachment.\n https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition",
+      "type": "string"
+    },
+    "contentEncoding": {
+      "default": "",
+      "description": "ContentEncoding specifies the encoding used for the blob's content, if any.\n https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding",
+      "type": "string"
+    },
+    "contentLanguage": {
+      "default": "",
+      "description": "ContentLanguage specifies the language used in the blob's content, if any.\n https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Language",
+      "type": "string"
+    },
+    "contentType": {
+      "default": "",
+      "description": "ContentType is the MIME type of the blob. It will not be empty.\n https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type",
+      "type": "string"
+    },
+    "createTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "CreateTime is the time the blob was created, if available. If not available,\n CreateTime will be the zero time."
+    },
+    "etag": {
+      "default": "",
+      "description": "ETag for the blob; see https://en.wikipedia.org/wiki/HTTP_ETag.",
+      "type": "string"
+    },
+    "key": {
+      "default": "",
+      "description": "Key of blob of retrieved attributes.",
+      "type": "string"
+    },
+    "md5": {
+      "default": "",
+      "description": "MD5 is an MD5 hash of the blob contents or nil if not available.",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Metadata holds key/value pairs associated with the blob.\n Keys are guaranteed to be in lowercase, even if the backend service\n has case-sensitive keys (although note that Metadata written via\n this package will always be lowercased). If there are duplicate\n case-insensitive keys (e.g., \"foo\" and \"FOO\"), only one value\n will be kept, and it is undefined which one.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "modTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "ModTime is the time the blob was last modified."
+    },
+    "size": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Size is the size of the blob's content in bytes."
+    }
+  },
+  "title": "Get Blob Response",
+  "type": "object"
+}

@@ -1,0 +1,18 @@
+{
+  "$id": "dtkt.shared.v1beta1.Param.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a parameterized value used in a query, input/output, etc.",
+  "properties": {
+    "field": {
+      "$ref": "dtkt.shared.v1beta1.Field.jsonschema.json",
+      "description": "Field describing the param data."
+    },
+    "value": {
+      "$ref": "google.protobuf.Any.jsonschema.json",
+      "description": "Value of the parameter, if any."
+    }
+  },
+  "title": "Param",
+  "type": "object"
+}

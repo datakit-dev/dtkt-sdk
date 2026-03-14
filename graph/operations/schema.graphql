@@ -1,0 +1,75 @@
+fragment SchemaRefFragment on SchemaRef {
+  id
+  name
+  description
+  alias
+  autoSync
+  syncStatus
+  syncError
+  syncedAt
+  catalogID
+  createdAt
+  updatedAt
+  deletedAt
+}
+
+query GetSchema($id: ID!) {
+  schema(id: $id) {
+    ...SchemaRefFragment
+  }
+}
+
+query ListSchemas($orderBy: [SchemaRefOrder!], $where: SchemaRefWhereInput) {
+  schemas(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...SchemaRefFragment
+      }
+    }
+    totalCount
+  }
+}
+
+query SchemasDeleted {
+  schemasDeleted {
+    ...SchemaRefFragment
+  }
+}
+
+mutation CreateSchema($input: CreateSchemaRefInput!) {
+  createSchema(input: $input) {
+    created
+    error
+    schemaRef {
+      ...SchemaRefFragment
+    }
+  }
+}
+
+mutation SyncSchema($id: ID!, $autoSync: Boolean) {
+  syncSchema(id: $id, autoSync: $autoSync) {
+    updated
+    error
+    schemaRef {
+      ...SchemaRefFragment
+    }
+  }
+}
+
+mutation UpdateSchema($id: ID!, $input: UpdateSchemaRefInput!) {
+  updateSchema(id: $id, input: $input) {
+    updated
+    error
+    schemaRef {
+      ...SchemaRefFragment
+    }
+  }
+}
+
+mutation DeleteSchema($id: ID!, $softDelete: Boolean) {
+  deleteSchema(id: $id, softDelete: $softDelete) {
+    deleted
+    error
+    id
+  }
+}

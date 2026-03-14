@@ -1,0 +1,110 @@
+{
+  "$id": "dtkt.blob.v1beta1.ReadBlobLinesRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(json_array_mode)$": {
+      "default": false,
+      "description": "JSON array mode: if true (when line_format is JSON), expects root JSON array; if false, expects newline-delimited JSON (default).",
+      "type": "boolean"
+    },
+    "^(line_format)$": {
+      "anyOf": [
+        {
+          "pattern": "^LINE_FORMAT_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "LINE_FORMAT_RAW",
+            "LINE_FORMAT_JSON"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Format of lines to read (default: LINE_FORMAT_RAW if unspecified).",
+      "title": "Line Format"
+    },
+    "^(max_size)$": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Max size (in bytes) of individual line."
+    }
+  },
+  "properties": {
+    "bucket": {
+      "default": "",
+      "description": "Bucket to read blob (may be optional).",
+      "type": "string"
+    },
+    "delimiter": {
+      "default": "",
+      "description": "Line delimiter; default: \\n.",
+      "type": "string"
+    },
+    "jsonArrayMode": {
+      "default": false,
+      "description": "JSON array mode: if true (when line_format is JSON), expects root JSON array; if false, expects newline-delimited JSON (default).",
+      "type": "boolean"
+    },
+    "key": {
+      "description": "Key of blob to read.",
+      "type": "string"
+    },
+    "lineFormat": {
+      "anyOf": [
+        {
+          "pattern": "^LINE_FORMAT_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "LINE_FORMAT_RAW",
+            "LINE_FORMAT_JSON"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "description": "Format of lines to read (default: LINE_FORMAT_RAW if unspecified).",
+      "title": "Line Format"
+    },
+    "maxSize": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Max size (in bytes) of individual line."
+    }
+  },
+  "required": [
+    "key"
+  ],
+  "title": "Read Blob Lines Request",
+  "type": "object"
+}

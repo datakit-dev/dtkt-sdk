@@ -1,0 +1,27 @@
+{
+  "$id": "dtkt.catalog.v1beta2.UpdateSchemaRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Update schema request.",
+  "patternProperties": {
+    "^(update_mask)$": {
+      "$ref": "google.protobuf.FieldMask.jsonschema.json",
+      "description": "Fields to update."
+    }
+  },
+  "properties": {
+    "schema": {
+      "$ref": "dtkt.catalog.v1beta2.Schema.jsonschema.json",
+      "description": "Schema with updated fields"
+    },
+    "updateMask": {
+      "$ref": "google.protobuf.FieldMask.jsonschema.json",
+      "description": "Fields to update."
+    }
+  },
+  "required": [
+    "schema"
+  ],
+  "title": "Update Schema Request",
+  "type": "object"
+}

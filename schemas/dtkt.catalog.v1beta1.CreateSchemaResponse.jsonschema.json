@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.catalog.v1beta1.CreateSchemaResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response message for creating a schema.",
+  "properties": {
+    "created": {
+      "default": false,
+      "description": "Indicates if the schema was successfully created.",
+      "type": "boolean"
+    },
+    "error": {
+      "default": "",
+      "description": "Error message, if any.",
+      "type": "string"
+    },
+    "schema": {
+      "$ref": "dtkt.catalog.v1beta1.Schema.jsonschema.json",
+      "description": "The created schema."
+    }
+  },
+  "title": "Create Schema Response",
+  "type": "object"
+}

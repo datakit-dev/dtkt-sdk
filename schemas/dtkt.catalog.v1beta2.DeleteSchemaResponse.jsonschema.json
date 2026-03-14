@@ -1,0 +1,9 @@
+{
+  "$id": "dtkt.catalog.v1beta2.DeleteSchemaResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response message for deleting a schema.",
+  "properties": {},
+  "title": "Delete Schema Response",
+  "type": "object"
+}

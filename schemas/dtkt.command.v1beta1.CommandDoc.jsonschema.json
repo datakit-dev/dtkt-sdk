@@ -1,0 +1,48 @@
+{
+  "$id": "dtkt.command.v1beta1.CommandDoc.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Describes a command.",
+  "patternProperties": {
+    "^(inherited_flags)$": {
+      "items": {
+        "$ref": "dtkt.command.v1beta1.FlagDoc.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "properties": {
+    "examples": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "flags": {
+      "items": {
+        "$ref": "dtkt.command.v1beta1.FlagDoc.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "inheritedFlags": {
+      "items": {
+        "$ref": "dtkt.command.v1beta1.FlagDoc.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "long": {
+      "default": "",
+      "type": "string"
+    },
+    "short": {
+      "default": "",
+      "type": "string"
+    },
+    "usage": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Command Doc",
+  "type": "object"
+}

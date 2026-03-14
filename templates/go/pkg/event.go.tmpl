@@ -1,0 +1,54 @@
+package pkg
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk/v1beta1"
+)
+
+type (
+	TestEvent        struct {
+		Message string `json:"message,omitempty"`
+	}
+	TestEventHandler func(context.Context, *v1beta1.EventRegistry) (*v1beta1.EventWithPayload, error)
+)
+
+var Events = []v1beta1.RegisterEventFunc[*Instance]{
+	v1beta1.RegisterEvent[*Instance, *TestEvent](
+		"TestEvent",
+		"A simple test event with a message.",
+	),
+}
+
+var EventSources = []v1beta1.RegisterSourceFunc[*Instance]{
+	v1beta1.NewPullSource(
+		"TestEventSource",
+		"A simple test event source which emits a test event with a random message every second.",
+		false, true,
+		time.Second,
+		NewTestEventHandler,
+	),
+}
+
+func NewTestEventHandler(_ context.Context, _ v1beta1.InstanceMux[*Instance], _ struct{}) (TestEventHandler, error) {
+	return TestEventHandler(func(ctx context.Context, events *v1beta1.EventRegistry) (*v1beta1.EventWithPayload, error) {
+		event, err := events.Find("TestEvent")
+		if err != nil {
+			return nil, err
+		}
+
+		return event.WithPayload(&TestEvent{
+			Message: fmt.Sprintf("Test event emitted at: %s", time.Now()),
+		})
+	}), nil
+}
+
+func (h TestEventHandler) PullEvent(ctx context.Context, events *v1beta1.EventRegistry) (*v1beta1.EventWithPayload, error) {
+	return h(ctx, events)
+}
+
+func (h TestEventHandler) ConfigEqual(struct{}) bool { return true }
+
+func (h TestEventHandler) Close() error              { return nil }

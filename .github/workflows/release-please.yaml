@@ -1,0 +1,29 @@
+name: Release Please
+
+on:
+  push:
+    branches:
+    - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    name: Release Please
+    runs-on: ${{ vars.RUNNER }}
+
+    steps:
+    - uses: googleapis/release-please-action@v4
+      id: release
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Reminder to update license notices
+      if: ${{ steps.release.outputs.prs_created == 'true' }}
+      run: |
+        echo "::notice::Release PR created! Before merging, checkout the PR branch."
+        echo "::notice::Validate there are no generation changes:%0A  task generate"
+        echo "::notice::Update the license notices for both SDKs (if needed):%0A  cd sdk-go && task legal:update-license-notices%0A  cd sdk-ts && task legal:update-license-notices"
+        echo "::notice::Review the changes, then commit and push them to the PR branch."

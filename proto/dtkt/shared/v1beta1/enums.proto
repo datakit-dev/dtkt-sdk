@@ -1,0 +1,152 @@
+syntax = "proto3";
+
+package dtkt.shared.v1beta1;
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1";
+
+// Which step of auth we're performing.
+enum AuthCheck {
+  AUTH_CHECK_UNSPECIFIED = 0; // ask integration to decide the next step
+  AUTH_CHECK_OAUTH_CODE = 1; // request authorization URL
+  AUTH_CHECK_OAUTH_CALLBACK = 2; // exchange authorization_code
+  AUTH_CHECK_OAUTH_REFRESH = 3; // refresh existing credentials
+}
+
+// Auth type exposed by a service (extensible later).
+enum AuthType {
+  AUTH_TYPE_UNSPECIFIED = 0;
+  AUTH_TYPE_OAUTH = 1;
+}
+
+// PKCE method (when used).
+enum CodeChallengeMethod {
+  CODE_CHALLENGE_METHOD_UNSPECIFIED = 0;
+  CODE_CHALLENGE_METHOD_PLAIN = 1;
+  CODE_CHALLENGE_METHOD_S256 = 2;
+}
+
+// How client credentials are sent to the token endpoint (optional).
+enum AuthStyle {
+  AUTH_STYLE_UNSPECIFIED = 0; // let provider/library decide
+  AUTH_STYLE_IN_PARAMS = 1; // client_id/secret in body
+  AUTH_STYLE_IN_HEADER = 2; // HTTP Basic (Authorization:)
+}
+
+// Enum representing event types.
+enum ActionType {
+  // Unspecified action.
+  ACTION_TYPE_UNSPECIFIED = 0;
+
+  // Create action.
+  ACTION_TYPE_CREATE = 1;
+
+  // Update action.
+  ACTION_TYPE_UPDATE = 2;
+
+  // Delete action.
+  ACTION_TYPE_DELETE = 3;
+
+  // Write action.
+  ACTION_TYPE_WRITE = 4;
+
+  // Read action.
+  ACTION_TYPE_READ = 5;
+
+  // View action.
+  ACTION_TYPE_VIEW = 6;
+}
+
+// Enum representing json data types.
+enum JSONType {
+  // Unspecified JSON type.
+  JSON_TYPE_UNSPECIFIED = 0;
+
+  // String JSON type.
+  JSON_TYPE_STRING = 1;
+
+  // Number JSON type.
+  JSON_TYPE_NUMBER = 2;
+
+  // Integer JSON type.
+  JSON_TYPE_INTEGER = 3;
+
+  // Boolean JSON type.
+  JSON_TYPE_BOOLEAN = 4;
+
+  // Object JSON type.
+  JSON_TYPE_OBJECT = 5;
+
+  // Array JSON type.
+  JSON_TYPE_ARRAY = 6;
+
+  // Null JSON type.
+  JSON_TYPE_NULL = 7;
+}
+
+// Enum representing geo data types.
+enum GeoType {
+  // Unspecified Geo type.
+  GEO_TYPE_UNSPECIFIED = 0;
+
+  // GeoJSON Geo type.
+  GEO_TYPE_JSON = 1;
+
+  // WKT (well-known text) Geo type.
+  GEO_TYPE_WKT = 2;
+
+  // WKB (well-known binary) Geo type.
+  GEO_TYPE_WKB = 3;
+}
+
+// Supported package types.
+enum PackageType {
+  // Unspecified package type.
+  PACKAGE_TYPE_UNSPECIFIED = 0;
+
+  // Go package type.
+  PACKAGE_TYPE_GO = 1;
+
+  // Node package type.
+  PACKAGE_TYPE_NODE = 2;
+}
+
+// Supported runtimes.
+enum Runtime {
+  RUNTIME_UNSPECIFIED = 0;
+  RUNTIME_NATIVE = 1;
+  RUNTIME_DOCKER = 2;
+}
+
+// Supported operating systems.
+enum OS {
+  OS_UNSPECIFIED = 0;
+  OS_LINUX = 1;
+  OS_DARWIN = 2;
+  OS_WINDOWS = 3;
+  OS_IOS = 4;
+  OS_ANDROID = 5;
+  OS_FREEBSD = 6;
+  OS_NETBSD = 7;
+  OS_OPENBSD = 8;
+  OS_SOLARIS = 9;
+  OS_ILLUMOS = 10;
+}
+
+// Supported CPU Architectures.
+enum Arch {
+  ARCH_UNSPECIFIED = 0;
+  ARCH_X86 = 1; // GOARCH=386
+  ARCH_AMD64 = 2; // GOARCH=amd64
+  ARCH_ARM = 3; // GOARCH=arm
+  ARCH_ARM64 = 4; // GOARCH=arm64
+  ARCH_LOONG64 = 5; // GOARCH=loong64
+  ARCH_MIPS = 6; // GOARCH=mips
+  ARCH_MIPS64 = 7; // GOARCH=mips64
+  ARCH_MIPS64LE = 8; // GOARCH=mips64le
+  ARCH_MIPSLE = 9; // GOARCH=mipsle
+  ARCH_PPC64 = 10; // GOARCH=ppc64
+  ARCH_PPC64LE = 11; // GOARCH=ppc64le
+  ARCH_RISCV64 = 12; // GOARCH=riscv64
+  ARCH_S390X = 13; // GOARCH=s390x
+  ARCH_WASM = 14; // GOARCH=wasm
+}

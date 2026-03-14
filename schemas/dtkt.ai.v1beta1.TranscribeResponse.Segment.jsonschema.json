@@ -1,0 +1,27 @@
+{
+  "$id": "dtkt.ai.v1beta1.TranscribeResponse.Segment.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(end_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json"
+    },
+    "^(start_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json"
+    }
+  },
+  "properties": {
+    "endTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json"
+    },
+    "startTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json"
+    },
+    "text": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Segment",
+  "type": "object"
+}

@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.protoui.v1beta1.File.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "File upload input\n Maps to file input components",
+  "patternProperties": {
+    "^(allowed_types)$": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "properties": {
+    "allowedTypes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "title": "File",
+  "type": "object"
+}

@@ -1,0 +1,35 @@
+{
+  "$id": "dtkt.catalog.v1beta1.CreateTableRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request message for creating a table in a schema.",
+  "properties": {
+    "description": {
+      "default": "",
+      "description": "Description of the new table.",
+      "type": "string"
+    },
+    "fields": {
+      "description": "Fields of the new table.",
+      "items": {
+        "$ref": "dtkt.shared.v1beta1.Field.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "metadata": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "Metadata of the table, if any."
+    },
+    "name": {
+      "default": "",
+      "description": "Name of the new table.",
+      "type": "string"
+    },
+    "schema": {
+      "$ref": "dtkt.catalog.v1beta1.Schema.jsonschema.json",
+      "description": "Reference to the schema where the table will be created."
+    }
+  },
+  "title": "Create Table Request",
+  "type": "object"
+}

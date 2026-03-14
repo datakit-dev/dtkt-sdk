@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.core.v1.SendAutomationEvent.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "SendAutomationEvent represents an event sent to an automation.",
+  "patternProperties": {
+    "^(inputs_event)$": {
+      "$ref": "dtkt.core.v1.SendAutomationEvent.InputsEvent.jsonschema.json"
+    },
+    "^(user_response_event)$": {
+      "$ref": "dtkt.core.v1.SendAutomationEvent.UserResponseEvent.jsonschema.json"
+    }
+  },
+  "properties": {
+    "inputsEvent": {
+      "$ref": "dtkt.core.v1.SendAutomationEvent.InputsEvent.jsonschema.json"
+    },
+    "userResponseEvent": {
+      "$ref": "dtkt.core.v1.SendAutomationEvent.UserResponseEvent.jsonschema.json"
+    }
+  },
+  "title": "Send Automation Event",
+  "type": "object"
+}

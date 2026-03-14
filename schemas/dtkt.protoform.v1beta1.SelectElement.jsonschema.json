@@ -1,0 +1,40 @@
+{
+  "$id": "dtkt.protoform.v1beta1.SelectElement.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Select element",
+  "patternProperties": {
+    "^(field_name)$": {
+      "default": "",
+      "type": "string"
+    },
+    "^(method_name)$": {
+      "default": "",
+      "type": "string"
+    },
+    "^(option_key)$": {
+      "$ref": "dtkt.protoform.v1beta1.ValueAccessor.jsonschema.json"
+    },
+    "^(option_value)$": {
+      "$ref": "dtkt.protoform.v1beta1.ValueAccessor.jsonschema.json"
+    }
+  },
+  "properties": {
+    "fieldName": {
+      "default": "",
+      "type": "string"
+    },
+    "methodName": {
+      "default": "",
+      "type": "string"
+    },
+    "optionKey": {
+      "$ref": "dtkt.protoform.v1beta1.ValueAccessor.jsonschema.json"
+    },
+    "optionValue": {
+      "$ref": "dtkt.protoform.v1beta1.ValueAccessor.jsonschema.json"
+    }
+  },
+  "title": "Select Element",
+  "type": "object"
+}

@@ -1,0 +1,26 @@
+{
+  "$id": "dtkt.core.v1.UpdateFlowRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(update_mask)$": {
+      "$ref": "google.protobuf.FieldMask.jsonschema.json",
+      "description": "Fields to update (e.g., \"spec\")."
+    }
+  },
+  "properties": {
+    "flow": {
+      "$ref": "dtkt.core.v1.Flow.jsonschema.json",
+      "description": "Flow with updated fields. Must include `name`."
+    },
+    "updateMask": {
+      "$ref": "google.protobuf.FieldMask.jsonschema.json",
+      "description": "Fields to update (e.g., \"spec\")."
+    }
+  },
+  "required": [
+    "flow"
+  ],
+  "title": "Update Flow Request",
+  "type": "object"
+}

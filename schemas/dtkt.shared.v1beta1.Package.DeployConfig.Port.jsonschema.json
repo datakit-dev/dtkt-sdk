@@ -1,0 +1,27 @@
+{
+  "$id": "dtkt.shared.v1beta1.Package.DeployConfig.Port.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "description": {
+      "default": "",
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "port": {
+      "type": "string"
+    },
+    "protocol": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "protocol",
+    "port"
+  ],
+  "title": "Port",
+  "type": "object"
+}

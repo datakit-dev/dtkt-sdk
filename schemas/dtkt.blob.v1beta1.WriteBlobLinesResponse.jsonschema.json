@@ -1,0 +1,15 @@
+{
+  "$id": "dtkt.blob.v1beta1.WriteBlobLinesResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "results": {
+      "items": {
+        "$ref": "dtkt.blob.v1beta1.WriteBlobLinesResponse.KeyResult.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Write Blob Lines Response",
+  "type": "object"
+}

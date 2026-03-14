@@ -1,0 +1,13 @@
+{
+  "$id": "dtkt.replication.v1beta1.GetDestinationResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response for replication Destination of given provider.",
+  "properties": {
+    "destination": {
+      "$ref": "dtkt.replication.v1beta1.Destination.jsonschema.json"
+    }
+  },
+  "title": "Get Destination Response",
+  "type": "object"
+}

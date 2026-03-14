@@ -1,0 +1,19 @@
+{
+  "$id": "dtkt.core.v1.BatchCreateAutomationsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "automations": {
+      "description": "The created automations.",
+      "items": {
+        "$ref": "dtkt.core.v1.Automation.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "automations"
+  ],
+  "title": "Batch Create Automations Response",
+  "type": "object"
+}

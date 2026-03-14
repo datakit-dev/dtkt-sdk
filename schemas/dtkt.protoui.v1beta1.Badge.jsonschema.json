@@ -1,0 +1,18 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Badge.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Render as a badge with optional color.\n Maps to Badge in @dtkt/ui/badge\n Use CEL expressions to generate badge text.\n The message or field is available as `this` in the expression context.\n Example: `this.status` or `string(this.count) + \" items\"` or `this.is_active ? \"Active\" : \"Inactive\"`",
+  "properties": {
+    "color": {
+      "description": "Color name from the UI theme (e.g., \"red\", \"blue\", \"green\", \"zinc\").\n Defaults to \"zinc\" if not specified.",
+      "type": "string"
+    },
+    "content": {
+      "description": "CEL expression that evaluates to a string for the badge text.\n Context: `this` is the message or field being rendered.\n If not specified, uses the field value directly.",
+      "type": "string"
+    }
+  },
+  "title": "Badge",
+  "type": "object"
+}

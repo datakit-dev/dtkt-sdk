@@ -1,0 +1,52 @@
+{
+  "$id": "dtkt.protoui.v1beta1.MultiSelect.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Multi-select input allowing multiple selections.\n Maps to multi-select or checkbox group components\n Use CEL expressions to generate select options.\n The message or field is available as `this` in the expression context.\n Example options: `this.available_tags`",
+  "patternProperties": {
+    "^(item_field)$": {
+      "default": "",
+      "description": "Field name to be used as the option value.",
+      "type": "string"
+    },
+    "^(label_field)$": {
+      "default": "",
+      "description": "Field name to be used as the option label.",
+      "type": "string"
+    },
+    "^(option_key)$": {
+      "default": "",
+      "description": "CEL expression for option keys.\n Context: `this` is the message or field being rendered.",
+      "type": "string"
+    },
+    "^(option_value)$": {
+      "default": "",
+      "description": "CEL expression for option values.\n Context: `this` is the message or field being rendered.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "itemField": {
+      "default": "",
+      "description": "Field name to be used as the option value.",
+      "type": "string"
+    },
+    "labelField": {
+      "default": "",
+      "description": "Field name to be used as the option label.",
+      "type": "string"
+    },
+    "optionKey": {
+      "default": "",
+      "description": "CEL expression for option keys.\n Context: `this` is the message or field being rendered.",
+      "type": "string"
+    },
+    "optionValue": {
+      "default": "",
+      "description": "CEL expression for option values.\n Context: `this` is the message or field being rendered.",
+      "type": "string"
+    }
+  },
+  "title": "Multi Select",
+  "type": "object"
+}

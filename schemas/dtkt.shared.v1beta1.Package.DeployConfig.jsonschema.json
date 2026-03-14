@@ -1,0 +1,26 @@
+{
+  "$id": "dtkt.shared.v1beta1.Package.DeployConfig.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "env": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Deploy environment variables.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "ports": {
+      "description": "Ports exposed by package (excluding assigned gRPC bind address).",
+      "items": {
+        "$ref": "dtkt.shared.v1beta1.Package.DeployConfig.Port.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Deploy Config",
+  "type": "object"
+}

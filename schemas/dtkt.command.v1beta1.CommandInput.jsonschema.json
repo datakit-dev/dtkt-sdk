@@ -1,0 +1,42 @@
+{
+  "$id": "dtkt.command.v1beta1.CommandInput.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A single stdin chunk or signal for streaming commands.",
+  "properties": {
+    "eof": {
+      "default": false,
+      "type": "boolean"
+    },
+    "signal": {
+      "anyOf": [
+        {
+          "pattern": "^SIGNAL_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "SIGNAL_SIGINT",
+            "SIGNAL_SIGTERM",
+            "SIGNAL_SIGKILL"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "title": "Signal"
+    },
+    "stdin": {
+      "default": null,
+      "pattern": "^[A-Za-z0-9+/]*={0,2}$",
+      "type": "string"
+    }
+  },
+  "title": "Command Input",
+  "type": "object"
+}

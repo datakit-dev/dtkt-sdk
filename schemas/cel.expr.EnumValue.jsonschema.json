@@ -1,0 +1,30 @@
+{
+  "$id": "cel.expr.EnumValue.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "An enum value.",
+  "properties": {
+    "type": {
+      "default": "",
+      "description": "The fully qualified name of the enum type.",
+      "type": "string"
+    },
+    "value": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The value of the enum."
+    }
+  },
+  "title": "Enum Value",
+  "type": "object"
+}

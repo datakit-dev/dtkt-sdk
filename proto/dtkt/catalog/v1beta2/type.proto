@@ -1,0 +1,120 @@
+syntax = "proto3";
+
+package dtkt.catalog.v1beta2;
+
+import "buf/validate/validate.proto";
+import "dtkt/protoform/v1beta1/protoform.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta2";
+
+enum TypeKind {
+  TYPE_KIND_UNSPECIFIED = 0;
+  TYPE_KIND_BOOL = 1;
+  TYPE_KIND_BYTES = 2;
+  TYPE_KIND_DOUBLE = 3;
+  TYPE_KIND_ENUM = 4;
+  TYPE_KIND_FLOAT = 5;
+  TYPE_KIND_INT32 = 6;
+  TYPE_KIND_INT64 = 7;
+  TYPE_KIND_STRING = 8;
+  TYPE_KIND_UINT32 = 9;
+  TYPE_KIND_UINT64 = 10;
+  TYPE_KIND_JSON = 11;
+  TYPE_KIND_OBJECT = 12;
+  TYPE_KIND_DURATION = 13;
+  TYPE_KIND_TIMESTAMP = 14;
+  // TYPE_KIND_SFIXED32 = 12;
+  // TYPE_KIND_SFIXED64 = 13;
+  // TYPE_KIND_SINT32 = 14;
+  // TYPE_KIND_SINT64 = 15;
+}
+
+// Type encodes a catalog implementation's native data type with a corresponding
+// kind and additional JSON, Geospatial, and type parameters.
+message Type {
+  // Name of the implementation's native type: (e.g. VARCHAR, BIGINT, etc.).
+  string name = 1;
+
+  // Kind of the type as defined in this package.
+  TypeKind kind = 2;
+
+  // Corresponding JSON type representation, if any.
+  JSONType json_type = 3;
+
+  // Corresponding Geo type representation, if any.
+  GeoType geo_type = 4;
+
+  // Type parameters, if any: e.g. (parametric types such as VARCHAR(10), DECIMAL(22, 5), etc.)
+  repeated string parameters = 10;
+}
+
+// Field encodes a named type (see above) definition of a value found in
+// the context of a table read/write or query param/result.
+message Field {
+  // Name of the field.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Type of the field.
+  Type type = 2 [(buf.validate.field).required = true];
+
+  // Description of the field.
+  string description = 3;
+
+  // Indicates if the field allows null values (i.e. a corresponding value is
+  // allowed to be null in the context of a table or query).
+  bool nullable = 4;
+
+  // Indicates if the field contains repeated values (i.e. value's kind is
+  // expected to be a ListValue with each value conforming to this field's
+  // type.
+  bool repeated = 5;
+
+  // Fields are nested named type definitions if this field type's kind
+  // corresponds with either an object or a JSON value.
+  repeated Field fields = 6;
+
+  // Protoform field element for runtime dynamic form UI.
+  dtkt.protoform.v1beta1.FieldElement element = 7;
+}
+
+// Enum representing json data types.
+enum JSONType {
+  // Unspecified JSON type.
+  JSON_TYPE_UNSPECIFIED = 0;
+
+  // String JSON type.
+  JSON_TYPE_STRING = 1;
+
+  // Number JSON type (float).
+  JSON_TYPE_NUMBER = 2;
+
+  // Integer JSON type (int).
+  JSON_TYPE_INTEGER = 3;
+
+  // Boolean JSON type.
+  JSON_TYPE_BOOLEAN = 4;
+
+  // Object JSON type.
+  JSON_TYPE_OBJECT = 5;
+
+  // Array JSON type.
+  JSON_TYPE_ARRAY = 6;
+
+  // Null JSON type.
+  JSON_TYPE_NULL = 7;
+}
+
+// Enum representing geo data types.
+enum GeoType {
+  // Unspecified Geo type.
+  GEO_TYPE_UNSPECIFIED = 0;
+
+  // GeoJSON Geo type.
+  GEO_TYPE_GEO_JSON = 1;
+
+  // WKT (well-known text) Geo type.
+  GEO_TYPE_WKT = 2;
+
+  // WKB (well-known binary) Geo type.
+  GEO_TYPE_WKB = 3;
+}

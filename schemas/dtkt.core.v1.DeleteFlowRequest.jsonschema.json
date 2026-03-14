@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.DeleteFlowRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "description": "Name of flow to delete.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Delete Flow Request",
+  "type": "object"
+}

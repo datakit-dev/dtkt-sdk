@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.catalog.v1beta1.CreateTableResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response message for creating a table.",
+  "properties": {
+    "created": {
+      "default": false,
+      "description": "Indicates if the table was successfully created.",
+      "type": "boolean"
+    },
+    "error": {
+      "default": "",
+      "description": "Error message, if any.",
+      "type": "string"
+    },
+    "table": {
+      "$ref": "dtkt.catalog.v1beta1.Table.jsonschema.json",
+      "description": "The created table."
+    }
+  },
+  "title": "Create Table Response",
+  "type": "object"
+}

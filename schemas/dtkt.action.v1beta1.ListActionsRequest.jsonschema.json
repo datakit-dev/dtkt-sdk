@@ -1,0 +1,56 @@
+{
+  "$id": "dtkt.action.v1beta1.ListActionsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(page_size)$": {
+      "anyOf": [
+        {
+          "maximum": 1000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Number of actions to return per page (0–1000). Leave empty or set to 0 for the server default."
+    },
+    "^(page_token)$": {
+      "default": "",
+      "description": "Token from a previous response's `next_page_token` to retrieve the next page of results.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "filter": {
+      "default": "",
+      "description": "Optional filter expression to narrow results. Supported fields: `display_name`, `version`, `labels.\u003ckey\u003e`, `disabled`.",
+      "type": "string"
+    },
+    "pageSize": {
+      "anyOf": [
+        {
+          "maximum": 1000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Number of actions to return per page (0–1000). Leave empty or set to 0 for the server default."
+    },
+    "pageToken": {
+      "default": "",
+      "description": "Token from a previous response's `next_page_token` to retrieve the next page of results.",
+      "type": "string"
+    }
+  },
+  "title": "List Actions Request",
+  "type": "object"
+}

@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.ReceiveAutomationEventsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "description": "Name of Automation resource to receive events.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Receive Automation Events Request",
+  "type": "object"
+}

@@ -1,0 +1,41 @@
+{
+  "$id": "dtkt.ai.v1beta1.Message.Content.ToolResult.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(is_error)$": {
+      "default": false,
+      "type": "boolean"
+    },
+    "^(tool_call_id)$": {
+      "default": "",
+      "type": "string"
+    },
+    "^(tool_name)$": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "isError": {
+      "default": false,
+      "type": "boolean"
+    },
+    "json": {
+      "$ref": "google.protobuf.Struct.jsonschema.json"
+    },
+    "proto": {
+      "$ref": "google.protobuf.Any.jsonschema.json"
+    },
+    "toolCallId": {
+      "default": "",
+      "type": "string"
+    },
+    "toolName": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Tool Result",
+  "type": "object"
+}

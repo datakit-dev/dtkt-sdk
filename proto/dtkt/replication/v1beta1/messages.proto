@@ -1,0 +1,311 @@
+syntax = "proto3";
+
+package dtkt.replication.v1beta1;
+
+import "dtkt/replication/v1beta1/enums.proto";
+import "dtkt/shared/v1beta1/enums.proto";
+import "dtkt/shared/v1beta1/messages.proto";
+import "google/protobuf/any.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/replication/v1beta1";
+
+// Represents a replication Destination.
+message Destination {
+  // Unique identifier of Destination.
+  string id = 1;
+
+  // Unique identifier of destination type.
+  string type_id = 2;
+
+  // Name assigned to Destination.
+  string name = 3;
+
+  // Config for Destination.
+  google.protobuf.Any config = 4;
+}
+
+// Represents a configured replication Source.
+message Source {
+  // Unique identifier returned by Source.
+  string id = 1;
+
+  // Unique identifier of source type.
+  string type_id = 2;
+
+  // Unique identifier of Destination.
+  string destination_id = 3;
+
+  // Name assigned to Source.
+  string name = 4;
+
+  // Config for Source.
+  google.protobuf.Any config = 5;
+
+  // Sync status of the Source.
+  SyncStatus sync_status = 6;
+
+  // Sync error message when sync status is failed.
+  string sync_error = 7;
+}
+
+// Represents a supported destination type.
+message DestinationType {
+  // Unique identifier for destination type.
+  string id = 1;
+
+  // Name of destination type.
+  string name = 2;
+
+  // Description of destination type.
+  string description = 3;
+
+  // Icon URL of destination type.
+  string icon_url = 4;
+
+  // Category of destination type.
+  string category = 5;
+
+  // Schema for destination type.
+  dtkt.shared.v1beta1.TypeSchema config_schema = 6;
+}
+
+// Represents a supported replication source type.
+message SourceType {
+  // Unique identifier for source type.
+  string id = 1;
+
+  // Name of source type.
+  string name = 2;
+
+  // Description of source type.
+  string description = 3;
+
+  // Icon URL of source type.
+  string icon_url = 4;
+
+  // Category of source type.
+  string category = 5;
+
+  // Schema for source type.
+  dtkt.shared.v1beta1.TypeSchema config_schema = 6;
+
+  // Supported auth types for this source type.
+  repeated dtkt.shared.v1beta1.AuthType supported_auth_types = 7;
+}
+
+// Request for checking source auth.
+message CheckSourceAuthRequest {
+  // Unique identifier of source.
+  string source_id = 1;
+
+  // The auth check type.
+  dtkt.shared.v1beta1.AuthCheck type = 2;
+
+  // If auth type response is OAuth.
+  oneof oauth {
+    // When check type is auth code url.
+    dtkt.shared.v1beta1.OAuthCodeRequest code_request = 3;
+
+    // When check type is callback.
+    dtkt.shared.v1beta1.OAuthTokenRequest token_request = 4;
+
+    // When check type is refresh.
+    dtkt.shared.v1beta1.OAuthRefreshRequest refresh_request = 5;
+  }
+}
+
+// Response for checking source auth.
+message CheckSourceAuthResponse {
+  // The auth type of this source.
+  dtkt.shared.v1beta1.AuthType type = 1;
+
+  // Indicates if the auth check was successful.
+  bool success = 2;
+
+  // Error message if success is false.
+  string error = 3;
+
+  // Present when type is OAuth.
+  oneof oauth {
+    // Returned when check is code.
+    string auth_code_url = 4;
+
+    // Returned when check type is token or refresh.
+    dtkt.shared.v1beta1.OAuthToken token = 5;
+  }
+
+  // Data for source type.
+  google.protobuf.Any config_data = 6;
+}
+
+// Request to retrieve a list of supported replication Sources.
+message ListSourceTypesRequest {}
+
+// Response to retrieve a list of supported replication Sources.
+message ListSourceTypesResponse {
+  repeated SourceType source_types = 1;
+}
+
+// Request for replication Source of given provider.
+message GetSourceRequest {
+  // Unique identifier of source type.
+  string type_id = 1;
+
+  // Unique identifier of Source.
+  string id = 2;
+}
+
+// Response for replication Source of given provider.
+message GetSourceResponse {
+  Source source = 1;
+}
+
+// Request to create configured Source.
+message CreateSourceRequest {
+  // Unique identifier of source type.
+  string type_id = 1;
+
+  // Name assigned to Source being created.
+  string name = 2;
+
+  // Config assigned to Source being created.
+  google.protobuf.Any config = 3;
+}
+
+// Response from create configured Source.
+message CreateSourceResponse {
+  // The returned Source.
+  Source source = 1;
+}
+
+// Request to update configured Source.
+message UpdateSourceRequest {
+  // Unique identifier of source type.
+  string type_id = 1;
+
+  // Unique identifier of Source.
+  string id = 2;
+
+  // source type overrides.
+  google.protobuf.Any config = 3;
+}
+
+// Response from update configured Source.
+message UpdateSourceResponse {
+  // The returned Source.
+  Source source = 1;
+}
+
+// Request to delete configured Source.
+message DeleteSourceRequest {
+  // Unique identifier of source type.
+  string type_id = 1;
+
+  // Unique identifier of Source.
+  string id = 2;
+}
+
+// Response for delete configured Source.
+message DeleteSourceResponse {}
+
+message StartSyncRequest {
+  // Unique identifier of Destination.
+  string destination_id = 1;
+
+  // Unique identifier of source type.
+  string type_id = 2;
+
+  // Unique identifier of Source.
+  string id = 3;
+}
+
+message StartSyncResponse {
+  // The returned Source.
+  Source source = 1;
+}
+
+message StopSyncRequest {
+  // Unique identifier of Destination.
+  string destination_id = 1;
+
+  // Unique identifier of source type.
+  string type_id = 2;
+
+  // Unique identifier of Source.
+  string id = 3;
+}
+
+message StopSyncResponse {
+  // The returned Source.
+  Source source = 1;
+}
+
+// Request to retrieve a list of supported destinations.
+message ListDestinationTypesRequest {}
+
+// List of Destinations.
+message ListDestinationTypesResponse {
+  repeated DestinationType destination_types = 1;
+}
+
+// Request for replication Destination of given provider.
+message GetDestinationRequest {
+  // Unique identifier of destination type.
+  string type_id = 1;
+
+  // Unique identifier of Destination.
+  string id = 2;
+}
+
+// Response for replication Destination of given provider.
+message GetDestinationResponse {
+  Destination destination = 1;
+}
+
+// Request to create configured destination.
+message CreateDestinationRequest {
+  // Unique identifier of destination type.
+  string type_id = 1;
+
+  // Name assigned to Destination.
+  string name = 2;
+
+  // Destination type overrides.
+  google.protobuf.Any config = 3;
+}
+
+// Response from create configured destination.
+message CreateDestinationResponse {
+  // The returned destination.
+  Destination destination = 1;
+}
+
+// Request to update configured destination.
+message UpdateDestinationRequest {
+  // Unique identifier of destination type.
+  string type_id = 1;
+
+  // Unique identifier of Destination.
+  string id = 2;
+
+  // Destination type overrides.
+  google.protobuf.Any config = 3;
+}
+
+// Response from update configured destination.
+message UpdateDestinationResponse {
+  // The returned destination.
+  Destination destination = 1;
+}
+
+// Request to delete configured destination.
+message DeleteDestinationRequest {
+  // Unique identifier of destination type.
+  string type_id = 1;
+
+  // Unique identifier of Destination.
+  string id = 2;
+}
+
+// Response for delete configured destination.
+message DeleteDestinationResponse {}

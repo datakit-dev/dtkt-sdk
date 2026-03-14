@@ -1,0 +1,67 @@
+{
+  "$id": "dtkt.command.v1beta1.CommandResult.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The result of a command execution.",
+  "patternProperties": {
+    "^(exit_code)$": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0
+    }
+  },
+  "properties": {
+    "duration": {
+      "$ref": "google.protobuf.Duration.jsonschema.json"
+    },
+    "exitCode": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "pattern": "^REASON_UNSPECIFIED$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "REASON_COMPLETED",
+            "REASON_TIMED_OUT",
+            "REASON_KILLED",
+            "REASON_FAILED_TO_START"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        }
+      ],
+      "default": 0,
+      "title": "Reason"
+    }
+  },
+  "title": "Command Result",
+  "type": "object"
+}

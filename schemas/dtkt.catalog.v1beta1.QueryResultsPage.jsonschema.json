@@ -1,0 +1,123 @@
+{
+  "$id": "dtkt.catalog.v1beta1.QueryResultsPage.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a page of query results.",
+  "patternProperties": {
+    "^(next_page)$": {
+      "default": "",
+      "description": "Token for the next page of results.",
+      "type": "string"
+    },
+    "^(prev_page)$": {
+      "default": "",
+      "description": "Token for the previous page of results.",
+      "type": "string"
+    },
+    "^(rows_count)$": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Number of rows in the current page."
+    },
+    "^(total_pages)$": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Total number of pages available."
+    },
+    "^(total_rows)$": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Total number of rows available."
+    }
+  },
+  "properties": {
+    "nextPage": {
+      "default": "",
+      "description": "Token for the next page of results.",
+      "type": "string"
+    },
+    "prevPage": {
+      "default": "",
+      "description": "Token for the previous page of results.",
+      "type": "string"
+    },
+    "rows": {
+      "description": "Rows in the current page.",
+      "items": {
+        "$ref": "google.protobuf.Struct.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "rowsCount": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Number of rows in the current page."
+    },
+    "totalPages": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Total number of pages available."
+    },
+    "totalRows": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Total number of rows available."
+    }
+  },
+  "title": "Query Results Page",
+  "type": "object"
+}

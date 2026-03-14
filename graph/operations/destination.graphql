@@ -1,0 +1,48 @@
+fragment DestinationFragment on Destination {
+  id
+  name
+  tzName
+  createdAt
+  updatedAt
+  providerID
+  connectionID
+  organizationID
+}
+
+query GetDestination($id: ID!) {
+  destination(id: $id) {
+    ...DestinationFragment
+  }
+}
+
+query ListDestinations(
+  $orderBy: DestinationOrder
+  $where: DestinationWhereInput
+) {
+  destinations(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...DestinationFragment
+      }
+    }
+    totalCount
+  }
+}
+
+mutation CreateDestination($input: CreateDestinationInput!) {
+  createDestination(input: $input) {
+    created
+    error
+    destination {
+      ...DestinationFragment
+    }
+  }
+}
+
+mutation DeleteDestination($id: ID!) {
+  deleteDestination(id: $id) {
+    deleted
+    error
+    id
+  }
+}

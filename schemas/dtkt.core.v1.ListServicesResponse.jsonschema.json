@@ -1,0 +1,25 @@
+{
+  "$id": "dtkt.core.v1.ListServicesResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(next_page_token)$": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "nextPageToken": {
+      "default": "",
+      "type": "string"
+    },
+    "services": {
+      "items": {
+        "$ref": "dtkt.core.v1.Service.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "List Services Response",
+  "type": "object"
+}

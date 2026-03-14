@@ -1,0 +1,15 @@
+{
+  "$id": "dtkt.geo.v1beta1.ListGeoSourcesRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "catalog": {
+      "$ref": "dtkt.catalog.v1beta1.Catalog.jsonschema.json"
+    },
+    "schema": {
+      "$ref": "dtkt.catalog.v1beta1.Schema.jsonschema.json"
+    }
+  },
+  "title": "List Geo Sources Request",
+  "type": "object"
+}

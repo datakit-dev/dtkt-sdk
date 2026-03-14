@@ -1,0 +1,12 @@
+{{ define "meta/additional" }}
+  {{- if $.Annotations.Protostore }}
+  // ProtostoreScanner of all {{ $.Name }} fields.
+  var ProtostoreScanner struct {
+    {{ range $f := $.Fields }}
+      {{- if $a := $f.Annotations.Protostore }}
+        {{ $f.StructField }} field.TypeValueScanner[{{ $f.Type }}]
+      {{- end }}
+    {{- end }}
+  }
+  {{- end }}
+{{ end }}

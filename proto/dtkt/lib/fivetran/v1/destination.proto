@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package dtkt.lib.fivetran.v1;
+
+import "buf/validate/validate.proto";
+import "dtkt/lib/fivetran/v1/destination_config.proto";
+import "dtkt/lib/fivetran/v1/destination_details.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/lib/fivetran/v1;fivetranv1";
+
+message Destination {
+  DestinationDetails details = 1 [(buf.validate.field).required = true];
+  DestinationConfig config = 2 [(buf.validate.field).required = true];
+}

@@ -1,0 +1,69 @@
+{
+  "$id": "dtkt.ai.v1beta1.StreamSpeechRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(output_media_type)$": {
+      "description": "Output media type, e.g., \"audio/mpeg\", \"audio/wav\", \"audio/ogg\"",
+      "pattern": "^audio/.*",
+      "type": "string"
+    },
+    "^(provider_options)$": {
+      "$ref": "google.protobuf.Struct.jsonschema.json"
+    }
+  },
+  "properties": {
+    "language": {
+      "description": "The language (input and output); an ISO-639-1 language code or 'auto' to auto-detect.\n Provider support may vary.",
+      "type": "string"
+    },
+    "messages": {
+      "description": "The input messages / prompts to be synthesized into speech",
+      "items": {
+        "$ref": "dtkt.ai.v1beta1.Message.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "outputMediaType": {
+      "description": "Output media type, e.g., \"audio/mpeg\", \"audio/wav\", \"audio/ogg\"",
+      "pattern": "^audio/.*",
+      "type": "string"
+    },
+    "providerOptions": {
+      "$ref": "google.protobuf.Struct.jsonschema.json"
+    },
+    "speed": {
+      "anyOf": [
+        {
+          "maximum": 3.4028234663852886e+38,
+          "minimum": -3.4028234663852886e+38,
+          "type": "number"
+        },
+        {
+          "enum": [
+            "Infinity",
+            "-Infinity",
+            "NaN"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "description": "Speech synthesis speed; range and meaning may vary by provider."
+    },
+    "text": {
+      "type": "string"
+    },
+    "voice": {
+      "description": "Provider specific voice identifier",
+      "type": "string"
+    }
+  },
+  "required": [
+    "text"
+  ],
+  "title": "Stream Speech Request",
+  "type": "object"
+}

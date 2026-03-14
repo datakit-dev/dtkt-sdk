@@ -1,0 +1,30 @@
+{
+  "$id": "dtkt.command.v1beta1.SSHConfig.IdentityFileAuth.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Identity file authentication",
+  "patternProperties": {
+    "^(file_path)$": {
+      "description": "Path to SSH private key file (e.g., ~/.ssh/id_ed25519)",
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "properties": {
+    "filePath": {
+      "description": "Path to SSH private key file (e.g., ~/.ssh/id_ed25519)",
+      "minLength": 1,
+      "type": "string"
+    },
+    "passphrase": {
+      "default": "",
+      "description": "Passphrase to decrypt encrypted key file (empty if not encrypted)",
+      "type": "string"
+    }
+  },
+  "required": [
+    "filePath"
+  ],
+  "title": "Identity File Auth",
+  "type": "object"
+}

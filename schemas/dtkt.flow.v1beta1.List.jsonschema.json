@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.flow.v1beta1.List.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "default": {
+      "$ref": "google.protobuf.ListValue.jsonschema.json"
+    },
+    "items": {
+      "description": "Type of list items: scalar type, nested list/map, or message type",
+      "minLength": 1,
+      "type": "string"
+    },
+    "nullable": {
+      "default": false,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "items"
+  ],
+  "title": "List",
+  "type": "object"
+}

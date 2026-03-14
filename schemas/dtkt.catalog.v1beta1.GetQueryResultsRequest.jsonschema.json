@@ -1,0 +1,59 @@
+{
+  "$id": "dtkt.catalog.v1beta1.GetQueryResultsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request to retrieve query results.",
+  "patternProperties": {
+    "^(page_size)$": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Number of rows per page."
+    }
+  },
+  "properties": {
+    "page": {
+      "default": "",
+      "description": "Token for the desired page.",
+      "type": "string"
+    },
+    "pageSize": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Number of rows per page."
+    },
+    "params": {
+      "description": "Parameters used in the query.",
+      "items": {
+        "$ref": "dtkt.shared.v1beta1.Param.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "query": {
+      "default": "",
+      "description": "The query to execute.",
+      "type": "string"
+    }
+  },
+  "title": "Get Query Results Request",
+  "type": "object"
+}

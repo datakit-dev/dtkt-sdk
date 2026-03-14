@@ -1,0 +1,24 @@
+{
+  "$id": "dtkt.blob.v1beta1.GenerateSignedURLResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(expires_at)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Expiration timestamp when the signed URL becomes invalid."
+    }
+  },
+  "properties": {
+    "expiresAt": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Expiration timestamp when the signed URL becomes invalid."
+    },
+    "url": {
+      "default": "",
+      "description": "Fully qualified signed URL.",
+      "type": "string"
+    }
+  },
+  "title": "Generate SignedURL Response",
+  "type": "object"
+}

@@ -1,0 +1,14 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Tree.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Render as a tree structure with expandable nodes.\n Maps to Tree in @dtkt/ui/tree\n Use CEL expressions to construct TreeNode messages from your data.\n The message or field is available as `this` in the expression context.\n Example: `this.folders.map(f, dtkt.protoui.v1beta1.Tree.TreeNode{label: dtkt.protoui.v1beta1.Data{text: f.name}, children: f.files.map(file, dtkt.protoui.v1beta1.Tree.TreeNode{label: dtkt.protoui.v1beta1.Data{text: file.name}})})`",
+  "properties": {
+    "nodes": {
+      "description": "CEL expression that evaluates to a list of TreeNode messages.\n Context: `this` is the message or field being rendered.\n If not specified, uses the field value directly.",
+      "type": "string"
+    }
+  },
+  "title": "Tree",
+  "type": "object"
+}

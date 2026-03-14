@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package dtkt.lib.fivetran.v1;
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/lib/fivetran/v1;fivetranv1";
+
+message DestinationConfig {
+  string auth = 1;
+
+  string auth_type = 2 [json_name = "auth_type"];
+
+  string bucket = 3;
+
+  string catalog = 4;
+
+  string client_id = 5 [json_name = "client_id"];
+
+  string cluster_id = 6 [json_name = "cluster_id"];
+
+  string cluster_region = 7 [json_name = "cluster_region"];
+
+  string connection_type = 8 [json_name = "connection_type"];
+
+  string container_name = 9 [json_name = "container_name"];
+
+  bool create_external_tables = 10 [json_name = "create_external_tables"];
+
+  string data_set_location = 11 [json_name = "data_set_location"];
+
+  string database = 12;
+
+  string external_location = 13 [json_name = "external_location"];
+
+  string fivetran_role_arn = 14 [json_name = "fivetran_role_arn"];
+
+  string host = 15;
+
+  string http_path = 16 [json_name = "http_path"];
+
+  bool is_private_key_encrypted = 17 [json_name = "is_private_key_encrypted"];
+
+  string lakehouse_name = 18 [json_name = "lakehouse_name"];
+
+  string passphrase = 19;
+
+  string password = 20;
+
+  string personal_access_token = 21 [json_name = "personal_access_token"];
+
+  int64 port = 22;
+
+  string prefix_path = 23 [json_name = "prefix_path"];
+
+  string private_key = 24 [json_name = "private_key"];
+
+  string project_id = 25 [json_name = "project_id"];
+
+  string region = 26;
+
+  string role = 27;
+
+  string role_arn = 28 [json_name = "role_arn"];
+
+  string secret_key = 29 [json_name = "secret_key"];
+
+  string secret_value = 30 [json_name = "secret_value"];
+
+  string server_host_name = 31 [json_name = "server_host_name"];
+
+  string storage_account_name = 32 [json_name = "storage_account_name"];
+
+  string tenant_id = 33 [json_name = "tenant_id"];
+
+  string tunnel_host = 34 [json_name = "tunnel_host"];
+
+  string tunnel_port = 35 [json_name = "tunnel_port"];
+
+  string tunnel_user = 36 [json_name = "tunnel_user"];
+
+  string user = 37;
+
+  string workspace_name = 38 [json_name = "workspace_name"];
+}

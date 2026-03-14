@@ -1,0 +1,23 @@
+{
+  "$id": "dtkt.catalog.v1beta1.GetTableRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request message for getting a specific table in a schema.",
+  "properties": {
+    "metadata": {
+      "$ref": "google.protobuf.Struct.jsonschema.json",
+      "description": "Metadata of the table, if any."
+    },
+    "name": {
+      "default": "",
+      "description": "Name of the table to retrieve.",
+      "type": "string"
+    },
+    "schema": {
+      "$ref": "dtkt.catalog.v1beta1.Schema.jsonschema.json",
+      "description": "Reference to the schema containing the table."
+    }
+  },
+  "title": "Get Table Request",
+  "type": "object"
+}

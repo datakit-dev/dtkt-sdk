@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.GetAutomationResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "automation": {
+      "$ref": "dtkt.core.v1.Automation.jsonschema.json",
+      "description": "The requested automation."
+    }
+  },
+  "required": [
+    "automation"
+  ],
+  "title": "Get Automation Response",
+  "type": "object"
+}

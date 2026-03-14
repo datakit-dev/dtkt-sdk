@@ -1,0 +1,9 @@
+{
+  "$id": "dtkt.catalog.v1beta1.GetQueryDialectRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request for retrieving the query dialect.",
+  "properties": {},
+  "title": "Get Query Dialect Request",
+  "type": "object"
+}

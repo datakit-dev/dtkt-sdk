@@ -1,0 +1,15 @@
+{
+  "$id": "dtkt.catalog.v1beta1.GetQueryDialectResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response containing the query dialect used by the service.",
+  "properties": {
+    "dialect": {
+      "default": "",
+      "description": "The query dialect (e.g., SQL).",
+      "type": "string"
+    }
+  },
+  "title": "Get Query Dialect Response",
+  "type": "object"
+}

@@ -1,0 +1,26 @@
+{
+  "$id": "dtkt.core.v1.UpdateConnectionRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(update_mask)$": {
+      "$ref": "google.protobuf.FieldMask.jsonschema.json",
+      "description": "Fields to update (e.g., \"config_data,integration\")."
+    }
+  },
+  "properties": {
+    "connection": {
+      "$ref": "dtkt.core.v1.Connection.jsonschema.json",
+      "description": "The connection with updated fields. Must include `name`."
+    },
+    "updateMask": {
+      "$ref": "google.protobuf.FieldMask.jsonschema.json",
+      "description": "Fields to update (e.g., \"config_data,integration\")."
+    }
+  },
+  "required": [
+    "connection"
+  ],
+  "title": "Update Connection Request",
+  "type": "object"
+}

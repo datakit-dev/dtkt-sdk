@@ -1,0 +1,63 @@
+{
+  "$id": "dtkt.blob.v1beta1.ListBlobsRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(page_size)$": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "maximum": 1000,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The maximum number of blobs to return. The service may return fewer than\n this value.\n If unspecified, at most 50 blobs will be returned.\n The maximum value is 1000; values above 1000 will be coerced to 1000."
+    },
+    "^(page_token)$": {
+      "default": "",
+      "description": "When paginating, all other parameters provided to `ListBlobs` must match\n the call that provided the page token.",
+      "title": "A page token, received from a previous `ListBlobs` call.\n Provide this to retrieve the subsequent page.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "bucket": {
+      "default": "",
+      "description": "Bucket to write blob (may be optional).",
+      "type": "string"
+    },
+    "pageSize": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "maximum": 1000,
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "The maximum number of blobs to return. The service may return fewer than\n this value.\n If unspecified, at most 50 blobs will be returned.\n The maximum value is 1000; values above 1000 will be coerced to 1000."
+    },
+    "pageToken": {
+      "default": "",
+      "description": "When paginating, all other parameters provided to `ListBlobs` must match\n the call that provided the page token.",
+      "title": "A page token, received from a previous `ListBlobs` call.\n Provide this to retrieve the subsequent page.",
+      "type": "string"
+    },
+    "prefix": {
+      "default": "",
+      "description": "Prefix indicates that only blobs with a key starting with this prefix\n should be returned.",
+      "type": "string"
+    }
+  },
+  "title": "List Blobs Request",
+  "type": "object"
+}

@@ -1,0 +1,82 @@
+{
+  "$id": "dtkt.ai.v1beta1.EmbeddingModel.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents an embedding model, including its ID, name, and supported dimensions.",
+  "patternProperties": {
+    "^(max_dimensions)$": {
+      "anyOf": [
+        {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Maximum number of dimensions supported by the model."
+    },
+    "^(min_dimensions)$": {
+      "anyOf": [
+        {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Minimum number of dimensions supported by the model."
+    }
+  },
+  "properties": {
+    "id": {
+      "default": "",
+      "description": "Unique identifier for the embedding model.",
+      "type": "string"
+    },
+    "maxDimensions": {
+      "anyOf": [
+        {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Maximum number of dimensions supported by the model."
+    },
+    "minDimensions": {
+      "anyOf": [
+        {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^[0-9]+$",
+          "type": "string"
+        }
+      ],
+      "default": 0,
+      "description": "Minimum number of dimensions supported by the model."
+    },
+    "name": {
+      "default": "",
+      "description": "Name of the embedding model.",
+      "type": "string"
+    }
+  },
+  "title": "Embedding Model",
+  "type": "object"
+}

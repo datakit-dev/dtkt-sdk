@@ -1,0 +1,34 @@
+fragment FlowFragment on Flow {
+  id
+  name
+  description
+  createdAt
+  updatedAt
+}
+
+query GetFlow($id: ID, $slug: String) {
+  flow(id: $id, slug: $slug) {
+    ...FlowFragment
+  }
+}
+
+query ListFlows($orderBy: FlowOrder, $where: FlowWhereInput) {
+  flows(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...FlowFragment
+      }
+    }
+    totalCount
+  }
+}
+
+mutation CreateFlow($input: CreateFlowInput!) {
+  createFlow(input: $input) {
+    created
+    error
+    flow {
+      ...FlowFragment
+    }
+  }
+}

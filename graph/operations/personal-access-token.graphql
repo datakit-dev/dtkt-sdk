@@ -1,0 +1,70 @@
+fragment PersonalAccessTokenFragment on PersonalAccessToken {
+  id
+  name
+  token
+  userID
+  expiresAt
+  createdAt
+  updatedAt
+}
+
+query GetPersonalAccessToken($id: ID, $token: String) {
+  personalAccessToken(id: $id, token: $token) {
+    ...PersonalAccessTokenFragment
+  }
+}
+
+query ListPersonalAccessTokens(
+  $orderBy: PersonalAccessTokenOrder
+  $where: PersonalAccessTokenWhereInput
+) {
+  personalAccessTokens(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...PersonalAccessTokenFragment
+      }
+    }
+    totalCount
+  }
+}
+
+mutation CreatePersonalAccessToken($input: CreatePersonalAccessTokenInput!) {
+  createPersonalAccessToken(input: $input) {
+    created
+    error
+    personalAccessToken {
+      ...PersonalAccessTokenFragment
+    }
+  }
+}
+
+mutation UpdatePersonalAccessToken(
+  $id: ID!
+  $input: UpdatePersonalAccessTokenInput!
+) {
+  updatePersonalAccessToken(id: $id, input: $input) {
+    updated
+    error
+    personalAccessToken {
+      ...PersonalAccessTokenFragment
+    }
+  }
+}
+
+mutation RotatePersonalAccessToken($id: ID, $token: String) {
+  rotatePersonalAccessToken(id: $id, token: $token) {
+    updated
+    error
+    personalAccessToken {
+      ...PersonalAccessTokenFragment
+    }
+  }
+}
+
+mutation DeletePersonalAccessToken($token: String!) {
+  deletePersonalAccessToken(token: $token) {
+    deleted
+    error
+    id
+  }
+}

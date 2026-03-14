@@ -1,0 +1,36 @@
+{
+  "$id": "dtkt.core.v1.CreateFlowRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(flow_id)$": {
+      "description": "Client-provided ID for flow resource.",
+      "minLength": 1,
+      "pattern": "^[a-z0-9-]+$",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "flow": {
+      "$ref": "dtkt.core.v1.Flow.jsonschema.json",
+      "description": "Flow to create."
+    },
+    "flowId": {
+      "description": "Client-provided ID for flow resource.",
+      "minLength": 1,
+      "pattern": "^[a-z0-9-]+$",
+      "type": "string"
+    },
+    "parent": {
+      "description": "Parent resource name: organizations/{organization} or users/{user}.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "parent",
+    "flowId",
+    "flow"
+  ],
+  "title": "Create Flow Request",
+  "type": "object"
+}

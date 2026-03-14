@@ -1,0 +1,72 @@
+{
+  "$id": "dtkt.core.v1.UpdateDeploymentRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(desired_state)$": {
+      "anyOf": [
+        {
+          "enum": [
+            "RUNNING",
+            "STOPPED"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2,
+          "minimum": 2,
+          "type": "integer"
+        },
+        {
+          "maximum": 4,
+          "minimum": 4,
+          "type": "integer"
+        }
+      ],
+      "description": "Desired state of deployment after update.",
+      "title": "State"
+    },
+    "^(update_mask)$": {
+      "$ref": "google.protobuf.FieldMask.jsonschema.json",
+      "description": "Fields to update (e.g., \"config,address\")."
+    }
+  },
+  "properties": {
+    "deployment": {
+      "$ref": "dtkt.core.v1.Deployment.jsonschema.json",
+      "description": "Deployment with updated fields. Must include `name`."
+    },
+    "desiredState": {
+      "anyOf": [
+        {
+          "enum": [
+            "RUNNING",
+            "STOPPED"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 2,
+          "minimum": 2,
+          "type": "integer"
+        },
+        {
+          "maximum": 4,
+          "minimum": 4,
+          "type": "integer"
+        }
+      ],
+      "description": "Desired state of deployment after update.",
+      "title": "State"
+    },
+    "updateMask": {
+      "$ref": "google.protobuf.FieldMask.jsonschema.json",
+      "description": "Fields to update (e.g., \"config,address\")."
+    }
+  },
+  "required": [
+    "deployment"
+  ],
+  "title": "Update Deployment Request",
+  "type": "object"
+}

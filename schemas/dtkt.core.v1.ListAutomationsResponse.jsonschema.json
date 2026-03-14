@@ -1,0 +1,31 @@
+{
+  "$id": "dtkt.core.v1.ListAutomationsResponse.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(next_page_token)$": {
+      "default": "",
+      "description": "Token for retrieving the next page.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "automations": {
+      "description": "The list of automations.",
+      "items": {
+        "$ref": "dtkt.core.v1.Automation.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "nextPageToken": {
+      "default": "",
+      "description": "Token for retrieving the next page.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "automations"
+  ],
+  "title": "List Automations Response",
+  "type": "object"
+}

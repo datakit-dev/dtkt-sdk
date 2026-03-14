@@ -1,0 +1,333 @@
+syntax = "proto3";
+
+package dtkt.command.v1beta1;
+
+import "buf/validate/validate.proto";
+import "dtkt/command/v1beta1/enums.proto";
+import "google/protobuf/duration.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/command/v1beta1";
+
+// Configuration for remote SSH execution.
+message SSHConfig {
+  // Private key authentication
+  message PrivateKeyAuth {
+    // Private key in raw bytes (PEM or OpenSSH format)
+    bytes key_data = 1 [
+      (buf.validate.field).required = true,
+      debug_redact = true
+    ];
+
+    // Passphrase to decrypt encrypted private key (empty if not encrypted)
+    string passphrase = 2 [debug_redact = true];
+  }
+
+  // Identity file authentication
+  message IdentityFileAuth {
+    // Path to SSH private key file (e.g., ~/.ssh/id_ed25519)
+    string file_path = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.min_len = 1
+    ];
+
+    // Passphrase to decrypt encrypted key file (empty if not encrypted)
+    string passphrase = 2 [debug_redact = true];
+  }
+
+  // Known hosts configuration
+  message KnownHosts {
+    repeated string file_paths = 1;
+  }
+
+  // Hostname or IP address and port of the SSH server
+  string address = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.host_and_port = true
+  ];
+
+  // Username for SSH authentication
+  string user = 2 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+
+  // Authentication method
+  // If not provided, uses SSH agent by default (matches SSH CLI behavior)
+  oneof auth {
+    // Private key authentication
+    PrivateKeyAuth private_key = 3;
+
+    // Identity file authentication
+    IdentityFileAuth identity_file = 4;
+
+    // Password authentication (not recommended - use key-based auth)
+    string password = 5 [debug_redact = true];
+  }
+
+  // Host key verification method
+  // If unset, defaults to Trust On First Use (TOFU) using ~/.ssh/known_hosts_tofu
+  oneof host_key_verification {
+    // Trust On First Use: Accept any key on first connection, store it,
+    // then verify against stored key on subsequent connections.
+    // Specifies custom path for storing trusted keys.
+    string tofu_file_path = 6;
+
+    // Verify against known_hosts files (uses default locations if empty)
+    KnownHosts known_hosts = 7;
+
+    // Verify against specific fingerprint (SHA256 or MD5 format)
+    // Examples: "SHA256:abc123..." or "MD5:12:34:56:..."
+    // Get fingerprint: `ssh-keyscan -p <port> <host> 2>/dev/null | ssh-keygen -lf -`
+    string fingerprint = 8;
+
+    // Skip verification (INSECURE)
+    bool insecure_skip_verify = 9;
+  }
+
+  // ProxyCommand to tunnel SSH connection through another command
+  // Example: `cloudflared access ssh --hostname %h`
+  // Supports variable expansion: `%h=hostname`, `%p=port`, `%r=remote-user`
+  // Takes precedence over config_file_path ProxyCommand if both are set
+  string proxy_command = 10;
+
+  // Path to SSH config file for default settings
+  // If unset, defaults to ~/.ssh/config
+  // Explicit settings above take precedence over config file values
+  string config_file_path = 11;
+}
+
+// Describes a command.
+message CommandDoc {
+  string usage = 1;
+  string short = 2;
+  string long = 3;
+  repeated string examples = 4;
+  repeated FlagDoc flags = 5;
+  repeated FlagDoc inherited_flags = 6;
+}
+
+// Describes a command flag.
+message FlagDoc {
+  string name = 1;
+  string shorthand = 2;
+  string usage = 3;
+  string default_value = 4;
+}
+
+message Command {
+  string name = 1;
+  string description = 2;
+  repeated CommandDoc commands = 3;
+}
+
+message ListCommandsResponse {
+  repeated Command commands = 1;
+}
+
+message GetCommandRequest {
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetCommandResponse {
+  repeated Command command = 1;
+}
+
+// A command to execute.
+message ExecutableCommand {
+  // Command executable.
+  string command = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+
+  repeated string args = 2; // Arguments to pass to the command
+
+  string workdir = 3; // Optional working directory
+  map<string, string> env = 4; // Optional environment variables
+  google.protobuf.Duration timeout = 5; // Optional execution timeout; defaults to no timeout
+
+  // Indicates whether this command expects stdin input.
+  // When false, stdin is not opened (command has no stdin).
+  // When true, stdin is opened and remains available for streaming input until EOF is explicitly sent.
+  // Default: false (most commands don't need stdin)
+  bool expects_stdin = 6;
+}
+
+// A shell command to execute.
+message ShellCommand {
+  // The shell command (supports pipes and redirects).
+  string command = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+
+  string workdir = 3; // Optional working directory
+  map<string, string> env = 4; // Optional environment variables
+  google.protobuf.Duration timeout = 5; // Optional execution timeout; defaults to no timeout
+
+  // Indicates whether this command expects stdin input.
+  // When false, stdin is not opened (command has no stdin).
+  // When true, stdin is opened and remains available for streaming input until EOF is explicitly sent.
+  // Default: false (most commands don't need stdin)
+  bool expects_stdin = 6;
+}
+
+// A single stdin chunk or signal for streaming commands.
+message CommandInput {
+  bytes stdin = 1; // User input
+  bool eof = 2; // End of input
+  Signal signal = 3; // Signal to send (e.g., SIGTERM)
+}
+
+// stdout and stderr chunks
+message CommandOutput {
+  bytes stdout = 1; // Standard output chunk
+  bytes stderr = 2; // Standard error chunk
+}
+
+// The result of a command execution.
+message CommandResult {
+  enum Reason {
+    REASON_UNSPECIFIED = 0; // Unspecified reason
+    REASON_COMPLETED = 1; // Command completed successfully
+    REASON_TIMED_OUT = 2; // Command timed out
+    REASON_KILLED = 3; // Command was killed
+    REASON_FAILED_TO_START = 4; // Command failed to start
+  }
+
+  int32 exit_code = 1; // Exit code of the command
+  Reason reason = 2; // Reason for command termination
+
+  google.protobuf.Duration duration = 3; // Duration of the command execution
+}
+
+message BatchResult {
+  CommandOutput output = 1; // Output (stdout/stderr)
+  CommandResult result = 2; // Final command result
+}
+
+// The request for executing a command.
+message ExecuteCommandRequest {
+  // The command to execute
+  ExecutableCommand command = 1 [(buf.validate.field).required = true];
+  CommandInput input = 2;
+}
+
+// The response for executing a command.
+message ExecuteCommandResponse {
+  CommandResult result = 1; // The command result
+  CommandOutput output = 2; // Output (stdout/stderr)
+}
+
+// The request for executing a stream of commands.
+message ExecuteCommandsRequest {
+  // Command to execute
+  ExecutableCommand command = 1 [(buf.validate.field).required = true];
+}
+
+// The response for executing a stream of commands.
+message ExecuteCommandsResponse {
+  CommandResult result = 1; // Final command result
+  CommandOutput output = 2; // Output (stdout/stderr)
+}
+
+// The request for streaming a single command.
+message ExecuteStreamedCommandRequest {
+  ExecutableCommand command = 1; // First message to initialize the command
+  CommandInput input = 2; // Subsequent messages for stdin or signals
+}
+
+// The response for streaming a single command.
+message ExecuteStreamedCommandResponse {
+  CommandOutput output = 1; // Output (stdout/stderr)
+  CommandResult result = 2; // Final command result
+}
+
+// The request for executing a batch of commands.
+message ExecuteBatchCommandsRequest {
+  repeated ExecutableCommand commands = 1; // Commands to execute
+}
+
+// The response for executing a batch of commands.
+message ExecuteBatchCommandsResponse {
+  repeated BatchResult results = 1; // Results for each command
+}
+
+// The request for executing a shell command.
+message ExecuteShellCommandRequest {
+  // The shell command to execute
+  ShellCommand command = 1 [(buf.validate.field).required = true];
+}
+
+// The response for executing a shell command.
+message ExecuteShellCommandResponse {
+  CommandResult result = 1; // The command result
+  CommandOutput output = 2; // Output (stdout/stderr)
+}
+
+// The request for executing a stream of shell commands.
+message ExecuteShellCommandsRequest {
+  // Shell command to execute
+  ShellCommand command = 1 [(buf.validate.field).required = true];
+}
+
+// The response for executing a stream of shell commands.
+message ExecuteShellCommandsResponse {
+  CommandResult result = 1; // The command result
+  CommandOutput output = 2; // Output (stdout/stderr)
+}
+
+// The request for streaming a single shell command.
+message ExecuteStreamedShellCommandRequest {
+  ShellCommand command = 1; // First message to initialize the command
+  CommandInput input = 2; // Subsequent messages for stdin or signals
+}
+
+// The response for streaming a single shell command.
+message ExecuteStreamedShellCommandResponse {
+  CommandResult result = 1; // Final command result
+  CommandOutput output = 2; // Output (stdout/stderr)
+}
+
+// The request for executing a batch of shell commands.
+message ExecuteBatchShellCommandsRequest {
+  repeated ShellCommand commands = 1; // Commands to execute
+}
+
+// The response for executing a batch of shell commands.
+message ExecuteBatchShellCommandsResponse {
+  repeated BatchResult results = 1; // Results for each shell command
+}
+
+// The request for a terminal session and streaming in input.
+message TerminalSessionRequest {
+  message Dimensions {
+    int32 cols = 1; // Number of columns in the terminal
+    int32 rows = 2; // Number of rows in the terminal
+  }
+
+  // Configuration for starting a terminal session.
+  message StartEvent {
+    string workdir = 2; // Optional working directory
+    map<string, string> env = 3; // Optional environment variables
+
+    // Terminal dimensions
+    Dimensions dimensions = 5 [(buf.validate.field).required = true];
+  }
+
+  message ResizeEvent {
+    // New terminal dimensions
+    Dimensions dimensions = 1 [(buf.validate.field).required = true];
+  }
+
+  StartEvent start = 1; // First message to initialize the terminal session
+  ResizeEvent resize = 2; // Resize event for the terminal
+  CommandInput input = 3; // Subsequent messages for stdin or signals
+}
+
+// The response for a terminal session.
+message TerminalSessionResponse {
+  CommandOutput output = 1; // Output from the terminal session
+}

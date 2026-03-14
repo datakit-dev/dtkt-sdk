@@ -1,0 +1,47 @@
+{
+  "$id": "dtkt.cli.v1beta1.ConfigFile.Cloud.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(auth_url)$": {
+      "default": "",
+      "description": "DataKit Cloud Auth URL",
+      "pattern": "^https://[\\w.-]+(:\\d+)?(/.*)?$",
+      "type": "string"
+    },
+    "^(graph_url)$": {
+      "default": "",
+      "description": "DataKit Cloud Graph URL",
+      "pattern": "^https://[\\w.-]+(:\\d+)?(/.*)?$",
+      "type": "string"
+    },
+    "^(schemas_url)$": {
+      "default": "",
+      "description": "DataKit Cloud Schemas URL",
+      "pattern": "^https://[\\w.-]+(:\\d+)?(/.*)?$",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "authUrl": {
+      "default": "",
+      "description": "DataKit Cloud Auth URL",
+      "pattern": "^https://[\\w.-]+(:\\d+)?(/.*)?$",
+      "type": "string"
+    },
+    "graphUrl": {
+      "default": "",
+      "description": "DataKit Cloud Graph URL",
+      "pattern": "^https://[\\w.-]+(:\\d+)?(/.*)?$",
+      "type": "string"
+    },
+    "schemasUrl": {
+      "default": "",
+      "description": "DataKit Cloud Schemas URL",
+      "pattern": "^https://[\\w.-]+(:\\d+)?(/.*)?$",
+      "type": "string"
+    }
+  },
+  "title": "Cloud",
+  "type": "object"
+}

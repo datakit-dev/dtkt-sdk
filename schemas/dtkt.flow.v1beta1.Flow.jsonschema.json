@@ -1,0 +1,55 @@
+{
+  "$id": "dtkt.flow.v1beta1.Flow.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "actions": {
+      "items": {
+        "$ref": "dtkt.flow.v1beta1.Action.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "connections": {
+      "items": {
+        "$ref": "dtkt.flow.v1beta1.Connection.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "description": {
+      "default": "",
+      "type": "string"
+    },
+    "inputs": {
+      "items": {
+        "$ref": "dtkt.flow.v1beta1.Input.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "name": {
+      "type": "string"
+    },
+    "outputs": {
+      "items": {
+        "$ref": "dtkt.flow.v1beta1.Output.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "streams": {
+      "items": {
+        "$ref": "dtkt.flow.v1beta1.Stream.jsonschema.json"
+      },
+      "type": "array"
+    },
+    "vars": {
+      "items": {
+        "$ref": "dtkt.flow.v1beta1.Var.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Flow",
+  "type": "object"
+}

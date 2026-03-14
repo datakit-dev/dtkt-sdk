@@ -1,0 +1,126 @@
+{
+  "$id": "dtkt.core.v1.Deployment.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Deployment is a running instance of an Integration with context aware build\n and runtime configuration. Deployments provide a way to run and manage software\n packages represented by Integrations in compatible runtime environments, enabling\n users to easily deploy and run their software packages in a consistent and\n traceable manner within the DataKit ecosystem.",
+  "patternProperties": {
+    "^(config_schema)$": {
+      "$ref": "dtkt.core.v1.TypeSchema.jsonschema.json",
+      "description": "Package config metadata fetched at runtime from server."
+    },
+    "^(create_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Deployment create time."
+    },
+    "^(package_spec)$": {
+      "$ref": "dtkt.core.v1.PackageSpecMetadata.jsonschema.json",
+      "description": "Package spec metadata fetched at runtime from server."
+    },
+    "^(update_time)$": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Deployment update time."
+    }
+  },
+  "properties": {
+    "address": {
+      "$ref": "dtkt.core.v1.Address.jsonschema.json",
+      "description": "Bind address of deployment gRPC server."
+    },
+    "build": {
+      "$ref": "dtkt.core.v1.Deployment.Build.jsonschema.json",
+      "description": "Build context for deployment, including reference to integration and build\n metadata (must include artifact etag for a successful build). This enables\n cross-control plane deployments where the integration resource is defined\n in a different control plane than where it is deployed (e.g. integration\n defined in shared cloud control plane and deployed to a user control plane,\n or vice versa)."
+    },
+    "cloud": {
+      "$ref": "dtkt.core.v1.Deployment.Cloud.jsonschema.json",
+      "description": "Cloud context with encrypted config for binding deployment to DataKit Cloud\n and only present when address's network is \"cloud\"."
+    },
+    "configSchema": {
+      "$ref": "dtkt.core.v1.TypeSchema.jsonschema.json",
+      "description": "Package config metadata fetched at runtime from server."
+    },
+    "createTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Deployment create time."
+    },
+    "env": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Env vars applied at runtime.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "etag": {
+      "description": "Etag for concurrency control of deployment updates (must match current etag\n to update or delete).",
+      "type": "string"
+    },
+    "name": {
+      "description": "Name of deployment resource.",
+      "type": "string"
+    },
+    "packageSpec": {
+      "$ref": "dtkt.core.v1.PackageSpecMetadata.jsonschema.json",
+      "description": "Package spec metadata fetched at runtime from server."
+    },
+    "ports": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Port mappings applied at runtime.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "runtime": {
+      "$ref": "dtkt.core.v1.Deployment.RuntimeMetadata.jsonschema.json",
+      "description": "Runtime metadata of deployment, including runtime-specific information such as process ID or container ID."
+    },
+    "state": {
+      "anyOf": [
+        {
+          "enum": [
+            "PENDING",
+            "RUNNING",
+            "STOPPING",
+            "STOPPED",
+            "FAILED"
+          ],
+          "type": "string"
+        },
+        {
+          "maximum": 5,
+          "minimum": 1,
+          "type": "integer"
+        }
+      ],
+      "title": "State"
+    },
+    "uid": {
+      "description": "Server-assigned unique ID (UUID).",
+      "minLength": 1,
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "type": "string"
+    },
+    "updateTime": {
+      "$ref": "google.protobuf.Timestamp.jsonschema.json",
+      "description": "Deployment update time."
+    }
+  },
+  "required": [
+    "name",
+    "uid",
+    "state",
+    "address",
+    "build",
+    "configSchema",
+    "packageSpec",
+    "etag",
+    "createTime",
+    "updateTime"
+  ],
+  "title": "Deployment",
+  "type": "object"
+}

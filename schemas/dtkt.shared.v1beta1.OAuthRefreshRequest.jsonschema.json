@@ -1,0 +1,30 @@
+{
+  "$id": "dtkt.shared.v1beta1.OAuthRefreshRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^(refresh_token)$": {
+      "default": "",
+      "description": "Typically empty: integration uses its stored refresh token.\n Allow optional override to support migrations or manual repairs.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "params": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "refreshToken": {
+      "default": "",
+      "description": "Typically empty: integration uses its stored refresh token.\n Allow optional override to support migrations or manual repairs.",
+      "type": "string"
+    }
+  },
+  "title": "O Auth Refresh Request",
+  "type": "object"
+}

@@ -1,0 +1,515 @@
+syntax = "proto3";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta1";
+
+package dtkt.catalog.v1beta1;
+
+import "dtkt/shared/v1beta1/messages.proto";
+import "google/protobuf/struct.proto";
+
+// Represents a catalog, which organizes schemas and tables.
+message Catalog {
+  // Name of the catalog.
+  string name = 1;
+
+  // Description of the catalog.
+  string description = 2;
+
+  // Additional metadata, if any.
+  google.protobuf.Struct metadata = 3;
+}
+
+// Represents a schema, which organizes tables.
+message Schema {
+  // Reference to the catalog containing the schema.
+  Catalog catalog = 1;
+
+  // Name of the schema.
+  string name = 2;
+
+  // Description of the schema.
+  string description = 3;
+
+  // Additional metadata, if any.
+  google.protobuf.Struct metadata = 4;
+}
+
+// Represents a table within a schema.
+message Table {
+  // Reference to the schema containing the table.
+  Schema schema = 1;
+
+  // Name of the table.
+  string name = 2;
+
+  // Description of the table.
+  string description = 3;
+
+  // List of fields contained by the table.
+  repeated dtkt.shared.v1beta1.Field fields = 4;
+
+  // Statistics about the table (e.g., row count), if any.
+  TableStats stats = 5;
+
+  // Additional metadata, if any.
+  google.protobuf.Struct metadata = 6;
+}
+
+// TableStats contains statistics about a table.
+message TableStats {
+  // The total number of rows in the table.
+  int64 total_rows = 1;
+
+  // The total size of the table in bytes.
+  int64 total_bytes = 2;
+}
+
+// Represents a query and its associated details.
+message Query {
+  // Indicates if the query is valid.
+  bool valid = 1;
+
+  // Error message, if any.
+  string error = 2;
+
+  // The query dialect used.
+  string dialect = 3;
+
+  // The query string.
+  string query = 4;
+
+  // List of fields returned by the query.
+  repeated dtkt.shared.v1beta1.Field fields = 5;
+
+  // Parameters used in the query, if any.
+  repeated dtkt.shared.v1beta1.Param params = 6;
+}
+
+// Request for retrieving the query dialect.
+message GetQueryDialectRequest {}
+
+// Response containing the query dialect used by the service.
+message GetQueryDialectResponse {
+  // The query dialect (e.g., SQL).
+  string dialect = 1;
+}
+
+// Request for retrieving data types.
+message ListDataTypesRequest {}
+
+// Response containing supported data types.
+message ListDataTypesResponse {
+  // List of supported data types.
+  repeated dtkt.shared.v1beta1.DataType types = 1;
+}
+
+// Request to retrieve a catalog by name.
+message GetCatalogRequest {
+  // Name of the catalog.
+  string name = 1;
+
+  // Metadata of the catalog, if any.
+  google.protobuf.Struct metadata = 2;
+}
+
+// Response containing catalog details.
+message GetCatalogResponse {
+  // The requested catalog.
+  Catalog catalog = 1;
+}
+
+// Request message for retrieving all schemas.
+message ListSchemasRequest {
+  // The catalog request containing catalog information.
+  Catalog catalog = 1;
+}
+
+// Response message for getting schemas.
+message ListSchemasResponse {
+  // The retrieved schema.
+  Schema schema = 1;
+}
+
+// Request message for retrieving a specific schema.
+message GetSchemaRequest {
+  // The catalog request containing catalog information.
+  Catalog catalog = 1;
+
+  // The name of the schema to retrieve.
+  string name = 2;
+
+  // Metadata of the schema, if any.
+  google.protobuf.Struct metadata = 3;
+}
+
+// Response message for getting a schema.
+message GetSchemaResponse {
+  // The retrieved schema.
+  Schema schema = 1;
+}
+
+// Request message for creating a schema.
+message CreateSchemaRequest {
+  // Reference to the catalog where the schema will be created.
+  Catalog catalog = 1;
+
+  // Name of the new schema.
+  string name = 2;
+
+  // Description of the new schema.
+  string description = 3;
+
+  // Metadata of the schema, if any.
+  google.protobuf.Struct metadata = 4;
+}
+
+// Response message for creating a schema.
+message CreateSchemaResponse {
+  // The created schema.
+  Schema schema = 1;
+
+  // Indicates if the schema was successfully created.
+  bool created = 2;
+
+  // Error message, if any.
+  string error = 3;
+}
+
+// Request message for updating a schema.
+message UpdateSchemaRequest {
+  // Reference to the catalog containing the schema.
+  Catalog catalog = 1;
+
+  // Name of the schema to update.
+  string name = 2;
+
+  // New description of the schema.
+  string description = 3;
+
+  // Metadata of the schema, if any.
+  google.protobuf.Struct metadata = 4;
+}
+
+// Response message for updating a schema.
+message UpdateSchemaResponse {
+  // The updated schema.
+  Schema schema = 1;
+
+  // Indicates if the schema was successfully updated.
+  bool updated = 2;
+
+  // Error message, if any.
+  string error = 3;
+}
+
+// Request message for deleting a schema.
+message DeleteSchemaRequest {
+  // Reference to the catalog containing the schema.
+  Catalog catalog = 1;
+
+  // Name of the schema to delete.
+  string name = 2;
+}
+
+// Response message for deleting a schema.
+message DeleteSchemaResponse {
+  // The deleted schema.
+  Schema schema = 1;
+
+  // Indicates if the schema was successfully deleted.
+  bool deleted = 2;
+
+  // Error message, if any.
+  string error = 3;
+}
+
+// Request message for getting tables in a schema.
+message ListTablesRequest {
+  // Reference to the schema containing the tables.
+  Schema schema = 1;
+}
+
+// Response message for getting tables.
+message ListTablesResponse {
+  // The retrieved table.
+  Table table = 1;
+}
+
+// Request message for getting a specific table in a schema.
+message GetTableRequest {
+  // Reference to the schema containing the table.
+  Schema schema = 1;
+
+  // Name of the table to retrieve.
+  string name = 2;
+
+  // Metadata of the table, if any.
+  google.protobuf.Struct metadata = 3;
+}
+
+// Response message for getting a specific table.
+message GetTableResponse {
+  // The retrieved table.
+  Table table = 1;
+}
+
+// Request message for creating a table in a schema.
+message CreateTableRequest {
+  // Reference to the schema where the table will be created.
+  Schema schema = 1;
+
+  // Name of the new table.
+  string name = 2;
+
+  // Description of the new table.
+  string description = 3;
+
+  // Fields of the new table.
+  repeated dtkt.shared.v1beta1.Field fields = 4;
+
+  // Metadata of the table, if any.
+  google.protobuf.Struct metadata = 5;
+}
+
+// Response message for creating a table.
+message CreateTableResponse {
+  // The created table.
+  Table table = 1;
+
+  // Indicates if the table was successfully created.
+  bool created = 2;
+
+  // Error message, if any.
+  string error = 3;
+}
+
+// Request message for updating a table in a schema.
+message UpdateTableRequest {
+  // Reference to the schema containing the table.
+  Schema schema = 1;
+
+  // Name of the table to update.
+  string name = 2;
+
+  // New description of the table.
+  string description = 3;
+
+  // Fields of the table.
+  repeated dtkt.shared.v1beta1.Field fields = 4;
+
+  // Metadata of the table, if any.
+  google.protobuf.Struct metadata = 5;
+}
+
+// Response message for updating a table.
+message UpdateTableResponse {
+  // The updated table.
+  Table table = 1;
+
+  // Indicates if the table was successfully updated.
+  bool updated = 2;
+
+  // Error message, if any.
+  string error = 3;
+}
+
+// Request message for deleting a table in a schema.
+message DeleteTableRequest {
+  // Reference to the schema containing the table.
+  Schema schema = 1;
+
+  // Name of the table to delete.
+  string name = 2;
+}
+
+// Response message for deleting a table.
+message DeleteTableResponse {
+  // The deleted table.
+  Table table = 1;
+
+  // Indicates if the table was successfully deleted.
+  bool deleted = 2;
+
+  // Error message, if any.
+  string error = 3;
+}
+
+// Request message for writing to a table.
+message WriteTablesRequest {
+  // Reference to the table where row will be written.
+  Table table = 1;
+
+  // Row to write to the table.
+  google.protobuf.Struct row = 2;
+}
+
+// Response message for rows written to a table.
+message WriteTableResponse {
+  // Reference to the table where rows were written.
+  Table table = 1;
+
+  // Number of rows successfully written.
+  int64 rows_written = 2;
+}
+
+// Response message for writing rows to multiple tables.
+message WriteTablesResponse {
+  // Results for each table written.
+  repeated WriteTableResponse tables = 1;
+}
+
+// Request message for reading rows from a table.
+message ReadTableRequest {
+  // Reference to the schema containing the table.
+  Schema schema = 1;
+
+  // Name of the table to read from.
+  string name = 2;
+
+  // Offset for reading rows.
+  int64 offset = 3;
+
+  // Selected fields to read from the table.
+  repeated string selected_fields = 4;
+}
+
+// Response message for reading rows from a table.
+message ReadTableResponse {
+  // Reference to the table from which rows were read.
+  Table table = 1;
+
+  // A row read from the table.
+  google.protobuf.Struct row = 2;
+}
+
+// Request to validate a query.
+message ValidateQueryRequest {
+  // The query to validate.
+  string query = 1;
+
+  // Accessible catalogs for validation.
+  repeated CatalogPermission accessible = 2;
+
+  // Parameters used in the query.
+  repeated dtkt.shared.v1beta1.Param params = 3;
+}
+
+// Response for query validation.
+message ValidateQueryResponse {
+  // Validated query details.
+  Query query = 1;
+
+  // Permissions accessed by the query.
+  repeated CatalogPermission accessed = 2;
+}
+
+// Request to retrieve query results.
+message GetQueryResultsRequest {
+  // The query to execute.
+  string query = 1;
+
+  // Parameters used in the query.
+  repeated dtkt.shared.v1beta1.Param params = 2;
+
+  // Number of rows per page.
+  int32 page_size = 3;
+
+  // Token for the desired page.
+  string page = 4;
+}
+
+// Response containing query results.
+message GetQueryResultsResponse {
+  // Details of the executed query.
+  Query query = 1;
+
+  // Results page containing rows.
+  QueryResultsPage results_page = 2;
+}
+
+// Request to stream query results.
+message StreamQueryResultsRequest {
+  // The query to execute.
+  string query = 1;
+
+  // Parameters used in the query.
+  repeated dtkt.shared.v1beta1.Param params = 2;
+}
+
+// Response containing streamed query results.
+message StreamQueryResultsResponse {
+  // Details of the executed query.
+  Query query = 1;
+
+  // A row of query results.
+  google.protobuf.Struct row = 2;
+}
+
+// Represents permissions for a column.
+message ColumnPermission {
+  // Name of the column.
+  string name = 1;
+
+  // Alias for the column.
+  string alias = 2;
+
+  // Data type of the column.
+  string type = 3;
+}
+
+// Represents permissions for a table.
+message TablePermission {
+  // Name of the table.
+  string name = 1;
+
+  // Alias for the table.
+  string alias = 2;
+
+  // Column-level permissions.
+  repeated ColumnPermission columns = 3;
+}
+
+// Represents permissions for a schema.
+message SchemaPermission {
+  // Name of the schema.
+  string name = 1;
+
+  // Alias for the schema.
+  string alias = 2;
+
+  // Table-level permissions.
+  repeated TablePermission tables = 3;
+}
+
+// Represents permissions for a catalog.
+message CatalogPermission {
+  // Name of the catalog.
+  string name = 1;
+
+  // Alias for the catalog.
+  string alias = 2;
+
+  // Schema-level permissions.
+  repeated SchemaPermission schemas = 3;
+}
+
+// Represents a page of query results.
+message QueryResultsPage {
+  // Token for the previous page of results.
+  string prev_page = 1;
+
+  // Token for the next page of results.
+  string next_page = 2;
+
+  // Total number of pages available.
+  uint64 total_pages = 3;
+
+  // Total number of rows available.
+  uint64 total_rows = 4;
+
+  // Number of rows in the current page.
+  uint64 rows_count = 5;
+
+  // Rows in the current page.
+  repeated google.protobuf.Struct rows = 6;
+}

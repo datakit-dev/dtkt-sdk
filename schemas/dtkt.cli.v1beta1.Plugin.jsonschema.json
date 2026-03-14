@@ -1,0 +1,22 @@
+{
+  "$id": "dtkt.cli.v1beta1.Plugin.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "CLI plugin metadata",
+  "properties": {
+    "name": {
+      "default": "",
+      "description": "Plugin name (must start with 'dtkt-')",
+      "pattern": "^dtkt-[\\w-]+$",
+      "type": "string"
+    },
+    "path": {
+      "default": "",
+      "description": "File system path to plugin executable",
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "title": "Plugin",
+  "type": "object"
+}

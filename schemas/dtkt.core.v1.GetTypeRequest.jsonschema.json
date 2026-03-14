@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.core.v1.GetTypeRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "description": "Type resource name, one of:\n - System: \"types/{type}\"\n - Organization/User: e.g. \"organizations/bar/types/{type}\" or \"users/foo/types/{type}\"\n - Connection: e.g. \"users/foo/connections/foobar/types/{type}\"\n - Deployment: e.g. \"users/foo/deployments/default/types/{type}\"",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Get Type Request",
+  "type": "object"
+}

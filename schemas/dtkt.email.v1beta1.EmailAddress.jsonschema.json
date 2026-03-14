@@ -1,0 +1,19 @@
+{
+  "$id": "dtkt.email.v1beta1.EmailAddress.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "address": {
+      "default": "",
+      "description": "The email address.",
+      "type": "string"
+    },
+    "name": {
+      "default": "",
+      "description": "The name associated with the email address.",
+      "type": "string"
+    }
+  },
+  "title": "Email Address",
+  "type": "object"
+}

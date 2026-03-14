@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=http://localhost:9900/schemas/dtkt.flowsdk.v1beta1.Flow.jsonschema.json
+
+apiVersion: v1beta1
+kind: Flow
+spec:
+  name: Example Echo Flow
+  description: |
+    This is an example echo flow.
+
+  connections:
+  - id: {{ $.PKG_SLUG }}
+    package:
+      name: {{ $.PKG_NAME }}
+      version: {{ $.PKG_VERSION }}
+    services:
+    - action.v1beta1.ActionService
+
+  inputs:
+  - id: message
+    string: {}
+
+  actions:
+  - id: echo
+    call:
+      connection: {{ $.PKG_SLUG }}
+      method: action.v1beta1.ActionService.ExecuteAction
+      request:
+        name: actions/echo
+        input:
+          message: = inputs.message.getValue()
+
+  outputs:
+  - id: echo
+    value: = actions.echo.getValue().message

@@ -1,0 +1,12 @@
+{
+  "$id": "dtkt.core.v1.PackageBuildMetadata.Platform.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "v1beta1": {
+      "$ref": "dtkt.shared.v1beta1.Platform.jsonschema.json"
+    }
+  },
+  "title": "Platform",
+  "type": "object"
+}

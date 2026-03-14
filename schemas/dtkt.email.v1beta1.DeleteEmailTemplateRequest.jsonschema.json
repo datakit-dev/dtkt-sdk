@@ -1,0 +1,14 @@
+{
+  "$id": "dtkt.email.v1beta1.DeleteEmailTemplateRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Represents a request to delete an email template.",
+  "properties": {
+    "id": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "title": "Delete Email Template Request",
+  "type": "object"
+}

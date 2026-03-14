@@ -1,0 +1,15 @@
+{
+  "$id": "dtkt.flow.v1beta1.UserAction.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "inputs": {
+      "items": {
+        "$ref": "dtkt.flow.v1beta1.UserAction.Input.jsonschema.json"
+      },
+      "type": "array"
+    }
+  },
+  "title": "User Action",
+  "type": "object"
+}

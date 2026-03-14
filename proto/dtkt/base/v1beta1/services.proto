@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package dtkt.base.v1beta1;
+
+import "dtkt/base/v1beta1/messages.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/base/v1beta1";
+
+// BaseService provides integration package metadata, config validation, and auth checks.
+service BaseService {
+  // Returns the embedded package manifest (package.dtkt.yaml) and metadata.
+  // NOTE: GetPackage is implemented by the Integration SDK (not by authors).
+  rpc GetPackage(GetPackageRequest) returns (GetPackageResponse) {
+    option (google.api.http) = {get: "/v1beta1/package"};
+  }
+
+  // Validates config, allocates instances, and .
+  // NOTE: CheckConfig is implemented by the Integration SDK (not by authors).
+  rpc CheckConfig(CheckConfigRequest) returns (CheckConfigResponse) {
+    option (google.api.http) = {
+      post: "/v1beta1:checkConfig"
+      body: "*"
+    };
+  }
+
+  // Orchestrates OAuth checks/exchanges (3-legged).
+  rpc CheckAuth(CheckAuthRequest) returns (CheckAuthResponse) {
+    option (google.api.http) = {
+      post: "/v1beta1/auth:check"
+      body: "*"
+      // Friendly step-specific routes:
+      additional_bindings: {
+        post: "/v1beta1/auth:code"
+        body: "*"
+      } /* AUTH_CHECK_OAUTH_CODE */
+      additional_bindings: {
+        post: "/v1beta1/auth:callback"
+        body: "*"
+      } /* AUTH_CHECK_OAUTH_CALLBACK */
+      additional_bindings: {
+        post: "/v1beta1/auth:refresh"
+        body: "*"
+      } /* AUTH_CHECK_OAUTH_REFRESH */
+    };
+  }
+
+  // Returns types registered to integration (through use of integration's type
+  // registry) typically from registered actions, events, and event sources.
+  // NOTE: ListTypes is implemented by the Integration SDK (not by authors).
+  rpc ListTypes(ListTypesRequest) returns (ListTypesResponse) {
+    option (google.api.http) = {get: "/v1beta1/types"};
+  }
+
+  // Returns type registered to integration.
+  // NOTE: GetType is implemented by the Integration SDK (not by authors).
+  rpc GetType(GetTypeRequest) returns (GetTypeResponse) {
+    option (google.api.http) = {get: "/v1beta1/types/{name}"};
+  }
+}

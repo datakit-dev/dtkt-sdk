@@ -1,0 +1,16 @@
+{
+  "$id": "dtkt.command.v1beta1.ExecuteStreamedCommandRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The request for streaming a single command.",
+  "properties": {
+    "command": {
+      "$ref": "dtkt.command.v1beta1.ExecutableCommand.jsonschema.json"
+    },
+    "input": {
+      "$ref": "dtkt.command.v1beta1.CommandInput.jsonschema.json"
+    }
+  },
+  "title": "Execute Streamed Command Request",
+  "type": "object"
+}

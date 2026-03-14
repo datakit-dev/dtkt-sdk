@@ -1,0 +1,21 @@
+{
+  "$id": "dtkt.protoui.v1beta1.Data.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "expr": {
+      "description": "Evaluate the data using a CEL expression.  The message or field is passed as `this` to the expression data context.",
+      "type": "string"
+    },
+    "template": {
+      "$ref": "dtkt.protoui.v1beta1.Template.jsonschema.json",
+      "description": "Evaluate the data using a template.  The message or field is passed as the template data context."
+    },
+    "text": {
+      "description": "Evaluate the data as plain text.",
+      "type": "string"
+    }
+  },
+  "title": "Data",
+  "type": "object"
+}

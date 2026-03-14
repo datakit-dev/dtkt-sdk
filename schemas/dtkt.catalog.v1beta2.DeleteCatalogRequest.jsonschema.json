@@ -1,0 +1,22 @@
+{
+  "$id": "dtkt.catalog.v1beta2.DeleteCatalogRequest.jsonschema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Delete catalog request.",
+  "properties": {
+    "force": {
+      "default": false,
+      "description": "If set to true, any schemas in this catalog will also be deleted.\n (Otherwise, the request will only work if the catalog has no schemas.)",
+      "type": "boolean"
+    },
+    "name": {
+      "description": "Name of catalog to delete.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Delete Catalog Request",
+  "type": "object"
+}

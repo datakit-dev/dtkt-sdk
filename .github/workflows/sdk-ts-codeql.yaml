@@ -1,0 +1,55 @@
+name: CodeQL TypeScript SDK
+
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - sdk-ts/**
+    - .github/workflows/sdk-ts-codeql.yaml
+  pull_request:
+    branches:
+    - main
+    paths:
+    - sdk-ts/**
+    - .github/workflows/sdk-ts-codeql.yaml
+  schedule:
+  - cron: '0 0 * * 1'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ${{ vars.RUNNER }}
+
+    permissions:
+      security-events: write
+      contents: read
+
+    steps:
+    - uses: datakit-dev/dtkt-dev/.github/actions/setup-monorepo@main
+      with:
+        dtkt-core-sparse-checkout: packages
+        dtkt-github-actions-app-id: ${{ vars.DTKT_GITHUB_ACTIONS_APP_ID }}
+        dtkt-github-actions-private-key: ${{ secrets.DTKT_GITHUB_ACTIONS_PRIVATE_KEY }}
+
+    - uses: datakit-dev/dtkt-dev/.github/actions/setup@main
+      with:
+        task: true
+        node: true
+        versions: ${{ vars.VERSIONS }}
+        pnpm-cache-dependency-path: ./dtkt-universe/pnpm-lock.yaml
+
+    - name: Setup
+      run: task setup
+      working-directory: ./dtkt-universe/dtkt-sdk/sdk-ts
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        languages: javascript-typescript
+        source-root: ./dtkt-universe/dtkt-sdk/sdk-ts
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v4
+      with:
+        category: /language:javascript-typescript

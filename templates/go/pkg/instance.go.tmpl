@@ -1,0 +1,49 @@
+package pkg
+
+import (
+  "context"
+
+	basev1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/base/v1beta1"
+  sharedv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
+{{ if $.PROTO_ENABLED }}
+	{{ $.PROTO_IMPORT }} "github.com/datakit-dev/dtkt-integrations/{{ $.PKG_SLUG }}/pkg/proto/{{ $.PROTO_PATH }}"
+{{- end }}
+)
+{{ if (not $.PROTO_ENABLED) }}
+// Instance config struct
+type Config struct {
+	Greeting   string `json:"greeting"`
+
+  {{- if hasPkg "action" "v1beta1" }}
+	EchoPrefix string `json:"echo_prefix"`
+  {{- end }}
+
+  // Extend with other configuration fields as needed
+}
+{{ end }}
+
+// Integration instance struct
+type Instance struct {
+{{- if $.PROTO_ENABLED }}
+  config *{{ $.PROTO_IMPORT }}.Config
+{{- else }}
+  config *Config
+{{- end }}
+}
+
+// Creates a new instance
+func NewInstance(ctx context.Context, config *{{ if $.PROTO_ENABLED }}{{ $.PROTO_IMPORT }}.{{ end }}Config) (*Instance, error) {
+	return &Instance{
+    config: config,
+  }, nil
+}
+
+// Orchestrates OAuth checks/exchanges.
+func (i *Instance) CheckAuth(ctx context.Context, req *basev1beta1.CheckAuthRequest) (*basev1beta1.CheckAuthResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckAuth not implemented")
+}
+
+// Close is called to release instance resources (e.g. client connections)
+func (i *Instance) Close() error {
+	return nil
+}
