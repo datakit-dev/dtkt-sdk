@@ -54,7 +54,7 @@ func WithHTTPDialerOptions(opts ...ConnectorOption) HTTPClientOption {
 	}
 }
 
-func (c *HTTPClient) DialContext(ctx context.Context, network string, address string) (_ net.Conn, err error) {
+func (c *HTTPClient) DialContext(ctx context.Context, _ string, _ string) (net.Conn, error) {
 	if c.dialer == nil {
 		dialer, err := NewConnector(c.address, c.dialerOpts...)
 		if err != nil {
@@ -62,7 +62,7 @@ func (c *HTTPClient) DialContext(ctx context.Context, network string, address st
 		}
 		c.dialer = dialer
 	}
-	return c.dialer.DialContext(ctx, network, address)
+	return c.dialer.DialContext(ctx)
 }
 
 func (c *HTTPClient) BaseURL() string {

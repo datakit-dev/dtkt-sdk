@@ -13,14 +13,17 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/encoding"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/reflection/grpc_reflection_v1"
+	"google.golang.org/grpc/status"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk/v1beta1"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/lib/env"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/network"
+	"github.com/datakit-dev/grpc-proxy/proxy"
 	"github.com/jhump/protoreflect/v2/sourceinfo"
 )
 
@@ -29,9 +32,12 @@ type (
 		intgr  *Integration[C, I]
 		health *health.Server
 
-		http http.Server
+		services     map[string]grpc.ServiceInfo
+		proxyMethods map[string]GetProxyConnFunc
+
 		mux  *http.ServeMux
 		grpc *grpc.Server
+		http http.Server
 
 		stopCh chan struct{}
 		doneCh chan struct{}
@@ -39,21 +45,53 @@ type (
 )
 
 func NewServer[C any, I v1beta1.InstanceType](intgr *Integration[C, I]) *Server[C, I] {
-	return &Server[C, I]{
-		intgr:  intgr,
-		health: health.NewServer(),
-		mux:    http.NewServeMux(),
-		grpc: grpc.NewServer(
-			grpc.UnaryInterceptor(
-				intgr.unaryInterceptor(),
-			),
-			grpc.StreamInterceptor(
-				intgr.streamInterceptor(),
-			),
+	opts := []grpc.ServerOption{
+		grpc.UnaryInterceptor(
+			intgr.unaryInterceptor(),
 		),
+		grpc.StreamInterceptor(
+			intgr.streamInterceptor(),
+		),
+	}
+
+	var (
+		services     = map[string]grpc.ServiceInfo{}
+		proxyMethods = map[string]GetProxyConnFunc{}
+	)
+
+	for name, svc := range intgr.services {
+		services[name] = svc.info
+		if svc.isProxy && svc.getConn != nil {
+			for _, m := range svc.info.Methods {
+				proxyMethods["/"+name+"/"+m.Name] = svc.getConn
+			}
+		}
+	}
+
+	srv := &Server[C, I]{
+		intgr:        intgr,
+		health:       health.NewServer(),
+		services:     services,
+		proxyMethods: proxyMethods,
+
+		mux: http.NewServeMux(),
+
 		stopCh: make(chan struct{}, 1),
 		doneCh: make(chan struct{}, 1),
 	}
+
+	if len(proxyMethods) > 0 {
+		encoding.RegisterCodecV2(proxy.Codec())
+
+		opts = append(opts,
+			grpc.ForceServerCodecV2(proxy.Codec()),
+			grpc.UnknownServiceHandler(srv.proxyHandler()),
+		)
+	}
+
+	srv.grpc = grpc.NewServer(opts...)
+
+	return srv
 }
 
 func (s *Server[C, I]) Serve() error {
@@ -67,22 +105,27 @@ func (s *Server[C, I]) Serve() error {
 		return ctx
 	}
 
-	for name, reg := range s.intgr.services {
-		reg(s.grpc)
+	for name, svc := range s.intgr.services {
+		if svc.isProxy {
+			continue
+		}
+
+		svc.regSvc(s.grpc)
 		s.health.SetServingStatus(name, grpc_health_v1.HealthCheckResponse_SERVING)
 	}
 
 	grpc_health_v1.RegisterHealthServer(s.grpc, s.health)
-	grpc_reflection_v1.RegisterServerReflectionServer(s.grpc, reflection.NewServerV1(reflection.ServerOptions{
-		Services:           s.grpc,
-		DescriptorResolver: sourceinfo.Files,
-		ExtensionResolver:  sourceinfo.Types,
-	}))
+	grpc_reflection_v1.RegisterServerReflectionServer(s.grpc,
+		reflection.NewServerV1(reflection.ServerOptions{
+			Services:           s,
+			DescriptorResolver: sourceinfo.Files,
+			ExtensionResolver:  sourceinfo.Types,
+		}),
+	)
 
 	s.health.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
 
 	s.mux.Handle("/", s.grpc)
-	s.mux.Handle(env.Handler())
 
 	for pattern, handler := range s.intgr.handlers {
 		s.mux.Handle(pattern, handler)
@@ -124,8 +167,29 @@ func (s *Server[C, I]) Serve() error {
 	return nil
 }
 
+func (s *Server[C, I]) GetServiceInfo() map[string]grpc.ServiceInfo {
+	return s.services
+}
+
 func (s *Server[C, I]) Stop() {
 	s.stopCh <- struct{}{}
+}
+
+func (s *Server[C, I]) proxyHandler() grpc.StreamHandler {
+	return proxy.TransparentHandler(
+		func(ctx context.Context, method string) (proxy.Mode, []proxy.Backend, error) {
+			getConn, ok := s.proxyMethods[method]
+			if !ok {
+				return 0, nil, status.Errorf(codes.Aborted, "proxy method not found: %s", method)
+			}
+
+			return proxy.One2One, []proxy.Backend{
+				&proxy.SingleBackend{
+					GetConn: getConn,
+				},
+			}, nil
+		},
+	)
 }
 
 func (s *Server[C, I]) stopWatch(ctx context.Context) {

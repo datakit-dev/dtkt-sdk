@@ -65,8 +65,8 @@ func (c *SSHConnector) DialGRPC(opts ...grpc.DialOption) (*grpc.ClientConn, erro
 
 	// Prepend our context dialer
 	opts = append([]grpc.DialOption{
-		grpc.WithContextDialer(func(ctx context.Context, target string) (net.Conn, error) {
-			return c.dialContext(ctx)
+		grpc.WithContextDialer(func(ctx context.Context, _ string) (net.Conn, error) {
+			return c.DialContext(ctx)
 		}),
 	}, opts...)
 
@@ -75,15 +75,9 @@ func (c *SSHConnector) DialGRPC(opts ...grpc.DialOption) (*grpc.ClientConn, erro
 
 // DialContext creates a connection to the remote address with context support.
 // This is useful for HTTP transports and other context-aware dialers.
-func (c *SSHConnector) DialContext(ctx context.Context, _, _ string) (net.Conn, error) {
-	// Ignore network and addr - we always dial the configured remote address over SSH
-	return c.dialContext(ctx)
-}
-
-// dialContext is the internal dial implementation that respects context.
 // If RemoteAddr is nil (as with SFTP), this only establishes the SSH connection
 // and returns nil (no remote dial needed).
-func (c *SSHConnector) dialContext(ctx context.Context) (net.Conn, error) {
+func (c *SSHConnector) DialContext(ctx context.Context) (net.Conn, error) {
 	if err := c.ensureSSHConnected(); err != nil {
 		return nil, err
 	}

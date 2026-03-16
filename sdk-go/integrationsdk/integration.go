@@ -52,11 +52,11 @@ type Integration[C any, I v1beta1.InstanceType] struct {
 	events  *v1beta1.EventRegistry
 	sources *v1beta1.EventSourceRegistry
 
-	services map[string]func(grpc.ServiceRegistrar)
+	services map[string]Service
 	handlers map[string]http.Handler
 
 	instances   util.SyncMap[string, *Instance[I]]
-	newInstance func(context.Context, C) (I, error)
+	newInstance NewInstanceFunc[C, I]
 
 	started bool
 	mut     sync.Mutex
@@ -116,6 +116,8 @@ func New[C any, I v1beta1.InstanceType](
 		return nil, err
 	}
 
+	debugPath, debugHandler := env.Handler()
+
 	intgr := &Integration[C, I]{
 		log: log.NewLogger().With(logOpts...),
 
@@ -131,15 +133,17 @@ func New[C any, I v1beta1.InstanceType](
 		events:  &v1beta1.EventRegistry{},
 		sources: &v1beta1.EventSourceRegistry{},
 
-		handlers: map[string]http.Handler{},
-		services: map[string]func(grpc.ServiceRegistrar){},
+		handlers: map[string]http.Handler{
+			debugPath: debugHandler,
+		},
+		services: map[string]Service{},
 
 		newInstance: newInstance,
 	}
 
 	// Register Integration as BaseService implementation
-	err = intgr.addService(basev1beta1.BaseService_ServiceDesc.ServiceName, func(srv grpc.ServiceRegistrar) {
-		basev1beta1.RegisterBaseServiceServer(srv, intgr)
+	err = intgr.RegisterService(&basev1beta1.BaseService_ServiceDesc, func(reg grpc.ServiceRegistrar) {
+		basev1beta1.RegisterBaseServiceServer(reg, intgr)
 	})
 	if err != nil {
 		return nil, err
@@ -241,7 +245,7 @@ func (i *Integration[C, I]) Serve() error {
 	return NewServer(i).Serve()
 }
 
-func (i *Integration[C, I]) addHandler(path string, handler http.Handler) error {
+func (i *Integration[C, I]) RegisterHandler(pattern string, handler http.Handler) error {
 	if i.isRunning() {
 		return fmt.Errorf("cannot modify handlers, server running")
 	}
@@ -249,54 +253,76 @@ func (i *Integration[C, I]) addHandler(path string, handler http.Handler) error 
 	i.mut.Lock()
 	defer i.mut.Unlock()
 
-	i.handlers[path] = handler
+	if _, ok := i.handlers[pattern]; ok {
+		return fmt.Errorf("handler already registered: %s", pattern)
+	}
+
+	i.handlers[pattern] = handler
 
 	return nil
 }
 
-func (i *Integration[C, I]) addService(name string, reg func(grpc.ServiceRegistrar)) error {
+func (i *Integration[C, I]) RegisterService(svcDesc *grpc.ServiceDesc, regSvc func(grpc.ServiceRegistrar)) error {
 	if i.isRunning() {
 		return fmt.Errorf("cannot modify services, server running")
+	} else if svcDesc == nil {
+		return fmt.Errorf("service descriptor cannot be nil")
+	} else if svcDesc.ServiceName == "" {
+		return fmt.Errorf("service name required")
+	} else if regSvc == nil {
+		return fmt.Errorf("service initializer cannot be nil")
 	}
 
 	i.mut.Lock()
 	defer i.mut.Unlock()
 
-	desc, err := sourceinfo.Files.FindDescriptorByName(protoreflect.FullName(name))
+	svcName := svcDesc.ServiceName
+	if _, ok := i.services[svcName]; ok {
+		return fmt.Errorf("service already registered: %s", svcName)
+	}
+
+	err := i.syncServiceTypes(svcName)
 	if err != nil {
-		return fmt.Errorf("service: %q: %w", name, err)
+		return err
 	}
 
-	svc, ok := desc.(protoreflect.ServiceDescriptor)
-	if !ok {
-		return fmt.Errorf("expected service descriptor for: %q, got: %T", name, desc)
+	i.services[svcName] = Service{
+		info:   NewServiceInfo(svcDesc),
+		regSvc: regSvc,
 	}
 
-	for idx := range svc.Methods().Len() {
-		method := svc.Methods().Get(idx)
-		inputType, err := sourceinfo.Types.FindMessageByName(method.Input().FullName())
-		if err != nil {
-			return fmt.Errorf("method input: %q: %w", method.Input().FullName(), err)
-		}
+	return nil
+}
 
-		_, err = v1beta1.NewTypeSchemaForProto(i.types, inputType.New().Interface())
-		if err != nil {
-			return fmt.Errorf("method input: %q: %w", method.Input().FullName(), err)
-		}
-
-		outputType, err := sourceinfo.Types.FindMessageByName(method.Output().FullName())
-		if err != nil {
-			return fmt.Errorf("method output: %q: %w", method.Output().FullName(), err)
-		}
-
-		_, err = v1beta1.NewTypeSchemaForProto(i.types, outputType.New().Interface())
-		if err != nil {
-			return fmt.Errorf("method output: %q: %w", method.Output().FullName(), err)
-		}
+func (i *Integration[C, I]) RegisterProxy(svcDesc *grpc.ServiceDesc, getConn GetProxyConnFunc) error {
+	if i.isRunning() {
+		return fmt.Errorf("cannot modify services, server running")
+	} else if svcDesc == nil {
+		return fmt.Errorf("service descriptor cannot be nil")
+	} else if svcDesc.ServiceName == "" {
+		return fmt.Errorf("service name required")
+	} else if getConn == nil {
+		return fmt.Errorf("get proxy connection cannot be nil")
 	}
 
-	i.services[name] = reg
-	i.log.Info(fmt.Sprintf("Added service %q", name))
+	i.mut.Lock()
+	defer i.mut.Unlock()
+
+	svcName := svcDesc.ServiceName
+	if _, ok := i.services[svcName]; ok {
+		return fmt.Errorf("service already registered: %s", svcName)
+	}
+
+	err := i.syncServiceTypes(svcName)
+	if err != nil {
+		return err
+	}
+
+	i.services[svcName] = Service{
+		info:    NewServiceInfo(svcDesc),
+		getConn: getConn,
+		isProxy: true,
+	}
 
 	return nil
 }
@@ -341,6 +367,43 @@ func (i *Integration[C, I]) ListTypes(_ context.Context, req *basev1beta1.ListTy
 
 func (i *Integration[C, I]) GetType(_ context.Context, req *basev1beta1.GetTypeRequest) (*basev1beta1.GetTypeResponse, error) {
 	return i.types.GetType(req)
+}
+
+func (i *Integration[C, I]) syncServiceTypes(svcName string) error {
+	desc, err := sourceinfo.Files.FindDescriptorByName(protoreflect.FullName(svcName))
+	if err != nil {
+		return fmt.Errorf("service: %q: %w", svcName, err)
+	}
+
+	svc, ok := desc.(protoreflect.ServiceDescriptor)
+	if !ok {
+		return fmt.Errorf("expected service descriptor for: %q, got: %T", svcName, desc)
+	}
+
+	for idx := range svc.Methods().Len() {
+		method := svc.Methods().Get(idx)
+		inputType, err := sourceinfo.Types.FindMessageByName(method.Input().FullName())
+		if err != nil {
+			return fmt.Errorf("method input: %q: %w", method.Input().FullName(), err)
+		}
+
+		_, err = v1beta1.NewTypeSchemaForProto(i.types, inputType.New().Interface())
+		if err != nil {
+			return fmt.Errorf("method input: %q: %w", method.Input().FullName(), err)
+		}
+
+		outputType, err := sourceinfo.Types.FindMessageByName(method.Output().FullName())
+		if err != nil {
+			return fmt.Errorf("method output: %q: %w", method.Output().FullName(), err)
+		}
+
+		_, err = v1beta1.NewTypeSchemaForProto(i.types, outputType.New().Interface())
+		if err != nil {
+			return fmt.Errorf("method output: %q: %w", method.Output().FullName(), err)
+		}
+	}
+
+	return nil
 }
 
 func (i *Integration[C, I]) isRunning() bool {

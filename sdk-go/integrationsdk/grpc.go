@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"strings"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/lib/log"
 	"google.golang.org/grpc"
@@ -46,6 +47,8 @@ func grpcError(err error) error {
 	_, ok := status.FromError(err)
 	if ok {
 		return err
+	} else if strings.Contains(err.Error(), "not implemented") {
+		return status.Error(codes.Unimplemented, err.Error())
 	}
 
 	if errors.Is(err, io.EOF) {

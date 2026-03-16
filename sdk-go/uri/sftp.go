@@ -51,7 +51,7 @@ func NewSFTPFileSystem(ctx context.Context, uri *url.URL) (*SFTPFileSystem, erro
 	}
 
 	// Establish SSH connection
-	_, err = sshConnector.DialContext(ctx, "", "")
+	_, err = sshConnector.DialContext(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to establish SSH connection: %w", errors.Join(err, sshConnector.Close()))
 	}
