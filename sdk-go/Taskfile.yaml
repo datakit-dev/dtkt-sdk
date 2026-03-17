@@ -12,10 +12,6 @@ tasks:
     cmds:
       - task: go:setup
 
-  pregenerate:
-    cmds:
-      - go run ./lib/fivetran/protogen.go ../proto/dtkt
-
   generate:
     cmds:
       - task: go:generate

@@ -14,7 +14,7 @@ var grpcInsecure = grpc.WithTransportCredentials(insecure.NewCredentials())
 type (
 	Dialer interface {
 		Address() net.Addr
-		DialContext(context.Context, string, string) (net.Conn, error)
+		DialContext(context.Context) (net.Conn, error)
 		DialGRPC(...grpc.DialOption) (*grpc.ClientConn, error)
 		GRPCTarget() string
 		Close() error

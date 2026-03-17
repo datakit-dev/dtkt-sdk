@@ -60,7 +60,7 @@ func (c *CloudConnector) Address() net.Addr {
 }
 
 func (c *CloudConnector) GRPCTarget() string {
-	// NOTE: For dialing an integration outside of cloud, c.config is always nil
+	// NOTE: For dialing an integration outside of cloud, c.opts.cloud is always nil
 	// and c.addr must be a valid cloud proxy endpoint.
 	if c.opts.cloud == nil {
 		return GRPCTarget(c.addr)
@@ -68,18 +68,16 @@ func (c *CloudConnector) GRPCTarget() string {
 	return fmt.Sprintf("passthrough:%s", c.opts.cloud.GetName())
 }
 
-func (c *CloudConnector) DialContext(ctx context.Context, network, address string) (_ net.Conn, err error) {
+func (c *CloudConnector) DialContext(ctx context.Context) (_ net.Conn, err error) {
 	if c.opts.cloud == nil {
 		dialer := &net.Dialer{
 			Timeout: 30 * time.Second,
 		}
 
-		if network == "" || network == "cloud" {
+		network := c.addr.Network()
+		address := c.addr.String()
+		if c.addr.Network() == "" || network == Cloud.String() {
 			network = "tcp"
-		}
-
-		if address == "" {
-			address = c.addr.String()
 		}
 
 		host, port, err := net.SplitHostPort(address)
@@ -87,13 +85,15 @@ func (c *CloudConnector) DialContext(ctx context.Context, network, address strin
 			return nil, err
 		}
 
+		if host == "" {
+			host = DefaultCloudHost
+		}
+
 		if port != "443" {
 			port = "443"
 		}
 
-		address = net.JoinHostPort(host, port)
-
-		conn, err := dialer.DialContext(ctx, network, address)
+		conn, err := dialer.DialContext(ctx, network, net.JoinHostPort(host, port))
 		if err != nil {
 			return nil, err
 		}
@@ -123,13 +123,13 @@ func (c *CloudConnector) DialContext(ctx context.Context, network, address strin
 func (c *CloudConnector) DialGRPC(opts ...grpc.DialOption) (*grpc.ClientConn, error) {
 	opts = append(c.opts.grpc, opts...)
 
-	// NOTE: For dialing an integration outside of cloud, c.config is always nil
+	// NOTE: For dialing an integration outside of cloud, c.opts.cloud is always nil
 	// and requests are made through cloud proxy with the same connection name
 	// as bind (passthrough identifier)
 	if c.opts.cloud != nil {
 		opts = append([]grpc.DialOption{
 			grpc.WithContextDialer(func(ctx context.Context, target string) (net.Conn, error) {
-				return c.DialContext(ctx, "", "")
+				return c.DialContext(ctx)
 			}),
 		}, opts...)
 	}
@@ -144,7 +144,7 @@ func (c *CloudConnector) DialGRPC(opts ...grpc.DialOption) (*grpc.ClientConn, er
 }
 
 func (c *CloudConnector) Bind(ctx context.Context) (net.Listener, error) {
-	// NOTE: For binding an integration to cloud network, c.config must be non-nil
+	// NOTE: For binding an integration to cloud network, c.opts.cloud must be non-nil
 	// in order to bind listener on edge network.
 	if c.opts.cloud == nil {
 		return nil, fmt.Errorf("cloud config cannot be nil")

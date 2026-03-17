@@ -61,7 +61,7 @@ func (c *connector) Bind(ctx context.Context) (net.Listener, error) {
 	return lis, nil
 }
 
-func (c *connector) DialContext(ctx context.Context, network, address string) (net.Conn, error) {
+func (c *connector) DialContext(ctx context.Context) (net.Conn, error) {
 	dialer := &net.Dialer{
 		Timeout: 30 * time.Second,
 	}

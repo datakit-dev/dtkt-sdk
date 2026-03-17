@@ -1,9 +1,10 @@
 package integrationsdk
 
 import (
+	"context"
 	"fmt"
 	"io"
-	logger "log"
+	"log"
 	"net/http"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk/v1beta1"
@@ -13,50 +14,91 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-type NewServiceFunc[I v1beta1.InstanceType, S any] func(v1beta1.InstanceMux[I]) S
+type (
+	Service struct {
+		info    grpc.ServiceInfo
+		regSvc  RegisterServiceFunc
+		getConn GetProxyConnFunc
+		isProxy bool
+	}
+	InitServiceFunc[I v1beta1.InstanceType, S any] func(v1beta1.InstanceMux[I]) S
+	RegisterServiceFunc                            func(grpc.ServiceRegistrar)
+	GetProxyConnFunc                               func(context.Context) (context.Context, *grpc.ClientConn, error)
+)
 
-func RegisterService[S, C any, I v1beta1.InstanceType](intgr *Integration[C, I], svcDesc *grpc.ServiceDesc, initSvc NewServiceFunc[I, S]) {
-	err := intgr.addService(svcDesc.ServiceName, func(reg grpc.ServiceRegistrar) {
-		reg.RegisterService(svcDesc, initSvc(intgr))
-	})
-	if err != nil {
-		logger.Fatal(err)
+func NewServiceInfo(svcDesc *grpc.ServiceDesc) grpc.ServiceInfo {
+	methods := make([]grpc.MethodInfo, 0, len(svcDesc.Methods)+len(svcDesc.Streams))
+	for _, m := range svcDesc.Methods {
+		methods = append(methods, grpc.MethodInfo{
+			Name:           m.MethodName,
+			IsClientStream: false,
+			IsServerStream: false,
+		})
+	}
+
+	for _, s := range svcDesc.Streams {
+		methods = append(methods, grpc.MethodInfo{
+			Name:           s.StreamName,
+			IsClientStream: s.ClientStreams,
+			IsServerStream: s.ServerStreams,
+		})
+	}
+
+	return grpc.ServiceInfo{
+		Methods:  methods,
+		Metadata: svcDesc.Metadata,
 	}
 }
 
-func RegisterManagedActionService[S actionv1beta1.ActionServiceServer, I v1beta1.InstanceType, C any](intgr *Integration[C, I], initSvc NewServiceFunc[I, S], regActions ...v1beta1.RegisterActionFunc[I]) {
-	err := intgr.addService(actionv1beta1.ActionService_ServiceDesc.ServiceName, func(reg grpc.ServiceRegistrar) {
+func RegisterServiceProxy[C any, I v1beta1.InstanceType](intgr *Integration[C, I], svcDesc *grpc.ServiceDesc, getConn GetProxyConnFunc) {
+	err := intgr.RegisterProxy(svcDesc, getConn)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func RegisterService[S, C any, I v1beta1.InstanceType](intgr *Integration[C, I], svcDesc *grpc.ServiceDesc, initSvc InitServiceFunc[I, S]) {
+	err := intgr.RegisterService(svcDesc, func(reg grpc.ServiceRegistrar) {
+		reg.RegisterService(svcDesc, initSvc(intgr))
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func RegisterManagedActionService[S actionv1beta1.ActionServiceServer, C any, I v1beta1.InstanceType](intgr *Integration[C, I], initSvc InitServiceFunc[I, S], regActions ...v1beta1.RegisterActionFunc[I]) {
+	err := intgr.RegisterService(&actionv1beta1.ActionService_ServiceDesc, func(reg grpc.ServiceRegistrar) {
 		actionv1beta1.RegisterActionServiceServer(reg, initSvc(intgr))
 	})
 	if err != nil {
-		logger.Fatal(err)
+		log.Fatal(err)
 	}
 
 	err = v1beta1.RegisterActions(intgr, regActions...)
 	if err != nil {
-		logger.Fatal(err)
+		log.Fatal(err)
 	}
 }
 
-func RegisterManagedEventService[S eventv1beta1.EventServiceServer, I v1beta1.InstanceType, C any](intgr *Integration[C, I], initSvc NewServiceFunc[I, S], regEvents []v1beta1.RegisterEventFunc[I], regSources ...v1beta1.RegisterSourceFunc[I]) {
-	err := intgr.addService(eventv1beta1.EventService_ServiceDesc.ServiceName, func(reg grpc.ServiceRegistrar) {
+func RegisterManagedEventService[S eventv1beta1.EventServiceServer, C any, I v1beta1.InstanceType](intgr *Integration[C, I], initSvc InitServiceFunc[I, S], regEvents []v1beta1.RegisterEventFunc[I], regSources ...v1beta1.RegisterSourceFunc[I]) {
+	err := intgr.RegisterService(&eventv1beta1.EventService_ServiceDesc, func(reg grpc.ServiceRegistrar) {
 		eventv1beta1.RegisterEventServiceServer(reg, initSvc(intgr))
 	})
 	if err != nil {
-		logger.Fatal(err)
+		log.Fatal(err)
 	}
 
 	err = v1beta1.RegisterEvents(intgr, regEvents...)
 	if err != nil {
-		logger.Fatal(err)
+		log.Fatal(err)
 	}
 
 	err = v1beta1.RegisterSources(intgr, regSources...)
 	if err != nil {
-		logger.Fatal(err)
+		log.Fatal(err)
 	}
 
-	err = intgr.addHandler("/"+v1beta1.EventSourcesPrefix+"/{event_source}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	err = intgr.RegisterHandler("/"+v1beta1.EventSourcesPrefix+"/{event_source}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		source, err := intgr.sources.Find(fmt.Sprintf("%s/%s", v1beta1.EventSourcesPrefix, r.PathValue("event_source")))
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
@@ -102,6 +144,6 @@ func RegisterManagedEventService[S eventv1beta1.EventServiceServer, I v1beta1.In
 		}
 	}))
 	if err != nil {
-		logger.Fatal(err)
+		log.Fatal(err)
 	}
 }

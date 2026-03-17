@@ -75,7 +75,7 @@ func (t Type) DefaultAddress() (addr Address, err error) {
 			return
 		}
 
-		return Addr(t, net.JoinHostPort("127.0.0.1", strconv.Itoa(port))), nil
+		return Addr(t, net.JoinHostPort(DefaultTCPHost, strconv.Itoa(port))), nil
 	}
 
 	err = fmt.Errorf("unsupported network type: %s", t)
