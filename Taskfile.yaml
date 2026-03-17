@@ -20,7 +20,6 @@ tasks:
 
   generate:
     cmds:
-      - task: go:pregenerate
       - buf generate
       - task: go:generate
       - task: ts:generate

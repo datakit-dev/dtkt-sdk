@@ -20,9 +20,6 @@ import (
 	_ "google.golang.org/protobuf/types/known/typepb"
 	_ "google.golang.org/protobuf/types/known/wrapperspb"
 
-	// Lib types
-	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/lib/fivetran/v1"
-
 	// V1Beta1
 	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/action/v1beta1"
 	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/ai/v1beta1"
