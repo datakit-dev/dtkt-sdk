@@ -14,12 +14,15 @@ jobs:
     runs-on: ${{ vars.RUNNER }}
 
     steps:
-    - uses: datakit-dev/dtkt-dev/.github/actions/setup-monorepo@main
+    - uses: datakit-dev/.github/actions/setup-monorepo@main
       with:
+        dtkt-dev-sparse-checkout: |
+          scripts
+          tasks
         dtkt-github-actions-app-id: ${{ vars.DTKT_GITHUB_ACTIONS_APP_ID }}
         dtkt-github-actions-private-key: ${{ secrets.DTKT_GITHUB_ACTIONS_PRIVATE_KEY }}
 
-    - uses: datakit-dev/dtkt-dev/.github/actions/setup@main
+    - uses: datakit-dev/.github/actions/setup@main
       with:
         task: true
         go: true
@@ -30,8 +33,13 @@ jobs:
       working-directory: ./dtkt-universe/dtkt-sdk/sdk-go
 
     - name: Lint
-      run: task lint
-      working-directory: ./dtkt-universe/dtkt-sdk/sdk-go
+      uses: golangci/golangci-lint-action@v9
+      env:
+        GOEXPERIMENT: jsonv2
+      with:
+        version: ${{ fromJSON(vars.VERSIONS).golangci-lint }}
+        working-directory: ./dtkt-universe/dtkt-sdk/sdk-go
+        args: --timeout=5m
 
     - name: Test
       run: task test

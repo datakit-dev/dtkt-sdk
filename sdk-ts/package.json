@@ -2,23 +2,40 @@
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@dtkt/sdk",
   "version": "0.0.1",
-  "private": true,
+  "private": false,
   "description": "DataKit TypeScript SDK.",
-  "keywords": [],
-  "homepage": "https://github.com/datakit-dev/dtkt-sdk",
-  "license": "BUSL-1.1",
-  "sideEffects": false,
-  "files": [
-    "dist",
-    "LICENSE",
-    "NOTICE"
+  "keywords": [
+    "datakit",
+    "dtkt",
+    "sdk",
+    "protobuf",
+    "grpc",
+    "integrations"
   ],
+  "homepage": "https://github.com/datakit-dev/dtkt-sdk",
+  "bugs": {
+    "url": "https://github.com/datakit-dev/dtkt-sdk/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/datakit-dev/dtkt-sdk.git",
+    "directory": "sdk-ts"
+  },
+  "license": "BUSL-1.1",
+  "author": "DataKit <team@withdatakit.com>",
+  "sideEffects": false,
   "type": "module",
   "exports": {
     "./cloud/*": "./src/cloud/*.ts",
     "./proto/*": "./src/proto/*.ts",
     "./protoformsdk/*": "./src/protoformsdk/*.ts"
   },
+  "files": [
+    "dist",
+    "legal",
+    "LICENSE",
+    "NOTICE"
+  ],
   "scripts": {
     "build": "tsdown",
     "format": "eslint --fix .",

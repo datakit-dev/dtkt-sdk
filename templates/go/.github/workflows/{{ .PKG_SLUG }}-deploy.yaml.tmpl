@@ -29,13 +29,16 @@ jobs:
       id-token: write
 
     steps:
-    - uses: datakit-dev/dtkt-dev/.github/actions/setup-monorepo@main
+    - uses: datakit-dev/.github/actions/setup-monorepo@main
       with:
+        dtkt-dev-sparse-checkout: |
+          scripts
+          tasks
         dtkt-sdk-sparse-checkout: sdk-go
         dtkt-github-actions-app-id: {{`${{ vars.DTKT_GITHUB_ACTIONS_APP_ID }}`}}
         dtkt-github-actions-private-key: {{`${{ secrets.DTKT_GITHUB_ACTIONS_PRIVATE_KEY }}`}}
 
-    - uses: datakit-dev/dtkt-dev/.github/actions/setup@main
+    - uses: datakit-dev/.github/actions/setup@main
       with:
         task: true
         versions: {{`${{ vars.VERSIONS }}`}}
@@ -96,7 +99,15 @@ jobs:
     needs: docker-build-push
 
     steps:
-    - uses: datakit-dev/dtkt-dev/.github/actions/setup@main
+    - uses: datakit-dev/.github/actions/setup-monorepo@main
+      with:
+        dtkt-dev-sparse-checkout: |
+          scripts
+          tasks
+        dtkt-github-actions-app-id: {{`${{ vars.DTKT_GITHUB_ACTIONS_APP_ID }}`}}
+        dtkt-github-actions-private-key: {{`${{ secrets.DTKT_GITHUB_ACTIONS_PRIVATE_KEY }}`}}
+
+    - uses: datakit-dev/.github/actions/setup@main
       with:
         argocd: true
         versions: {{`${{ vars.VERSIONS }}`}}
@@ -109,13 +120,7 @@ jobs:
         tags: type=sha,format=long
         flavor: latest=false
 
-    # - uses: datakit-dev/dtkt-dev/.github/actions/cloudflare-warp@main
-    #   with:
-    #     organization: {{`${{ vars.CLOUDFLARE_WARP_ORGANIZATION }}`}}
-    #     auth-client-id: {{`${{ vars.CLOUDFLARE_WARP_AUTH_CLIENT_ID }}`}}
-    #     auth-client-secret: {{`${{ secrets.CLOUDFLARE_WARP_AUTH_CLIENT_SECRET }}`}}
-
-    - uses: datakit-dev/dtkt-dev/.github/actions/deploy@main
+    - uses: datakit-dev/.github/actions/deploy@main
       with:
         project-name: dtkt-integrations
         argocd-app-name: dtkt-integrations-{{`${{ env.PKG_SLUG }}`}}-pkg
