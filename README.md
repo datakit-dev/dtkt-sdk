@@ -10,20 +10,24 @@
 
 # DataKit SDK
 
-[![Release](https://img.shields.io/github/v/release/datakit-dev/dtkt-sdk?style=for-the-badge)](https://github.com/datakit-dev/dtkt-sdk/releases)
-[![License](https://img.shields.io/github/license/datakit-dev/dtkt-sdk?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/License-BUSL--1.1-blue?style=for-the-badge)](https://spdx.org/licenses/BUSL-1.1.html)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-blue?style=for-the-badge)](https://conventionalcommits.org)
 
 ## Go SDK
 
-![Build](https://img.shields.io/github/actions/workflow/status/datakit-dev/dtkt-sdk/publish-dtkt-sdk.yaml?style=for-the-badge)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/datakit-dev/dtkt-sdk?style=for-the-badge&filename=sdk-go/go.mod)](sdk-go/go.mod)
+[![Release](https://img.shields.io/github/v/release/datakit-dev/dtkt-sdk?filter=sdk-go*&style=for-the-badge)](https://github.com/datakit-dev/dtkt-sdk/releases?q=sdk-go)
 [![Go Doc](https://img.shields.io/badge/godoc-reference-blue?style=for-the-badge)](http://godoc.org/github.com/datakit-dev/dtkt-sdk/sdk-go)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/datakit-dev/dtkt-sdk?style=for-the-badge&filename=sdk-go/go.mod)](sdk-go/go.mod)
+
+## TypeScript SDK
+
+[![Release](https://img.shields.io/github/v/release/datakit-dev/dtkt-sdk?filter=sdk-ts*&style=for-the-badge)](https://github.com/datakit-dev/dtkt-sdk/releases?q=sdk-ts)
+[![npm](https://img.shields.io/npm/v/@dtkt/sdk?style=for-the-badge)](https://www.npmjs.com/package/@dtkt/sdk)
+[![Node Version](https://img.shields.io/node/v/@dtkt/sdk?style=for-the-badge)](https://nodejs.org)
 
 <!--
 ## Java SDK
 ## Python SDK
-## TypeScript SDK
 ## ...
 -->
 
