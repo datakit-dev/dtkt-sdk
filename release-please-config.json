@@ -6,16 +6,14 @@
       "package-name": "sdk-go",
       "component": "sdk-go",
       "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true,
-      "release-as": "0.0.1"
+      "bump-patch-for-minor-pre-major": true
     },
     "sdk-ts": {
       "release-type": "node",
       "package-name": "@dtkt/sdk",
       "component": "sdk-ts",
       "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true,
-      "release-as": "0.0.1"
+      "bump-patch-for-minor-pre-major": true
     }
   }
 }
