@@ -1,4 +1,4 @@
-name: Publish the TypeScript SDK
+name: Publish TypeScript SDK
 
 on:
   release:
@@ -7,17 +7,26 @@ on:
 jobs:
   build-publish:
     name: Build & Publish
+    environment: prd
     if: startsWith(github.event.release.tag_name, 'sdk-ts-v')
     runs-on: ${{ vars.RUNNER }}
 
+    # Needed for npm trusted publishers
+    permissions:
+      contents: read
+      id-token: write
+
     steps:
-    - uses: datakit-dev/dtkt-dev/.github/actions/setup-monorepo@main
+    - uses: datakit-dev/.github/actions/setup-monorepo@main
       with:
+        dtkt-dev-sparse-checkout: |
+          scripts
+          tasks
         dtkt-core-sparse-checkout: packages
         dtkt-github-actions-app-id: ${{ vars.DTKT_GITHUB_ACTIONS_APP_ID }}
         dtkt-github-actions-private-key: ${{ secrets.DTKT_GITHUB_ACTIONS_PRIVATE_KEY }}
 
-    - uses: datakit-dev/dtkt-dev/.github/actions/setup@main
+    - uses: datakit-dev/.github/actions/setup@main
       with:
         task: true
         node: true
