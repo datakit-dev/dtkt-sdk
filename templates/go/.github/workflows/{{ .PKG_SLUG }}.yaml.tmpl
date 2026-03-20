@@ -40,7 +40,7 @@ jobs:
           ./dtkt-universe/dtkt-integrations/packages/{{`${{ env.PKG_SLUG }}`}}/go.sum
           ./dtkt-universe/dtkt-sdk/sdk-go/go.sum
 
-    - run: task setup-local
+    - run: task setup
       working-directory: ./dtkt-universe/dtkt-integrations/packages/{{`${{ env.PKG_SLUG }}`}}
 
     - name: Build
