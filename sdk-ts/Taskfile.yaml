@@ -15,6 +15,10 @@ tasks:
     - pnpm run lint
     - pnpm run typecheck
 
+  build:
+    cmds:
+    - pnpm run build
+
   test:
     cmds:
     - pnpm run test
@@ -98,5 +102,5 @@ tasks:
     - cp ../LICENSE .
     # Extract header + sdk-ts section only (skip sdk-go section)
     - awk '/^### sdk-go$/{skip=1} /^### sdk-ts$/{skip=0} !skip{print}' ../NOTICE > NOTICE
-    - pnpm publish
+    - pnpm publish {{.CLI_ARGS}}
     - rm LICENSE NOTICE

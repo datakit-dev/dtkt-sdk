@@ -22,13 +22,16 @@ jobs:
       checks: write
 
     steps:
-    - uses: datakit-dev/dtkt-dev/.github/actions/setup-monorepo@main
+    - uses: datakit-dev/.github/actions/setup-monorepo@main
       with:
+        dtkt-dev-sparse-checkout: |
+          scripts
+          tasks
         dtkt-sdk-sparse-checkout: sdk-go
         dtkt-github-actions-app-id: {{`${{ vars.DTKT_GITHUB_ACTIONS_APP_ID }}`}}
         dtkt-github-actions-private-key: {{`${{ secrets.DTKT_GITHUB_ACTIONS_PRIVATE_KEY }}`}}
 
-    - uses: datakit-dev/dtkt-dev/.github/actions/setup@main
+    - uses: datakit-dev/.github/actions/setup@main
       with:
         task: true
         go: true

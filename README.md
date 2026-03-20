@@ -54,7 +54,7 @@ We take security seriously! Please review our [SECURITY.md](SECURITY.md) file fo
 
 This project is licensed under the [DataKit Business Source License 1.1](https://withdatakit.com/legal/bsl) - see the [LICENSE](LICENSE) file for details.  By contributing, you agree your contributions will be licensed under the same terms.
 
-Copyright © 2025 DataKit, LLC <legal@withdatakit.com>
+Copyright © 2026 DataKit, LLC <legal@withdatakit.com>
 
 ### Notice
 
