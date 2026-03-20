@@ -79,15 +79,18 @@
     "typescript": "catalog:default",
     "vitest": "catalog:test"
   },
+  "engines": {
+    "node": "^24"
+  },
   "publishConfig": {
     "access": "public",
-    "provenance": true,
     "dependencies": {},
     "devDependencies": {},
     "exports": {
       "./cloud/*": "./dist/cloud/*.mjs",
       "./proto/*": "./dist/proto/*.mjs",
       "./protoformsdk/*": "./dist/protoformsdk/*.mjs"
-    }
+    },
+    "provenance": true
   }
 }

@@ -16,8 +16,8 @@
 ## Go SDK
 
 [![Release](https://img.shields.io/github/v/release/datakit-dev/dtkt-sdk?filter=sdk-go*&style=for-the-badge)](https://github.com/datakit-dev/dtkt-sdk/releases?q=sdk-go)
-[![Go Doc](https://img.shields.io/badge/godoc-reference-blue?style=for-the-badge)](http://godoc.org/github.com/datakit-dev/dtkt-sdk/sdk-go)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/datakit-dev/dtkt-sdk?style=for-the-badge&filename=sdk-go/go.mod)](sdk-go/go.mod)
+[![Go Doc](https://img.shields.io/badge/go-reference-blue?style=for-the-badge&logo=go&logoColor=white)](https://pkg.go.dev/github.com/datakit-dev/dtkt-sdk/sdk-go)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/datakit-dev/dtkt-sdk?style=for-the-badge&logo=go&logoColor=white&filename=sdk-go/go.mod)](sdk-go/go.mod)
 
 ## TypeScript SDK
 
