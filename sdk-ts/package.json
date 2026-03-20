@@ -80,6 +80,8 @@
     "vitest": "catalog:test"
   },
   "publishConfig": {
+    "access": "public",
+    "provenance": true,
     "dependencies": {},
     "devDependencies": {},
     "exports": {

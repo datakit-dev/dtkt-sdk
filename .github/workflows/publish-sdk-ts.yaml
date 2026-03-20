@@ -7,8 +7,14 @@ on:
 jobs:
   build-publish:
     name: Build & Publish
+    environment: prd
     if: startsWith(github.event.release.tag_name, 'sdk-ts-v')
     runs-on: ${{ vars.RUNNER }}
+
+    # Needed for npm trusted publishers
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
     - uses: datakit-dev/.github/actions/setup-monorepo@main
