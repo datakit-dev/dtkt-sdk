@@ -23,7 +23,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dtkt/flow/v1beta1/spec.proto.
  */
 export const file_dtkt_flow_v1beta1_spec: GenFile = /*@__PURE__*/
-  fileDesc("ChxkdGt0L2Zsb3cvdjFiZXRhMS9zcGVjLnByb3RvEhFkdGt0LmZsb3cudjFiZXRhMSLDAgoERmxvdxIUCgRuYW1lGAEgASgJQga6SAPIAQESHQoLZGVzY3JpcHRpb24YAiABKAlCCIK1GAQqAggBEjIKC2Nvbm5lY3Rpb25zGAMgAygLMh0uZHRrdC5mbG93LnYxYmV0YTEuQ29ubmVjdGlvbhIoCgZpbnB1dHMYBCADKAsyGC5kdGt0LmZsb3cudjFiZXRhMS5JbnB1dBIkCgR2YXJzGAUgAygLMhYuZHRrdC5mbG93LnYxYmV0YTEuVmFyEioKB2FjdGlvbnMYByADKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5BY3Rpb24SKgoHb3V0cHV0cxgJIAMoCzIZLmR0a3QuZmxvdy52MWJldGExLk91dHB1dBIqCgdzdHJlYW1zGAogAygLMhkuZHRrdC5mbG93LnYxYmV0YTEuU3RyZWFtIqEBCgpDb25uZWN0aW9uEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSNgoHcGFja2FnZRgCIAEoCzIlLmR0a3Quc2hhcmVkLnYxYmV0YTEuUGFja2FnZS5JZGVudGl0eRIQCghzZXJ2aWNlcxgDIAMoCToaukgXIhUKB3BhY2thZ2UKCHNlcnZpY2VzEAEi3AQKBUlucHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSJwoEYm9vbBgDIAEoCzIXLmR0a3QuZmxvdy52MWJldGExLkJvb2xIABIpCgVieXRlcxgEIAEoCzIYLmR0a3QuZmxvdy52MWJldGExLkJ5dGVzSAASKwoGZG91YmxlGAUgASgLMhkuZHRrdC5mbG93LnYxYmV0YTEuRG91YmxlSAASKQoFZmxvYXQYBiABKAsyGC5kdGt0LmZsb3cudjFiZXRhMS5GbG9hdEgAEikKBWludDY0GAcgASgLMhguZHRrdC5mbG93LnYxYmV0YTEuSW50NjRIABIrCgZ1aW50NjQYCCABKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5VaW50NjRIABIpCgVpbnQzMhgJIAEoCzIYLmR0a3QuZmxvdy52MWJldGExLkludDMySAASKwoGdWludDMyGAogASgLMhkuZHRrdC5mbG93LnYxYmV0YTEuVWludDMySAASKwoGc3RyaW5nGAsgASgLMhkuZHRrdC5mbG93LnYxYmV0YTEuU3RyaW5nSAASJwoEbGlzdBgMIAEoCzIXLmR0a3QuZmxvdy52MWJldGExLkxpc3RIABIlCgNtYXAYDSABKAsyFi5kdGt0LmZsb3cudjFiZXRhMS5NYXBIABItCgdtZXNzYWdlGA4gASgLMhouZHRrdC5mbG93LnYxYmV0YTEuTWVzc2FnZUgAEg0KBWNhY2hlGBQgASgIQg0KBHR5cGUSBbpIAggBIrwBCgNWYXISLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10rJBINCgVjYWNoZRgCIAEoCBI7CgV2YWx1ZRgDIAEoCUIqukgnciUyCF5ccz89XHM/kgIYID0gaW5wdXRzLmZvby5nZXRWYWx1ZSgpSAASKwoGc3dpdGNoGAQgASgLMhkuZHRrdC5mbG93LnYxYmV0YTEuU3dpdGNoSABCDQoEdHlwZRIFukgCCAEi/QEKBkFjdGlvbhItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSskEiIKBnJ1bl9pZhgCIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EiQKCG9uX2Vycm9yGAMgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8SDQoFY2FjaGUYCiABKAgSLQoEY2FsbBgEIAEoCzIdLmR0a3QuZmxvdy52MWJldGExLk1ldGhvZENhbGxIABItCgR1c2VyGAUgASgLMh0uZHRrdC5mbG93LnYxYmV0YTEuVXNlckFjdGlvbkgAQg0KBHR5cGUSBbpIAggBIloKBk91dHB1dBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSskEiEKBXZhbHVlGAIgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8i7wEKBlN0cmVhbRItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSskEiQKCHN0YXJ0X2lmGAogASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8SIwoHc3RvcF9pZhgLIAEoCUISukgP2AEBcgoyCF5ccz89XHM/Ei0KBGNhbGwYAiABKAsyHS5kdGt0LmZsb3cudjFiZXRhMS5NZXRob2RDYWxsSAASLQoIZ2VuZXJhdGUYAyABKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5UaWNrZXJIAEINCgR0eXBlEgW6SAIIASK6AQoKTWV0aG9kQ2FsbBI1Cgpjb25uZWN0aW9uGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSJgoGbWV0aG9kGAIgASgJQha6SBPIAQFyDjIMW2EtekEtWi5fL10rEicKB3JlcXVlc3QYAyABKAsyFi5nb29nbGUucHJvdG9idWYuVmFsdWUSJAoIcmVzcG9uc2UYBCABKAlCErpID9gBAXIKMgheXHM/PVxzPyKnBgoKVXNlckFjdGlvbhIzCgZpbnB1dHMYASADKAsyIy5kdGt0LmZsb3cudjFiZXRhMS5Vc2VyQWN0aW9uLklucHV0GjkKDkNvbmZpcm1CaW5kaW5nEicKBXZhbHVlGAEgASgIQhiCtRgUIhIKB0FwcHJvdmUSB0RlY2xpbmUaJQoMSW5wdXRCaW5kaW5nEhUKBXZhbHVlGAEgASgJQgaCtRgCKgAaJAoLRmlsZUJpbmRpbmcSFQoFdmFsdWUYASABKAxCBoK1GAIyABo8Cg1TZWxlY3RCaW5kaW5nEisKBXZhbHVlGAEgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueUIGgrUYAjoAGkEKEk11bHRpU2VsZWN0QmluZGluZxIrCgV2YWx1ZRgBIAMoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnlCBoK1GAJCABraAwoFSW5wdXQSLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10rJBIpCgV0aXRsZRgCIAEoCUIaukgXyAEBchIyEF5ccz8oPSk/XHM/KC4qKSQSMQoLZGVzY3JpcHRpb24YAyABKAlCF7pIFHISMhBeXHM/KD0pP1xzPyguKikkSAGIAQESOQoHY29uZmlybRgEIAEoCzImLmR0a3QucHJvdG9mb3JtLnYxYmV0YTEuQ29uZmlybUVsZW1lbnRIABI1CgVpbnB1dBgFIAEoCzIkLmR0a3QucHJvdG9mb3JtLnYxYmV0YTEuSW5wdXRFbGVtZW50SAASMwoEZmlsZRgGIAEoCzIjLmR0a3QucHJvdG9mb3JtLnYxYmV0YTEuRmlsZUVsZW1lbnRIABI3CgZzZWxlY3QYByABKAsyJS5kdGt0LnByb3RvZm9ybS52MWJldGExLlNlbGVjdEVsZW1lbnRIABJCCgxtdWx0aV9zZWxlY3QYCCABKAsyKi5kdGt0LnByb3RvZm9ybS52MWJldGExLk11bHRpU2VsZWN0RWxlbWVudEgAQhAKB2VsZW1lbnQSBbpIAggBQg4KDF9kZXNjcmlwdGlvbiLNAQoGU3dpdGNoEiEKBXZhbHVlGAEgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8SLAoEY2FzZRgCIAMoCzIeLmR0a3QuZmxvdy52MWJldGExLlN3aXRjaC5DYXNlEiMKB2RlZmF1bHQYAyABKAlCErpID8gBAXIKMgheXHM/PVxzPxpNCgRDYXNlEiEKBXZhbHVlGAEgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8SIgoGcmV0dXJuGAIgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8iiQEKBlRpY2tlchIwCgVldmVyeRgBIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIGukgDyAEBEioKB2luaXRpYWwYAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SIQoFdmFsdWUYAyABKAlCErpID9gBAXIKMgheXHM/PVxzP0LWAQoXcHJvdG8uZHRrdC5mbG93LnYxYmV0YTFCCVNwZWNQcm90b1ABWkpnaXRodWIuY29tL2RhdGFraXQtZGV2L2R0a3Qtc2RrL3Nkay1nby9wcm90by9kdGt0L2Zsb3cvdjFiZXRhMTtmbG93djFiZXRhMaICA0RGWKoCEUR0a3QuRmxvdy5WMWJldGExygIRRHRrdFxGbG93XFYxYmV0YTHiAh1EdGt0XEZsb3dcVjFiZXRhMVxHUEJNZXRhZGF0YeoCE0R0a3Q6OkZsb3c6OlYxYmV0YTFiBnByb3RvMw", [file_buf_validate_validate, file_dtkt_flow_v1beta1_type, file_dtkt_protoform_v1beta1_protoform, file_dtkt_shared_v1beta1_messages, file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_struct]);
+  fileDesc("ChxkdGt0L2Zsb3cvdjFiZXRhMS9zcGVjLnByb3RvEhFkdGt0LmZsb3cudjFiZXRhMSLDAgoERmxvdxIUCgRuYW1lGAEgASgJQga6SAPIAQESHQoLZGVzY3JpcHRpb24YAiABKAlCCIK1GAQqAggBEjIKC2Nvbm5lY3Rpb25zGAMgAygLMh0uZHRrdC5mbG93LnYxYmV0YTEuQ29ubmVjdGlvbhIoCgZpbnB1dHMYBCADKAsyGC5kdGt0LmZsb3cudjFiZXRhMS5JbnB1dBIkCgR2YXJzGAUgAygLMhYuZHRrdC5mbG93LnYxYmV0YTEuVmFyEioKB2FjdGlvbnMYByADKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5BY3Rpb24SKgoHb3V0cHV0cxgJIAMoCzIZLmR0a3QuZmxvdy52MWJldGExLk91dHB1dBIqCgdzdHJlYW1zGAogAygLMhkuZHRrdC5mbG93LnYxYmV0YTEuU3RyZWFtIqEBCgpDb25uZWN0aW9uEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSNgoHcGFja2FnZRgCIAEoCzIlLmR0a3Quc2hhcmVkLnYxYmV0YTEuUGFja2FnZS5JZGVudGl0eRIQCghzZXJ2aWNlcxgDIAMoCToaukgXIhUKB3BhY2thZ2UKCHNlcnZpY2VzEAEi6wQKBUlucHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSEgoFY2FjaGUYAiABKAhIAYgBARInCgRib29sGAMgASgLMhcuZHRrdC5mbG93LnYxYmV0YTEuQm9vbEgAEikKBWJ5dGVzGAQgASgLMhguZHRrdC5mbG93LnYxYmV0YTEuQnl0ZXNIABIrCgZkb3VibGUYBSABKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5Eb3VibGVIABIpCgVmbG9hdBgGIAEoCzIYLmR0a3QuZmxvdy52MWJldGExLkZsb2F0SAASKQoFaW50NjQYByABKAsyGC5kdGt0LmZsb3cudjFiZXRhMS5JbnQ2NEgAEisKBnVpbnQ2NBgIIAEoCzIZLmR0a3QuZmxvdy52MWJldGExLlVpbnQ2NEgAEikKBWludDMyGAkgASgLMhguZHRrdC5m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dC5wcm90b2Zvcm0udjFiZXRhMS5Db25maXJtRWxlbWVudEgAEjUKBWlucHV0GAUgASgLMiQuZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5JbnB1dEVsZW1lbnRIABIzCgRmaWxlGAYgASgLMiMuZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5GaWxlRWxlbWVudEgAEjcKBnNlbGVjdBgHIAEoCzIlLmR0a3QucHJvdG9mb3JtLnYxYmV0YTEuU2VsZWN0RWxlbWVudEgAEkIKDG11bHRpX3NlbGVjdBgIIAEoCzIqLmR0a3QucHJvdG9mb3JtLnYxYmV0YTEuTXVsdGlTZWxlY3RFbGVtZW50SABCEAoHZWxlbWVudBIFukgCCAFCDgoMX2Rlc2NyaXB0aW9uIs0BCgZTd2l0Y2gSIQoFdmFsdWUYASABKAlCErpID8gBAXIKMgheXHM/PVxzPxIsCgRjYXNlGAIgAygLMh4uZHRrdC5mbG93LnYxYmV0YTEuU3dpdGNoLkNhc2USIwoHZGVmYXVsdBgDIAEoCUISukgPyAEBcgoyCF5ccz89XHM/Gk0KBENhc2USIQoFdmFsdWUYASABKAlCErpID8gBAXIKMgheXHM/PVxzPxIiCgZyZXR1cm4YAiABKAlCErpID8gBAXIKMgheXHM/PVxzPyKJAQoGVGlja2VyEjAKBWV2ZXJ5GAEgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uQga6SAPIAQESKgoHaW5pdGlhbBgCIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIhCgV2YWx1ZRgDIAEoCUISukgP2AEBcgoyCF5ccz89XHM/QtYBChdwcm90by5kdGt0LmZsb3cudjFiZXRhMUIJU3BlY1Byb3RvUAFaSmdpdGh1Yi5jb20vZGF0YWtpdC1kZXYvZHRrdC1zZGsvc2RrLWdvL3Byb3RvL2R0a3QvZmxvdy92MWJldGExO2Zsb3d2MWJldGExogIDREZYqgIRRHRrdC5GbG93LlYxYmV0YTHKAhFEdGt0XEZsb3dcVjFiZXRhMeICHUR0a3RcRmxvd1xWMWJldGExXEdQQk1ldGFkYXRh6gITRHRrdDo6Rmxvdzo6VjFiZXRhMWIGcHJvdG8z", [file_buf_validate_validate, file_dtkt_flow_v1beta1_type, file_dtkt_protoform_v1beta1_protoform, file_dtkt_shared_v1beta1_messages, file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_struct]);
 
 /**
  * @generated from message dtkt.flow.v1beta1.Flow
@@ -132,11 +132,15 @@ export type Connection = Message<"dtkt.flow.v1beta1.Connection"> & {
   id: string;
 
   /**
+   * Connection must resolve to an integration with the given package identity.
+   *
    * @generated from field: dtkt.shared.v1beta1.Package.Identity package = 2;
    */
   package?: Package_Identity;
 
   /**
+   * Connection must resolve to a server which implements the given services.
+   *
    * @generated from field: repeated string services = 3;
    */
   services: string[];
@@ -152,11 +156,15 @@ export type ConnectionValid = Message<"dtkt.flow.v1beta1.Connection"> & {
   id: string;
 
   /**
+   * Connection must resolve to an integration with the given package identity.
+   *
    * @generated from field: dtkt.shared.v1beta1.Package.Identity package = 2;
    */
   package?: Package_IdentityValid;
 
   /**
+   * Connection must resolve to a server which implements the given services.
+   *
    * @generated from field: repeated string services = 3;
    */
   services: string[];
@@ -177,6 +185,13 @@ export type Input = Message<"dtkt.flow.v1beta1.Input"> & {
    * @generated from field: string id = 1;
    */
   id: string;
+
+  /**
+   * When true input always returns its first non-null memoized value.
+   *
+   * @generated from field: optional bool cache = 2;
+   */
+  cache?: boolean;
 
   /**
    * @generated from oneof dtkt.flow.v1beta1.Input.type
@@ -254,11 +269,6 @@ export type Input = Message<"dtkt.flow.v1beta1.Input"> & {
     value: Message$1;
     case: "message";
   } | { case: undefined; value?: undefined };
-
-  /**
-   * @generated from field: bool cache = 20;
-   */
-  cache: boolean;
 };
 
 /**
@@ -269,6 +279,13 @@ export type InputValid = Message<"dtkt.flow.v1beta1.Input"> & {
    * @generated from field: string id = 1;
    */
   id: string;
+
+  /**
+   * When true input always returns its first non-null memoized value.
+   *
+   * @generated from field: optional bool cache = 2;
+   */
+  cache?: boolean;
 
   /**
    * @generated from oneof dtkt.flow.v1beta1.Input.type
@@ -346,11 +363,6 @@ export type InputValid = Message<"dtkt.flow.v1beta1.Input"> & {
     value: MessageValid;
     case: "message";
   } | { case: undefined; value?: undefined };
-
-  /**
-   * @generated from field: bool cache = 20;
-   */
-  cache: boolean;
 };
 
 /**
@@ -372,32 +384,25 @@ export type Var = Message<"dtkt.flow.v1beta1.Var"> & {
   id: string;
 
   /**
-   * When cache is true var always returns its first non-null memoized value.
+   * When true var always returns its first non-null memoized value.
    *
-   * @generated from field: bool cache = 2;
+   * @generated from field: optional bool cache = 2;
    */
-  cache: boolean;
+  cache?: boolean;
 
   /**
-   * @generated from oneof dtkt.flow.v1beta1.Var.type
+   * Given expression evaluates to var's memoized value, example: "= inputs.foo.getValue()"
+   *
+   * @generated from field: string value = 3;
    */
-  type: {
-    /**
-     * Given expression evaluates to var's memoized value, example: "= inputs.foo.getValue()"
-     *
-     * @generated from field: string value = 3;
-     */
-    value: string;
-    case: "value";
-  } | {
-    /**
-     * Given switch statement's first matching case (otherwise default) evaluates to var's memoized value.
-     *
-     * @generated from field: dtkt.flow.v1beta1.Switch switch = 4;
-     */
-    value: Switch;
-    case: "switch";
-  } | { case: undefined; value?: undefined };
+  value: string;
+
+  /**
+   * Given switch statement's first matching case (otherwise default) evaluates to var's memoized value.
+   *
+   * @generated from field: dtkt.flow.v1beta1.Switch switch = 4;
+   */
+  switch?: Switch;
 };
 
 /**
@@ -412,32 +417,25 @@ export type VarValid = Message<"dtkt.flow.v1beta1.Var"> & {
   id: string;
 
   /**
-   * When cache is true var always returns its first non-null memoized value.
+   * When true var always returns its first non-null memoized value.
    *
-   * @generated from field: bool cache = 2;
+   * @generated from field: optional bool cache = 2;
    */
-  cache: boolean;
+  cache?: boolean;
 
   /**
-   * @generated from oneof dtkt.flow.v1beta1.Var.type
+   * Given expression evaluates to var's memoized value, example: "= inputs.foo.getValue()"
+   *
+   * @generated from field: string value = 3;
    */
-  type: {
-    /**
-     * Given expression evaluates to var's memoized value, example: "= inputs.foo.getValue()"
-     *
-     * @generated from field: string value = 3;
-     */
-    value: string;
-    case: "value";
-  } | {
-    /**
-     * Given switch statement's first matching case (otherwise default) evaluates to var's memoized value.
-     *
-     * @generated from field: dtkt.flow.v1beta1.Switch switch = 4;
-     */
-    value: SwitchValid;
-    case: "switch";
-  } | { case: undefined; value?: undefined };
+  value: string;
+
+  /**
+   * Given switch statement's first matching case (otherwise default) evaluates to var's memoized value.
+   *
+   * @generated from field: dtkt.flow.v1beta1.Switch switch = 4;
+   */
+  switch?: SwitchValid;
 };
 
 /**
@@ -457,38 +455,36 @@ export type Action = Message<"dtkt.flow.v1beta1.Action"> & {
   id: string;
 
   /**
-   * @generated from field: string run_if = 2;
-   */
-  runIf: string;
-
-  /**
-   * @generated from field: string on_error = 3;
-   */
-  onError: string;
-
-  /**
-   * When cache is true action always returns its first non-null memoized value.
+   * When true action always returns its first non-null memoized value.
    *
-   * @generated from field: bool cache = 10;
+   * @generated from field: optional bool cache = 2;
    */
-  cache: boolean;
+  cache?: boolean;
 
   /**
-   * @generated from oneof dtkt.flow.v1beta1.Action.type
+   * Execute action when given expression evaluates to true; optional.
+   *
+   * @generated from field: optional string run_if = 3;
    */
-  type: {
-    /**
-     * @generated from field: dtkt.flow.v1beta1.MethodCall call = 4;
-     */
-    value: MethodCall;
-    case: "call";
-  } | {
-    /**
-     * @generated from field: dtkt.flow.v1beta1.UserAction user = 5;
-     */
-    value: UserAction;
-    case: "user";
-  } | { case: undefined; value?: undefined };
+  runIf?: string;
+
+  /**
+   * Return evaluation of given expression when an error is encountered in call
+   * or user; optional.
+   *
+   * @generated from field: optional string on_error = 4;
+   */
+  onError?: string;
+
+  /**
+   * @generated from field: dtkt.flow.v1beta1.MethodCall call = 5;
+   */
+  call?: MethodCall;
+
+  /**
+   * @generated from field: dtkt.flow.v1beta1.UserAction user = 6;
+   */
+  user?: UserAction;
 };
 
 /**
@@ -501,38 +497,36 @@ export type ActionValid = Message<"dtkt.flow.v1beta1.Action"> & {
   id: string;
 
   /**
-   * @generated from field: string run_if = 2;
-   */
-  runIf: string;
-
-  /**
-   * @generated from field: string on_error = 3;
-   */
-  onError: string;
-
-  /**
-   * When cache is true action always returns its first non-null memoized value.
+   * When true action always returns its first non-null memoized value.
    *
-   * @generated from field: bool cache = 10;
+   * @generated from field: optional bool cache = 2;
    */
-  cache: boolean;
+  cache?: boolean;
 
   /**
-   * @generated from oneof dtkt.flow.v1beta1.Action.type
+   * Execute action when given expression evaluates to true; optional.
+   *
+   * @generated from field: optional string run_if = 3;
    */
-  type: {
-    /**
-     * @generated from field: dtkt.flow.v1beta1.MethodCall call = 4;
-     */
-    value: MethodCallValid;
-    case: "call";
-  } | {
-    /**
-     * @generated from field: dtkt.flow.v1beta1.UserAction user = 5;
-     */
-    value: UserActionValid;
-    case: "user";
-  } | { case: undefined; value?: undefined };
+  runIf?: string;
+
+  /**
+   * Return evaluation of given expression when an error is encountered in call
+   * or user; optional.
+   *
+   * @generated from field: optional string on_error = 4;
+   */
+  onError?: string;
+
+  /**
+   * @generated from field: dtkt.flow.v1beta1.MethodCall call = 5;
+   */
+  call?: MethodCallValid;
+
+  /**
+   * @generated from field: dtkt.flow.v1beta1.UserAction user = 6;
+   */
+  user?: UserActionValid;
 };
 
 /**
@@ -591,33 +585,26 @@ export type Stream = Message<"dtkt.flow.v1beta1.Stream"> & {
   /**
    * Start stream when expression evaluates to true; optional.
    *
-   * @generated from field: string start_if = 10;
+   * @generated from field: optional string start_if = 2;
    */
-  startIf: string;
+  startIf?: string;
 
   /**
    * Stop stream when expression evaluates to true; optional.
    *
-   * @generated from field: string stop_if = 11;
+   * @generated from field: optional string stop_if = 3;
    */
-  stopIf: string;
+  stopIf?: string;
 
   /**
-   * @generated from oneof dtkt.flow.v1beta1.Stream.type
+   * @generated from field: dtkt.flow.v1beta1.MethodCall call = 4;
    */
-  type: {
-    /**
-     * @generated from field: dtkt.flow.v1beta1.MethodCall call = 2;
-     */
-    value: MethodCall;
-    case: "call";
-  } | {
-    /**
-     * @generated from field: dtkt.flow.v1beta1.Ticker generate = 3;
-     */
-    value: Ticker;
-    case: "generate";
-  } | { case: undefined; value?: undefined };
+  call?: MethodCall;
+
+  /**
+   * @generated from field: dtkt.flow.v1beta1.Ticker generate = 5;
+   */
+  generate?: Ticker;
 };
 
 /**
@@ -632,33 +619,26 @@ export type StreamValid = Message<"dtkt.flow.v1beta1.Stream"> & {
   /**
    * Start stream when expression evaluates to true; optional.
    *
-   * @generated from field: string start_if = 10;
+   * @generated from field: optional string start_if = 2;
    */
-  startIf: string;
+  startIf?: string;
 
   /**
    * Stop stream when expression evaluates to true; optional.
    *
-   * @generated from field: string stop_if = 11;
+   * @generated from field: optional string stop_if = 3;
    */
-  stopIf: string;
+  stopIf?: string;
 
   /**
-   * @generated from oneof dtkt.flow.v1beta1.Stream.type
+   * @generated from field: dtkt.flow.v1beta1.MethodCall call = 4;
    */
-  type: {
-    /**
-     * @generated from field: dtkt.flow.v1beta1.MethodCall call = 2;
-     */
-    value: MethodCallValid;
-    case: "call";
-  } | {
-    /**
-     * @generated from field: dtkt.flow.v1beta1.Ticker generate = 3;
-     */
-    value: TickerValid;
-    case: "generate";
-  } | { case: undefined; value?: undefined };
+  call?: MethodCallValid;
+
+  /**
+   * @generated from field: dtkt.flow.v1beta1.Ticker generate = 5;
+   */
+  generate?: TickerValid;
 };
 
 /**
@@ -686,11 +666,6 @@ export type MethodCall = Message<"dtkt.flow.v1beta1.MethodCall"> & {
    * @generated from field: google.protobuf.Value request = 3;
    */
   request?: Value;
-
-  /**
-   * @generated from field: string response = 4;
-   */
-  response: string;
 };
 
 /**
@@ -711,11 +686,6 @@ export type MethodCallValid = Message<"dtkt.flow.v1beta1.MethodCall"> & {
    * @generated from field: google.protobuf.Value request = 3;
    */
   request?: Value;
-
-  /**
-   * @generated from field: string response = 4;
-   */
-  response: string;
 };
 
 /**

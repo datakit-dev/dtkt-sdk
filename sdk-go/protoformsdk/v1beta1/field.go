@@ -1,4 +1,4 @@
-package form
+package v1beta1
 
 import (
 	"fmt"
@@ -8,13 +8,13 @@ import (
 
 type (
 	FieldGroup struct {
-		message            *Message
-		fields             []*Field
-		hidden             bool
-		title, description string
+		fields []Field
+		title,
+		description string
+		hidden bool
 	}
 	Field struct {
-		Type FieldType
+		FieldType
 	}
 	FieldType interface {
 		Parent() *Message
@@ -27,70 +27,66 @@ type (
 	}
 )
 
-func NewFieldGroup(message *Message, fields ...*Field) *FieldGroup {
-	var title, desc string
-	if message != nil && message.Descriptor() != nil {
-		title = fmt.Sprint(message.Descriptor().Name())
-		desc = GetProtoDescription(message.Descriptor())
-		if desc == "" {
-			desc = fmt.Sprint(message.Descriptor().FullName())
-		}
-	}
-
+func NewFieldGroup(fields ...Field) *FieldGroup {
 	return &FieldGroup{
-		message:     message,
-		fields:      fields,
-		title:       title,
-		description: desc,
+		fields: fields,
 	}
 }
 
-func NewField(fieldType FieldType) *Field {
-	return &Field{
-		Type: fieldType,
+func (f *Field) Get() protoreflect.Value {
+	if _, ok := f.IsList(); ok {
+		return f.Parent().Get().Mutable(f.Descriptor())
+	} else if _, ok := f.IsMap(); ok {
+		return f.Parent().Get().Mutable(f.Descriptor())
+	} else if _, ok := f.IsMessage(); ok {
+		return f.Parent().Get().Mutable(f.Descriptor())
+	} else {
+		return f.Parent().Get().Get(f.Descriptor())
 	}
+}
+
+func (f *Field) Set(value protoreflect.Value) {
+	f.Parent().Get().Set(f.Descriptor(), value)
 }
 
 func (f *Field) IsList() (*ListField, bool) {
-	l, ok := f.Type.(*ListField)
+	l, ok := f.FieldType.(*ListField)
 	return l, ok
 }
 
 func (f *Field) IsMap() (*MapField, bool) {
-	m, ok := f.Type.(*MapField)
+	m, ok := f.FieldType.(*MapField)
 	return m, ok
 }
 
 func (f *Field) IsMessage() (*MessageField, bool) {
-	m, ok := f.Type.(*MessageField)
+	m, ok := f.FieldType.(*MessageField)
 	return m, ok
 }
 
 func (f *Field) IsOneOf() (*OneOfField, bool) {
-	m, ok := f.Type.(*OneOfField)
+	m, ok := f.FieldType.(*OneOfField)
 	return m, ok
 }
 
 func (f *Field) IsScalar() (*ScalarField, bool) {
-	s, ok := f.Type.(*ScalarField)
+	s, ok := f.FieldType.(*ScalarField)
 	return s, ok
-}
-
-func (g *FieldGroup) Message() *Message {
-	return g.message
 }
 
 func (g *FieldGroup) Len() int {
 	return len(g.fields)
 }
 
-func (g *FieldGroup) GetFields() []*Field {
-	return g.fields
+func (g *FieldGroup) GetField(idx int) (_ Field, ok bool) {
+	if g.Len() == 0 || idx < 0 || idx >= g.Len() {
+		return
+	}
+	return g.fields[idx], true
 }
 
-func (g *FieldGroup) WithFields(fields []*Field) *FieldGroup {
-	g.fields = fields
-	return g
+func (g *FieldGroup) GetFields() []Field {
+	return g.fields
 }
 
 func (g *FieldGroup) WithTitle(t string) *FieldGroup {

@@ -37,7 +37,11 @@ message Connection {
     (buf.validate.field).required = true,
     (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
   ];
+
+  // Connection must resolve to an integration with the given package identity.
   dtkt.shared.v1beta1.Package.Identity package = 2;
+
+  // Connection must resolve to a server which implements the given services.
   repeated string services = 3;
 }
 
@@ -46,6 +50,9 @@ message Input {
     (buf.validate.field).required = true,
     (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
   ];
+
+  // When true input always returns its first non-null memoized value.
+  optional bool cache = 2;
 
   oneof type {
     option (buf.validate.oneof).required = true;
@@ -63,57 +70,62 @@ message Input {
     Map map = 13;
     Message message = 14;
   }
-
-  bool cache = 20;
 }
 
 // Var is an intermediate value in a Flow used to transform and/or memoize the result of a computation for reuse.
 message Var {
+  option (buf.validate.message).oneof = {
+    fields: [
+      "value",
+      "switch"
+    ]
+    required: true
+  };
+
   string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
   ];
 
-  // When cache is true var always returns its first non-null memoized value.
-  bool cache = 2;
+  // When true var always returns its first non-null memoized value.
+  optional bool cache = 2;
 
-  oneof type {
-    option (buf.validate.oneof).required = true;
-    // Given expression evaluates to var's memoized value, example: "= inputs.foo.getValue()"
-    string value = 3 [
-      (buf.validate.field).string.pattern = "^\\s?=\\s?",
-      (buf.validate.field).string.example = " = inputs.foo.getValue()"
-    ];
+  // Given expression evaluates to var's memoized value, example: "= inputs.foo.getValue()"
+  string value = 3 [
+    (buf.validate.field).string.pattern = "^\\s?=\\s?",
+    (buf.validate.field).string.example = " = inputs.foo.getValue()"
+  ];
 
-    // Given switch statement's first matching case (otherwise default) evaluates to var's memoized value.
-    Switch switch = 4;
-  }
+  // Given switch statement's first matching case (otherwise default) evaluates to var's memoized value.
+  Switch switch = 4;
 }
 
 message Action {
+  option (buf.validate.message).oneof = {
+    fields: [
+      "call",
+      "user"
+    ]
+    required: true
+  };
+
   string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
   ];
 
-  string run_if = 2 [
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
-  ];
+  // When true action always returns its first non-null memoized value.
+  optional bool cache = 2;
 
-  string on_error = 3 [
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
-  ];
+  // Execute action when given expression evaluates to true; optional.
+  optional string run_if = 3 [(buf.validate.field).string.pattern = "^\\s?=\\s?"];
 
-  // When cache is true action always returns its first non-null memoized value.
-  bool cache = 10;
+  // Return evaluation of given expression when an error is encountered in call
+  // or user; optional.
+  optional string on_error = 4 [(buf.validate.field).string.pattern = "^\\s?=\\s?"];
 
-  oneof type {
-    option (buf.validate.oneof).required = true;
-    MethodCall call = 4;
-    UserAction user = 5;
-  }
+  MethodCall call = 5;
+  UserAction user = 6;
 }
 
 message Output {
@@ -129,28 +141,27 @@ message Output {
 }
 
 message Stream {
+  option (buf.validate.message).oneof = {
+    fields: [
+      "call",
+      "generate"
+    ]
+    required: true
+  };
+
   string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
   ];
 
   // Start stream when expression evaluates to true; optional.
-  string start_if = 10 [
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
-  ];
+  optional string start_if = 2 [(buf.validate.field).string.pattern = "^\\s?=\\s?"];
 
   // Stop stream when expression evaluates to true; optional.
-  string stop_if = 11 [
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
-  ];
+  optional string stop_if = 3 [(buf.validate.field).string.pattern = "^\\s?=\\s?"];
 
-  oneof type {
-    option (buf.validate.oneof).required = true;
-    MethodCall call = 2;
-    Ticker generate = 3;
-  }
+  MethodCall call = 4;
+  Ticker generate = 5;
 }
 
 message MethodCall {
@@ -165,11 +176,6 @@ message MethodCall {
   ];
 
   google.protobuf.Value request = 3;
-
-  string response = 4 [
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
-  ];
 }
 
 message UserAction {

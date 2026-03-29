@@ -7,7 +7,7 @@ import (
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 	protoformv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protoform/v1beta1"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/protoformsdk/form"
+	form "github.com/datakit-dev/dtkt-sdk/sdk-go/protoformsdk/v1beta1"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"google.golang.org/protobuf/proto"
@@ -90,17 +90,17 @@ func GetUserActionBinding(input *flowv1beta1.UserAction_Input) (*protoformv1beta
 	return elem, binding, ok
 }
 
-func ParseUserAction(ctx shared.Runtime, action *flowv1beta1.UserAction, visitor shared.ParseExprFunc) error {
+func ParseUserAction(env shared.Env, action *flowv1beta1.UserAction, visitor shared.ExprVisitFunc) error {
 	for _, input := range action.GetInputs() {
 		switch elemType := input.GetElement().(type) {
 		case *flowv1beta1.UserAction_Input_Confirm:
 			if elemType.Confirm != nil {
-				_, err := shared.ParseExpr(ctx, elemType.Confirm.GetApprove(), visitor)
+				_, err := shared.ParseExpr(env, elemType.Confirm.GetApprove(), visitor)
 				if err != nil && !shared.IsInvalidExprError(err) {
 					return err
 				}
 
-				_, err = shared.ParseExpr(ctx, elemType.Confirm.GetDecline(), visitor)
+				_, err = shared.ParseExpr(env, elemType.Confirm.GetDecline(), visitor)
 				if err != nil && !shared.IsInvalidExprError(err) {
 					return err
 				}
@@ -113,8 +113,8 @@ func ParseUserAction(ctx shared.Runtime, action *flowv1beta1.UserAction, visitor
 	return nil
 }
 
-func CompileUserAction(r shared.Runtime, action *flowv1beta1.Action) (_ shared.EvalExpr, err error) {
-	env, err := r.Env()
+func CompileUserAction(run shared.Runtime, action *flowv1beta1.Action) (_ shared.Eval, err error) {
+	env, err := run.Env()
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +131,7 @@ func CompileUserAction(r shared.Runtime, action *flowv1beta1.Action) (_ shared.E
 			return nil, fmt.Errorf("%s invalid: element required", inputID)
 		}
 
-		inputEval, err := CompileUserActionInput(r, action, input)
+		inputEval, err := CompileUserActionInput(run, action, input)
 		if err != nil {
 			return nil, fmt.Errorf("%s invalid: %w", inputID, err)
 		}
@@ -139,25 +139,26 @@ func CompileUserAction(r shared.Runtime, action *flowv1beta1.Action) (_ shared.E
 		inputsEval[inputID] = inputEval
 	}
 
-	return shared.EvalExprFunc(func(ctx context.Context) ref.Val {
-		if err := inputsEval.Eval(ctx); err != nil {
+	return shared.EvalFunc(func(run shared.Runtime) ref.Val {
+		if err := inputsEval.Eval(run.Context()); err != nil {
 			return types.WrapErr(err)
 		}
 
-		values, err := r.GetUserValues(actionID)
+		// values, err := r.GetUserValues(actionID)
+		values, err := run.GetValue(actionID)
 		if err != nil {
-			return types.WrapErr(ctx.Err())
+			return types.WrapErr(context.Cause(run.Context()))
 		}
 
-		return env.CELTypeAdapter().NativeToValue(values)
+		return env.TypeAdapter().NativeToValue(values)
 	}), nil
 }
 
-func CompileUserActionInput(ctx shared.Runtime, action *flowv1beta1.Action, input *flowv1beta1.UserAction_Input) (_ UserActionInputEvalFunc, err error) {
+func CompileUserActionInput(run shared.Runtime, action *flowv1beta1.Action, input *flowv1beta1.UserAction_Input) (_ UserActionInputEvalFunc, err error) {
 	var elemEval UserActionInputEvalFunc
 	switch elemType := input.GetElement().(type) {
 	case *flowv1beta1.UserAction_Input_Confirm:
-		elemEval, err = CompileUserActionConfirm(ctx, action, elemType.Confirm)
+		elemEval, err = CompileUserActionConfirm(run, action, elemType.Confirm)
 		if err != nil {
 			return nil, err
 		}
@@ -171,17 +172,17 @@ func CompileUserActionInput(ctx shared.Runtime, action *flowv1beta1.Action, inpu
 		return nil, fmt.Errorf("%s: invalid input", UserActionInputID(action, input))
 	}
 
-	vars, err := ctx.Vars()
+	env, err := run.Env()
 	if err != nil {
 		return nil, err
 	}
 
-	titleExpr, _ := shared.CompileExpr(ctx, input.GetTitle())
-	descExpr, _ := shared.CompileExpr(ctx, input.GetDescription())
+	titleExpr, _ := shared.CompileExpr(run, input.GetTitle())
+	descExpr, _ := shared.CompileExpr(run, input.GetDescription())
 
 	return func(ctx context.Context) error {
 		if titleExpr != nil {
-			val, _, err := titleExpr.ContextEval(ctx, vars)
+			val, _, err := titleExpr.ContextEval(ctx, env.Vars())
 			if err != nil {
 				return err
 			} else if titleVal, ok := val.Value().(string); ok {
@@ -192,7 +193,7 @@ func CompileUserActionInput(ctx shared.Runtime, action *flowv1beta1.Action, inpu
 		}
 
 		if descExpr != nil {
-			val, _, err := descExpr.ContextEval(ctx, vars)
+			val, _, err := descExpr.ContextEval(ctx, env.Vars())
 			if err != nil {
 				return err
 			} else if descVal, ok := val.Value().(string); ok {
@@ -210,18 +211,18 @@ func CompileUserActionInput(ctx shared.Runtime, action *flowv1beta1.Action, inpu
 	}, nil
 }
 
-func CompileUserActionConfirm(ctx shared.Runtime, action *flowv1beta1.Action, confirm *protoformv1beta1.ConfirmElement) (UserActionInputEvalFunc, error) {
-	vars, err := ctx.Vars()
+func CompileUserActionConfirm(run shared.Runtime, action *flowv1beta1.Action, confirm *protoformv1beta1.ConfirmElement) (UserActionInputEvalFunc, error) {
+	env, err := run.Env()
 	if err != nil {
 		return nil, err
 	}
 
-	approveExpr, _ := shared.CompileExpr(ctx, confirm.GetApprove())
-	declineExpr, _ := shared.CompileExpr(ctx, confirm.GetDecline())
+	approveExpr, _ := shared.CompileExpr(run, confirm.GetApprove())
+	declineExpr, _ := shared.CompileExpr(run, confirm.GetDecline())
 
 	return func(ctx context.Context) error {
 		if approveExpr != nil {
-			val, _, err := approveExpr.ContextEval(ctx, vars)
+			val, _, err := approveExpr.ContextEval(ctx, env.Vars())
 			if err != nil {
 				return err
 			} else if approveVal, ok := val.Value().(string); ok {
@@ -232,7 +233,7 @@ func CompileUserActionConfirm(ctx shared.Runtime, action *flowv1beta1.Action, co
 		}
 
 		if declineExpr != nil {
-			val, _, err := declineExpr.ContextEval(ctx, vars)
+			val, _, err := declineExpr.ContextEval(ctx, env.Vars())
 			if err != nil {
 				return err
 			} else if declineVal, ok := val.Value().(string); ok {

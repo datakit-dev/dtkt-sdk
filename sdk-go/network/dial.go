@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var grpcInsecure = grpc.WithTransportCredentials(insecure.NewCredentials())
+var DialGRPCInsecure = grpc.WithTransportCredentials(insecure.NewCredentials())
 
 type (
 	Dialer interface {
@@ -23,7 +23,9 @@ type (
 )
 
 func DialGRPCClient[Client any](addr Address, newClient DialGRPCFunc[Client], opts ...grpc.DialOption) (c Client, err error) {
-	opts = append([]grpc.DialOption{grpcInsecure}, opts...)
+	if len(opts) == 0 {
+		opts = []grpc.DialOption{DialGRPCInsecure}
+	}
 
 	conn, err := DialGRPC(addr, opts...)
 	if err != nil {
@@ -34,7 +36,9 @@ func DialGRPCClient[Client any](addr Address, newClient DialGRPCFunc[Client], op
 }
 
 func DialGRPCClientUsing[Client any](dialer Dialer, newClient DialGRPCFunc[Client], opts ...grpc.DialOption) (c Client, err error) {
-	opts = append([]grpc.DialOption{grpcInsecure}, opts...)
+	if len(opts) == 0 {
+		opts = []grpc.DialOption{DialGRPCInsecure}
+	}
 
 	conn, err := DialGRPCUsing(dialer, opts...)
 	if err != nil {
@@ -45,7 +49,9 @@ func DialGRPCClientUsing[Client any](dialer Dialer, newClient DialGRPCFunc[Clien
 }
 
 func DialGRPC(addr Address, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
-	opts = append([]grpc.DialOption{grpcInsecure}, opts...)
+	if len(opts) == 0 {
+		opts = []grpc.DialOption{DialGRPCInsecure}
+	}
 
 	dialer, err := NewConnector(addr)
 	if err != nil {
@@ -55,13 +61,17 @@ func DialGRPC(addr Address, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
 }
 
 func DialGRPCUsing(dialer Dialer, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
-	opts = append([]grpc.DialOption{grpcInsecure}, opts...)
+	if len(opts) == 0 {
+		opts = []grpc.DialOption{DialGRPCInsecure}
+	}
 
 	return dialer.DialGRPC(opts...)
 }
 
 func DialGRPCTarget(target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
-	opts = append([]grpc.DialOption{grpcInsecure}, opts...)
+	if len(opts) == 0 {
+		opts = []grpc.DialOption{DialGRPCInsecure}
+	}
 
 	return grpc.NewClient(target, opts...)
 }

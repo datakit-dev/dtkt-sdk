@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
+	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/functions"
 	"github.com/google/cel-go/common/types"
@@ -12,33 +13,22 @@ import (
 
 const GetCountFunc = "getCount"
 
-func MakeGetCountFunc(ctx shared.Runtime) cel.EnvOption {
-	var opts []cel.FunctionOpt
-	ctx.RangeNodes(func(id string, node shared.Node) bool {
-		typeName := string(node.GetRuntimeNode().ProtoReflect().Descriptor().FullName())
-
-		opts = append(opts, cel.MemberOverload(
-			fmt.Sprintf("%s_%s", typeName, GetCountFunc),
-			[]*cel.Type{cel.ObjectType(typeName)},
+func MakeGetCountFunc(env shared.Env) cel.EnvOption {
+	return cel.Function(GetCountFunc,
+		cel.MemberOverload(
+			fmt.Sprintf("%s_%s", nodeType, GetCountFunc),
+			[]*cel.Type{cel.ObjectType(nodeType)},
 			cel.UintType,
-			cel.FunctionBinding(EvalGetCountFunc(ctx)),
-		))
-		return true
-	})
-
-	return cel.Function(GetCountFunc, opts...)
+			cel.FunctionBinding(EvalGetCountFunc(env)),
+		),
+	)
 }
 
-func EvalGetCountFunc(ctx shared.Runtime) functions.FunctionOp {
+func EvalGetCountFunc(env shared.Env) functions.FunctionOp {
 	return func(args ...ref.Val) ref.Val {
-		node, ok := args[0].Value().(shared.EvalNode)
+		node, ok := args[0].Value().(*flowv1beta1.Node)
 		if ok && node != nil {
-			env, err := ctx.Env()
-			if err != nil {
-				return types.WrapErr(err)
-			}
-
-			return env.CELTypeAdapter().NativeToValue(node.GetCallCount())
+			return env.TypeAdapter().NativeToValue(node.GetCallCount())
 		}
 
 		return types.WrapErr(fmt.Errorf("%s failed to resolve for: %#v", GetCountFunc, args[0].Value()))

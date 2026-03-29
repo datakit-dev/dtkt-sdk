@@ -1,4 +1,4 @@
-package form
+package v1beta1
 
 import (
 	"encoding/json"
@@ -106,8 +106,7 @@ func NewList(parent *Message, field protoreflect.FieldDescriptor) (ListType, boo
 	if field.Message() != nil {
 		return &List[*Message]{
 			Getter: ListGetter(parent.Get(), field, func(v protoreflect.Value) *Message {
-				msg, _ := NewMessage(v.Message())
-				return msg
+				return NewMessage(v.Message())
 			}),
 			Setter: ListSetter(parent.Get(), field, func(m *Message) protoreflect.Value { return protoreflect.ValueOfMessage(m.Get()) }),
 			Parser: ParserFunc[[]*Message](func(s string) ([]*Message, error) {
@@ -125,8 +124,7 @@ func NewList(parent *Message, field protoreflect.FieldDescriptor) (ListType, boo
 						return nil, err
 					}
 
-					msg, _ := NewMessage(m.ProtoReflect())
-					list_[idx] = msg
+					list_[idx] = NewMessage(m.ProtoReflect())
 				}
 
 				return list_, nil
@@ -139,8 +137,7 @@ func NewList(parent *Message, field protoreflect.FieldDescriptor) (ListType, boo
 				return string(b)
 			}),
 			newItem: func() *Message {
-				msg, _ := NewMessage(list.NewElement().Message().New())
-				return msg
+				return NewMessage(list.NewElement().Message().New())
 			},
 			parent:     parent,
 			descriptor: field,

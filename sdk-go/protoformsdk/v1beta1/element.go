@@ -1,4 +1,4 @@
-package form
+package v1beta1
 
 import (
 	"buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
@@ -25,13 +25,13 @@ type (
 
 func NewElement(field protoreflect.FieldDescriptor) *Element {
 	var (
-		element *protoformv1beta1.FieldElement
-		rules   *validate.FieldRules
+		proto *protoformv1beta1.FieldElement
+		rules *validate.FieldRules
 	)
 
 	if field != nil {
 		if fieldElem, ok := GetFieldElement(field); ok {
-			element = fieldElem
+			proto = fieldElem
 		}
 
 		if fieldRules, ok := GetFieldRules(field); ok {
@@ -39,27 +39,27 @@ func NewElement(field protoreflect.FieldDescriptor) *Element {
 		}
 	}
 
-	if element == nil {
-		element = &protoformv1beta1.FieldElement{}
+	if proto == nil {
+		proto = &protoformv1beta1.FieldElement{}
 	}
 
 	if rules == nil {
 		rules = &validate.FieldRules{}
 	}
 
-	if element.Title == nil {
-		element.Title = new(string)
+	if proto.Title == nil {
+		proto.Title = new(string)
 	}
 
-	if field != nil && element.GetTitle() == "" {
-		element.Title = new(fd{field}.GetTitle())
+	if field != nil && proto.GetTitle() == "" {
+		proto.Title = new(fd{field}.GetTitle())
 	}
 
-	if element.Description == nil {
-		element.Description = new(string)
+	if proto.Description == nil {
+		proto.Description = new(string)
 	}
 
-	if field != nil && element.GetDescription() == "" {
+	if field != nil && proto.GetDescription() == "" {
 		desc := ProtoSourceInfoOptions{
 			Multiline: false,
 		}.GetDescription(field)
@@ -68,19 +68,19 @@ func NewElement(field protoreflect.FieldDescriptor) *Element {
 			desc = fd{field}.GetDescription()
 		}
 
-		element.Description = new(desc)
+		proto.Description = new(desc)
 	}
 
-	if element.Hidden == nil {
-		element.Hidden = new(bool)
+	if proto.Hidden == nil {
+		proto.Hidden = new(bool)
 	}
 
 	elem := &Element{
-		proto: element,
+		proto: proto,
 		rules: rules,
 	}
 
-	switch element.GetType().(type) {
+	switch proto.GetType().(type) {
 	case *protoformv1beta1.FieldElement_Confirm:
 		elem.AsConfirm()
 	case *protoformv1beta1.FieldElement_Input:

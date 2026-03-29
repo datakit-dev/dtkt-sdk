@@ -24,9 +24,11 @@ const (
 	AutomationService_ListAutomations_FullMethodName         = "/dtkt.core.v1.AutomationService/ListAutomations"
 	AutomationService_GetAutomation_FullMethodName           = "/dtkt.core.v1.AutomationService/GetAutomation"
 	AutomationService_CreateAutomation_FullMethodName        = "/dtkt.core.v1.AutomationService/CreateAutomation"
-	AutomationService_StreamAutomationEvents_FullMethodName  = "/dtkt.core.v1.AutomationService/StreamAutomationEvents"
+	AutomationService_UpdateAutomation_FullMethodName        = "/dtkt.core.v1.AutomationService/UpdateAutomation"
+	AutomationService_DeleteAutomation_FullMethodName        = "/dtkt.core.v1.AutomationService/DeleteAutomation"
 	AutomationService_ReceiveAutomationEvents_FullMethodName = "/dtkt.core.v1.AutomationService/ReceiveAutomationEvents"
 	AutomationService_SendAutomationEvent_FullMethodName     = "/dtkt.core.v1.AutomationService/SendAutomationEvent"
+	AutomationService_StreamAutomationEvents_FullMethodName  = "/dtkt.core.v1.AutomationService/StreamAutomationEvents"
 )
 
 // AutomationServiceClient is the client API for AutomationService service.
@@ -39,23 +41,18 @@ type AutomationServiceClient interface {
 	ListAutomations(ctx context.Context, in *ListAutomationsRequest, opts ...grpc.CallOption) (*ListAutomationsResponse, error)
 	// Get a single automation by name.
 	GetAutomation(ctx context.Context, in *GetAutomationRequest, opts ...grpc.CallOption) (*GetAutomationResponse, error)
-	// Create a new automation and start its execution.
-	CreateAutomation(ctx context.Context, in *CreateAutomationRequest, opts ...grpc.CallOption) (*CreateAutomationResponse, error)
-	// TODO: Batch create automations and start their executions.
-	//
-	//	rpc BatchCreateAutomations(BatchCreateAutomationsRequest) returns (google.longrunning.Operation) {
-	//	  option (google.longrunning.operation_info) = {
-	//	    metadata_type: "BatchRunOperationMetadata"
-	//	    response_type: "BatchCreateAutomationsResponse"
-	//	  };
-	//	}
-	//
-	// Send input events and user action responses and receive output events and user action requests bi-directionally.
-	StreamAutomationEvents(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[StreamAutomationEventsRequest, StreamAutomationEventsResponse], error)
-	// Receive a stream of output events or user action requests (for environments with server streaming but not client streaming, e.g. web browsers).
+	// Create a new automation.
+	CreateAutomation(ctx context.Context, in *CreateAutomationRequest, opts ...grpc.CallOption) (*longrunningpb.Operation, error)
+	// Update an automation.
+	UpdateAutomation(ctx context.Context, in *UpdateAutomationRequest, opts ...grpc.CallOption) (*longrunningpb.Operation, error)
+	// Delete an automation.
+	DeleteAutomation(ctx context.Context, in *DeleteAutomationRequest, opts ...grpc.CallOption) (*longrunningpb.Operation, error)
+	// Receive a stream of output/user action events (for environments with server streaming but not client streaming, e.g. web browsers).
 	ReceiveAutomationEvents(ctx context.Context, in *ReceiveAutomationEventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ReceiveAutomationEventsResponse], error)
-	// Send an input event or user action response (for environments without client streaming, e.g. web browsers).
+	// Send an input/user action event (for environments without client streaming, e.g. web browsers).
 	SendAutomationEvent(ctx context.Context, in *SendAutomationEventRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Send input/user action events and receive output/user action events bi-directionally.
+	StreamAutomationEvents(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[StreamAutomationEventsRequest, StreamAutomationEventsResponse], error)
 }
 
 type automationServiceClient struct {
@@ -86,9 +83,9 @@ func (c *automationServiceClient) GetAutomation(ctx context.Context, in *GetAuto
 	return out, nil
 }
 
-func (c *automationServiceClient) CreateAutomation(ctx context.Context, in *CreateAutomationRequest, opts ...grpc.CallOption) (*CreateAutomationResponse, error) {
+func (c *automationServiceClient) CreateAutomation(ctx context.Context, in *CreateAutomationRequest, opts ...grpc.CallOption) (*longrunningpb.Operation, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateAutomationResponse)
+	out := new(longrunningpb.Operation)
 	err := c.cc.Invoke(ctx, AutomationService_CreateAutomation_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -96,22 +93,29 @@ func (c *automationServiceClient) CreateAutomation(ctx context.Context, in *Crea
 	return out, nil
 }
 
-func (c *automationServiceClient) StreamAutomationEvents(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[StreamAutomationEventsRequest, StreamAutomationEventsResponse], error) {
+func (c *automationServiceClient) UpdateAutomation(ctx context.Context, in *UpdateAutomationRequest, opts ...grpc.CallOption) (*longrunningpb.Operation, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &AutomationService_ServiceDesc.Streams[0], AutomationService_StreamAutomationEvents_FullMethodName, cOpts...)
+	out := new(longrunningpb.Operation)
+	err := c.cc.Invoke(ctx, AutomationService_UpdateAutomation_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[StreamAutomationEventsRequest, StreamAutomationEventsResponse]{ClientStream: stream}
-	return x, nil
+	return out, nil
 }
 
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type AutomationService_StreamAutomationEventsClient = grpc.BidiStreamingClient[StreamAutomationEventsRequest, StreamAutomationEventsResponse]
+func (c *automationServiceClient) DeleteAutomation(ctx context.Context, in *DeleteAutomationRequest, opts ...grpc.CallOption) (*longrunningpb.Operation, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(longrunningpb.Operation)
+	err := c.cc.Invoke(ctx, AutomationService_DeleteAutomation_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
 
 func (c *automationServiceClient) ReceiveAutomationEvents(ctx context.Context, in *ReceiveAutomationEventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ReceiveAutomationEventsResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &AutomationService_ServiceDesc.Streams[1], AutomationService_ReceiveAutomationEvents_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &AutomationService_ServiceDesc.Streams[0], AutomationService_ReceiveAutomationEvents_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -138,6 +142,19 @@ func (c *automationServiceClient) SendAutomationEvent(ctx context.Context, in *S
 	return out, nil
 }
 
+func (c *automationServiceClient) StreamAutomationEvents(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[StreamAutomationEventsRequest, StreamAutomationEventsResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &AutomationService_ServiceDesc.Streams[1], AutomationService_StreamAutomationEvents_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[StreamAutomationEventsRequest, StreamAutomationEventsResponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type AutomationService_StreamAutomationEventsClient = grpc.BidiStreamingClient[StreamAutomationEventsRequest, StreamAutomationEventsResponse]
+
 // AutomationServiceServer is the server API for AutomationService service.
 // All implementations must embed UnimplementedAutomationServiceServer
 // for forward compatibility.
@@ -148,23 +165,18 @@ type AutomationServiceServer interface {
 	ListAutomations(context.Context, *ListAutomationsRequest) (*ListAutomationsResponse, error)
 	// Get a single automation by name.
 	GetAutomation(context.Context, *GetAutomationRequest) (*GetAutomationResponse, error)
-	// Create a new automation and start its execution.
-	CreateAutomation(context.Context, *CreateAutomationRequest) (*CreateAutomationResponse, error)
-	// TODO: Batch create automations and start their executions.
-	//
-	//	rpc BatchCreateAutomations(BatchCreateAutomationsRequest) returns (google.longrunning.Operation) {
-	//	  option (google.longrunning.operation_info) = {
-	//	    metadata_type: "BatchRunOperationMetadata"
-	//	    response_type: "BatchCreateAutomationsResponse"
-	//	  };
-	//	}
-	//
-	// Send input events and user action responses and receive output events and user action requests bi-directionally.
-	StreamAutomationEvents(grpc.BidiStreamingServer[StreamAutomationEventsRequest, StreamAutomationEventsResponse]) error
-	// Receive a stream of output events or user action requests (for environments with server streaming but not client streaming, e.g. web browsers).
+	// Create a new automation.
+	CreateAutomation(context.Context, *CreateAutomationRequest) (*longrunningpb.Operation, error)
+	// Update an automation.
+	UpdateAutomation(context.Context, *UpdateAutomationRequest) (*longrunningpb.Operation, error)
+	// Delete an automation.
+	DeleteAutomation(context.Context, *DeleteAutomationRequest) (*longrunningpb.Operation, error)
+	// Receive a stream of output/user action events (for environments with server streaming but not client streaming, e.g. web browsers).
 	ReceiveAutomationEvents(*ReceiveAutomationEventsRequest, grpc.ServerStreamingServer[ReceiveAutomationEventsResponse]) error
-	// Send an input event or user action response (for environments without client streaming, e.g. web browsers).
+	// Send an input/user action event (for environments without client streaming, e.g. web browsers).
 	SendAutomationEvent(context.Context, *SendAutomationEventRequest) (*emptypb.Empty, error)
+	// Send input/user action events and receive output/user action events bi-directionally.
+	StreamAutomationEvents(grpc.BidiStreamingServer[StreamAutomationEventsRequest, StreamAutomationEventsResponse]) error
 	mustEmbedUnimplementedAutomationServiceServer()
 }
 
@@ -181,17 +193,23 @@ func (UnimplementedAutomationServiceServer) ListAutomations(context.Context, *Li
 func (UnimplementedAutomationServiceServer) GetAutomation(context.Context, *GetAutomationRequest) (*GetAutomationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAutomation not implemented")
 }
-func (UnimplementedAutomationServiceServer) CreateAutomation(context.Context, *CreateAutomationRequest) (*CreateAutomationResponse, error) {
+func (UnimplementedAutomationServiceServer) CreateAutomation(context.Context, *CreateAutomationRequest) (*longrunningpb.Operation, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAutomation not implemented")
 }
-func (UnimplementedAutomationServiceServer) StreamAutomationEvents(grpc.BidiStreamingServer[StreamAutomationEventsRequest, StreamAutomationEventsResponse]) error {
-	return status.Errorf(codes.Unimplemented, "method StreamAutomationEvents not implemented")
+func (UnimplementedAutomationServiceServer) UpdateAutomation(context.Context, *UpdateAutomationRequest) (*longrunningpb.Operation, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAutomation not implemented")
+}
+func (UnimplementedAutomationServiceServer) DeleteAutomation(context.Context, *DeleteAutomationRequest) (*longrunningpb.Operation, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAutomation not implemented")
 }
 func (UnimplementedAutomationServiceServer) ReceiveAutomationEvents(*ReceiveAutomationEventsRequest, grpc.ServerStreamingServer[ReceiveAutomationEventsResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method ReceiveAutomationEvents not implemented")
 }
 func (UnimplementedAutomationServiceServer) SendAutomationEvent(context.Context, *SendAutomationEventRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendAutomationEvent not implemented")
+}
+func (UnimplementedAutomationServiceServer) StreamAutomationEvents(grpc.BidiStreamingServer[StreamAutomationEventsRequest, StreamAutomationEventsResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method StreamAutomationEvents not implemented")
 }
 func (UnimplementedAutomationServiceServer) mustEmbedUnimplementedAutomationServiceServer() {}
 func (UnimplementedAutomationServiceServer) testEmbeddedByValue()                           {}
@@ -268,12 +286,41 @@ func _AutomationService_CreateAutomation_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AutomationService_StreamAutomationEvents_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(AutomationServiceServer).StreamAutomationEvents(&grpc.GenericServerStream[StreamAutomationEventsRequest, StreamAutomationEventsResponse]{ServerStream: stream})
+func _AutomationService_UpdateAutomation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateAutomationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AutomationServiceServer).UpdateAutomation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AutomationService_UpdateAutomation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AutomationServiceServer).UpdateAutomation(ctx, req.(*UpdateAutomationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type AutomationService_StreamAutomationEventsServer = grpc.BidiStreamingServer[StreamAutomationEventsRequest, StreamAutomationEventsResponse]
+func _AutomationService_DeleteAutomation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAutomationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AutomationServiceServer).DeleteAutomation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AutomationService_DeleteAutomation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AutomationServiceServer).DeleteAutomation(ctx, req.(*DeleteAutomationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
 
 func _AutomationService_ReceiveAutomationEvents_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(ReceiveAutomationEventsRequest)
@@ -304,6 +351,13 @@ func _AutomationService_SendAutomationEvent_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AutomationService_StreamAutomationEvents_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(AutomationServiceServer).StreamAutomationEvents(&grpc.GenericServerStream[StreamAutomationEventsRequest, StreamAutomationEventsResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type AutomationService_StreamAutomationEventsServer = grpc.BidiStreamingServer[StreamAutomationEventsRequest, StreamAutomationEventsResponse]
+
 // AutomationService_ServiceDesc is the grpc.ServiceDesc for AutomationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -324,21 +378,29 @@ var AutomationService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AutomationService_CreateAutomation_Handler,
 		},
 		{
+			MethodName: "UpdateAutomation",
+			Handler:    _AutomationService_UpdateAutomation_Handler,
+		},
+		{
+			MethodName: "DeleteAutomation",
+			Handler:    _AutomationService_DeleteAutomation_Handler,
+		},
+		{
 			MethodName: "SendAutomationEvent",
 			Handler:    _AutomationService_SendAutomationEvent_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
+			StreamName:    "ReceiveAutomationEvents",
+			Handler:       _AutomationService_ReceiveAutomationEvents_Handler,
+			ServerStreams: true,
+		},
+		{
 			StreamName:    "StreamAutomationEvents",
 			Handler:       _AutomationService_StreamAutomationEvents_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
-		},
-		{
-			StreamName:    "ReceiveAutomationEvents",
-			Handler:       _AutomationService_ReceiveAutomationEvents_Handler,
-			ServerStreams: true,
 		},
 	},
 	Metadata: "dtkt/core/v1/services.proto",

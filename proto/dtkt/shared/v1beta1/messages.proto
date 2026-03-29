@@ -33,7 +33,10 @@ message Package {
       (buf.validate.field).required = true,
       (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
     ];
-    string version = 2 [(buf.validate.field).string.pattern = "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"];
+    string version = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+    ];
   }
 
   // Identity name (camel, snake, or pascal case) and version (semver) of integration.
@@ -190,11 +193,11 @@ message DataType {
 }
 
 // -----------------------------------------------------------------------------
-// OAuth config (maps to oauth2.Config; secrets flow TO Integration only)
+// OAuth config
 // -----------------------------------------------------------------------------
 
 message OAuthConfig {
-  string client_id = 1 [(buf.validate.field).string.min_len = 1];
+  string client_id = 1 [(buf.validate.field).required = true];
   string client_secret = 2; // inbound-only; never returned
 
   OAuthEndpoint endpoint = 3;
@@ -215,7 +218,7 @@ message OAuthConfig {
 message OAuthEndpoint {
   string auth_url = 1 [(buf.validate.field).string.uri = true];
   string token_url = 2 [(buf.validate.field).string.uri = true];
-  string device_auth_url = 3 [(buf.validate.field).string.uri = true]; // optional; device flow
+  optional string device_auth_url = 3 [(buf.validate.field).string.uri = true]; // optional; device flow
 }
 
 // -----------------------------------------------------------------------------
@@ -243,8 +246,11 @@ message OAuthCodeRequest {
 // -----------------------------------------------------------------------------
 
 message OAuthTokenRequest {
-  string code = 1 [(buf.validate.field).string.min_len = 1];
-  string redirect_url = 2 [(buf.validate.field).string.uri = true];
+  string code = 1 [(buf.validate.field).required = true];
+  string redirect_url = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uri = true
+  ];
 
   // PKCE verifier if PKCE was used.
   string code_verifier = 3;
@@ -257,10 +263,7 @@ message OAuthTokenRequest {
 // -----------------------------------------------------------------------------
 
 message OAuthRefreshRequest {
-  // Typically empty: integration uses its stored refresh token.
-  // Allow optional override to support migrations or manual repairs.
-  string refresh_token = 1;
-  map<string, string> params = 10;
+  OAuthToken token = 1 [(buf.validate.field).required = true];
 }
 
 // -----------------------------------------------------------------------------
@@ -270,9 +273,9 @@ message OAuthRefreshRequest {
 message OAuthToken {
   string access_token = 1;
   string token_type = 2;
-  string refresh_token = 3; // inbound-only
+  string refresh_token = 3;
   google.protobuf.Timestamp expiry = 4;
-  int64 expires_in = 5; // wire convenience; libs should derive expiry from this when present
+  int64 expires_in = 5; // derive expiry from this when present
 }
 
 message PageToken {

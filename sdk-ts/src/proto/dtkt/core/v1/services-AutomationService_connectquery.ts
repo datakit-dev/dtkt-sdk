@@ -19,14 +19,28 @@ export const listAutomations = AutomationService.method.listAutomations;
 export const getAutomation = AutomationService.method.getAutomation;
 
 /**
- * Create a new automation and start its execution.
+ * Create a new automation.
  *
  * @generated from rpc dtkt.core.v1.AutomationService.CreateAutomation
  */
 export const createAutomation = AutomationService.method.createAutomation;
 
 /**
- * Send an input event or user action response (for environments without client streaming, e.g. web browsers).
+ * Update an automation.
+ *
+ * @generated from rpc dtkt.core.v1.AutomationService.UpdateAutomation
+ */
+export const updateAutomation = AutomationService.method.updateAutomation;
+
+/**
+ * Delete an automation.
+ *
+ * @generated from rpc dtkt.core.v1.AutomationService.DeleteAutomation
+ */
+export const deleteAutomation = AutomationService.method.deleteAutomation;
+
+/**
+ * Send an input/user action event (for environments without client streaming, e.g. web browsers).
  *
  * @generated from rpc dtkt.core.v1.AutomationService.SendAutomationEvent
  */

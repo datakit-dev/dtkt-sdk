@@ -236,16 +236,6 @@ func (w ProtoOptions) Wrap(value any) (proto.Message, error) {
 		return timestamppb.New(value), nil
 	case string:
 		return wrapperspb.String(value), nil
-	case json.Number:
-		if i64Val, i64Err := value.Int64(); i64Err != nil {
-			if f64Val, f64Err := value.Float64(); f64Err != nil {
-				return nil, errors.Join(i64Err, f64Err)
-			} else {
-				return wrapperspb.Double(f64Val), nil
-			}
-		} else {
-			return wrapperspb.Int64(i64Val), nil
-		}
 	case int32:
 		return wrapperspb.Int32(value), nil
 	case int64:
@@ -272,6 +262,22 @@ func (w ProtoOptions) Wrap(value any) (proto.Message, error) {
 		if err == nil {
 			return msg, nil
 		}
+	case json.Number:
+		if i64Val, i64Err := value.Int64(); i64Err != nil {
+			if f64Val, f64Err := value.Float64(); f64Err != nil {
+				return nil, errors.Join(i64Err, f64Err)
+			} else {
+				return wrapperspb.Double(f64Val), nil
+			}
+		} else {
+			return wrapperspb.Int64(i64Val), nil
+		}
+	case json.RawMessage:
+		msg := new(structpb.Value)
+		if err := encoding.FromJSONV2(value, msg); err != nil {
+			return nil, err
+		}
+		return msg, nil
 	case proto.Message:
 		return value, nil
 	}

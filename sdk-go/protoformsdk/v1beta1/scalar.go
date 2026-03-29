@@ -1,11 +1,10 @@
-package form
+package v1beta1
 
 import (
 	"fmt"
 	"slices"
 	"strconv"
 
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
@@ -220,24 +219,38 @@ func (s *Scalar[T]) SetAny(v any) error {
 	return nil
 }
 
-func (m *Scalar[T]) Parse(s string) (T, error) {
+func (m *Scalar[T]) Parse(str string) (T, error) {
 	if m.Parser != nil {
-		return m.Parser.Parse(s)
+		return m.Parser.Parse(str)
 	}
-	return common.UnmarshalJSON[T](s)
+
+	var v T
+	switch any(v).(type) {
+	case []byte:
+		return any([]byte(str)).(T), nil
+	case protoreflect.EnumNumber:
+		num, err := util.ScanValueFor[int32](str)
+		if err != nil {
+			return v, err
+		}
+		return any(protoreflect.EnumNumber(num)).(T), nil
+	}
+
+	val, err := util.ScanValue(v, str)
+	if err != nil {
+		return v, err
+	}
+
+	return val.(T), nil
 }
 
 func (s *Scalar[T]) StringOf(v T) string {
 	if s.Stringer != nil {
 		return s.Stringer.StringOf(v)
 	}
-
 	return util.StringFormatAny(v)
 }
 
 func (s *Scalar[T]) String() string {
-	if s.Stringer != nil {
-		return s.Stringer.StringOf(s.Get())
-	}
-	return util.StringFormatAny(s.Get())
+	return s.StringOf(s.Get())
 }

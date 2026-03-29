@@ -1,91 +1,70 @@
 package shared
 
 import (
-	"context"
+	"errors"
+	"fmt"
 	"regexp"
 	"strings"
 
-	"cel.dev/expr"
 	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/common/types/ref"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/anypb"
 )
 
-const (
-	InvalidExprErrPrefix = "invalid expression"
-)
+const InvalidExprErrPrefix = "invalid expression"
 
-var (
-	invalidExprErr = NewExprError(InvalidExprErrPrefix)
-	validExpr      = regexp.MustCompile(`^\s?=\s?`)
-)
+var validExpr = regexp.MustCompile(`^\s?=\s?`)
 
 var _ error = (*ExprError)(nil)
 
 type (
-	EvalExpr interface {
-		Eval(context.Context) ref.Val
-	}
-	EvalExprFunc func(context.Context) ref.Val
-	ExprError    struct {
+	ExprError struct {
 		msg string
 	}
+	ExprVisitFunc func(*cel.Ast)
+	NodeVisitFunc func(string, *cel.Ast)
 )
 
-func ExprValueToNative(run Runtime, exprVal *expr.Value) (any, error) {
-	if exprVal == nil {
-		return nil, nil
-	} else if _, val := exprVal.GetKind().(*expr.Value_NullValue); val {
-		return nil, nil
+func ParseExpr(env Env, expr string, visitor ExprVisitFunc) (*cel.Ast, error) {
+	expr, valid := IsValidExpr(expr)
+	if !valid {
+		return nil, NewExprError(fmt.Sprintf("%s: %s", InvalidExprErrPrefix, expr))
 	}
 
-	switch exprVal.GetKind().(type) {
-	case *expr.Value_ObjectValue:
-		objVal := exprVal.GetObjectValue()
-		return anypb.UnmarshalNew(objVal, proto.UnmarshalOptions{
-			DiscardUnknown: true,
-			Resolver:       run.Resolver(),
-		})
-	case *expr.Value_MapValue:
-		mapVal := exprVal.GetMapValue()
-		entries := make(map[any]any)
-		for _, entry := range mapVal.Entries {
-			key, err := ExprValueToNative(run, entry.Key)
-			if err != nil {
-				return nil, err
-			}
-			val, err := ExprValueToNative(run, entry.Value)
-			if err != nil {
-				return nil, err
-			}
-			entries[key] = val
-		}
-		return entries, nil
-	case *expr.Value_ListValue:
-		listVal := exprVal.GetListValue()
-		slice := make([]any, len(listVal.Values))
-		for i, e := range listVal.Values {
-			rv, err := ExprValueToNative(run, e)
-			if err != nil {
-				return nil, err
-			}
-			slice[i] = rv
-		}
-		return slice, nil
+	ast, iss := env.Parse(expr)
+	if iss.Err() != nil {
+		return nil, iss.Err()
 	}
 
-	types, err := run.Types()
+	ast, iss = env.Check(ast)
+	if iss.Err() != nil {
+		return nil, iss.Err()
+	}
+
+	if visitor != nil {
+		visitor(ast)
+	}
+
+	return ast, nil
+}
+
+func CompileExpr(run Runtime, expr string, opts ...cel.ProgramOption) (cel.Program, error) {
+	expr, valid := IsValidExpr(expr)
+	if !valid {
+		return nil, NewExprError(fmt.Sprintf("%s: %s", InvalidExprErrPrefix, expr))
+	}
+
+	env, err := run.Env()
 	if err != nil {
 		return nil, err
 	}
 
-	refVal, err := cel.ProtoAsValue(types, exprVal)
-	if err != nil {
-		return nil, err
+	opts = append(opts, cel.InterruptCheckFrequency(1))
+
+	ast, iss := env.Compile(expr)
+	if iss.Err() != nil {
+		return nil, iss.Err()
 	}
 
-	return refVal.Value(), nil
+	return env.Program(ast, opts...)
 }
 
 func NewExprError(err string) *ExprError {
@@ -94,14 +73,31 @@ func NewExprError(err string) *ExprError {
 	}
 }
 
+func IsInvalidExprError(err error) bool {
+	exprErr := new(ExprError)
+	return errors.As(err, &exprErr)
+}
+
+func IsValidExpr(expr string) (string, bool) {
+	matches := validExpr.FindStringSubmatch(expr)
+
+	if len(matches) != 1 {
+		return "", false
+	}
+
+	celExpr := strings.TrimSpace(expr[len(matches[0]):])
+
+	if len(celExpr) == 0 {
+		return "", false
+	}
+
+	return celExpr, true
+}
+
 func (e *ExprError) Is(err error) bool {
-	return strings.HasPrefix(err.Error(), e.msg)
+	return IsInvalidExprError(err)
 }
 
 func (e *ExprError) Error() string {
 	return e.msg
-}
-
-func (f EvalExprFunc) Eval(ctx context.Context) ref.Val {
-	return f(ctx)
 }

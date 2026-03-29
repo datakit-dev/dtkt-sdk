@@ -1,8 +1,7 @@
-package form
+package v1beta1
 
 import (
 	protoformv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protoform/v1beta1"
-	"google.golang.org/protobuf/proto"
 )
 
 var _ ElementType = (*InputElement)(nil)
@@ -33,7 +32,7 @@ func NewInputElement(elem *Element) *InputElement {
 func (*InputElement) isElementType() {}
 
 func (i *InputElement) AsMultiline(m bool) *InputElement {
-	i.element.MultilineText = proto.Bool(m)
+	i.element.MultilineText = new(m)
 	return i
 }
 

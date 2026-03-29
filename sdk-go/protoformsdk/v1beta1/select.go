@@ -1,4 +1,4 @@
-package form
+package v1beta1
 
 import (
 	"slices"
@@ -43,7 +43,7 @@ func (s *SelectElement) GetOptions() *util.OrderedMap[string, any] {
 	slices.SortFunc(s.options, func(a, b util.MapPair[string, any]) int {
 		return strings.Compare(a.Key, b.Key)
 	})
-	return util.NewOrderedMap[string, any](s.options...)
+	return util.NewOrderedMap(s.options...)
 }
 
 func (s *SelectElement) GetMethodName() string {

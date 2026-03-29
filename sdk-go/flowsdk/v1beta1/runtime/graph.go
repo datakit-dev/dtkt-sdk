@@ -7,55 +7,103 @@ import (
 	"slices"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta1/spec"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	graphlib "github.com/dominikbraun/graph"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/ast"
+	"google.golang.org/protobuf/proto"
 )
 
 type Graph struct {
 	graphlib.Graph[string, *flowv1beta1.Node]
-	proto   *flowv1beta1.Graph
+	proto *flowv1beta1.Graph
+
+	build func() error
+
 	errors  []error
 	forward map[string][]string
 	reverse map[string][]string
 }
 
-func NewGraph(run *Runtime) (*Graph, error) {
-	graph := &Graph{
+func NewGraph(env shared.Env, nodes []*flowv1beta1.Node) (*Graph, error) {
+	g := &Graph{
 		proto:   &flowv1beta1.Graph{},
 		forward: make(map[string][]string),
 		reverse: make(map[string][]string),
 	}
-	graph.Graph = graphlib.NewWithStore(
+	g.Graph = graphlib.NewWithStore(
 		GetNodeID,
-		graph,
+		g,
 		graphlib.Directed(),
 		graphlib.PreventCycles(),
 	)
 
-	var err error
-	run.nodes.Range(func(id string, node *Node) bool {
-		err = graph.Graph.AddVertex(node.proto)
-		return err == nil
-	})
+	for _, node := range nodes {
+		err := g.Graph.AddVertex(node)
+		if err != nil {
+			return nil, fmt.Errorf("add graph vertex: %w", err)
+		}
+	}
+
+	visitor := GraphVisitor(g)
+	for _, node := range nodes {
+		specNode := GetSpecNode(node)
+		// Connection and Input nodes contain no CEL expressions; skip them.
+		// Input message-type resolution also requires integration-specific proto
+		// registrations that are not available at graph-build time.
+		switch specNode.(type) {
+		case *flowv1beta1.Connection, *flowv1beta1.Input:
+			continue
+		}
+		_, err := spec.NewRuntimeNode(env, specNode, func(ast *cel.Ast) {
+			visitor(node.GetId(), ast)
+		})
+		if err != nil {
+			return nil, fmt.Errorf("parse graph node %s: %w", node.GetId(), err)
+		}
+	}
+
+	if g.Error() != nil {
+		return nil, fmt.Errorf("traverse graph error: %w", g.Error())
+	}
+
+	err := g.Build()
 	if err != nil {
-		return nil, fmt.Errorf("graph vertex addition error: %w", err)
+		return nil, fmt.Errorf("build graph error: %w", g.Error())
 	}
 
-	err = run.Parse(GraphVisitor(graph))
+	return g, nil
+}
+
+func RuntimeGraph(run *Runtime) (*Graph, error) {
+	env, err := run.env()
 	if err != nil {
-		return nil, fmt.Errorf("graph parsing error: %w", err)
+		return nil, err
 	}
 
-	if graph.Error() != nil {
-		return nil, fmt.Errorf("graph traversal error: %w", graph.Error())
-	} else if err = graph.Build(); err != nil {
-		return nil, fmt.Errorf("graph build error: %w", err)
+	return NewGraph(env, util.SliceMap(run.nodes.Values(), func(n *Node) *flowv1beta1.Node {
+		return n.proto
+	}))
+}
+
+func SpecGraph(spec *flowv1beta1.Flow) (*Graph, error) {
+	run := ProtoFromSpec(spec)
+	env, err := NewEnv(run)
+	if err != nil {
+		return nil, err
 	}
 
-	return graph, nil
+	var nodes []*flowv1beta1.Node
+	nodes = slices.AppendSeq(nodes, maps.Values(run.Connections))
+	nodes = slices.AppendSeq(nodes, maps.Values(run.Inputs))
+	nodes = slices.AppendSeq(nodes, maps.Values(run.Vars))
+	nodes = slices.AppendSeq(nodes, maps.Values(run.Actions))
+	nodes = slices.AppendSeq(nodes, maps.Values(run.Outputs))
+	nodes = slices.AppendSeq(nodes, maps.Values(run.Streams))
+
+	return NewGraph(env, nodes)
 }
 
 func GraphFromProto(proto *flowv1beta1.Graph) (*Graph, error) {
@@ -78,7 +126,7 @@ func GraphFromProto(proto *flowv1beta1.Graph) (*Graph, error) {
 	return graph, nil
 }
 
-func GraphVisitor(graph *Graph) shared.ParseNodeFunc {
+func GraphVisitor(graph *Graph) shared.NodeVisitFunc {
 	return func(target string, expr *cel.Ast) {
 		ast.PreOrderVisit(ast.NavigateAST(expr.NativeRep()), ast.NewExprVisitor(func(expr ast.Expr) {
 			switch expr.Kind() {
@@ -102,7 +150,7 @@ func GraphVisitor(graph *Graph) shared.ParseNodeFunc {
 }
 
 func (g *Graph) Proto() *flowv1beta1.Graph {
-	return g.proto
+	return proto.CloneOf(g.proto)
 }
 
 // Build constructs the forward/reverse dependency maps and applies transitive reduction.

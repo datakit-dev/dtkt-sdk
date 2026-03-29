@@ -192,10 +192,8 @@ func (x *CheckConfigRequest) GetConfigGen() uint64 {
 // Response for checking config.
 type CheckConfigResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// True if config is valid.
-	Valid bool `protobuf:"varint,1,opt,name=valid,proto3" json:"valid,omitempty"`
-	// Human-readable summary.
-	Message       string `protobuf:"bytes,5,opt,name=message,proto3" json:"message,omitempty"`
+	// Auth type if auth is required.
+	AuthRequired  *v1beta1.AuthType `protobuf:"varint,1,opt,name=auth_required,json=authRequired,proto3,enum=dtkt.shared.v1beta1.AuthType,oneof" json:"auth_required,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -230,33 +228,22 @@ func (*CheckConfigResponse) Descriptor() ([]byte, []int) {
 	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *CheckConfigResponse) GetValid() bool {
-	if x != nil {
-		return x.Valid
+func (x *CheckConfigResponse) GetAuthRequired() v1beta1.AuthType {
+	if x != nil && x.AuthRequired != nil {
+		return *x.AuthRequired
 	}
-	return false
-}
-
-func (x *CheckConfigResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
+	return v1beta1.AuthType(0)
 }
 
 // Request for checking auth (3-legged OAuth over gRPC).
 type CheckAuthRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The auth check type.
-	Type v1beta1.AuthCheck `protobuf:"varint,1,opt,name=type,proto3,enum=dtkt.shared.v1beta1.AuthCheck" json:"type,omitempty"`
-	// If auth type response is OAuth.
-	//
-	// Types that are valid to be assigned to Oauth:
+	// Types that are valid to be assigned to Type:
 	//
 	//	*CheckAuthRequest_CodeRequest
 	//	*CheckAuthRequest_TokenRequest
 	//	*CheckAuthRequest_RefreshRequest
-	Oauth         isCheckAuthRequest_Oauth `protobuf_oneof:"oauth"`
+	Type          isCheckAuthRequest_Type `protobuf_oneof:"type"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -291,23 +278,16 @@ func (*CheckAuthRequest) Descriptor() ([]byte, []int) {
 	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *CheckAuthRequest) GetType() v1beta1.AuthCheck {
+func (x *CheckAuthRequest) GetType() isCheckAuthRequest_Type {
 	if x != nil {
 		return x.Type
-	}
-	return v1beta1.AuthCheck(0)
-}
-
-func (x *CheckAuthRequest) GetOauth() isCheckAuthRequest_Oauth {
-	if x != nil {
-		return x.Oauth
 	}
 	return nil
 }
 
 func (x *CheckAuthRequest) GetCodeRequest() *v1beta1.OAuthCodeRequest {
 	if x != nil {
-		if x, ok := x.Oauth.(*CheckAuthRequest_CodeRequest); ok {
+		if x, ok := x.Type.(*CheckAuthRequest_CodeRequest); ok {
 			return x.CodeRequest
 		}
 	}
@@ -316,7 +296,7 @@ func (x *CheckAuthRequest) GetCodeRequest() *v1beta1.OAuthCodeRequest {
 
 func (x *CheckAuthRequest) GetTokenRequest() *v1beta1.OAuthTokenRequest {
 	if x != nil {
-		if x, ok := x.Oauth.(*CheckAuthRequest_TokenRequest); ok {
+		if x, ok := x.Type.(*CheckAuthRequest_TokenRequest); ok {
 			return x.TokenRequest
 		}
 	}
@@ -325,54 +305,45 @@ func (x *CheckAuthRequest) GetTokenRequest() *v1beta1.OAuthTokenRequest {
 
 func (x *CheckAuthRequest) GetRefreshRequest() *v1beta1.OAuthRefreshRequest {
 	if x != nil {
-		if x, ok := x.Oauth.(*CheckAuthRequest_RefreshRequest); ok {
+		if x, ok := x.Type.(*CheckAuthRequest_RefreshRequest); ok {
 			return x.RefreshRequest
 		}
 	}
 	return nil
 }
 
-type isCheckAuthRequest_Oauth interface {
-	isCheckAuthRequest_Oauth()
+type isCheckAuthRequest_Type interface {
+	isCheckAuthRequest_Type()
 }
 
 type CheckAuthRequest_CodeRequest struct {
-	// When check type is auth code url.
 	CodeRequest *v1beta1.OAuthCodeRequest `protobuf:"bytes,2,opt,name=code_request,json=codeRequest,proto3,oneof"`
 }
 
 type CheckAuthRequest_TokenRequest struct {
-	// When check type is callback.
 	TokenRequest *v1beta1.OAuthTokenRequest `protobuf:"bytes,3,opt,name=token_request,json=tokenRequest,proto3,oneof"`
 }
 
 type CheckAuthRequest_RefreshRequest struct {
-	// When check type is refresh.
 	RefreshRequest *v1beta1.OAuthRefreshRequest `protobuf:"bytes,4,opt,name=refresh_request,json=refreshRequest,proto3,oneof"`
 }
 
-func (*CheckAuthRequest_CodeRequest) isCheckAuthRequest_Oauth() {}
+func (*CheckAuthRequest_CodeRequest) isCheckAuthRequest_Type() {}
 
-func (*CheckAuthRequest_TokenRequest) isCheckAuthRequest_Oauth() {}
+func (*CheckAuthRequest_TokenRequest) isCheckAuthRequest_Type() {}
 
-func (*CheckAuthRequest_RefreshRequest) isCheckAuthRequest_Oauth() {}
+func (*CheckAuthRequest_RefreshRequest) isCheckAuthRequest_Type() {}
 
 // Response for checking auth.
 type CheckAuthResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The auth type.
-	Type v1beta1.AuthType `protobuf:"varint,1,opt,name=type,proto3,enum=dtkt.shared.v1beta1.AuthType" json:"type,omitempty"`
-	// Indicates if the auth check was successful.
-	Success bool `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
-	// Error message if success is false.
-	Error string `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`
-	// Present when type is OAuth.
+	// Auth type if auth is required.
+	AuthRequired v1beta1.AuthType `protobuf:"varint,1,opt,name=auth_required,json=authRequired,proto3,enum=dtkt.shared.v1beta1.AuthType" json:"auth_required,omitempty"`
+	// Types that are valid to be assigned to Type:
 	//
-	// Types that are valid to be assigned to Oauth:
-	//
-	//	*CheckAuthResponse_AuthCodeUrl
+	//	*CheckAuthResponse_OauthCodeUrl
 	//	*CheckAuthResponse_Token
-	Oauth         isCheckAuthResponse_Oauth `protobuf_oneof:"oauth"`
+	Type          isCheckAuthResponse_Type `protobuf_oneof:"type"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -407,38 +378,24 @@ func (*CheckAuthResponse) Descriptor() ([]byte, []int) {
 	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *CheckAuthResponse) GetType() v1beta1.AuthType {
+func (x *CheckAuthResponse) GetAuthRequired() v1beta1.AuthType {
 	if x != nil {
-		return x.Type
+		return x.AuthRequired
 	}
 	return v1beta1.AuthType(0)
 }
 
-func (x *CheckAuthResponse) GetSuccess() bool {
+func (x *CheckAuthResponse) GetType() isCheckAuthResponse_Type {
 	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-func (x *CheckAuthResponse) GetError() string {
-	if x != nil {
-		return x.Error
-	}
-	return ""
-}
-
-func (x *CheckAuthResponse) GetOauth() isCheckAuthResponse_Oauth {
-	if x != nil {
-		return x.Oauth
+		return x.Type
 	}
 	return nil
 }
 
-func (x *CheckAuthResponse) GetAuthCodeUrl() string {
+func (x *CheckAuthResponse) GetOauthCodeUrl() string {
 	if x != nil {
-		if x, ok := x.Oauth.(*CheckAuthResponse_AuthCodeUrl); ok {
-			return x.AuthCodeUrl
+		if x, ok := x.Type.(*CheckAuthResponse_OauthCodeUrl); ok {
+			return x.OauthCodeUrl
 		}
 	}
 	return ""
@@ -446,30 +403,30 @@ func (x *CheckAuthResponse) GetAuthCodeUrl() string {
 
 func (x *CheckAuthResponse) GetToken() *v1beta1.OAuthToken {
 	if x != nil {
-		if x, ok := x.Oauth.(*CheckAuthResponse_Token); ok {
+		if x, ok := x.Type.(*CheckAuthResponse_Token); ok {
 			return x.Token
 		}
 	}
 	return nil
 }
 
-type isCheckAuthResponse_Oauth interface {
-	isCheckAuthResponse_Oauth()
+type isCheckAuthResponse_Type interface {
+	isCheckAuthResponse_Type()
 }
 
-type CheckAuthResponse_AuthCodeUrl struct {
-	// Returned when check is code.
-	AuthCodeUrl string `protobuf:"bytes,4,opt,name=auth_code_url,json=authCodeUrl,proto3,oneof"`
+type CheckAuthResponse_OauthCodeUrl struct {
+	// Returned when auth type is code.
+	OauthCodeUrl string `protobuf:"bytes,2,opt,name=oauth_code_url,json=oauthCodeUrl,proto3,oneof"`
 }
 
 type CheckAuthResponse_Token struct {
-	// Returned when check type is token or refresh.
-	Token *v1beta1.OAuthToken `protobuf:"bytes,5,opt,name=token,proto3,oneof"`
+	// Returned when auth type is token or refresh.
+	Token *v1beta1.OAuthToken `protobuf:"bytes,3,opt,name=token,proto3,oneof"`
 }
 
-func (*CheckAuthResponse_AuthCodeUrl) isCheckAuthResponse_Oauth() {}
+func (*CheckAuthResponse_OauthCodeUrl) isCheckAuthResponse_Type() {}
 
-func (*CheckAuthResponse_Token) isCheckAuthResponse_Oauth() {}
+func (*CheckAuthResponse_Token) isCheckAuthResponse_Type() {}
 
 // Request for listing custom types.
 type ListTypesRequest struct {
@@ -686,23 +643,20 @@ const file_dtkt_base_v1beta1_messages_proto_rawDesc = "" +
 	"\vconfig_hash\x18\x03 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\n" +
 	"configHash\x12%\n" +
 	"\n" +
-	"config_gen\x18\x04 \x01(\x04B\x06\xbaH\x03\xc8\x01\x01R\tconfigGen\"E\n" +
-	"\x13CheckConfigResponse\x12\x14\n" +
-	"\x05valid\x18\x01 \x01(\bR\x05valid\x12\x18\n" +
-	"\amessage\x18\x05 \x01(\tR\amessage\"\xbf\x02\n" +
-	"\x10CheckAuthRequest\x122\n" +
-	"\x04type\x18\x01 \x01(\x0e2\x1e.dtkt.shared.v1beta1.AuthCheckR\x04type\x12J\n" +
+	"config_gen\x18\x04 \x01(\x04B\x06\xbaH\x03\xc8\x01\x01R\tconfigGen\"p\n" +
+	"\x13CheckConfigResponse\x12G\n" +
+	"\rauth_required\x18\x01 \x01(\x0e2\x1d.dtkt.shared.v1beta1.AuthTypeH\x00R\fauthRequired\x88\x01\x01B\x10\n" +
+	"\x0e_auth_required\"\x8a\x02\n" +
+	"\x10CheckAuthRequest\x12J\n" +
 	"\fcode_request\x18\x02 \x01(\v2%.dtkt.shared.v1beta1.OAuthCodeRequestH\x00R\vcodeRequest\x12M\n" +
 	"\rtoken_request\x18\x03 \x01(\v2&.dtkt.shared.v1beta1.OAuthTokenRequestH\x00R\ftokenRequest\x12S\n" +
-	"\x0frefresh_request\x18\x04 \x01(\v2(.dtkt.shared.v1beta1.OAuthRefreshRequestH\x00R\x0erefreshRequestB\a\n" +
-	"\x05oauth\"\xde\x01\n" +
-	"\x11CheckAuthResponse\x121\n" +
-	"\x04type\x18\x01 \x01(\x0e2\x1d.dtkt.shared.v1beta1.AuthTypeR\x04type\x12\x18\n" +
-	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x14\n" +
-	"\x05error\x18\x03 \x01(\tR\x05error\x12$\n" +
-	"\rauth_code_url\x18\x04 \x01(\tH\x00R\vauthCodeUrl\x127\n" +
-	"\x05token\x18\x05 \x01(\v2\x1f.dtkt.shared.v1beta1.OAuthTokenH\x00R\x05tokenB\a\n" +
-	"\x05oauth\"N\n" +
+	"\x0frefresh_request\x18\x04 \x01(\v2(.dtkt.shared.v1beta1.OAuthRefreshRequestH\x00R\x0erefreshRequestB\x06\n" +
+	"\x04type\"\xc0\x01\n" +
+	"\x11CheckAuthResponse\x12B\n" +
+	"\rauth_required\x18\x01 \x01(\x0e2\x1d.dtkt.shared.v1beta1.AuthTypeR\fauthRequired\x12&\n" +
+	"\x0eoauth_code_url\x18\x02 \x01(\tH\x00R\foauthCodeUrl\x127\n" +
+	"\x05token\x18\x03 \x01(\v2\x1f.dtkt.shared.v1beta1.OAuthTokenH\x00R\x05tokenB\x06\n" +
+	"\x04type\"N\n" +
 	"\x10ListTypesRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
@@ -743,23 +697,22 @@ var file_dtkt_base_v1beta1_messages_proto_goTypes = []any{
 	(*v1beta1.Package)(nil),             // 10: dtkt.shared.v1beta1.Package
 	(*v1beta1.TypeSchema)(nil),          // 11: dtkt.shared.v1beta1.TypeSchema
 	(*anypb.Any)(nil),                   // 12: google.protobuf.Any
-	(v1beta1.AuthCheck)(0),              // 13: dtkt.shared.v1beta1.AuthCheck
+	(v1beta1.AuthType)(0),               // 13: dtkt.shared.v1beta1.AuthType
 	(*v1beta1.OAuthCodeRequest)(nil),    // 14: dtkt.shared.v1beta1.OAuthCodeRequest
 	(*v1beta1.OAuthTokenRequest)(nil),   // 15: dtkt.shared.v1beta1.OAuthTokenRequest
 	(*v1beta1.OAuthRefreshRequest)(nil), // 16: dtkt.shared.v1beta1.OAuthRefreshRequest
-	(v1beta1.AuthType)(0),               // 17: dtkt.shared.v1beta1.AuthType
-	(*v1beta1.OAuthToken)(nil),          // 18: dtkt.shared.v1beta1.OAuthToken
+	(*v1beta1.OAuthToken)(nil),          // 17: dtkt.shared.v1beta1.OAuthToken
 }
 var file_dtkt_base_v1beta1_messages_proto_depIdxs = []int32{
 	10, // 0: dtkt.base.v1beta1.GetPackageResponse.package:type_name -> dtkt.shared.v1beta1.Package
 	11, // 1: dtkt.base.v1beta1.GetPackageResponse.config_schema:type_name -> dtkt.shared.v1beta1.TypeSchema
 	12, // 2: dtkt.base.v1beta1.CheckConfigRequest.config_data:type_name -> google.protobuf.Any
-	13, // 3: dtkt.base.v1beta1.CheckAuthRequest.type:type_name -> dtkt.shared.v1beta1.AuthCheck
+	13, // 3: dtkt.base.v1beta1.CheckConfigResponse.auth_required:type_name -> dtkt.shared.v1beta1.AuthType
 	14, // 4: dtkt.base.v1beta1.CheckAuthRequest.code_request:type_name -> dtkt.shared.v1beta1.OAuthCodeRequest
 	15, // 5: dtkt.base.v1beta1.CheckAuthRequest.token_request:type_name -> dtkt.shared.v1beta1.OAuthTokenRequest
 	16, // 6: dtkt.base.v1beta1.CheckAuthRequest.refresh_request:type_name -> dtkt.shared.v1beta1.OAuthRefreshRequest
-	17, // 7: dtkt.base.v1beta1.CheckAuthResponse.type:type_name -> dtkt.shared.v1beta1.AuthType
-	18, // 8: dtkt.base.v1beta1.CheckAuthResponse.token:type_name -> dtkt.shared.v1beta1.OAuthToken
+	13, // 7: dtkt.base.v1beta1.CheckAuthResponse.auth_required:type_name -> dtkt.shared.v1beta1.AuthType
+	17, // 8: dtkt.base.v1beta1.CheckAuthResponse.token:type_name -> dtkt.shared.v1beta1.OAuthToken
 	11, // 9: dtkt.base.v1beta1.ListTypesResponse.types:type_name -> dtkt.shared.v1beta1.TypeSchema
 	11, // 10: dtkt.base.v1beta1.GetTypeResponse.type:type_name -> dtkt.shared.v1beta1.TypeSchema
 	11, // [11:11] is the sub-list for method output_type
@@ -774,13 +727,14 @@ func file_dtkt_base_v1beta1_messages_proto_init() {
 	if File_dtkt_base_v1beta1_messages_proto != nil {
 		return
 	}
+	file_dtkt_base_v1beta1_messages_proto_msgTypes[3].OneofWrappers = []any{}
 	file_dtkt_base_v1beta1_messages_proto_msgTypes[4].OneofWrappers = []any{
 		(*CheckAuthRequest_CodeRequest)(nil),
 		(*CheckAuthRequest_TokenRequest)(nil),
 		(*CheckAuthRequest_RefreshRequest)(nil),
 	}
 	file_dtkt_base_v1beta1_messages_proto_msgTypes[5].OneofWrappers = []any{
-		(*CheckAuthResponse_AuthCodeUrl)(nil),
+		(*CheckAuthResponse_OauthCodeUrl)(nil),
 		(*CheckAuthResponse_Token)(nil),
 	}
 	type x struct{}

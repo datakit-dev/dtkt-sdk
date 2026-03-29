@@ -11,6 +11,7 @@ import (
 	expr "cel.dev/expr"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -312,12 +313,14 @@ func (x *Edge) GetTarget() string {
 }
 
 type Node struct {
-	state     protoimpl.MessageState `protogen:"open.v1"`
-	Id        string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	State     Node_State             `protobuf:"varint,2,opt,name=state,proto3,enum=dtkt.flow.v1beta1.Node_State" json:"state,omitempty"`
-	CallCount uint64                 `protobuf:"varint,4,opt,name=call_count,json=callCount,proto3" json:"call_count,omitempty"`
-	PrevValue *expr.Value            `protobuf:"bytes,5,opt,name=prev_value,json=prevValue,proto3" json:"prev_value,omitempty"`
-	CurrValue *expr.Value            `protobuf:"bytes,6,opt,name=curr_value,json=currValue,proto3" json:"curr_value,omitempty"`
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	Id         string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	State      Node_State             `protobuf:"varint,2,opt,name=state,proto3,enum=dtkt.flow.v1beta1.Node_State" json:"state,omitempty"`
+	CallCount  uint64                 `protobuf:"varint,4,opt,name=call_count,json=callCount,proto3" json:"call_count,omitempty"`
+	PrevValue  *expr.Value            `protobuf:"bytes,5,opt,name=prev_value,json=prevValue,proto3" json:"prev_value,omitempty"`
+	CurrValue  *expr.Value            `protobuf:"bytes,6,opt,name=curr_value,json=currValue,proto3" json:"curr_value,omitempty"`
+	StartTime  *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	FinishTime *timestamppb.Timestamp `protobuf:"bytes,21,opt,name=finish_time,json=finishTime,proto3" json:"finish_time,omitempty"`
 	// Types that are valid to be assigned to Type:
 	//
 	//	*Node_Connection
@@ -392,6 +395,20 @@ func (x *Node) GetPrevValue() *expr.Value {
 func (x *Node) GetCurrValue() *expr.Value {
 	if x != nil {
 		return x.CurrValue
+	}
+	return nil
+}
+
+func (x *Node) GetStartTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartTime
+	}
+	return nil
+}
+
+func (x *Node) GetFinishTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.FinishTime
 	}
 	return nil
 }
@@ -641,7 +658,7 @@ var File_dtkt_flow_v1beta1_eval_proto protoreflect.FileDescriptor
 
 const file_dtkt_flow_v1beta1_eval_proto_rawDesc = "" +
 	"\n" +
-	"\x1cdtkt/flow/v1beta1/eval.proto\x12\x11dtkt.flow.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x14cel/expr/value.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\"\xeb\a\n" +
+	"\x1cdtkt/flow/v1beta1/eval.proto\x12\x11dtkt.flow.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x14cel/expr/value.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xeb\a\n" +
 	"\aRuntime\x12M\n" +
 	"\vconnections\x18\x01 \x03(\v2+.dtkt.flow.v1beta1.Runtime.ConnectionsEntryR\vconnections\x12>\n" +
 	"\x06inputs\x18\x02 \x03(\v2&.dtkt.flow.v1beta1.Runtime.InputsEntryR\x06inputs\x128\n" +
@@ -681,7 +698,7 @@ const file_dtkt_flow_v1beta1_eval_proto_rawDesc = "" +
 	"\x03ids\x18\x01 \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R\x03ids\"\xe2\x01\n" +
 	"\x04Edge\x12l\n" +
 	"\x06source\x18\x01 \x01(\tBT\xbaHQ\xc8\x01\x01rL2J^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x06source\x12l\n" +
-	"\x06target\x18\x02 \x01(\tBT\xbaHQ\xc8\x01\x01rL2J^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x06target\"\xc4\x05\n" +
+	"\x06target\x18\x02 \x01(\tBT\xbaHQ\xc8\x01\x01rL2J^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x06target\"\xbc\x06\n" +
 	"\x04Node\x12d\n" +
 	"\x02id\x18\x01 \x01(\tBT\xbaHQ\xc8\x01\x01rL2J^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x02id\x123\n" +
 	"\x05state\x18\x02 \x01(\x0e2\x1d.dtkt.flow.v1beta1.Node.StateR\x05state\x12\x1d\n" +
@@ -690,7 +707,11 @@ const file_dtkt_flow_v1beta1_eval_proto_rawDesc = "" +
 	"\n" +
 	"prev_value\x18\x05 \x01(\v2\x0f.cel.expr.ValueR\tprevValue\x12.\n" +
 	"\n" +
-	"curr_value\x18\x06 \x01(\v2\x0f.cel.expr.ValueR\tcurrValue\x12?\n" +
+	"curr_value\x18\x06 \x01(\v2\x0f.cel.expr.ValueR\tcurrValue\x129\n" +
+	"\n" +
+	"start_time\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x12;\n" +
+	"\vfinish_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"finishTime\x12?\n" +
 	"\n" +
 	"connection\x18\a \x01(\v2\x1d.dtkt.flow.v1beta1.ConnectionH\x00R\n" +
 	"connection\x120\n" +
@@ -722,28 +743,29 @@ func file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP() []byte {
 var file_dtkt_flow_v1beta1_eval_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_dtkt_flow_v1beta1_eval_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_dtkt_flow_v1beta1_eval_proto_goTypes = []any{
-	(Node_State)(0),      // 0: dtkt.flow.v1beta1.Node.State
-	(*Runtime)(nil),      // 1: dtkt.flow.v1beta1.Runtime
-	(*Graph)(nil),        // 2: dtkt.flow.v1beta1.Graph
-	(*Groups)(nil),       // 3: dtkt.flow.v1beta1.Groups
-	(*Edge)(nil),         // 4: dtkt.flow.v1beta1.Edge
-	(*Node)(nil),         // 5: dtkt.flow.v1beta1.Node
-	(*Runtime_Done)(nil), // 6: dtkt.flow.v1beta1.Runtime.Done
-	(*Runtime_EOF)(nil),  // 7: dtkt.flow.v1beta1.Runtime.EOF
-	nil,                  // 8: dtkt.flow.v1beta1.Runtime.ConnectionsEntry
-	nil,                  // 9: dtkt.flow.v1beta1.Runtime.InputsEntry
-	nil,                  // 10: dtkt.flow.v1beta1.Runtime.VarsEntry
-	nil,                  // 11: dtkt.flow.v1beta1.Runtime.ActionsEntry
-	nil,                  // 12: dtkt.flow.v1beta1.Runtime.StreamsEntry
-	nil,                  // 13: dtkt.flow.v1beta1.Runtime.OutputsEntry
-	(*Groups_Group)(nil), // 14: dtkt.flow.v1beta1.Groups.Group
-	(*expr.Value)(nil),   // 15: cel.expr.Value
-	(*Connection)(nil),   // 16: dtkt.flow.v1beta1.Connection
-	(*Input)(nil),        // 17: dtkt.flow.v1beta1.Input
-	(*Var)(nil),          // 18: dtkt.flow.v1beta1.Var
-	(*Action)(nil),       // 19: dtkt.flow.v1beta1.Action
-	(*Output)(nil),       // 20: dtkt.flow.v1beta1.Output
-	(*Stream)(nil),       // 21: dtkt.flow.v1beta1.Stream
+	(Node_State)(0),               // 0: dtkt.flow.v1beta1.Node.State
+	(*Runtime)(nil),               // 1: dtkt.flow.v1beta1.Runtime
+	(*Graph)(nil),                 // 2: dtkt.flow.v1beta1.Graph
+	(*Groups)(nil),                // 3: dtkt.flow.v1beta1.Groups
+	(*Edge)(nil),                  // 4: dtkt.flow.v1beta1.Edge
+	(*Node)(nil),                  // 5: dtkt.flow.v1beta1.Node
+	(*Runtime_Done)(nil),          // 6: dtkt.flow.v1beta1.Runtime.Done
+	(*Runtime_EOF)(nil),           // 7: dtkt.flow.v1beta1.Runtime.EOF
+	nil,                           // 8: dtkt.flow.v1beta1.Runtime.ConnectionsEntry
+	nil,                           // 9: dtkt.flow.v1beta1.Runtime.InputsEntry
+	nil,                           // 10: dtkt.flow.v1beta1.Runtime.VarsEntry
+	nil,                           // 11: dtkt.flow.v1beta1.Runtime.ActionsEntry
+	nil,                           // 12: dtkt.flow.v1beta1.Runtime.StreamsEntry
+	nil,                           // 13: dtkt.flow.v1beta1.Runtime.OutputsEntry
+	(*Groups_Group)(nil),          // 14: dtkt.flow.v1beta1.Groups.Group
+	(*expr.Value)(nil),            // 15: cel.expr.Value
+	(*timestamppb.Timestamp)(nil), // 16: google.protobuf.Timestamp
+	(*Connection)(nil),            // 17: dtkt.flow.v1beta1.Connection
+	(*Input)(nil),                 // 18: dtkt.flow.v1beta1.Input
+	(*Var)(nil),                   // 19: dtkt.flow.v1beta1.Var
+	(*Action)(nil),                // 20: dtkt.flow.v1beta1.Action
+	(*Output)(nil),                // 21: dtkt.flow.v1beta1.Output
+	(*Stream)(nil),                // 22: dtkt.flow.v1beta1.Stream
 }
 var file_dtkt_flow_v1beta1_eval_proto_depIdxs = []int32{
 	8,  // 0: dtkt.flow.v1beta1.Runtime.connections:type_name -> dtkt.flow.v1beta1.Runtime.ConnectionsEntry
@@ -758,23 +780,25 @@ var file_dtkt_flow_v1beta1_eval_proto_depIdxs = []int32{
 	0,  // 9: dtkt.flow.v1beta1.Node.state:type_name -> dtkt.flow.v1beta1.Node.State
 	15, // 10: dtkt.flow.v1beta1.Node.prev_value:type_name -> cel.expr.Value
 	15, // 11: dtkt.flow.v1beta1.Node.curr_value:type_name -> cel.expr.Value
-	16, // 12: dtkt.flow.v1beta1.Node.connection:type_name -> dtkt.flow.v1beta1.Connection
-	17, // 13: dtkt.flow.v1beta1.Node.input:type_name -> dtkt.flow.v1beta1.Input
-	18, // 14: dtkt.flow.v1beta1.Node.var:type_name -> dtkt.flow.v1beta1.Var
-	19, // 15: dtkt.flow.v1beta1.Node.action:type_name -> dtkt.flow.v1beta1.Action
-	20, // 16: dtkt.flow.v1beta1.Node.output:type_name -> dtkt.flow.v1beta1.Output
-	21, // 17: dtkt.flow.v1beta1.Node.stream:type_name -> dtkt.flow.v1beta1.Stream
-	5,  // 18: dtkt.flow.v1beta1.Runtime.ConnectionsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	5,  // 19: dtkt.flow.v1beta1.Runtime.InputsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	5,  // 20: dtkt.flow.v1beta1.Runtime.VarsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	5,  // 21: dtkt.flow.v1beta1.Runtime.ActionsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	5,  // 22: dtkt.flow.v1beta1.Runtime.StreamsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	5,  // 23: dtkt.flow.v1beta1.Runtime.OutputsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	24, // [24:24] is the sub-list for method output_type
-	24, // [24:24] is the sub-list for method input_type
-	24, // [24:24] is the sub-list for extension type_name
-	24, // [24:24] is the sub-list for extension extendee
-	0,  // [0:24] is the sub-list for field type_name
+	16, // 12: dtkt.flow.v1beta1.Node.start_time:type_name -> google.protobuf.Timestamp
+	16, // 13: dtkt.flow.v1beta1.Node.finish_time:type_name -> google.protobuf.Timestamp
+	17, // 14: dtkt.flow.v1beta1.Node.connection:type_name -> dtkt.flow.v1beta1.Connection
+	18, // 15: dtkt.flow.v1beta1.Node.input:type_name -> dtkt.flow.v1beta1.Input
+	19, // 16: dtkt.flow.v1beta1.Node.var:type_name -> dtkt.flow.v1beta1.Var
+	20, // 17: dtkt.flow.v1beta1.Node.action:type_name -> dtkt.flow.v1beta1.Action
+	21, // 18: dtkt.flow.v1beta1.Node.output:type_name -> dtkt.flow.v1beta1.Output
+	22, // 19: dtkt.flow.v1beta1.Node.stream:type_name -> dtkt.flow.v1beta1.Stream
+	5,  // 20: dtkt.flow.v1beta1.Runtime.ConnectionsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	5,  // 21: dtkt.flow.v1beta1.Runtime.InputsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	5,  // 22: dtkt.flow.v1beta1.Runtime.VarsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	5,  // 23: dtkt.flow.v1beta1.Runtime.ActionsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	5,  // 24: dtkt.flow.v1beta1.Runtime.StreamsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	5,  // 25: dtkt.flow.v1beta1.Runtime.OutputsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	26, // [26:26] is the sub-list for method output_type
+	26, // [26:26] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_flow_v1beta1_eval_proto_init() }

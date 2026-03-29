@@ -1,7 +1,6 @@
 package spec
 
 import (
-	"context"
 	"errors"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
@@ -11,25 +10,52 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 )
 
-func ParseVar(run shared.Runtime, node *flowv1beta1.Var, visitor shared.ParseExprFunc) error {
+var _ shared.RuntimeNode = (*Var)(nil)
+
+type Var struct {
+	node *flowv1beta1.Var
+	eval shared.EvalFunc
+}
+
+func NewVar(env shared.Env, node *flowv1beta1.Var, visitor shared.ExprVisitFunc) (*Var, error) {
+	if err := ParseVar(env, node, visitor); err != nil {
+		return nil, err
+	}
+	return &Var{node: node}, nil
+}
+
+func (v *Var) Compile(run shared.Runtime) error {
+	eval, err := CompileVar(run, v.node)
+	if err != nil {
+		return err
+	}
+	v.eval = eval.Eval
+	return nil
+}
+
+func (v *Var) Eval() (shared.EvalFunc, bool) { return v.eval, true }
+func (v *Var) Recv() (shared.RecvFunc, bool) { return nil, false }
+func (v *Var) Send() (shared.SendFunc, bool) { return nil, false }
+
+func ParseVar(env shared.Env, node *flowv1beta1.Var, visitor shared.ExprVisitFunc) error {
 	switch {
 	case node.GetSwitch() != nil:
-		return ParseSwitch(run, node.GetSwitch(), visitor)
+		return ParseSwitch(env, node.GetSwitch(), visitor)
 	case node.GetValue() != "":
-		_, err := shared.ParseExpr(run, node.GetValue(), visitor)
+		_, err := shared.ParseExpr(env, node.GetValue(), visitor)
 		return err
 	}
 
 	return errors.New("switch or value required")
 }
 
-func CompileVar(run shared.Runtime, node *flowv1beta1.Var) (_ shared.EvalExpr, err error) {
-	vars, err := run.Vars()
+func CompileVar(run shared.Runtime, node *flowv1beta1.Var) (_ shared.Eval, err error) {
+	env, err := run.Env()
 	if err != nil {
 		return nil, err
 	}
 
-	var expr shared.EvalExpr
+	var expr shared.Eval
 	switch {
 	case node.GetSwitch() != nil:
 		expr, err = CompileSwitch(run, node.GetSwitch())
@@ -43,8 +69,8 @@ func CompileVar(run shared.Runtime, node *flowv1beta1.Var) (_ shared.EvalExpr, e
 			return
 		}
 
-		expr = shared.EvalExprFunc(func(ctx context.Context) ref.Val {
-			val, _, err := prog.ContextEval(ctx, vars)
+		expr = shared.EvalFunc(func(run shared.Runtime) ref.Val {
+			val, _, err := prog.ContextEval(run.Context(), env.Vars())
 			if err != nil {
 				return types.WrapErr(err)
 			}
@@ -55,7 +81,7 @@ func CompileVar(run shared.Runtime, node *flowv1beta1.Var) (_ shared.EvalExpr, e
 		return nil, errors.New("switch or value required")
 	}
 
-	return CacheableEval(node, shared.EvalExprFunc(func(ctx context.Context) ref.Val {
-		return expr.Eval(ctx)
+	return CacheableEval(node, shared.EvalFunc(func(run shared.Runtime) ref.Val {
+		return expr.Eval(run)
 	})), nil
 }

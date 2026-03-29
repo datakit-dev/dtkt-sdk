@@ -1,4 +1,4 @@
-package form
+package v1beta1
 
 import (
 	protoformv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protoform/v1beta1"

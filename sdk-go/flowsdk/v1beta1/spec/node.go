@@ -9,12 +9,30 @@ import (
 
 type Node interface {
 	shared.SpecNode
-	*flowv1beta1.Connection |
+	*flowv1beta1.Action |
+		*flowv1beta1.Connection |
 		*flowv1beta1.Input |
-		*flowv1beta1.Var |
-		*flowv1beta1.Action |
 		*flowv1beta1.Output |
-		*flowv1beta1.Stream
+		*flowv1beta1.Stream |
+		*flowv1beta1.Var
+}
+
+func NewRuntimeNode(env shared.Env, node shared.SpecNode, visitor shared.ExprVisitFunc) (shared.RuntimeNode, error) {
+	switch node := node.(type) {
+	case *flowv1beta1.Connection:
+		return NewConnection(env, node)
+	case *flowv1beta1.Input:
+		return NewInput(env, node)
+	case *flowv1beta1.Var:
+		return NewVar(env, node, visitor)
+	case *flowv1beta1.Action:
+		return NewAction(env, node, visitor)
+	case *flowv1beta1.Stream:
+		return NewStream(env, node, visitor)
+	case *flowv1beta1.Output:
+		return NewOutput(env, node, visitor)
+	}
+	return nil, nil
 }
 
 func GetID[T Node](node T) string {

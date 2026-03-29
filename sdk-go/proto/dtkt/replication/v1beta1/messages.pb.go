@@ -392,8 +392,6 @@ type CheckSourceAuthRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Unique identifier of source.
 	SourceId string `protobuf:"bytes,1,opt,name=source_id,json=sourceId,proto3" json:"source_id,omitempty"`
-	// The auth check type.
-	Type v1beta1.AuthCheck `protobuf:"varint,2,opt,name=type,proto3,enum=dtkt.shared.v1beta1.AuthCheck" json:"type,omitempty"`
 	// If auth type response is OAuth.
 	//
 	// Types that are valid to be assigned to Oauth:
@@ -441,13 +439,6 @@ func (x *CheckSourceAuthRequest) GetSourceId() string {
 		return x.SourceId
 	}
 	return ""
-}
-
-func (x *CheckSourceAuthRequest) GetType() v1beta1.AuthCheck {
-	if x != nil {
-		return x.Type
-	}
-	return v1beta1.AuthCheck(0)
 }
 
 func (x *CheckSourceAuthRequest) GetOauth() isCheckSourceAuthRequest_Oauth {
@@ -1871,10 +1862,9 @@ const file_dtkt_replication_v1beta1_messages_proto_rawDesc = "" +
 	"\bicon_url\x18\x04 \x01(\tR\aiconUrl\x12\x1a\n" +
 	"\bcategory\x18\x05 \x01(\tR\bcategory\x12D\n" +
 	"\rconfig_schema\x18\x06 \x01(\v2\x1f.dtkt.shared.v1beta1.TypeSchemaR\fconfigSchema\x12O\n" +
-	"\x14supported_auth_types\x18\a \x03(\x0e2\x1d.dtkt.shared.v1beta1.AuthTypeR\x12supportedAuthTypes\"\xe2\x02\n" +
+	"\x14supported_auth_types\x18\a \x03(\x0e2\x1d.dtkt.shared.v1beta1.AuthTypeR\x12supportedAuthTypes\"\xae\x02\n" +
 	"\x16CheckSourceAuthRequest\x12\x1b\n" +
-	"\tsource_id\x18\x01 \x01(\tR\bsourceId\x122\n" +
-	"\x04type\x18\x02 \x01(\x0e2\x1e.dtkt.shared.v1beta1.AuthCheckR\x04type\x12J\n" +
+	"\tsource_id\x18\x01 \x01(\tR\bsourceId\x12J\n" +
 	"\fcode_request\x18\x03 \x01(\v2%.dtkt.shared.v1beta1.OAuthCodeRequestH\x00R\vcodeRequest\x12M\n" +
 	"\rtoken_request\x18\x04 \x01(\v2&.dtkt.shared.v1beta1.OAuthTokenRequestH\x00R\ftokenRequest\x12S\n" +
 	"\x0frefresh_request\x18\x05 \x01(\v2(.dtkt.shared.v1beta1.OAuthRefreshRequestH\x00R\x0erefreshRequestB\a\n" +
@@ -1998,11 +1988,10 @@ var file_dtkt_replication_v1beta1_messages_proto_goTypes = []any{
 	(SyncStatus)(0),                      // 31: dtkt.replication.v1beta1.SyncStatus
 	(*v1beta1.TypeSchema)(nil),           // 32: dtkt.shared.v1beta1.TypeSchema
 	(v1beta1.AuthType)(0),                // 33: dtkt.shared.v1beta1.AuthType
-	(v1beta1.AuthCheck)(0),               // 34: dtkt.shared.v1beta1.AuthCheck
-	(*v1beta1.OAuthCodeRequest)(nil),     // 35: dtkt.shared.v1beta1.OAuthCodeRequest
-	(*v1beta1.OAuthTokenRequest)(nil),    // 36: dtkt.shared.v1beta1.OAuthTokenRequest
-	(*v1beta1.OAuthRefreshRequest)(nil),  // 37: dtkt.shared.v1beta1.OAuthRefreshRequest
-	(*v1beta1.OAuthToken)(nil),           // 38: dtkt.shared.v1beta1.OAuthToken
+	(*v1beta1.OAuthCodeRequest)(nil),     // 34: dtkt.shared.v1beta1.OAuthCodeRequest
+	(*v1beta1.OAuthTokenRequest)(nil),    // 35: dtkt.shared.v1beta1.OAuthTokenRequest
+	(*v1beta1.OAuthRefreshRequest)(nil),  // 36: dtkt.shared.v1beta1.OAuthRefreshRequest
+	(*v1beta1.OAuthToken)(nil),           // 37: dtkt.shared.v1beta1.OAuthToken
 }
 var file_dtkt_replication_v1beta1_messages_proto_depIdxs = []int32{
 	30, // 0: dtkt.replication.v1beta1.Destination.config:type_name -> google.protobuf.Any
@@ -2011,32 +2000,31 @@ var file_dtkt_replication_v1beta1_messages_proto_depIdxs = []int32{
 	32, // 3: dtkt.replication.v1beta1.DestinationType.config_schema:type_name -> dtkt.shared.v1beta1.TypeSchema
 	32, // 4: dtkt.replication.v1beta1.SourceType.config_schema:type_name -> dtkt.shared.v1beta1.TypeSchema
 	33, // 5: dtkt.replication.v1beta1.SourceType.supported_auth_types:type_name -> dtkt.shared.v1beta1.AuthType
-	34, // 6: dtkt.replication.v1beta1.CheckSourceAuthRequest.type:type_name -> dtkt.shared.v1beta1.AuthCheck
-	35, // 7: dtkt.replication.v1beta1.CheckSourceAuthRequest.code_request:type_name -> dtkt.shared.v1beta1.OAuthCodeRequest
-	36, // 8: dtkt.replication.v1beta1.CheckSourceAuthRequest.token_request:type_name -> dtkt.shared.v1beta1.OAuthTokenRequest
-	37, // 9: dtkt.replication.v1beta1.CheckSourceAuthRequest.refresh_request:type_name -> dtkt.shared.v1beta1.OAuthRefreshRequest
-	33, // 10: dtkt.replication.v1beta1.CheckSourceAuthResponse.type:type_name -> dtkt.shared.v1beta1.AuthType
-	38, // 11: dtkt.replication.v1beta1.CheckSourceAuthResponse.token:type_name -> dtkt.shared.v1beta1.OAuthToken
-	30, // 12: dtkt.replication.v1beta1.CheckSourceAuthResponse.config_data:type_name -> google.protobuf.Any
-	3,  // 13: dtkt.replication.v1beta1.ListSourceTypesResponse.source_types:type_name -> dtkt.replication.v1beta1.SourceType
-	1,  // 14: dtkt.replication.v1beta1.GetSourceResponse.source:type_name -> dtkt.replication.v1beta1.Source
-	30, // 15: dtkt.replication.v1beta1.CreateSourceRequest.config:type_name -> google.protobuf.Any
-	1,  // 16: dtkt.replication.v1beta1.CreateSourceResponse.source:type_name -> dtkt.replication.v1beta1.Source
-	30, // 17: dtkt.replication.v1beta1.UpdateSourceRequest.config:type_name -> google.protobuf.Any
-	1,  // 18: dtkt.replication.v1beta1.UpdateSourceResponse.source:type_name -> dtkt.replication.v1beta1.Source
-	1,  // 19: dtkt.replication.v1beta1.StartSyncResponse.source:type_name -> dtkt.replication.v1beta1.Source
-	1,  // 20: dtkt.replication.v1beta1.StopSyncResponse.source:type_name -> dtkt.replication.v1beta1.Source
-	2,  // 21: dtkt.replication.v1beta1.ListDestinationTypesResponse.destination_types:type_name -> dtkt.replication.v1beta1.DestinationType
-	0,  // 22: dtkt.replication.v1beta1.GetDestinationResponse.destination:type_name -> dtkt.replication.v1beta1.Destination
-	30, // 23: dtkt.replication.v1beta1.CreateDestinationRequest.config:type_name -> google.protobuf.Any
-	0,  // 24: dtkt.replication.v1beta1.CreateDestinationResponse.destination:type_name -> dtkt.replication.v1beta1.Destination
-	30, // 25: dtkt.replication.v1beta1.UpdateDestinationRequest.config:type_name -> google.protobuf.Any
-	0,  // 26: dtkt.replication.v1beta1.UpdateDestinationResponse.destination:type_name -> dtkt.replication.v1beta1.Destination
-	27, // [27:27] is the sub-list for method output_type
-	27, // [27:27] is the sub-list for method input_type
-	27, // [27:27] is the sub-list for extension type_name
-	27, // [27:27] is the sub-list for extension extendee
-	0,  // [0:27] is the sub-list for field type_name
+	34, // 6: dtkt.replication.v1beta1.CheckSourceAuthRequest.code_request:type_name -> dtkt.shared.v1beta1.OAuthCodeRequest
+	35, // 7: dtkt.replication.v1beta1.CheckSourceAuthRequest.token_request:type_name -> dtkt.shared.v1beta1.OAuthTokenRequest
+	36, // 8: dtkt.replication.v1beta1.CheckSourceAuthRequest.refresh_request:type_name -> dtkt.shared.v1beta1.OAuthRefreshRequest
+	33, // 9: dtkt.replication.v1beta1.CheckSourceAuthResponse.type:type_name -> dtkt.shared.v1beta1.AuthType
+	37, // 10: dtkt.replication.v1beta1.CheckSourceAuthResponse.token:type_name -> dtkt.shared.v1beta1.OAuthToken
+	30, // 11: dtkt.replication.v1beta1.CheckSourceAuthResponse.config_data:type_name -> google.protobuf.Any
+	3,  // 12: dtkt.replication.v1beta1.ListSourceTypesResponse.source_types:type_name -> dtkt.replication.v1beta1.SourceType
+	1,  // 13: dtkt.replication.v1beta1.GetSourceResponse.source:type_name -> dtkt.replication.v1beta1.Source
+	30, // 14: dtkt.replication.v1beta1.CreateSourceRequest.config:type_name -> google.protobuf.Any
+	1,  // 15: dtkt.replication.v1beta1.CreateSourceResponse.source:type_name -> dtkt.replication.v1beta1.Source
+	30, // 16: dtkt.replication.v1beta1.UpdateSourceRequest.config:type_name -> google.protobuf.Any
+	1,  // 17: dtkt.replication.v1beta1.UpdateSourceResponse.source:type_name -> dtkt.replication.v1beta1.Source
+	1,  // 18: dtkt.replication.v1beta1.StartSyncResponse.source:type_name -> dtkt.replication.v1beta1.Source
+	1,  // 19: dtkt.replication.v1beta1.StopSyncResponse.source:type_name -> dtkt.replication.v1beta1.Source
+	2,  // 20: dtkt.replication.v1beta1.ListDestinationTypesResponse.destination_types:type_name -> dtkt.replication.v1beta1.DestinationType
+	0,  // 21: dtkt.replication.v1beta1.GetDestinationResponse.destination:type_name -> dtkt.replication.v1beta1.Destination
+	30, // 22: dtkt.replication.v1beta1.CreateDestinationRequest.config:type_name -> google.protobuf.Any
+	0,  // 23: dtkt.replication.v1beta1.CreateDestinationResponse.destination:type_name -> dtkt.replication.v1beta1.Destination
+	30, // 24: dtkt.replication.v1beta1.UpdateDestinationRequest.config:type_name -> google.protobuf.Any
+	0,  // 25: dtkt.replication.v1beta1.UpdateDestinationResponse.destination:type_name -> dtkt.replication.v1beta1.Destination
+	26, // [26:26] is the sub-list for method output_type
+	26, // [26:26] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_replication_v1beta1_messages_proto_init() }

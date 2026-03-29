@@ -31,9 +31,7 @@ func EnumField[E protostore.EnumType](opts ...FieldOption) *fieldType[E] {
 func EnumValues[E protostore.EnumType]() (values []string) {
 	var enum E
 	for idx := range enum.Descriptor().Values().Len() {
-		if idx > 0 {
-			values = append(values, string(enum.Descriptor().Values().Get(idx).Name()))
-		}
+		values = append(values, string(enum.Descriptor().Values().Get(idx).Name()))
 	}
 	return
 }
@@ -42,7 +40,7 @@ func EnumValueScanner[E protostore.EnumType](id ...string) entfield.TypeValueSca
 	values := EnumValues[E]()
 	return entfield.ValueScannerFunc[E, *sql.NullString]{
 		V: func(value E) (driver.Value, error) {
-			if value <= 0 || int(value) >= len(values) {
+			if value < 0 || int(value) >= len(values) {
 				return nil, fmt.Errorf("invalid enum value: %d", value)
 			}
 			return values[int(value)], nil

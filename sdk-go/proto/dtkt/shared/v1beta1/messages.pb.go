@@ -687,7 +687,7 @@ type OAuthEndpoint struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AuthUrl       string                 `protobuf:"bytes,1,opt,name=auth_url,json=authUrl,proto3" json:"auth_url,omitempty"`
 	TokenUrl      string                 `protobuf:"bytes,2,opt,name=token_url,json=tokenUrl,proto3" json:"token_url,omitempty"`
-	DeviceAuthUrl string                 `protobuf:"bytes,3,opt,name=device_auth_url,json=deviceAuthUrl,proto3" json:"device_auth_url,omitempty"` // optional; device flow
+	DeviceAuthUrl *string                `protobuf:"bytes,3,opt,name=device_auth_url,json=deviceAuthUrl,proto3,oneof" json:"device_auth_url,omitempty"` // optional; device flow
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -737,8 +737,8 @@ func (x *OAuthEndpoint) GetTokenUrl() string {
 }
 
 func (x *OAuthEndpoint) GetDeviceAuthUrl() string {
-	if x != nil {
-		return x.DeviceAuthUrl
+	if x != nil && x.DeviceAuthUrl != nil {
+		return *x.DeviceAuthUrl
 	}
 	return ""
 }
@@ -901,11 +901,8 @@ func (x *OAuthTokenRequest) GetParams() map[string]string {
 }
 
 type OAuthRefreshRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Typically empty: integration uses its stored refresh token.
-	// Allow optional override to support migrations or manual repairs.
-	RefreshToken  string            `protobuf:"bytes,1,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
-	Params        map[string]string `protobuf:"bytes,10,rep,name=params,proto3" json:"params,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Token         *OAuthToken            `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -940,16 +937,9 @@ func (*OAuthRefreshRequest) Descriptor() ([]byte, []int) {
 	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *OAuthRefreshRequest) GetRefreshToken() string {
+func (x *OAuthRefreshRequest) GetToken() *OAuthToken {
 	if x != nil {
-		return x.RefreshToken
-	}
-	return ""
-}
-
-func (x *OAuthRefreshRequest) GetParams() map[string]string {
-	if x != nil {
-		return x.Params
+		return x.Token
 	}
 	return nil
 }
@@ -958,9 +948,9 @@ type OAuthToken struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AccessToken   string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
 	TokenType     string                 `protobuf:"bytes,2,opt,name=token_type,json=tokenType,proto3" json:"token_type,omitempty"`
-	RefreshToken  string                 `protobuf:"bytes,3,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"` // inbound-only
+	RefreshToken  string                 `protobuf:"bytes,3,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
 	Expiry        *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=expiry,proto3" json:"expiry,omitempty"`
-	ExpiresIn     int64                  `protobuf:"varint,5,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in,omitempty"` // wire convenience; libs should derive expiry from this when present
+	ExpiresIn     int64                  `protobuf:"varint,5,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in,omitempty"` // derive expiry from this when present
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1423,7 +1413,7 @@ var File_dtkt_shared_v1beta1_messages_proto protoreflect.FileDescriptor
 
 const file_dtkt_shared_v1beta1_messages_proto_rawDesc = "" +
 	"\n" +
-	"\"dtkt/shared/v1beta1/messages.proto\x12\x13dtkt.shared.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\"dtkt/protoui/v1beta1/protoui.proto\x1a\x1fdtkt/shared/v1beta1/enums.proto\x1a\x19google/protobuf/any.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xaf\f\n" +
+	"\"dtkt/shared/v1beta1/messages.proto\x12\x13dtkt.shared.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\"dtkt/protoui/v1beta1/protoui.proto\x1a\x1fdtkt/shared/v1beta1/enums.proto\x1a\x19google/protobuf/any.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb2\f\n" +
 	"\aPackage\x12I\n" +
 	"\bidentity\x18\x01 \x01(\v2%.dtkt.shared.v1beta1.Package.IdentityB\x06\xbaH\x03\xc8\x01\x01R\bidentity\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12D\n" +
@@ -1433,10 +1423,10 @@ const file_dtkt_shared_v1beta1_messages_proto_rawDesc = "" +
 	"\bruntimes\x18\x05 \x03(\x0e2\x1c.dtkt.shared.v1beta1.RuntimeR\bruntimes\x12;\n" +
 	"\tplatforms\x18\x06 \x03(\v2\x1d.dtkt.shared.v1beta1.PlatformR\tplatforms\x12>\n" +
 	"\x05build\x18\a \x01(\v2(.dtkt.shared.v1beta1.Package.BuildConfigR\x05build\x12A\n" +
-	"\x06deploy\x18\b \x01(\v2).dtkt.shared.v1beta1.Package.DeployConfigR\x06deploy\x1a\x9c\x02\n" +
+	"\x06deploy\x18\b \x01(\v2).dtkt.shared.v1beta1.Package.DeployConfigR\x06deploy\x1a\x9f\x02\n" +
 	"\bIdentity\x125\n" +
-	"\x04name\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]+$R\x04name\x12\xd8\x01\n" +
-	"\aversion\x18\x02 \x01(\tB\xbd\x01\xbaH\xb9\x01r\xb6\x012\xb3\x01^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$R\aversion\x1a\xe4\x02\n" +
+	"\x04name\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]+$R\x04name\x12\xdb\x01\n" +
+	"\aversion\x18\x02 \x01(\tB\xc0\x01\xbaH\xbc\x01\xc8\x01\x01r\xb6\x012\xb3\x01^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$R\aversion\x1a\xe4\x02\n" +
 	"\vBuildConfig\x12K\n" +
 	"\x03env\x18\x01 \x03(\v21.dtkt.shared.v1beta1.Package.BuildConfig.EnvEntryB\x06\xbaH\x03\xd8\x01\x01R\x03env\x12Q\n" +
 	"\x06binary\x18\n" +
@@ -1498,9 +1488,9 @@ const file_dtkt_shared_v1beta1_messages_proto_rawDesc = "" +
 	"nativeType\x12:\n" +
 	"\tjson_type\x18\x02 \x01(\x0e2\x1d.dtkt.shared.v1beta1.JSONTypeR\bjsonType\x127\n" +
 	"\bgeo_type\x18\x03 \x01(\x0e2\x1c.dtkt.shared.v1beta1.GeoTypeR\ageoType\x123\n" +
-	"\bmetadata\x18\x04 \x01(\v2\x17.google.protobuf.StructR\bmetadata\"\xa7\x03\n" +
-	"\vOAuthConfig\x12$\n" +
-	"\tclient_id\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\bclientId\x12#\n" +
+	"\bmetadata\x18\x04 \x01(\v2\x17.google.protobuf.StructR\bmetadata\"\xa6\x03\n" +
+	"\vOAuthConfig\x12#\n" +
+	"\tclient_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bclientId\x12#\n" +
 	"\rclient_secret\x18\x02 \x01(\tR\fclientSecret\x12>\n" +
 	"\bendpoint\x18\x03 \x01(\v2\".dtkt.shared.v1beta1.OAuthEndpointR\bendpoint\x12+\n" +
 	"\fredirect_url\x18\x04 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\vredirectUrl\x12 \n" +
@@ -1510,11 +1500,12 @@ const file_dtkt_shared_v1beta1_messages_proto_rawDesc = "" +
 	"\x06params\x18\a \x03(\v2,.dtkt.shared.v1beta1.OAuthConfig.ParamsEntryR\x06params\x1a9\n" +
 	"\vParamsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x8d\x01\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xa6\x01\n" +
 	"\rOAuthEndpoint\x12#\n" +
 	"\bauth_url\x18\x01 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\aauthUrl\x12%\n" +
-	"\ttoken_url\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\btokenUrl\x120\n" +
-	"\x0fdevice_auth_url\x18\x03 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\rdeviceAuthUrl\"\x82\x03\n" +
+	"\ttoken_url\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\btokenUrl\x125\n" +
+	"\x0fdevice_auth_url\x18\x03 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01H\x00R\rdeviceAuthUrl\x88\x01\x01B\x12\n" +
+	"\x10_device_auth_url\"\x82\x03\n" +
 	"\x10OAuthCodeRequest\x12\x14\n" +
 	"\x05state\x18\x01 \x01(\tR\x05state\x12+\n" +
 	"\fredirect_url\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\vredirectUrl\x12%\n" +
@@ -1524,23 +1515,18 @@ const file_dtkt_shared_v1beta1_messages_proto_rawDesc = "" +
 	"\x06params\x18\x06 \x03(\v21.dtkt.shared.v1beta1.OAuthCodeRequest.ParamsEntryR\x06params\x1a9\n" +
 	"\vParamsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x89\x02\n" +
-	"\x11OAuthTokenRequest\x12\x1b\n" +
-	"\x04code\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x04code\x12+\n" +
-	"\fredirect_url\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01R\vredirectUrl\x12#\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x8b\x02\n" +
+	"\x11OAuthTokenRequest\x12\x1a\n" +
+	"\x04code\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04code\x12.\n" +
+	"\fredirect_url\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x88\x01\x01R\vredirectUrl\x12#\n" +
 	"\rcode_verifier\x18\x03 \x01(\tR\fcodeVerifier\x12J\n" +
 	"\x06params\x18\n" +
 	" \x03(\v22.dtkt.shared.v1beta1.OAuthTokenRequest.ParamsEntryR\x06params\x1a9\n" +
 	"\vParamsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xc3\x01\n" +
-	"\x13OAuthRefreshRequest\x12#\n" +
-	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\x12L\n" +
-	"\x06params\x18\n" +
-	" \x03(\v24.dtkt.shared.v1beta1.OAuthRefreshRequest.ParamsEntryR\x06params\x1a9\n" +
-	"\vParamsEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xc6\x01\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"T\n" +
+	"\x13OAuthRefreshRequest\x12=\n" +
+	"\x05token\x18\x01 \x01(\v2\x1f.dtkt.shared.v1beta1.OAuthTokenB\x06\xbaH\x03\xc8\x01\x01R\x05token\"\xc6\x01\n" +
 	"\n" +
 	"OAuthToken\x12!\n" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12\x1d\n" +
@@ -1567,7 +1553,7 @@ func file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP() []byte {
 	return file_dtkt_shared_v1beta1_messages_proto_rawDescData
 }
 
-var file_dtkt_shared_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
+var file_dtkt_shared_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
 var file_dtkt_shared_v1beta1_messages_proto_goTypes = []any{
 	(*Package)(nil),                            // 0: dtkt.shared.v1beta1.Package
 	(*Platform)(nil),                           // 1: dtkt.shared.v1beta1.Platform
@@ -1596,55 +1582,54 @@ var file_dtkt_shared_v1beta1_messages_proto_goTypes = []any{
 	nil,                               // 24: dtkt.shared.v1beta1.OAuthConfig.ParamsEntry
 	nil,                               // 25: dtkt.shared.v1beta1.OAuthCodeRequest.ParamsEntry
 	nil,                               // 26: dtkt.shared.v1beta1.OAuthTokenRequest.ParamsEntry
-	nil,                               // 27: dtkt.shared.v1beta1.OAuthRefreshRequest.ParamsEntry
-	(PackageType)(0),                  // 28: dtkt.shared.v1beta1.PackageType
-	(Runtime)(0),                      // 29: dtkt.shared.v1beta1.Runtime
-	(OS)(0),                           // 30: dtkt.shared.v1beta1.OS
-	(Arch)(0),                         // 31: dtkt.shared.v1beta1.Arch
-	(*v1beta1.FieldElement)(nil),      // 32: dtkt.protoform.v1beta1.FieldElement
-	(*anypb.Any)(nil),                 // 33: google.protobuf.Any
-	(*structpb.Struct)(nil),           // 34: google.protobuf.Struct
-	(*timestamppb.Timestamp)(nil),     // 35: google.protobuf.Timestamp
-	(JSONType)(0),                     // 36: dtkt.shared.v1beta1.JSONType
-	(GeoType)(0),                      // 37: dtkt.shared.v1beta1.GeoType
-	(AuthStyle)(0),                    // 38: dtkt.shared.v1beta1.AuthStyle
-	(CodeChallengeMethod)(0),          // 39: dtkt.shared.v1beta1.CodeChallengeMethod
+	(PackageType)(0),                  // 27: dtkt.shared.v1beta1.PackageType
+	(Runtime)(0),                      // 28: dtkt.shared.v1beta1.Runtime
+	(OS)(0),                           // 29: dtkt.shared.v1beta1.OS
+	(Arch)(0),                         // 30: dtkt.shared.v1beta1.Arch
+	(*v1beta1.FieldElement)(nil),      // 31: dtkt.protoform.v1beta1.FieldElement
+	(*anypb.Any)(nil),                 // 32: google.protobuf.Any
+	(*structpb.Struct)(nil),           // 33: google.protobuf.Struct
+	(*timestamppb.Timestamp)(nil),     // 34: google.protobuf.Timestamp
+	(JSONType)(0),                     // 35: dtkt.shared.v1beta1.JSONType
+	(GeoType)(0),                      // 36: dtkt.shared.v1beta1.GeoType
+	(AuthStyle)(0),                    // 37: dtkt.shared.v1beta1.AuthStyle
+	(CodeChallengeMethod)(0),          // 38: dtkt.shared.v1beta1.CodeChallengeMethod
 }
 var file_dtkt_shared_v1beta1_messages_proto_depIdxs = []int32{
 	15, // 0: dtkt.shared.v1beta1.Package.identity:type_name -> dtkt.shared.v1beta1.Package.Identity
-	28, // 1: dtkt.shared.v1beta1.Package.type:type_name -> dtkt.shared.v1beta1.PackageType
-	29, // 2: dtkt.shared.v1beta1.Package.runtimes:type_name -> dtkt.shared.v1beta1.Runtime
+	27, // 1: dtkt.shared.v1beta1.Package.type:type_name -> dtkt.shared.v1beta1.PackageType
+	28, // 2: dtkt.shared.v1beta1.Package.runtimes:type_name -> dtkt.shared.v1beta1.Runtime
 	1,  // 3: dtkt.shared.v1beta1.Package.platforms:type_name -> dtkt.shared.v1beta1.Platform
 	16, // 4: dtkt.shared.v1beta1.Package.build:type_name -> dtkt.shared.v1beta1.Package.BuildConfig
 	17, // 5: dtkt.shared.v1beta1.Package.deploy:type_name -> dtkt.shared.v1beta1.Package.DeployConfig
-	30, // 6: dtkt.shared.v1beta1.Platform.os:type_name -> dtkt.shared.v1beta1.OS
-	31, // 7: dtkt.shared.v1beta1.Platform.arch:type_name -> dtkt.shared.v1beta1.Arch
+	29, // 6: dtkt.shared.v1beta1.Platform.os:type_name -> dtkt.shared.v1beta1.OS
+	30, // 7: dtkt.shared.v1beta1.Platform.arch:type_name -> dtkt.shared.v1beta1.Arch
 	7,  // 8: dtkt.shared.v1beta1.Field.type:type_name -> dtkt.shared.v1beta1.DataType
 	2,  // 9: dtkt.shared.v1beta1.Field.fields:type_name -> dtkt.shared.v1beta1.Field
-	32, // 10: dtkt.shared.v1beta1.Field.element:type_name -> dtkt.protoform.v1beta1.FieldElement
+	31, // 10: dtkt.shared.v1beta1.Field.element:type_name -> dtkt.protoform.v1beta1.FieldElement
 	2,  // 11: dtkt.shared.v1beta1.Param.field:type_name -> dtkt.shared.v1beta1.Field
-	33, // 12: dtkt.shared.v1beta1.Param.value:type_name -> google.protobuf.Any
+	32, // 12: dtkt.shared.v1beta1.Param.value:type_name -> google.protobuf.Any
 	23, // 13: dtkt.shared.v1beta1.AnyMap.values:type_name -> dtkt.shared.v1beta1.AnyMap.ValuesEntry
-	34, // 14: dtkt.shared.v1beta1.TypeSchema.json_schema:type_name -> google.protobuf.Struct
-	35, // 15: dtkt.shared.v1beta1.TypeSchema.mod_time:type_name -> google.protobuf.Timestamp
-	36, // 16: dtkt.shared.v1beta1.DataType.json_type:type_name -> dtkt.shared.v1beta1.JSONType
-	37, // 17: dtkt.shared.v1beta1.DataType.geo_type:type_name -> dtkt.shared.v1beta1.GeoType
-	34, // 18: dtkt.shared.v1beta1.DataType.metadata:type_name -> google.protobuf.Struct
+	33, // 14: dtkt.shared.v1beta1.TypeSchema.json_schema:type_name -> google.protobuf.Struct
+	34, // 15: dtkt.shared.v1beta1.TypeSchema.mod_time:type_name -> google.protobuf.Timestamp
+	35, // 16: dtkt.shared.v1beta1.DataType.json_type:type_name -> dtkt.shared.v1beta1.JSONType
+	36, // 17: dtkt.shared.v1beta1.DataType.geo_type:type_name -> dtkt.shared.v1beta1.GeoType
+	33, // 18: dtkt.shared.v1beta1.DataType.metadata:type_name -> google.protobuf.Struct
 	9,  // 19: dtkt.shared.v1beta1.OAuthConfig.endpoint:type_name -> dtkt.shared.v1beta1.OAuthEndpoint
-	38, // 20: dtkt.shared.v1beta1.OAuthConfig.auth_style:type_name -> dtkt.shared.v1beta1.AuthStyle
+	37, // 20: dtkt.shared.v1beta1.OAuthConfig.auth_style:type_name -> dtkt.shared.v1beta1.AuthStyle
 	24, // 21: dtkt.shared.v1beta1.OAuthConfig.params:type_name -> dtkt.shared.v1beta1.OAuthConfig.ParamsEntry
-	39, // 22: dtkt.shared.v1beta1.OAuthCodeRequest.code_challenge_method:type_name -> dtkt.shared.v1beta1.CodeChallengeMethod
+	38, // 22: dtkt.shared.v1beta1.OAuthCodeRequest.code_challenge_method:type_name -> dtkt.shared.v1beta1.CodeChallengeMethod
 	25, // 23: dtkt.shared.v1beta1.OAuthCodeRequest.params:type_name -> dtkt.shared.v1beta1.OAuthCodeRequest.ParamsEntry
 	26, // 24: dtkt.shared.v1beta1.OAuthTokenRequest.params:type_name -> dtkt.shared.v1beta1.OAuthTokenRequest.ParamsEntry
-	27, // 25: dtkt.shared.v1beta1.OAuthRefreshRequest.params:type_name -> dtkt.shared.v1beta1.OAuthRefreshRequest.ParamsEntry
-	35, // 26: dtkt.shared.v1beta1.OAuthToken.expiry:type_name -> google.protobuf.Timestamp
-	35, // 27: dtkt.shared.v1beta1.PageToken.time:type_name -> google.protobuf.Timestamp
+	13, // 25: dtkt.shared.v1beta1.OAuthRefreshRequest.token:type_name -> dtkt.shared.v1beta1.OAuthToken
+	34, // 26: dtkt.shared.v1beta1.OAuthToken.expiry:type_name -> google.protobuf.Timestamp
+	34, // 27: dtkt.shared.v1beta1.PageToken.time:type_name -> google.protobuf.Timestamp
 	18, // 28: dtkt.shared.v1beta1.Package.BuildConfig.env:type_name -> dtkt.shared.v1beta1.Package.BuildConfig.EnvEntry
 	19, // 29: dtkt.shared.v1beta1.Package.BuildConfig.binary:type_name -> dtkt.shared.v1beta1.Package.BuildConfig.BinaryArtifact
 	20, // 30: dtkt.shared.v1beta1.Package.BuildConfig.image:type_name -> dtkt.shared.v1beta1.Package.BuildConfig.ImageArtifact
 	21, // 31: dtkt.shared.v1beta1.Package.DeployConfig.env:type_name -> dtkt.shared.v1beta1.Package.DeployConfig.EnvEntry
 	22, // 32: dtkt.shared.v1beta1.Package.DeployConfig.ports:type_name -> dtkt.shared.v1beta1.Package.DeployConfig.Port
-	33, // 33: dtkt.shared.v1beta1.AnyMap.ValuesEntry.value:type_name -> google.protobuf.Any
+	32, // 33: dtkt.shared.v1beta1.AnyMap.ValuesEntry.value:type_name -> google.protobuf.Any
 	34, // [34:34] is the sub-list for method output_type
 	34, // [34:34] is the sub-list for method input_type
 	34, // [34:34] is the sub-list for extension type_name
@@ -1658,6 +1643,7 @@ func file_dtkt_shared_v1beta1_messages_proto_init() {
 		return
 	}
 	file_dtkt_shared_v1beta1_enums_proto_init()
+	file_dtkt_shared_v1beta1_messages_proto_msgTypes[9].OneofWrappers = []any{}
 	file_dtkt_shared_v1beta1_messages_proto_msgTypes[16].OneofWrappers = []any{
 		(*Package_BuildConfig_Binary)(nil),
 		(*Package_BuildConfig_Image)(nil),
@@ -1668,7 +1654,7 @@ func file_dtkt_shared_v1beta1_messages_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_shared_v1beta1_messages_proto_rawDesc), len(file_dtkt_shared_v1beta1_messages_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   28,
+			NumMessages:   27,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

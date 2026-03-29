@@ -26,18 +26,17 @@ var _ Connector = (*CloudConnector)(nil)
 type (
 	CloudConnector struct {
 		addr net.Addr
-		opts *connectorOptions
+		opts connectorOptions
 	}
 )
 
 func NewCloudConnector(addr net.Addr, opts ...ConnectorOption) (*CloudConnector, error) {
-	o := &connectorOptions{}
-	o.apply(opts...)
-
-	return &CloudConnector{
+	conn := &CloudConnector{
 		addr: addr,
-		opts: o,
-	}, nil
+	}
+	conn.opts.apply(opts...)
+
+	return conn, nil
 }
 
 func CloudAuthInterceptor(auth *corev1.Auth) connect.UnaryInterceptorFunc {
