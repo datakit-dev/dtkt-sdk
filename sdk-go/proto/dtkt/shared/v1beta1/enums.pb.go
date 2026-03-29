@@ -21,76 +21,79 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Which step of auth we're performing.
-type AuthCheck int32
+// How client credentials are sent to the token endpoint (optional).
+type AuthStyle int32
 
 const (
-	AuthCheck_AUTH_CHECK_UNSPECIFIED    AuthCheck = 0 // ask integration to decide the next step
-	AuthCheck_AUTH_CHECK_OAUTH_CODE     AuthCheck = 1 // request authorization URL
-	AuthCheck_AUTH_CHECK_OAUTH_CALLBACK AuthCheck = 2 // exchange authorization_code
-	AuthCheck_AUTH_CHECK_OAUTH_REFRESH  AuthCheck = 3 // refresh existing credentials
+	AuthStyle_AUTH_STYLE_UNSPECIFIED AuthStyle = 0 // let provider/library decide
+	AuthStyle_AUTH_STYLE_IN_PARAMS   AuthStyle = 1 // client_id/secret in body
+	AuthStyle_AUTH_STYLE_IN_HEADER   AuthStyle = 2 // HTTP Basic (Authorization:)
 )
 
-// Enum value maps for AuthCheck.
+// Enum value maps for AuthStyle.
 var (
-	AuthCheck_name = map[int32]string{
-		0: "AUTH_CHECK_UNSPECIFIED",
-		1: "AUTH_CHECK_OAUTH_CODE",
-		2: "AUTH_CHECK_OAUTH_CALLBACK",
-		3: "AUTH_CHECK_OAUTH_REFRESH",
+	AuthStyle_name = map[int32]string{
+		0: "AUTH_STYLE_UNSPECIFIED",
+		1: "AUTH_STYLE_IN_PARAMS",
+		2: "AUTH_STYLE_IN_HEADER",
 	}
-	AuthCheck_value = map[string]int32{
-		"AUTH_CHECK_UNSPECIFIED":    0,
-		"AUTH_CHECK_OAUTH_CODE":     1,
-		"AUTH_CHECK_OAUTH_CALLBACK": 2,
-		"AUTH_CHECK_OAUTH_REFRESH":  3,
+	AuthStyle_value = map[string]int32{
+		"AUTH_STYLE_UNSPECIFIED": 0,
+		"AUTH_STYLE_IN_PARAMS":   1,
+		"AUTH_STYLE_IN_HEADER":   2,
 	}
 )
 
-func (x AuthCheck) Enum() *AuthCheck {
-	p := new(AuthCheck)
+func (x AuthStyle) Enum() *AuthStyle {
+	p := new(AuthStyle)
 	*p = x
 	return p
 }
 
-func (x AuthCheck) String() string {
+func (x AuthStyle) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (AuthCheck) Descriptor() protoreflect.EnumDescriptor {
+func (AuthStyle) Descriptor() protoreflect.EnumDescriptor {
 	return file_dtkt_shared_v1beta1_enums_proto_enumTypes[0].Descriptor()
 }
 
-func (AuthCheck) Type() protoreflect.EnumType {
+func (AuthStyle) Type() protoreflect.EnumType {
 	return &file_dtkt_shared_v1beta1_enums_proto_enumTypes[0]
 }
 
-func (x AuthCheck) Number() protoreflect.EnumNumber {
+func (x AuthStyle) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use AuthCheck.Descriptor instead.
-func (AuthCheck) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use AuthStyle.Descriptor instead.
+func (AuthStyle) EnumDescriptor() ([]byte, []int) {
 	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{0}
 }
 
-// Auth type exposed by a service (extensible later).
+// Which step of auth we're performing.
 type AuthType int32
 
 const (
-	AuthType_AUTH_TYPE_UNSPECIFIED AuthType = 0
-	AuthType_AUTH_TYPE_OAUTH       AuthType = 1
+	AuthType_AUTH_TYPE_UNSPECIFIED   AuthType = 0
+	AuthType_AUTH_TYPE_OAUTH_CODE    AuthType = 1 // OAuth code.
+	AuthType_AUTH_TYPE_OAUTH_TOKEN   AuthType = 2 // OAuth token.
+	AuthType_AUTH_TYPE_OAUTH_REFRESH AuthType = 3 // OAuth refresh.
 )
 
 // Enum value maps for AuthType.
 var (
 	AuthType_name = map[int32]string{
 		0: "AUTH_TYPE_UNSPECIFIED",
-		1: "AUTH_TYPE_OAUTH",
+		1: "AUTH_TYPE_OAUTH_CODE",
+		2: "AUTH_TYPE_OAUTH_TOKEN",
+		3: "AUTH_TYPE_OAUTH_REFRESH",
 	}
 	AuthType_value = map[string]int32{
-		"AUTH_TYPE_UNSPECIFIED": 0,
-		"AUTH_TYPE_OAUTH":       1,
+		"AUTH_TYPE_UNSPECIFIED":   0,
+		"AUTH_TYPE_OAUTH_CODE":    1,
+		"AUTH_TYPE_OAUTH_TOKEN":   2,
+		"AUTH_TYPE_OAUTH_REFRESH": 3,
 	}
 )
 
@@ -171,56 +174,6 @@ func (CodeChallengeMethod) EnumDescriptor() ([]byte, []int) {
 	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{2}
 }
 
-// How client credentials are sent to the token endpoint (optional).
-type AuthStyle int32
-
-const (
-	AuthStyle_AUTH_STYLE_UNSPECIFIED AuthStyle = 0 // let provider/library decide
-	AuthStyle_AUTH_STYLE_IN_PARAMS   AuthStyle = 1 // client_id/secret in body
-	AuthStyle_AUTH_STYLE_IN_HEADER   AuthStyle = 2 // HTTP Basic (Authorization:)
-)
-
-// Enum value maps for AuthStyle.
-var (
-	AuthStyle_name = map[int32]string{
-		0: "AUTH_STYLE_UNSPECIFIED",
-		1: "AUTH_STYLE_IN_PARAMS",
-		2: "AUTH_STYLE_IN_HEADER",
-	}
-	AuthStyle_value = map[string]int32{
-		"AUTH_STYLE_UNSPECIFIED": 0,
-		"AUTH_STYLE_IN_PARAMS":   1,
-		"AUTH_STYLE_IN_HEADER":   2,
-	}
-)
-
-func (x AuthStyle) Enum() *AuthStyle {
-	p := new(AuthStyle)
-	*p = x
-	return p
-}
-
-func (x AuthStyle) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (AuthStyle) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_shared_v1beta1_enums_proto_enumTypes[3].Descriptor()
-}
-
-func (AuthStyle) Type() protoreflect.EnumType {
-	return &file_dtkt_shared_v1beta1_enums_proto_enumTypes[3]
-}
-
-func (x AuthStyle) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use AuthStyle.Descriptor instead.
-func (AuthStyle) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{3}
-}
-
 // Enum representing event types.
 type ActionType int32
 
@@ -274,11 +227,11 @@ func (x ActionType) String() string {
 }
 
 func (ActionType) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_shared_v1beta1_enums_proto_enumTypes[4].Descriptor()
+	return file_dtkt_shared_v1beta1_enums_proto_enumTypes[3].Descriptor()
 }
 
 func (ActionType) Type() protoreflect.EnumType {
-	return &file_dtkt_shared_v1beta1_enums_proto_enumTypes[4]
+	return &file_dtkt_shared_v1beta1_enums_proto_enumTypes[3]
 }
 
 func (x ActionType) Number() protoreflect.EnumNumber {
@@ -287,7 +240,7 @@ func (x ActionType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ActionType.Descriptor instead.
 func (ActionType) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{4}
+	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{3}
 }
 
 // Enum representing json data types.
@@ -347,11 +300,11 @@ func (x JSONType) String() string {
 }
 
 func (JSONType) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_shared_v1beta1_enums_proto_enumTypes[5].Descriptor()
+	return file_dtkt_shared_v1beta1_enums_proto_enumTypes[4].Descriptor()
 }
 
 func (JSONType) Type() protoreflect.EnumType {
-	return &file_dtkt_shared_v1beta1_enums_proto_enumTypes[5]
+	return &file_dtkt_shared_v1beta1_enums_proto_enumTypes[4]
 }
 
 func (x JSONType) Number() protoreflect.EnumNumber {
@@ -360,7 +313,7 @@ func (x JSONType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use JSONType.Descriptor instead.
 func (JSONType) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{5}
+	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{4}
 }
 
 // Enum representing geo data types.
@@ -404,11 +357,11 @@ func (x GeoType) String() string {
 }
 
 func (GeoType) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_shared_v1beta1_enums_proto_enumTypes[6].Descriptor()
+	return file_dtkt_shared_v1beta1_enums_proto_enumTypes[5].Descriptor()
 }
 
 func (GeoType) Type() protoreflect.EnumType {
-	return &file_dtkt_shared_v1beta1_enums_proto_enumTypes[6]
+	return &file_dtkt_shared_v1beta1_enums_proto_enumTypes[5]
 }
 
 func (x GeoType) Number() protoreflect.EnumNumber {
@@ -417,7 +370,7 @@ func (x GeoType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use GeoType.Descriptor instead.
 func (GeoType) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{6}
+	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{5}
 }
 
 // Supported package types.
@@ -457,11 +410,11 @@ func (x PackageType) String() string {
 }
 
 func (PackageType) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_shared_v1beta1_enums_proto_enumTypes[7].Descriptor()
+	return file_dtkt_shared_v1beta1_enums_proto_enumTypes[6].Descriptor()
 }
 
 func (PackageType) Type() protoreflect.EnumType {
-	return &file_dtkt_shared_v1beta1_enums_proto_enumTypes[7]
+	return &file_dtkt_shared_v1beta1_enums_proto_enumTypes[6]
 }
 
 func (x PackageType) Number() protoreflect.EnumNumber {
@@ -470,7 +423,7 @@ func (x PackageType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use PackageType.Descriptor instead.
 func (PackageType) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{7}
+	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{6}
 }
 
 // Supported runtimes.
@@ -507,11 +460,11 @@ func (x Runtime) String() string {
 }
 
 func (Runtime) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_shared_v1beta1_enums_proto_enumTypes[8].Descriptor()
+	return file_dtkt_shared_v1beta1_enums_proto_enumTypes[7].Descriptor()
 }
 
 func (Runtime) Type() protoreflect.EnumType {
-	return &file_dtkt_shared_v1beta1_enums_proto_enumTypes[8]
+	return &file_dtkt_shared_v1beta1_enums_proto_enumTypes[7]
 }
 
 func (x Runtime) Number() protoreflect.EnumNumber {
@@ -520,7 +473,7 @@ func (x Runtime) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Runtime.Descriptor instead.
 func (Runtime) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{8}
+	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{7}
 }
 
 // Supported operating systems.
@@ -581,11 +534,11 @@ func (x OS) String() string {
 }
 
 func (OS) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_shared_v1beta1_enums_proto_enumTypes[9].Descriptor()
+	return file_dtkt_shared_v1beta1_enums_proto_enumTypes[8].Descriptor()
 }
 
 func (OS) Type() protoreflect.EnumType {
-	return &file_dtkt_shared_v1beta1_enums_proto_enumTypes[9]
+	return &file_dtkt_shared_v1beta1_enums_proto_enumTypes[8]
 }
 
 func (x OS) Number() protoreflect.EnumNumber {
@@ -594,7 +547,7 @@ func (x OS) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use OS.Descriptor instead.
 func (OS) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{9}
+	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{8}
 }
 
 // Supported CPU Architectures.
@@ -667,11 +620,11 @@ func (x Arch) String() string {
 }
 
 func (Arch) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_shared_v1beta1_enums_proto_enumTypes[10].Descriptor()
+	return file_dtkt_shared_v1beta1_enums_proto_enumTypes[9].Descriptor()
 }
 
 func (Arch) Type() protoreflect.EnumType {
-	return &file_dtkt_shared_v1beta1_enums_proto_enumTypes[10]
+	return &file_dtkt_shared_v1beta1_enums_proto_enumTypes[9]
 }
 
 func (x Arch) Number() protoreflect.EnumNumber {
@@ -680,30 +633,27 @@ func (x Arch) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Arch.Descriptor instead.
 func (Arch) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{10}
+	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{9}
 }
 
 var File_dtkt_shared_v1beta1_enums_proto protoreflect.FileDescriptor
 
 const file_dtkt_shared_v1beta1_enums_proto_rawDesc = "" +
 	"\n" +
-	"\x1fdtkt/shared/v1beta1/enums.proto\x12\x13dtkt.shared.v1beta1*\x7f\n" +
-	"\tAuthCheck\x12\x1a\n" +
-	"\x16AUTH_CHECK_UNSPECIFIED\x10\x00\x12\x19\n" +
-	"\x15AUTH_CHECK_OAUTH_CODE\x10\x01\x12\x1d\n" +
-	"\x19AUTH_CHECK_OAUTH_CALLBACK\x10\x02\x12\x1c\n" +
-	"\x18AUTH_CHECK_OAUTH_REFRESH\x10\x03*:\n" +
-	"\bAuthType\x12\x19\n" +
-	"\x15AUTH_TYPE_UNSPECIFIED\x10\x00\x12\x13\n" +
-	"\x0fAUTH_TYPE_OAUTH\x10\x01*}\n" +
-	"\x13CodeChallengeMethod\x12%\n" +
-	"!CODE_CHALLENGE_METHOD_UNSPECIFIED\x10\x00\x12\x1f\n" +
-	"\x1bCODE_CHALLENGE_METHOD_PLAIN\x10\x01\x12\x1e\n" +
-	"\x1aCODE_CHALLENGE_METHOD_S256\x10\x02*[\n" +
+	"\x1fdtkt/shared/v1beta1/enums.proto\x12\x13dtkt.shared.v1beta1*[\n" +
 	"\tAuthStyle\x12\x1a\n" +
 	"\x16AUTH_STYLE_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14AUTH_STYLE_IN_PARAMS\x10\x01\x12\x18\n" +
-	"\x14AUTH_STYLE_IN_HEADER\x10\x02*\xb4\x01\n" +
+	"\x14AUTH_STYLE_IN_HEADER\x10\x02*w\n" +
+	"\bAuthType\x12\x19\n" +
+	"\x15AUTH_TYPE_UNSPECIFIED\x10\x00\x12\x18\n" +
+	"\x14AUTH_TYPE_OAUTH_CODE\x10\x01\x12\x19\n" +
+	"\x15AUTH_TYPE_OAUTH_TOKEN\x10\x02\x12\x1b\n" +
+	"\x17AUTH_TYPE_OAUTH_REFRESH\x10\x03*}\n" +
+	"\x13CodeChallengeMethod\x12%\n" +
+	"!CODE_CHALLENGE_METHOD_UNSPECIFIED\x10\x00\x12\x1f\n" +
+	"\x1bCODE_CHALLENGE_METHOD_PLAIN\x10\x01\x12\x1e\n" +
+	"\x1aCODE_CHALLENGE_METHOD_S256\x10\x02*\xb4\x01\n" +
 	"\n" +
 	"ActionType\x12\x1b\n" +
 	"\x17ACTION_TYPE_UNSPECIFIED\x10\x00\x12\x16\n" +
@@ -791,19 +741,18 @@ func file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP() []byte {
 	return file_dtkt_shared_v1beta1_enums_proto_rawDescData
 }
 
-var file_dtkt_shared_v1beta1_enums_proto_enumTypes = make([]protoimpl.EnumInfo, 11)
+var file_dtkt_shared_v1beta1_enums_proto_enumTypes = make([]protoimpl.EnumInfo, 10)
 var file_dtkt_shared_v1beta1_enums_proto_goTypes = []any{
-	(AuthCheck)(0),           // 0: dtkt.shared.v1beta1.AuthCheck
+	(AuthStyle)(0),           // 0: dtkt.shared.v1beta1.AuthStyle
 	(AuthType)(0),            // 1: dtkt.shared.v1beta1.AuthType
 	(CodeChallengeMethod)(0), // 2: dtkt.shared.v1beta1.CodeChallengeMethod
-	(AuthStyle)(0),           // 3: dtkt.shared.v1beta1.AuthStyle
-	(ActionType)(0),          // 4: dtkt.shared.v1beta1.ActionType
-	(JSONType)(0),            // 5: dtkt.shared.v1beta1.JSONType
-	(GeoType)(0),             // 6: dtkt.shared.v1beta1.GeoType
-	(PackageType)(0),         // 7: dtkt.shared.v1beta1.PackageType
-	(Runtime)(0),             // 8: dtkt.shared.v1beta1.Runtime
-	(OS)(0),                  // 9: dtkt.shared.v1beta1.OS
-	(Arch)(0),                // 10: dtkt.shared.v1beta1.Arch
+	(ActionType)(0),          // 3: dtkt.shared.v1beta1.ActionType
+	(JSONType)(0),            // 4: dtkt.shared.v1beta1.JSONType
+	(GeoType)(0),             // 5: dtkt.shared.v1beta1.GeoType
+	(PackageType)(0),         // 6: dtkt.shared.v1beta1.PackageType
+	(Runtime)(0),             // 7: dtkt.shared.v1beta1.Runtime
+	(OS)(0),                  // 8: dtkt.shared.v1beta1.OS
+	(Arch)(0),                // 9: dtkt.shared.v1beta1.Arch
 }
 var file_dtkt_shared_v1beta1_enums_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -823,7 +772,7 @@ func file_dtkt_shared_v1beta1_enums_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_shared_v1beta1_enums_proto_rawDesc), len(file_dtkt_shared_v1beta1_enums_proto_rawDesc)),
-			NumEnums:      11,
+			NumEnums:      10,
 			NumMessages:   0,
 			NumExtensions: 0,
 			NumServices:   0,

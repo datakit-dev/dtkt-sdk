@@ -1,9 +1,11 @@
 package common
 
 import (
+	"fmt"
 	"strings"
 	"unicode"
 
+	"buf.build/go/protovalidate"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
@@ -24,28 +26,33 @@ type (
 	CELResolver interface {
 		protoregistry.ExtensionTypeResolver
 		protoregistry.MessageTypeResolver
+		RangeServices(func(protoreflect.ServiceDescriptor) bool)
+		RangeMethods(func(protoreflect.MethodDescriptor) bool)
+		FindMethodByName(protoreflect.FullName) (protoreflect.MethodDescriptor, error)
 		RangeFiles(func(protoreflect.FileDescriptor) bool)
+		GetValidator() (protovalidate.Validator, error)
 	}
 )
 
 func NewCELTypes(resolver CELResolver) (*CELTypes, error) {
+	if resolver == nil {
+		return nil, fmt.Errorf("resolver required")
+	}
+
 	registry, err := types.NewRegistry()
 	if err != nil {
 		return nil, err
 	}
 
-	if resolver != nil {
-		var regErr error
-		resolver.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
-			if err := registry.RegisterDescriptor(fd); err != nil {
-				regErr = err
-				return false
-			}
-			return true
-		})
-		if regErr != nil {
-			return nil, err
+	resolver.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
+		err = registry.RegisterDescriptor(fd)
+		if err != nil {
+			return false
 		}
+		return true
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	return &CELTypes{

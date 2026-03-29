@@ -1,4 +1,4 @@
-package form
+package v1beta1
 
 import (
 	"encoding/json"
@@ -150,8 +150,7 @@ func NewMapWithKey[K MapKey](parent *Message, field protoreflect.FieldDescriptor
 	if field.MapValue().Message() != nil {
 		return &Map[K, *Message]{
 			Getter: MapGetter(parentMsg, field, getKey, func(v protoreflect.Value) *Message {
-				msg, _ := NewMessage(v.Message())
-				return msg
+				return NewMessage(v.Message())
 			}),
 			Setter:      MapSetter(parentMsg, field, setKey, func(m *Message) protoreflect.Value { return protoreflect.ValueOfMessage(m.Get()) }),
 			Parser:      MapMessageParser(keyParser, parentMsg.NewField(field).Map().NewValue().Message),
@@ -161,8 +160,7 @@ func NewMapWithKey[K MapKey](parent *Message, field protoreflect.FieldDescriptor
 			keyParser:   keyParser,
 			keyStringer: keyStringer,
 			newValue: func() *Message {
-				msg, _ := NewMessage(map_.NewValue().Message().New())
-				return msg
+				return NewMessage(map_.NewValue().Message().New())
 			},
 		}, true
 	} else {
@@ -308,8 +306,7 @@ func MapMessageParser[K MapKey](parseKey func(string) K, newMsg func() protorefl
 				return nil, err
 			}
 
-			m, _ := NewMessage(msg)
-			map_[parseKey(key)] = m
+			map_[parseKey(key)] = NewMessage(msg)
 		}
 
 		return map_, nil

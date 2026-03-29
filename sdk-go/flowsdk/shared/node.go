@@ -5,7 +5,6 @@ import (
 	"slices"
 	"strings"
 
-	"cel.dev/expr"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -28,7 +27,7 @@ const (
 )
 
 var (
-	// validNodePrefixes is a list of valid node type prefixes.
+	// validNodePrefixes is a list of valid node id prefixes
 	validNodePrefixes = []string{
 		ActionPrefix,
 		ConnectionPrefix,
@@ -37,28 +36,26 @@ var (
 		StreamPrefix,
 		VarPrefix,
 	}
-	// invalidEdges is a map of invalid target to source node prefixes
+	// invalidEdges is a map of target -> source prefixes which are not supported
 	invalidEdges = map[string][]string{
-		ConnectionPrefix: {}, // connections contain no expressions
-		InputPrefix:      {}, // inputs contain no expressions
-		VarPrefix:        {"connections", "outputs"},
-		ActionPrefix:     {"connections", "outputs"},
-		StreamPrefix:     {"connections", "outputs"},
-		OutputPrefix:     {"connections"},
+		// connections and inputs contain no expressions
+		ActionPrefix: {"connections", "outputs"},
+		OutputPrefix: {"connections"},
+		StreamPrefix: {"connections", "outputs"},
+		VarPrefix:    {"connections", "outputs"},
 	}
 )
 
 type (
-	EvalNode interface {
-		proto.Message
-		GetId() string
-		GetCallCount() uint64
-		GetCurrValue() *expr.Value
-		GetPrevValue() *expr.Value
-	}
 	SpecNode interface {
 		proto.Message
 		GetId() string
+	}
+	RuntimeNode interface {
+		Compile(Runtime) error
+		Recv() (RecvFunc, bool)
+		Send() (SendFunc, bool)
+		Eval() (EvalFunc, bool)
 	}
 )
 
@@ -84,14 +81,20 @@ func ParseNodePrefixAndID(ident string) (string, string, bool) {
 }
 
 func IsValidEdge(sourceID, targetID string) error {
-	if sourcePrefix, ok := ParseNodePrefix(sourceID); !ok {
-		return fmt.Errorf("invalid node id: %s", sourceID)
-	} else if targetPrefix, ok := ParseNodePrefix(targetID); !ok {
-		return fmt.Errorf("invalid node id: %s", targetID)
-	} else if invalidSources, ok := invalidEdges[targetPrefix]; ok && len(invalidSources) > 0 {
-		if slices.Contains(invalidSources, sourcePrefix) {
-			return fmt.Errorf("invalid reference: %s -> %s", sourceID, targetID)
-		}
+	sourcePrefix, ok := ParseNodePrefix(sourceID)
+	if !ok {
+		return fmt.Errorf("invalid source node id: %s", sourceID)
 	}
+
+	targetPrefix, ok := ParseNodePrefix(targetID)
+	if !ok {
+		return fmt.Errorf("invalid target node id: %s", targetID)
+	}
+
+	invalidSources, ok := invalidEdges[targetPrefix]
+	if ok && slices.Contains(invalidSources, sourcePrefix) {
+		return fmt.Errorf("invalid edge: source[%s] -> target[%s]", sourceID, targetID)
+	}
+
 	return nil
 }

@@ -76,6 +76,8 @@ func Parse(uriStr string) (*url.URL, error) {
 }
 
 func ParseWithScheme(uri string, scheme string) (*url.URL, error) {
+	scheme = strings.ToLower(scheme)
+
 	if !HasScheme(uri) {
 		uri = scheme + `://` + uri
 	}
@@ -85,8 +87,10 @@ func ParseWithScheme(uri string, scheme string) (*url.URL, error) {
 		return nil, err
 	}
 
+	url.Scheme = strings.ToLower(url.Scheme)
+
 	if url.Scheme != scheme {
-		url.Scheme = scheme
+		return nil, fmt.Errorf("uri scheme invalid: %q, expected: %q", url.Scheme, scheme)
 	}
 
 	return url, nil

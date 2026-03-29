@@ -25,7 +25,7 @@ import type { JsonObject, Message } from "@bufbuild/protobuf";
  * Describes the file dtkt/shared/v1beta1/messages.proto.
  */
 export const file_dtkt_shared_v1beta1_messages: GenFile = /*@__PURE__*/
-  fileDesc("CiJkdGt0L3NoYXJlZC92MWJldGExL21lc3NhZ2VzLnByb3RvEhNkdGt0LnNoYXJlZC52MWJldGExIv0KCgdQYWNrYWdlEj8KCGlkZW50aXR5GAEgASgLMiUuZHRrdC5zaGFyZWQudjFiZXRhMS5QYWNrYWdlLklkZW50aXR5Qga6SAPIAQESEwoLZGVzY3JpcHRpb24YAiABKAkSPgoEaWNvbhgDIAEoCUIwukgt2AEBcigyJl5odHRwczovL3xeZGF0YTppbWFnZS9bYS16XSs7YmFzZTY0LC4rEj0KBHR5cGUYBCABKA4yIC5kdGt0LnNoYXJlZC52MWJldGExLlBhY2thZ2VUeXBlQg26SArIAQGCAQQQASAAEi4KCHJ1bnRpbWVzGAUgAygOMhwuZHRrdC5zaGFyZWQudjFiZXRhMS5SdW50aW1lEjAKCXBsYXRmb3JtcxgGIAMoCzIdLmR0a3Quc2hhcmVkLnYxYmV0YTEuUGxhdGZvcm0SNwoFYnVpbGQYByABKAsyKC5kdGt0LnNoYXJlZC52MWJldGExLlBhY2thZ2UuQnVpbGRDb25maWcSOQoGZGVwbG95GAggASgLMikuZHRrdC5zaGFyZWQudjFiZXRhMS5QYWNrYWdlLkRlcGxveUNvbmZpZxqNAgoISWRlbnRpdHkSLwoEbmFtZRgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSskEs8BCgd2ZXJzaW9uGAIgASgJQr0Buki5AXK2ATKzAV4oMHxbMS05XVxkKilcLigwfFsxLTldXGQqKVwuKDB8WzEtOV1cZCopKD86LSgoPzowfFsxLTldXGQqfFxkKlthLXpBLVotXVswLTlhLXpBLVotXSopKD86XC4oPzowfFsxLTldXGQqfFxkKlthLXpBLVotXVswLTlhLXpBLVotXSopKSopKT8oPzpcKyhbMC05YS16QS1aLV0rKD86XC5bMC05YS16QS1aLV0rKSopKT8kGsQCCgtCdWlsZENvbmZpZxJGCgNlbnYYASADKAsyMS5kdGt0LnNoYXJlZC52MWJldGExLlBhY2thZ2UuQnVpbGRDb25maWcuRW52RW50cnlCBrpIA9gBARJJCgZiaW5hcnkYCiABKAsyNy5kdGt0LnNoYXJlZC52MWJldGExLlBhY2thZ2UuQnVpbGRDb25maWcuQmluYXJ5QXJ0aWZhY3RIABJHCgVpbWFnZRgLIAEoCzI2LmR0a3Quc2hhcmVkLnYxYmV0YTEuUGFja2FnZS5CdWlsZENvbmZpZy5JbWFnZUFydGlmYWN0SAAaKgoIRW52RW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ARoQCg5CaW5hcnlBcnRpZmFjdBoPCg1JbWFnZUFydGlmYWN0QgoKCGFydGlmYWN0GrUCCgxEZXBsb3lDb25maWcSRwoDZW52GAEgAygLMjIuZHRrdC5zaGFyZWQudjFiZXRhMS5QYWNrYWdlLkRlcGxveUNvbmZpZy5FbnZFbnRyeUIGukgD2AEBEkUKBXBvcnRzGAIgAygLMi4uZHRrdC5zaGFyZWQudjFiZXRhMS5QYWNrYWdlLkRlcGxveUNvbmZpZy5Qb3J0Qga6SAPYAQEaKgoIRW52RW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ARppCgRQb3J0EhQKBG5hbWUYASABKAlCBrpIA8gBARIbCgtkZXNjcmlwdGlvbhgCIAEoCUIGukgD2AEBEhgKCHByb3RvY29sGAMgASgJQga6SAPIAQESFAoEcG9ydBgEIAEoCUIGukgDyAEBOjjStRg0CjJiMAouEix0aGlzLmlkZW50aXR5Lm5hbWUrJ0AnK3RoaXMuaWRlbnRpdHkudmVyc2lvbiJtCghQbGF0Zm9ybRIrCgJvcxgCIAEoDjIXLmR0a3Quc2hhcmVkLnYxYmV0YTEuT1NCBrpIA8gBARI0CgRhcmNoGAMgASgOMhkuZHRrdC5zaGFyZWQudjFiZXRhMS5BcmNoQgu6SAjYAQGCAQIQASLuAQoFRmllbGQSFAoEbmFtZRgBIAEoCUIGukgDyAEBEjMKBHR5cGUYAiABKAsyHS5kdGt0LnNoYXJlZC52MWJldGExLkRhdGFUeXBlQga6SAPIAQESEwoLZGVzY3JpcHRpb24YAyABKAkSEAoIbnVsbGFibGUYBCABKAgSEAoIcmVwZWF0ZWQYBSABKAgSKgoGZmllbGRzGAYgAygLMhouZHRrdC5zaGFyZWQudjFiZXRhMS5GaWVsZBI1CgdlbGVtZW50GAcgASgLMiQuZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5GaWVsZEVsZW1lbnQiVwoFUGFyYW0SKQoFZmllbGQYASABKAsyGi5kdGt0LnNoYXJlZC52MWJldGExLkZpZWxkEiMKBXZhbHVlGAIgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueSIcCgpTdHJpbmdMaXN0Eg4KBnZhbHVlcxgBIAMoCSKGAQoGQW55TWFwEjcKBnZhbHVlcxgBIAMoCzInLmR0a3Quc2hhcmVkLnYxYmV0YTEuQW55TWFwLlZhbHVlc0VudHJ5GkMKC1ZhbHVlc0VudHJ5EgsKA2tleRgBIAEoCRIjCgV2YWx1ZRgCIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5Bbnk6AjgBIq4BCgpUeXBlU2NoZW1hEhgKA3VyaRgBIAEoCUILukgIyAEBcgOIAQESNAoLanNvbl9zY2hlbWEYAiABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0Qga6SAPIAQESGgoKcHJvdG9fbmFtZRgDIAEoCUIGukgDyAEBEjQKCG1vZF90aW1lGAogASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEIGukgDyAEBIqwBCghEYXRhVHlwZRITCgtuYXRpdmVfdHlwZRgBIAEoCRIwCglqc29uX3R5cGUYAiABKA4yHS5kdGt0LnNoYXJlZC52MWJldGExLkpTT05UeXBlEi4KCGdlb190eXBlGAMgASgOMhwuZHRrdC5zaGFyZWQudjFiZXRhMS5HZW9UeXBlEikKCG1ldGFkYXRhGAQgASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdCLRAgoLT0F1dGhDb25maWcSGgoJY2xpZW50X2lkGAEgASgJQge6SARyAhABEhUKDWNsaWVudF9zZWNyZXQYAiABKAkSNAoIZW5kcG9pbnQYAyABKAsyIi5kdGt0LnNoYXJlZC52MWJldGExLk9BdXRoRW5kcG9pbnQSHgoMcmVkaXJlY3RfdXJsGAQgASgJQgi6SAVyA4gBARIYCgZzY29wZXMYBSADKAlCCLpIBZIBAhgBEjIKCmF1dGhfc3R5bGUYBiABKA4yHi5kdGt0LnNoYXJlZC52MWJldGExLkF1dGhTdHlsZRI8CgZwYXJhbXMYByADKAsyLC5kdGt0LnNoYXJlZC52MWJldGExLk9BdXRoQ29uZmlnLlBhcmFtc0VudHJ5Gi0KC1BhcmFtc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiawoNT0F1dGhFbmRwb2ludBIaCghhdXRoX3VybBgBIAEoCUIIukgFcgOIAQESGwoJdG9rZW5fdXJsGAIgASgJQgi6SAVyA4gBARIhCg9kZXZpY2VfYXV0aF91cmwYAyABKAlCCLpIBXIDiAEBIq4CChBPQXV0aENvZGVSZXF1ZXN0Eg0KBXN0YXRlGAEgASgJEh4KDHJlZGlyZWN0X3VybBgCIAEoCUIIukgFcgOIAQESFgoOY29kZV9jaGFsbGVuZ2UYAyABKAkSRwoVY29kZV9jaGFsbGVuZ2VfbWV0aG9kGAQgASgOMiguZHRrdC5zaGFyZWQudjFiZXRhMS5Db2RlQ2hhbGxlbmdlTWV0aG9kEhgKBnNjb3BlcxgFIAMoCUIIukgFkgECGAESQQoGcGFyYW1zGAYgAygLMjEuZHRrdC5zaGFyZWQudjFiZXRhMS5PQXV0aENvZGVSZXF1ZXN0LlBhcmFtc0VudHJ5Gi0KC1BhcmFtc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEi1AEKEU9BdXRoVG9rZW5SZXF1ZXN0EhUKBGNvZGUYASABKAlCB7pIBHICEAESHgoMcmVkaXJlY3RfdXJsGAIgASgJQgi6SAVyA4gBARIVCg1jb2RlX3ZlcmlmaWVyGAMgASgJEkIKBnBhcmFtcxgKIAMoCzIyLmR0a3Quc2hhcmVkLnYxYmV0YTEuT0F1dGhUb2tlblJlcXVlc3QuUGFyYW1zRW50cnkaLQoLUGFyYW1zRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASKhAQoTT0F1dGhSZWZyZXNoUmVxdWVzdBIVCg1yZWZyZXNoX3Rva2VuGAEgASgJEkQKBnBhcmFtcxgKIAMoCzI0LmR0a3Quc2hhcmVkLnYxYmV0YTEuT0F1dGhSZWZyZXNoUmVxdWVzdC5QYXJhbXNFbnRyeRotCgtQYXJhbXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIo0BCgpPQXV0aFRva2VuEhQKDGFjY2Vzc190b2tlbhgBIAEoCRISCgp0b2tlbl90eXBlGAIgASgJEhUKDXJlZnJlc2hfdG9rZW4YAyABKAkSKgoGZXhwaXJ5GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBISCgpleHBpcmVzX2luGAUgASgDIlEKCVBhZ2VUb2tlbhISCgJpZBgBIAEoA0IGukgDyAEBEjAKBHRpbWUYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQga6SAPIAQFC6AEKGXByb3RvLmR0a3Quc2hhcmVkLnYxYmV0YTFCDU1lc3NhZ2VzUHJvdG9QAVpOZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9zaGFyZWQvdjFiZXRhMTtzaGFyZWR2MWJldGExogIDRFNYqgITRHRrdC5TaGFyZWQuVjFiZXRhMcoCE0R0a3RcU2hhcmVkXFYxYmV0YTHiAh9EdGt0XFNoYXJlZFxWMWJldGExXEdQQk1ldGFkYXRh6gIVRHRrdDo6U2hhcmVkOjpWMWJldGExYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_protoform_v1beta1_protoform, file_dtkt_protoui_v1beta1_protoui, file_dtkt_shared_v1beta1_enums, file_google_protobuf_any, file_google_protobuf_struct, file_google_protobuf_timestamp]);
+  fileDesc("CiJkdGt0L3NoYXJlZC92MWJldGExL21lc3NhZ2VzLnByb3RvEhNkdGt0LnNoYXJlZC52MWJldGExIoALCgdQYWNrYWdlEj8KCGlkZW50aXR5GAEgASgLMiUuZHRrdC5zaGFyZWQudjFiZXRhMS5QYWNrYWdlLklkZW50aXR5Qga6SAPIAQESEwoLZGVzY3JpcHRpb24YAiABKAkSPgoEaWNvbhgDIAEoCUIwukgt2AEBcigyJl5odHRwczovL3xeZGF0YTppbWFnZS9bYS16XSs7YmFzZTY0LC4rEj0KBHR5cGUYBCABKA4yIC5kdGt0LnNoYXJlZC52MWJldGExLlBhY2thZ2VUeXBlQg26SArIAQGCAQQQASAAEi4KCHJ1bnRpbWVzGAUgAygOMhwuZHRrdC5zaGFyZWQudjFiZXRhMS5SdW50aW1lEjAKCXBsYXRmb3JtcxgGIAMoCzIdLmR0a3Quc2hhcmVkLnYxYmV0YTEuUGxhdGZvcm0SNwoFYnVpbGQYByABKAsyKC5kdGt0LnNoYXJlZC52MWJldGExLlBhY2thZ2UuQnVpbGRDb25maWcSOQoGZGVwbG95GAggASgLMikuZHRrdC5zaGFyZWQudjFiZXRhMS5QYWNrYWdlLkRlcGxveUNvbmZpZxqQAgoISWRlbnRpdHkSLwoEbmFtZRgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSskEtIBCgd2ZXJzaW9uGAIgASgJQsABuki8AcgBAXK2ATKzAV4oMHxbMS05XVxkKilcLigwfFsxLTldXGQqKVwuKDB8WzEtOV1cZCopKD86LSgoPzowfFsxLTldXGQqfFxkKlthLXpBLVotXVswLTlhLXpBLVotXSopKD86XC4oPzowfFsxLTldXGQqfFxkKlthLXpBLVotXVswLTlhLXpBLVotXSopKSopKT8oPzpcKyhbMC05YS16QS1aLV0rKD86XC5bMC05YS16QS1aLV0rKSopKT8kGsQCCgtCdWlsZENvbmZpZxJGCgNlbnYYASADKAsyMS5kdGt0LnNoYXJlZC52MWJldGExLlBhY2thZ2UuQnVpbGRDb25maWcuRW52RW50cnlCBrpIA9gBARJJCgZiaW5hcnkYCiABKAsyNy5kdGt0LnNoYXJlZC52MWJldGExLlBhY2thZ2UuQnVpbGRDb25maWcuQmluYXJ5QXJ0aWZhY3RIABJHCgVpbWFnZRgLIAEoCzI2LmR0a3Quc2hhcmVkLnYxYmV0YTEuUGFja2FnZS5CdWlsZENvbmZpZy5JbWFnZUFydGlmYWN0SAAaKgoIRW52RW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ARoQCg5CaW5hcnlBcnRpZmFjdBoPCg1JbWFnZUFydGlmYWN0QgoKCGFydGlmYWN0GrUCCgxEZXBsb3lDb25maWcSRwoDZW52GAEgAygLMjIuZHRrdC5zaGFyZWQudjFiZXRhMS5QYWNrYWdlLkRlcGxveUNvbmZpZy5FbnZFbnRyeUIGukgD2AEBEkUKBXBvcnRzGAIgAygLMi4uZHRrdC5zaGFyZWQudjFiZXRhMS5QYWNrYWdlLkRlcGxveUNvbmZpZy5Qb3J0Qga6SAPYAQEaKgoIRW52RW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ARppCgRQb3J0EhQKBG5hbWUYASABKAlCBrpIA8gBARIbCgtkZXNjcmlwdGlvbhgCIAEoCUIGukgD2AEBEhgKCHByb3RvY29sGAMgASgJQga6SAPIAQESFAoEcG9ydBgEIAEoCUIGukgDyAEBOjjStRg0CjJiMAouEix0aGlzLmlkZW50aXR5Lm5hbWUrJ0AnK3RoaXMuaWRlbnRpdHkudmVyc2lvbiJtCghQbGF0Zm9ybRIrCgJvcxgCIAEoDjIXLmR0a3Quc2hhcmVkLnYxYmV0YTEuT1NCBrpIA8gBARI0CgRhcmNoGAMgASgOMhkuZHRrdC5zaGFyZWQudjFiZXRhMS5BcmNoQgu6SAjYAQGCAQIQASLuAQoFRmllbGQSFAoEbmFtZRgBIAEoCUIGukgDyAEBEjMKBHR5cGUYAiABKAsyHS5kdGt0LnNoYXJlZC52MWJldGExLkRhdGFUeXBlQga6SAPIAQESEwoLZGVzY3JpcHRpb24YAyABKAkSEAoIbnVsbGFibGUYBCABKAgSEAoIcmVwZWF0ZWQYBSABKAgSKgoGZmllbGRzGAYgAygLMhouZHRrdC5zaGFyZWQudjFiZXRhMS5GaWVsZBI1CgdlbGVtZW50GAcgASgLMiQuZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5GaWVsZEVsZW1lbnQiVwoFUGFyYW0SKQoFZmllbGQYASABKAsyGi5kdGt0LnNoYXJlZC52MWJldGExLkZpZWxkEiMKBXZhbHVlGAIgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueSIcCgpTdHJpbmdMaXN0Eg4KBnZhbHVlcxgBIAMoCSKGAQoGQW55TWFwEjcKBnZhbHVlcxgBIAMoCzInLmR0a3Quc2hhcmVkLnYxYmV0YTEuQW55TWFwLlZhbHVlc0VudHJ5GkMKC1ZhbHVlc0VudHJ5EgsKA2tleRgBIAEoCRIjCgV2YWx1ZRgCIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5Bbnk6AjgBIq4BCgpUeXBlU2NoZW1hEhgKA3VyaRgBIAEoCUILukgIyAEBcgOIAQESNAoLanNvbl9zY2hlbWEYAiABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0Qga6SAPIAQESGgoKcHJvdG9fbmFtZRgDIAEoCUIGukgDyAEBEjQKCG1vZF90aW1lGAogASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEIGukgDyAEBIqwBCghEYXRhVHlwZRITCgtuYXRpdmVfdHlwZRgBIAEoCRIwCglqc29uX3R5cGUYAiABKA4yHS5kdGt0LnNoYXJlZC52MWJldGExLkpTT05UeXBlEi4KCGdlb190eXBlGAMgASgOMhwuZHRrdC5zaGFyZWQudjFiZXRhMS5HZW9UeXBlEikKCG1ldGFkYXRhGAQgASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdCLQAgoLT0F1dGhDb25maWcSGQoJY2xpZW50X2lkGAEgASgJQga6SAPIAQESFQoNY2xpZW50X3NlY3JldBgCIAEoCRI0CghlbmRwb2ludBgDIAEoCzIiLmR0a3Quc2hhcmVkLnYxYmV0YTEuT0F1dGhFbmRwb2ludBIeCgxyZWRpcmVjdF91cmwYBCABKAlCCLpIBXIDiAEBEhgKBnNjb3BlcxgFIAMoCUIIukgFkgECGAESMgoKYXV0aF9zdHlsZRgGIAEoDjIeLmR0a3Quc2hhcmVkLnYxYmV0YTEuQXV0aFN0eWxlEjwKBnBhcmFtcxgHIAMoCzIsLmR0a3Quc2hhcmVkLnYxYmV0YTEuT0F1dGhDb25maWcuUGFyYW1zRW50cnkaLQoLUGFyYW1zRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASKEAQoNT0F1dGhFbmRwb2ludBIaCghhdXRoX3VybBgBIAEoCUIIukgFcgOIAQESGwoJdG9rZW5fdXJsGAIgASgJQgi6SAVyA4gBARImCg9kZXZpY2VfYXV0aF91cmwYAyABKAlCCLpIBXIDiAEBSACIAQFCEgoQX2RldmljZV9hdXRoX3VybCKuAgoQT0F1dGhDb2RlUmVxdWVzdBINCgVzdGF0ZRgBIAEoCRIeCgxyZWRpcmVjdF91cmwYAiABKAlCCLpIBXIDiAEBEhYKDmNvZGVfY2hhbGxlbmdlGAMgASgJEkcKFWNvZGVfY2hhbGxlbmdlX21ldGhvZBgEIAEoDjIoLmR0a3Quc2hhcmVkLnYxYmV0YTEuQ29kZUNoYWxsZW5nZU1ldGhvZBIYCgZzY29wZXMYBSADKAlCCLpIBZIBAhgBEkEKBnBhcmFtcxgGIAMoCzIxLmR0a3Quc2hhcmVkLnYxYmV0YTEuT0F1dGhDb2RlUmVxdWVzdC5QYXJhbXNFbnRyeRotCgtQYXJhbXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBItYBChFPQXV0aFRva2VuUmVxdWVzdBIUCgRjb2RlGAEgASgJQga6SAPIAQESIQoMcmVkaXJlY3RfdXJsGAIgASgJQgu6SAjIAQFyA4gBARIVCg1jb2RlX3ZlcmlmaWVyGAMgASgJEkIKBnBhcmFtcxgKIAMoCzIyLmR0a3Quc2hhcmVkLnYxYmV0YTEuT0F1dGhUb2tlblJlcXVlc3QuUGFyYW1zRW50cnkaLQoLUGFyYW1zRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJNChNPQXV0aFJlZnJlc2hSZXF1ZXN0EjYKBXRva2VuGAEgASgLMh8uZHRrdC5zaGFyZWQudjFiZXRhMS5PQXV0aFRva2VuQga6SAPIAQEijQEKCk9BdXRoVG9rZW4SFAoMYWNjZXNzX3Rva2VuGAEgASgJEhIKCnRva2VuX3R5cGUYAiABKAkSFQoNcmVmcmVzaF90b2tlbhgDIAEoCRIqCgZleHBpcnkYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhIKCmV4cGlyZXNfaW4YBSABKAMiUQoJUGFnZVRva2VuEhIKAmlkGAEgASgDQga6SAPIAQESMAoEdGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCBrpIA8gBAULoAQoZcHJvdG8uZHRrdC5zaGFyZWQudjFiZXRhMUINTWVzc2FnZXNQcm90b1ABWk5naXRodWIuY29tL2RhdGFraXQtZGV2L2R0a3Qtc2RrL3Nkay1nby9wcm90by9kdGt0L3NoYXJlZC92MWJldGExO3NoYXJlZHYxYmV0YTGiAgNEU1iqAhNEdGt0LlNoYXJlZC5WMWJldGExygITRHRrdFxTaGFyZWRcVjFiZXRhMeICH0R0a3RcU2hhcmVkXFYxYmV0YTFcR1BCTWV0YWRhdGHqAhVEdGt0OjpTaGFyZWQ6OlYxYmV0YTFiBnByb3RvMw", [file_buf_validate_validate, file_dtkt_protoform_v1beta1_protoform, file_dtkt_protoui_v1beta1_protoui, file_dtkt_shared_v1beta1_enums, file_google_protobuf_any, file_google_protobuf_struct, file_google_protobuf_timestamp]);
 
 /**
  * Package provides an identity and metadata for a DataKit Integration.
@@ -799,7 +799,55 @@ export type OAuthConfig = Message<"dtkt.shared.v1beta1.OAuthConfig"> & {
   params: { [key: string]: string };
 };
 
-export type OAuthConfigValid = OAuthConfig;
+/**
+ * @generated from message dtkt.shared.v1beta1.OAuthConfig
+ */
+export type OAuthConfigValid = Message<"dtkt.shared.v1beta1.OAuthConfig"> & {
+  /**
+   * @generated from field: string client_id = 1;
+   */
+  clientId: string;
+
+  /**
+   * inbound-only; never returned
+   *
+   * @generated from field: string client_secret = 2;
+   */
+  clientSecret: string;
+
+  /**
+   * @generated from field: dtkt.shared.v1beta1.OAuthEndpoint endpoint = 3;
+   */
+  endpoint?: OAuthEndpointValid;
+
+  /**
+   * Optional redirect URL (can also be supplied per-request).
+   *
+   * @generated from field: string redirect_url = 4;
+   */
+  redirectUrl: string;
+
+  /**
+   * Requested permissions.
+   *
+   * @generated from field: repeated string scopes = 5;
+   */
+  scopes: string[];
+
+  /**
+   * Optional: how to auth against token endpoint.
+   *
+   * @generated from field: dtkt.shared.v1beta1.AuthStyle auth_style = 6;
+   */
+  authStyle: AuthStyle;
+
+  /**
+   * Provider-specific extra params (e.g., access_type=offline, prompt=consent).
+   *
+   * @generated from field: map<string, string> params = 7;
+   */
+  params: { [key: string]: string };
+};
 
 /**
  * Describes the message dtkt.shared.v1beta1.OAuthConfig.
@@ -825,9 +873,9 @@ export type OAuthEndpoint = Message<"dtkt.shared.v1beta1.OAuthEndpoint"> & {
   /**
    * optional; device flow
    *
-   * @generated from field: string device_auth_url = 3;
+   * @generated from field: optional string device_auth_url = 3;
    */
-  deviceAuthUrl: string;
+  deviceAuthUrl?: string;
 };
 
 export type OAuthEndpointValid = OAuthEndpoint;
@@ -920,7 +968,34 @@ export type OAuthTokenRequest = Message<"dtkt.shared.v1beta1.OAuthTokenRequest">
   params: { [key: string]: string };
 };
 
-export type OAuthTokenRequestValid = OAuthTokenRequest;
+/**
+ * @generated from message dtkt.shared.v1beta1.OAuthTokenRequest
+ */
+export type OAuthTokenRequestValid = Message<"dtkt.shared.v1beta1.OAuthTokenRequest"> & {
+  /**
+   * @generated from field: string code = 1;
+   */
+  code: string;
+
+  /**
+   * @generated from field: string redirect_url = 2;
+   */
+  redirectUrl: string;
+
+  /**
+   * PKCE verifier if PKCE was used.
+   *
+   * @generated from field: string code_verifier = 3;
+   */
+  codeVerifier: string;
+
+  /**
+   * provider extras
+   *
+   * @generated from field: map<string, string> params = 10;
+   */
+  params: { [key: string]: string };
+};
 
 /**
  * Describes the message dtkt.shared.v1beta1.OAuthTokenRequest.
@@ -934,20 +1009,20 @@ export const OAuthTokenRequestSchema: GenMessage<OAuthTokenRequest, {validType: 
  */
 export type OAuthRefreshRequest = Message<"dtkt.shared.v1beta1.OAuthRefreshRequest"> & {
   /**
-   * Typically empty: integration uses its stored refresh token.
-   * Allow optional override to support migrations or manual repairs.
-   *
-   * @generated from field: string refresh_token = 1;
+   * @generated from field: dtkt.shared.v1beta1.OAuthToken token = 1;
    */
-  refreshToken: string;
-
-  /**
-   * @generated from field: map<string, string> params = 10;
-   */
-  params: { [key: string]: string };
+  token?: OAuthToken;
 };
 
-export type OAuthRefreshRequestValid = OAuthRefreshRequest;
+/**
+ * @generated from message dtkt.shared.v1beta1.OAuthRefreshRequest
+ */
+export type OAuthRefreshRequestValid = Message<"dtkt.shared.v1beta1.OAuthRefreshRequest"> & {
+  /**
+   * @generated from field: dtkt.shared.v1beta1.OAuthToken token = 1;
+   */
+  token: OAuthTokenValid;
+};
 
 /**
  * Describes the message dtkt.shared.v1beta1.OAuthRefreshRequest.
@@ -971,8 +1046,6 @@ export type OAuthToken = Message<"dtkt.shared.v1beta1.OAuthToken"> & {
   tokenType: string;
 
   /**
-   * inbound-only
-   *
    * @generated from field: string refresh_token = 3;
    */
   refreshToken: string;
@@ -983,7 +1056,7 @@ export type OAuthToken = Message<"dtkt.shared.v1beta1.OAuthToken"> & {
   expiry?: Timestamp;
 
   /**
-   * wire convenience; libs should derive expiry from this when present
+   * derive expiry from this when present
    *
    * @generated from field: int64 expires_in = 5;
    */

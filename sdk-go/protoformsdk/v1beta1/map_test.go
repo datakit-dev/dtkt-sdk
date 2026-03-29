@@ -1,10 +1,10 @@
-package form_test
+package v1beta1_test
 
 import (
 	"strconv"
 	"testing"
 
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/protoformsdk/form"
+	form "github.com/datakit-dev/dtkt-sdk/sdk-go/protoformsdk/v1beta1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/emptypb"

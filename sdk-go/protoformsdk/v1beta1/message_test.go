@@ -1,10 +1,10 @@
-package form_test
+package v1beta1_test
 
 import (
 	"testing"
 
 	sharedv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/protoformsdk/form"
+	form "github.com/datakit-dev/dtkt-sdk/sdk-go/protoformsdk/v1beta1"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
@@ -19,7 +19,7 @@ func TestMessage(t *testing.T) {
 		Build:       &sharedv1beta1.Package_BuildConfig{},
 	}
 
-	msg, _ := form.NewMessage(pkg.ProtoReflect())
+	msg := form.NewMessage(pkg.ProtoReflect())
 	if msg.String() != msg.StringOf(pkg.ProtoReflect()) {
 		t.Fatalf("expected to be equal: %s != %s", msg.String(), msg.StringOf(pkg.ProtoReflect()))
 	}
@@ -50,7 +50,7 @@ func TestMessage(t *testing.T) {
 	// }
 
 	for _, field := range msg.FieldGroup().GetFields() {
-		switch field.Type.Descriptor().Name() {
+		switch field.FieldType.Descriptor().Name() {
 		case "type":
 			if scalar, ok := field.IsScalar(); ok {
 				if selec, ok := scalar.Element().IsSelect(); ok {
@@ -73,16 +73,16 @@ func TestMessage(t *testing.T) {
 				t.Fatalf("expected type scalar field")
 			}
 		case "platforms":
-			if field == nil {
+			if field.FieldType == nil {
 				t.Fatalf("expected platforms field, got nil")
 			}
 			if list, ok := field.IsList(); ok {
 				if value, ok := list.ListType.(*form.List[*form.Message]); ok {
-					m1, _ := form.NewMessage((&sharedv1beta1.Platform{
+					m1 := form.NewMessage((&sharedv1beta1.Platform{
 						Os:   sharedv1beta1.OS_OS_LINUX,
 						Arch: sharedv1beta1.Arch_ARCH_X86,
 					}).ProtoReflect())
-					m2, _ := form.NewMessage((&sharedv1beta1.Platform{
+					m2 := form.NewMessage((&sharedv1beta1.Platform{
 						Os:   sharedv1beta1.OS_OS_WINDOWS,
 						Arch: sharedv1beta1.Arch_ARCH_X86,
 					}).ProtoReflect())
@@ -109,7 +109,7 @@ func TestMessage(t *testing.T) {
 				t.Fatalf("expected platforms list field")
 			}
 		case "services":
-			if field == nil {
+			if field.FieldType == nil {
 				t.Fatalf("expected services field, got nil")
 			}
 			if list, ok := field.IsList(); ok {
@@ -175,7 +175,7 @@ func TestMessage(t *testing.T) {
 					t.Fatalf("expected to be equal: %s != %s", ident.Get().Interface(), pkg.Identity)
 				}
 
-				pkg.ProtoReflect().Clear(field.Type.Descriptor())
+				pkg.ProtoReflect().Clear(field.FieldType.Descriptor())
 
 				if msg.Get().Has(ident.Descriptor()) {
 					t.Fatalf("expected identity to be cleared, got: %s", ident.Get().Interface())

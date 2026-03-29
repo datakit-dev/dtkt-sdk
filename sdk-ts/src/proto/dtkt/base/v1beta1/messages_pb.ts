@@ -5,9 +5,9 @@
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_buf_validate_validate } from "../../../buf/validate/validate_pb";
-import type { AuthCheck, AuthType } from "../../shared/v1beta1/enums_pb";
+import type { AuthType } from "../../shared/v1beta1/enums_pb";
 import { file_dtkt_shared_v1beta1_enums } from "../../shared/v1beta1/enums_pb";
-import type { OAuthCodeRequest, OAuthRefreshRequest, OAuthToken, OAuthTokenRequest, Package, PackageValid, TypeSchema, TypeSchemaValid } from "../../shared/v1beta1/messages_pb";
+import type { OAuthCodeRequest, OAuthCodeRequestValid, OAuthRefreshRequest, OAuthRefreshRequestValid, OAuthToken, OAuthTokenRequest, OAuthTokenRequestValid, Package, PackageValid, TypeSchema, TypeSchemaValid } from "../../shared/v1beta1/messages_pb";
 import { file_dtkt_shared_v1beta1_messages } from "../../shared/v1beta1/messages_pb";
 import type { Any } from "../../../google/protobuf/any_pb";
 import { file_google_protobuf_any } from "../../../google/protobuf/any_pb";
@@ -17,7 +17,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dtkt/base/v1beta1/messages.proto.
  */
 export const file_dtkt_base_v1beta1_messages: GenFile = /*@__PURE__*/
-  fileDesc("CiBkdGt0L2Jhc2UvdjFiZXRhMS9tZXNzYWdlcy5wcm90bxIRZHRrdC5iYXNlLnYxYmV0YTEiEwoRR2V0UGFja2FnZVJlcXVlc3QiiwEKEkdldFBhY2thZ2VSZXNwb25zZRI1CgdwYWNrYWdlGAEgASgLMhwuZHRrdC5zaGFyZWQudjFiZXRhMS5QYWNrYWdlQga6SAPIAQESPgoNY29uZmlnX3NjaGVtYRgCIAEoCzIfLmR0a3Quc2hhcmVkLnYxYmV0YTEuVHlwZVNjaGVtYUIGukgDyAEBIpwBChJDaGVja0NvbmZpZ1JlcXVlc3QSGgoKY29ubmVjdGlvbhgBIAEoCUIGukgDyAEBEjEKC2NvbmZpZ19kYXRhGAIgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueUIGukgDyAEBEhsKC2NvbmZpZ19oYXNoGAMgASgJQga6SAPIAQESGgoKY29uZmlnX2dlbhgEIAEoBEIGukgDyAEBIjUKE0NoZWNrQ29uZmlnUmVzcG9uc2USDQoFdmFsaWQYASABKAgSDwoHbWVzc2FnZRgFIAEoCSKOAgoQQ2hlY2tBdXRoUmVxdWVzdBIsCgR0eXBlGAEgASgOMh4uZHRrdC5zaGFyZWQudjFiZXRhMS5BdXRoQ2hlY2sSPQoMY29kZV9yZXF1ZXN0GAIgASgLMiUuZHRrdC5zaGFyZWQudjFiZXRhMS5PQXV0aENvZGVSZXF1ZXN0SAASPwoNdG9rZW5fcmVxdWVzdBgDIAEoCzImLmR0a3Quc2hhcmVkLnYxYmV0YTEuT0F1dGhUb2tlblJlcXVlc3RIABJDCg9yZWZyZXNoX3JlcXVlc3QYBCABKAsyKC5kdGt0LnNoYXJlZC52MWJldGExLk9BdXRoUmVmcmVzaFJlcXVlc3RIAEIHCgVvYXV0aCK0AQoRQ2hlY2tBdXRoUmVzcG9uc2USKwoEdHlwZRgBIAEoDjIdLmR0a3Quc2hhcmVkLnYxYmV0YTEuQXV0aFR5cGUSDwoHc3VjY2VzcxgCIAEoCBINCgVlcnJvchgDIAEoCRIXCg1hdXRoX2NvZGVfdXJsGAQgASgJSAASMAoFdG9rZW4YBSABKAsyHy5kdGt0LnNoYXJlZC52MWJldGExLk9BdXRoVG9rZW5IAEIHCgVvYXV0aCI5ChBMaXN0VHlwZXNSZXF1ZXN0EhEKCXBhZ2Vfc2l6ZRgBIAEoBRISCgpwYWdlX3Rva2VuGAIgASgJIlwKEUxpc3RUeXBlc1Jlc3BvbnNlEi4KBXR5cGVzGAEgAygLMh8uZHRrdC5zaGFyZWQudjFiZXRhMS5UeXBlU2NoZW1hEhcKD25leHRfcGFnZV90b2tlbhgCIAEoCSImCg5HZXRUeXBlUmVxdWVzdBIUCgRuYW1lGAEgASgJQga6SAPIAQEiSAoPR2V0VHlwZVJlc3BvbnNlEjUKBHR5cGUYASABKAsyHy5kdGt0LnNoYXJlZC52MWJldGExLlR5cGVTY2hlbWFCBrpIA8gBAULaAQoXcHJvdG8uZHRrdC5iYXNlLnYxYmV0YTFCDU1lc3NhZ2VzUHJvdG9QAVpKZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9iYXNlL3YxYmV0YTE7YmFzZXYxYmV0YTGiAgNEQliqAhFEdGt0LkJhc2UuVjFiZXRhMcoCEUR0a3RcQmFzZVxWMWJldGEx4gIdRHRrdFxCYXNlXFYxYmV0YTFcR1BCTWV0YWRhdGHqAhNEdGt0OjpCYXNlOjpWMWJldGExYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_shared_v1beta1_enums, file_dtkt_shared_v1beta1_messages, file_google_protobuf_any]);
+  fileDesc("CiBkdGt0L2Jhc2UvdjFiZXRhMS9tZXNzYWdlcy5wcm90bxIRZHRrdC5iYXNlLnYxYmV0YTEiEwoRR2V0UGFja2FnZVJlcXVlc3QiiwEKEkdldFBhY2thZ2VSZXNwb25zZRI1CgdwYWNrYWdlGAEgASgLMhwuZHRrdC5zaGFyZWQudjFiZXRhMS5QYWNrYWdlQga6SAPIAQESPgoNY29uZmlnX3NjaGVtYRgCIAEoCzIfLmR0a3Quc2hhcmVkLnYxYmV0YTEuVHlwZVNjaGVtYUIGukgDyAEBIpwBChJDaGVja0NvbmZpZ1JlcXVlc3QSGgoKY29ubmVjdGlvbhgBIAEoCUIGukgDyAEBEjEKC2NvbmZpZ19kYXRhGAIgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueUIGukgDyAEBEhsKC2NvbmZpZ19oYXNoGAMgASgJQga6SAPIAQESGgoKY29uZmlnX2dlbhgEIAEoBEIGukgDyAEBImIKE0NoZWNrQ29uZmlnUmVzcG9uc2USOQoNYXV0aF9yZXF1aXJlZBgBIAEoDjIdLmR0a3Quc2hhcmVkLnYxYmV0YTEuQXV0aFR5cGVIAIgBAUIQCg5fYXV0aF9yZXF1aXJlZCLfAQoQQ2hlY2tBdXRoUmVxdWVzdBI9Cgxjb2RlX3JlcXVlc3QYAiABKAsyJS5kdGt0LnNoYXJlZC52MWJldGExLk9BdXRoQ29kZVJlcXVlc3RIABI/Cg10b2tlbl9yZXF1ZXN0GAMgASgLMiYuZHRrdC5zaGFyZWQudjFiZXRhMS5PQXV0aFRva2VuUmVxdWVzdEgAEkMKD3JlZnJlc2hfcmVxdWVzdBgEIAEoCzIoLmR0a3Quc2hhcmVkLnYxYmV0YTEuT0F1dGhSZWZyZXNoUmVxdWVzdEgAQgYKBHR5cGUinQEKEUNoZWNrQXV0aFJlc3BvbnNlEjQKDWF1dGhfcmVxdWlyZWQYASABKA4yHS5kdGt0LnNoYXJlZC52MWJldGExLkF1dGhUeXBlEhgKDm9hdXRoX2NvZGVfdXJsGAIgASgJSAASMAoFdG9rZW4YAyABKAsyHy5kdGt0LnNoYXJlZC52MWJldGExLk9BdXRoVG9rZW5IAEIGCgR0eXBlIjkKEExpc3RUeXBlc1JlcXVlc3QSEQoJcGFnZV9zaXplGAEgASgFEhIKCnBhZ2VfdG9rZW4YAiABKAkiXAoRTGlzdFR5cGVzUmVzcG9uc2USLgoFdHlwZXMYASADKAsyHy5kdGt0LnNoYXJlZC52MWJldGExLlR5cGVTY2hlbWESFwoPbmV4dF9wYWdlX3Rva2VuGAIgASgJIiYKDkdldFR5cGVSZXF1ZXN0EhQKBG5hbWUYASABKAlCBrpIA8gBASJICg9HZXRUeXBlUmVzcG9uc2USNQoEdHlwZRgBIAEoCzIfLmR0a3Quc2hhcmVkLnYxYmV0YTEuVHlwZVNjaGVtYUIGukgDyAEBQtoBChdwcm90by5kdGt0LmJhc2UudjFiZXRhMUINTWVzc2FnZXNQcm90b1ABWkpnaXRodWIuY29tL2RhdGFraXQtZGV2L2R0a3Qtc2RrL3Nkay1nby9wcm90by9kdGt0L2Jhc2UvdjFiZXRhMTtiYXNldjFiZXRhMaICA0RCWKoCEUR0a3QuQmFzZS5WMWJldGExygIRRHRrdFxCYXNlXFYxYmV0YTHiAh1EdGt0XEJhc2VcVjFiZXRhMVxHUEJNZXRhZGF0YeoCE0R0a3Q6OkJhc2U6OlYxYmV0YTFiBnByb3RvMw", [file_buf_validate_validate, file_dtkt_shared_v1beta1_enums, file_dtkt_shared_v1beta1_messages, file_google_protobuf_any]);
 
 /**
  * Request for getting package spec and config schema.
@@ -169,18 +169,11 @@ export const CheckConfigRequestSchema: GenMessage<CheckConfigRequest, {validType
  */
 export type CheckConfigResponse = Message<"dtkt.base.v1beta1.CheckConfigResponse"> & {
   /**
-   * True if config is valid.
+   * Auth type if auth is required.
    *
-   * @generated from field: bool valid = 1;
+   * @generated from field: optional dtkt.shared.v1beta1.AuthType auth_required = 1;
    */
-  valid: boolean;
-
-  /**
-   * Human-readable summary.
-   *
-   * @generated from field: string message = 5;
-   */
-  message: string;
+  authRequired?: AuthType;
 };
 
 export type CheckConfigResponseValid = CheckConfigResponse;
@@ -199,37 +192,22 @@ export const CheckConfigResponseSchema: GenMessage<CheckConfigResponse, {validTy
  */
 export type CheckAuthRequest = Message<"dtkt.base.v1beta1.CheckAuthRequest"> & {
   /**
-   * The auth check type.
-   *
-   * @generated from field: dtkt.shared.v1beta1.AuthCheck type = 1;
+   * @generated from oneof dtkt.base.v1beta1.CheckAuthRequest.type
    */
-  type: AuthCheck;
-
-  /**
-   * If auth type response is OAuth.
-   *
-   * @generated from oneof dtkt.base.v1beta1.CheckAuthRequest.oauth
-   */
-  oauth: {
+  type: {
     /**
-     * When check type is auth code url.
-     *
      * @generated from field: dtkt.shared.v1beta1.OAuthCodeRequest code_request = 2;
      */
     value: OAuthCodeRequest;
     case: "codeRequest";
   } | {
     /**
-     * When check type is callback.
-     *
      * @generated from field: dtkt.shared.v1beta1.OAuthTokenRequest token_request = 3;
      */
     value: OAuthTokenRequest;
     case: "tokenRequest";
   } | {
     /**
-     * When check type is refresh.
-     *
      * @generated from field: dtkt.shared.v1beta1.OAuthRefreshRequest refresh_request = 4;
      */
     value: OAuthRefreshRequest;
@@ -237,7 +215,35 @@ export type CheckAuthRequest = Message<"dtkt.base.v1beta1.CheckAuthRequest"> & {
   } | { case: undefined; value?: undefined };
 };
 
-export type CheckAuthRequestValid = CheckAuthRequest;
+/**
+ * Request for checking auth (3-legged OAuth over gRPC).
+ *
+ * @generated from message dtkt.base.v1beta1.CheckAuthRequest
+ */
+export type CheckAuthRequestValid = Message<"dtkt.base.v1beta1.CheckAuthRequest"> & {
+  /**
+   * @generated from oneof dtkt.base.v1beta1.CheckAuthRequest.type
+   */
+  type: {
+    /**
+     * @generated from field: dtkt.shared.v1beta1.OAuthCodeRequest code_request = 2;
+     */
+    value: OAuthCodeRequestValid;
+    case: "codeRequest";
+  } | {
+    /**
+     * @generated from field: dtkt.shared.v1beta1.OAuthTokenRequest token_request = 3;
+     */
+    value: OAuthTokenRequestValid;
+    case: "tokenRequest";
+  } | {
+    /**
+     * @generated from field: dtkt.shared.v1beta1.OAuthRefreshRequest refresh_request = 4;
+     */
+    value: OAuthRefreshRequestValid;
+    case: "refreshRequest";
+  } | { case: undefined; value?: undefined };
+};
 
 /**
  * Describes the message dtkt.base.v1beta1.CheckAuthRequest.
@@ -253,44 +259,28 @@ export const CheckAuthRequestSchema: GenMessage<CheckAuthRequest, {validType: Ch
  */
 export type CheckAuthResponse = Message<"dtkt.base.v1beta1.CheckAuthResponse"> & {
   /**
-   * The auth type.
+   * Auth type if auth is required.
    *
-   * @generated from field: dtkt.shared.v1beta1.AuthType type = 1;
+   * @generated from field: dtkt.shared.v1beta1.AuthType auth_required = 1;
    */
-  type: AuthType;
+  authRequired: AuthType;
 
   /**
-   * Indicates if the auth check was successful.
-   *
-   * @generated from field: bool success = 2;
+   * @generated from oneof dtkt.base.v1beta1.CheckAuthResponse.type
    */
-  success: boolean;
-
-  /**
-   * Error message if success is false.
-   *
-   * @generated from field: string error = 3;
-   */
-  error: string;
-
-  /**
-   * Present when type is OAuth.
-   *
-   * @generated from oneof dtkt.base.v1beta1.CheckAuthResponse.oauth
-   */
-  oauth: {
+  type: {
     /**
-     * Returned when check is code.
+     * Returned when auth type is code.
      *
-     * @generated from field: string auth_code_url = 4;
+     * @generated from field: string oauth_code_url = 2;
      */
     value: string;
-    case: "authCodeUrl";
+    case: "oauthCodeUrl";
   } | {
     /**
-     * Returned when check type is token or refresh.
+     * Returned when auth type is token or refresh.
      *
-     * @generated from field: dtkt.shared.v1beta1.OAuthToken token = 5;
+     * @generated from field: dtkt.shared.v1beta1.OAuthToken token = 3;
      */
     value: OAuthToken;
     case: "token";

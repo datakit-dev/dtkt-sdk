@@ -23,7 +23,7 @@ type (
 	}
 	InitServiceFunc[I v1beta1.InstanceType, S any] func(v1beta1.InstanceMux[I]) S
 	RegisterServiceFunc                            func(grpc.ServiceRegistrar)
-	GetProxyConnFunc                               func(context.Context) (context.Context, *grpc.ClientConn, error)
+	GetProxyConnFunc                               func(context.Context, ...grpc.DialOption) (context.Context, *grpc.ClientConn, error)
 )
 
 func NewServiceInfo(svcDesc *grpc.ServiceDesc) grpc.ServiceInfo {

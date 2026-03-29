@@ -447,8 +447,6 @@ func (t *inputList[V]) Validate(value any) (any, error) {
 			return nil, err
 		}
 
-		fmt.Println(string(b))
-
 		var list []V
 		err = encoding.FromJSONV2(b, &list,
 			encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
@@ -676,23 +674,26 @@ func (t *inputMessage) HasDefault() bool {
 }
 
 func (t *inputMessage) GetDefault() (any, error) {
-	if t.HasDefault() && t.defaultValue == nil {
-		b, err := encoding.ToJSONV2(t.spec.Default)
-		if err != nil {
-			return nil, err
-		}
-
+	if t.defaultValue == nil {
 		t.defaultValue = t.msgType.New().Interface()
-		err = encoding.FromJSONV2(b, t.defaultValue,
-			encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
-				Resolver: t.options.Resolver,
-			}),
-		)
-		if err != nil {
-			return nil, err
+
+		if t.HasDefault() {
+			b, err := encoding.ToJSONV2(t.spec.Default)
+			if err != nil {
+				return nil, err
+			}
+
+			err = encoding.FromJSONV2(b, t.defaultValue,
+				encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
+					Resolver: t.options.Resolver,
+				}),
+			)
+			if err != nil {
+				return nil, err
+			}
 		}
 
-		err = t.validator.Validate(t.defaultValue)
+		err := t.validator.Validate(t.defaultValue)
 		if err != nil {
 			return nil, err
 		}
@@ -702,33 +703,34 @@ func (t *inputMessage) GetDefault() (any, error) {
 }
 
 func (t *inputMessage) Validate(value any) (_ any, err error) {
-	if value == nil {
-		if t.IsRequired() {
-			return nil, fmt.Errorf("cannot be null")
-		} else if t.HasDefault() {
-			return t.GetDefault()
-		} else if t.GetNullable() {
-			return nil, nil
-		}
+	if value == nil && t.HasDefault() {
+		return t.GetDefault()
+	} else if value == nil && t.GetNullable() {
+		return t.msgType.New().Interface(), nil
+	} else if value == nil {
+		return nil, fmt.Errorf("cannot be null")
 	}
 
 	msg, isProto := value.(proto.Message)
 	if !isProto || msg.ProtoReflect().Descriptor().FullName() != t.msgType.Descriptor().FullName() {
-		if isProto {
-			value, err = t.options.Unwrap(msg)
-			if err != nil {
-				return nil, fmt.Errorf("invalid message value, expected message type: %s: %w", t.spec.Type, err)
-			}
-		}
-
-		msg, err = t.options.Wrap(value)
+		b, err := encoding.ToJSONV2(value,
+			encoding.WithEncodeProtoJSONOptions(protojson.MarshalOptions{
+				Resolver: t.options.Resolver,
+			}),
+		)
 		if err != nil {
-			return nil, fmt.Errorf("invalid message value: %T, expected: %s", value, t.spec.Type)
+			return nil, err
 		}
-	}
 
-	if msg.ProtoReflect().Descriptor().FullName() != t.msgType.Descriptor().FullName() {
-		return nil, fmt.Errorf("invalid message value: %s, expected: %s", msg.ProtoReflect().Descriptor().FullName(), t.spec.Type)
+		msg = t.msgType.New().Interface()
+		err = encoding.FromJSONV2(b, msg,
+			encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
+				Resolver: t.options.Resolver,
+			}),
+		)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	err = t.validator.Validate(msg)

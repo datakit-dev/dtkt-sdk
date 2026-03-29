@@ -1,4 +1,4 @@
-package form
+package v1beta1
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ var _ FieldType = (*MessageField)(nil)
 
 type (
 	MessageField struct {
-		*Message
+		Message
 		element    *Element
 		parent     *Message
 		descriptor protoreflect.FieldDescriptor
@@ -29,9 +29,9 @@ type (
 	}
 )
 
-func NewMessage(val protoreflect.Message) (*Message, bool) {
+func NewMessage(val protoreflect.Message) *Message {
 	if val == nil {
-		return nil, false
+		log.Fatal("message cannot be nil")
 	}
 
 	return &Message{
@@ -49,48 +49,40 @@ func NewMessage(val protoreflect.Message) (*Message, bool) {
 				MergeMessage(val, msg)
 			}
 		}),
-	}, true
+	}
 }
 
-func NewMessageField(parent *Message, field protoreflect.FieldDescriptor) (*MessageField, bool) {
-	if parent == nil || field == nil || field.Message() == nil {
+func NewMessageField(parent *Message, desc protoreflect.FieldDescriptor) (*MessageField, bool) {
+	if parent == nil || desc == nil || desc.Message() == nil {
 		return nil, false
 	}
 
-	var (
-		get = func() protoreflect.Message {
-			if parent.Get().Has(field) {
-				return parent.Get().Mutable(field).Message()
-			}
-			return parent.Get().NewField(field).Message()
-		}
-		set = func(msg protoreflect.Message) {
-			if msg == nil {
-				msg = get()
-				msg.Range(func(field protoreflect.FieldDescriptor, _ protoreflect.Value) bool {
-					msg.Clear(field)
-					return true
-				})
-			} else {
-				parent.Get().Set(field, protoreflect.ValueOfMessage(msg))
-			}
-		}
-	)
-
-	return &MessageField{
-		Message: &Message{
-			descriptor: field.Message(),
-			Getter:     GetterFunc[protoreflect.Message](get),
-			Setter:     SetterFunc[protoreflect.Message](set),
-		},
-		element:    NewElement(field),
+	field := &MessageField{
+		element:    NewElement(desc),
 		parent:     parent,
-		descriptor: field,
-	}, true
+		descriptor: desc,
+	}
+
+	field.Message.descriptor = desc.Message()
+	field.Getter = GetterFunc[protoreflect.Message](func() protoreflect.Message {
+		if parent.Get().Has(desc) {
+			return parent.Get().Mutable(desc).Message()
+		}
+		return parent.Get().NewField(desc).Message()
+	})
+	field.Setter = SetterFunc[protoreflect.Message](func(msg protoreflect.Message) {
+		if msg == nil {
+			parent.Get().Clear(desc)
+		} else {
+			parent.Get().Set(desc, protoreflect.ValueOfMessage(msg))
+		}
+	})
+
+	return field, true
 }
 
 func MergeMessage(dst, src protoreflect.Message) {
-	if dst.Descriptor().FullName() == src.Descriptor().FullName() {
+	if dst.Descriptor() == src.Descriptor() {
 		for idx := range dst.Descriptor().Fields().Len() {
 			field := dst.Descriptor().Fields().Get(idx)
 			if !src.Has(field) {
@@ -103,16 +95,12 @@ func MergeMessage(dst, src protoreflect.Message) {
 }
 
 func (m *Message) FieldGroup() *FieldGroup {
-	if m == nil {
-		log.Fatal("field group message cannot be nil")
-	} else if m.Descriptor() == nil {
-		log.Fatal("field group message descriptor cannot be nil")
-	} else if m.group != nil {
+	if m.group != nil {
 		return m.group
 	}
 
 	var (
-		fields []*Field
+		fields []Field
 		oneOfs []protoreflect.OneofDescriptor
 	)
 	for idx := range m.Descriptor().Fields().Len() {
@@ -123,29 +111,37 @@ func (m *Message) FieldGroup() *FieldGroup {
 			}
 
 			if field, ok := NewOneOfField(m, desc); ok {
-				fields = append(fields, NewField(field))
+				fields = append(fields, Field{field})
 				oneOfs = append(oneOfs, desc.ContainingOneof())
 			}
 		} else if desc.IsList() {
 			if field, ok := NewListField(m, desc); ok {
-				fields = append(fields, NewField(field))
+				fields = append(fields, Field{field})
 			}
 		} else if desc.IsMap() {
 			if field, ok := NewMapField(m, desc); ok {
-				fields = append(fields, NewField(field))
+				fields = append(fields, Field{field})
 			}
 		} else if desc.Message() != nil {
 			if field, ok := NewMessageField(m, desc); ok {
-				fields = append(fields, NewField(field))
+				fields = append(fields, Field{field})
 			}
 		} else {
 			if field, ok := NewScalarField(m, desc); ok {
-				fields = append(fields, NewField(field))
+				fields = append(fields, Field{field})
 			}
 		}
 	}
 
-	m.group = NewFieldGroup(m, fields...)
+	desc := GetProtoDescription(m.Descriptor())
+	if desc == "" {
+		desc = fmt.Sprint(m.Descriptor().FullName())
+	}
+
+	m.group = NewFieldGroup(fields...).
+		WithTitle(fmt.Sprint(m.Descriptor().Name())).
+		WithDescription(desc)
+
 	return m.group
 }
 

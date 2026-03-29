@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
@@ -14,7 +13,7 @@ import (
 
 const IsEOFFunc = "isEOF"
 
-func MakeIsEOFFunc(ctx shared.Runtime) cel.EnvOption {
+func MakeIsEOFFunc() cel.EnvOption {
 	return cel.Function(IsEOFFunc,
 		cel.SingletonFunctionBinding(
 			func(args ...ref.Val) ref.Val {

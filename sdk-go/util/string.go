@@ -77,9 +77,13 @@ func StringFormatAny(val any) string {
 
 	switch val := val.(type) {
 	case protoreflect.Message:
-		return prototext.Format(val.Interface())
+		return prototext.MarshalOptions{
+			Multiline: false,
+		}.Format(val.Interface())
 	case proto.Message:
-		return prototext.Format(val)
+		return prototext.MarshalOptions{
+			Multiline: false,
+		}.Format(val)
 	case fmt.Stringer:
 		return val.String()
 	case string:

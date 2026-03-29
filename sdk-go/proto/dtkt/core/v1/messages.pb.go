@@ -85,6 +85,61 @@ func (Auth_AuthMethod) EnumDescriptor() ([]byte, []int) {
 	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{1, 0}
 }
 
+type Automation_State int32
+
+const (
+	Automation_STATE_UNSPECIFIED Automation_State = 0
+	Automation_PENDING           Automation_State = 1
+	Automation_RUNNING           Automation_State = 2
+	Automation_STOPPED           Automation_State = 3
+	Automation_FAILED            Automation_State = 4
+)
+
+// Enum value maps for Automation_State.
+var (
+	Automation_State_name = map[int32]string{
+		0: "STATE_UNSPECIFIED",
+		1: "PENDING",
+		2: "RUNNING",
+		3: "STOPPED",
+		4: "FAILED",
+	}
+	Automation_State_value = map[string]int32{
+		"STATE_UNSPECIFIED": 0,
+		"PENDING":           1,
+		"RUNNING":           2,
+		"STOPPED":           3,
+		"FAILED":            4,
+	}
+)
+
+func (x Automation_State) Enum() *Automation_State {
+	p := new(Automation_State)
+	*p = x
+	return p
+}
+
+func (x Automation_State) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Automation_State) Descriptor() protoreflect.EnumDescriptor {
+	return file_dtkt_core_v1_messages_proto_enumTypes[1].Descriptor()
+}
+
+func (Automation_State) Type() protoreflect.EnumType {
+	return &file_dtkt_core_v1_messages_proto_enumTypes[1]
+}
+
+func (x Automation_State) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Automation_State.Descriptor instead.
+func (Automation_State) EnumDescriptor() ([]byte, []int) {
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{4, 0}
+}
+
 type Deployment_State int32
 
 const (
@@ -127,11 +182,11 @@ func (x Deployment_State) String() string {
 }
 
 func (Deployment_State) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_core_v1_messages_proto_enumTypes[1].Descriptor()
+	return file_dtkt_core_v1_messages_proto_enumTypes[2].Descriptor()
 }
 
 func (Deployment_State) Type() protoreflect.EnumType {
-	return &file_dtkt_core_v1_messages_proto_enumTypes[1]
+	return &file_dtkt_core_v1_messages_proto_enumTypes[2]
 }
 
 func (x Deployment_State) Number() protoreflect.EnumNumber {
@@ -182,11 +237,11 @@ func (x BuildOperationMetadata_State) String() string {
 }
 
 func (BuildOperationMetadata_State) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_core_v1_messages_proto_enumTypes[2].Descriptor()
+	return file_dtkt_core_v1_messages_proto_enumTypes[3].Descriptor()
 }
 
 func (BuildOperationMetadata_State) Type() protoreflect.EnumType {
-	return &file_dtkt_core_v1_messages_proto_enumTypes[2]
+	return &file_dtkt_core_v1_messages_proto_enumTypes[3]
 }
 
 func (x BuildOperationMetadata_State) Number() protoreflect.EnumNumber {
@@ -195,7 +250,7 @@ func (x BuildOperationMetadata_State) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use BuildOperationMetadata_State.Descriptor instead.
 func (BuildOperationMetadata_State) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{22, 0}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{23, 0}
 }
 
 type RunOperationMetadata_State int32
@@ -237,11 +292,11 @@ func (x RunOperationMetadata_State) String() string {
 }
 
 func (RunOperationMetadata_State) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_core_v1_messages_proto_enumTypes[3].Descriptor()
+	return file_dtkt_core_v1_messages_proto_enumTypes[4].Descriptor()
 }
 
 func (RunOperationMetadata_State) Type() protoreflect.EnumType {
-	return &file_dtkt_core_v1_messages_proto_enumTypes[3]
+	return &file_dtkt_core_v1_messages_proto_enumTypes[4]
 }
 
 func (x RunOperationMetadata_State) Number() protoreflect.EnumNumber {
@@ -250,7 +305,7 @@ func (x RunOperationMetadata_State) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use RunOperationMetadata_State.Descriptor instead.
 func (RunOperationMetadata_State) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{23, 0}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{24, 0}
 }
 
 type SyncOperationMetadata_State int32
@@ -292,11 +347,11 @@ func (x SyncOperationMetadata_State) String() string {
 }
 
 func (SyncOperationMetadata_State) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_core_v1_messages_proto_enumTypes[4].Descriptor()
+	return file_dtkt_core_v1_messages_proto_enumTypes[5].Descriptor()
 }
 
 func (SyncOperationMetadata_State) Type() protoreflect.EnumType {
-	return &file_dtkt_core_v1_messages_proto_enumTypes[4]
+	return &file_dtkt_core_v1_messages_proto_enumTypes[5]
 }
 
 func (x SyncOperationMetadata_State) Number() protoreflect.EnumNumber {
@@ -305,7 +360,7 @@ func (x SyncOperationMetadata_State) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use SyncOperationMetadata_State.Descriptor instead.
 func (SyncOperationMetadata_State) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{24, 0}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{25, 0}
 }
 
 type DialMetadata_State int32
@@ -341,11 +396,11 @@ func (x DialMetadata_State) String() string {
 }
 
 func (DialMetadata_State) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_core_v1_messages_proto_enumTypes[5].Descriptor()
+	return file_dtkt_core_v1_messages_proto_enumTypes[6].Descriptor()
 }
 
 func (DialMetadata_State) Type() protoreflect.EnumType {
-	return &file_dtkt_core_v1_messages_proto_enumTypes[5]
+	return &file_dtkt_core_v1_messages_proto_enumTypes[6]
 }
 
 func (x DialMetadata_State) Number() protoreflect.EnumNumber {
@@ -354,7 +409,7 @@ func (x DialMetadata_State) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use DialMetadata_State.Descriptor instead.
 func (DialMetadata_State) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{25, 0}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{26, 0}
 }
 
 // Address contains a supported network and compatible target.
@@ -701,14 +756,14 @@ type Automation struct {
 	Name  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Server-assigned unique ID (UUID).
 	Uid string `protobuf:"bytes,2,opt,name=uid,proto3" json:"uid,omitempty"`
+	// Automation state.
+	State Automation_State `protobuf:"varint,3,opt,name=state,proto3,enum=dtkt.core.v1.Automation_State" json:"state,omitempty"`
+	// Automation runtime metadata.
+	Runtime *FlowRuntimeMetadata `protobuf:"bytes,4,opt,name=runtime,proto3" json:"runtime,omitempty"`
 	// Name of flow resource to resolve spec.
-	Flow string `protobuf:"bytes,3,opt,name=flow,proto3" json:"flow,omitempty"`
-	// Checksum of flow spec must match when resolving spec (concurrency control).
-	SpecEtag string `protobuf:"bytes,4,opt,name=spec_etag,json=specEtag,proto3" json:"spec_etag,omitempty"`
-	// Executor runtime metadata of resolved Flow spec (versioned).
-	Runtime *FlowRuntimeMetadata `protobuf:"bytes,5,opt,name=runtime,proto3" json:"runtime,omitempty"`
-	// Execution groups metadata of resolved Flow spec (versioned).
-	Groups *FlowGroupsMetadata `protobuf:"bytes,6,opt,name=groups,proto3" json:"groups,omitempty"`
+	Flow string `protobuf:"bytes,5,opt,name=flow,proto3" json:"flow,omitempty"`
+	// Checksum of flow spec must match flow when resolving spec (concurrency control).
+	SpecEtag string `protobuf:"bytes,6,opt,name=spec_etag,json=specEtag,proto3" json:"spec_etag,omitempty"`
 	// Connections configuration as map of connection node id to connection
 	// resource name and context (control plane).
 	// Examples:
@@ -736,6 +791,9 @@ type Automation struct {
 	Timeout *durationpb.Duration `protobuf:"bytes,9,opt,name=timeout,proto3" json:"timeout,omitempty"`
 	// Server-assigned batch name if created within a batch (optional).
 	Batch *string `protobuf:"bytes,10,opt,name=batch,proto3,oneof" json:"batch,omitempty"`
+	// Etag for concurrency control of automation updates (must match current etag
+	// to update or delete).
+	Etag string `protobuf:"bytes,15,opt,name=etag,proto3" json:"etag,omitempty"`
 	// Automation create time.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
 	// Automation update time.
@@ -788,6 +846,20 @@ func (x *Automation) GetUid() string {
 	return ""
 }
 
+func (x *Automation) GetState() Automation_State {
+	if x != nil {
+		return x.State
+	}
+	return Automation_STATE_UNSPECIFIED
+}
+
+func (x *Automation) GetRuntime() *FlowRuntimeMetadata {
+	if x != nil {
+		return x.Runtime
+	}
+	return nil
+}
+
 func (x *Automation) GetFlow() string {
 	if x != nil {
 		return x.Flow
@@ -800,20 +872,6 @@ func (x *Automation) GetSpecEtag() string {
 		return x.SpecEtag
 	}
 	return ""
-}
-
-func (x *Automation) GetRuntime() *FlowRuntimeMetadata {
-	if x != nil {
-		return x.Runtime
-	}
-	return nil
-}
-
-func (x *Automation) GetGroups() *FlowGroupsMetadata {
-	if x != nil {
-		return x.Groups
-	}
-	return nil
 }
 
 func (x *Automation) GetConnections() map[string]*FlowConnectionMetadata {
@@ -840,6 +898,13 @@ func (x *Automation) GetTimeout() *durationpb.Duration {
 func (x *Automation) GetBatch() string {
 	if x != nil && x.Batch != nil {
 		return *x.Batch
+	}
+	return ""
+}
+
+func (x *Automation) GetEtag() string {
+	if x != nil {
+		return x.Etag
 	}
 	return ""
 }
@@ -995,7 +1060,12 @@ type Connection struct {
 	ConfigGen uint64 `protobuf:"varint,12,opt,name=config_gen,json=configGen,proto3" json:"config_gen,omitempty"`
 	// Config source uri (optional).
 	ConfigUri string `protobuf:"bytes,13,opt,name=config_uri,json=configUri,proto3" json:"config_uri,omitempty"`
-	// Headers applied when dialing connection.
+	// Types that are valid to be assigned to Auth:
+	//
+	//	*Connection_DecryptedAuth
+	//	*Connection_EncryptedAuth
+	Auth isConnection_Auth `protobuf_oneof:"auth"`
+	// Headers applied when dialing connection (only valid for custom connections).
 	Headers map[string]string `protobuf:"bytes,14,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Connection create time.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
@@ -1136,6 +1206,31 @@ func (x *Connection) GetConfigUri() string {
 	return ""
 }
 
+func (x *Connection) GetAuth() isConnection_Auth {
+	if x != nil {
+		return x.Auth
+	}
+	return nil
+}
+
+func (x *Connection) GetDecryptedAuth() *anypb.Any {
+	if x != nil {
+		if x, ok := x.Auth.(*Connection_DecryptedAuth); ok {
+			return x.DecryptedAuth
+		}
+	}
+	return nil
+}
+
+func (x *Connection) GetEncryptedAuth() *EncryptedAny {
+	if x != nil {
+		if x, ok := x.Auth.(*Connection_EncryptedAuth); ok {
+			return x.EncryptedAuth
+		}
+	}
+	return nil
+}
+
 func (x *Connection) GetHeaders() map[string]string {
 	if x != nil {
 		return x.Headers
@@ -1187,7 +1282,7 @@ type isConnection_Config interface {
 }
 
 type Connection_DecryptedConfig struct {
-	// Config data compatible with integration config schema.
+	// Config data compatible with deployment config schema.
 	DecryptedConfig *anypb.Any `protobuf:"bytes,7,opt,name=decrypted_config,json=decryptedConfig,proto3,oneof"`
 }
 
@@ -1200,6 +1295,24 @@ func (*Connection_DecryptedConfig) isConnection_Config() {}
 
 func (*Connection_EncryptedConfig) isConnection_Config() {}
 
+type isConnection_Auth interface {
+	isConnection_Auth()
+}
+
+type Connection_DecryptedAuth struct {
+	// Decrypted auth data.
+	DecryptedAuth *anypb.Any `protobuf:"bytes,9,opt,name=decrypted_auth,json=decryptedAuth,proto3,oneof"`
+}
+
+type Connection_EncryptedAuth struct {
+	// Encrypted auth data.
+	EncryptedAuth *EncryptedAny `protobuf:"bytes,10,opt,name=encrypted_auth,json=encryptedAuth,proto3,oneof"`
+}
+
+func (*Connection_DecryptedAuth) isConnection_Auth() {}
+
+func (*Connection_EncryptedAuth) isConnection_Auth() {}
+
 // Deployment is a running instance of an Integration with context aware build
 // and runtime configuration. Deployments provide a way to run and manage software
 // packages represented by Integrations in compatible runtime environments, enabling
@@ -1210,7 +1323,8 @@ type Deployment struct {
 	// Name of deployment resource.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Server-assigned unique ID (UUID).
-	Uid   string           `protobuf:"bytes,2,opt,name=uid,proto3" json:"uid,omitempty"`
+	Uid string `protobuf:"bytes,2,opt,name=uid,proto3" json:"uid,omitempty"`
+	// Deployment state.
 	State Deployment_State `protobuf:"varint,3,opt,name=state,proto3,enum=dtkt.core.v1.Deployment_State" json:"state,omitempty"`
 	// Bind address of deployment gRPC server.
 	Address *Address `protobuf:"bytes,4,opt,name=address,proto3" json:"address,omitempty"`
@@ -1960,6 +2074,70 @@ type TypeSchema_V1Beta1 struct {
 
 func (*TypeSchema_V1Beta1) isTypeSchema_Version() {}
 
+// AutomationMetadata contains metadata for automation operations.
+type AutomationMetadata struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Status message.
+	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	// Start time.
+	StartTime *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	// Stop time.
+	StopTime      *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=stop_time,json=stopTime,proto3" json:"stop_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AutomationMetadata) Reset() {
+	*x = AutomationMetadata{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AutomationMetadata) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AutomationMetadata) ProtoMessage() {}
+
+func (x *AutomationMetadata) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AutomationMetadata.ProtoReflect.Descriptor instead.
+func (*AutomationMetadata) Descriptor() ([]byte, []int) {
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *AutomationMetadata) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *AutomationMetadata) GetStartTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartTime
+	}
+	return nil
+}
+
+func (x *AutomationMetadata) GetStopTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StopTime
+	}
+	return nil
+}
+
 // DeploymentMetadata contains metadata for deployment operations.
 type DeploymentMetadata struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -1975,7 +2153,7 @@ type DeploymentMetadata struct {
 
 func (x *DeploymentMetadata) Reset() {
 	*x = DeploymentMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[14]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1987,7 +2165,7 @@ func (x *DeploymentMetadata) String() string {
 func (*DeploymentMetadata) ProtoMessage() {}
 
 func (x *DeploymentMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[14]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2000,7 +2178,7 @@ func (x *DeploymentMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeploymentMetadata.ProtoReflect.Descriptor instead.
 func (*DeploymentMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{14}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *DeploymentMetadata) GetMessage() string {
@@ -2030,7 +2208,7 @@ type FlowConnectionMetadata struct {
 	// Name of connection resource.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Optional context to resolve connection resource by name.
-	// If unspecified, defaults to the context where the flow automation runs.
+	// If unspecified, defaults to the context where the automation runs.
 	Context       *Context `protobuf:"bytes,2,opt,name=context,proto3" json:"context,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2038,7 +2216,7 @@ type FlowConnectionMetadata struct {
 
 func (x *FlowConnectionMetadata) Reset() {
 	*x = FlowConnectionMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[15]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2050,7 +2228,7 @@ func (x *FlowConnectionMetadata) String() string {
 func (*FlowConnectionMetadata) ProtoMessage() {}
 
 func (x *FlowConnectionMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[15]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2063,7 +2241,7 @@ func (x *FlowConnectionMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FlowConnectionMetadata.ProtoReflect.Descriptor instead.
 func (*FlowConnectionMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{15}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *FlowConnectionMetadata) GetName() string {
@@ -2093,7 +2271,7 @@ type FlowRuntimeMetadata struct {
 
 func (x *FlowRuntimeMetadata) Reset() {
 	*x = FlowRuntimeMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[16]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2105,7 +2283,7 @@ func (x *FlowRuntimeMetadata) String() string {
 func (*FlowRuntimeMetadata) ProtoMessage() {}
 
 func (x *FlowRuntimeMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[16]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2118,7 +2296,7 @@ func (x *FlowRuntimeMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FlowRuntimeMetadata.ProtoReflect.Descriptor instead.
 func (*FlowRuntimeMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{16}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *FlowRuntimeMetadata) GetVersion() isFlowRuntimeMetadata_Version {
@@ -2160,7 +2338,7 @@ type FlowGroupsMetadata struct {
 
 func (x *FlowGroupsMetadata) Reset() {
 	*x = FlowGroupsMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[17]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2172,7 +2350,7 @@ func (x *FlowGroupsMetadata) String() string {
 func (*FlowGroupsMetadata) ProtoMessage() {}
 
 func (x *FlowGroupsMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[17]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2185,7 +2363,7 @@ func (x *FlowGroupsMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FlowGroupsMetadata.ProtoReflect.Descriptor instead.
 func (*FlowGroupsMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{17}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *FlowGroupsMetadata) GetVersion() isFlowGroupsMetadata_Version {
@@ -2227,7 +2405,7 @@ type FlowSpecMetadata struct {
 
 func (x *FlowSpecMetadata) Reset() {
 	*x = FlowSpecMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[18]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2239,7 +2417,7 @@ func (x *FlowSpecMetadata) String() string {
 func (*FlowSpecMetadata) ProtoMessage() {}
 
 func (x *FlowSpecMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[18]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2252,7 +2430,7 @@ func (x *FlowSpecMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FlowSpecMetadata.ProtoReflect.Descriptor instead.
 func (*FlowSpecMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{18}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *FlowSpecMetadata) GetVersion() isFlowSpecMetadata_Version {
@@ -2294,7 +2472,7 @@ type FlowGraphMetadata struct {
 
 func (x *FlowGraphMetadata) Reset() {
 	*x = FlowGraphMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[19]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2306,7 +2484,7 @@ func (x *FlowGraphMetadata) String() string {
 func (*FlowGraphMetadata) ProtoMessage() {}
 
 func (x *FlowGraphMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[19]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2319,7 +2497,7 @@ func (x *FlowGraphMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FlowGraphMetadata.ProtoReflect.Descriptor instead.
 func (*FlowGraphMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{19}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *FlowGraphMetadata) GetVersion() isFlowGraphMetadata_Version {
@@ -2361,7 +2539,7 @@ type PackageSpecMetadata struct {
 
 func (x *PackageSpecMetadata) Reset() {
 	*x = PackageSpecMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[20]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2373,7 +2551,7 @@ func (x *PackageSpecMetadata) String() string {
 func (*PackageSpecMetadata) ProtoMessage() {}
 
 func (x *PackageSpecMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[20]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2386,7 +2564,7 @@ func (x *PackageSpecMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PackageSpecMetadata.ProtoReflect.Descriptor instead.
 func (*PackageSpecMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{20}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *PackageSpecMetadata) GetVersion() isPackageSpecMetadata_Version {
@@ -2435,7 +2613,7 @@ type PackageBuildMetadata struct {
 
 func (x *PackageBuildMetadata) Reset() {
 	*x = PackageBuildMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[21]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2447,7 +2625,7 @@ func (x *PackageBuildMetadata) String() string {
 func (*PackageBuildMetadata) ProtoMessage() {}
 
 func (x *PackageBuildMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[21]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2460,7 +2638,7 @@ func (x *PackageBuildMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PackageBuildMetadata.ProtoReflect.Descriptor instead.
 func (*PackageBuildMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{21}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *PackageBuildMetadata) GetRuntime() *PackageBuildMetadata_Runtime {
@@ -2515,7 +2693,7 @@ type BuildOperationMetadata struct {
 
 func (x *BuildOperationMetadata) Reset() {
 	*x = BuildOperationMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[22]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2527,7 +2705,7 @@ func (x *BuildOperationMetadata) String() string {
 func (*BuildOperationMetadata) ProtoMessage() {}
 
 func (x *BuildOperationMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[22]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2540,7 +2718,7 @@ func (x *BuildOperationMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BuildOperationMetadata.ProtoReflect.Descriptor instead.
 func (*BuildOperationMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{22}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *BuildOperationMetadata) GetState() BuildOperationMetadata_State {
@@ -2588,7 +2766,7 @@ type RunOperationMetadata struct {
 
 func (x *RunOperationMetadata) Reset() {
 	*x = RunOperationMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[23]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2600,7 +2778,7 @@ func (x *RunOperationMetadata) String() string {
 func (*RunOperationMetadata) ProtoMessage() {}
 
 func (x *RunOperationMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[23]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2613,7 +2791,7 @@ func (x *RunOperationMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RunOperationMetadata.ProtoReflect.Descriptor instead.
 func (*RunOperationMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{23}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *RunOperationMetadata) GetState() RunOperationMetadata_State {
@@ -2664,7 +2842,7 @@ type SyncOperationMetadata struct {
 
 func (x *SyncOperationMetadata) Reset() {
 	*x = SyncOperationMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[24]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2676,7 +2854,7 @@ func (x *SyncOperationMetadata) String() string {
 func (*SyncOperationMetadata) ProtoMessage() {}
 
 func (x *SyncOperationMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[24]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2689,7 +2867,7 @@ func (x *SyncOperationMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncOperationMetadata.ProtoReflect.Descriptor instead.
 func (*SyncOperationMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{24}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *SyncOperationMetadata) GetState() SyncOperationMetadata_State {
@@ -2755,7 +2933,7 @@ type DialMetadata struct {
 
 func (x *DialMetadata) Reset() {
 	*x = DialMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[25]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2767,7 +2945,7 @@ func (x *DialMetadata) String() string {
 func (*DialMetadata) ProtoMessage() {}
 
 func (x *DialMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[25]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2780,7 +2958,7 @@ func (x *DialMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DialMetadata.ProtoReflect.Descriptor instead.
 func (*DialMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{25}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *DialMetadata) GetState() DialMetadata_State {
@@ -2815,7 +2993,7 @@ type BatchRunOperationMetadata struct {
 
 func (x *BatchRunOperationMetadata) Reset() {
 	*x = BatchRunOperationMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[26]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2827,7 +3005,7 @@ func (x *BatchRunOperationMetadata) String() string {
 func (*BatchRunOperationMetadata) ProtoMessage() {}
 
 func (x *BatchRunOperationMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[26]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2840,7 +3018,7 @@ func (x *BatchRunOperationMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BatchRunOperationMetadata.ProtoReflect.Descriptor instead.
 func (*BatchRunOperationMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{26}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *BatchRunOperationMetadata) GetFailedRequests() map[int32]*status.Status {
@@ -2863,7 +3041,7 @@ type EncryptedAny struct {
 
 func (x *EncryptedAny) Reset() {
 	*x = EncryptedAny{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[27]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2875,7 +3053,7 @@ func (x *EncryptedAny) String() string {
 func (*EncryptedAny) ProtoMessage() {}
 
 func (x *EncryptedAny) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[27]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2888,7 +3066,7 @@ func (x *EncryptedAny) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EncryptedAny.ProtoReflect.Descriptor instead.
 func (*EncryptedAny) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{27}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *EncryptedAny) GetTypeUrl() string {
@@ -2916,7 +3094,7 @@ type EncryptRequest struct {
 
 func (x *EncryptRequest) Reset() {
 	*x = EncryptRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[28]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2928,7 +3106,7 @@ func (x *EncryptRequest) String() string {
 func (*EncryptRequest) ProtoMessage() {}
 
 func (x *EncryptRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[28]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2941,7 +3119,7 @@ func (x *EncryptRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EncryptRequest.ProtoReflect.Descriptor instead.
 func (*EncryptRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{28}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *EncryptRequest) GetResource() *Resource {
@@ -2962,7 +3140,7 @@ type EncryptResponse struct {
 
 func (x *EncryptResponse) Reset() {
 	*x = EncryptResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[29]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2974,7 +3152,7 @@ func (x *EncryptResponse) String() string {
 func (*EncryptResponse) ProtoMessage() {}
 
 func (x *EncryptResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[29]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2987,7 +3165,7 @@ func (x *EncryptResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EncryptResponse.ProtoReflect.Descriptor instead.
 func (*EncryptResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{29}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *EncryptResponse) GetResource() *Resource {
@@ -3008,7 +3186,7 @@ type DecryptRequest struct {
 
 func (x *DecryptRequest) Reset() {
 	*x = DecryptRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[30]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3020,7 +3198,7 @@ func (x *DecryptRequest) String() string {
 func (*DecryptRequest) ProtoMessage() {}
 
 func (x *DecryptRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[30]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3033,7 +3211,7 @@ func (x *DecryptRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DecryptRequest.ProtoReflect.Descriptor instead.
 func (*DecryptRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{30}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *DecryptRequest) GetResource() *Resource {
@@ -3054,7 +3232,7 @@ type DecryptResponse struct {
 
 func (x *DecryptResponse) Reset() {
 	*x = DecryptResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[31]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3066,7 +3244,7 @@ func (x *DecryptResponse) String() string {
 func (*DecryptResponse) ProtoMessage() {}
 
 func (x *DecryptResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[31]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3079,7 +3257,7 @@ func (x *DecryptResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DecryptResponse.ProtoReflect.Descriptor instead.
 func (*DecryptResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{31}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *DecryptResponse) GetResource() *Resource {
@@ -3099,7 +3277,7 @@ type GetAutomationRequest struct {
 
 func (x *GetAutomationRequest) Reset() {
 	*x = GetAutomationRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[32]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3111,7 +3289,7 @@ func (x *GetAutomationRequest) String() string {
 func (*GetAutomationRequest) ProtoMessage() {}
 
 func (x *GetAutomationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[32]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3124,7 +3302,7 @@ func (x *GetAutomationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAutomationRequest.ProtoReflect.Descriptor instead.
 func (*GetAutomationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{32}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *GetAutomationRequest) GetName() string {
@@ -3144,7 +3322,7 @@ type GetAutomationResponse struct {
 
 func (x *GetAutomationResponse) Reset() {
 	*x = GetAutomationResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[33]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3156,7 +3334,7 @@ func (x *GetAutomationResponse) String() string {
 func (*GetAutomationResponse) ProtoMessage() {}
 
 func (x *GetAutomationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[33]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3169,7 +3347,7 @@ func (x *GetAutomationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAutomationResponse.ProtoReflect.Descriptor instead.
 func (*GetAutomationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{33}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *GetAutomationResponse) GetAutomation() *Automation {
@@ -3192,7 +3370,7 @@ type CreateAutomationRequest struct {
 
 func (x *CreateAutomationRequest) Reset() {
 	*x = CreateAutomationRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[34]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3204,7 +3382,7 @@ func (x *CreateAutomationRequest) String() string {
 func (*CreateAutomationRequest) ProtoMessage() {}
 
 func (x *CreateAutomationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[34]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3217,7 +3395,7 @@ func (x *CreateAutomationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAutomationRequest.ProtoReflect.Descriptor instead.
 func (*CreateAutomationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{34}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *CreateAutomationRequest) GetParent() string {
@@ -3251,7 +3429,7 @@ type CreateAutomationResponse struct {
 
 func (x *CreateAutomationResponse) Reset() {
 	*x = CreateAutomationResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[35]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3263,7 +3441,7 @@ func (x *CreateAutomationResponse) String() string {
 func (*CreateAutomationResponse) ProtoMessage() {}
 
 func (x *CreateAutomationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[35]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3276,7 +3454,7 @@ func (x *CreateAutomationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAutomationResponse.ProtoReflect.Descriptor instead.
 func (*CreateAutomationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{35}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *CreateAutomationResponse) GetAutomation() *Automation {
@@ -3284,6 +3462,124 @@ func (x *CreateAutomationResponse) GetAutomation() *Automation {
 		return x.Automation
 	}
 	return nil
+}
+
+type UpdateAutomationRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Automation with updated fields. Must include `name`.
+	Automation *Automation `protobuf:"bytes,1,opt,name=automation,proto3" json:"automation,omitempty"`
+	// Fields to update (e.g., "config,address").
+	UpdateMask *fieldmaskpb.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
+	// Desired state of automation after update.
+	DesiredState  *Automation_State `protobuf:"varint,3,opt,name=desired_state,json=desiredState,proto3,enum=dtkt.core.v1.Automation_State,oneof" json:"desired_state,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateAutomationRequest) Reset() {
+	*x = UpdateAutomationRequest{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateAutomationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateAutomationRequest) ProtoMessage() {}
+
+func (x *UpdateAutomationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateAutomationRequest.ProtoReflect.Descriptor instead.
+func (*UpdateAutomationRequest) Descriptor() ([]byte, []int) {
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *UpdateAutomationRequest) GetAutomation() *Automation {
+	if x != nil {
+		return x.Automation
+	}
+	return nil
+}
+
+func (x *UpdateAutomationRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.UpdateMask
+	}
+	return nil
+}
+
+func (x *UpdateAutomationRequest) GetDesiredState() Automation_State {
+	if x != nil && x.DesiredState != nil {
+		return *x.DesiredState
+	}
+	return Automation_STATE_UNSPECIFIED
+}
+
+type DeleteAutomationRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Name of automation to delete.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Etag must match current automation etag for delete to succeed (ensures
+	// automation is up-to-date and prevents lost deletes).
+	Etag          string `protobuf:"bytes,2,opt,name=etag,proto3" json:"etag,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteAutomationRequest) Reset() {
+	*x = DeleteAutomationRequest{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteAutomationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteAutomationRequest) ProtoMessage() {}
+
+func (x *DeleteAutomationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteAutomationRequest.ProtoReflect.Descriptor instead.
+func (*DeleteAutomationRequest) Descriptor() ([]byte, []int) {
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *DeleteAutomationRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *DeleteAutomationRequest) GetEtag() string {
+	if x != nil {
+		return x.Etag
+	}
+	return ""
 }
 
 type BatchCreateAutomationsRequest struct {
@@ -3297,7 +3593,7 @@ type BatchCreateAutomationsRequest struct {
 
 func (x *BatchCreateAutomationsRequest) Reset() {
 	*x = BatchCreateAutomationsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[36]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3309,7 +3605,7 @@ func (x *BatchCreateAutomationsRequest) String() string {
 func (*BatchCreateAutomationsRequest) ProtoMessage() {}
 
 func (x *BatchCreateAutomationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[36]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3322,7 +3618,7 @@ func (x *BatchCreateAutomationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BatchCreateAutomationsRequest.ProtoReflect.Descriptor instead.
 func (*BatchCreateAutomationsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{36}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *BatchCreateAutomationsRequest) GetParent() string {
@@ -3349,7 +3645,7 @@ type BatchCreateAutomationsResponse struct {
 
 func (x *BatchCreateAutomationsResponse) Reset() {
 	*x = BatchCreateAutomationsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[37]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3361,7 +3657,7 @@ func (x *BatchCreateAutomationsResponse) String() string {
 func (*BatchCreateAutomationsResponse) ProtoMessage() {}
 
 func (x *BatchCreateAutomationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[37]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3374,7 +3670,7 @@ func (x *BatchCreateAutomationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BatchCreateAutomationsResponse.ProtoReflect.Descriptor instead.
 func (*BatchCreateAutomationsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{37}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *BatchCreateAutomationsResponse) GetAutomations() []*Automation {
@@ -3400,7 +3696,7 @@ type ListAutomationsRequest struct {
 
 func (x *ListAutomationsRequest) Reset() {
 	*x = ListAutomationsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[38]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3412,7 +3708,7 @@ func (x *ListAutomationsRequest) String() string {
 func (*ListAutomationsRequest) ProtoMessage() {}
 
 func (x *ListAutomationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[38]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3425,7 +3721,7 @@ func (x *ListAutomationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAutomationsRequest.ProtoReflect.Descriptor instead.
 func (*ListAutomationsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{38}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *ListAutomationsRequest) GetPageSize() int32 {
@@ -3468,7 +3764,7 @@ type ListAutomationsResponse struct {
 
 func (x *ListAutomationsResponse) Reset() {
 	*x = ListAutomationsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[39]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3480,7 +3776,7 @@ func (x *ListAutomationsResponse) String() string {
 func (*ListAutomationsResponse) ProtoMessage() {}
 
 func (x *ListAutomationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[39]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3493,7 +3789,7 @@ func (x *ListAutomationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAutomationsResponse.ProtoReflect.Descriptor instead.
 func (*ListAutomationsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{39}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *ListAutomationsResponse) GetAutomations() []*Automation {
@@ -3524,7 +3820,7 @@ type SendAutomationEvent struct {
 
 func (x *SendAutomationEvent) Reset() {
 	*x = SendAutomationEvent{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[40]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3536,7 +3832,7 @@ func (x *SendAutomationEvent) String() string {
 func (*SendAutomationEvent) ProtoMessage() {}
 
 func (x *SendAutomationEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[40]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3549,7 +3845,7 @@ func (x *SendAutomationEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendAutomationEvent.ProtoReflect.Descriptor instead.
 func (*SendAutomationEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{40}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *SendAutomationEvent) GetType() isSendAutomationEvent_Type {
@@ -3607,7 +3903,7 @@ type ReceiveAutomationEvent struct {
 
 func (x *ReceiveAutomationEvent) Reset() {
 	*x = ReceiveAutomationEvent{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[41]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3619,7 +3915,7 @@ func (x *ReceiveAutomationEvent) String() string {
 func (*ReceiveAutomationEvent) ProtoMessage() {}
 
 func (x *ReceiveAutomationEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[41]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3632,7 +3928,7 @@ func (x *ReceiveAutomationEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReceiveAutomationEvent.ProtoReflect.Descriptor instead.
 func (*ReceiveAutomationEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{41}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *ReceiveAutomationEvent) GetType() isReceiveAutomationEvent_Type {
@@ -3688,7 +3984,7 @@ type SendAutomationEventRequest struct {
 
 func (x *SendAutomationEventRequest) Reset() {
 	*x = SendAutomationEventRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[42]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3700,7 +3996,7 @@ func (x *SendAutomationEventRequest) String() string {
 func (*SendAutomationEventRequest) ProtoMessage() {}
 
 func (x *SendAutomationEventRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[42]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3713,7 +4009,7 @@ func (x *SendAutomationEventRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendAutomationEventRequest.ProtoReflect.Descriptor instead.
 func (*SendAutomationEventRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{42}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *SendAutomationEventRequest) GetName() string {
@@ -3740,7 +4036,7 @@ type ReceiveAutomationEventsRequest struct {
 
 func (x *ReceiveAutomationEventsRequest) Reset() {
 	*x = ReceiveAutomationEventsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[43]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3752,7 +4048,7 @@ func (x *ReceiveAutomationEventsRequest) String() string {
 func (*ReceiveAutomationEventsRequest) ProtoMessage() {}
 
 func (x *ReceiveAutomationEventsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[43]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3765,7 +4061,7 @@ func (x *ReceiveAutomationEventsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReceiveAutomationEventsRequest.ProtoReflect.Descriptor instead.
 func (*ReceiveAutomationEventsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{43}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *ReceiveAutomationEventsRequest) GetName() string {
@@ -3785,7 +4081,7 @@ type ReceiveAutomationEventsResponse struct {
 
 func (x *ReceiveAutomationEventsResponse) Reset() {
 	*x = ReceiveAutomationEventsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[44]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3797,7 +4093,7 @@ func (x *ReceiveAutomationEventsResponse) String() string {
 func (*ReceiveAutomationEventsResponse) ProtoMessage() {}
 
 func (x *ReceiveAutomationEventsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[44]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3810,7 +4106,7 @@ func (x *ReceiveAutomationEventsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReceiveAutomationEventsResponse.ProtoReflect.Descriptor instead.
 func (*ReceiveAutomationEventsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{44}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *ReceiveAutomationEventsResponse) GetEvent() *ReceiveAutomationEvent {
@@ -3832,7 +4128,7 @@ type StreamAutomationEventsRequest struct {
 
 func (x *StreamAutomationEventsRequest) Reset() {
 	*x = StreamAutomationEventsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[45]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3844,7 +4140,7 @@ func (x *StreamAutomationEventsRequest) String() string {
 func (*StreamAutomationEventsRequest) ProtoMessage() {}
 
 func (x *StreamAutomationEventsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[45]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3857,7 +4153,7 @@ func (x *StreamAutomationEventsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamAutomationEventsRequest.ProtoReflect.Descriptor instead.
 func (*StreamAutomationEventsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{45}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *StreamAutomationEventsRequest) GetName() string {
@@ -3884,7 +4180,7 @@ type StreamAutomationEventsResponse struct {
 
 func (x *StreamAutomationEventsResponse) Reset() {
 	*x = StreamAutomationEventsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[46]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3896,7 +4192,7 @@ func (x *StreamAutomationEventsResponse) String() string {
 func (*StreamAutomationEventsResponse) ProtoMessage() {}
 
 func (x *StreamAutomationEventsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[46]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3909,7 +4205,7 @@ func (x *StreamAutomationEventsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamAutomationEventsResponse.ProtoReflect.Descriptor instead.
 func (*StreamAutomationEventsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{46}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *StreamAutomationEventsResponse) GetEvent() *ReceiveAutomationEvent {
@@ -3935,7 +4231,7 @@ type ListConnectionsRequest struct {
 
 func (x *ListConnectionsRequest) Reset() {
 	*x = ListConnectionsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[47]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3947,7 +4243,7 @@ func (x *ListConnectionsRequest) String() string {
 func (*ListConnectionsRequest) ProtoMessage() {}
 
 func (x *ListConnectionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[47]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3960,7 +4256,7 @@ func (x *ListConnectionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListConnectionsRequest.ProtoReflect.Descriptor instead.
 func (*ListConnectionsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{47}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *ListConnectionsRequest) GetPageSize() int32 {
@@ -4003,7 +4299,7 @@ type ListConnectionsResponse struct {
 
 func (x *ListConnectionsResponse) Reset() {
 	*x = ListConnectionsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[48]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4015,7 +4311,7 @@ func (x *ListConnectionsResponse) String() string {
 func (*ListConnectionsResponse) ProtoMessage() {}
 
 func (x *ListConnectionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[48]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4028,7 +4324,7 @@ func (x *ListConnectionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListConnectionsResponse.ProtoReflect.Descriptor instead.
 func (*ListConnectionsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{48}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{51}
 }
 
 func (x *ListConnectionsResponse) GetConnections() []*Connection {
@@ -4055,7 +4351,7 @@ type GetConnectionRequest struct {
 
 func (x *GetConnectionRequest) Reset() {
 	*x = GetConnectionRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[49]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4067,7 +4363,7 @@ func (x *GetConnectionRequest) String() string {
 func (*GetConnectionRequest) ProtoMessage() {}
 
 func (x *GetConnectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[49]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4080,7 +4376,7 @@ func (x *GetConnectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetConnectionRequest.ProtoReflect.Descriptor instead.
 func (*GetConnectionRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{49}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *GetConnectionRequest) GetName() string {
@@ -4100,7 +4396,7 @@ type GetConnectionResponse struct {
 
 func (x *GetConnectionResponse) Reset() {
 	*x = GetConnectionResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[50]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4112,7 +4408,7 @@ func (x *GetConnectionResponse) String() string {
 func (*GetConnectionResponse) ProtoMessage() {}
 
 func (x *GetConnectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[50]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4125,7 +4421,7 @@ func (x *GetConnectionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetConnectionResponse.ProtoReflect.Descriptor instead.
 func (*GetConnectionResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{50}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *GetConnectionResponse) GetConnection() *Connection {
@@ -4149,7 +4445,7 @@ type CreateConnectionRequest struct {
 
 func (x *CreateConnectionRequest) Reset() {
 	*x = CreateConnectionRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[51]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4161,7 +4457,7 @@ func (x *CreateConnectionRequest) String() string {
 func (*CreateConnectionRequest) ProtoMessage() {}
 
 func (x *CreateConnectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[51]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4174,7 +4470,7 @@ func (x *CreateConnectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateConnectionRequest.ProtoReflect.Descriptor instead.
 func (*CreateConnectionRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{51}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{54}
 }
 
 func (x *CreateConnectionRequest) GetParent() string {
@@ -4208,7 +4504,7 @@ type CreateConnectionResponse struct {
 
 func (x *CreateConnectionResponse) Reset() {
 	*x = CreateConnectionResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[52]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4220,7 +4516,7 @@ func (x *CreateConnectionResponse) String() string {
 func (*CreateConnectionResponse) ProtoMessage() {}
 
 func (x *CreateConnectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[52]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4233,7 +4529,7 @@ func (x *CreateConnectionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateConnectionResponse.ProtoReflect.Descriptor instead.
 func (*CreateConnectionResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{52}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *CreateConnectionResponse) GetConnection() *Connection {
@@ -4255,7 +4551,7 @@ type UpdateConnectionRequest struct {
 
 func (x *UpdateConnectionRequest) Reset() {
 	*x = UpdateConnectionRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[53]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4267,7 +4563,7 @@ func (x *UpdateConnectionRequest) String() string {
 func (*UpdateConnectionRequest) ProtoMessage() {}
 
 func (x *UpdateConnectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[53]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4280,7 +4576,7 @@ func (x *UpdateConnectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateConnectionRequest.ProtoReflect.Descriptor instead.
 func (*UpdateConnectionRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{53}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{56}
 }
 
 func (x *UpdateConnectionRequest) GetConnection() *Connection {
@@ -4307,7 +4603,7 @@ type UpdateConnectionResponse struct {
 
 func (x *UpdateConnectionResponse) Reset() {
 	*x = UpdateConnectionResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[54]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4319,7 +4615,7 @@ func (x *UpdateConnectionResponse) String() string {
 func (*UpdateConnectionResponse) ProtoMessage() {}
 
 func (x *UpdateConnectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[54]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4332,7 +4628,7 @@ func (x *UpdateConnectionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateConnectionResponse.ProtoReflect.Descriptor instead.
 func (*UpdateConnectionResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{54}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{57}
 }
 
 func (x *UpdateConnectionResponse) GetConnection() *Connection {
@@ -4352,7 +4648,7 @@ type DeleteConnectionRequest struct {
 
 func (x *DeleteConnectionRequest) Reset() {
 	*x = DeleteConnectionRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[55]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4364,7 +4660,7 @@ func (x *DeleteConnectionRequest) String() string {
 func (*DeleteConnectionRequest) ProtoMessage() {}
 
 func (x *DeleteConnectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[55]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4377,7 +4673,7 @@ func (x *DeleteConnectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteConnectionRequest.ProtoReflect.Descriptor instead.
 func (*DeleteConnectionRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{55}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{58}
 }
 
 func (x *DeleteConnectionRequest) GetName() string {
@@ -4395,7 +4691,7 @@ type DeleteConnectionResponse struct {
 
 func (x *DeleteConnectionResponse) Reset() {
 	*x = DeleteConnectionResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[56]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[59]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4407,7 +4703,7 @@ func (x *DeleteConnectionResponse) String() string {
 func (*DeleteConnectionResponse) ProtoMessage() {}
 
 func (x *DeleteConnectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[56]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[59]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4420,7 +4716,7 @@ func (x *DeleteConnectionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteConnectionResponse.ProtoReflect.Descriptor instead.
 func (*DeleteConnectionResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{56}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{59}
 }
 
 type DialConnectionRequest struct {
@@ -4436,7 +4732,7 @@ type DialConnectionRequest struct {
 
 func (x *DialConnectionRequest) Reset() {
 	*x = DialConnectionRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[57]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4448,7 +4744,7 @@ func (x *DialConnectionRequest) String() string {
 func (*DialConnectionRequest) ProtoMessage() {}
 
 func (x *DialConnectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[57]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4461,7 +4757,7 @@ func (x *DialConnectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DialConnectionRequest.ProtoReflect.Descriptor instead.
 func (*DialConnectionRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{57}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{60}
 }
 
 func (x *DialConnectionRequest) GetTarget() isDialConnectionRequest_Target {
@@ -4517,7 +4813,7 @@ type DialConnectionResponse struct {
 
 func (x *DialConnectionResponse) Reset() {
 	*x = DialConnectionResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[58]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[61]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4529,7 +4825,7 @@ func (x *DialConnectionResponse) String() string {
 func (*DialConnectionResponse) ProtoMessage() {}
 
 func (x *DialConnectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[58]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[61]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4542,7 +4838,7 @@ func (x *DialConnectionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DialConnectionResponse.ProtoReflect.Descriptor instead.
 func (*DialConnectionResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{58}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{61}
 }
 
 func (x *DialConnectionResponse) GetDial() *DialMetadata {
@@ -4566,7 +4862,7 @@ type SyncDescriptorsRequest struct {
 
 func (x *SyncDescriptorsRequest) Reset() {
 	*x = SyncDescriptorsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[59]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[62]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4578,7 +4874,7 @@ func (x *SyncDescriptorsRequest) String() string {
 func (*SyncDescriptorsRequest) ProtoMessage() {}
 
 func (x *SyncDescriptorsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[59]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[62]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4591,7 +4887,7 @@ func (x *SyncDescriptorsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncDescriptorsRequest.ProtoReflect.Descriptor instead.
 func (*SyncDescriptorsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{59}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{62}
 }
 
 func (x *SyncDescriptorsRequest) GetParent() string {
@@ -4618,7 +4914,7 @@ type SyncDescriptorsResponse struct {
 
 func (x *SyncDescriptorsResponse) Reset() {
 	*x = SyncDescriptorsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[60]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[63]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4630,7 +4926,7 @@ func (x *SyncDescriptorsResponse) String() string {
 func (*SyncDescriptorsResponse) ProtoMessage() {}
 
 func (x *SyncDescriptorsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[60]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[63]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4643,7 +4939,7 @@ func (x *SyncDescriptorsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncDescriptorsResponse.ProtoReflect.Descriptor instead.
 func (*SyncDescriptorsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{60}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{63}
 }
 
 func (x *SyncDescriptorsResponse) GetFile() *File {
@@ -4663,7 +4959,7 @@ type GetDescriptorsRequest struct {
 
 func (x *GetDescriptorsRequest) Reset() {
 	*x = GetDescriptorsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[61]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[64]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4675,7 +4971,7 @@ func (x *GetDescriptorsRequest) String() string {
 func (*GetDescriptorsRequest) ProtoMessage() {}
 
 func (x *GetDescriptorsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[61]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[64]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4688,7 +4984,7 @@ func (x *GetDescriptorsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDescriptorsRequest.ProtoReflect.Descriptor instead.
 func (*GetDescriptorsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{61}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{64}
 }
 
 func (x *GetDescriptorsRequest) GetParent() string {
@@ -4708,7 +5004,7 @@ type GetDescriptorsResponse struct {
 
 func (x *GetDescriptorsResponse) Reset() {
 	*x = GetDescriptorsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[62]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[65]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4720,7 +5016,7 @@ func (x *GetDescriptorsResponse) String() string {
 func (*GetDescriptorsResponse) ProtoMessage() {}
 
 func (x *GetDescriptorsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[62]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[65]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4733,7 +5029,7 @@ func (x *GetDescriptorsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDescriptorsResponse.ProtoReflect.Descriptor instead.
 func (*GetDescriptorsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{62}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{65}
 }
 
 func (x *GetDescriptorsResponse) GetFile() *File {
@@ -4759,7 +5055,7 @@ type ListDeploymentsRequest struct {
 
 func (x *ListDeploymentsRequest) Reset() {
 	*x = ListDeploymentsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[63]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[66]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4771,7 +5067,7 @@ func (x *ListDeploymentsRequest) String() string {
 func (*ListDeploymentsRequest) ProtoMessage() {}
 
 func (x *ListDeploymentsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[63]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[66]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4784,7 +5080,7 @@ func (x *ListDeploymentsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDeploymentsRequest.ProtoReflect.Descriptor instead.
 func (*ListDeploymentsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{63}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{66}
 }
 
 func (x *ListDeploymentsRequest) GetPageSize() int32 {
@@ -4827,7 +5123,7 @@ type ListDeploymentsResponse struct {
 
 func (x *ListDeploymentsResponse) Reset() {
 	*x = ListDeploymentsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[64]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[67]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4839,7 +5135,7 @@ func (x *ListDeploymentsResponse) String() string {
 func (*ListDeploymentsResponse) ProtoMessage() {}
 
 func (x *ListDeploymentsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[64]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[67]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4852,7 +5148,7 @@ func (x *ListDeploymentsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDeploymentsResponse.ProtoReflect.Descriptor instead.
 func (*ListDeploymentsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{64}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{67}
 }
 
 func (x *ListDeploymentsResponse) GetDeployments() []*Deployment {
@@ -4879,7 +5175,7 @@ type GetDeploymentRequest struct {
 
 func (x *GetDeploymentRequest) Reset() {
 	*x = GetDeploymentRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[65]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[68]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4891,7 +5187,7 @@ func (x *GetDeploymentRequest) String() string {
 func (*GetDeploymentRequest) ProtoMessage() {}
 
 func (x *GetDeploymentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[65]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[68]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4904,7 +5200,7 @@ func (x *GetDeploymentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeploymentRequest.ProtoReflect.Descriptor instead.
 func (*GetDeploymentRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{65}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{68}
 }
 
 func (x *GetDeploymentRequest) GetName() string {
@@ -4924,7 +5220,7 @@ type GetDeploymentResponse struct {
 
 func (x *GetDeploymentResponse) Reset() {
 	*x = GetDeploymentResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[66]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[69]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4936,7 +5232,7 @@ func (x *GetDeploymentResponse) String() string {
 func (*GetDeploymentResponse) ProtoMessage() {}
 
 func (x *GetDeploymentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[66]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[69]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4949,7 +5245,7 @@ func (x *GetDeploymentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeploymentResponse.ProtoReflect.Descriptor instead.
 func (*GetDeploymentResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{66}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{69}
 }
 
 func (x *GetDeploymentResponse) GetDeployment() *Deployment {
@@ -4973,7 +5269,7 @@ type CreateDeploymentRequest struct {
 
 func (x *CreateDeploymentRequest) Reset() {
 	*x = CreateDeploymentRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[67]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[70]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4985,7 +5281,7 @@ func (x *CreateDeploymentRequest) String() string {
 func (*CreateDeploymentRequest) ProtoMessage() {}
 
 func (x *CreateDeploymentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[67]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[70]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4998,7 +5294,7 @@ func (x *CreateDeploymentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateDeploymentRequest.ProtoReflect.Descriptor instead.
 func (*CreateDeploymentRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{67}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{70}
 }
 
 func (x *CreateDeploymentRequest) GetParent() string {
@@ -5036,7 +5332,7 @@ type UpdateDeploymentRequest struct {
 
 func (x *UpdateDeploymentRequest) Reset() {
 	*x = UpdateDeploymentRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[68]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[71]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5048,7 +5344,7 @@ func (x *UpdateDeploymentRequest) String() string {
 func (*UpdateDeploymentRequest) ProtoMessage() {}
 
 func (x *UpdateDeploymentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[68]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[71]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5061,7 +5357,7 @@ func (x *UpdateDeploymentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateDeploymentRequest.ProtoReflect.Descriptor instead.
 func (*UpdateDeploymentRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{68}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{71}
 }
 
 func (x *UpdateDeploymentRequest) GetDeployment() *Deployment {
@@ -5098,7 +5394,7 @@ type DeleteDeploymentRequest struct {
 
 func (x *DeleteDeploymentRequest) Reset() {
 	*x = DeleteDeploymentRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[69]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[72]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5110,7 +5406,7 @@ func (x *DeleteDeploymentRequest) String() string {
 func (*DeleteDeploymentRequest) ProtoMessage() {}
 
 func (x *DeleteDeploymentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[69]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[72]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5123,7 +5419,7 @@ func (x *DeleteDeploymentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteDeploymentRequest.ProtoReflect.Descriptor instead.
 func (*DeleteDeploymentRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{69}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{72}
 }
 
 func (x *DeleteDeploymentRequest) GetName() string {
@@ -5156,7 +5452,7 @@ type ListFlowsRequest struct {
 
 func (x *ListFlowsRequest) Reset() {
 	*x = ListFlowsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[70]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[73]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5168,7 +5464,7 @@ func (x *ListFlowsRequest) String() string {
 func (*ListFlowsRequest) ProtoMessage() {}
 
 func (x *ListFlowsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[70]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[73]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5181,7 +5477,7 @@ func (x *ListFlowsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFlowsRequest.ProtoReflect.Descriptor instead.
 func (*ListFlowsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{70}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{73}
 }
 
 func (x *ListFlowsRequest) GetPageSize() int32 {
@@ -5224,7 +5520,7 @@ type ListFlowsResponse struct {
 
 func (x *ListFlowsResponse) Reset() {
 	*x = ListFlowsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[71]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[74]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5236,7 +5532,7 @@ func (x *ListFlowsResponse) String() string {
 func (*ListFlowsResponse) ProtoMessage() {}
 
 func (x *ListFlowsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[71]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[74]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5249,7 +5545,7 @@ func (x *ListFlowsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFlowsResponse.ProtoReflect.Descriptor instead.
 func (*ListFlowsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{71}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{74}
 }
 
 func (x *ListFlowsResponse) GetFlows() []*Flow {
@@ -5276,7 +5572,7 @@ type GetFlowRequest struct {
 
 func (x *GetFlowRequest) Reset() {
 	*x = GetFlowRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[72]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[75]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5288,7 +5584,7 @@ func (x *GetFlowRequest) String() string {
 func (*GetFlowRequest) ProtoMessage() {}
 
 func (x *GetFlowRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[72]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[75]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5301,7 +5597,7 @@ func (x *GetFlowRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFlowRequest.ProtoReflect.Descriptor instead.
 func (*GetFlowRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{72}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{75}
 }
 
 func (x *GetFlowRequest) GetName() string {
@@ -5321,7 +5617,7 @@ type GetFlowResponse struct {
 
 func (x *GetFlowResponse) Reset() {
 	*x = GetFlowResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[73]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[76]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5333,7 +5629,7 @@ func (x *GetFlowResponse) String() string {
 func (*GetFlowResponse) ProtoMessage() {}
 
 func (x *GetFlowResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[73]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[76]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5346,7 +5642,7 @@ func (x *GetFlowResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFlowResponse.ProtoReflect.Descriptor instead.
 func (*GetFlowResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{73}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{76}
 }
 
 func (x *GetFlowResponse) GetFlow() *Flow {
@@ -5370,7 +5666,7 @@ type CreateFlowRequest struct {
 
 func (x *CreateFlowRequest) Reset() {
 	*x = CreateFlowRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[74]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[77]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5382,7 +5678,7 @@ func (x *CreateFlowRequest) String() string {
 func (*CreateFlowRequest) ProtoMessage() {}
 
 func (x *CreateFlowRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[74]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[77]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5395,7 +5691,7 @@ func (x *CreateFlowRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateFlowRequest.ProtoReflect.Descriptor instead.
 func (*CreateFlowRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{74}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{77}
 }
 
 func (x *CreateFlowRequest) GetParent() string {
@@ -5429,7 +5725,7 @@ type CreateFlowResponse struct {
 
 func (x *CreateFlowResponse) Reset() {
 	*x = CreateFlowResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[75]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[78]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5441,7 +5737,7 @@ func (x *CreateFlowResponse) String() string {
 func (*CreateFlowResponse) ProtoMessage() {}
 
 func (x *CreateFlowResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[75]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[78]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5454,7 +5750,7 @@ func (x *CreateFlowResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateFlowResponse.ProtoReflect.Descriptor instead.
 func (*CreateFlowResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{75}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{78}
 }
 
 func (x *CreateFlowResponse) GetFlow() *Flow {
@@ -5476,7 +5772,7 @@ type UpdateFlowRequest struct {
 
 func (x *UpdateFlowRequest) Reset() {
 	*x = UpdateFlowRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[76]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[79]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5488,7 +5784,7 @@ func (x *UpdateFlowRequest) String() string {
 func (*UpdateFlowRequest) ProtoMessage() {}
 
 func (x *UpdateFlowRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[76]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[79]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5501,7 +5797,7 @@ func (x *UpdateFlowRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateFlowRequest.ProtoReflect.Descriptor instead.
 func (*UpdateFlowRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{76}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{79}
 }
 
 func (x *UpdateFlowRequest) GetFlow() *Flow {
@@ -5528,7 +5824,7 @@ type UpdateFlowResponse struct {
 
 func (x *UpdateFlowResponse) Reset() {
 	*x = UpdateFlowResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[77]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[80]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5540,7 +5836,7 @@ func (x *UpdateFlowResponse) String() string {
 func (*UpdateFlowResponse) ProtoMessage() {}
 
 func (x *UpdateFlowResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[77]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[80]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5553,7 +5849,7 @@ func (x *UpdateFlowResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateFlowResponse.ProtoReflect.Descriptor instead.
 func (*UpdateFlowResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{77}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{80}
 }
 
 func (x *UpdateFlowResponse) GetFlow() *Flow {
@@ -5573,7 +5869,7 @@ type DeleteFlowRequest struct {
 
 func (x *DeleteFlowRequest) Reset() {
 	*x = DeleteFlowRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[78]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[81]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5585,7 +5881,7 @@ func (x *DeleteFlowRequest) String() string {
 func (*DeleteFlowRequest) ProtoMessage() {}
 
 func (x *DeleteFlowRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[78]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[81]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5598,7 +5894,7 @@ func (x *DeleteFlowRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFlowRequest.ProtoReflect.Descriptor instead.
 func (*DeleteFlowRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{78}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{81}
 }
 
 func (x *DeleteFlowRequest) GetName() string {
@@ -5616,7 +5912,7 @@ type DeleteFlowResponse struct {
 
 func (x *DeleteFlowResponse) Reset() {
 	*x = DeleteFlowResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[79]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[82]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5628,7 +5924,7 @@ func (x *DeleteFlowResponse) String() string {
 func (*DeleteFlowResponse) ProtoMessage() {}
 
 func (x *DeleteFlowResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[79]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[82]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5641,7 +5937,7 @@ func (x *DeleteFlowResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFlowResponse.ProtoReflect.Descriptor instead.
 func (*DeleteFlowResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{79}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{82}
 }
 
 type ListIntegrationsRequest struct {
@@ -5660,7 +5956,7 @@ type ListIntegrationsRequest struct {
 
 func (x *ListIntegrationsRequest) Reset() {
 	*x = ListIntegrationsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[80]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[83]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5672,7 +5968,7 @@ func (x *ListIntegrationsRequest) String() string {
 func (*ListIntegrationsRequest) ProtoMessage() {}
 
 func (x *ListIntegrationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[80]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[83]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5685,7 +5981,7 @@ func (x *ListIntegrationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListIntegrationsRequest.ProtoReflect.Descriptor instead.
 func (*ListIntegrationsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{80}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{83}
 }
 
 func (x *ListIntegrationsRequest) GetPageSize() int32 {
@@ -5726,7 +6022,7 @@ type ListIntegrationsResponse struct {
 
 func (x *ListIntegrationsResponse) Reset() {
 	*x = ListIntegrationsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[81]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[84]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5738,7 +6034,7 @@ func (x *ListIntegrationsResponse) String() string {
 func (*ListIntegrationsResponse) ProtoMessage() {}
 
 func (x *ListIntegrationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[81]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[84]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5751,7 +6047,7 @@ func (x *ListIntegrationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListIntegrationsResponse.ProtoReflect.Descriptor instead.
 func (*ListIntegrationsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{81}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{84}
 }
 
 func (x *ListIntegrationsResponse) GetIntegrations() []*Integration {
@@ -5780,7 +6076,7 @@ type GetIntegrationRequest struct {
 
 func (x *GetIntegrationRequest) Reset() {
 	*x = GetIntegrationRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[82]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[85]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5792,7 +6088,7 @@ func (x *GetIntegrationRequest) String() string {
 func (*GetIntegrationRequest) ProtoMessage() {}
 
 func (x *GetIntegrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[82]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[85]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5805,7 +6101,7 @@ func (x *GetIntegrationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetIntegrationRequest.ProtoReflect.Descriptor instead.
 func (*GetIntegrationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{82}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{85}
 }
 
 func (x *GetIntegrationRequest) GetName() string {
@@ -5825,7 +6121,7 @@ type GetIntegrationResponse struct {
 
 func (x *GetIntegrationResponse) Reset() {
 	*x = GetIntegrationResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[83]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[86]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5837,7 +6133,7 @@ func (x *GetIntegrationResponse) String() string {
 func (*GetIntegrationResponse) ProtoMessage() {}
 
 func (x *GetIntegrationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[83]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[86]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5850,7 +6146,7 @@ func (x *GetIntegrationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetIntegrationResponse.ProtoReflect.Descriptor instead.
 func (*GetIntegrationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{83}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{86}
 }
 
 func (x *GetIntegrationResponse) GetIntegration() *Integration {
@@ -5874,7 +6170,7 @@ type CreateIntegrationRequest struct {
 
 func (x *CreateIntegrationRequest) Reset() {
 	*x = CreateIntegrationRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[84]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[87]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5886,7 +6182,7 @@ func (x *CreateIntegrationRequest) String() string {
 func (*CreateIntegrationRequest) ProtoMessage() {}
 
 func (x *CreateIntegrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[84]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[87]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5899,7 +6195,7 @@ func (x *CreateIntegrationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateIntegrationRequest.ProtoReflect.Descriptor instead.
 func (*CreateIntegrationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{84}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{87}
 }
 
 func (x *CreateIntegrationRequest) GetParent() string {
@@ -5933,7 +6229,7 @@ type CreateIntegrationResponse struct {
 
 func (x *CreateIntegrationResponse) Reset() {
 	*x = CreateIntegrationResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[85]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[88]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5945,7 +6241,7 @@ func (x *CreateIntegrationResponse) String() string {
 func (*CreateIntegrationResponse) ProtoMessage() {}
 
 func (x *CreateIntegrationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[85]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[88]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5958,7 +6254,7 @@ func (x *CreateIntegrationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateIntegrationResponse.ProtoReflect.Descriptor instead.
 func (*CreateIntegrationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{85}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{88}
 }
 
 func (x *CreateIntegrationResponse) GetIntegration() *Integration {
@@ -5984,7 +6280,7 @@ type BuildIntegrationRequest struct {
 
 func (x *BuildIntegrationRequest) Reset() {
 	*x = BuildIntegrationRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[86]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[89]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5996,7 +6292,7 @@ func (x *BuildIntegrationRequest) String() string {
 func (*BuildIntegrationRequest) ProtoMessage() {}
 
 func (x *BuildIntegrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[86]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[89]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6009,7 +6305,7 @@ func (x *BuildIntegrationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BuildIntegrationRequest.ProtoReflect.Descriptor instead.
 func (*BuildIntegrationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{86}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{89}
 }
 
 func (x *BuildIntegrationRequest) GetName() string {
@@ -6052,7 +6348,7 @@ type BuildIntegrationResponse struct {
 
 func (x *BuildIntegrationResponse) Reset() {
 	*x = BuildIntegrationResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[87]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[90]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6064,7 +6360,7 @@ func (x *BuildIntegrationResponse) String() string {
 func (*BuildIntegrationResponse) ProtoMessage() {}
 
 func (x *BuildIntegrationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[87]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[90]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6077,7 +6373,7 @@ func (x *BuildIntegrationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BuildIntegrationResponse.ProtoReflect.Descriptor instead.
 func (*BuildIntegrationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{87}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{90}
 }
 
 func (x *BuildIntegrationResponse) GetIntegration() *Integration {
@@ -6106,7 +6402,7 @@ type UpdateIntegrationRequest struct {
 
 func (x *UpdateIntegrationRequest) Reset() {
 	*x = UpdateIntegrationRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[88]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[91]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6118,7 +6414,7 @@ func (x *UpdateIntegrationRequest) String() string {
 func (*UpdateIntegrationRequest) ProtoMessage() {}
 
 func (x *UpdateIntegrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[88]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[91]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6131,7 +6427,7 @@ func (x *UpdateIntegrationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateIntegrationRequest.ProtoReflect.Descriptor instead.
 func (*UpdateIntegrationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{88}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{91}
 }
 
 func (x *UpdateIntegrationRequest) GetIntegration() *Integration {
@@ -6158,7 +6454,7 @@ type UpdateIntegrationResponse struct {
 
 func (x *UpdateIntegrationResponse) Reset() {
 	*x = UpdateIntegrationResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[89]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[92]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6170,7 +6466,7 @@ func (x *UpdateIntegrationResponse) String() string {
 func (*UpdateIntegrationResponse) ProtoMessage() {}
 
 func (x *UpdateIntegrationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[89]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[92]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6183,7 +6479,7 @@ func (x *UpdateIntegrationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateIntegrationResponse.ProtoReflect.Descriptor instead.
 func (*UpdateIntegrationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{89}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{92}
 }
 
 func (x *UpdateIntegrationResponse) GetIntegration() *Integration {
@@ -6203,7 +6499,7 @@ type DeleteIntegrationRequest struct {
 
 func (x *DeleteIntegrationRequest) Reset() {
 	*x = DeleteIntegrationRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[90]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[93]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6215,7 +6511,7 @@ func (x *DeleteIntegrationRequest) String() string {
 func (*DeleteIntegrationRequest) ProtoMessage() {}
 
 func (x *DeleteIntegrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[90]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[93]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6228,7 +6524,7 @@ func (x *DeleteIntegrationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteIntegrationRequest.ProtoReflect.Descriptor instead.
 func (*DeleteIntegrationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{90}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{93}
 }
 
 func (x *DeleteIntegrationRequest) GetName() string {
@@ -6246,7 +6542,7 @@ type DeleteIntegrationResponse struct {
 
 func (x *DeleteIntegrationResponse) Reset() {
 	*x = DeleteIntegrationResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[91]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[94]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6258,7 +6554,7 @@ func (x *DeleteIntegrationResponse) String() string {
 func (*DeleteIntegrationResponse) ProtoMessage() {}
 
 func (x *DeleteIntegrationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[91]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[94]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6271,7 +6567,7 @@ func (x *DeleteIntegrationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteIntegrationResponse.ProtoReflect.Descriptor instead.
 func (*DeleteIntegrationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{91}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{94}
 }
 
 type GetTypeRequest struct {
@@ -6288,7 +6584,7 @@ type GetTypeRequest struct {
 
 func (x *GetTypeRequest) Reset() {
 	*x = GetTypeRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[92]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[95]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6300,7 +6596,7 @@ func (x *GetTypeRequest) String() string {
 func (*GetTypeRequest) ProtoMessage() {}
 
 func (x *GetTypeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[92]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[95]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6313,7 +6609,7 @@ func (x *GetTypeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTypeRequest.ProtoReflect.Descriptor instead.
 func (*GetTypeRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{92}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{95}
 }
 
 func (x *GetTypeRequest) GetName() string {
@@ -6333,7 +6629,7 @@ type GetTypeResponse struct {
 
 func (x *GetTypeResponse) Reset() {
 	*x = GetTypeResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[93]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[96]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6345,7 +6641,7 @@ func (x *GetTypeResponse) String() string {
 func (*GetTypeResponse) ProtoMessage() {}
 
 func (x *GetTypeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[93]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[96]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6358,7 +6654,7 @@ func (x *GetTypeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTypeResponse.ProtoReflect.Descriptor instead.
 func (*GetTypeResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{93}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{96}
 }
 
 func (x *GetTypeResponse) GetType() *Type {
@@ -6389,7 +6685,7 @@ type ListTypesRequest struct {
 
 func (x *ListTypesRequest) Reset() {
 	*x = ListTypesRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[94]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[97]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6401,7 +6697,7 @@ func (x *ListTypesRequest) String() string {
 func (*ListTypesRequest) ProtoMessage() {}
 
 func (x *ListTypesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[94]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[97]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6414,7 +6710,7 @@ func (x *ListTypesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTypesRequest.ProtoReflect.Descriptor instead.
 func (*ListTypesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{94}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{97}
 }
 
 func (x *ListTypesRequest) GetPageSize() int32 {
@@ -6457,7 +6753,7 @@ type ListTypesResponse struct {
 
 func (x *ListTypesResponse) Reset() {
 	*x = ListTypesResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[95]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[98]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6469,7 +6765,7 @@ func (x *ListTypesResponse) String() string {
 func (*ListTypesResponse) ProtoMessage() {}
 
 func (x *ListTypesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[95]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[98]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6482,7 +6778,7 @@ func (x *ListTypesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTypesResponse.ProtoReflect.Descriptor instead.
 func (*ListTypesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{95}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{98}
 }
 
 func (x *ListTypesResponse) GetTypes() []*Type {
@@ -6513,7 +6809,7 @@ type GetMethodRequest struct {
 
 func (x *GetMethodRequest) Reset() {
 	*x = GetMethodRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[96]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[99]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6525,7 +6821,7 @@ func (x *GetMethodRequest) String() string {
 func (*GetMethodRequest) ProtoMessage() {}
 
 func (x *GetMethodRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[96]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[99]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6538,7 +6834,7 @@ func (x *GetMethodRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMethodRequest.ProtoReflect.Descriptor instead.
 func (*GetMethodRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{96}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{99}
 }
 
 func (x *GetMethodRequest) GetName() string {
@@ -6558,7 +6854,7 @@ type GetMethodResponse struct {
 
 func (x *GetMethodResponse) Reset() {
 	*x = GetMethodResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[97]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[100]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6570,7 +6866,7 @@ func (x *GetMethodResponse) String() string {
 func (*GetMethodResponse) ProtoMessage() {}
 
 func (x *GetMethodResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[97]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[100]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6583,7 +6879,7 @@ func (x *GetMethodResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMethodResponse.ProtoReflect.Descriptor instead.
 func (*GetMethodResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{97}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{100}
 }
 
 func (x *GetMethodResponse) GetMethod() *Method {
@@ -6607,7 +6903,7 @@ type GetServiceRequest struct {
 
 func (x *GetServiceRequest) Reset() {
 	*x = GetServiceRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[98]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[101]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6619,7 +6915,7 @@ func (x *GetServiceRequest) String() string {
 func (*GetServiceRequest) ProtoMessage() {}
 
 func (x *GetServiceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[98]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[101]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6632,7 +6928,7 @@ func (x *GetServiceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetServiceRequest.ProtoReflect.Descriptor instead.
 func (*GetServiceRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{98}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{101}
 }
 
 func (x *GetServiceRequest) GetName() string {
@@ -6652,7 +6948,7 @@ type GetServiceResponse struct {
 
 func (x *GetServiceResponse) Reset() {
 	*x = GetServiceResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[99]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[102]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6664,7 +6960,7 @@ func (x *GetServiceResponse) String() string {
 func (*GetServiceResponse) ProtoMessage() {}
 
 func (x *GetServiceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[99]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[102]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6677,7 +6973,7 @@ func (x *GetServiceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetServiceResponse.ProtoReflect.Descriptor instead.
 func (*GetServiceResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{99}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{102}
 }
 
 func (x *GetServiceResponse) GetService() *Service {
@@ -6708,7 +7004,7 @@ type ListServicesRequest struct {
 
 func (x *ListServicesRequest) Reset() {
 	*x = ListServicesRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[100]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[103]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6720,7 +7016,7 @@ func (x *ListServicesRequest) String() string {
 func (*ListServicesRequest) ProtoMessage() {}
 
 func (x *ListServicesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[100]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[103]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6733,7 +7029,7 @@ func (x *ListServicesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListServicesRequest.ProtoReflect.Descriptor instead.
 func (*ListServicesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{100}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{103}
 }
 
 func (x *ListServicesRequest) GetPageSize() int32 {
@@ -6774,7 +7070,7 @@ type ListServicesResponse struct {
 
 func (x *ListServicesResponse) Reset() {
 	*x = ListServicesResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[101]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[104]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6786,7 +7082,7 @@ func (x *ListServicesResponse) String() string {
 func (*ListServicesResponse) ProtoMessage() {}
 
 func (x *ListServicesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[101]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[104]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6799,7 +7095,7 @@ func (x *ListServicesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListServicesResponse.ProtoReflect.Descriptor instead.
 func (*ListServicesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{101}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{104}
 }
 
 func (x *ListServicesResponse) GetServices() []*Service {
@@ -6837,7 +7133,7 @@ type ListMethodsRequest struct {
 
 func (x *ListMethodsRequest) Reset() {
 	*x = ListMethodsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[102]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[105]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6849,7 +7145,7 @@ func (x *ListMethodsRequest) String() string {
 func (*ListMethodsRequest) ProtoMessage() {}
 
 func (x *ListMethodsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[102]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[105]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6862,7 +7158,7 @@ func (x *ListMethodsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMethodsRequest.ProtoReflect.Descriptor instead.
 func (*ListMethodsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{102}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{105}
 }
 
 func (x *ListMethodsRequest) GetPageSize() int32 {
@@ -6903,7 +7199,7 @@ type ListMethodsResponse struct {
 
 func (x *ListMethodsResponse) Reset() {
 	*x = ListMethodsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[103]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[106]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6915,7 +7211,7 @@ func (x *ListMethodsResponse) String() string {
 func (*ListMethodsResponse) ProtoMessage() {}
 
 func (x *ListMethodsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[103]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[106]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6928,7 +7224,7 @@ func (x *ListMethodsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMethodsResponse.ProtoReflect.Descriptor instead.
 func (*ListMethodsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{103}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{106}
 }
 
 func (x *ListMethodsResponse) GetMethods() []*Method {
@@ -6960,7 +7256,7 @@ type Deployment_Build struct {
 
 func (x *Deployment_Build) Reset() {
 	*x = Deployment_Build{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[109]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[112]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6972,7 +7268,7 @@ func (x *Deployment_Build) String() string {
 func (*Deployment_Build) ProtoMessage() {}
 
 func (x *Deployment_Build) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[109]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[112]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7019,7 +7315,7 @@ type Deployment_Cloud struct {
 
 func (x *Deployment_Cloud) Reset() {
 	*x = Deployment_Cloud{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[110]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[113]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7031,7 +7327,7 @@ func (x *Deployment_Cloud) String() string {
 func (*Deployment_Cloud) ProtoMessage() {}
 
 func (x *Deployment_Cloud) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[110]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[113]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7074,7 +7370,7 @@ type Deployment_RuntimeMetadata struct {
 
 func (x *Deployment_RuntimeMetadata) Reset() {
 	*x = Deployment_RuntimeMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[111]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[114]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7086,7 +7382,7 @@ func (x *Deployment_RuntimeMetadata) String() string {
 func (*Deployment_RuntimeMetadata) ProtoMessage() {}
 
 func (x *Deployment_RuntimeMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[111]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[114]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7153,7 +7449,7 @@ type Deployment_RuntimeMetadata_Native struct {
 
 func (x *Deployment_RuntimeMetadata_Native) Reset() {
 	*x = Deployment_RuntimeMetadata_Native{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[112]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[115]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7165,7 +7461,7 @@ func (x *Deployment_RuntimeMetadata_Native) String() string {
 func (*Deployment_RuntimeMetadata_Native) ProtoMessage() {}
 
 func (x *Deployment_RuntimeMetadata_Native) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[112]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[115]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7198,7 +7494,7 @@ type Deployment_RuntimeMetadata_Docker struct {
 
 func (x *Deployment_RuntimeMetadata_Docker) Reset() {
 	*x = Deployment_RuntimeMetadata_Docker{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[113]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[116]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7210,7 +7506,7 @@ func (x *Deployment_RuntimeMetadata_Docker) String() string {
 func (*Deployment_RuntimeMetadata_Docker) ProtoMessage() {}
 
 func (x *Deployment_RuntimeMetadata_Docker) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[113]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[116]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7245,7 +7541,7 @@ type PackageBuildMetadata_Runtime struct {
 
 func (x *PackageBuildMetadata_Runtime) Reset() {
 	*x = PackageBuildMetadata_Runtime{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[114]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[117]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7257,7 +7553,7 @@ func (x *PackageBuildMetadata_Runtime) String() string {
 func (*PackageBuildMetadata_Runtime) ProtoMessage() {}
 
 func (x *PackageBuildMetadata_Runtime) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[114]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[117]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7270,7 +7566,7 @@ func (x *PackageBuildMetadata_Runtime) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PackageBuildMetadata_Runtime.ProtoReflect.Descriptor instead.
 func (*PackageBuildMetadata_Runtime) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{21, 0}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{22, 0}
 }
 
 func (x *PackageBuildMetadata_Runtime) GetVersion() isPackageBuildMetadata_Runtime_Version {
@@ -7311,7 +7607,7 @@ type PackageBuildMetadata_Platform struct {
 
 func (x *PackageBuildMetadata_Platform) Reset() {
 	*x = PackageBuildMetadata_Platform{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[115]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[118]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7323,7 +7619,7 @@ func (x *PackageBuildMetadata_Platform) String() string {
 func (*PackageBuildMetadata_Platform) ProtoMessage() {}
 
 func (x *PackageBuildMetadata_Platform) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[115]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[118]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7336,7 +7632,7 @@ func (x *PackageBuildMetadata_Platform) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PackageBuildMetadata_Platform.ProtoReflect.Descriptor instead.
 func (*PackageBuildMetadata_Platform) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{21, 1}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{22, 1}
 }
 
 func (x *PackageBuildMetadata_Platform) GetVersion() isPackageBuildMetadata_Platform_Version {
@@ -7376,7 +7672,7 @@ type SendAutomationEvent_InputsEvent struct {
 
 func (x *SendAutomationEvent_InputsEvent) Reset() {
 	*x = SendAutomationEvent_InputsEvent{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[118]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[121]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7388,7 +7684,7 @@ func (x *SendAutomationEvent_InputsEvent) String() string {
 func (*SendAutomationEvent_InputsEvent) ProtoMessage() {}
 
 func (x *SendAutomationEvent_InputsEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[118]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[121]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7401,7 +7697,7 @@ func (x *SendAutomationEvent_InputsEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendAutomationEvent_InputsEvent.ProtoReflect.Descriptor instead.
 func (*SendAutomationEvent_InputsEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{40, 0}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{43, 0}
 }
 
 func (x *SendAutomationEvent_InputsEvent) GetValues() map[string]*anypb.Any {
@@ -7424,7 +7720,7 @@ type SendAutomationEvent_UserResponseEvent struct {
 
 func (x *SendAutomationEvent_UserResponseEvent) Reset() {
 	*x = SendAutomationEvent_UserResponseEvent{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[119]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[122]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7436,7 +7732,7 @@ func (x *SendAutomationEvent_UserResponseEvent) String() string {
 func (*SendAutomationEvent_UserResponseEvent) ProtoMessage() {}
 
 func (x *SendAutomationEvent_UserResponseEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[119]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[122]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7449,7 +7745,7 @@ func (x *SendAutomationEvent_UserResponseEvent) ProtoReflect() protoreflect.Mess
 
 // Deprecated: Use SendAutomationEvent_UserResponseEvent.ProtoReflect.Descriptor instead.
 func (*SendAutomationEvent_UserResponseEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{40, 1}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{43, 1}
 }
 
 func (x *SendAutomationEvent_UserResponseEvent) GetId() string {
@@ -7477,7 +7773,7 @@ type ReceiveAutomationEvent_OutputsEvent struct {
 
 func (x *ReceiveAutomationEvent_OutputsEvent) Reset() {
 	*x = ReceiveAutomationEvent_OutputsEvent{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[122]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[125]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7489,7 +7785,7 @@ func (x *ReceiveAutomationEvent_OutputsEvent) String() string {
 func (*ReceiveAutomationEvent_OutputsEvent) ProtoMessage() {}
 
 func (x *ReceiveAutomationEvent_OutputsEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[122]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[125]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7502,7 +7798,7 @@ func (x *ReceiveAutomationEvent_OutputsEvent) ProtoReflect() protoreflect.Messag
 
 // Deprecated: Use ReceiveAutomationEvent_OutputsEvent.ProtoReflect.Descriptor instead.
 func (*ReceiveAutomationEvent_OutputsEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{41, 0}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{44, 0}
 }
 
 func (x *ReceiveAutomationEvent_OutputsEvent) GetValues() map[string]*anypb.Any {
@@ -7525,7 +7821,7 @@ type ReceiveAutomationEvent_UserRequestEvent struct {
 
 func (x *ReceiveAutomationEvent_UserRequestEvent) Reset() {
 	*x = ReceiveAutomationEvent_UserRequestEvent{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[123]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[126]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7537,7 +7833,7 @@ func (x *ReceiveAutomationEvent_UserRequestEvent) String() string {
 func (*ReceiveAutomationEvent_UserRequestEvent) ProtoMessage() {}
 
 func (x *ReceiveAutomationEvent_UserRequestEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[123]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[126]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7550,7 +7846,7 @@ func (x *ReceiveAutomationEvent_UserRequestEvent) ProtoReflect() protoreflect.Me
 
 // Deprecated: Use ReceiveAutomationEvent_UserRequestEvent.ProtoReflect.Descriptor instead.
 func (*ReceiveAutomationEvent_UserRequestEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{41, 1}
+	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{44, 1}
 }
 
 func (x *ReceiveAutomationEvent_UserRequestEvent) GetId() string {
@@ -7602,23 +7898,24 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\tencrypted\x18\n" +
 	" \x01(\v2\x1a.dtkt.core.v1.EncryptedAnyB\x03\x80\x01\x01H\x00R\tencrypted\x129\n" +
 	"\tdecrypted\x18\v \x01(\v2\x14.google.protobuf.AnyB\x03\x80\x01\x01H\x00R\tdecryptedB\r\n" +
-	"\x04data\x12\x05\xbaH\x02\b\x01\"\xfb\b\n" +
+	"\x04data\x12\x05\xbaH\x02\b\x01\"\xf7\t\n" +
 	"\n" +
 	"Automation\x12#\n" +
 	"\x04name\x18\x01 \x01(\tB\x0f\xe0A\b\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x04name\x12&\n" +
-	"\x03uid\x18\x02 \x01(\tB\x14\xe0A\x03\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01\x82\xb5\x18\x02\x18\x01R\x03uid\x12\x9a\x01\n" +
-	"\x04flow\x18\x03 \x01(\tB\x85\x01\xfaA\x06\n" +
+	"\x03uid\x18\x02 \x01(\tB\x14\xe0A\x03\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01\x82\xb5\x18\x02\x18\x01R\x03uid\x12D\n" +
+	"\x05state\x18\x03 \x01(\x0e2\x1e.dtkt.core.v1.Automation.StateB\x0e\xe0A\x03\xbaH\b\xc8\x01\x01\x82\x01\x02\x10\x01R\x05state\x12F\n" +
+	"\aruntime\x18\x04 \x01(\v2!.dtkt.core.v1.FlowRuntimeMetadataB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\aruntime\x12\x9a\x01\n" +
+	"\x04flow\x18\x05 \x01(\tB\x85\x01\xfaA\x06\n" +
 	"\x04Flow\xbaH\x03\xc8\x01\x01\x82\xb5\x18r\n" +
 	"\x04Flow\x12\x0eSelect a flow.:Z\n" +
 	"\"dtkt.core.v1.FlowService.ListFlows\x12\x19this.flows.map(i, i.name)\x1a\x19this.flows.map(i, i.name)R\x04flow\x12,\n" +
-	"\tspec_etag\x18\x04 \x01(\tB\x0f\xe0A\x04\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\bspecEtag\x12F\n" +
-	"\aruntime\x18\x05 \x01(\v2!.dtkt.core.v1.FlowRuntimeMetadataB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\aruntime\x12C\n" +
-	"\x06groups\x18\x06 \x01(\v2 .dtkt.core.v1.FlowGroupsMetadataB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\x06groups\x12K\n" +
+	"\tspec_etag\x18\x06 \x01(\tB\x0f\xe0A\x04\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\bspecEtag\x12K\n" +
 	"\vconnections\x18\a \x03(\v2).dtkt.core.v1.Automation.ConnectionsEntryR\vconnections\x12<\n" +
 	"\x06inputs\x18\b \x03(\v2$.dtkt.core.v1.Automation.InputsEntryR\x06inputs\x123\n" +
 	"\atimeout\x18\t \x01(\v2\x19.google.protobuf.DurationR\atimeout\x12!\n" +
 	"\x05batch\x18\n" +
-	" \x01(\tB\x06\x82\xb5\x18\x02\x18\x01H\x00R\x05batch\x88\x01\x01\x12L\n" +
+	" \x01(\tB\x06\x82\xb5\x18\x02\x18\x01H\x00R\x05batch\x88\x01\x01\x12&\n" +
+	"\x04etag\x18\x0f \x01(\tB\x12\xe0A\x03\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01\x80\x01\x01R\x04etag\x12L\n" +
 	"\vcreate_time\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampB\x0f\xe0A\x03\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\n" +
 	"createTime\x12L\n" +
 	"\vupdate_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampB\x0f\xe0A\x03\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\n" +
@@ -7628,7 +7925,14 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\v2$.dtkt.core.v1.FlowConnectionMetadataR\x05value:\x028\x01\x1aO\n" +
 	"\vInputsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12*\n" +
-	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyR\x05value:\x028\x01:\x87\x01\xeaA\x83\x01\n" +
+	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyR\x05value:\x028\x01\"Q\n" +
+	"\x05State\x12\x15\n" +
+	"\x11STATE_UNSPECIFIED\x10\x00\x12\v\n" +
+	"\aPENDING\x10\x01\x12\v\n" +
+	"\aRUNNING\x10\x02\x12\v\n" +
+	"\aSTOPPED\x10\x03\x12\n" +
+	"\n" +
+	"\x06FAILED\x10\x04:\x87\x01\xeaA\x83\x01\n" +
 	"\n" +
 	"Automation\x125organizations/{organization}/automations/{automation}\x12%users/{user}/automations/{automation}*\vautomations2\n" +
 	"automationB\b\n" +
@@ -7644,7 +7948,7 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"createTime\x12F\n" +
 	"\vupdate_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\n" +
 	"updateTime:\\\xeaAY\n" +
-	"\x04Flow\x12)organizations/{organization}/flows/{flow}\x12\x19users/{user}/flows/{flow}*\x05flows2\x04flow\"\xb4\r\n" +
+	"\x04Flow\x12)organizations/{organization}/flows/{flow}\x12\x19users/{user}/flows/{flow}*\x05flows2\x04flow\"\xd3\x0e\n" +
 	"\n" +
 	"Connection\x12#\n" +
 	"\x04name\x18\x01 \x01(\tB\x0f\xe0A\b\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x04name\x12&\n" +
@@ -7671,7 +7975,10 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\n" +
 	"config_gen\x18\f \x01(\x04B\f\xe0A\x03\x82\xb5\x18\x02\x18\x01\x80\x01\x01R\tconfigGen\x12O\n" +
 	"\n" +
-	"config_uri\x18\r \x01(\tB0\xe0A\x04\xbaH\b\xd8\x01\x01r\x03\x88\x01\x01\x82\xb5\x18\x1e\x12\x1aConfig data URI (optional)2\x00R\tconfigUri\x12D\n" +
+	"config_uri\x18\r \x01(\tB0\xe0A\x04\xbaH\b\xd8\x01\x01r\x03\x88\x01\x01\x82\xb5\x18\x1e\x12\x1aConfig data URI (optional)2\x00R\tconfigUri\x12E\n" +
+	"\x0edecrypted_auth\x18\t \x01(\v2\x14.google.protobuf.AnyB\x06\xe0A\x04\x80\x01\x01H\x02R\rdecryptedAuth\x12N\n" +
+	"\x0eencrypted_auth\x18\n" +
+	" \x01(\v2\x1a.dtkt.core.v1.EncryptedAnyB\t\xe0A\x03\x82\xb5\x18\x02\x18\x01H\x02R\rencryptedAuth\x12D\n" +
 	"\aheaders\x18\x0e \x03(\v2%.dtkt.core.v1.Connection.HeadersEntryB\x03\x80\x01\x01R\aheaders\x12L\n" +
 	"\vcreate_time\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampB\x0f\xe0A\x03\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\n" +
 	"createTime\x12L\n" +
@@ -7684,7 +7991,8 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"Connection\x125organizations/{organization}/connections/{connection}\x12%users/{user}/connections/{connection}*\vconnections2\n" +
 	"connection\xbaH\x85\x02*](has(this.custom_protos) || has(this.custom_grpc)) ? has(this.address) : has(this.deployment)*Vhas(this.deployment) ? has(this.decrypted_config) || has(this.encrypted_config) : true*Lhas(this.headers) ? has(this.custom_protos) || has(this.custom_grpc) : falseB\r\n" +
 	"\x04type\x12\x05\xbaH\x02\b\x01B\b\n" +
-	"\x06config\"\xc7\x0f\n" +
+	"\x06configB\x06\n" +
+	"\x04auth\"\xc7\x0f\n" +
 	"\n" +
 	"Deployment\x12#\n" +
 	"\x04name\x18\x01 \x01(\tB\x0f\xe0A\b\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x04name\x12&\n" +
@@ -7806,6 +8114,12 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"TypeSchema\x12;\n" +
 	"\av1beta1\x18\x01 \x01(\v2\x1f.dtkt.shared.v1beta1.TypeSchemaH\x00R\av1beta1B\x10\n" +
 	"\aversion\x12\x05\xbaH\x02\b\x01\"\xa2\x01\n" +
+	"\x12AutomationMetadata\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\x129\n" +
+	"\n" +
+	"start_time\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x127\n" +
+	"\tstop_time\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\bstopTime\"\xa2\x01\n" +
 	"\x12DeploymentMetadata\x12\x18\n" +
 	"\amessage\x18\n" +
 	" \x01(\tR\amessage\x129\n" +
@@ -7929,7 +8243,19 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\x18CreateAutomationResponse\x12@\n" +
 	"\n" +
 	"automation\x18\x01 \x01(\v2\x18.dtkt.core.v1.AutomationB\x06\xbaH\x03\xc8\x01\x01R\n" +
-	"automation\"\xb1\x02\n" +
+	"automation\"\x80\x02\n" +
+	"\x17UpdateAutomationRequest\x12@\n" +
+	"\n" +
+	"automation\x18\x01 \x01(\v2\x18.dtkt.core.v1.AutomationB\x06\xbaH\x03\xc8\x01\x01R\n" +
+	"automation\x12;\n" +
+	"\vupdate_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
+	"updateMask\x12T\n" +
+	"\rdesired_state\x18\x03 \x01(\x0e2\x1e.dtkt.core.v1.Automation.StateB\n" +
+	"\xbaH\a\x82\x01\x04\x18\x02\x18\x03H\x00R\fdesiredState\x88\x01\x01B\x10\n" +
+	"\x0e_desired_state\"Q\n" +
+	"\x17DeleteAutomationRequest\x12\x1a\n" +
+	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12\x1a\n" +
+	"\x04etag\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04etag\"\xb1\x02\n" +
 	"\x1dBatchCreateAutomationsRequest\x12$\n" +
 	"\x06parent\x18\x01 \x01(\tB\f\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x06parent\x12K\n" +
 	"\brequests\x18\x02 \x03(\v2%.dtkt.core.v1.CreateAutomationRequestB\b\xbaH\x05\x92\x01\x02\b\x02R\brequests:\x9c\x01\xbaH\x98\x01\x1a\x95\x01\n" +
@@ -8206,310 +8532,321 @@ func file_dtkt_core_v1_messages_proto_rawDescGZIP() []byte {
 	return file_dtkt_core_v1_messages_proto_rawDescData
 }
 
-var file_dtkt_core_v1_messages_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_dtkt_core_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 125)
+var file_dtkt_core_v1_messages_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
+var file_dtkt_core_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 128)
 var file_dtkt_core_v1_messages_proto_goTypes = []any{
 	(Auth_AuthMethod)(0),                          // 0: dtkt.core.v1.Auth.AuthMethod
-	(Deployment_State)(0),                         // 1: dtkt.core.v1.Deployment.State
-	(BuildOperationMetadata_State)(0),             // 2: dtkt.core.v1.BuildOperationMetadata.State
-	(RunOperationMetadata_State)(0),               // 3: dtkt.core.v1.RunOperationMetadata.State
-	(SyncOperationMetadata_State)(0),              // 4: dtkt.core.v1.SyncOperationMetadata.State
-	(DialMetadata_State)(0),                       // 5: dtkt.core.v1.DialMetadata.State
-	(*Address)(nil),                               // 6: dtkt.core.v1.Address
-	(*Auth)(nil),                                  // 7: dtkt.core.v1.Auth
-	(*Context)(nil),                               // 8: dtkt.core.v1.Context
-	(*Resource)(nil),                              // 9: dtkt.core.v1.Resource
-	(*Automation)(nil),                            // 10: dtkt.core.v1.Automation
-	(*Flow)(nil),                                  // 11: dtkt.core.v1.Flow
-	(*Connection)(nil),                            // 12: dtkt.core.v1.Connection
-	(*Deployment)(nil),                            // 13: dtkt.core.v1.Deployment
-	(*Integration)(nil),                           // 14: dtkt.core.v1.Integration
-	(*File)(nil),                                  // 15: dtkt.core.v1.File
-	(*Service)(nil),                               // 16: dtkt.core.v1.Service
-	(*Method)(nil),                                // 17: dtkt.core.v1.Method
-	(*Type)(nil),                                  // 18: dtkt.core.v1.Type
-	(*TypeSchema)(nil),                            // 19: dtkt.core.v1.TypeSchema
-	(*DeploymentMetadata)(nil),                    // 20: dtkt.core.v1.DeploymentMetadata
-	(*FlowConnectionMetadata)(nil),                // 21: dtkt.core.v1.FlowConnectionMetadata
-	(*FlowRuntimeMetadata)(nil),                   // 22: dtkt.core.v1.FlowRuntimeMetadata
-	(*FlowGroupsMetadata)(nil),                    // 23: dtkt.core.v1.FlowGroupsMetadata
-	(*FlowSpecMetadata)(nil),                      // 24: dtkt.core.v1.FlowSpecMetadata
-	(*FlowGraphMetadata)(nil),                     // 25: dtkt.core.v1.FlowGraphMetadata
-	(*PackageSpecMetadata)(nil),                   // 26: dtkt.core.v1.PackageSpecMetadata
-	(*PackageBuildMetadata)(nil),                  // 27: dtkt.core.v1.PackageBuildMetadata
-	(*BuildOperationMetadata)(nil),                // 28: dtkt.core.v1.BuildOperationMetadata
-	(*RunOperationMetadata)(nil),                  // 29: dtkt.core.v1.RunOperationMetadata
-	(*SyncOperationMetadata)(nil),                 // 30: dtkt.core.v1.SyncOperationMetadata
-	(*DialMetadata)(nil),                          // 31: dtkt.core.v1.DialMetadata
-	(*BatchRunOperationMetadata)(nil),             // 32: dtkt.core.v1.BatchRunOperationMetadata
-	(*EncryptedAny)(nil),                          // 33: dtkt.core.v1.EncryptedAny
-	(*EncryptRequest)(nil),                        // 34: dtkt.core.v1.EncryptRequest
-	(*EncryptResponse)(nil),                       // 35: dtkt.core.v1.EncryptResponse
-	(*DecryptRequest)(nil),                        // 36: dtkt.core.v1.DecryptRequest
-	(*DecryptResponse)(nil),                       // 37: dtkt.core.v1.DecryptResponse
-	(*GetAutomationRequest)(nil),                  // 38: dtkt.core.v1.GetAutomationRequest
-	(*GetAutomationResponse)(nil),                 // 39: dtkt.core.v1.GetAutomationResponse
-	(*CreateAutomationRequest)(nil),               // 40: dtkt.core.v1.CreateAutomationRequest
-	(*CreateAutomationResponse)(nil),              // 41: dtkt.core.v1.CreateAutomationResponse
-	(*BatchCreateAutomationsRequest)(nil),         // 42: dtkt.core.v1.BatchCreateAutomationsRequest
-	(*BatchCreateAutomationsResponse)(nil),        // 43: dtkt.core.v1.BatchCreateAutomationsResponse
-	(*ListAutomationsRequest)(nil),                // 44: dtkt.core.v1.ListAutomationsRequest
-	(*ListAutomationsResponse)(nil),               // 45: dtkt.core.v1.ListAutomationsResponse
-	(*SendAutomationEvent)(nil),                   // 46: dtkt.core.v1.SendAutomationEvent
-	(*ReceiveAutomationEvent)(nil),                // 47: dtkt.core.v1.ReceiveAutomationEvent
-	(*SendAutomationEventRequest)(nil),            // 48: dtkt.core.v1.SendAutomationEventRequest
-	(*ReceiveAutomationEventsRequest)(nil),        // 49: dtkt.core.v1.ReceiveAutomationEventsRequest
-	(*ReceiveAutomationEventsResponse)(nil),       // 50: dtkt.core.v1.ReceiveAutomationEventsResponse
-	(*StreamAutomationEventsRequest)(nil),         // 51: dtkt.core.v1.StreamAutomationEventsRequest
-	(*StreamAutomationEventsResponse)(nil),        // 52: dtkt.core.v1.StreamAutomationEventsResponse
-	(*ListConnectionsRequest)(nil),                // 53: dtkt.core.v1.ListConnectionsRequest
-	(*ListConnectionsResponse)(nil),               // 54: dtkt.core.v1.ListConnectionsResponse
-	(*GetConnectionRequest)(nil),                  // 55: dtkt.core.v1.GetConnectionRequest
-	(*GetConnectionResponse)(nil),                 // 56: dtkt.core.v1.GetConnectionResponse
-	(*CreateConnectionRequest)(nil),               // 57: dtkt.core.v1.CreateConnectionRequest
-	(*CreateConnectionResponse)(nil),              // 58: dtkt.core.v1.CreateConnectionResponse
-	(*UpdateConnectionRequest)(nil),               // 59: dtkt.core.v1.UpdateConnectionRequest
-	(*UpdateConnectionResponse)(nil),              // 60: dtkt.core.v1.UpdateConnectionResponse
-	(*DeleteConnectionRequest)(nil),               // 61: dtkt.core.v1.DeleteConnectionRequest
-	(*DeleteConnectionResponse)(nil),              // 62: dtkt.core.v1.DeleteConnectionResponse
-	(*DialConnectionRequest)(nil),                 // 63: dtkt.core.v1.DialConnectionRequest
-	(*DialConnectionResponse)(nil),                // 64: dtkt.core.v1.DialConnectionResponse
-	(*SyncDescriptorsRequest)(nil),                // 65: dtkt.core.v1.SyncDescriptorsRequest
-	(*SyncDescriptorsResponse)(nil),               // 66: dtkt.core.v1.SyncDescriptorsResponse
-	(*GetDescriptorsRequest)(nil),                 // 67: dtkt.core.v1.GetDescriptorsRequest
-	(*GetDescriptorsResponse)(nil),                // 68: dtkt.core.v1.GetDescriptorsResponse
-	(*ListDeploymentsRequest)(nil),                // 69: dtkt.core.v1.ListDeploymentsRequest
-	(*ListDeploymentsResponse)(nil),               // 70: dtkt.core.v1.ListDeploymentsResponse
-	(*GetDeploymentRequest)(nil),                  // 71: dtkt.core.v1.GetDeploymentRequest
-	(*GetDeploymentResponse)(nil),                 // 72: dtkt.core.v1.GetDeploymentResponse
-	(*CreateDeploymentRequest)(nil),               // 73: dtkt.core.v1.CreateDeploymentRequest
-	(*UpdateDeploymentRequest)(nil),               // 74: dtkt.core.v1.UpdateDeploymentRequest
-	(*DeleteDeploymentRequest)(nil),               // 75: dtkt.core.v1.DeleteDeploymentRequest
-	(*ListFlowsRequest)(nil),                      // 76: dtkt.core.v1.ListFlowsRequest
-	(*ListFlowsResponse)(nil),                     // 77: dtkt.core.v1.ListFlowsResponse
-	(*GetFlowRequest)(nil),                        // 78: dtkt.core.v1.GetFlowRequest
-	(*GetFlowResponse)(nil),                       // 79: dtkt.core.v1.GetFlowResponse
-	(*CreateFlowRequest)(nil),                     // 80: dtkt.core.v1.CreateFlowRequest
-	(*CreateFlowResponse)(nil),                    // 81: dtkt.core.v1.CreateFlowResponse
-	(*UpdateFlowRequest)(nil),                     // 82: dtkt.core.v1.UpdateFlowRequest
-	(*UpdateFlowResponse)(nil),                    // 83: dtkt.core.v1.UpdateFlowResponse
-	(*DeleteFlowRequest)(nil),                     // 84: dtkt.core.v1.DeleteFlowRequest
-	(*DeleteFlowResponse)(nil),                    // 85: dtkt.core.v1.DeleteFlowResponse
-	(*ListIntegrationsRequest)(nil),               // 86: dtkt.core.v1.ListIntegrationsRequest
-	(*ListIntegrationsResponse)(nil),              // 87: dtkt.core.v1.ListIntegrationsResponse
-	(*GetIntegrationRequest)(nil),                 // 88: dtkt.core.v1.GetIntegrationRequest
-	(*GetIntegrationResponse)(nil),                // 89: dtkt.core.v1.GetIntegrationResponse
-	(*CreateIntegrationRequest)(nil),              // 90: dtkt.core.v1.CreateIntegrationRequest
-	(*CreateIntegrationResponse)(nil),             // 91: dtkt.core.v1.CreateIntegrationResponse
-	(*BuildIntegrationRequest)(nil),               // 92: dtkt.core.v1.BuildIntegrationRequest
-	(*BuildIntegrationResponse)(nil),              // 93: dtkt.core.v1.BuildIntegrationResponse
-	(*UpdateIntegrationRequest)(nil),              // 94: dtkt.core.v1.UpdateIntegrationRequest
-	(*UpdateIntegrationResponse)(nil),             // 95: dtkt.core.v1.UpdateIntegrationResponse
-	(*DeleteIntegrationRequest)(nil),              // 96: dtkt.core.v1.DeleteIntegrationRequest
-	(*DeleteIntegrationResponse)(nil),             // 97: dtkt.core.v1.DeleteIntegrationResponse
-	(*GetTypeRequest)(nil),                        // 98: dtkt.core.v1.GetTypeRequest
-	(*GetTypeResponse)(nil),                       // 99: dtkt.core.v1.GetTypeResponse
-	(*ListTypesRequest)(nil),                      // 100: dtkt.core.v1.ListTypesRequest
-	(*ListTypesResponse)(nil),                     // 101: dtkt.core.v1.ListTypesResponse
-	(*GetMethodRequest)(nil),                      // 102: dtkt.core.v1.GetMethodRequest
-	(*GetMethodResponse)(nil),                     // 103: dtkt.core.v1.GetMethodResponse
-	(*GetServiceRequest)(nil),                     // 104: dtkt.core.v1.GetServiceRequest
-	(*GetServiceResponse)(nil),                    // 105: dtkt.core.v1.GetServiceResponse
-	(*ListServicesRequest)(nil),                   // 106: dtkt.core.v1.ListServicesRequest
-	(*ListServicesResponse)(nil),                  // 107: dtkt.core.v1.ListServicesResponse
-	(*ListMethodsRequest)(nil),                    // 108: dtkt.core.v1.ListMethodsRequest
-	(*ListMethodsResponse)(nil),                   // 109: dtkt.core.v1.ListMethodsResponse
-	nil,                                           // 110: dtkt.core.v1.Automation.ConnectionsEntry
-	nil,                                           // 111: dtkt.core.v1.Automation.InputsEntry
-	nil,                                           // 112: dtkt.core.v1.Connection.HeadersEntry
-	nil,                                           // 113: dtkt.core.v1.Deployment.EnvEntry
-	nil,                                           // 114: dtkt.core.v1.Deployment.PortsEntry
-	(*Deployment_Build)(nil),                      // 115: dtkt.core.v1.Deployment.Build
-	(*Deployment_Cloud)(nil),                      // 116: dtkt.core.v1.Deployment.Cloud
-	(*Deployment_RuntimeMetadata)(nil),            // 117: dtkt.core.v1.Deployment.RuntimeMetadata
-	(*Deployment_RuntimeMetadata_Native)(nil),     // 118: dtkt.core.v1.Deployment.RuntimeMetadata.Native
-	(*Deployment_RuntimeMetadata_Docker)(nil),     // 119: dtkt.core.v1.Deployment.RuntimeMetadata.Docker
-	(*PackageBuildMetadata_Runtime)(nil),          // 120: dtkt.core.v1.PackageBuildMetadata.Runtime
-	(*PackageBuildMetadata_Platform)(nil),         // 121: dtkt.core.v1.PackageBuildMetadata.Platform
-	nil,                                           // 122: dtkt.core.v1.PackageBuildMetadata.EnvEntry
-	nil,                                           // 123: dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry
-	(*SendAutomationEvent_InputsEvent)(nil),       // 124: dtkt.core.v1.SendAutomationEvent.InputsEvent
-	(*SendAutomationEvent_UserResponseEvent)(nil), // 125: dtkt.core.v1.SendAutomationEvent.UserResponseEvent
-	nil, // 126: dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry
-	nil, // 127: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry
-	(*ReceiveAutomationEvent_OutputsEvent)(nil),     // 128: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent
-	(*ReceiveAutomationEvent_UserRequestEvent)(nil), // 129: dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent
-	nil,                                    // 130: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry
-	(*timestamppb.Timestamp)(nil),          // 131: google.protobuf.Timestamp
-	(*anypb.Any)(nil),                      // 132: google.protobuf.Any
-	(*durationpb.Duration)(nil),            // 133: google.protobuf.Duration
-	(*descriptorpb.FileDescriptorSet)(nil), // 134: google.protobuf.FileDescriptorSet
-	(*v1beta1.TypeSchema)(nil),             // 135: dtkt.shared.v1beta1.TypeSchema
-	(*v1beta11.Runtime)(nil),               // 136: dtkt.flow.v1beta1.Runtime
-	(*v1beta11.Groups)(nil),                // 137: dtkt.flow.v1beta1.Groups
-	(*v1beta11.Flow)(nil),                  // 138: dtkt.flow.v1beta1.Flow
-	(*v1beta11.Graph)(nil),                 // 139: dtkt.flow.v1beta1.Graph
-	(*v1beta1.Package)(nil),                // 140: dtkt.shared.v1beta1.Package
-	(*fieldmaskpb.FieldMask)(nil),          // 141: google.protobuf.FieldMask
-	(v1beta1.Runtime)(0),                   // 142: dtkt.shared.v1beta1.Runtime
-	(*v1beta1.Platform)(nil),               // 143: dtkt.shared.v1beta1.Platform
-	(*status.Status)(nil),                  // 144: google.rpc.Status
-	(*v1beta11.UserAction)(nil),            // 145: dtkt.flow.v1beta1.UserAction
+	(Automation_State)(0),                         // 1: dtkt.core.v1.Automation.State
+	(Deployment_State)(0),                         // 2: dtkt.core.v1.Deployment.State
+	(BuildOperationMetadata_State)(0),             // 3: dtkt.core.v1.BuildOperationMetadata.State
+	(RunOperationMetadata_State)(0),               // 4: dtkt.core.v1.RunOperationMetadata.State
+	(SyncOperationMetadata_State)(0),              // 5: dtkt.core.v1.SyncOperationMetadata.State
+	(DialMetadata_State)(0),                       // 6: dtkt.core.v1.DialMetadata.State
+	(*Address)(nil),                               // 7: dtkt.core.v1.Address
+	(*Auth)(nil),                                  // 8: dtkt.core.v1.Auth
+	(*Context)(nil),                               // 9: dtkt.core.v1.Context
+	(*Resource)(nil),                              // 10: dtkt.core.v1.Resource
+	(*Automation)(nil),                            // 11: dtkt.core.v1.Automation
+	(*Flow)(nil),                                  // 12: dtkt.core.v1.Flow
+	(*Connection)(nil),                            // 13: dtkt.core.v1.Connection
+	(*Deployment)(nil),                            // 14: dtkt.core.v1.Deployment
+	(*Integration)(nil),                           // 15: dtkt.core.v1.Integration
+	(*File)(nil),                                  // 16: dtkt.core.v1.File
+	(*Service)(nil),                               // 17: dtkt.core.v1.Service
+	(*Method)(nil),                                // 18: dtkt.core.v1.Method
+	(*Type)(nil),                                  // 19: dtkt.core.v1.Type
+	(*TypeSchema)(nil),                            // 20: dtkt.core.v1.TypeSchema
+	(*AutomationMetadata)(nil),                    // 21: dtkt.core.v1.AutomationMetadata
+	(*DeploymentMetadata)(nil),                    // 22: dtkt.core.v1.DeploymentMetadata
+	(*FlowConnectionMetadata)(nil),                // 23: dtkt.core.v1.FlowConnectionMetadata
+	(*FlowRuntimeMetadata)(nil),                   // 24: dtkt.core.v1.FlowRuntimeMetadata
+	(*FlowGroupsMetadata)(nil),                    // 25: dtkt.core.v1.FlowGroupsMetadata
+	(*FlowSpecMetadata)(nil),                      // 26: dtkt.core.v1.FlowSpecMetadata
+	(*FlowGraphMetadata)(nil),                     // 27: dtkt.core.v1.FlowGraphMetadata
+	(*PackageSpecMetadata)(nil),                   // 28: dtkt.core.v1.PackageSpecMetadata
+	(*PackageBuildMetadata)(nil),                  // 29: dtkt.core.v1.PackageBuildMetadata
+	(*BuildOperationMetadata)(nil),                // 30: dtkt.core.v1.BuildOperationMetadata
+	(*RunOperationMetadata)(nil),                  // 31: dtkt.core.v1.RunOperationMetadata
+	(*SyncOperationMetadata)(nil),                 // 32: dtkt.core.v1.SyncOperationMetadata
+	(*DialMetadata)(nil),                          // 33: dtkt.core.v1.DialMetadata
+	(*BatchRunOperationMetadata)(nil),             // 34: dtkt.core.v1.BatchRunOperationMetadata
+	(*EncryptedAny)(nil),                          // 35: dtkt.core.v1.EncryptedAny
+	(*EncryptRequest)(nil),                        // 36: dtkt.core.v1.EncryptRequest
+	(*EncryptResponse)(nil),                       // 37: dtkt.core.v1.EncryptResponse
+	(*DecryptRequest)(nil),                        // 38: dtkt.core.v1.DecryptRequest
+	(*DecryptResponse)(nil),                       // 39: dtkt.core.v1.DecryptResponse
+	(*GetAutomationRequest)(nil),                  // 40: dtkt.core.v1.GetAutomationRequest
+	(*GetAutomationResponse)(nil),                 // 41: dtkt.core.v1.GetAutomationResponse
+	(*CreateAutomationRequest)(nil),               // 42: dtkt.core.v1.CreateAutomationRequest
+	(*CreateAutomationResponse)(nil),              // 43: dtkt.core.v1.CreateAutomationResponse
+	(*UpdateAutomationRequest)(nil),               // 44: dtkt.core.v1.UpdateAutomationRequest
+	(*DeleteAutomationRequest)(nil),               // 45: dtkt.core.v1.DeleteAutomationRequest
+	(*BatchCreateAutomationsRequest)(nil),         // 46: dtkt.core.v1.BatchCreateAutomationsRequest
+	(*BatchCreateAutomationsResponse)(nil),        // 47: dtkt.core.v1.BatchCreateAutomationsResponse
+	(*ListAutomationsRequest)(nil),                // 48: dtkt.core.v1.ListAutomationsRequest
+	(*ListAutomationsResponse)(nil),               // 49: dtkt.core.v1.ListAutomationsResponse
+	(*SendAutomationEvent)(nil),                   // 50: dtkt.core.v1.SendAutomationEvent
+	(*ReceiveAutomationEvent)(nil),                // 51: dtkt.core.v1.ReceiveAutomationEvent
+	(*SendAutomationEventRequest)(nil),            // 52: dtkt.core.v1.SendAutomationEventRequest
+	(*ReceiveAutomationEventsRequest)(nil),        // 53: dtkt.core.v1.ReceiveAutomationEventsRequest
+	(*ReceiveAutomationEventsResponse)(nil),       // 54: dtkt.core.v1.ReceiveAutomationEventsResponse
+	(*StreamAutomationEventsRequest)(nil),         // 55: dtkt.core.v1.StreamAutomationEventsRequest
+	(*StreamAutomationEventsResponse)(nil),        // 56: dtkt.core.v1.StreamAutomationEventsResponse
+	(*ListConnectionsRequest)(nil),                // 57: dtkt.core.v1.ListConnectionsRequest
+	(*ListConnectionsResponse)(nil),               // 58: dtkt.core.v1.ListConnectionsResponse
+	(*GetConnectionRequest)(nil),                  // 59: dtkt.core.v1.GetConnectionRequest
+	(*GetConnectionResponse)(nil),                 // 60: dtkt.core.v1.GetConnectionResponse
+	(*CreateConnectionRequest)(nil),               // 61: dtkt.core.v1.CreateConnectionRequest
+	(*CreateConnectionResponse)(nil),              // 62: dtkt.core.v1.CreateConnectionResponse
+	(*UpdateConnectionRequest)(nil),               // 63: dtkt.core.v1.UpdateConnectionRequest
+	(*UpdateConnectionResponse)(nil),              // 64: dtkt.core.v1.UpdateConnectionResponse
+	(*DeleteConnectionRequest)(nil),               // 65: dtkt.core.v1.DeleteConnectionRequest
+	(*DeleteConnectionResponse)(nil),              // 66: dtkt.core.v1.DeleteConnectionResponse
+	(*DialConnectionRequest)(nil),                 // 67: dtkt.core.v1.DialConnectionRequest
+	(*DialConnectionResponse)(nil),                // 68: dtkt.core.v1.DialConnectionResponse
+	(*SyncDescriptorsRequest)(nil),                // 69: dtkt.core.v1.SyncDescriptorsRequest
+	(*SyncDescriptorsResponse)(nil),               // 70: dtkt.core.v1.SyncDescriptorsResponse
+	(*GetDescriptorsRequest)(nil),                 // 71: dtkt.core.v1.GetDescriptorsRequest
+	(*GetDescriptorsResponse)(nil),                // 72: dtkt.core.v1.GetDescriptorsResponse
+	(*ListDeploymentsRequest)(nil),                // 73: dtkt.core.v1.ListDeploymentsRequest
+	(*ListDeploymentsResponse)(nil),               // 74: dtkt.core.v1.ListDeploymentsResponse
+	(*GetDeploymentRequest)(nil),                  // 75: dtkt.core.v1.GetDeploymentRequest
+	(*GetDeploymentResponse)(nil),                 // 76: dtkt.core.v1.GetDeploymentResponse
+	(*CreateDeploymentRequest)(nil),               // 77: dtkt.core.v1.CreateDeploymentRequest
+	(*UpdateDeploymentRequest)(nil),               // 78: dtkt.core.v1.UpdateDeploymentRequest
+	(*DeleteDeploymentRequest)(nil),               // 79: dtkt.core.v1.DeleteDeploymentRequest
+	(*ListFlowsRequest)(nil),                      // 80: dtkt.core.v1.ListFlowsRequest
+	(*ListFlowsResponse)(nil),                     // 81: dtkt.core.v1.ListFlowsResponse
+	(*GetFlowRequest)(nil),                        // 82: dtkt.core.v1.GetFlowRequest
+	(*GetFlowResponse)(nil),                       // 83: dtkt.core.v1.GetFlowResponse
+	(*CreateFlowRequest)(nil),                     // 84: dtkt.core.v1.CreateFlowRequest
+	(*CreateFlowResponse)(nil),                    // 85: dtkt.core.v1.CreateFlowResponse
+	(*UpdateFlowRequest)(nil),                     // 86: dtkt.core.v1.UpdateFlowRequest
+	(*UpdateFlowResponse)(nil),                    // 87: dtkt.core.v1.UpdateFlowResponse
+	(*DeleteFlowRequest)(nil),                     // 88: dtkt.core.v1.DeleteFlowRequest
+	(*DeleteFlowResponse)(nil),                    // 89: dtkt.core.v1.DeleteFlowResponse
+	(*ListIntegrationsRequest)(nil),               // 90: dtkt.core.v1.ListIntegrationsRequest
+	(*ListIntegrationsResponse)(nil),              // 91: dtkt.core.v1.ListIntegrationsResponse
+	(*GetIntegrationRequest)(nil),                 // 92: dtkt.core.v1.GetIntegrationRequest
+	(*GetIntegrationResponse)(nil),                // 93: dtkt.core.v1.GetIntegrationResponse
+	(*CreateIntegrationRequest)(nil),              // 94: dtkt.core.v1.CreateIntegrationRequest
+	(*CreateIntegrationResponse)(nil),             // 95: dtkt.core.v1.CreateIntegrationResponse
+	(*BuildIntegrationRequest)(nil),               // 96: dtkt.core.v1.BuildIntegrationRequest
+	(*BuildIntegrationResponse)(nil),              // 97: dtkt.core.v1.BuildIntegrationResponse
+	(*UpdateIntegrationRequest)(nil),              // 98: dtkt.core.v1.UpdateIntegrationRequest
+	(*UpdateIntegrationResponse)(nil),             // 99: dtkt.core.v1.UpdateIntegrationResponse
+	(*DeleteIntegrationRequest)(nil),              // 100: dtkt.core.v1.DeleteIntegrationRequest
+	(*DeleteIntegrationResponse)(nil),             // 101: dtkt.core.v1.DeleteIntegrationResponse
+	(*GetTypeRequest)(nil),                        // 102: dtkt.core.v1.GetTypeRequest
+	(*GetTypeResponse)(nil),                       // 103: dtkt.core.v1.GetTypeResponse
+	(*ListTypesRequest)(nil),                      // 104: dtkt.core.v1.ListTypesRequest
+	(*ListTypesResponse)(nil),                     // 105: dtkt.core.v1.ListTypesResponse
+	(*GetMethodRequest)(nil),                      // 106: dtkt.core.v1.GetMethodRequest
+	(*GetMethodResponse)(nil),                     // 107: dtkt.core.v1.GetMethodResponse
+	(*GetServiceRequest)(nil),                     // 108: dtkt.core.v1.GetServiceRequest
+	(*GetServiceResponse)(nil),                    // 109: dtkt.core.v1.GetServiceResponse
+	(*ListServicesRequest)(nil),                   // 110: dtkt.core.v1.ListServicesRequest
+	(*ListServicesResponse)(nil),                  // 111: dtkt.core.v1.ListServicesResponse
+	(*ListMethodsRequest)(nil),                    // 112: dtkt.core.v1.ListMethodsRequest
+	(*ListMethodsResponse)(nil),                   // 113: dtkt.core.v1.ListMethodsResponse
+	nil,                                           // 114: dtkt.core.v1.Automation.ConnectionsEntry
+	nil,                                           // 115: dtkt.core.v1.Automation.InputsEntry
+	nil,                                           // 116: dtkt.core.v1.Connection.HeadersEntry
+	nil,                                           // 117: dtkt.core.v1.Deployment.EnvEntry
+	nil,                                           // 118: dtkt.core.v1.Deployment.PortsEntry
+	(*Deployment_Build)(nil),                      // 119: dtkt.core.v1.Deployment.Build
+	(*Deployment_Cloud)(nil),                      // 120: dtkt.core.v1.Deployment.Cloud
+	(*Deployment_RuntimeMetadata)(nil),            // 121: dtkt.core.v1.Deployment.RuntimeMetadata
+	(*Deployment_RuntimeMetadata_Native)(nil),     // 122: dtkt.core.v1.Deployment.RuntimeMetadata.Native
+	(*Deployment_RuntimeMetadata_Docker)(nil),     // 123: dtkt.core.v1.Deployment.RuntimeMetadata.Docker
+	(*PackageBuildMetadata_Runtime)(nil),          // 124: dtkt.core.v1.PackageBuildMetadata.Runtime
+	(*PackageBuildMetadata_Platform)(nil),         // 125: dtkt.core.v1.PackageBuildMetadata.Platform
+	nil,                                           // 126: dtkt.core.v1.PackageBuildMetadata.EnvEntry
+	nil,                                           // 127: dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry
+	(*SendAutomationEvent_InputsEvent)(nil),       // 128: dtkt.core.v1.SendAutomationEvent.InputsEvent
+	(*SendAutomationEvent_UserResponseEvent)(nil), // 129: dtkt.core.v1.SendAutomationEvent.UserResponseEvent
+	nil, // 130: dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry
+	nil, // 131: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry
+	(*ReceiveAutomationEvent_OutputsEvent)(nil),     // 132: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent
+	(*ReceiveAutomationEvent_UserRequestEvent)(nil), // 133: dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent
+	nil,                                    // 134: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry
+	(*timestamppb.Timestamp)(nil),          // 135: google.protobuf.Timestamp
+	(*anypb.Any)(nil),                      // 136: google.protobuf.Any
+	(*durationpb.Duration)(nil),            // 137: google.protobuf.Duration
+	(*descriptorpb.FileDescriptorSet)(nil), // 138: google.protobuf.FileDescriptorSet
+	(*v1beta1.TypeSchema)(nil),             // 139: dtkt.shared.v1beta1.TypeSchema
+	(*v1beta11.Runtime)(nil),               // 140: dtkt.flow.v1beta1.Runtime
+	(*v1beta11.Groups)(nil),                // 141: dtkt.flow.v1beta1.Groups
+	(*v1beta11.Flow)(nil),                  // 142: dtkt.flow.v1beta1.Flow
+	(*v1beta11.Graph)(nil),                 // 143: dtkt.flow.v1beta1.Graph
+	(*v1beta1.Package)(nil),                // 144: dtkt.shared.v1beta1.Package
+	(*fieldmaskpb.FieldMask)(nil),          // 145: google.protobuf.FieldMask
+	(v1beta1.Runtime)(0),                   // 146: dtkt.shared.v1beta1.Runtime
+	(*v1beta1.Platform)(nil),               // 147: dtkt.shared.v1beta1.Platform
+	(*status.Status)(nil),                  // 148: google.rpc.Status
+	(*v1beta11.UserAction)(nil),            // 149: dtkt.flow.v1beta1.UserAction
 }
 var file_dtkt_core_v1_messages_proto_depIdxs = []int32{
 	0,   // 0: dtkt.core.v1.Auth.method:type_name -> dtkt.core.v1.Auth.AuthMethod
-	131, // 1: dtkt.core.v1.Auth.expires_at:type_name -> google.protobuf.Timestamp
-	6,   // 2: dtkt.core.v1.Context.address:type_name -> dtkt.core.v1.Address
-	7,   // 3: dtkt.core.v1.Context.auth:type_name -> dtkt.core.v1.Auth
-	8,   // 4: dtkt.core.v1.Resource.context:type_name -> dtkt.core.v1.Context
-	6,   // 5: dtkt.core.v1.Resource.address:type_name -> dtkt.core.v1.Address
-	33,  // 6: dtkt.core.v1.Resource.encrypted:type_name -> dtkt.core.v1.EncryptedAny
-	132, // 7: dtkt.core.v1.Resource.decrypted:type_name -> google.protobuf.Any
-	22,  // 8: dtkt.core.v1.Automation.runtime:type_name -> dtkt.core.v1.FlowRuntimeMetadata
-	23,  // 9: dtkt.core.v1.Automation.groups:type_name -> dtkt.core.v1.FlowGroupsMetadata
-	110, // 10: dtkt.core.v1.Automation.connections:type_name -> dtkt.core.v1.Automation.ConnectionsEntry
-	111, // 11: dtkt.core.v1.Automation.inputs:type_name -> dtkt.core.v1.Automation.InputsEntry
-	133, // 12: dtkt.core.v1.Automation.timeout:type_name -> google.protobuf.Duration
-	131, // 13: dtkt.core.v1.Automation.create_time:type_name -> google.protobuf.Timestamp
-	131, // 14: dtkt.core.v1.Automation.update_time:type_name -> google.protobuf.Timestamp
-	24,  // 15: dtkt.core.v1.Flow.spec:type_name -> dtkt.core.v1.FlowSpecMetadata
-	25,  // 16: dtkt.core.v1.Flow.graph:type_name -> dtkt.core.v1.FlowGraphMetadata
-	131, // 17: dtkt.core.v1.Flow.create_time:type_name -> google.protobuf.Timestamp
-	131, // 18: dtkt.core.v1.Flow.update_time:type_name -> google.protobuf.Timestamp
-	6,   // 19: dtkt.core.v1.Connection.address:type_name -> dtkt.core.v1.Address
-	132, // 20: dtkt.core.v1.Connection.decrypted_config:type_name -> google.protobuf.Any
-	33,  // 21: dtkt.core.v1.Connection.encrypted_config:type_name -> dtkt.core.v1.EncryptedAny
-	112, // 22: dtkt.core.v1.Connection.headers:type_name -> dtkt.core.v1.Connection.HeadersEntry
-	131, // 23: dtkt.core.v1.Connection.create_time:type_name -> google.protobuf.Timestamp
-	131, // 24: dtkt.core.v1.Connection.update_time:type_name -> google.protobuf.Timestamp
-	1,   // 25: dtkt.core.v1.Deployment.state:type_name -> dtkt.core.v1.Deployment.State
-	6,   // 26: dtkt.core.v1.Deployment.address:type_name -> dtkt.core.v1.Address
-	113, // 27: dtkt.core.v1.Deployment.env:type_name -> dtkt.core.v1.Deployment.EnvEntry
-	114, // 28: dtkt.core.v1.Deployment.ports:type_name -> dtkt.core.v1.Deployment.PortsEntry
-	115, // 29: dtkt.core.v1.Deployment.build:type_name -> dtkt.core.v1.Deployment.Build
-	116, // 30: dtkt.core.v1.Deployment.cloud:type_name -> dtkt.core.v1.Deployment.Cloud
-	19,  // 31: dtkt.core.v1.Deployment.config_schema:type_name -> dtkt.core.v1.TypeSchema
-	26,  // 32: dtkt.core.v1.Deployment.package_spec:type_name -> dtkt.core.v1.PackageSpecMetadata
-	117, // 33: dtkt.core.v1.Deployment.runtime:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata
-	131, // 34: dtkt.core.v1.Deployment.create_time:type_name -> google.protobuf.Timestamp
-	131, // 35: dtkt.core.v1.Deployment.update_time:type_name -> google.protobuf.Timestamp
-	26,  // 36: dtkt.core.v1.Integration.spec:type_name -> dtkt.core.v1.PackageSpecMetadata
-	131, // 37: dtkt.core.v1.Integration.create_time:type_name -> google.protobuf.Timestamp
-	131, // 38: dtkt.core.v1.Integration.update_time:type_name -> google.protobuf.Timestamp
-	134, // 39: dtkt.core.v1.File.protos:type_name -> google.protobuf.FileDescriptorSet
-	131, // 40: dtkt.core.v1.File.create_time:type_name -> google.protobuf.Timestamp
-	131, // 41: dtkt.core.v1.File.update_time:type_name -> google.protobuf.Timestamp
-	131, // 42: dtkt.core.v1.Service.create_time:type_name -> google.protobuf.Timestamp
-	131, // 43: dtkt.core.v1.Service.update_time:type_name -> google.protobuf.Timestamp
-	131, // 44: dtkt.core.v1.Method.create_time:type_name -> google.protobuf.Timestamp
-	131, // 45: dtkt.core.v1.Method.update_time:type_name -> google.protobuf.Timestamp
-	19,  // 46: dtkt.core.v1.Type.schema:type_name -> dtkt.core.v1.TypeSchema
-	131, // 47: dtkt.core.v1.Type.create_time:type_name -> google.protobuf.Timestamp
-	131, // 48: dtkt.core.v1.Type.update_time:type_name -> google.protobuf.Timestamp
-	135, // 49: dtkt.core.v1.TypeSchema.v1beta1:type_name -> dtkt.shared.v1beta1.TypeSchema
-	131, // 50: dtkt.core.v1.DeploymentMetadata.start_time:type_name -> google.protobuf.Timestamp
-	131, // 51: dtkt.core.v1.DeploymentMetadata.stop_time:type_name -> google.protobuf.Timestamp
-	8,   // 52: dtkt.core.v1.FlowConnectionMetadata.context:type_name -> dtkt.core.v1.Context
-	136, // 53: dtkt.core.v1.FlowRuntimeMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Runtime
-	137, // 54: dtkt.core.v1.FlowGroupsMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Groups
-	138, // 55: dtkt.core.v1.FlowSpecMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Flow
-	139, // 56: dtkt.core.v1.FlowGraphMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Graph
-	140, // 57: dtkt.core.v1.PackageSpecMetadata.v1beta1:type_name -> dtkt.shared.v1beta1.Package
-	120, // 58: dtkt.core.v1.PackageBuildMetadata.runtime:type_name -> dtkt.core.v1.PackageBuildMetadata.Runtime
-	121, // 59: dtkt.core.v1.PackageBuildMetadata.platform:type_name -> dtkt.core.v1.PackageBuildMetadata.Platform
-	122, // 60: dtkt.core.v1.PackageBuildMetadata.env:type_name -> dtkt.core.v1.PackageBuildMetadata.EnvEntry
-	2,   // 61: dtkt.core.v1.BuildOperationMetadata.state:type_name -> dtkt.core.v1.BuildOperationMetadata.State
-	131, // 62: dtkt.core.v1.BuildOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
-	131, // 63: dtkt.core.v1.BuildOperationMetadata.finish_time:type_name -> google.protobuf.Timestamp
-	3,   // 64: dtkt.core.v1.RunOperationMetadata.state:type_name -> dtkt.core.v1.RunOperationMetadata.State
-	131, // 65: dtkt.core.v1.RunOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
-	131, // 66: dtkt.core.v1.RunOperationMetadata.stop_time:type_name -> google.protobuf.Timestamp
-	4,   // 67: dtkt.core.v1.SyncOperationMetadata.state:type_name -> dtkt.core.v1.SyncOperationMetadata.State
-	131, // 68: dtkt.core.v1.SyncOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
-	131, // 69: dtkt.core.v1.SyncOperationMetadata.stop_time:type_name -> google.protobuf.Timestamp
-	5,   // 70: dtkt.core.v1.DialMetadata.state:type_name -> dtkt.core.v1.DialMetadata.State
-	131, // 71: dtkt.core.v1.DialMetadata.time:type_name -> google.protobuf.Timestamp
-	123, // 72: dtkt.core.v1.BatchRunOperationMetadata.failed_requests:type_name -> dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry
-	9,   // 73: dtkt.core.v1.EncryptRequest.resource:type_name -> dtkt.core.v1.Resource
-	9,   // 74: dtkt.core.v1.EncryptResponse.resource:type_name -> dtkt.core.v1.Resource
-	9,   // 75: dtkt.core.v1.DecryptRequest.resource:type_name -> dtkt.core.v1.Resource
-	9,   // 76: dtkt.core.v1.DecryptResponse.resource:type_name -> dtkt.core.v1.Resource
-	10,  // 77: dtkt.core.v1.GetAutomationResponse.automation:type_name -> dtkt.core.v1.Automation
-	10,  // 78: dtkt.core.v1.CreateAutomationRequest.automation:type_name -> dtkt.core.v1.Automation
-	10,  // 79: dtkt.core.v1.CreateAutomationResponse.automation:type_name -> dtkt.core.v1.Automation
-	40,  // 80: dtkt.core.v1.BatchCreateAutomationsRequest.requests:type_name -> dtkt.core.v1.CreateAutomationRequest
-	10,  // 81: dtkt.core.v1.BatchCreateAutomationsResponse.automations:type_name -> dtkt.core.v1.Automation
-	10,  // 82: dtkt.core.v1.ListAutomationsResponse.automations:type_name -> dtkt.core.v1.Automation
-	124, // 83: dtkt.core.v1.SendAutomationEvent.inputs_event:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent
-	125, // 84: dtkt.core.v1.SendAutomationEvent.user_response_event:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent
-	128, // 85: dtkt.core.v1.ReceiveAutomationEvent.outputs_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent
-	129, // 86: dtkt.core.v1.ReceiveAutomationEvent.user_request_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent
-	46,  // 87: dtkt.core.v1.SendAutomationEventRequest.event:type_name -> dtkt.core.v1.SendAutomationEvent
-	47,  // 88: dtkt.core.v1.ReceiveAutomationEventsResponse.event:type_name -> dtkt.core.v1.ReceiveAutomationEvent
-	46,  // 89: dtkt.core.v1.StreamAutomationEventsRequest.event:type_name -> dtkt.core.v1.SendAutomationEvent
-	47,  // 90: dtkt.core.v1.StreamAutomationEventsResponse.event:type_name -> dtkt.core.v1.ReceiveAutomationEvent
-	12,  // 91: dtkt.core.v1.ListConnectionsResponse.connections:type_name -> dtkt.core.v1.Connection
-	12,  // 92: dtkt.core.v1.GetConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
-	12,  // 93: dtkt.core.v1.CreateConnectionRequest.connection:type_name -> dtkt.core.v1.Connection
-	12,  // 94: dtkt.core.v1.CreateConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
-	12,  // 95: dtkt.core.v1.UpdateConnectionRequest.connection:type_name -> dtkt.core.v1.Connection
-	141, // 96: dtkt.core.v1.UpdateConnectionRequest.update_mask:type_name -> google.protobuf.FieldMask
-	12,  // 97: dtkt.core.v1.UpdateConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
-	31,  // 98: dtkt.core.v1.DialConnectionResponse.dial:type_name -> dtkt.core.v1.DialMetadata
-	15,  // 99: dtkt.core.v1.SyncDescriptorsResponse.file:type_name -> dtkt.core.v1.File
-	15,  // 100: dtkt.core.v1.GetDescriptorsResponse.file:type_name -> dtkt.core.v1.File
-	13,  // 101: dtkt.core.v1.ListDeploymentsResponse.deployments:type_name -> dtkt.core.v1.Deployment
-	13,  // 102: dtkt.core.v1.GetDeploymentResponse.deployment:type_name -> dtkt.core.v1.Deployment
-	13,  // 103: dtkt.core.v1.CreateDeploymentRequest.deployment:type_name -> dtkt.core.v1.Deployment
-	13,  // 104: dtkt.core.v1.UpdateDeploymentRequest.deployment:type_name -> dtkt.core.v1.Deployment
-	141, // 105: dtkt.core.v1.UpdateDeploymentRequest.update_mask:type_name -> google.protobuf.FieldMask
-	1,   // 106: dtkt.core.v1.UpdateDeploymentRequest.desired_state:type_name -> dtkt.core.v1.Deployment.State
-	11,  // 107: dtkt.core.v1.ListFlowsResponse.flows:type_name -> dtkt.core.v1.Flow
-	11,  // 108: dtkt.core.v1.GetFlowResponse.flow:type_name -> dtkt.core.v1.Flow
-	11,  // 109: dtkt.core.v1.CreateFlowRequest.flow:type_name -> dtkt.core.v1.Flow
-	11,  // 110: dtkt.core.v1.CreateFlowResponse.flow:type_name -> dtkt.core.v1.Flow
-	11,  // 111: dtkt.core.v1.UpdateFlowRequest.flow:type_name -> dtkt.core.v1.Flow
-	141, // 112: dtkt.core.v1.UpdateFlowRequest.update_mask:type_name -> google.protobuf.FieldMask
-	11,  // 113: dtkt.core.v1.UpdateFlowResponse.flow:type_name -> dtkt.core.v1.Flow
-	14,  // 114: dtkt.core.v1.ListIntegrationsResponse.integrations:type_name -> dtkt.core.v1.Integration
-	14,  // 115: dtkt.core.v1.GetIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
-	14,  // 116: dtkt.core.v1.CreateIntegrationRequest.integration:type_name -> dtkt.core.v1.Integration
-	14,  // 117: dtkt.core.v1.CreateIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
-	27,  // 118: dtkt.core.v1.BuildIntegrationRequest.build:type_name -> dtkt.core.v1.PackageBuildMetadata
-	14,  // 119: dtkt.core.v1.BuildIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
-	27,  // 120: dtkt.core.v1.BuildIntegrationResponse.build:type_name -> dtkt.core.v1.PackageBuildMetadata
-	14,  // 121: dtkt.core.v1.UpdateIntegrationRequest.integration:type_name -> dtkt.core.v1.Integration
-	141, // 122: dtkt.core.v1.UpdateIntegrationRequest.update_mask:type_name -> google.protobuf.FieldMask
-	14,  // 123: dtkt.core.v1.UpdateIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
-	18,  // 124: dtkt.core.v1.GetTypeResponse.type:type_name -> dtkt.core.v1.Type
-	18,  // 125: dtkt.core.v1.ListTypesResponse.types:type_name -> dtkt.core.v1.Type
-	17,  // 126: dtkt.core.v1.GetMethodResponse.method:type_name -> dtkt.core.v1.Method
-	16,  // 127: dtkt.core.v1.GetServiceResponse.service:type_name -> dtkt.core.v1.Service
-	16,  // 128: dtkt.core.v1.ListServicesResponse.services:type_name -> dtkt.core.v1.Service
-	17,  // 129: dtkt.core.v1.ListMethodsResponse.methods:type_name -> dtkt.core.v1.Method
-	21,  // 130: dtkt.core.v1.Automation.ConnectionsEntry.value:type_name -> dtkt.core.v1.FlowConnectionMetadata
-	132, // 131: dtkt.core.v1.Automation.InputsEntry.value:type_name -> google.protobuf.Any
-	27,  // 132: dtkt.core.v1.Deployment.Build.metadata:type_name -> dtkt.core.v1.PackageBuildMetadata
-	8,   // 133: dtkt.core.v1.Deployment.Build.context:type_name -> dtkt.core.v1.Context
-	8,   // 134: dtkt.core.v1.Deployment.Cloud.context:type_name -> dtkt.core.v1.Context
-	33,  // 135: dtkt.core.v1.Deployment.Cloud.config:type_name -> dtkt.core.v1.EncryptedAny
-	118, // 136: dtkt.core.v1.Deployment.RuntimeMetadata.native:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata.Native
-	119, // 137: dtkt.core.v1.Deployment.RuntimeMetadata.docker:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata.Docker
-	142, // 138: dtkt.core.v1.PackageBuildMetadata.Runtime.v1beta1:type_name -> dtkt.shared.v1beta1.Runtime
-	143, // 139: dtkt.core.v1.PackageBuildMetadata.Platform.v1beta1:type_name -> dtkt.shared.v1beta1.Platform
-	144, // 140: dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry.value:type_name -> google.rpc.Status
-	126, // 141: dtkt.core.v1.SendAutomationEvent.InputsEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry
-	127, // 142: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry
-	132, // 143: dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
-	132, // 144: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry.value:type_name -> google.protobuf.Any
-	130, // 145: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.values:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry
-	145, // 146: dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent.user_action:type_name -> dtkt.flow.v1beta1.UserAction
-	132, // 147: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
-	148, // [148:148] is the sub-list for method output_type
-	148, // [148:148] is the sub-list for method input_type
-	148, // [148:148] is the sub-list for extension type_name
-	148, // [148:148] is the sub-list for extension extendee
-	0,   // [0:148] is the sub-list for field type_name
+	135, // 1: dtkt.core.v1.Auth.expires_at:type_name -> google.protobuf.Timestamp
+	7,   // 2: dtkt.core.v1.Context.address:type_name -> dtkt.core.v1.Address
+	8,   // 3: dtkt.core.v1.Context.auth:type_name -> dtkt.core.v1.Auth
+	9,   // 4: dtkt.core.v1.Resource.context:type_name -> dtkt.core.v1.Context
+	7,   // 5: dtkt.core.v1.Resource.address:type_name -> dtkt.core.v1.Address
+	35,  // 6: dtkt.core.v1.Resource.encrypted:type_name -> dtkt.core.v1.EncryptedAny
+	136, // 7: dtkt.core.v1.Resource.decrypted:type_name -> google.protobuf.Any
+	1,   // 8: dtkt.core.v1.Automation.state:type_name -> dtkt.core.v1.Automation.State
+	24,  // 9: dtkt.core.v1.Automation.runtime:type_name -> dtkt.core.v1.FlowRuntimeMetadata
+	114, // 10: dtkt.core.v1.Automation.connections:type_name -> dtkt.core.v1.Automation.ConnectionsEntry
+	115, // 11: dtkt.core.v1.Automation.inputs:type_name -> dtkt.core.v1.Automation.InputsEntry
+	137, // 12: dtkt.core.v1.Automation.timeout:type_name -> google.protobuf.Duration
+	135, // 13: dtkt.core.v1.Automation.create_time:type_name -> google.protobuf.Timestamp
+	135, // 14: dtkt.core.v1.Automation.update_time:type_name -> google.protobuf.Timestamp
+	26,  // 15: dtkt.core.v1.Flow.spec:type_name -> dtkt.core.v1.FlowSpecMetadata
+	27,  // 16: dtkt.core.v1.Flow.graph:type_name -> dtkt.core.v1.FlowGraphMetadata
+	135, // 17: dtkt.core.v1.Flow.create_time:type_name -> google.protobuf.Timestamp
+	135, // 18: dtkt.core.v1.Flow.update_time:type_name -> google.protobuf.Timestamp
+	7,   // 19: dtkt.core.v1.Connection.address:type_name -> dtkt.core.v1.Address
+	136, // 20: dtkt.core.v1.Connection.decrypted_config:type_name -> google.protobuf.Any
+	35,  // 21: dtkt.core.v1.Connection.encrypted_config:type_name -> dtkt.core.v1.EncryptedAny
+	136, // 22: dtkt.core.v1.Connection.decrypted_auth:type_name -> google.protobuf.Any
+	35,  // 23: dtkt.core.v1.Connection.encrypted_auth:type_name -> dtkt.core.v1.EncryptedAny
+	116, // 24: dtkt.core.v1.Connection.headers:type_name -> dtkt.core.v1.Connection.HeadersEntry
+	135, // 25: dtkt.core.v1.Connection.create_time:type_name -> google.protobuf.Timestamp
+	135, // 26: dtkt.core.v1.Connection.update_time:type_name -> google.protobuf.Timestamp
+	2,   // 27: dtkt.core.v1.Deployment.state:type_name -> dtkt.core.v1.Deployment.State
+	7,   // 28: dtkt.core.v1.Deployment.address:type_name -> dtkt.core.v1.Address
+	117, // 29: dtkt.core.v1.Deployment.env:type_name -> dtkt.core.v1.Deployment.EnvEntry
+	118, // 30: dtkt.core.v1.Deployment.ports:type_name -> dtkt.core.v1.Deployment.PortsEntry
+	119, // 31: dtkt.core.v1.Deployment.build:type_name -> dtkt.core.v1.Deployment.Build
+	120, // 32: dtkt.core.v1.Deployment.cloud:type_name -> dtkt.core.v1.Deployment.Cloud
+	20,  // 33: dtkt.core.v1.Deployment.config_schema:type_name -> dtkt.core.v1.TypeSchema
+	28,  // 34: dtkt.core.v1.Deployment.package_spec:type_name -> dtkt.core.v1.PackageSpecMetadata
+	121, // 35: dtkt.core.v1.Deployment.runtime:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata
+	135, // 36: dtkt.core.v1.Deployment.create_time:type_name -> google.protobuf.Timestamp
+	135, // 37: dtkt.core.v1.Deployment.update_time:type_name -> google.protobuf.Timestamp
+	28,  // 38: dtkt.core.v1.Integration.spec:type_name -> dtkt.core.v1.PackageSpecMetadata
+	135, // 39: dtkt.core.v1.Integration.create_time:type_name -> google.protobuf.Timestamp
+	135, // 40: dtkt.core.v1.Integration.update_time:type_name -> google.protobuf.Timestamp
+	138, // 41: dtkt.core.v1.File.protos:type_name -> google.protobuf.FileDescriptorSet
+	135, // 42: dtkt.core.v1.File.create_time:type_name -> google.protobuf.Timestamp
+	135, // 43: dtkt.core.v1.File.update_time:type_name -> google.protobuf.Timestamp
+	135, // 44: dtkt.core.v1.Service.create_time:type_name -> google.protobuf.Timestamp
+	135, // 45: dtkt.core.v1.Service.update_time:type_name -> google.protobuf.Timestamp
+	135, // 46: dtkt.core.v1.Method.create_time:type_name -> google.protobuf.Timestamp
+	135, // 47: dtkt.core.v1.Method.update_time:type_name -> google.protobuf.Timestamp
+	20,  // 48: dtkt.core.v1.Type.schema:type_name -> dtkt.core.v1.TypeSchema
+	135, // 49: dtkt.core.v1.Type.create_time:type_name -> google.protobuf.Timestamp
+	135, // 50: dtkt.core.v1.Type.update_time:type_name -> google.protobuf.Timestamp
+	139, // 51: dtkt.core.v1.TypeSchema.v1beta1:type_name -> dtkt.shared.v1beta1.TypeSchema
+	135, // 52: dtkt.core.v1.AutomationMetadata.start_time:type_name -> google.protobuf.Timestamp
+	135, // 53: dtkt.core.v1.AutomationMetadata.stop_time:type_name -> google.protobuf.Timestamp
+	135, // 54: dtkt.core.v1.DeploymentMetadata.start_time:type_name -> google.protobuf.Timestamp
+	135, // 55: dtkt.core.v1.DeploymentMetadata.stop_time:type_name -> google.protobuf.Timestamp
+	9,   // 56: dtkt.core.v1.FlowConnectionMetadata.context:type_name -> dtkt.core.v1.Context
+	140, // 57: dtkt.core.v1.FlowRuntimeMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Runtime
+	141, // 58: dtkt.core.v1.FlowGroupsMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Groups
+	142, // 59: dtkt.core.v1.FlowSpecMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Flow
+	143, // 60: dtkt.core.v1.FlowGraphMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Graph
+	144, // 61: dtkt.core.v1.PackageSpecMetadata.v1beta1:type_name -> dtkt.shared.v1beta1.Package
+	124, // 62: dtkt.core.v1.PackageBuildMetadata.runtime:type_name -> dtkt.core.v1.PackageBuildMetadata.Runtime
+	125, // 63: dtkt.core.v1.PackageBuildMetadata.platform:type_name -> dtkt.core.v1.PackageBuildMetadata.Platform
+	126, // 64: dtkt.core.v1.PackageBuildMetadata.env:type_name -> dtkt.core.v1.PackageBuildMetadata.EnvEntry
+	3,   // 65: dtkt.core.v1.BuildOperationMetadata.state:type_name -> dtkt.core.v1.BuildOperationMetadata.State
+	135, // 66: dtkt.core.v1.BuildOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
+	135, // 67: dtkt.core.v1.BuildOperationMetadata.finish_time:type_name -> google.protobuf.Timestamp
+	4,   // 68: dtkt.core.v1.RunOperationMetadata.state:type_name -> dtkt.core.v1.RunOperationMetadata.State
+	135, // 69: dtkt.core.v1.RunOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
+	135, // 70: dtkt.core.v1.RunOperationMetadata.stop_time:type_name -> google.protobuf.Timestamp
+	5,   // 71: dtkt.core.v1.SyncOperationMetadata.state:type_name -> dtkt.core.v1.SyncOperationMetadata.State
+	135, // 72: dtkt.core.v1.SyncOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
+	135, // 73: dtkt.core.v1.SyncOperationMetadata.stop_time:type_name -> google.protobuf.Timestamp
+	6,   // 74: dtkt.core.v1.DialMetadata.state:type_name -> dtkt.core.v1.DialMetadata.State
+	135, // 75: dtkt.core.v1.DialMetadata.time:type_name -> google.protobuf.Timestamp
+	127, // 76: dtkt.core.v1.BatchRunOperationMetadata.failed_requests:type_name -> dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry
+	10,  // 77: dtkt.core.v1.EncryptRequest.resource:type_name -> dtkt.core.v1.Resource
+	10,  // 78: dtkt.core.v1.EncryptResponse.resource:type_name -> dtkt.core.v1.Resource
+	10,  // 79: dtkt.core.v1.DecryptRequest.resource:type_name -> dtkt.core.v1.Resource
+	10,  // 80: dtkt.core.v1.DecryptResponse.resource:type_name -> dtkt.core.v1.Resource
+	11,  // 81: dtkt.core.v1.GetAutomationResponse.automation:type_name -> dtkt.core.v1.Automation
+	11,  // 82: dtkt.core.v1.CreateAutomationRequest.automation:type_name -> dtkt.core.v1.Automation
+	11,  // 83: dtkt.core.v1.CreateAutomationResponse.automation:type_name -> dtkt.core.v1.Automation
+	11,  // 84: dtkt.core.v1.UpdateAutomationRequest.automation:type_name -> dtkt.core.v1.Automation
+	145, // 85: dtkt.core.v1.UpdateAutomationRequest.update_mask:type_name -> google.protobuf.FieldMask
+	1,   // 86: dtkt.core.v1.UpdateAutomationRequest.desired_state:type_name -> dtkt.core.v1.Automation.State
+	42,  // 87: dtkt.core.v1.BatchCreateAutomationsRequest.requests:type_name -> dtkt.core.v1.CreateAutomationRequest
+	11,  // 88: dtkt.core.v1.BatchCreateAutomationsResponse.automations:type_name -> dtkt.core.v1.Automation
+	11,  // 89: dtkt.core.v1.ListAutomationsResponse.automations:type_name -> dtkt.core.v1.Automation
+	128, // 90: dtkt.core.v1.SendAutomationEvent.inputs_event:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent
+	129, // 91: dtkt.core.v1.SendAutomationEvent.user_response_event:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent
+	132, // 92: dtkt.core.v1.ReceiveAutomationEvent.outputs_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent
+	133, // 93: dtkt.core.v1.ReceiveAutomationEvent.user_request_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent
+	50,  // 94: dtkt.core.v1.SendAutomationEventRequest.event:type_name -> dtkt.core.v1.SendAutomationEvent
+	51,  // 95: dtkt.core.v1.ReceiveAutomationEventsResponse.event:type_name -> dtkt.core.v1.ReceiveAutomationEvent
+	50,  // 96: dtkt.core.v1.StreamAutomationEventsRequest.event:type_name -> dtkt.core.v1.SendAutomationEvent
+	51,  // 97: dtkt.core.v1.StreamAutomationEventsResponse.event:type_name -> dtkt.core.v1.ReceiveAutomationEvent
+	13,  // 98: dtkt.core.v1.ListConnectionsResponse.connections:type_name -> dtkt.core.v1.Connection
+	13,  // 99: dtkt.core.v1.GetConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
+	13,  // 100: dtkt.core.v1.CreateConnectionRequest.connection:type_name -> dtkt.core.v1.Connection
+	13,  // 101: dtkt.core.v1.CreateConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
+	13,  // 102: dtkt.core.v1.UpdateConnectionRequest.connection:type_name -> dtkt.core.v1.Connection
+	145, // 103: dtkt.core.v1.UpdateConnectionRequest.update_mask:type_name -> google.protobuf.FieldMask
+	13,  // 104: dtkt.core.v1.UpdateConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
+	33,  // 105: dtkt.core.v1.DialConnectionResponse.dial:type_name -> dtkt.core.v1.DialMetadata
+	16,  // 106: dtkt.core.v1.SyncDescriptorsResponse.file:type_name -> dtkt.core.v1.File
+	16,  // 107: dtkt.core.v1.GetDescriptorsResponse.file:type_name -> dtkt.core.v1.File
+	14,  // 108: dtkt.core.v1.ListDeploymentsResponse.deployments:type_name -> dtkt.core.v1.Deployment
+	14,  // 109: dtkt.core.v1.GetDeploymentResponse.deployment:type_name -> dtkt.core.v1.Deployment
+	14,  // 110: dtkt.core.v1.CreateDeploymentRequest.deployment:type_name -> dtkt.core.v1.Deployment
+	14,  // 111: dtkt.core.v1.UpdateDeploymentRequest.deployment:type_name -> dtkt.core.v1.Deployment
+	145, // 112: dtkt.core.v1.UpdateDeploymentRequest.update_mask:type_name -> google.protobuf.FieldMask
+	2,   // 113: dtkt.core.v1.UpdateDeploymentRequest.desired_state:type_name -> dtkt.core.v1.Deployment.State
+	12,  // 114: dtkt.core.v1.ListFlowsResponse.flows:type_name -> dtkt.core.v1.Flow
+	12,  // 115: dtkt.core.v1.GetFlowResponse.flow:type_name -> dtkt.core.v1.Flow
+	12,  // 116: dtkt.core.v1.CreateFlowRequest.flow:type_name -> dtkt.core.v1.Flow
+	12,  // 117: dtkt.core.v1.CreateFlowResponse.flow:type_name -> dtkt.core.v1.Flow
+	12,  // 118: dtkt.core.v1.UpdateFlowRequest.flow:type_name -> dtkt.core.v1.Flow
+	145, // 119: dtkt.core.v1.UpdateFlowRequest.update_mask:type_name -> google.protobuf.FieldMask
+	12,  // 120: dtkt.core.v1.UpdateFlowResponse.flow:type_name -> dtkt.core.v1.Flow
+	15,  // 121: dtkt.core.v1.ListIntegrationsResponse.integrations:type_name -> dtkt.core.v1.Integration
+	15,  // 122: dtkt.core.v1.GetIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
+	15,  // 123: dtkt.core.v1.CreateIntegrationRequest.integration:type_name -> dtkt.core.v1.Integration
+	15,  // 124: dtkt.core.v1.CreateIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
+	29,  // 125: dtkt.core.v1.BuildIntegrationRequest.build:type_name -> dtkt.core.v1.PackageBuildMetadata
+	15,  // 126: dtkt.core.v1.BuildIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
+	29,  // 127: dtkt.core.v1.BuildIntegrationResponse.build:type_name -> dtkt.core.v1.PackageBuildMetadata
+	15,  // 128: dtkt.core.v1.UpdateIntegrationRequest.integration:type_name -> dtkt.core.v1.Integration
+	145, // 129: dtkt.core.v1.UpdateIntegrationRequest.update_mask:type_name -> google.protobuf.FieldMask
+	15,  // 130: dtkt.core.v1.UpdateIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
+	19,  // 131: dtkt.core.v1.GetTypeResponse.type:type_name -> dtkt.core.v1.Type
+	19,  // 132: dtkt.core.v1.ListTypesResponse.types:type_name -> dtkt.core.v1.Type
+	18,  // 133: dtkt.core.v1.GetMethodResponse.method:type_name -> dtkt.core.v1.Method
+	17,  // 134: dtkt.core.v1.GetServiceResponse.service:type_name -> dtkt.core.v1.Service
+	17,  // 135: dtkt.core.v1.ListServicesResponse.services:type_name -> dtkt.core.v1.Service
+	18,  // 136: dtkt.core.v1.ListMethodsResponse.methods:type_name -> dtkt.core.v1.Method
+	23,  // 137: dtkt.core.v1.Automation.ConnectionsEntry.value:type_name -> dtkt.core.v1.FlowConnectionMetadata
+	136, // 138: dtkt.core.v1.Automation.InputsEntry.value:type_name -> google.protobuf.Any
+	29,  // 139: dtkt.core.v1.Deployment.Build.metadata:type_name -> dtkt.core.v1.PackageBuildMetadata
+	9,   // 140: dtkt.core.v1.Deployment.Build.context:type_name -> dtkt.core.v1.Context
+	9,   // 141: dtkt.core.v1.Deployment.Cloud.context:type_name -> dtkt.core.v1.Context
+	35,  // 142: dtkt.core.v1.Deployment.Cloud.config:type_name -> dtkt.core.v1.EncryptedAny
+	122, // 143: dtkt.core.v1.Deployment.RuntimeMetadata.native:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata.Native
+	123, // 144: dtkt.core.v1.Deployment.RuntimeMetadata.docker:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata.Docker
+	146, // 145: dtkt.core.v1.PackageBuildMetadata.Runtime.v1beta1:type_name -> dtkt.shared.v1beta1.Runtime
+	147, // 146: dtkt.core.v1.PackageBuildMetadata.Platform.v1beta1:type_name -> dtkt.shared.v1beta1.Platform
+	148, // 147: dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry.value:type_name -> google.rpc.Status
+	130, // 148: dtkt.core.v1.SendAutomationEvent.InputsEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry
+	131, // 149: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry
+	136, // 150: dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
+	136, // 151: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry.value:type_name -> google.protobuf.Any
+	134, // 152: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.values:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry
+	149, // 153: dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent.user_action:type_name -> dtkt.flow.v1beta1.UserAction
+	136, // 154: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
+	155, // [155:155] is the sub-list for method output_type
+	155, // [155:155] is the sub-list for method input_type
+	155, // [155:155] is the sub-list for extension type_name
+	155, // [155:155] is the sub-list for extension extendee
+	0,   // [0:155] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_core_v1_messages_proto_init() }
@@ -8529,6 +8866,8 @@ func file_dtkt_core_v1_messages_proto_init() {
 		(*Connection_CustomGrpc)(nil),
 		(*Connection_DecryptedConfig)(nil),
 		(*Connection_EncryptedConfig)(nil),
+		(*Connection_DecryptedAuth)(nil),
+		(*Connection_EncryptedAuth)(nil),
 	}
 	file_dtkt_core_v1_messages_proto_msgTypes[8].OneofWrappers = []any{}
 	file_dtkt_core_v1_messages_proto_msgTypes[9].OneofWrappers = []any{
@@ -8537,50 +8876,51 @@ func file_dtkt_core_v1_messages_proto_init() {
 	file_dtkt_core_v1_messages_proto_msgTypes[13].OneofWrappers = []any{
 		(*TypeSchema_V1Beta1)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[16].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[17].OneofWrappers = []any{
 		(*FlowRuntimeMetadata_V1Beta1)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[17].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[18].OneofWrappers = []any{
 		(*FlowGroupsMetadata_V1Beta1)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[18].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[19].OneofWrappers = []any{
 		(*FlowSpecMetadata_V1Beta1)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[19].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[20].OneofWrappers = []any{
 		(*FlowGraphMetadata_V1Beta1)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[20].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[21].OneofWrappers = []any{
 		(*PackageSpecMetadata_V1Beta1)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[38].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[40].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[37].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[41].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[43].OneofWrappers = []any{
 		(*SendAutomationEvent_InputsEvent_)(nil),
 		(*SendAutomationEvent_UserResponseEvent_)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[41].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[44].OneofWrappers = []any{
 		(*ReceiveAutomationEvent_OutputsEvent_)(nil),
 		(*ReceiveAutomationEvent_UserRequestEvent_)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[47].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[57].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[50].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[60].OneofWrappers = []any{
 		(*DialConnectionRequest_Name)(nil),
 		(*DialConnectionRequest_Address)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[63].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[68].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[70].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[80].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[94].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[100].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[102].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[111].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[66].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[71].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[73].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[83].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[97].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[103].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[105].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[114].OneofWrappers = []any{
 		(*Deployment_RuntimeMetadata_Native_)(nil),
 		(*Deployment_RuntimeMetadata_Docker_)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[114].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[117].OneofWrappers = []any{
 		(*PackageBuildMetadata_Runtime_V1Beta1)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[115].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[118].OneofWrappers = []any{
 		(*PackageBuildMetadata_Platform_V1Beta1)(nil),
 	}
 	type x struct{}
@@ -8588,8 +8928,8 @@ func file_dtkt_core_v1_messages_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_core_v1_messages_proto_rawDesc), len(file_dtkt_core_v1_messages_proto_rawDesc)),
-			NumEnums:      6,
-			NumMessages:   125,
+			NumEnums:      7,
+			NumMessages:   128,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

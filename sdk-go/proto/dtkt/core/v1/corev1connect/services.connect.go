@@ -56,15 +56,21 @@ const (
 	// AutomationServiceCreateAutomationProcedure is the fully-qualified name of the AutomationService's
 	// CreateAutomation RPC.
 	AutomationServiceCreateAutomationProcedure = "/dtkt.core.v1.AutomationService/CreateAutomation"
-	// AutomationServiceStreamAutomationEventsProcedure is the fully-qualified name of the
-	// AutomationService's StreamAutomationEvents RPC.
-	AutomationServiceStreamAutomationEventsProcedure = "/dtkt.core.v1.AutomationService/StreamAutomationEvents"
+	// AutomationServiceUpdateAutomationProcedure is the fully-qualified name of the AutomationService's
+	// UpdateAutomation RPC.
+	AutomationServiceUpdateAutomationProcedure = "/dtkt.core.v1.AutomationService/UpdateAutomation"
+	// AutomationServiceDeleteAutomationProcedure is the fully-qualified name of the AutomationService's
+	// DeleteAutomation RPC.
+	AutomationServiceDeleteAutomationProcedure = "/dtkt.core.v1.AutomationService/DeleteAutomation"
 	// AutomationServiceReceiveAutomationEventsProcedure is the fully-qualified name of the
 	// AutomationService's ReceiveAutomationEvents RPC.
 	AutomationServiceReceiveAutomationEventsProcedure = "/dtkt.core.v1.AutomationService/ReceiveAutomationEvents"
 	// AutomationServiceSendAutomationEventProcedure is the fully-qualified name of the
 	// AutomationService's SendAutomationEvent RPC.
 	AutomationServiceSendAutomationEventProcedure = "/dtkt.core.v1.AutomationService/SendAutomationEvent"
+	// AutomationServiceStreamAutomationEventsProcedure is the fully-qualified name of the
+	// AutomationService's StreamAutomationEvents RPC.
+	AutomationServiceStreamAutomationEventsProcedure = "/dtkt.core.v1.AutomationService/StreamAutomationEvents"
 	// ConnectionServiceDialConnectionProcedure is the fully-qualified name of the ConnectionService's
 	// DialConnection RPC.
 	ConnectionServiceDialConnectionProcedure = "/dtkt.core.v1.ConnectionService/DialConnection"
@@ -163,23 +169,18 @@ type AutomationServiceClient interface {
 	ListAutomations(context.Context, *connect.Request[v1.ListAutomationsRequest]) (*connect.Response[v1.ListAutomationsResponse], error)
 	// Get a single automation by name.
 	GetAutomation(context.Context, *connect.Request[v1.GetAutomationRequest]) (*connect.Response[v1.GetAutomationResponse], error)
-	// Create a new automation and start its execution.
-	CreateAutomation(context.Context, *connect.Request[v1.CreateAutomationRequest]) (*connect.Response[v1.CreateAutomationResponse], error)
-	// TODO: Batch create automations and start their executions.
-	//
-	//	rpc BatchCreateAutomations(BatchCreateAutomationsRequest) returns (google.longrunning.Operation) {
-	//	  option (google.longrunning.operation_info) = {
-	//	    metadata_type: "BatchRunOperationMetadata"
-	//	    response_type: "BatchCreateAutomationsResponse"
-	//	  };
-	//	}
-	//
-	// Send input events and user action responses and receive output events and user action requests bi-directionally.
-	StreamAutomationEvents(context.Context) *connect.BidiStreamForClient[v1.StreamAutomationEventsRequest, v1.StreamAutomationEventsResponse]
-	// Receive a stream of output events or user action requests (for environments with server streaming but not client streaming, e.g. web browsers).
+	// Create a new automation.
+	CreateAutomation(context.Context, *connect.Request[v1.CreateAutomationRequest]) (*connect.Response[longrunningpb.Operation], error)
+	// Update an automation.
+	UpdateAutomation(context.Context, *connect.Request[v1.UpdateAutomationRequest]) (*connect.Response[longrunningpb.Operation], error)
+	// Delete an automation.
+	DeleteAutomation(context.Context, *connect.Request[v1.DeleteAutomationRequest]) (*connect.Response[longrunningpb.Operation], error)
+	// Receive a stream of output/user action events (for environments with server streaming but not client streaming, e.g. web browsers).
 	ReceiveAutomationEvents(context.Context, *connect.Request[v1.ReceiveAutomationEventsRequest]) (*connect.ServerStreamForClient[v1.ReceiveAutomationEventsResponse], error)
-	// Send an input event or user action response (for environments without client streaming, e.g. web browsers).
+	// Send an input/user action event (for environments without client streaming, e.g. web browsers).
 	SendAutomationEvent(context.Context, *connect.Request[v1.SendAutomationEventRequest]) (*connect.Response[emptypb.Empty], error)
+	// Send input/user action events and receive output/user action events bi-directionally.
+	StreamAutomationEvents(context.Context) *connect.BidiStreamForClient[v1.StreamAutomationEventsRequest, v1.StreamAutomationEventsResponse]
 }
 
 // NewAutomationServiceClient constructs a client for the dtkt.core.v1.AutomationService service. By
@@ -207,16 +208,22 @@ func NewAutomationServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
-		createAutomation: connect.NewClient[v1.CreateAutomationRequest, v1.CreateAutomationResponse](
+		createAutomation: connect.NewClient[v1.CreateAutomationRequest, longrunningpb.Operation](
 			httpClient,
 			baseURL+AutomationServiceCreateAutomationProcedure,
 			connect.WithSchema(automationServiceMethods.ByName("CreateAutomation")),
 			connect.WithClientOptions(opts...),
 		),
-		streamAutomationEvents: connect.NewClient[v1.StreamAutomationEventsRequest, v1.StreamAutomationEventsResponse](
+		updateAutomation: connect.NewClient[v1.UpdateAutomationRequest, longrunningpb.Operation](
 			httpClient,
-			baseURL+AutomationServiceStreamAutomationEventsProcedure,
-			connect.WithSchema(automationServiceMethods.ByName("StreamAutomationEvents")),
+			baseURL+AutomationServiceUpdateAutomationProcedure,
+			connect.WithSchema(automationServiceMethods.ByName("UpdateAutomation")),
+			connect.WithClientOptions(opts...),
+		),
+		deleteAutomation: connect.NewClient[v1.DeleteAutomationRequest, longrunningpb.Operation](
+			httpClient,
+			baseURL+AutomationServiceDeleteAutomationProcedure,
+			connect.WithSchema(automationServiceMethods.ByName("DeleteAutomation")),
 			connect.WithClientOptions(opts...),
 		),
 		receiveAutomationEvents: connect.NewClient[v1.ReceiveAutomationEventsRequest, v1.ReceiveAutomationEventsResponse](
@@ -231,6 +238,12 @@ func NewAutomationServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithSchema(automationServiceMethods.ByName("SendAutomationEvent")),
 			connect.WithClientOptions(opts...),
 		),
+		streamAutomationEvents: connect.NewClient[v1.StreamAutomationEventsRequest, v1.StreamAutomationEventsResponse](
+			httpClient,
+			baseURL+AutomationServiceStreamAutomationEventsProcedure,
+			connect.WithSchema(automationServiceMethods.ByName("StreamAutomationEvents")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -238,10 +251,12 @@ func NewAutomationServiceClient(httpClient connect.HTTPClient, baseURL string, o
 type automationServiceClient struct {
 	listAutomations         *connect.Client[v1.ListAutomationsRequest, v1.ListAutomationsResponse]
 	getAutomation           *connect.Client[v1.GetAutomationRequest, v1.GetAutomationResponse]
-	createAutomation        *connect.Client[v1.CreateAutomationRequest, v1.CreateAutomationResponse]
-	streamAutomationEvents  *connect.Client[v1.StreamAutomationEventsRequest, v1.StreamAutomationEventsResponse]
+	createAutomation        *connect.Client[v1.CreateAutomationRequest, longrunningpb.Operation]
+	updateAutomation        *connect.Client[v1.UpdateAutomationRequest, longrunningpb.Operation]
+	deleteAutomation        *connect.Client[v1.DeleteAutomationRequest, longrunningpb.Operation]
 	receiveAutomationEvents *connect.Client[v1.ReceiveAutomationEventsRequest, v1.ReceiveAutomationEventsResponse]
 	sendAutomationEvent     *connect.Client[v1.SendAutomationEventRequest, emptypb.Empty]
+	streamAutomationEvents  *connect.Client[v1.StreamAutomationEventsRequest, v1.StreamAutomationEventsResponse]
 }
 
 // ListAutomations calls dtkt.core.v1.AutomationService.ListAutomations.
@@ -255,13 +270,18 @@ func (c *automationServiceClient) GetAutomation(ctx context.Context, req *connec
 }
 
 // CreateAutomation calls dtkt.core.v1.AutomationService.CreateAutomation.
-func (c *automationServiceClient) CreateAutomation(ctx context.Context, req *connect.Request[v1.CreateAutomationRequest]) (*connect.Response[v1.CreateAutomationResponse], error) {
+func (c *automationServiceClient) CreateAutomation(ctx context.Context, req *connect.Request[v1.CreateAutomationRequest]) (*connect.Response[longrunningpb.Operation], error) {
 	return c.createAutomation.CallUnary(ctx, req)
 }
 
-// StreamAutomationEvents calls dtkt.core.v1.AutomationService.StreamAutomationEvents.
-func (c *automationServiceClient) StreamAutomationEvents(ctx context.Context) *connect.BidiStreamForClient[v1.StreamAutomationEventsRequest, v1.StreamAutomationEventsResponse] {
-	return c.streamAutomationEvents.CallBidiStream(ctx)
+// UpdateAutomation calls dtkt.core.v1.AutomationService.UpdateAutomation.
+func (c *automationServiceClient) UpdateAutomation(ctx context.Context, req *connect.Request[v1.UpdateAutomationRequest]) (*connect.Response[longrunningpb.Operation], error) {
+	return c.updateAutomation.CallUnary(ctx, req)
+}
+
+// DeleteAutomation calls dtkt.core.v1.AutomationService.DeleteAutomation.
+func (c *automationServiceClient) DeleteAutomation(ctx context.Context, req *connect.Request[v1.DeleteAutomationRequest]) (*connect.Response[longrunningpb.Operation], error) {
+	return c.deleteAutomation.CallUnary(ctx, req)
 }
 
 // ReceiveAutomationEvents calls dtkt.core.v1.AutomationService.ReceiveAutomationEvents.
@@ -274,29 +294,29 @@ func (c *automationServiceClient) SendAutomationEvent(ctx context.Context, req *
 	return c.sendAutomationEvent.CallUnary(ctx, req)
 }
 
+// StreamAutomationEvents calls dtkt.core.v1.AutomationService.StreamAutomationEvents.
+func (c *automationServiceClient) StreamAutomationEvents(ctx context.Context) *connect.BidiStreamForClient[v1.StreamAutomationEventsRequest, v1.StreamAutomationEventsResponse] {
+	return c.streamAutomationEvents.CallBidiStream(ctx)
+}
+
 // AutomationServiceHandler is an implementation of the dtkt.core.v1.AutomationService service.
 type AutomationServiceHandler interface {
 	// List automations with filtering options.
 	ListAutomations(context.Context, *connect.Request[v1.ListAutomationsRequest]) (*connect.Response[v1.ListAutomationsResponse], error)
 	// Get a single automation by name.
 	GetAutomation(context.Context, *connect.Request[v1.GetAutomationRequest]) (*connect.Response[v1.GetAutomationResponse], error)
-	// Create a new automation and start its execution.
-	CreateAutomation(context.Context, *connect.Request[v1.CreateAutomationRequest]) (*connect.Response[v1.CreateAutomationResponse], error)
-	// TODO: Batch create automations and start their executions.
-	//
-	//	rpc BatchCreateAutomations(BatchCreateAutomationsRequest) returns (google.longrunning.Operation) {
-	//	  option (google.longrunning.operation_info) = {
-	//	    metadata_type: "BatchRunOperationMetadata"
-	//	    response_type: "BatchCreateAutomationsResponse"
-	//	  };
-	//	}
-	//
-	// Send input events and user action responses and receive output events and user action requests bi-directionally.
-	StreamAutomationEvents(context.Context, *connect.BidiStream[v1.StreamAutomationEventsRequest, v1.StreamAutomationEventsResponse]) error
-	// Receive a stream of output events or user action requests (for environments with server streaming but not client streaming, e.g. web browsers).
+	// Create a new automation.
+	CreateAutomation(context.Context, *connect.Request[v1.CreateAutomationRequest]) (*connect.Response[longrunningpb.Operation], error)
+	// Update an automation.
+	UpdateAutomation(context.Context, *connect.Request[v1.UpdateAutomationRequest]) (*connect.Response[longrunningpb.Operation], error)
+	// Delete an automation.
+	DeleteAutomation(context.Context, *connect.Request[v1.DeleteAutomationRequest]) (*connect.Response[longrunningpb.Operation], error)
+	// Receive a stream of output/user action events (for environments with server streaming but not client streaming, e.g. web browsers).
 	ReceiveAutomationEvents(context.Context, *connect.Request[v1.ReceiveAutomationEventsRequest], *connect.ServerStream[v1.ReceiveAutomationEventsResponse]) error
-	// Send an input event or user action response (for environments without client streaming, e.g. web browsers).
+	// Send an input/user action event (for environments without client streaming, e.g. web browsers).
 	SendAutomationEvent(context.Context, *connect.Request[v1.SendAutomationEventRequest]) (*connect.Response[emptypb.Empty], error)
+	// Send input/user action events and receive output/user action events bi-directionally.
+	StreamAutomationEvents(context.Context, *connect.BidiStream[v1.StreamAutomationEventsRequest, v1.StreamAutomationEventsResponse]) error
 }
 
 // NewAutomationServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -326,10 +346,16 @@ func NewAutomationServiceHandler(svc AutomationServiceHandler, opts ...connect.H
 		connect.WithSchema(automationServiceMethods.ByName("CreateAutomation")),
 		connect.WithHandlerOptions(opts...),
 	)
-	automationServiceStreamAutomationEventsHandler := connect.NewBidiStreamHandler(
-		AutomationServiceStreamAutomationEventsProcedure,
-		svc.StreamAutomationEvents,
-		connect.WithSchema(automationServiceMethods.ByName("StreamAutomationEvents")),
+	automationServiceUpdateAutomationHandler := connect.NewUnaryHandler(
+		AutomationServiceUpdateAutomationProcedure,
+		svc.UpdateAutomation,
+		connect.WithSchema(automationServiceMethods.ByName("UpdateAutomation")),
+		connect.WithHandlerOptions(opts...),
+	)
+	automationServiceDeleteAutomationHandler := connect.NewUnaryHandler(
+		AutomationServiceDeleteAutomationProcedure,
+		svc.DeleteAutomation,
+		connect.WithSchema(automationServiceMethods.ByName("DeleteAutomation")),
 		connect.WithHandlerOptions(opts...),
 	)
 	automationServiceReceiveAutomationEventsHandler := connect.NewServerStreamHandler(
@@ -344,6 +370,12 @@ func NewAutomationServiceHandler(svc AutomationServiceHandler, opts ...connect.H
 		connect.WithSchema(automationServiceMethods.ByName("SendAutomationEvent")),
 		connect.WithHandlerOptions(opts...),
 	)
+	automationServiceStreamAutomationEventsHandler := connect.NewBidiStreamHandler(
+		AutomationServiceStreamAutomationEventsProcedure,
+		svc.StreamAutomationEvents,
+		connect.WithSchema(automationServiceMethods.ByName("StreamAutomationEvents")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/dtkt.core.v1.AutomationService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AutomationServiceListAutomationsProcedure:
@@ -352,12 +384,16 @@ func NewAutomationServiceHandler(svc AutomationServiceHandler, opts ...connect.H
 			automationServiceGetAutomationHandler.ServeHTTP(w, r)
 		case AutomationServiceCreateAutomationProcedure:
 			automationServiceCreateAutomationHandler.ServeHTTP(w, r)
-		case AutomationServiceStreamAutomationEventsProcedure:
-			automationServiceStreamAutomationEventsHandler.ServeHTTP(w, r)
+		case AutomationServiceUpdateAutomationProcedure:
+			automationServiceUpdateAutomationHandler.ServeHTTP(w, r)
+		case AutomationServiceDeleteAutomationProcedure:
+			automationServiceDeleteAutomationHandler.ServeHTTP(w, r)
 		case AutomationServiceReceiveAutomationEventsProcedure:
 			automationServiceReceiveAutomationEventsHandler.ServeHTTP(w, r)
 		case AutomationServiceSendAutomationEventProcedure:
 			automationServiceSendAutomationEventHandler.ServeHTTP(w, r)
+		case AutomationServiceStreamAutomationEventsProcedure:
+			automationServiceStreamAutomationEventsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -375,12 +411,16 @@ func (UnimplementedAutomationServiceHandler) GetAutomation(context.Context, *con
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.AutomationService.GetAutomation is not implemented"))
 }
 
-func (UnimplementedAutomationServiceHandler) CreateAutomation(context.Context, *connect.Request[v1.CreateAutomationRequest]) (*connect.Response[v1.CreateAutomationResponse], error) {
+func (UnimplementedAutomationServiceHandler) CreateAutomation(context.Context, *connect.Request[v1.CreateAutomationRequest]) (*connect.Response[longrunningpb.Operation], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.AutomationService.CreateAutomation is not implemented"))
 }
 
-func (UnimplementedAutomationServiceHandler) StreamAutomationEvents(context.Context, *connect.BidiStream[v1.StreamAutomationEventsRequest, v1.StreamAutomationEventsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.AutomationService.StreamAutomationEvents is not implemented"))
+func (UnimplementedAutomationServiceHandler) UpdateAutomation(context.Context, *connect.Request[v1.UpdateAutomationRequest]) (*connect.Response[longrunningpb.Operation], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.AutomationService.UpdateAutomation is not implemented"))
+}
+
+func (UnimplementedAutomationServiceHandler) DeleteAutomation(context.Context, *connect.Request[v1.DeleteAutomationRequest]) (*connect.Response[longrunningpb.Operation], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.AutomationService.DeleteAutomation is not implemented"))
 }
 
 func (UnimplementedAutomationServiceHandler) ReceiveAutomationEvents(context.Context, *connect.Request[v1.ReceiveAutomationEventsRequest], *connect.ServerStream[v1.ReceiveAutomationEventsResponse]) error {
@@ -389,6 +429,10 @@ func (UnimplementedAutomationServiceHandler) ReceiveAutomationEvents(context.Con
 
 func (UnimplementedAutomationServiceHandler) SendAutomationEvent(context.Context, *connect.Request[v1.SendAutomationEventRequest]) (*connect.Response[emptypb.Empty], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.AutomationService.SendAutomationEvent is not implemented"))
+}
+
+func (UnimplementedAutomationServiceHandler) StreamAutomationEvents(context.Context, *connect.BidiStream[v1.StreamAutomationEventsRequest, v1.StreamAutomationEventsResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.AutomationService.StreamAutomationEvents is not implemented"))
 }
 
 // ConnectionServiceClient is a client for the dtkt.core.v1.ConnectionService service.

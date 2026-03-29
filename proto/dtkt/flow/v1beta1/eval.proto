@@ -5,6 +5,7 @@ package dtkt.flow.v1beta1;
 import "buf/validate/validate.proto";
 import "cel/expr/value.proto";
 import "dtkt/flow/v1beta1/spec.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1";
 
@@ -71,6 +72,9 @@ message Node {
 
   cel.expr.Value prev_value = 5;
   cel.expr.Value curr_value = 6;
+
+  google.protobuf.Timestamp start_time = 20;
+  google.protobuf.Timestamp finish_time = 21;
 
   oneof type {
     option (buf.validate.oneof).required = true;

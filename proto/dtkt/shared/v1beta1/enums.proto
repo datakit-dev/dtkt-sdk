@@ -4,18 +4,19 @@ package dtkt.shared.v1beta1;
 
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1";
 
-// Which step of auth we're performing.
-enum AuthCheck {
-  AUTH_CHECK_UNSPECIFIED = 0; // ask integration to decide the next step
-  AUTH_CHECK_OAUTH_CODE = 1; // request authorization URL
-  AUTH_CHECK_OAUTH_CALLBACK = 2; // exchange authorization_code
-  AUTH_CHECK_OAUTH_REFRESH = 3; // refresh existing credentials
+// How client credentials are sent to the token endpoint (optional).
+enum AuthStyle {
+  AUTH_STYLE_UNSPECIFIED = 0; // let provider/library decide
+  AUTH_STYLE_IN_PARAMS = 1; // client_id/secret in body
+  AUTH_STYLE_IN_HEADER = 2; // HTTP Basic (Authorization:)
 }
 
-// Auth type exposed by a service (extensible later).
+// Which step of auth we're performing.
 enum AuthType {
   AUTH_TYPE_UNSPECIFIED = 0;
-  AUTH_TYPE_OAUTH = 1;
+  AUTH_TYPE_OAUTH_CODE = 1; // OAuth code.
+  AUTH_TYPE_OAUTH_TOKEN = 2; // OAuth token.
+  AUTH_TYPE_OAUTH_REFRESH = 3; // OAuth refresh.
 }
 
 // PKCE method (when used).
@@ -23,13 +24,6 @@ enum CodeChallengeMethod {
   CODE_CHALLENGE_METHOD_UNSPECIFIED = 0;
   CODE_CHALLENGE_METHOD_PLAIN = 1;
   CODE_CHALLENGE_METHOD_S256 = 2;
-}
-
-// How client credentials are sent to the token endpoint (optional).
-enum AuthStyle {
-  AUTH_STYLE_UNSPECIFIED = 0; // let provider/library decide
-  AUTH_STYLE_IN_PARAMS = 1; // client_id/secret in body
-  AUTH_STYLE_IN_HEADER = 2; // HTTP Basic (Authorization:)
 }
 
 // Enum representing event types.

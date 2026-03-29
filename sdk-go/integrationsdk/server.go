@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -125,13 +126,18 @@ func (s *Server[C, I]) Serve() error {
 
 	s.health.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
 
-	s.mux.Handle("/", s.grpc)
-
 	for pattern, handler := range s.intgr.handlers {
 		s.mux.Handle(pattern, handler)
 	}
 
-	s.http.Handler = s.mux
+	s.http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.ProtoMajor == 2 && strings.HasPrefix(
+			r.Header.Get("Content-Type"), "application/grpc") {
+			s.grpc.ServeHTTP(w, r)
+		} else {
+			s.mux.ServeHTTP(w, r)
+		}
+	})
 
 	s.intgr.log.Info("Integration server starting...")
 
@@ -185,7 +191,15 @@ func (s *Server[C, I]) proxyHandler() grpc.StreamHandler {
 
 			return proxy.One2One, []proxy.Backend{
 				&proxy.SingleBackend{
-					GetConn: getConn,
+					GetConn: func(ctx context.Context) (context.Context, *grpc.ClientConn, error) {
+						return getConn(ctx,
+							network.DialGRPCInsecure,
+							grpc.WithDefaultCallOptions(
+								grpc.ForceCodecV2(proxy.Codec()),
+								grpc.CallContentSubtype("proto"),
+							),
+						)
+					},
 				},
 			}, nil
 		},

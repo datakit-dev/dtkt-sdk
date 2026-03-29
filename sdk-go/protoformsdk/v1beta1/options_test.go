@@ -1,4 +1,4 @@
-package form_test
+package v1beta1_test
 
 // import (
 // 	"testing"

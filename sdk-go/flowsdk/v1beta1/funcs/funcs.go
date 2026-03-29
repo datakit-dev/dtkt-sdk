@@ -4,12 +4,16 @@ import (
 	"time"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
+	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 )
 
-func Make(run shared.Runtime) []cel.EnvOption {
+var evalNode *flowv1beta1.Node
+var nodeType = string(evalNode.ProtoReflect().Descriptor().FullName())
+
+func EnvOptions(env shared.Env, run shared.Runtime) []cel.EnvOption {
 	return []cel.EnvOption{
 		cel.Function("now",
 			cel.SingletonFunctionBinding(
@@ -21,9 +25,9 @@ func Make(run shared.Runtime) []cel.EnvOption {
 			),
 			cel.Overload("now", nil, cel.TimestampType),
 		),
-		MakeGetCountFunc(run),
-		MakeGetPrevFunc(run),
-		MakeGetValueFunc(run),
-		MakeIsEOFFunc(run),
+		MakeGetCountFunc(env),
+		MakeGetPrevFunc(env),
+		MakeGetValueFunc(env, run),
+		MakeIsEOFFunc(),
 	}
 }

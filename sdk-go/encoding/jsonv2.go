@@ -10,6 +10,8 @@ import (
 	"slices"
 	"strconv"
 	"time"
+
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 const DefaultJSONDelim = "\n"
@@ -108,6 +110,8 @@ func (e *JSONEncoderV2) encodeRaw(v any) (jsontext.Value, bool) {
 		} else {
 			return []byte(strconv.Quote(v.String())), true
 		}
+	case *durationpb.Duration:
+		return e.encodeRaw(v.AsDuration())
 	}
 	return nil, false
 }
@@ -221,6 +225,5 @@ func (d *JSONDecoderV2) StreamDecode(r io.Reader) func(any) error {
 
 			return json.UnmarshalDecode(dec, v, d.opts...)
 		}
-
 	}
 }

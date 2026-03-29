@@ -5,34 +5,27 @@ import (
 
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
+	"github.com/google/cel-go/common/types/ref"
 )
 
 type (
 	Runtime interface {
 		Context() context.Context
 		Connectors() ConnectorProvider
+		Env() (Env, error)
+		GetNode(string) (SpecNode, bool)
+		GetValue(string) (any, error)
+		GetSendCh(string) (chan<- ref.Val, error)
+		GetRecvCh(string) (<-chan any, error)
+	}
+	Env interface {
+		Check(*cel.Ast) (*cel.Ast, *cel.Issues)
+		Compile(string) (*cel.Ast, *cel.Issues)
+		Parse(string) (*cel.Ast, *cel.Issues)
+		Program(*cel.Ast, ...cel.ProgramOption) (cel.Program, error)
 		Resolver() Resolver
-		Types() (Types, error)
-		Env() (*cel.Env, error)
-		Vars() (cel.Activation, error)
-		Parse(ParseNodeFunc) error
-		Compile() error
-		Reset()
-		GetNode(string) (Node, bool)
-		GetNodeValue(string) (any, error)
-		GetInputValue(string) (any, error)
-		SetInputValues(map[string]any) error
-		GetUserValues(string) (map[string]any, error)
-		SetUserValues(string, map[string]any) error
-		GetOutputValues() (map[string]any, error)
-		RangeNodes(func(string, Node) bool)
-	}
-	Types interface {
-		types.Adapter
-		types.Provider
-	}
-	Node interface {
-		GetRuntimeNode() EvalNode
-		GetTypeNode() SpecNode
+		TypeAdapter() types.Adapter
+		TypeProvider() types.Provider
+		Vars() cel.Activation
 	}
 )

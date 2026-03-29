@@ -130,8 +130,29 @@ message Automation {
     (dtkt.protoform.v1beta1.field).hidden = true
   ];
 
+  enum State {
+    STATE_UNSPECIFIED = 0;
+    PENDING = 1;
+    RUNNING = 2;
+    STOPPED = 3;
+    FAILED = 4;
+  }
+
+  // Automation state.
+  State state = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Automation runtime metadata.
+  FlowRuntimeMetadata runtime = 4 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
   // Name of flow resource to resolve spec.
-  string flow = 3 [
+  string flow = 5 [
     (buf.validate.field).required = true,
     (google.api.resource_reference).type = "Flow",
     (dtkt.protoform.v1beta1.field).title = "Flow",
@@ -141,23 +162,11 @@ message Automation {
     (dtkt.protoform.v1beta1.field).select.val_expr = "this.flows.map(i, i.name)"
   ];
 
-  // Checksum of flow spec must match when resolving spec (concurrency control).
-  string spec_etag = 4 [
+  // Checksum of flow spec must match flow when resolving spec (concurrency control).
+  string spec_etag = 6 [
     (buf.validate.field).required = true,
     (google.api.field_behavior) = INPUT_ONLY,
     (dtkt.protoform.v1beta1.field).hidden = true
-  ];
-
-  // Executor runtime metadata of resolved Flow spec (versioned).
-  FlowRuntimeMetadata runtime = 5 [
-    (buf.validate.field).required = true,
-    (google.api.field_behavior) = OUTPUT_ONLY
-  ];
-
-  // Execution groups metadata of resolved Flow spec (versioned).
-  FlowGroupsMetadata groups = 6 [
-    (buf.validate.field).required = true,
-    (google.api.field_behavior) = OUTPUT_ONLY
   ];
 
   // Connections configuration as map of connection node id to connection
@@ -189,6 +198,15 @@ message Automation {
 
   // Server-assigned batch name if created within a batch (optional).
   optional string batch = 10 [(dtkt.protoform.v1beta1.field).hidden = true];
+
+  // Etag for concurrency control of automation updates (must match current etag
+  // to update or delete).
+  string etag = 15 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true,
+    debug_redact = true
+  ];
 
   // Automation create time.
   google.protobuf.Timestamp create_time = 20 [
@@ -327,7 +345,7 @@ message Connection {
   option (buf.validate.message).cel_expression = "(has(this.custom_protos) || has(this.custom_grpc)) ? has(this.address) : has(this.deployment)";
 
   oneof config {
-    // Config data compatible with integration config schema.
+    // Config data compatible with deployment config schema.
     google.protobuf.Any decrypted_config = 7 [
       (google.api.field_behavior) = INPUT_ONLY,
       debug_redact = true
@@ -363,7 +381,20 @@ message Connection {
     (dtkt.protoform.v1beta1.field).file = {}
   ];
 
-  // Headers applied when dialing connection.
+  oneof auth {
+    // Decrypted auth data.
+    google.protobuf.Any decrypted_auth = 9 [
+      (google.api.field_behavior) = INPUT_ONLY,
+      debug_redact = true
+    ];
+    // Encrypted auth data.
+    EncryptedAny encrypted_auth = 10 [
+      (google.api.field_behavior) = OUTPUT_ONLY,
+      (dtkt.protoform.v1beta1.field).hidden = true
+    ];
+  }
+
+  // Headers applied when dialing connection (only valid for custom connections).
   map<string, string> headers = 14 [debug_redact = true];
   option (buf.validate.message).cel_expression = "has(this.headers) ? has(this.custom_protos) || has(this.custom_grpc) : false";
 
@@ -420,6 +451,7 @@ message Deployment {
     FAILED = 5;
   }
 
+  // Deployment state.
   State state = 3 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true,
@@ -783,6 +815,18 @@ message TypeSchema {
   }
 }
 
+// AutomationMetadata contains metadata for automation operations.
+message AutomationMetadata {
+  // Status message.
+  string message = 1;
+
+  // Start time.
+  google.protobuf.Timestamp start_time = 10;
+
+  // Stop time.
+  google.protobuf.Timestamp stop_time = 11;
+}
+
 // DeploymentMetadata contains metadata for deployment operations.
 message DeploymentMetadata {
   // Status message.
@@ -809,7 +853,7 @@ message FlowConnectionMetadata {
   ];
 
   // Optional context to resolve connection resource by name.
-  // If unspecified, defaults to the context where the flow automation runs.
+  // If unspecified, defaults to the context where the automation runs.
   Context context = 2;
 }
 
@@ -1064,6 +1108,31 @@ message CreateAutomationRequest {
 message CreateAutomationResponse {
   // The created automation.
   Automation automation = 1 [(buf.validate.field).required = true];
+}
+
+message UpdateAutomationRequest {
+  // Automation with updated fields. Must include `name`.
+  Automation automation = 1 [(buf.validate.field).required = true];
+
+  // Fields to update (e.g., "config,address").
+  google.protobuf.FieldMask update_mask = 2;
+
+  // Desired state of automation after update.
+  optional Automation.State desired_state = 3 [(buf.validate.field).enum = {
+    in: [
+      2,
+      3
+    ]
+  } /* RUNNING or STOPPED */];
+}
+
+message DeleteAutomationRequest {
+  // Name of automation to delete.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Etag must match current automation etag for delete to succeed (ensures
+  // automation is up-to-date and prevents lost deletes).
+  string etag = 2 [(buf.validate.field).required = true];
 }
 
 message BatchCreateAutomationsRequest {

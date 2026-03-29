@@ -82,14 +82,16 @@ func New[C any, I v1beta1.InstanceType](
 	}
 
 	var (
-		// ident   = common.GetPackageIdentity(spec)
+		ident   = common.GetPackageIdentity(spec)
 		name    resource.Name
 		types   *v1beta1.TypeRegistry
 		logOpts = []any{
+			slog.String("package", ident.String()),
 			slog.String("network", addr.Network()),
 			slog.String("address", addr.String()),
 		}
 	)
+
 	if env.GetVar(env.ContextAddress) != "" && resource.Deployment.IsName(env.GetVar(env.DeployName)) {
 		addr, err := network.ParseAddr(env.GetVar(env.ContextAddress))
 		if err != nil {
@@ -119,7 +121,10 @@ func New[C any, I v1beta1.InstanceType](
 	debugPath, debugHandler := env.Handler()
 
 	intgr := &Integration[C, I]{
-		log: log.NewLogger().With(logOpts...),
+		log: log.NewLogger(
+			log.WithFormat(log.FormatPretty),
+			log.WithSource(true),
+		).With(logOpts...),
 
 		spec:   spec,
 		config: config,
@@ -335,9 +340,9 @@ func (i *Integration[C, I]) GetPackage(context.Context, *basev1beta1.GetPackageR
 }
 
 func (i *Integration[C, I]) CheckConfig(ctx context.Context, req *basev1beta1.CheckConfigRequest) (*basev1beta1.CheckConfigResponse, error) {
-	_, err := i.getInstance(middleware.NewRequest(req.Connection, req.ConfigHash, req.ConfigGen))
+	inst, err := i.getInstance(middleware.NewRequest(req.Connection, req.ConfigHash, req.ConfigGen))
 	if err != nil {
-		inst, err := NewInstance(ctx, i, req)
+		inst, err = NewInstance(ctx, i, req)
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "new instance error: %s", err)
 		}
@@ -346,9 +351,14 @@ func (i *Integration[C, I]) CheckConfig(ctx context.Context, req *basev1beta1.Ch
 		i.instances.Store(inst.String(), inst)
 	}
 
+	var authRequired *sharedv1beta1.AuthType
+	resp, err := inst.inst.CheckAuth(ctx, &basev1beta1.CheckAuthRequest{})
+	if resp.GetAuthRequired() > 0 {
+		authRequired = new(resp.GetAuthRequired())
+	}
+
 	return &basev1beta1.CheckConfigResponse{
-		Valid:   true,
-		Message: "Check config succeeded.",
+		AuthRequired: authRequired,
 	}, nil
 }
 
@@ -489,11 +499,7 @@ func (i *Integration[C, I]) streamInterceptor() grpc.StreamServerInterceptor {
 
 func (i *Integration[C, I]) newContext(ctx context.Context, req *middleware.Request) context.Context {
 	ctx = log.NewCtx(ctx, i.log.With(slog.String("connection", req.AddrName())))
-	return middleware.AddRequestToContext(
-		v1beta1.AddPackageToContext(
-			v1beta1.AddRegistryToContext(ctx, i.types), i.Package(),
-		), req,
-	)
+	return middleware.AddRequestToContext(ctx, req)
 }
 
 func (i *Integration[C, I]) getInstance(req *middleware.Request) (*Instance[I], error) {

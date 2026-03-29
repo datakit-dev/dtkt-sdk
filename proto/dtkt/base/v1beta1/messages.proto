@@ -38,49 +38,30 @@ message CheckConfigRequest {
 
 // Response for checking config.
 message CheckConfigResponse {
-  // True if config is valid.
-  bool valid = 1;
-
-  // Human-readable summary.
-  string message = 5;
+  // Auth type if auth is required.
+  optional dtkt.shared.v1beta1.AuthType auth_required = 1;
 }
 
 // Request for checking auth (3-legged OAuth over gRPC).
 message CheckAuthRequest {
-  // The auth check type.
-  dtkt.shared.v1beta1.AuthCheck type = 1;
-
-  // If auth type response is OAuth.
-  oneof oauth {
-    // When check type is auth code url.
+  oneof type {
     dtkt.shared.v1beta1.OAuthCodeRequest code_request = 2;
-
-    // When check type is callback.
     dtkt.shared.v1beta1.OAuthTokenRequest token_request = 3;
-
-    // When check type is refresh.
     dtkt.shared.v1beta1.OAuthRefreshRequest refresh_request = 4;
   }
 }
 
 // Response for checking auth.
 message CheckAuthResponse {
-  // The auth type.
-  dtkt.shared.v1beta1.AuthType type = 1;
+  // Auth type if auth is required.
+  dtkt.shared.v1beta1.AuthType auth_required = 1;
 
-  // Indicates if the auth check was successful.
-  bool success = 2;
+  oneof type {
+    // Returned when auth type is code.
+    string oauth_code_url = 2;
 
-  // Error message if success is false.
-  string error = 3;
-
-  // Present when type is OAuth.
-  oneof oauth {
-    // Returned when check is code.
-    string auth_code_url = 4;
-
-    // Returned when check type is token or refresh.
-    dtkt.shared.v1beta1.OAuthToken token = 5;
+    // Returned when auth type is token or refresh.
+    dtkt.shared.v1beta1.OAuthToken token = 3;
   }
 }
 

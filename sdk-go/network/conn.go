@@ -19,7 +19,7 @@ type (
 	}
 	connector struct {
 		addr Address
-		opts *connectorOptions
+		opts connectorOptions
 	}
 )
 
@@ -31,20 +31,20 @@ func NewConnector(addr Address, opts ...ConnectorOption) (Connector, error) {
 		return NewSSHConnector(addr)
 	}
 
-	o := &connectorOptions{}
-	o.apply(opts...)
-
-	return &connector{
+	conn := &connector{
 		addr: addr,
-		opts: o,
-	}, nil
+	}
+
+	conn.opts.apply(opts...)
+
+	return conn, nil
 }
 
 func (c *connector) Address() net.Addr {
 	return c.addr
 }
 
-func (c *connector) Bind(ctx context.Context) (net.Listener, error) {
+func (c *connector) Bind(context.Context) (net.Listener, error) {
 	lis, err := net.Listen(c.addr.Network(), c.addr.String())
 	if err != nil {
 		return nil, err
@@ -65,11 +65,13 @@ func (c *connector) DialContext(ctx context.Context) (net.Conn, error) {
 	dialer := &net.Dialer{
 		Timeout: 30 * time.Second,
 	}
+
 	conn, err := dialer.DialContext(ctx, c.addr.Network(), c.addr.String())
 	if err != nil {
 		return nil, err
 	}
 	c.opts.close = conn.Close
+
 	return conn, nil
 }
 

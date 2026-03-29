@@ -9,51 +9,44 @@ import { enumDesc, fileDesc } from "@bufbuild/protobuf/codegenv2";
  * Describes the file dtkt/shared/v1beta1/enums.proto.
  */
 export const file_dtkt_shared_v1beta1_enums: GenFile = /*@__PURE__*/
-  fileDesc("Ch9kdGt0L3NoYXJlZC92MWJldGExL2VudW1zLnByb3RvEhNkdGt0LnNoYXJlZC52MWJldGExKn8KCUF1dGhDaGVjaxIaChZBVVRIX0NIRUNLX1VOU1BFQ0lGSUVEEAASGQoVQVVUSF9DSEVDS19PQVVUSF9DT0RFEAESHQoZQVVUSF9DSEVDS19PQVVUSF9DQUxMQkFDSxACEhwKGEFVVEhfQ0hFQ0tfT0FVVEhfUkVGUkVTSBADKjoKCEF1dGhUeXBlEhkKFUFVVEhfVFlQRV9VTlNQRUNJRklFRBAAEhMKD0FVVEhfVFlQRV9PQVVUSBABKn0KE0NvZGVDaGFsbGVuZ2VNZXRob2QSJQohQ09ERV9DSEFMTEVOR0VfTUVUSE9EX1VOU1BFQ0lGSUVEEAASHwobQ09ERV9DSEFMTEVOR0VfTUVUSE9EX1BMQUlOEAESHgoaQ09ERV9DSEFMTEVOR0VfTUVUSE9EX1MyNTYQAipbCglBdXRoU3R5bGUSGgoWQVVUSF9TVFlMRV9VTlNQRUNJRklFRBAAEhgKFEFVVEhfU1RZTEVfSU5fUEFSQU1TEAESGAoUQVVUSF9TVFlMRV9JTl9IRUFERVIQAiq0AQoKQWN0aW9uVHlwZRIbChdBQ1RJT05fVFlQRV9VTlNQRUNJRklFRBAAEhYKEkFDVElPTl9UWVBFX0NSRUFURRABEhYKEkFDVElPTl9UWVBFX1VQREFURRACEhYKEkFDVElPTl9UWVBFX0RFTEVURRADEhUKEUFDVElPTl9UWVBFX1dSSVRFEAQSFAoQQUNUSU9OX1RZUEVfUkVBRBAFEhQKEEFDVElPTl9UWVBFX1ZJRVcQBiq+AQoISlNPTlR5cGUSGQoVSlNPTl9UWVBFX1VOU1BFQ0lGSUVEEAASFAoQSlNPTl9UWVBFX1NUUklORxABEhQKEEpTT05fVFlQRV9OVU1CRVIQAhIVChFKU09OX1RZUEVfSU5URUdFUhADEhUKEUpTT05fVFlQRV9CT09MRUFOEAQSFAoQSlNPTl9UWVBFX09CSkVDVBAFEhMKD0pTT05fVFlQRV9BUlJBWRAGEhIKDkpTT05fVFlQRV9OVUxMEAcqWgoHR2VvVHlwZRIYChRHRU9fVFlQRV9VTlNQRUNJRklFRBAAEhEKDUdFT19UWVBFX0pTT04QARIQCgxHRU9fVFlQRV9XS1QQAhIQCgxHRU9fVFlQRV9XS0IQAypXCgtQYWNrYWdlVHlwZRIcChhQQUNLQUdFX1RZUEVfVU5TUEVDSUZJRUQQABITCg9QQUNLQUdFX1RZUEVfR08QARIVChFQQUNLQUdFX1RZUEVfTk9ERRACKkoKB1J1bnRpbWUSFwoTUlVOVElNRV9VTlNQRUNJRklFRBAAEhIKDlJVTlRJTUVfTkFUSVZFEAESEgoOUlVOVElNRV9ET0NLRVIQAiqwAQoCT1MSEgoOT1NfVU5TUEVDSUZJRUQQABIMCghPU19MSU5VWBABEg0KCU9TX0RBUldJThACEg4KCk9TX1dJTkRPV1MQAxIKCgZPU19JT1MQBBIOCgpPU19BTkRST0lEEAUSDgoKT1NfRlJFRUJTRBAGEg0KCU9TX05FVEJTRBAHEg4KCk9TX09QRU5CU0QQCBIOCgpPU19TT0xBUklTEAkSDgoKT1NfSUxMVU1PUxAKKoECCgRBcmNoEhQKEEFSQ0hfVU5TUEVDSUZJRUQQABIMCghBUkNIX1g4NhABEg4KCkFSQ0hfQU1ENjQQAhIMCghBUkNIX0FSTRADEg4KCkFSQ0hfQVJNNjQQBBIQCgxBUkNIX0xPT05HNjQQBRINCglBUkNIX01JUFMQBhIPCgtBUkNIX01JUFM2NBAHEhEKDUFSQ0hfTUlQUzY0TEUQCBIPCgtBUkNIX01JUFNMRRAJEg4KCkFSQ0hfUFBDNjQQChIQCgxBUkNIX1BQQzY0TEUQCxIQCgxBUkNIX1JJU0NWNjQQDBIOCgpBUkNIX1MzOTBYEA0SDQoJQVJDSF9XQVNNEA5C5QEKGXByb3RvLmR0a3Quc2hhcmVkLnYxYmV0YTFCCkVudW1zUHJvdG9QAVpOZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9zaGFyZWQvdjFiZXRhMTtzaGFyZWR2MWJldGExogIDRFNYqgITRHRrdC5TaGFyZWQuVjFiZXRhMcoCE0R0a3RcU2hhcmVkXFYxYmV0YTHiAh9EdGt0XFNoYXJlZFxWMWJldGExXEdQQk1ldGFkYXRh6gIVRHRrdDo6U2hhcmVkOjpWMWJldGExYgZwcm90bzM");
+  fileDesc("Ch9kdGt0L3NoYXJlZC92MWJldGExL2VudW1zLnByb3RvEhNkdGt0LnNoYXJlZC52MWJldGExKlsKCUF1dGhTdHlsZRIaChZBVVRIX1NUWUxFX1VOU1BFQ0lGSUVEEAASGAoUQVVUSF9TVFlMRV9JTl9QQVJBTVMQARIYChRBVVRIX1NUWUxFX0lOX0hFQURFUhACKncKCEF1dGhUeXBlEhkKFUFVVEhfVFlQRV9VTlNQRUNJRklFRBAAEhgKFEFVVEhfVFlQRV9PQVVUSF9DT0RFEAESGQoVQVVUSF9UWVBFX09BVVRIX1RPS0VOEAISGwoXQVVUSF9UWVBFX09BVVRIX1JFRlJFU0gQAyp9ChNDb2RlQ2hhbGxlbmdlTWV0aG9kEiUKIUNPREVfQ0hBTExFTkdFX01FVEhPRF9VTlNQRUNJRklFRBAAEh8KG0NPREVfQ0hBTExFTkdFX01FVEhPRF9QTEFJThABEh4KGkNPREVfQ0hBTExFTkdFX01FVEhPRF9TMjU2EAIqtAEKCkFjdGlvblR5cGUSGwoXQUNUSU9OX1RZUEVfVU5TUEVDSUZJRUQQABIWChJBQ1RJT05fVFlQRV9DUkVBVEUQARIWChJBQ1RJT05fVFlQRV9VUERBVEUQAhIWChJBQ1RJT05fVFlQRV9ERUxFVEUQAxIVChFBQ1RJT05fVFlQRV9XUklURRAEEhQKEEFDVElPTl9UWVBFX1JFQUQQBRIUChBBQ1RJT05fVFlQRV9WSUVXEAYqvgEKCEpTT05UeXBlEhkKFUpTT05fVFlQRV9VTlNQRUNJRklFRBAAEhQKEEpTT05fVFlQRV9TVFJJTkcQARIUChBKU09OX1RZUEVfTlVNQkVSEAISFQoRSlNPTl9UWVBFX0lOVEVHRVIQAxIVChFKU09OX1RZUEVfQk9PTEVBThAEEhQKEEpTT05fVFlQRV9PQkpFQ1QQBRITCg9KU09OX1RZUEVfQVJSQVkQBhISCg5KU09OX1RZUEVfTlVMTBAHKloKB0dlb1R5cGUSGAoUR0VPX1RZUEVfVU5TUEVDSUZJRUQQABIRCg1HRU9fVFlQRV9KU09OEAESEAoMR0VPX1RZUEVfV0tUEAISEAoMR0VPX1RZUEVfV0tCEAMqVwoLUGFja2FnZVR5cGUSHAoYUEFDS0FHRV9UWVBFX1VOU1BFQ0lGSUVEEAASEwoPUEFDS0FHRV9UWVBFX0dPEAESFQoRUEFDS0FHRV9UWVBFX05PREUQAipKCgdSdW50aW1lEhcKE1JVTlRJTUVfVU5TUEVDSUZJRUQQABISCg5SVU5USU1FX05BVElWRRABEhIKDlJVTlRJTUVfRE9DS0VSEAIqsAEKAk9TEhIKDk9TX1VOU1BFQ0lGSUVEEAASDAoIT1NfTElOVVgQARINCglPU19EQVJXSU4QAhIOCgpPU19XSU5ET1dTEAMSCgoGT1NfSU9TEAQSDgoKT1NfQU5EUk9JRBAFEg4KCk9TX0ZSRUVCU0QQBhINCglPU19ORVRCU0QQBxIOCgpPU19PUEVOQlNEEAgSDgoKT1NfU09MQVJJUxAJEg4KCk9TX0lMTFVNT1MQCiqBAgoEQXJjaBIUChBBUkNIX1VOU1BFQ0lGSUVEEAASDAoIQVJDSF9YODYQARIOCgpBUkNIX0FNRDY0EAISDAoIQVJDSF9BUk0QAxIOCgpBUkNIX0FSTTY0EAQSEAoMQVJDSF9MT09ORzY0EAUSDQoJQVJDSF9NSVBTEAYSDwoLQVJDSF9NSVBTNjQQBxIRCg1BUkNIX01JUFM2NExFEAgSDwoLQVJDSF9NSVBTTEUQCRIOCgpBUkNIX1BQQzY0EAoSEAoMQVJDSF9QUEM2NExFEAsSEAoMQVJDSF9SSVNDVjY0EAwSDgoKQVJDSF9TMzkwWBANEg0KCUFSQ0hfV0FTTRAOQuUBChlwcm90by5kdGt0LnNoYXJlZC52MWJldGExQgpFbnVtc1Byb3RvUAFaTmdpdGh1Yi5jb20vZGF0YWtpdC1kZXYvZHRrdC1zZGsvc2RrLWdvL3Byb3RvL2R0a3Qvc2hhcmVkL3YxYmV0YTE7c2hhcmVkdjFiZXRhMaICA0RTWKoCE0R0a3QuU2hhcmVkLlYxYmV0YTHKAhNEdGt0XFNoYXJlZFxWMWJldGEx4gIfRHRrdFxTaGFyZWRcVjFiZXRhMVxHUEJNZXRhZGF0YeoCFUR0a3Q6OlNoYXJlZDo6VjFiZXRhMWIGcHJvdG8z");
 
 /**
- * Which step of auth we're performing.
+ * How client credentials are sent to the token endpoint (optional).
  *
- * @generated from enum dtkt.shared.v1beta1.AuthCheck
+ * @generated from enum dtkt.shared.v1beta1.AuthStyle
  */
-export enum AuthCheck {
+export enum AuthStyle {
   /**
-   * ask integration to decide the next step
+   * let provider/library decide
    *
-   * @generated from enum value: AUTH_CHECK_UNSPECIFIED = 0;
+   * @generated from enum value: AUTH_STYLE_UNSPECIFIED = 0;
    */
   UNSPECIFIED = 0,
 
   /**
-   * request authorization URL
+   * client_id/secret in body
    *
-   * @generated from enum value: AUTH_CHECK_OAUTH_CODE = 1;
+   * @generated from enum value: AUTH_STYLE_IN_PARAMS = 1;
    */
-  OAUTH_CODE = 1,
+  IN_PARAMS = 1,
 
   /**
-   * exchange authorization_code
+   * HTTP Basic (Authorization:)
    *
-   * @generated from enum value: AUTH_CHECK_OAUTH_CALLBACK = 2;
+   * @generated from enum value: AUTH_STYLE_IN_HEADER = 2;
    */
-  OAUTH_CALLBACK = 2,
-
-  /**
-   * refresh existing credentials
-   *
-   * @generated from enum value: AUTH_CHECK_OAUTH_REFRESH = 3;
-   */
-  OAUTH_REFRESH = 3,
+  IN_HEADER = 2,
 }
 
 /**
- * Describes the enum dtkt.shared.v1beta1.AuthCheck.
+ * Describes the enum dtkt.shared.v1beta1.AuthStyle.
  */
-export const AuthCheckSchema: GenEnum<AuthCheck> = /*@__PURE__*/
+export const AuthStyleSchema: GenEnum<AuthStyle> = /*@__PURE__*/
   enumDesc(file_dtkt_shared_v1beta1_enums, 0);
 
 /**
- * Auth type exposed by a service (extensible later).
+ * Which step of auth we're performing.
  *
  * @generated from enum dtkt.shared.v1beta1.AuthType
  */
@@ -64,9 +57,25 @@ export enum AuthType {
   UNSPECIFIED = 0,
 
   /**
-   * @generated from enum value: AUTH_TYPE_OAUTH = 1;
+   * OAuth code.
+   *
+   * @generated from enum value: AUTH_TYPE_OAUTH_CODE = 1;
    */
-  OAUTH = 1,
+  OAUTH_CODE = 1,
+
+  /**
+   * OAuth token.
+   *
+   * @generated from enum value: AUTH_TYPE_OAUTH_TOKEN = 2;
+   */
+  OAUTH_TOKEN = 2,
+
+  /**
+   * OAuth refresh.
+   *
+   * @generated from enum value: AUTH_TYPE_OAUTH_REFRESH = 3;
+   */
+  OAUTH_REFRESH = 3,
 }
 
 /**
@@ -102,40 +111,6 @@ export enum CodeChallengeMethod {
  */
 export const CodeChallengeMethodSchema: GenEnum<CodeChallengeMethod> = /*@__PURE__*/
   enumDesc(file_dtkt_shared_v1beta1_enums, 2);
-
-/**
- * How client credentials are sent to the token endpoint (optional).
- *
- * @generated from enum dtkt.shared.v1beta1.AuthStyle
- */
-export enum AuthStyle {
-  /**
-   * let provider/library decide
-   *
-   * @generated from enum value: AUTH_STYLE_UNSPECIFIED = 0;
-   */
-  UNSPECIFIED = 0,
-
-  /**
-   * client_id/secret in body
-   *
-   * @generated from enum value: AUTH_STYLE_IN_PARAMS = 1;
-   */
-  IN_PARAMS = 1,
-
-  /**
-   * HTTP Basic (Authorization:)
-   *
-   * @generated from enum value: AUTH_STYLE_IN_HEADER = 2;
-   */
-  IN_HEADER = 2,
-}
-
-/**
- * Describes the enum dtkt.shared.v1beta1.AuthStyle.
- */
-export const AuthStyleSchema: GenEnum<AuthStyle> = /*@__PURE__*/
-  enumDesc(file_dtkt_shared_v1beta1_enums, 3);
 
 /**
  * Enum representing event types.
@@ -197,7 +172,7 @@ export enum ActionType {
  * Describes the enum dtkt.shared.v1beta1.ActionType.
  */
 export const ActionTypeSchema: GenEnum<ActionType> = /*@__PURE__*/
-  enumDesc(file_dtkt_shared_v1beta1_enums, 4);
+  enumDesc(file_dtkt_shared_v1beta1_enums, 3);
 
 /**
  * Enum representing json data types.
@@ -266,7 +241,7 @@ export enum JSONType {
  * Describes the enum dtkt.shared.v1beta1.JSONType.
  */
 export const JSONTypeSchema: GenEnum<JSONType> = /*@__PURE__*/
-  enumDesc(file_dtkt_shared_v1beta1_enums, 5);
+  enumDesc(file_dtkt_shared_v1beta1_enums, 4);
 
 /**
  * Enum representing geo data types.
@@ -307,7 +282,7 @@ export enum GeoType {
  * Describes the enum dtkt.shared.v1beta1.GeoType.
  */
 export const GeoTypeSchema: GenEnum<GeoType> = /*@__PURE__*/
-  enumDesc(file_dtkt_shared_v1beta1_enums, 6);
+  enumDesc(file_dtkt_shared_v1beta1_enums, 5);
 
 /**
  * Supported package types.
@@ -341,7 +316,7 @@ export enum PackageType {
  * Describes the enum dtkt.shared.v1beta1.PackageType.
  */
 export const PackageTypeSchema: GenEnum<PackageType> = /*@__PURE__*/
-  enumDesc(file_dtkt_shared_v1beta1_enums, 7);
+  enumDesc(file_dtkt_shared_v1beta1_enums, 6);
 
 /**
  * Supported runtimes.
@@ -369,7 +344,7 @@ export enum Runtime {
  * Describes the enum dtkt.shared.v1beta1.Runtime.
  */
 export const RuntimeSchema: GenEnum<Runtime> = /*@__PURE__*/
-  enumDesc(file_dtkt_shared_v1beta1_enums, 8);
+  enumDesc(file_dtkt_shared_v1beta1_enums, 7);
 
 /**
  * Supported operating systems.
@@ -437,7 +412,7 @@ export enum OS {
  * Describes the enum dtkt.shared.v1beta1.OS.
  */
 export const OSSchema: GenEnum<OS> = /*@__PURE__*/
-  enumDesc(file_dtkt_shared_v1beta1_enums, 9);
+  enumDesc(file_dtkt_shared_v1beta1_enums, 8);
 
 /**
  * Supported CPU Architectures.
@@ -553,5 +528,5 @@ export enum Arch {
  * Describes the enum dtkt.shared.v1beta1.Arch.
  */
 export const ArchSchema: GenEnum<Arch> = /*@__PURE__*/
-  enumDesc(file_dtkt_shared_v1beta1_enums, 10);
+  enumDesc(file_dtkt_shared_v1beta1_enums, 9);
 

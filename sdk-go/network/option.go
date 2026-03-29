@@ -38,7 +38,10 @@ func (o *connectorOptions) apply(opts ...ConnectorOption) {
 			opt(o)
 		}
 	}
-	o.grpc = append([]grpc.DialOption{grpcInsecure}, o.grpc...)
+
+	if len(o.grpc) == 0 {
+		o.grpc = append([]grpc.DialOption{DialGRPCInsecure}, o.grpc...)
+	}
 }
 
 func (o *connectorOptions) Close() error {

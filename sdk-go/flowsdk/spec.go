@@ -12,6 +12,7 @@ import (
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta1/runtime"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta1/spec"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk/v1beta1"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
@@ -116,6 +117,14 @@ func (f *Spec) Validate() error {
 		return fmt.Errorf("invalid spec: missing flow")
 	}
 	return protovalidate.Validate(f.flow)
+}
+
+func (s *Spec) Parse() (*flowv1beta1.Graph, error) {
+	graph, err := runtime.SpecGraph(s.flow)
+	if err != nil {
+		return nil, err
+	}
+	return graph.Proto(), nil
 }
 
 func (f Spec) MarshalJSON() ([]byte, error) {

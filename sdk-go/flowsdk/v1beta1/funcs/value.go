@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
+	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/functions"
 	"github.com/google/cel-go/common/types"
@@ -12,39 +13,27 @@ import (
 
 const GetValueFunc = "getValue"
 
-func MakeGetValueFunc(run shared.Runtime) cel.EnvOption {
-	var opts []cel.FunctionOpt
-	run.RangeNodes(func(id string, node shared.Node) bool {
-		typeName := string(node.GetRuntimeNode().ProtoReflect().Descriptor().FullName())
-		opts = append(opts,
-			cel.MemberOverload(
-				fmt.Sprintf("%s_%s", typeName, GetValueFunc),
-				[]*cel.Type{cel.ObjectType(typeName)},
-				cel.DynType,
-				cel.FunctionBinding(EvalGetValueFunc(run)),
-			),
-		)
-		return true
-	})
-
-	return cel.Function(GetValueFunc, opts...)
+func MakeGetValueFunc(env shared.Env, run shared.Runtime) cel.EnvOption {
+	return cel.Function(GetValueFunc,
+		cel.MemberOverload(
+			fmt.Sprintf("%s_%s", nodeType, GetValueFunc),
+			[]*cel.Type{cel.ObjectType(nodeType)},
+			cel.DynType,
+			cel.FunctionBinding(EvalGetValueFunc(env, run)),
+		),
+	)
 }
 
-func EvalGetValueFunc(run shared.Runtime) functions.FunctionOp {
+func EvalGetValueFunc(env shared.Env, _ shared.Runtime) functions.FunctionOp {
 	return func(args ...ref.Val) ref.Val {
-		node, ok := args[0].Value().(shared.EvalNode)
+		node, ok := args[0].Value().(*flowv1beta1.Node)
 		if ok && node != nil {
-			env, err := run.Env()
+			val, err := shared.ExprValueToNative(env, node.GetCurrValue())
 			if err != nil {
 				return types.WrapErr(err)
 			}
 
-			val, err := run.GetNodeValue(node.GetId())
-			if err != nil {
-				return types.WrapErr(err)
-			}
-
-			return env.CELTypeAdapter().NativeToValue(val)
+			return env.TypeAdapter().NativeToValue(val)
 		}
 
 		return types.WrapErr(fmt.Errorf("%s failed to resolve for: %#v", GetValueFunc, args[0].Value()))

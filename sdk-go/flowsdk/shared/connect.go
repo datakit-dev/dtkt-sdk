@@ -11,9 +11,9 @@ import (
 
 type (
 	ConnectorProvider interface {
-		// GetConnector returns a Connector for a connection node with given id.
-		// It must match given package name/version and implement given list of
-		// services, otherwise return an error.
+		// GetConnector returns a Connector for a connection node with the given id.
+		// It must match the given package (name & version) or implement the given
+		// list of services.
 		GetConnector(ctx context.Context, id string, pkg Package, services []string) (Connector, error)
 	}
 	Connector interface {

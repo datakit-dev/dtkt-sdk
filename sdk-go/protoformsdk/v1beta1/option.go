@@ -1,4 +1,4 @@
-package form
+package v1beta1
 
 import (
 	"fmt"
@@ -40,9 +40,9 @@ func LoadOptions(env Env, elem OptionsElement) error {
 		return fmt.Errorf("request type not found: %s", method.Input().FullName())
 	}
 
-	msg, _ := NewMessage(reqType.New())
+	msg := NewMessage(reqType.New())
 	return env.OnGroupCompleted(msg.FieldGroup(), func(group *FieldGroup) error {
-		res, err := env.Resolver().InvokeMethod(env.Context(), method.FullName(), group.Message().Get().Interface())
+		res, err := env.Resolver().InvokeMethod(env.Context(), method.FullName(), msg.Get().Interface())
 		if err != nil {
 			return fmt.Errorf("invoke method %s: %w", elem.GetMethodName(), err)
 		}
