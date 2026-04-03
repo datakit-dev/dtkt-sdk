@@ -10,6 +10,7 @@ import (
 	"buf.build/go/protovalidate"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
+	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
@@ -222,6 +223,11 @@ var _ shared.Connector = (*MockConnector)(nil)
 type MockConnector struct {
 	Client   common.DynamicClient
 	Resolver shared.Resolver
+	node     *flowv1beta1.Connection
+}
+
+func (m *MockConnector) SpecNode() shared.SpecNode {
+	return m.node
 }
 
 func (m *MockConnector) GetResolver(_ context.Context) (shared.Resolver, error) {

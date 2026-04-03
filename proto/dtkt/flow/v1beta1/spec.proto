@@ -244,7 +244,9 @@ message Switch {
     (buf.validate.field).required = true,
     (buf.validate.field).string.pattern = "^\\s?=\\s?"
   ];
+
   repeated Case case = 2;
+
   string default = 3 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.pattern = "^\\s?=\\s?"

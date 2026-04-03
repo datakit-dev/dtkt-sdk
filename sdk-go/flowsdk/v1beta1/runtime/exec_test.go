@@ -22,16 +22,14 @@ func parseSpec(t *testing.T, yaml string) *flowsdk.Spec {
 	buf.WriteString(yaml)
 	spec, err := flowsdk.ReadSpec(encoding.YAML, &buf)
 	require.NoError(t, err)
-	_, err = spec.Parse()
-	require.NoError(t, err)
 	return spec
 }
 
 // newRun creates a Runtime + Graph + Executor from a parsed spec.
 func newRun(t *testing.T, ctx context.Context, cancel context.CancelCauseFunc, spec *flowsdk.Spec) (*runtime.Runtime, *runtime.Executor) {
 	t.Helper()
-	run := runtime.New(ctx, cancel, spec.GetFlow())
-	graph, err := runtime.RuntimeGraph(run)
+	run := runtime.NewFromSpec(ctx, cancel, spec.GetFlow())
+	graph, err := runtime.GraphFromRuntime(run)
 	require.NoError(t, err)
 	exec, err := runtime.NewExecutor(run, graph)
 	require.NoError(t, err)

@@ -5,54 +5,49 @@ import (
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
+	"github.com/google/cel-go/cel"
 )
 
-type Node interface {
-	shared.SpecNode
-	*flowv1beta1.Action |
-		*flowv1beta1.Connection |
-		*flowv1beta1.Input |
-		*flowv1beta1.Output |
-		*flowv1beta1.Stream |
-		*flowv1beta1.Var
-}
+func ParseNode(env shared.Env, node shared.SpecNode, visitor shared.NodeVisitFunc) (shared.ExecNode, error) {
+	exprVisitor := func(ast *cel.Ast) {
+		visitor(GetID(node), ast)
+	}
 
-func NewRuntimeNode(env shared.Env, node shared.SpecNode, visitor shared.ExprVisitFunc) (shared.RuntimeNode, error) {
 	switch node := node.(type) {
 	case *flowv1beta1.Connection:
-		return NewConnection(env, node)
+		return NewConnection(env, node), nil
 	case *flowv1beta1.Input:
-		return NewInput(env, node)
+		return NewInput(env, node), nil
 	case *flowv1beta1.Var:
-		return NewVar(env, node, visitor)
+		return NewVar(env, node, exprVisitor)
 	case *flowv1beta1.Action:
-		return NewAction(env, node, visitor)
+		return NewAction(env, node, exprVisitor)
 	case *flowv1beta1.Stream:
-		return NewStream(env, node, visitor)
+		return NewStream(env, node, exprVisitor)
 	case *flowv1beta1.Output:
-		return NewOutput(env, node, visitor)
+		return NewOutput(env, node, exprVisitor)
 	}
 	return nil, nil
 }
 
-func GetID[T Node](node T) string {
+func GetID(node shared.SpecNode) string {
 	return fmt.Sprintf("%s.%s", GetIDPrefix(node), node.GetId())
 }
 
-func GetIDPrefix[T Node](node T) string {
-	switch node.ProtoReflect().Interface().(type) {
+func GetIDPrefix(node shared.SpecNode) string {
+	switch node.(type) {
+	case *flowv1beta1.Action:
+		return shared.ActionPrefix
 	case *flowv1beta1.Connection:
 		return shared.ConnectionPrefix
 	case *flowv1beta1.Input:
 		return shared.InputPrefix
-	case *flowv1beta1.Var:
-		return shared.VarPrefix
-	case *flowv1beta1.Action:
-		return shared.ActionPrefix
 	case *flowv1beta1.Output:
 		return shared.OutputPrefix
 	case *flowv1beta1.Stream:
 		return shared.StreamPrefix
+	case *flowv1beta1.Var:
+		return shared.VarPrefix
 	}
 	return ""
 }

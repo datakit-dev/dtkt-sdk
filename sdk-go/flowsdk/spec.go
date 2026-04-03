@@ -90,12 +90,12 @@ func WriteSpec(spec *Spec, format encoding.Format, writer io.Writer) (int, error
 	return writer.Write(b)
 }
 
-func (f *Spec) GetFlow() *flowv1beta1.Flow {
-	return f.flow
+func (s *Spec) GetFlow() *flowv1beta1.Flow {
+	return s.flow
 }
 
-func (f *Spec) GetRaw() []byte {
-	return f.raw
+func (s *Spec) GetRaw() []byte {
+	return s.raw
 }
 
 func (*Spec) SpecKind() string {
@@ -110,34 +110,34 @@ func (*Spec) APIVersion() api.Version {
 	return SpecAPIVersion
 }
 
-func (f *Spec) Validate() error {
-	if f == nil {
+func (s *Spec) Validate() error {
+	if s == nil {
 		return fmt.Errorf("invalid spec: failed to load")
-	} else if f.flow == nil {
+	} else if s.flow == nil {
 		return fmt.Errorf("invalid spec: missing flow")
 	}
-	return protovalidate.Validate(f.flow)
+	return protovalidate.Validate(s.flow)
 }
 
-func (s *Spec) Parse() (*flowv1beta1.Graph, error) {
-	graph, err := runtime.SpecGraph(s.flow)
+func (s *Spec) ParseGraph() (*flowv1beta1.Graph, error) {
+	graph, err := runtime.GraphFromSpec(s.flow)
 	if err != nil {
 		return nil, err
 	}
 	return graph.Proto(), nil
 }
 
-func (f Spec) MarshalJSON() ([]byte, error) {
-	return encoding.ToJSONV2(f.flow)
+func (s Spec) MarshalJSON() ([]byte, error) {
+	return encoding.ToJSONV2(s.flow)
 }
 
-func (f *Spec) UnmarshalJSON(data []byte) error {
+func (s *Spec) UnmarshalJSON(data []byte) error {
 	flow := new(flowv1beta1.Flow)
 	if err := encoding.FromJSONV2(data, flow); err != nil {
 		return err
 	}
 
-	*f = Spec{
+	*s = Spec{
 		flow: flow,
 	}
 

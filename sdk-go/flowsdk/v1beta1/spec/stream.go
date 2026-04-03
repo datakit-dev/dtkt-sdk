@@ -8,14 +8,14 @@ import (
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 )
 
-var _ shared.RuntimeNode = (*StreamCall)(nil)
+var _ shared.ExecNode = (*StreamCall)(nil)
 
 // StreamCall is a lazy wrapper for call-based streams. The actual sub-type
 // (ServerStream, ClientStream, or BidiStream) is determined at Compile time
 // when the method descriptor is available via the runtime's resolver.
 type StreamCall struct {
 	node  *flowv1beta1.Stream
-	inner shared.RuntimeNode
+	inner shared.ExecNode
 }
 
 func newStreamCall(env shared.Env, node *flowv1beta1.Stream, visitor shared.ExprVisitFunc) (*StreamCall, error) {
@@ -30,7 +30,7 @@ func (s *StreamCall) Compile(run shared.Runtime) error {
 	if err != nil {
 		return err
 	}
-	rn, ok := caller.(shared.RuntimeNode)
+	rn, ok := caller.(shared.ExecNode)
 	if !ok {
 		return fmt.Errorf("stream caller %T does not implement RuntimeNode", caller)
 	}
@@ -42,7 +42,7 @@ func (s *StreamCall) Recv() (shared.RecvFunc, bool) { return s.inner.Recv() }
 func (s *StreamCall) Send() (shared.SendFunc, bool) { return s.inner.Send() }
 func (s *StreamCall) Eval() (shared.EvalFunc, bool) { return s.inner.Eval() }
 
-func NewStream(env shared.Env, node *flowv1beta1.Stream, visitor shared.ExprVisitFunc) (shared.RuntimeNode, error) {
+func NewStream(env shared.Env, node *flowv1beta1.Stream, visitor shared.ExprVisitFunc) (shared.ExecNode, error) {
 	switch {
 	case node.GetCall() != nil:
 		return newStreamCall(env, node, visitor)

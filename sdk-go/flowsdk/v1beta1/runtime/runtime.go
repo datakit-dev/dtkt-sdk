@@ -7,7 +7,6 @@ import (
 	"slices"
 	"sync"
 
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/api"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
@@ -17,31 +16,40 @@ import (
 
 var _ shared.Runtime = (*Runtime)(nil)
 
-type (
-	Runtime struct {
-		proto    *flowv1beta1.Runtime
-		nodes    util.SyncMap[string, *Node]
-		conns    shared.ConnectorProvider
-		resolver shared.Resolver
+type Runtime struct {
+	proto *flowv1beta1.Runtime
 
-		env     func() (*Env, error)
-		recvChs map[string]chan any
-		sendChs map[string]chan ref.Val
+	nodes NodeMap
+	conns shared.ConnectorProvider
+	env   func() (*Env, error)
 
-		ctx    context.Context
-		cancel context.CancelCauseFunc
-		mut    sync.Mutex
-	}
-	RuntimeOption func(*Runtime)
-)
+	recvChs map[string]chan any
+	sendChs map[string]chan ref.Val
 
-func New(ctx context.Context, cancel context.CancelCauseFunc, spec *flowv1beta1.Flow, opts ...RuntimeOption) *Runtime {
+	ctx    context.Context
+	cancel context.CancelCauseFunc
+	mut    sync.Mutex
+}
+
+func NewFromSpec(ctx context.Context, cancel context.CancelCauseFunc, spec *flowv1beta1.Flow, opts ...Option) *Runtime {
 	return NewFromProto(ctx, cancel, ProtoFromSpec(spec), opts...)
 }
 
-func NewFromProto(ctx context.Context, cancel context.CancelCauseFunc, proto *flowv1beta1.Runtime, opts ...RuntimeOption) *Runtime {
+func NewFromProto(ctx context.Context, cancel context.CancelCauseFunc, proto *flowv1beta1.Runtime, opts ...Option) *Runtime {
 	run := &Runtime{
 		proto: proto,
+
+		nodes: RuntimeNodeMap(
+			proto.Actions,
+			proto.Connections,
+			proto.Inputs,
+			proto.Outputs,
+			proto.Streams,
+			proto.Vars,
+		),
+		env: sync.OnceValues(func() (*Env, error) {
+			return NewEnv(proto, opts...)
+		}),
 
 		recvChs: map[string]chan any{},
 		sendChs: map[string]chan ref.Val{},
@@ -50,72 +58,39 @@ func NewFromProto(ctx context.Context, cancel context.CancelCauseFunc, proto *fl
 		cancel: cancel,
 	}
 
-	run.nodes.StorePairs(
-		util.SliceMap(NewNodes(
-			proto.Connections,
-			proto.Inputs,
-			proto.Vars,
-			proto.Actions,
-			proto.Streams,
-			proto.Outputs,
-		), func(node *Node) util.MapPair[string, *Node] {
-			return util.NewMapPair(node.proto.GetId(), node)
-		})...,
-	)
-
-	for _, opt := range opts {
-		if opt != nil {
-			opt(run)
-		}
-	}
-
-	if run.resolver == nil {
-		run.resolver = api.GlobalResolver()
-	}
+	run.applyOptions(opts...)
 
 	if run.conns == nil {
 		run.conns = NewConnectors(
 			util.SliceMap(
-				slices.Collect(maps.Values(proto.GetConnections())),
+				slices.Collect(maps.Values(run.proto.GetConnections())),
 				func(n *flowv1beta1.Node) *Connector {
-					return NewConnector(n.GetConnection().GetId())
+					return NewConnector(n.GetConnection())
 				},
 			)...,
 		)
 	}
-
-	run.env = sync.OnceValues(func() (*Env, error) {
-		return NewEnv(run.proto, WithEnvResolver(run.resolver), WithRuntime(run))
-	})
 
 	return run
 }
 
 func ProtoFromSpec(spec *flowv1beta1.Flow) *flowv1beta1.Runtime {
 	return &flowv1beta1.Runtime{
-		Connections: NewNodeMap(spec.Connections...),
-		Inputs:      NewNodeMap(spec.Inputs...),
-		Vars:        NewNodeMap(spec.Vars...),
-		Actions:     NewNodeMap(spec.Actions...),
-		Streams:     NewNodeMap(spec.Streams...),
-		Outputs:     NewNodeMap(spec.Outputs...),
+		Actions:     SpecNodeMap(spec.Actions),
+		Connections: SpecNodeMap(spec.Connections),
+		Inputs:      SpecNodeMap(spec.Inputs),
+		Outputs:     SpecNodeMap(spec.Outputs),
+		Streams:     SpecNodeMap(spec.Streams),
+		Vars:        SpecNodeMap(spec.Vars),
 	}
 }
 
-func WithConnectors(provider shared.ConnectorProvider) RuntimeOption {
-	return func(r *Runtime) {
-		r.conns = provider
+func (r *Runtime) applyOptions(opts ...Option) {
+	for _, opt := range opts {
+		if opt != nil {
+			opt(r)
+		}
 	}
-}
-
-func WithResolver(resolver shared.Resolver) RuntimeOption {
-	return func(r *Runtime) {
-		r.resolver = resolver
-	}
-}
-
-func (r *Runtime) Resolver() shared.Resolver {
-	return r.resolver
 }
 
 func (r *Runtime) Context() context.Context {
@@ -173,7 +148,7 @@ func (r *Runtime) GetNode(id string) (shared.SpecNode, bool) {
 func (r *Runtime) GetValue(id string) (any, error) {
 	node, ok := r.nodes.Load(id)
 	if !ok {
-		return nil, fmt.Errorf("node not found: %s", id)
+		return nil, fmt.Errorf("method GetValue: node not found: %s", id)
 	}
 	return node.GetValue(r)
 }
@@ -207,7 +182,7 @@ func (r *Runtime) Reset() {
 func (r *Runtime) getSendCh(id string) (chan ref.Val, error) {
 	_, ok := r.nodes.Load(id)
 	if !ok {
-		return nil, fmt.Errorf("node not found: %q", id)
+		return nil, fmt.Errorf("method getSendCh: node not found: %q", id)
 	}
 
 	r.mut.Lock()
@@ -225,7 +200,7 @@ func (r *Runtime) getSendCh(id string) (chan ref.Val, error) {
 func (r *Runtime) getRecvCh(id string) (chan any, error) {
 	_, ok := r.nodes.Load(id)
 	if !ok {
-		return nil, fmt.Errorf("node not found: %q", id)
+		return nil, fmt.Errorf("method getRecvCh: node not found: %q", id)
 	}
 
 	r.mut.Lock()

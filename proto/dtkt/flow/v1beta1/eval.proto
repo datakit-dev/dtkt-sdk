@@ -30,14 +30,6 @@ message Graph {
   repeated Edge edges = 2;
 }
 
-message Groups {
-  message Group {
-    repeated string ids = 1 [(buf.validate.field).repeated = {min_items: 1}];
-  }
-
-  repeated Group groups = 1 [(buf.validate.field).repeated = {min_items: 1}];
-}
-
 message Edge {
   string source = 1 [
     (buf.validate.field).required = true,

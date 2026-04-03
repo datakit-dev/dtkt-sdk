@@ -12,7 +12,7 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 )
 
-var _ shared.RuntimeNode = (*Output)(nil)
+var _ shared.ExecNode = (*Output)(nil)
 
 type Output struct {
 	node *flowv1beta1.Output

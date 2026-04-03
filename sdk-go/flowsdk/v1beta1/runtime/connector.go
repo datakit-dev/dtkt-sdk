@@ -6,6 +6,7 @@ import (
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
+	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 )
 
 var _ shared.ConnectorProvider = (Connectors)(nil)
@@ -16,7 +17,7 @@ type (
 		ctx      context.Context
 		resolver shared.Resolver
 		client   common.DynamicClient
-		id       string
+		node     *flowv1beta1.Connection
 	}
 	Connectors map[string]*Connector
 )
@@ -24,14 +25,14 @@ type (
 func NewConnectors(conns ...*Connector) Connectors {
 	connMap := Connectors{}
 	for _, conn := range conns {
-		connMap[conn.id] = conn
+		connMap[conn.node.Id] = conn
 	}
 	return connMap
 }
 
-func NewConnector(id string) *Connector {
+func NewConnector(node *flowv1beta1.Connection) *Connector {
 	return &Connector{
-		id: id,
+		node: node,
 	}
 }
 
@@ -42,18 +43,22 @@ func (conns Connectors) GetConnector(ctx context.Context, id string, pkg shared.
 	return nil, fmt.Errorf("connections.%s: not found", id)
 }
 
+func (c *Connector) SpecNode() shared.SpecNode {
+	return c.node
+}
+
 func (c *Connector) GetResolver(context.Context) (shared.Resolver, error) {
 	if c.resolver == nil {
-		return nil, fmt.Errorf("connections.%s: resolver not found", c.id)
+		return nil, fmt.Errorf("connections.%s: resolver not found", c.node.Id)
 	}
 	return c.resolver, nil
 }
 
 func (c *Connector) GetClient(ctx context.Context) (context.Context, common.DynamicClient, error) {
 	if c.ctx == nil {
-		return nil, nil, fmt.Errorf("connections.%s missing context", c.id)
+		return nil, nil, fmt.Errorf("connections.%s missing context", c.node.Id)
 	} else if c.ctx == nil || c.client == nil {
-		return nil, nil, fmt.Errorf("connections.%s missing client", c.id)
+		return nil, nil, fmt.Errorf("connections.%s missing client", c.node.Id)
 	}
 	return c.ctx, c.client, nil
 }

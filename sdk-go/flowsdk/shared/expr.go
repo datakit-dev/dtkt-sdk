@@ -19,8 +19,8 @@ type (
 	ExprError struct {
 		msg string
 	}
-	ExprVisitFunc func(*cel.Ast)
-	NodeVisitFunc func(string, *cel.Ast)
+	ExprVisitFunc func(expr *cel.Ast)
+	NodeVisitFunc func(id string, expr *cel.Ast)
 )
 
 func ParseExpr(env Env, expr string, visitor ExprVisitFunc) (*cel.Ast, error) {

@@ -59,7 +59,7 @@ func SliceReduceError[T, V any](ts []T, fn func(T) (V, bool, error)) (s []V, _ e
 	return
 }
 
-func SliceFlatten[T any](ss ...[]T) (s []T) {
+func JoinSlices[S ~[]T, T any](ss ...S) (s S) {
 	for idx := range ss {
 		s = append(s, ss[idx]...)
 	}

@@ -15,7 +15,7 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-var _ shared.RuntimeNode = (*BidiStream)(nil)
+var _ shared.ExecNode = (*BidiStream)(nil)
 var _ CallCloser = (*BidiStream)(nil)
 
 // BidiStream implements a bidirectional-streaming RPC.

@@ -10,7 +10,7 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 )
 
-var _ shared.RuntimeNode = (*Var)(nil)
+var _ shared.ExecNode = (*Var)(nil)
 
 type Var struct {
 	node *flowv1beta1.Var

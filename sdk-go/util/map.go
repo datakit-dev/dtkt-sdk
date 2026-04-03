@@ -92,6 +92,16 @@ func MergeMaps[M ~map[K]V, K comparable, V any](dst, src M) M {
 	return dst
 }
 
+func JoinMaps[M ~map[K]V, K comparable, V any](srcs ...M) (dst M) {
+	dst = M{}
+	for _, src := range srcs {
+		if src != nil {
+			maps.Copy(dst, src)
+		}
+	}
+	return
+}
+
 // ReduceMap returns a map r for any key/value pairs from m for which fn returns true.
 func ReduceMap[Map ~map[K]V, K comparable, V any](m Map, fn func(K, V) bool) (r Map) {
 	r = maps.Clone(m)
