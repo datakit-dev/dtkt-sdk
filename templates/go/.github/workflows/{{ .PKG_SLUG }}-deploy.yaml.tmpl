@@ -1,12 +1,8 @@
 name: Docker Build, Push, & Deploy {{ $.PKG_NAME }} Integration Package
 
 on:
-  push:
-    branches:
-    - main
-    paths:
-    - packages/{{ $.PKG_SLUG }}/**
-    - .github/workflows/{{ $.PKG_SLUG }}-deploy.yaml
+  release:
+    types: [published]
 
 concurrency:
   group: {{`${{ github.workflow }}`}}-{{`${{ github.ref }}`}}
@@ -20,6 +16,7 @@ env:
 jobs:
   docker-build-push:
     name: Docker Build & Push
+    if: startsWith(github.event.release.tag_name, '{{ $.PKG_SLUG }}-v')
     environment: prd
     runs-on: {{`${{ vars.RUNNER }}`}}
 
@@ -51,11 +48,11 @@ jobs:
         service_account: {{`${{ vars.GCP_SERVICE_ACCOUNT_PRD }}`}}
         request_reason: dtkt-integrations {{`${{ env.PKG_SLUG }}`}} integration CI/CD
 
-    - uses: docker/setup-buildx-action@v3
+    - uses: docker/setup-buildx-action@v4
 
     - name: Configure {{`${{ env.PKG_NAME }}`}} Docker metadata
       id: meta
-      uses: docker/metadata-action@v5
+      uses: docker/metadata-action@v6
       with:
         images: {{`${{ vars.GCP_ARTIFACT_PUSH_REGISTRY }}`}}{{`${{ env.PKG_IMAGE_REF }}`}}
         tags: type=sha,format=long
@@ -71,14 +68,14 @@ jobs:
           org.opencontainers.image.vendor={{`${{ github.repository_owner }}`}}
 
     - name: Login to Google Artifact Registry
-      uses: docker/login-action@v3
+      uses: docker/login-action@v4
       with:
         registry: {{`${{ vars.GCP_ARTIFACT_PUSH_REGISTRY }}`}}{{`${{ env.PKG_IMAGE }}`}}
         username: oauth2accesstoken
         password: {{`${{ steps.auth.outputs.access_token }}`}}
 
     - name: Build & Push {{`${{ env.PKG_NAME }}`}} Integration Docker image
-      uses: docker/build-push-action@v6
+      uses: docker/build-push-action@v7
       with:
         context: ./dtkt-universe
         file: ./dtkt-universe/dtkt-integrations/packages/{{`${{ env.PKG_SLUG }}`}}/Dockerfile
@@ -114,7 +111,7 @@ jobs:
 
     - name: Docker tag
       id: meta
-      uses: docker/metadata-action@v5
+      uses: docker/metadata-action@v6
       with:
         images: {{`${{ vars.GCP_ARTIFACT_PULL_REGISTRY }}`}}{{`${{ env.PKG_IMAGE_NAME }}`}}
         tags: type=sha,format=long

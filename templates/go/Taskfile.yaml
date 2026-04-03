@@ -24,24 +24,24 @@ tasks:
   setup:
     desc: Setup the dev environment
     cmds:
-      - task: go:setup
-      - buf dep update
+    - task: go:setup
+    - go install github.com/bufbuild/buf/cmd/buf@latest
 
   dev:
     cmds:
-      - dtkt intgr dev
+    - dtkt intgr dev
 
   generate:
     desc: Code generation
     cmds:
-      - task: go:generate
-      - buf generate
+    - task: go:generate
+    - buf generate
 
   vhs-tapes:
     desc: Generate vhs tapes
     cmds:
-      - for: { var: TAPES, as: TAPE }
-        cmd: vhs {{.TAPE}} -o $(dirname {{.TAPE}})/$(basename {{.TAPE}} .tape).gif
+    - for: { var: TAPES, as: TAPE }
+      cmd: vhs {{.TAPE}} -o $(dirname {{.TAPE}})/$(basename {{.TAPE}} .tape).gif
     vars:
       TAPES:
         sh: find ./examples -name '*.tape' {{.CLI_ARGS}}
@@ -49,17 +49,17 @@ tasks:
   docs:
     desc: Generate documentation
     cmds:
-      - task: vhs-tapes
+    - task: vhs-tapes
 
   lint:
     cmds:
-      - task: go:lint
-      - buf lint
+    - task: go:lint
+    - buf lint
 
   build:
     cmds:
-      - task: go:build
+    - task: go:build
 
   test:
     cmds:
-      - task: go:test
+    - task: go:test
