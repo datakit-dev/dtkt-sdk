@@ -9,7 +9,7 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 )
 
-var _ shared.RuntimeNode = (*Input)(nil)
+var _ shared.ExecNode = (*Input)(nil)
 
 type Input struct {
 	node *flowv1beta1.Input
@@ -21,28 +21,32 @@ type Input struct {
 	valueCh chan ref.Val
 }
 
-func NewInput(env shared.Env, input *flowv1beta1.Input) (*Input, error) {
-	inputType, err := NewInputTypeWithResolver(input, env.Resolver())
+func NewInput(env shared.Env, input *flowv1beta1.Input) *Input {
+	return &Input{
+		node:    input,
+		valueCh: make(chan ref.Val, 1),
+	}
+}
+
+func (i *Input) Compile(run shared.Runtime) error {
+	env, err := run.Env()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	var defaultVal any
-	if inputType.HasDefault() {
-		defaultVal, err = inputType.GetDefault()
+	i.typ, err = NewInputTypeWithResolver(i.node, env.Resolver())
+	if err != nil {
+		return err
+	}
+
+	if i.typ.HasDefault() {
+		i.defaultVal, err = i.typ.GetDefault()
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 
-	return &Input{
-		node: input,
-
-		typ:        inputType,
-		defaultVal: defaultVal,
-
-		valueCh: make(chan ref.Val, 1),
-	}, nil
+	return nil
 }
 
 func (i *Input) Recv() (shared.RecvFunc, bool) {
@@ -111,12 +115,8 @@ func (i *Input) Send() (shared.SendFunc, bool) {
 	}, true
 }
 
-func (i *Input) Compile(shared.Runtime) error {
-	return nil
-}
-
 // IsRequired returns true when the input has no default and is not nullable,
 // meaning it must receive an external value before it can emit.
 func (i *Input) IsRequired() bool {
-	return i.typ.IsRequired()
+	return i.typ != nil && i.typ.IsRequired()
 }

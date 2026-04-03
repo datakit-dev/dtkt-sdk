@@ -17,6 +17,7 @@ type (
 		GetConnector(ctx context.Context, id string, pkg Package, services []string) (Connector, error)
 	}
 	Connector interface {
+		SpecNode() SpecNode
 		GetResolver(context.Context) (Resolver, error)
 		GetClient(context.Context) (context.Context, common.DynamicClient, error)
 	}

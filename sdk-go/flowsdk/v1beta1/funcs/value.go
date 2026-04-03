@@ -13,18 +13,18 @@ import (
 
 const GetValueFunc = "getValue"
 
-func MakeGetValueFunc(env shared.Env, run shared.Runtime) cel.EnvOption {
+func MakeGetValueFunc(env shared.Env) cel.EnvOption {
 	return cel.Function(GetValueFunc,
 		cel.MemberOverload(
 			fmt.Sprintf("%s_%s", nodeType, GetValueFunc),
 			[]*cel.Type{cel.ObjectType(nodeType)},
 			cel.DynType,
-			cel.FunctionBinding(EvalGetValueFunc(env, run)),
+			cel.FunctionBinding(EvalGetValueFunc(env)),
 		),
 	)
 }
 
-func EvalGetValueFunc(env shared.Env, _ shared.Runtime) functions.FunctionOp {
+func EvalGetValueFunc(env shared.Env) functions.FunctionOp {
 	return func(args ...ref.Val) ref.Val {
 		node, ok := args[0].Value().(*flowv1beta1.Node)
 		if ok && node != nil {

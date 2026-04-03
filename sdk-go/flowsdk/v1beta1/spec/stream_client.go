@@ -15,7 +15,7 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-var _ shared.RuntimeNode = (*ClientStream)(nil)
+var _ shared.ExecNode = (*ClientStream)(nil)
 var _ CallCloser = (*ClientStream)(nil)
 
 // ClientStream implements a client-streaming RPC: N requests, 1 response.

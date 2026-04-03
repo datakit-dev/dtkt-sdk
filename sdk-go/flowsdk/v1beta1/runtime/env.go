@@ -18,35 +18,31 @@ type (
 		vars     cel.Activation
 		types    *common.CELTypes
 		resolver shared.Resolver
-		runtime  shared.Runtime
 	}
 	EnvOption func(*Env)
 )
 
-func NewEnv(run *flowv1beta1.Runtime, opts ...EnvOption) (*Env, error) {
-	vars, err := cel.ContextProtoVars(run)
-	if err != nil {
-		return nil, err
-	}
-
-	env := &Env{
-		vars: vars,
-	}
-
-	for _, opt := range opts {
-		if opt != nil {
-			opt(env)
-		}
-	}
+func NewEnv(proto *flowv1beta1.Runtime, opts ...Option) (*Env, error) {
+	env := &Env{}
+	env.applyOptions(opts...)
 
 	if env.resolver == nil {
 		env.resolver = api.GlobalResolver()
 	}
 
-	env.types, err = common.NewCELTypes(env.resolver)
+	types, err := common.NewCELTypes(env.resolver)
 	if err != nil {
 		return nil, err
 	}
+
+	env.types = types
+
+	vars, err := cel.ContextProtoVars(proto)
+	if err != nil {
+		return nil, err
+	}
+
+	env.vars = vars
 
 	celOpts := append([]cel.EnvOption{
 		cel.CustomTypeProvider(env.types),
@@ -56,8 +52,8 @@ func NewEnv(run *flowv1beta1.Runtime, opts ...EnvOption) (*Env, error) {
 			string(new(flowv1beta1.Runtime_Done).ProtoReflect().Descriptor().FullName()),
 			string(new(flowv1beta1.Runtime_EOF).ProtoReflect().Descriptor().FullName()),
 		),
-		cel.DeclareContextProto(run.ProtoReflect().Descriptor()),
-	}, funcs.EnvOptions(env, env.runtime)...)
+		cel.DeclareContextProto(proto.ProtoReflect().Descriptor()),
+	}, funcs.EnvOptions(env)...)
 
 	env.Env, err = common.NewCELEnv(celOpts...)
 	if err != nil {
@@ -67,15 +63,11 @@ func NewEnv(run *flowv1beta1.Runtime, opts ...EnvOption) (*Env, error) {
 	return env, nil
 }
 
-func WithEnvResolver(resolver shared.Resolver) EnvOption {
-	return func(e *Env) {
-		e.resolver = resolver
-	}
-}
-
-func WithRuntime(run shared.Runtime) EnvOption {
-	return func(e *Env) {
-		e.runtime = run
+func (e *Env) applyOptions(opts ...Option) {
+	for _, opt := range opts {
+		if opt != nil {
+			opt(e)
+		}
 	}
 }
 

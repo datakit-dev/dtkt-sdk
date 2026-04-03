@@ -12,7 +12,7 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 )
 
-var _ shared.RuntimeNode = (*Ticker)(nil)
+var _ shared.ExecNode = (*Ticker)(nil)
 
 // var _ CallCloser = (*Ticker)(nil)
 

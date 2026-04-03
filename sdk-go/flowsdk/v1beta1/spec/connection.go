@@ -7,15 +7,15 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 )
 
-var _ shared.RuntimeNode = (*Connection)(nil)
+var _ shared.ExecNode = (*Connection)(nil)
 
 type Connection struct {
 	node *flowv1beta1.Connection
 	eval shared.EvalFunc
 }
 
-func NewConnection(_ shared.Env, node *flowv1beta1.Connection) (*Connection, error) {
-	return &Connection{node: node}, nil
+func NewConnection(_ shared.Env, node *flowv1beta1.Connection) *Connection {
+	return &Connection{node: node}
 }
 
 func (c *Connection) Compile(run shared.Runtime) error {

@@ -51,7 +51,7 @@ type (
 		proto.Message
 		GetId() string
 	}
-	RuntimeNode interface {
+	ExecNode interface {
 		Compile(Runtime) error
 		Recv() (RecvFunc, bool)
 		Send() (SendFunc, bool)

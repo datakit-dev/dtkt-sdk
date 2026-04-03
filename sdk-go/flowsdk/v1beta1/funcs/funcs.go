@@ -13,7 +13,7 @@ import (
 var evalNode *flowv1beta1.Node
 var nodeType = string(evalNode.ProtoReflect().Descriptor().FullName())
 
-func EnvOptions(env shared.Env, run shared.Runtime) []cel.EnvOption {
+func EnvOptions(env shared.Env) []cel.EnvOption {
 	return []cel.EnvOption{
 		cel.Function("now",
 			cel.SingletonFunctionBinding(
@@ -27,7 +27,7 @@ func EnvOptions(env shared.Env, run shared.Runtime) []cel.EnvOption {
 		),
 		MakeGetCountFunc(env),
 		MakeGetPrevFunc(env),
-		MakeGetValueFunc(env, run),
+		MakeGetValueFunc(env),
 		MakeIsEOFFunc(),
 	}
 }

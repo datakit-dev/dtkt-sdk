@@ -14,7 +14,7 @@ type (
 		GetCall() *flowv1beta1.MethodCall
 	}
 	CallCloser interface {
-		shared.RuntimeNode
+		shared.ExecNode
 		Close() error
 	}
 )

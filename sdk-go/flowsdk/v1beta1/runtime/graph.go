@@ -7,7 +7,6 @@ import (
 	"slices"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta1/spec"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	graphlib "github.com/dominikbraun/graph"
@@ -17,113 +16,81 @@ import (
 )
 
 type Graph struct {
-	graphlib.Graph[string, *flowv1beta1.Node]
+	dag   graphlib.Graph[string, *flowv1beta1.Node]
 	proto *flowv1beta1.Graph
 
-	build func() error
-
-	errors  []error
+	groups  [][]string
 	forward map[string][]string
 	reverse map[string][]string
+
+	errors []error
 }
 
-func NewGraph(env shared.Env, nodes []*flowv1beta1.Node) (*Graph, error) {
-	g := &Graph{
-		proto:   &flowv1beta1.Graph{},
-		forward: make(map[string][]string),
-		reverse: make(map[string][]string),
-	}
-	g.Graph = graphlib.NewWithStore(
-		GetNodeID,
-		g,
-		graphlib.Directed(),
-		graphlib.PreventCycles(),
-	)
-
-	for _, node := range nodes {
-		err := g.Graph.AddVertex(node)
-		if err != nil {
-			return nil, fmt.Errorf("add graph vertex: %w", err)
-		}
-	}
-
-	visitor := GraphVisitor(g)
-	for _, node := range nodes {
-		specNode := GetSpecNode(node)
-		// Connection and Input nodes contain no CEL expressions; skip them.
-		// Input message-type resolution also requires integration-specific proto
-		// registrations that are not available at graph-build time.
-		switch specNode.(type) {
-		case *flowv1beta1.Connection, *flowv1beta1.Input:
-			continue
-		}
-		_, err := spec.NewRuntimeNode(env, specNode, func(ast *cel.Ast) {
-			visitor(node.GetId(), ast)
-		})
-		if err != nil {
-			return nil, fmt.Errorf("parse graph node %s: %w", node.GetId(), err)
-		}
-	}
-
-	if g.Error() != nil {
-		return nil, fmt.Errorf("traverse graph error: %w", g.Error())
-	}
-
-	err := g.Build()
-	if err != nil {
-		return nil, fmt.Errorf("build graph error: %w", g.Error())
-	}
-
-	return g, nil
-}
-
-func RuntimeGraph(run *Runtime) (*Graph, error) {
-	env, err := run.env()
-	if err != nil {
-		return nil, err
-	}
-
-	return NewGraph(env, util.SliceMap(run.nodes.Values(), func(n *Node) *flowv1beta1.Node {
-		return n.proto
-	}))
-}
-
-func SpecGraph(spec *flowv1beta1.Flow) (*Graph, error) {
-	run := ProtoFromSpec(spec)
-	env, err := NewEnv(run)
-	if err != nil {
-		return nil, err
-	}
-
-	var nodes []*flowv1beta1.Node
-	nodes = slices.AppendSeq(nodes, maps.Values(run.Connections))
-	nodes = slices.AppendSeq(nodes, maps.Values(run.Inputs))
-	nodes = slices.AppendSeq(nodes, maps.Values(run.Vars))
-	nodes = slices.AppendSeq(nodes, maps.Values(run.Actions))
-	nodes = slices.AppendSeq(nodes, maps.Values(run.Outputs))
-	nodes = slices.AppendSeq(nodes, maps.Values(run.Streams))
-
-	return NewGraph(env, nodes)
-}
-
-func GraphFromProto(proto *flowv1beta1.Graph) (*Graph, error) {
+func NewGraph(env *Env, nodes NodeMap) (*Graph, error) {
 	graph := &Graph{
-		proto:   proto,
+		proto: &flowv1beta1.Graph{
+			Nodes: nodes.Protos(),
+		},
 		forward: make(map[string][]string),
 		reverse: make(map[string][]string),
 	}
-	graph.Graph = graphlib.NewWithStore(
+	graph.dag = graphlib.NewWithStore(
 		GetNodeID,
 		graph,
 		graphlib.Directed(),
 		graphlib.PreventCycles(),
 	)
 
-	if err := graph.Build(); err != nil {
-		return nil, fmt.Errorf("failed to build graph: %w", err)
+	err := nodes.Parse(env, GraphVisitor(graph))
+	if err != nil {
+		return nil, err
+	}
+
+	for _, node := range nodes {
+		err := graph.dag.AddVertex(node.proto)
+		if err != nil {
+			return nil, fmt.Errorf("add graph vertex: %w", err)
+		}
+	}
+
+	if graph.Error() != nil {
+		return nil, fmt.Errorf("build graph error: %w", graph.Error())
+	}
+
+	err = graph.Build(env)
+	if err != nil {
+		return nil, err
 	}
 
 	return graph, nil
+}
+
+func GraphFromRuntime(run *Runtime) (*Graph, error) {
+	env, err := run.env()
+	if err != nil {
+		return nil, err
+	}
+
+	return NewGraph(env, run.nodes)
+}
+
+func GraphFromSpec(spec *flowv1beta1.Flow, opts ...Option) (*Graph, error) {
+	run := ProtoFromSpec(spec)
+	env, err := NewEnv(run, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewGraph(env,
+		RuntimeNodeMap(
+			run.Actions,
+			run.Connections,
+			run.Inputs,
+			run.Outputs,
+			run.Streams,
+			run.Vars,
+		),
+	)
 }
 
 func GraphVisitor(graph *Graph) shared.NodeVisitFunc {
@@ -137,7 +104,7 @@ func GraphVisitor(graph *Graph) shared.NodeVisitFunc {
 					if shared.IsNodeID(source) {
 						if err := shared.IsValidEdge(source, target); err != nil {
 							graph.AddError(err)
-						} else if err = graph.Graph.AddEdge(source, target); err != nil {
+						} else if err = graph.dag.AddEdge(source, target); err != nil {
 							if !errors.Is(err, graphlib.ErrEdgeAlreadyExists) {
 								graph.AddError(err)
 							}
@@ -149,14 +116,22 @@ func GraphVisitor(graph *Graph) shared.NodeVisitFunc {
 	}
 }
 
-func (g *Graph) Proto() *flowv1beta1.Graph {
-	return proto.CloneOf(g.proto)
+func (g *Graph) Build(env *Env) (err error) {
+	g.dag, err = graphlib.TransitiveReduction(g.dag)
+	if err != nil {
+		return err
+	}
+
+	err = g.computePreds()
+	if err != nil {
+		return err
+	}
+
+	return g.computeGroups()
 }
 
-// Build constructs the forward/reverse dependency maps and applies transitive reduction.
-// This must be called after all vertices and edges are added to prepare the graph for grouping.
-func (g *Graph) Build() error {
-	preds, err := g.PredecessorMap()
+func (g *Graph) computePreds() error {
+	preds, err := g.dag.PredecessorMap()
 	if err != nil {
 		return err
 	}
@@ -168,14 +143,71 @@ func (g *Graph) Build() error {
 		}
 	}
 
-	graph, err := graphlib.TransitiveReduction(g.Graph)
+	return nil
+}
+
+func (g *Graph) computeGroups() error {
+	// Use topological ordering to group independent nodes
+	// Get all nodes in topological order
+	order, err := graphlib.TopologicalSort(g.dag)
 	if err != nil {
-		return err
+		return fmt.Errorf("topological sort error: %w", err)
 	}
 
-	g.Graph = graph
+	// Track which nodes have been processed
+	processed := make(map[string]bool)
+
+	// Process nodes in topological order, grouping independent nodes
+	// We use the forward/reverse maps that were saved before transitive reduction
+	for len(processed) < len(order) {
+		var nodeIDs []string
+
+		// Find all nodes whose dependencies have been processed
+		for _, nodeID := range order {
+			if processed[nodeID] {
+				continue
+			}
+
+			// Check if all dependencies (predecessors) are processed
+			// Use the forward map which contains predecessors
+			deps := g.Forward(nodeID)
+			allDepsProcessed := true
+			for _, depID := range deps {
+				if !processed[depID] {
+					allDepsProcessed = false
+					break
+				}
+			}
+
+			if allDepsProcessed {
+				_, _, err := g.Vertex(nodeID)
+				if err != nil {
+					return err
+				}
+
+				nodeIDs = append(nodeIDs, nodeID)
+			}
+		}
+
+		// Mark all nodes in this group as processed AFTER building the group
+		// This ensures nodes in the same group don't see each other as already processed
+		for _, nodeID := range nodeIDs {
+			processed[nodeID] = true
+		}
+
+		if len(nodeIDs) > 0 {
+			g.groups = append(g.groups, nodeIDs)
+		} else {
+			// Should never happen with a valid DAG
+			break
+		}
+	}
 
 	return nil
+}
+
+func (g *Graph) Proto() *flowv1beta1.Graph {
+	return proto.CloneOf(g.proto)
 }
 
 // AddVertex should add the given vertex with the given hash value and vertex properties to the
