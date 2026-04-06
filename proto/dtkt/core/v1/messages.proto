@@ -865,14 +865,6 @@ message FlowRuntimeMetadata {
   }
 }
 
-// FlowGroupsMetadata wraps versioned execution groups metadata.
-message FlowGroupsMetadata {
-  oneof version {
-    option (buf.validate.oneof).required = true;
-    dtkt.flow.v1beta1.Groups v1beta1 = 1;
-  }
-}
-
 // FlowSpecMetadata wraps versioned flow specification.
 message FlowSpecMetadata {
   oneof version {

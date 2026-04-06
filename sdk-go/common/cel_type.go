@@ -2,10 +2,12 @@ package common
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 	"unicode"
 
 	"buf.build/go/protovalidate"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
@@ -15,6 +17,7 @@ import (
 	"google.golang.org/protobuf/reflect/protorange"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 type (
@@ -84,8 +87,39 @@ func (t *CELTypes) NativeToValue(val any) ref.Val {
 			desc:   val.Descriptor(),
 			refVal: types.Int(val.Number()),
 		}
+	case ref.Val:
+		// Already a CEL value, pass through to registry.
+	default:
+		rv := reflect.ValueOf(val)
+		if rv.Kind() == reflect.Ptr {
+			if rv.IsNil() {
+				return types.NullValue
+			}
+			return t.NativeToValue(rv.Elem().Interface())
+		}
+		if rv.Kind() == reflect.Struct {
+			sv, err := structToValue(val)
+			if err != nil {
+				return types.WrapErr(err)
+			}
+			return t.NativeToValue(sv)
+		}
 	}
 	return t.wrapRefVal(t.registry.NativeToValue(val))
+}
+
+// structToValue converts a plain Go struct to *structpb.Value via JSON
+// round-trip so CEL can evaluate expressions against it.
+func structToValue(val any) (*structpb.Value, error) {
+	b, err := encoding.ToJSONV2(val)
+	if err != nil {
+		return nil, err
+	}
+	sv := &structpb.Value{}
+	if err = encoding.FromJSONV2(b, sv); err != nil {
+		return nil, err
+	}
+	return sv, nil
 }
 
 func (t *CELTypes) FindIdent(identName string) (ref.Val, bool) {
