@@ -1,0 +1,11 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_float_to_output
+  description: "Float input passed directly to output"
+  inputs:
+    - id: x
+      float: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value"

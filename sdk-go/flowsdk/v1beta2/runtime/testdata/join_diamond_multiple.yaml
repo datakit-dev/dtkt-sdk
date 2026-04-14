@@ -1,0 +1,20 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: join_diamond_multiple
+  description: "Diamond with doubled and negated vars"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: doubled
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= this.value * 2"
+    - id: negated
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= this.value * -1"
+  outputs:
+    - id: sum
+      value: "= vars.doubled.value + vars.negated.value"

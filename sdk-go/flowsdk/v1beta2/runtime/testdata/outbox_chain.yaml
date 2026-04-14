@@ -1,0 +1,15 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: outbox_chain
+  inputs:
+    - id: "n"
+      int64: {}
+  vars:
+    - id: inc
+      value: "= inputs.n.value + 1"
+    - id: sq
+      value: "= vars.inc.value * vars.inc.value"
+  outputs:
+    - id: result
+      value: "= vars.sq.value"

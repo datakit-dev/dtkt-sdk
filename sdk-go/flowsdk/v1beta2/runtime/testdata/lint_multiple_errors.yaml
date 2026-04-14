@@ -1,0 +1,10 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_multiple_errors
+  vars:
+    - id: bad1
+      value: "= +++a"
+  outputs:
+    - id: bad2
+      value: "= +++b"

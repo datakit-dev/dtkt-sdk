@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/catalog/v1beta2/value.proto
 
+//go:build !protoopaque
+
 package catalogv1beta2
 
 import (
@@ -14,7 +16,6 @@ import (
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -30,7 +31,7 @@ const (
 // intended to provide maximum adaptability and representation for native types
 // found in OLTP databases as well as OLAP data warehouses/query engines.
 type Value struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Kind:
 	//
 	//	*Value_BoolValue
@@ -76,11 +77,6 @@ func (x *Value) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Value.ProtoReflect.Descriptor instead.
-func (*Value) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_value_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Value) GetKind() isValue_Kind {
@@ -225,6 +221,488 @@ func (x *Value) GetListValue() *ListValue {
 	return nil
 }
 
+func (x *Value) SetBoolValue(v *BoolValue) {
+	if v == nil {
+		x.Kind = nil
+		return
+	}
+	x.Kind = &Value_BoolValue{v}
+}
+
+func (x *Value) SetBytesValue(v *BytesValue) {
+	if v == nil {
+		x.Kind = nil
+		return
+	}
+	x.Kind = &Value_BytesValue{v}
+}
+
+func (x *Value) SetDoubleValue(v *DoubleValue) {
+	if v == nil {
+		x.Kind = nil
+		return
+	}
+	x.Kind = &Value_DoubleValue{v}
+}
+
+func (x *Value) SetEnumValue(v *EnumValue) {
+	if v == nil {
+		x.Kind = nil
+		return
+	}
+	x.Kind = &Value_EnumValue{v}
+}
+
+func (x *Value) SetFloatValue(v *FloatValue) {
+	if v == nil {
+		x.Kind = nil
+		return
+	}
+	x.Kind = &Value_FloatValue{v}
+}
+
+func (x *Value) SetInt32Value(v *Int32Value) {
+	if v == nil {
+		x.Kind = nil
+		return
+	}
+	x.Kind = &Value_Int32Value{v}
+}
+
+func (x *Value) SetInt64Value(v *Int64Value) {
+	if v == nil {
+		x.Kind = nil
+		return
+	}
+	x.Kind = &Value_Int64Value{v}
+}
+
+func (x *Value) SetStringValue(v *StringValue) {
+	if v == nil {
+		x.Kind = nil
+		return
+	}
+	x.Kind = &Value_StringValue{v}
+}
+
+func (x *Value) SetUint32Value(v *UInt32Value) {
+	if v == nil {
+		x.Kind = nil
+		return
+	}
+	x.Kind = &Value_Uint32Value{v}
+}
+
+func (x *Value) SetUint64Value(v *UInt64Value) {
+	if v == nil {
+		x.Kind = nil
+		return
+	}
+	x.Kind = &Value_Uint64Value{v}
+}
+
+func (x *Value) SetJsonValue(v *structpb.Value) {
+	if v == nil {
+		x.Kind = nil
+		return
+	}
+	x.Kind = &Value_JsonValue{v}
+}
+
+func (x *Value) SetObjectValue(v *anypb.Any) {
+	if v == nil {
+		x.Kind = nil
+		return
+	}
+	x.Kind = &Value_ObjectValue{v}
+}
+
+func (x *Value) SetDurationValue(v *durationpb.Duration) {
+	if v == nil {
+		x.Kind = nil
+		return
+	}
+	x.Kind = &Value_DurationValue{v}
+}
+
+func (x *Value) SetTimestampValue(v *timestamppb.Timestamp) {
+	if v == nil {
+		x.Kind = nil
+		return
+	}
+	x.Kind = &Value_TimestampValue{v}
+}
+
+func (x *Value) SetListValue(v *ListValue) {
+	if v == nil {
+		x.Kind = nil
+		return
+	}
+	x.Kind = &Value_ListValue{v}
+}
+
+func (x *Value) HasKind() bool {
+	if x == nil {
+		return false
+	}
+	return x.Kind != nil
+}
+
+func (x *Value) HasBoolValue() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Kind.(*Value_BoolValue)
+	return ok
+}
+
+func (x *Value) HasBytesValue() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Kind.(*Value_BytesValue)
+	return ok
+}
+
+func (x *Value) HasDoubleValue() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Kind.(*Value_DoubleValue)
+	return ok
+}
+
+func (x *Value) HasEnumValue() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Kind.(*Value_EnumValue)
+	return ok
+}
+
+func (x *Value) HasFloatValue() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Kind.(*Value_FloatValue)
+	return ok
+}
+
+func (x *Value) HasInt32Value() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Kind.(*Value_Int32Value)
+	return ok
+}
+
+func (x *Value) HasInt64Value() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Kind.(*Value_Int64Value)
+	return ok
+}
+
+func (x *Value) HasStringValue() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Kind.(*Value_StringValue)
+	return ok
+}
+
+func (x *Value) HasUint32Value() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Kind.(*Value_Uint32Value)
+	return ok
+}
+
+func (x *Value) HasUint64Value() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Kind.(*Value_Uint64Value)
+	return ok
+}
+
+func (x *Value) HasJsonValue() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Kind.(*Value_JsonValue)
+	return ok
+}
+
+func (x *Value) HasObjectValue() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Kind.(*Value_ObjectValue)
+	return ok
+}
+
+func (x *Value) HasDurationValue() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Kind.(*Value_DurationValue)
+	return ok
+}
+
+func (x *Value) HasTimestampValue() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Kind.(*Value_TimestampValue)
+	return ok
+}
+
+func (x *Value) HasListValue() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Kind.(*Value_ListValue)
+	return ok
+}
+
+func (x *Value) ClearKind() {
+	x.Kind = nil
+}
+
+func (x *Value) ClearBoolValue() {
+	if _, ok := x.Kind.(*Value_BoolValue); ok {
+		x.Kind = nil
+	}
+}
+
+func (x *Value) ClearBytesValue() {
+	if _, ok := x.Kind.(*Value_BytesValue); ok {
+		x.Kind = nil
+	}
+}
+
+func (x *Value) ClearDoubleValue() {
+	if _, ok := x.Kind.(*Value_DoubleValue); ok {
+		x.Kind = nil
+	}
+}
+
+func (x *Value) ClearEnumValue() {
+	if _, ok := x.Kind.(*Value_EnumValue); ok {
+		x.Kind = nil
+	}
+}
+
+func (x *Value) ClearFloatValue() {
+	if _, ok := x.Kind.(*Value_FloatValue); ok {
+		x.Kind = nil
+	}
+}
+
+func (x *Value) ClearInt32Value() {
+	if _, ok := x.Kind.(*Value_Int32Value); ok {
+		x.Kind = nil
+	}
+}
+
+func (x *Value) ClearInt64Value() {
+	if _, ok := x.Kind.(*Value_Int64Value); ok {
+		x.Kind = nil
+	}
+}
+
+func (x *Value) ClearStringValue() {
+	if _, ok := x.Kind.(*Value_StringValue); ok {
+		x.Kind = nil
+	}
+}
+
+func (x *Value) ClearUint32Value() {
+	if _, ok := x.Kind.(*Value_Uint32Value); ok {
+		x.Kind = nil
+	}
+}
+
+func (x *Value) ClearUint64Value() {
+	if _, ok := x.Kind.(*Value_Uint64Value); ok {
+		x.Kind = nil
+	}
+}
+
+func (x *Value) ClearJsonValue() {
+	if _, ok := x.Kind.(*Value_JsonValue); ok {
+		x.Kind = nil
+	}
+}
+
+func (x *Value) ClearObjectValue() {
+	if _, ok := x.Kind.(*Value_ObjectValue); ok {
+		x.Kind = nil
+	}
+}
+
+func (x *Value) ClearDurationValue() {
+	if _, ok := x.Kind.(*Value_DurationValue); ok {
+		x.Kind = nil
+	}
+}
+
+func (x *Value) ClearTimestampValue() {
+	if _, ok := x.Kind.(*Value_TimestampValue); ok {
+		x.Kind = nil
+	}
+}
+
+func (x *Value) ClearListValue() {
+	if _, ok := x.Kind.(*Value_ListValue); ok {
+		x.Kind = nil
+	}
+}
+
+const Value_Kind_not_set_case case_Value_Kind = 0
+const Value_BoolValue_case case_Value_Kind = 1
+const Value_BytesValue_case case_Value_Kind = 2
+const Value_DoubleValue_case case_Value_Kind = 3
+const Value_EnumValue_case case_Value_Kind = 4
+const Value_FloatValue_case case_Value_Kind = 5
+const Value_Int32Value_case case_Value_Kind = 6
+const Value_Int64Value_case case_Value_Kind = 7
+const Value_StringValue_case case_Value_Kind = 8
+const Value_Uint32Value_case case_Value_Kind = 9
+const Value_Uint64Value_case case_Value_Kind = 10
+const Value_JsonValue_case case_Value_Kind = 11
+const Value_ObjectValue_case case_Value_Kind = 12
+const Value_DurationValue_case case_Value_Kind = 13
+const Value_TimestampValue_case case_Value_Kind = 14
+const Value_ListValue_case case_Value_Kind = 15
+
+func (x *Value) WhichKind() case_Value_Kind {
+	if x == nil {
+		return Value_Kind_not_set_case
+	}
+	switch x.Kind.(type) {
+	case *Value_BoolValue:
+		return Value_BoolValue_case
+	case *Value_BytesValue:
+		return Value_BytesValue_case
+	case *Value_DoubleValue:
+		return Value_DoubleValue_case
+	case *Value_EnumValue:
+		return Value_EnumValue_case
+	case *Value_FloatValue:
+		return Value_FloatValue_case
+	case *Value_Int32Value:
+		return Value_Int32Value_case
+	case *Value_Int64Value:
+		return Value_Int64Value_case
+	case *Value_StringValue:
+		return Value_StringValue_case
+	case *Value_Uint32Value:
+		return Value_Uint32Value_case
+	case *Value_Uint64Value:
+		return Value_Uint64Value_case
+	case *Value_JsonValue:
+		return Value_JsonValue_case
+	case *Value_ObjectValue:
+		return Value_ObjectValue_case
+	case *Value_DurationValue:
+		return Value_DurationValue_case
+	case *Value_TimestampValue:
+		return Value_TimestampValue_case
+	case *Value_ListValue:
+		return Value_ListValue_case
+	default:
+		return Value_Kind_not_set_case
+	}
+}
+
+type Value_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Kind:
+	BoolValue      *BoolValue
+	BytesValue     *BytesValue
+	DoubleValue    *DoubleValue
+	EnumValue      *EnumValue
+	FloatValue     *FloatValue
+	Int32Value     *Int32Value
+	Int64Value     *Int64Value
+	StringValue    *StringValue
+	Uint32Value    *UInt32Value
+	Uint64Value    *UInt64Value
+	JsonValue      *structpb.Value
+	ObjectValue    *anypb.Any
+	DurationValue  *durationpb.Duration
+	TimestampValue *timestamppb.Timestamp
+	ListValue      *ListValue
+	// -- end of Kind
+}
+
+func (b0 Value_builder) Build() *Value {
+	m0 := &Value{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.BoolValue != nil {
+		x.Kind = &Value_BoolValue{b.BoolValue}
+	}
+	if b.BytesValue != nil {
+		x.Kind = &Value_BytesValue{b.BytesValue}
+	}
+	if b.DoubleValue != nil {
+		x.Kind = &Value_DoubleValue{b.DoubleValue}
+	}
+	if b.EnumValue != nil {
+		x.Kind = &Value_EnumValue{b.EnumValue}
+	}
+	if b.FloatValue != nil {
+		x.Kind = &Value_FloatValue{b.FloatValue}
+	}
+	if b.Int32Value != nil {
+		x.Kind = &Value_Int32Value{b.Int32Value}
+	}
+	if b.Int64Value != nil {
+		x.Kind = &Value_Int64Value{b.Int64Value}
+	}
+	if b.StringValue != nil {
+		x.Kind = &Value_StringValue{b.StringValue}
+	}
+	if b.Uint32Value != nil {
+		x.Kind = &Value_Uint32Value{b.Uint32Value}
+	}
+	if b.Uint64Value != nil {
+		x.Kind = &Value_Uint64Value{b.Uint64Value}
+	}
+	if b.JsonValue != nil {
+		x.Kind = &Value_JsonValue{b.JsonValue}
+	}
+	if b.ObjectValue != nil {
+		x.Kind = &Value_ObjectValue{b.ObjectValue}
+	}
+	if b.DurationValue != nil {
+		x.Kind = &Value_DurationValue{b.DurationValue}
+	}
+	if b.TimestampValue != nil {
+		x.Kind = &Value_TimestampValue{b.TimestampValue}
+	}
+	if b.ListValue != nil {
+		x.Kind = &Value_ListValue{b.ListValue}
+	}
+	return m0
+}
+
+type case_Value_Kind protoreflect.FieldNumber
+
+func (x case_Value_Kind) String() string {
+	md := file_dtkt_catalog_v1beta2_value_proto_msgTypes[0].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isValue_Kind interface {
 	isValue_Kind()
 }
@@ -321,7 +799,7 @@ func (*Value_ListValue) isValue_Kind() {}
 
 // List of values for repeated fields.
 type ListValue struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Values        []*Value               `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -352,11 +830,6 @@ func (x *ListValue) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListValue.ProtoReflect.Descriptor instead.
-func (*ListValue) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_value_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *ListValue) GetValues() []*Value {
 	if x != nil {
 		return x.Values
@@ -364,11 +837,29 @@ func (x *ListValue) GetValues() []*Value {
 	return nil
 }
 
+func (x *ListValue) SetValues(v []*Value) {
+	x.Values = v
+}
+
+type ListValue_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Values []*Value
+}
+
+func (b0 ListValue_builder) Build() *ListValue {
+	m0 := &ListValue{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Values = b.Values
+	return m0
+}
+
 // Row represents a list of values with each value's type defined by a field of
 // the same index in the context of a table read/write operation or a query
 // input param or result operation.
 type Row struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Values        []*Value               `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -399,11 +890,6 @@ func (x *Row) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Row.ProtoReflect.Descriptor instead.
-func (*Row) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_value_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *Row) GetValues() []*Value {
 	if x != nil {
 		return x.Values
@@ -411,8 +897,26 @@ func (x *Row) GetValues() []*Value {
 	return nil
 }
 
+func (x *Row) SetValues(v []*Value) {
+	x.Values = v
+}
+
+type Row_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Values []*Value
+}
+
+func (b0 Row_builder) Build() *Row {
+	m0 := &Row{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Values = b.Values
+	return m0
+}
+
 type DoubleValue struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The double value.
 	Value float64 `protobuf:"fixed64,1,opt,name=value,proto3" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
@@ -446,11 +950,6 @@ func (x *DoubleValue) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DoubleValue.ProtoReflect.Descriptor instead.
-func (*DoubleValue) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_value_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *DoubleValue) GetValue() float64 {
 	if x != nil {
 		return x.Value
@@ -465,9 +964,35 @@ func (x *DoubleValue) GetValid() bool {
 	return false
 }
 
+func (x *DoubleValue) SetValue(v float64) {
+	x.Value = v
+}
+
+func (x *DoubleValue) SetValid(v bool) {
+	x.Valid = v
+}
+
+type DoubleValue_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The double value.
+	Value float64
+	// Valid is true if value is not NULL.
+	Valid bool
+}
+
+func (b0 DoubleValue_builder) Build() *DoubleValue {
+	m0 := &DoubleValue{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	x.Valid = b.Valid
+	return m0
+}
+
 // Nullable wrapper message for `float`.
 type FloatValue struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The float value.
 	Value float32 `protobuf:"fixed32,1,opt,name=value,proto3" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
@@ -501,11 +1026,6 @@ func (x *FloatValue) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FloatValue.ProtoReflect.Descriptor instead.
-func (*FloatValue) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_value_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *FloatValue) GetValue() float32 {
 	if x != nil {
 		return x.Value
@@ -520,9 +1040,35 @@ func (x *FloatValue) GetValid() bool {
 	return false
 }
 
+func (x *FloatValue) SetValue(v float32) {
+	x.Value = v
+}
+
+func (x *FloatValue) SetValid(v bool) {
+	x.Valid = v
+}
+
+type FloatValue_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The float value.
+	Value float32
+	// Valid is true if value is not NULL.
+	Valid bool
+}
+
+func (b0 FloatValue_builder) Build() *FloatValue {
+	m0 := &FloatValue{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	x.Valid = b.Valid
+	return m0
+}
+
 // Nullable wrapper message for `int64`.
 type Int64Value struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The int64 value.
 	Value int64 `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
@@ -556,11 +1102,6 @@ func (x *Int64Value) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Int64Value.ProtoReflect.Descriptor instead.
-func (*Int64Value) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_value_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *Int64Value) GetValue() int64 {
 	if x != nil {
 		return x.Value
@@ -575,9 +1116,35 @@ func (x *Int64Value) GetValid() bool {
 	return false
 }
 
+func (x *Int64Value) SetValue(v int64) {
+	x.Value = v
+}
+
+func (x *Int64Value) SetValid(v bool) {
+	x.Valid = v
+}
+
+type Int64Value_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The int64 value.
+	Value int64
+	// Valid is true if value is not NULL.
+	Valid bool
+}
+
+func (b0 Int64Value_builder) Build() *Int64Value {
+	m0 := &Int64Value{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	x.Valid = b.Valid
+	return m0
+}
+
 // Nullable wrapper message for `uint64`.
 type UInt64Value struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The uint64 value.
 	Value uint64 `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
@@ -611,11 +1178,6 @@ func (x *UInt64Value) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UInt64Value.ProtoReflect.Descriptor instead.
-func (*UInt64Value) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_value_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *UInt64Value) GetValue() uint64 {
 	if x != nil {
 		return x.Value
@@ -630,9 +1192,35 @@ func (x *UInt64Value) GetValid() bool {
 	return false
 }
 
+func (x *UInt64Value) SetValue(v uint64) {
+	x.Value = v
+}
+
+func (x *UInt64Value) SetValid(v bool) {
+	x.Valid = v
+}
+
+type UInt64Value_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The uint64 value.
+	Value uint64
+	// Valid is true if value is not NULL.
+	Valid bool
+}
+
+func (b0 UInt64Value_builder) Build() *UInt64Value {
+	m0 := &UInt64Value{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	x.Valid = b.Valid
+	return m0
+}
+
 // Nullable wrapper message for `int32`.
 type Int32Value struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The int32 value.
 	Value int32 `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
@@ -666,11 +1254,6 @@ func (x *Int32Value) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Int32Value.ProtoReflect.Descriptor instead.
-func (*Int32Value) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_value_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *Int32Value) GetValue() int32 {
 	if x != nil {
 		return x.Value
@@ -685,9 +1268,35 @@ func (x *Int32Value) GetValid() bool {
 	return false
 }
 
+func (x *Int32Value) SetValue(v int32) {
+	x.Value = v
+}
+
+func (x *Int32Value) SetValid(v bool) {
+	x.Valid = v
+}
+
+type Int32Value_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The int32 value.
+	Value int32
+	// Valid is true if value is not NULL.
+	Valid bool
+}
+
+func (b0 Int32Value_builder) Build() *Int32Value {
+	m0 := &Int32Value{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	x.Valid = b.Valid
+	return m0
+}
+
 // Nullable wrapper message for `uint32`.
 type UInt32Value struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The uint32 value.
 	Value uint32 `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
@@ -721,11 +1330,6 @@ func (x *UInt32Value) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UInt32Value.ProtoReflect.Descriptor instead.
-func (*UInt32Value) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_value_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *UInt32Value) GetValue() uint32 {
 	if x != nil {
 		return x.Value
@@ -740,9 +1344,35 @@ func (x *UInt32Value) GetValid() bool {
 	return false
 }
 
+func (x *UInt32Value) SetValue(v uint32) {
+	x.Value = v
+}
+
+func (x *UInt32Value) SetValid(v bool) {
+	x.Valid = v
+}
+
+type UInt32Value_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The uint32 value.
+	Value uint32
+	// Valid is true if value is not NULL.
+	Valid bool
+}
+
+func (b0 UInt32Value_builder) Build() *UInt32Value {
+	m0 := &UInt32Value{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	x.Valid = b.Valid
+	return m0
+}
+
 // Nullable wrapper message for `bool`.
 type BoolValue struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The bool value.
 	Value bool `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
@@ -776,11 +1406,6 @@ func (x *BoolValue) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BoolValue.ProtoReflect.Descriptor instead.
-func (*BoolValue) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_value_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *BoolValue) GetValue() bool {
 	if x != nil {
 		return x.Value
@@ -795,9 +1420,35 @@ func (x *BoolValue) GetValid() bool {
 	return false
 }
 
+func (x *BoolValue) SetValue(v bool) {
+	x.Value = v
+}
+
+func (x *BoolValue) SetValid(v bool) {
+	x.Valid = v
+}
+
+type BoolValue_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The bool value.
+	Value bool
+	// Valid is true if value is not NULL.
+	Valid bool
+}
+
+func (b0 BoolValue_builder) Build() *BoolValue {
+	m0 := &BoolValue{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	x.Valid = b.Valid
+	return m0
+}
+
 // Nullable wrapper message for `string`.
 type StringValue struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The string value.
 	Value string `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
@@ -831,11 +1482,6 @@ func (x *StringValue) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StringValue.ProtoReflect.Descriptor instead.
-func (*StringValue) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_value_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *StringValue) GetValue() string {
 	if x != nil {
 		return x.Value
@@ -850,9 +1496,35 @@ func (x *StringValue) GetValid() bool {
 	return false
 }
 
+func (x *StringValue) SetValue(v string) {
+	x.Value = v
+}
+
+func (x *StringValue) SetValid(v bool) {
+	x.Valid = v
+}
+
+type StringValue_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The string value.
+	Value string
+	// Valid is true if value is not NULL.
+	Valid bool
+}
+
+func (b0 StringValue_builder) Build() *StringValue {
+	m0 := &StringValue{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	x.Valid = b.Valid
+	return m0
+}
+
 // Nullable wrapper message for `bytes`.
 type BytesValue struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The bytes value.
 	Value []byte `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
@@ -886,11 +1558,6 @@ func (x *BytesValue) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BytesValue.ProtoReflect.Descriptor instead.
-func (*BytesValue) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_value_proto_rawDescGZIP(), []int{11}
-}
-
 func (x *BytesValue) GetValue() []byte {
 	if x != nil {
 		return x.Value
@@ -905,9 +1572,38 @@ func (x *BytesValue) GetValid() bool {
 	return false
 }
 
+func (x *BytesValue) SetValue(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.Value = v
+}
+
+func (x *BytesValue) SetValid(v bool) {
+	x.Valid = v
+}
+
+type BytesValue_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The bytes value.
+	Value []byte
+	// Valid is true if value is not NULL.
+	Valid bool
+}
+
+func (b0 BytesValue_builder) Build() *BytesValue {
+	m0 := &BytesValue{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	x.Valid = b.Valid
+	return m0
+}
+
 // Nullable wrapper message for ENUM values.
 type EnumValue struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The string representation of the ENUM value.
 	Value string `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
@@ -941,11 +1637,6 @@ func (x *EnumValue) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use EnumValue.ProtoReflect.Descriptor instead.
-func (*EnumValue) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_value_proto_rawDescGZIP(), []int{12}
-}
-
 func (x *EnumValue) GetValue() string {
 	if x != nil {
 		return x.Value
@@ -958,6 +1649,32 @@ func (x *EnumValue) GetValid() bool {
 		return x.Valid
 	}
 	return false
+}
+
+func (x *EnumValue) SetValue(v string) {
+	x.Value = v
+}
+
+func (x *EnumValue) SetValid(v bool) {
+	x.Valid = v
+}
+
+type EnumValue_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The string representation of the ENUM value.
+	Value string
+	// Valid is true if value is not NULL.
+	Valid bool
+}
+
+func (b0 EnumValue_builder) Build() *EnumValue {
+	m0 := &EnumValue{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	x.Valid = b.Valid
+	return m0
 }
 
 var File_dtkt_catalog_v1beta2_value_proto protoreflect.FileDescriptor
@@ -1031,18 +1748,6 @@ const file_dtkt_catalog_v1beta2_value_proto_rawDesc = "" +
 	"\x05valid\x18\x02 \x01(\bR\x05validB\xec\x01\n" +
 	"\x1aproto.dtkt.catalog.v1beta2B\n" +
 	"ValueProtoP\x01ZPgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta2;catalogv1beta2\xa2\x02\x03DCX\xaa\x02\x14Dtkt.Catalog.V1beta2\xca\x02\x14Dtkt\\Catalog\\V1beta2\xe2\x02 Dtkt\\Catalog\\V1beta2\\GPBMetadata\xea\x02\x16Dtkt::Catalog::V1beta2b\x06proto3"
-
-var (
-	file_dtkt_catalog_v1beta2_value_proto_rawDescOnce sync.Once
-	file_dtkt_catalog_v1beta2_value_proto_rawDescData []byte
-)
-
-func file_dtkt_catalog_v1beta2_value_proto_rawDescGZIP() []byte {
-	file_dtkt_catalog_v1beta2_value_proto_rawDescOnce.Do(func() {
-		file_dtkt_catalog_v1beta2_value_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_catalog_v1beta2_value_proto_rawDesc), len(file_dtkt_catalog_v1beta2_value_proto_rawDesc)))
-	})
-	return file_dtkt_catalog_v1beta2_value_proto_rawDescData
-}
 
 var file_dtkt_catalog_v1beta2_value_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_dtkt_catalog_v1beta2_value_proto_goTypes = []any{

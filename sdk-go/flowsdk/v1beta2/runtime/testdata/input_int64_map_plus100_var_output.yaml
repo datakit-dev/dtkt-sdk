@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_int64_map_plus100_var_output
+  description: "Int64 input with map +100 transform, passed through a var to output"
+  inputs:
+    - id: x
+      int64: {}
+      transforms:
+        - map: "= this.value + 100"
+  vars:
+    - id: pass
+      value: "= inputs.x.value"
+  outputs:
+    - id: result
+      value: "= vars.pass.value"

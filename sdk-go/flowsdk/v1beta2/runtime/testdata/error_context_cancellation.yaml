@@ -1,0 +1,12 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: context_cancellation
+  description: "Ticker for context cancellation test"
+  generators:
+    - id: tick
+      ticker:
+        interval: "0.05s"
+  outputs:
+    - id: result
+      value: "= generators.tick.value"

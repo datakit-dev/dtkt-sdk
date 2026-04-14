@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package dtkt.flow.v1beta2;
+
+import "buf/validate/validate.proto";
+import "dtkt/flow/v1beta2/spec.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2;flowv1beta2";
+
+// A Flow gets compiled into a Graph, which is a DAG representation of all the nodes
+// (connections, inputs, generators, vars, actions, streams, interactions, outputs).
+// The Graph is what gets executed by the Runtime.
+message Graph {
+  // All nodes in the graph.
+  repeated Node nodes = 1;
+  // Directed edges connecting nodes. Each edge represents a data dependency.
+  repeated Edge edges = 2;
+}
+
+// Edge is a directed data dependency between two nodes in the graph.
+message Edge {
+  // Fully-qualified source node ID (e.g. "inputs.number", "actions.fetch").
+  string source = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^(connections|inputs|generators|vars|actions|streams|interactions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+  // Fully-qualified target node ID that depends on the source.
+  string target = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^(connections|inputs|generators|vars|actions|streams|interactions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+}
+
+// Node is a single vertex in the graph, wrapping exactly one typed spec definition.
+message Node {
+  // Fully-qualified node ID (e.g. "inputs.number", "actions.fetch").
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^(connections|inputs|generators|vars|actions|streams|interactions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+
+  // The typed spec definition for this node. Exactly one must be set.
+  oneof type {
+    option (buf.validate.oneof).required = true;
+    // gRPC/Connect connection configuration.
+    Connection connection = 8;
+    // External input to the flow.
+    Input input = 9;
+    // Value generator (ticker, cron, or range).
+    Generator generator = 10;
+    // Intermediate CEL variable or switch expression.
+    Var var = 11;
+    // Unary RPC method call.
+    Action action = 12;
+    // Streaming RPC method call.
+    Stream stream = 13;
+    // External interaction requiring a response from an actor.
+    Interaction interaction = 14;
+    // External output from the flow.
+    Output output = 15;
+  }
+}

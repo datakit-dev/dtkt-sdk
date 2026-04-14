@@ -118,6 +118,47 @@ service FlowService {
   rpc DeleteFlow(DeleteFlowRequest) returns (DeleteFlowResponse);
 }
 
+// FlowRunService provides operations for managing and running flowruns.
+service FlowRunService {
+  // List flowruns with filtering options.
+  rpc ListFlowRuns(ListFlowRunsRequest) returns (ListFlowRunsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Get a single flowrun by name.
+  rpc GetFlowRun(GetFlowRunRequest) returns (GetFlowRunResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create a new flowrun.
+  rpc CreateFlowRun(CreateFlowRunRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      metadata_type: "FlowRunOperationMetadata"
+      response_type: "FlowRun"
+    };
+  }
+  // Update a flowrun.
+  rpc UpdateFlowRun(UpdateFlowRunRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      metadata_type: "FlowRunOperationMetadata"
+      response_type: "FlowRun"
+    };
+  }
+  // Delete a flowrun.
+  rpc DeleteFlowRun(DeleteFlowRunRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      metadata_type: "FlowRunOperationMetadata"
+      response_type: "google.protobuf.Empty"
+    };
+  }
+  // Receive a stream of executor events (outputs, input requests, interaction requests, state changes).
+  // For environments with server streaming but not client streaming (e.g. web browsers).
+  rpc ReceiveFlowRunEvents(ReceiveFlowRunEventsRequest) returns (stream ReceiveFlowRunEventsResponse);
+  // Send an input, interaction response, or flow/node command (stop, terminate, suspend, resume).
+  // For environments without client streaming (e.g. web browsers).
+  rpc SendFlowRunEvent(SendFlowRunEventRequest) returns (google.protobuf.Empty);
+  // Bi-directional event stream: send inputs/commands and receive executor events.
+  rpc StreamFlowRunEvents(stream StreamFlowRunEventsRequest) returns (stream StreamFlowRunEventsResponse);
+}
+
 // IntegrationService provides operations for managing integration specs.
 service IntegrationService {
   // List integrations.

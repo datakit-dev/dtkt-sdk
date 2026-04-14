@@ -1,0 +1,18 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fc_action_terminate
+  inputs:
+    - id: msg
+      int64: {}
+  actions:
+    - id: call
+      call:
+        connection: echo
+        method: echo.Echo
+        request: "= inputs.msg.value"
+      flow_control:
+        terminate_when: "= true"
+  outputs:
+    - id: result
+      value: "= actions.call.value"

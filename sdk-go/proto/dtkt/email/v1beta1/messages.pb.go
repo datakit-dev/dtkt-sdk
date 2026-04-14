@@ -4,13 +4,14 @@
 // 	protoc        (unknown)
 // source: dtkt/email/v1beta1/messages.proto
 
+//go:build !protoopaque
+
 package emailv1beta1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -65,13 +66,8 @@ func (x TemplateLanguage) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use TemplateLanguage.Descriptor instead.
-func (TemplateLanguage) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{0}
-}
-
 type EmailAddress struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The email address.
 	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
 	// The name associated with the email address.
@@ -105,11 +101,6 @@ func (x *EmailAddress) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use EmailAddress.ProtoReflect.Descriptor instead.
-func (*EmailAddress) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *EmailAddress) GetAddress() string {
 	if x != nil {
 		return x.Address
@@ -124,8 +115,34 @@ func (x *EmailAddress) GetName() string {
 	return ""
 }
 
+func (x *EmailAddress) SetAddress(v string) {
+	x.Address = v
+}
+
+func (x *EmailAddress) SetName(v string) {
+	x.Name = v
+}
+
+type EmailAddress_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The email address.
+	Address string
+	// The name associated with the email address.
+	Name string
+}
+
+func (b0 EmailAddress_builder) Build() *EmailAddress {
+	m0 := &EmailAddress{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Address = b.Address
+	x.Name = b.Name
+	return m0
+}
+
 type EmailSendStatus struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
 	Error         string                 `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`
@@ -158,11 +175,6 @@ func (x *EmailSendStatus) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use EmailSendStatus.ProtoReflect.Descriptor instead.
-func (*EmailSendStatus) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *EmailSendStatus) GetId() string {
 	if x != nil {
 		return x.Id
@@ -184,9 +196,39 @@ func (x *EmailSendStatus) GetError() string {
 	return ""
 }
 
+func (x *EmailSendStatus) SetId(v string) {
+	x.Id = v
+}
+
+func (x *EmailSendStatus) SetSuccess(v bool) {
+	x.Success = v
+}
+
+func (x *EmailSendStatus) SetError(v string) {
+	x.Error = v
+}
+
+type EmailSendStatus_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id      string
+	Success bool
+	Error   string
+}
+
+func (b0 EmailSendStatus_builder) Build() *EmailSendStatus {
+	m0 := &EmailSendStatus{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Success = b.Success
+	x.Error = b.Error
+	return m0
+}
+
 // Represents an email message.
 type Email struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	From          *EmailAddress          `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty"`
 	ReplyTo       *EmailAddress          `protobuf:"bytes,2,opt,name=reply_to,json=replyTo,proto3" json:"reply_to,omitempty"`
 	To            []*EmailAddress        `protobuf:"bytes,3,rep,name=to,proto3" json:"to,omitempty"`
@@ -223,11 +265,6 @@ func (x *Email) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Email.ProtoReflect.Descriptor instead.
-func (*Email) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Email) GetFrom() *EmailAddress {
@@ -293,9 +330,108 @@ func (x *Email) GetHtmlBody() string {
 	return ""
 }
 
+func (x *Email) SetFrom(v *EmailAddress) {
+	x.From = v
+}
+
+func (x *Email) SetReplyTo(v *EmailAddress) {
+	x.ReplyTo = v
+}
+
+func (x *Email) SetTo(v []*EmailAddress) {
+	x.To = v
+}
+
+func (x *Email) SetCc(v []*EmailAddress) {
+	x.Cc = v
+}
+
+func (x *Email) SetBcc(v []*EmailAddress) {
+	x.Bcc = v
+}
+
+func (x *Email) SetReturnPath(v *EmailAddress) {
+	x.ReturnPath = v
+}
+
+func (x *Email) SetSubject(v string) {
+	x.Subject = v
+}
+
+func (x *Email) SetTextBody(v string) {
+	x.TextBody = v
+}
+
+func (x *Email) SetHtmlBody(v string) {
+	x.HtmlBody = v
+}
+
+func (x *Email) HasFrom() bool {
+	if x == nil {
+		return false
+	}
+	return x.From != nil
+}
+
+func (x *Email) HasReplyTo() bool {
+	if x == nil {
+		return false
+	}
+	return x.ReplyTo != nil
+}
+
+func (x *Email) HasReturnPath() bool {
+	if x == nil {
+		return false
+	}
+	return x.ReturnPath != nil
+}
+
+func (x *Email) ClearFrom() {
+	x.From = nil
+}
+
+func (x *Email) ClearReplyTo() {
+	x.ReplyTo = nil
+}
+
+func (x *Email) ClearReturnPath() {
+	x.ReturnPath = nil
+}
+
+type Email_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	From       *EmailAddress
+	ReplyTo    *EmailAddress
+	To         []*EmailAddress
+	Cc         []*EmailAddress
+	Bcc        []*EmailAddress
+	ReturnPath *EmailAddress
+	Subject    string
+	TextBody   string
+	HtmlBody   string
+}
+
+func (b0 Email_builder) Build() *Email {
+	m0 := &Email{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.From = b.From
+	x.ReplyTo = b.ReplyTo
+	x.To = b.To
+	x.Cc = b.Cc
+	x.Bcc = b.Bcc
+	x.ReturnPath = b.ReturnPath
+	x.Subject = b.Subject
+	x.TextBody = b.TextBody
+	x.HtmlBody = b.HtmlBody
+	return m0
+}
+
 // Represents an email template.
 type EmailTemplate struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Language      TemplateLanguage       `protobuf:"varint,2,opt,name=language,proto3,enum=dtkt.email.v1beta1.TemplateLanguage" json:"language,omitempty"`
 	Subject       string                 `protobuf:"bytes,3,opt,name=subject,proto3" json:"subject,omitempty"`
@@ -328,11 +464,6 @@ func (x *EmailTemplate) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use EmailTemplate.ProtoReflect.Descriptor instead.
-func (*EmailTemplate) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *EmailTemplate) GetId() string {
@@ -370,9 +501,51 @@ func (x *EmailTemplate) GetHtmlBody() string {
 	return ""
 }
 
+func (x *EmailTemplate) SetId(v string) {
+	x.Id = v
+}
+
+func (x *EmailTemplate) SetLanguage(v TemplateLanguage) {
+	x.Language = v
+}
+
+func (x *EmailTemplate) SetSubject(v string) {
+	x.Subject = v
+}
+
+func (x *EmailTemplate) SetTextBody(v string) {
+	x.TextBody = v
+}
+
+func (x *EmailTemplate) SetHtmlBody(v string) {
+	x.HtmlBody = v
+}
+
+type EmailTemplate_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id       string
+	Language TemplateLanguage
+	Subject  string
+	TextBody string
+	HtmlBody string
+}
+
+func (b0 EmailTemplate_builder) Build() *EmailTemplate {
+	m0 := &EmailTemplate{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Language = b.Language
+	x.Subject = b.Subject
+	x.TextBody = b.TextBody
+	x.HtmlBody = b.HtmlBody
+	return m0
+}
+
 // Represents an email message.
 type EmailWithTemplate struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
+	state          protoimpl.MessageState `protogen:"hybrid.v1"`
 	From           *EmailAddress          `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty"`
 	ReplyTo        *EmailAddress          `protobuf:"bytes,2,opt,name=reply_to,json=replyTo,proto3" json:"reply_to,omitempty"`
 	To             []*EmailAddress        `protobuf:"bytes,3,rep,name=to,proto3" json:"to,omitempty"`
@@ -408,11 +581,6 @@ func (x *EmailWithTemplate) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use EmailWithTemplate.ProtoReflect.Descriptor instead.
-func (*EmailWithTemplate) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *EmailWithTemplate) GetFrom() *EmailAddress {
@@ -471,9 +639,102 @@ func (x *EmailWithTemplate) GetTemplateParams() map[string]string {
 	return nil
 }
 
+func (x *EmailWithTemplate) SetFrom(v *EmailAddress) {
+	x.From = v
+}
+
+func (x *EmailWithTemplate) SetReplyTo(v *EmailAddress) {
+	x.ReplyTo = v
+}
+
+func (x *EmailWithTemplate) SetTo(v []*EmailAddress) {
+	x.To = v
+}
+
+func (x *EmailWithTemplate) SetCc(v []*EmailAddress) {
+	x.Cc = v
+}
+
+func (x *EmailWithTemplate) SetBcc(v []*EmailAddress) {
+	x.Bcc = v
+}
+
+func (x *EmailWithTemplate) SetReturnPath(v *EmailAddress) {
+	x.ReturnPath = v
+}
+
+func (x *EmailWithTemplate) SetTemplateId(v string) {
+	x.TemplateId = v
+}
+
+func (x *EmailWithTemplate) SetTemplateParams(v map[string]string) {
+	x.TemplateParams = v
+}
+
+func (x *EmailWithTemplate) HasFrom() bool {
+	if x == nil {
+		return false
+	}
+	return x.From != nil
+}
+
+func (x *EmailWithTemplate) HasReplyTo() bool {
+	if x == nil {
+		return false
+	}
+	return x.ReplyTo != nil
+}
+
+func (x *EmailWithTemplate) HasReturnPath() bool {
+	if x == nil {
+		return false
+	}
+	return x.ReturnPath != nil
+}
+
+func (x *EmailWithTemplate) ClearFrom() {
+	x.From = nil
+}
+
+func (x *EmailWithTemplate) ClearReplyTo() {
+	x.ReplyTo = nil
+}
+
+func (x *EmailWithTemplate) ClearReturnPath() {
+	x.ReturnPath = nil
+}
+
+type EmailWithTemplate_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	From           *EmailAddress
+	ReplyTo        *EmailAddress
+	To             []*EmailAddress
+	Cc             []*EmailAddress
+	Bcc            []*EmailAddress
+	ReturnPath     *EmailAddress
+	TemplateId     string
+	TemplateParams map[string]string
+}
+
+func (b0 EmailWithTemplate_builder) Build() *EmailWithTemplate {
+	m0 := &EmailWithTemplate{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.From = b.From
+	x.ReplyTo = b.ReplyTo
+	x.To = b.To
+	x.Cc = b.Cc
+	x.Bcc = b.Bcc
+	x.ReturnPath = b.ReturnPath
+	x.TemplateId = b.TemplateId
+	x.TemplateParams = b.TemplateParams
+	return m0
+}
+
 // Represents an email sending request.
 type SendEmailRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The email to be sent.
 	Email         *Email `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -505,11 +766,6 @@ func (x *SendEmailRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SendEmailRequest.ProtoReflect.Descriptor instead.
-func (*SendEmailRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *SendEmailRequest) GetEmail() *Email {
 	if x != nil {
 		return x.Email
@@ -517,9 +773,39 @@ func (x *SendEmailRequest) GetEmail() *Email {
 	return nil
 }
 
+func (x *SendEmailRequest) SetEmail(v *Email) {
+	x.Email = v
+}
+
+func (x *SendEmailRequest) HasEmail() bool {
+	if x == nil {
+		return false
+	}
+	return x.Email != nil
+}
+
+func (x *SendEmailRequest) ClearEmail() {
+	x.Email = nil
+}
+
+type SendEmailRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The email to be sent.
+	Email *Email
+}
+
+func (b0 SendEmailRequest_builder) Build() *SendEmailRequest {
+	m0 := &SendEmailRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Email = b.Email
+	return m0
+}
+
 // Represents an email sending response.
 type SendEmailResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The email sending status.
 	SendStatus    *EmailSendStatus `protobuf:"bytes,1,opt,name=send_status,json=sendStatus,proto3" json:"send_status,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -551,11 +837,6 @@ func (x *SendEmailResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SendEmailResponse.ProtoReflect.Descriptor instead.
-func (*SendEmailResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *SendEmailResponse) GetSendStatus() *EmailSendStatus {
 	if x != nil {
 		return x.SendStatus
@@ -563,9 +844,39 @@ func (x *SendEmailResponse) GetSendStatus() *EmailSendStatus {
 	return nil
 }
 
+func (x *SendEmailResponse) SetSendStatus(v *EmailSendStatus) {
+	x.SendStatus = v
+}
+
+func (x *SendEmailResponse) HasSendStatus() bool {
+	if x == nil {
+		return false
+	}
+	return x.SendStatus != nil
+}
+
+func (x *SendEmailResponse) ClearSendStatus() {
+	x.SendStatus = nil
+}
+
+type SendEmailResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The email sending status.
+	SendStatus *EmailSendStatus
+}
+
+func (b0 SendEmailResponse_builder) Build() *SendEmailResponse {
+	m0 := &SendEmailResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.SendStatus = b.SendStatus
+	return m0
+}
+
 // Represents a stream of email sending requests.
 type SendEmailsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The email to be sent.
 	Email         *Email `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -597,11 +908,6 @@ func (x *SendEmailsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SendEmailsRequest.ProtoReflect.Descriptor instead.
-func (*SendEmailsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *SendEmailsRequest) GetEmail() *Email {
 	if x != nil {
 		return x.Email
@@ -609,9 +915,39 @@ func (x *SendEmailsRequest) GetEmail() *Email {
 	return nil
 }
 
+func (x *SendEmailsRequest) SetEmail(v *Email) {
+	x.Email = v
+}
+
+func (x *SendEmailsRequest) HasEmail() bool {
+	if x == nil {
+		return false
+	}
+	return x.Email != nil
+}
+
+func (x *SendEmailsRequest) ClearEmail() {
+	x.Email = nil
+}
+
+type SendEmailsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The email to be sent.
+	Email *Email
+}
+
+func (b0 SendEmailsRequest_builder) Build() *SendEmailsRequest {
+	m0 := &SendEmailsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Email = b.Email
+	return m0
+}
+
 // Represents a stream of email sending responses.
 type SendEmailsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The email sending status.
 	SendStatus    *EmailSendStatus `protobuf:"bytes,1,opt,name=send_status,json=sendStatus,proto3" json:"send_status,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -643,11 +979,6 @@ func (x *SendEmailsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SendEmailsResponse.ProtoReflect.Descriptor instead.
-func (*SendEmailsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *SendEmailsResponse) GetSendStatus() *EmailSendStatus {
 	if x != nil {
 		return x.SendStatus
@@ -655,9 +986,39 @@ func (x *SendEmailsResponse) GetSendStatus() *EmailSendStatus {
 	return nil
 }
 
+func (x *SendEmailsResponse) SetSendStatus(v *EmailSendStatus) {
+	x.SendStatus = v
+}
+
+func (x *SendEmailsResponse) HasSendStatus() bool {
+	if x == nil {
+		return false
+	}
+	return x.SendStatus != nil
+}
+
+func (x *SendEmailsResponse) ClearSendStatus() {
+	x.SendStatus = nil
+}
+
+type SendEmailsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The email sending status.
+	SendStatus *EmailSendStatus
+}
+
+func (b0 SendEmailsResponse_builder) Build() *SendEmailsResponse {
+	m0 := &SendEmailsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.SendStatus = b.SendStatus
+	return m0
+}
+
 // Represents a batch email sending request.
 type SendBatchEmailRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The list of emails to be sent.
 	Emails        []*Email `protobuf:"bytes,1,rep,name=emails,proto3" json:"emails,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -689,11 +1050,6 @@ func (x *SendBatchEmailRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SendBatchEmailRequest.ProtoReflect.Descriptor instead.
-func (*SendBatchEmailRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *SendBatchEmailRequest) GetEmails() []*Email {
 	if x != nil {
 		return x.Emails
@@ -701,9 +1057,28 @@ func (x *SendBatchEmailRequest) GetEmails() []*Email {
 	return nil
 }
 
+func (x *SendBatchEmailRequest) SetEmails(v []*Email) {
+	x.Emails = v
+}
+
+type SendBatchEmailRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The list of emails to be sent.
+	Emails []*Email
+}
+
+func (b0 SendBatchEmailRequest_builder) Build() *SendBatchEmailRequest {
+	m0 := &SendBatchEmailRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Emails = b.Emails
+	return m0
+}
+
 // Represents a batch email sending response.
 type SendBatchEmailResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The list of email sending statuses.
 	SendStatus    []*EmailSendStatus `protobuf:"bytes,1,rep,name=send_status,json=sendStatus,proto3" json:"send_status,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -735,11 +1110,6 @@ func (x *SendBatchEmailResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SendBatchEmailResponse.ProtoReflect.Descriptor instead.
-func (*SendBatchEmailResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *SendBatchEmailResponse) GetSendStatus() []*EmailSendStatus {
 	if x != nil {
 		return x.SendStatus
@@ -747,9 +1117,28 @@ func (x *SendBatchEmailResponse) GetSendStatus() []*EmailSendStatus {
 	return nil
 }
 
+func (x *SendBatchEmailResponse) SetSendStatus(v []*EmailSendStatus) {
+	x.SendStatus = v
+}
+
+type SendBatchEmailResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The list of email sending statuses.
+	SendStatus []*EmailSendStatus
+}
+
+func (b0 SendBatchEmailResponse_builder) Build() *SendBatchEmailResponse {
+	m0 := &SendBatchEmailResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.SendStatus = b.SendStatus
+	return m0
+}
+
 // Represents an email sending request sent with a template.
 type SendEmailWithTemplateRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The email to be sent.
 	Email         *EmailWithTemplate `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -781,11 +1170,6 @@ func (x *SendEmailWithTemplateRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SendEmailWithTemplateRequest.ProtoReflect.Descriptor instead.
-func (*SendEmailWithTemplateRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{11}
-}
-
 func (x *SendEmailWithTemplateRequest) GetEmail() *EmailWithTemplate {
 	if x != nil {
 		return x.Email
@@ -793,9 +1177,39 @@ func (x *SendEmailWithTemplateRequest) GetEmail() *EmailWithTemplate {
 	return nil
 }
 
+func (x *SendEmailWithTemplateRequest) SetEmail(v *EmailWithTemplate) {
+	x.Email = v
+}
+
+func (x *SendEmailWithTemplateRequest) HasEmail() bool {
+	if x == nil {
+		return false
+	}
+	return x.Email != nil
+}
+
+func (x *SendEmailWithTemplateRequest) ClearEmail() {
+	x.Email = nil
+}
+
+type SendEmailWithTemplateRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The email to be sent.
+	Email *EmailWithTemplate
+}
+
+func (b0 SendEmailWithTemplateRequest_builder) Build() *SendEmailWithTemplateRequest {
+	m0 := &SendEmailWithTemplateRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Email = b.Email
+	return m0
+}
+
 // Represents an email sending response sent with a template.
 type SendEmailWithTemplateResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The email sending status.
 	SendStatus    *EmailSendStatus `protobuf:"bytes,1,opt,name=send_status,json=sendStatus,proto3" json:"send_status,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -827,11 +1241,6 @@ func (x *SendEmailWithTemplateResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SendEmailWithTemplateResponse.ProtoReflect.Descriptor instead.
-func (*SendEmailWithTemplateResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{12}
-}
-
 func (x *SendEmailWithTemplateResponse) GetSendStatus() *EmailSendStatus {
 	if x != nil {
 		return x.SendStatus
@@ -839,9 +1248,39 @@ func (x *SendEmailWithTemplateResponse) GetSendStatus() *EmailSendStatus {
 	return nil
 }
 
+func (x *SendEmailWithTemplateResponse) SetSendStatus(v *EmailSendStatus) {
+	x.SendStatus = v
+}
+
+func (x *SendEmailWithTemplateResponse) HasSendStatus() bool {
+	if x == nil {
+		return false
+	}
+	return x.SendStatus != nil
+}
+
+func (x *SendEmailWithTemplateResponse) ClearSendStatus() {
+	x.SendStatus = nil
+}
+
+type SendEmailWithTemplateResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The email sending status.
+	SendStatus *EmailSendStatus
+}
+
+func (b0 SendEmailWithTemplateResponse_builder) Build() *SendEmailWithTemplateResponse {
+	m0 := &SendEmailWithTemplateResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.SendStatus = b.SendStatus
+	return m0
+}
+
 // Represents a stream of email sending requests sent with a template.
 type SendEmailsWithTemplateRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The email to be sent.
 	Email         *EmailWithTemplate `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -873,11 +1312,6 @@ func (x *SendEmailsWithTemplateRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SendEmailsWithTemplateRequest.ProtoReflect.Descriptor instead.
-func (*SendEmailsWithTemplateRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{13}
-}
-
 func (x *SendEmailsWithTemplateRequest) GetEmail() *EmailWithTemplate {
 	if x != nil {
 		return x.Email
@@ -885,9 +1319,39 @@ func (x *SendEmailsWithTemplateRequest) GetEmail() *EmailWithTemplate {
 	return nil
 }
 
+func (x *SendEmailsWithTemplateRequest) SetEmail(v *EmailWithTemplate) {
+	x.Email = v
+}
+
+func (x *SendEmailsWithTemplateRequest) HasEmail() bool {
+	if x == nil {
+		return false
+	}
+	return x.Email != nil
+}
+
+func (x *SendEmailsWithTemplateRequest) ClearEmail() {
+	x.Email = nil
+}
+
+type SendEmailsWithTemplateRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The email to be sent.
+	Email *EmailWithTemplate
+}
+
+func (b0 SendEmailsWithTemplateRequest_builder) Build() *SendEmailsWithTemplateRequest {
+	m0 := &SendEmailsWithTemplateRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Email = b.Email
+	return m0
+}
+
 // Represents a stream of email sending responses sent with a template.
 type SendEmailsWithTemplateResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The email sending status.
 	SendStatus    *EmailSendStatus `protobuf:"bytes,1,opt,name=send_status,json=sendStatus,proto3" json:"send_status,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -919,11 +1383,6 @@ func (x *SendEmailsWithTemplateResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SendEmailsWithTemplateResponse.ProtoReflect.Descriptor instead.
-func (*SendEmailsWithTemplateResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{14}
-}
-
 func (x *SendEmailsWithTemplateResponse) GetSendStatus() *EmailSendStatus {
 	if x != nil {
 		return x.SendStatus
@@ -931,9 +1390,39 @@ func (x *SendEmailsWithTemplateResponse) GetSendStatus() *EmailSendStatus {
 	return nil
 }
 
+func (x *SendEmailsWithTemplateResponse) SetSendStatus(v *EmailSendStatus) {
+	x.SendStatus = v
+}
+
+func (x *SendEmailsWithTemplateResponse) HasSendStatus() bool {
+	if x == nil {
+		return false
+	}
+	return x.SendStatus != nil
+}
+
+func (x *SendEmailsWithTemplateResponse) ClearSendStatus() {
+	x.SendStatus = nil
+}
+
+type SendEmailsWithTemplateResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The email sending status.
+	SendStatus *EmailSendStatus
+}
+
+func (b0 SendEmailsWithTemplateResponse_builder) Build() *SendEmailsWithTemplateResponse {
+	m0 := &SendEmailsWithTemplateResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.SendStatus = b.SendStatus
+	return m0
+}
+
 // Represents a batch email sending request sent with a template.
 type SendBatchEmailWithTemplateRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The list of emails to be sent.
 	Emails        []*EmailWithTemplate `protobuf:"bytes,1,rep,name=emails,proto3" json:"emails,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -965,11 +1454,6 @@ func (x *SendBatchEmailWithTemplateRequest) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SendBatchEmailWithTemplateRequest.ProtoReflect.Descriptor instead.
-func (*SendBatchEmailWithTemplateRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{15}
-}
-
 func (x *SendBatchEmailWithTemplateRequest) GetEmails() []*EmailWithTemplate {
 	if x != nil {
 		return x.Emails
@@ -977,9 +1461,28 @@ func (x *SendBatchEmailWithTemplateRequest) GetEmails() []*EmailWithTemplate {
 	return nil
 }
 
+func (x *SendBatchEmailWithTemplateRequest) SetEmails(v []*EmailWithTemplate) {
+	x.Emails = v
+}
+
+type SendBatchEmailWithTemplateRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The list of emails to be sent.
+	Emails []*EmailWithTemplate
+}
+
+func (b0 SendBatchEmailWithTemplateRequest_builder) Build() *SendBatchEmailWithTemplateRequest {
+	m0 := &SendBatchEmailWithTemplateRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Emails = b.Emails
+	return m0
+}
+
 // Represents a batch email sending response sent with a template.
 type SendBatchEmailWithTemplateResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The list of email sending statuses.
 	SendStatus    []*EmailSendStatus `protobuf:"bytes,1,rep,name=send_status,json=sendStatus,proto3" json:"send_status,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1011,11 +1514,6 @@ func (x *SendBatchEmailWithTemplateResponse) ProtoReflect() protoreflect.Message
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SendBatchEmailWithTemplateResponse.ProtoReflect.Descriptor instead.
-func (*SendBatchEmailWithTemplateResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{16}
-}
-
 func (x *SendBatchEmailWithTemplateResponse) GetSendStatus() []*EmailSendStatus {
 	if x != nil {
 		return x.SendStatus
@@ -1023,9 +1521,28 @@ func (x *SendBatchEmailWithTemplateResponse) GetSendStatus() []*EmailSendStatus 
 	return nil
 }
 
+func (x *SendBatchEmailWithTemplateResponse) SetSendStatus(v []*EmailSendStatus) {
+	x.SendStatus = v
+}
+
+type SendBatchEmailWithTemplateResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The list of email sending statuses.
+	SendStatus []*EmailSendStatus
+}
+
+func (b0 SendBatchEmailWithTemplateResponse_builder) Build() *SendBatchEmailWithTemplateResponse {
+	m0 := &SendBatchEmailWithTemplateResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.SendStatus = b.SendStatus
+	return m0
+}
+
 // Represents a request to get an email template by ID.
 type GetEmailTemplateRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1056,11 +1573,6 @@ func (x *GetEmailTemplateRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetEmailTemplateRequest.ProtoReflect.Descriptor instead.
-func (*GetEmailTemplateRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{17}
-}
-
 func (x *GetEmailTemplateRequest) GetId() string {
 	if x != nil {
 		return x.Id
@@ -1068,9 +1580,27 @@ func (x *GetEmailTemplateRequest) GetId() string {
 	return ""
 }
 
+func (x *GetEmailTemplateRequest) SetId(v string) {
+	x.Id = v
+}
+
+type GetEmailTemplateRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id string
+}
+
+func (b0 GetEmailTemplateRequest_builder) Build() *GetEmailTemplateRequest {
+	m0 := &GetEmailTemplateRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	return m0
+}
+
 // Represents a response to get an email template by ID.
 type GetEmailTemplateResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Template      *EmailTemplate         `protobuf:"bytes,1,opt,name=template,proto3" json:"template,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1101,11 +1631,6 @@ func (x *GetEmailTemplateResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetEmailTemplateResponse.ProtoReflect.Descriptor instead.
-func (*GetEmailTemplateResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{18}
-}
-
 func (x *GetEmailTemplateResponse) GetTemplate() *EmailTemplate {
 	if x != nil {
 		return x.Template
@@ -1113,9 +1638,38 @@ func (x *GetEmailTemplateResponse) GetTemplate() *EmailTemplate {
 	return nil
 }
 
+func (x *GetEmailTemplateResponse) SetTemplate(v *EmailTemplate) {
+	x.Template = v
+}
+
+func (x *GetEmailTemplateResponse) HasTemplate() bool {
+	if x == nil {
+		return false
+	}
+	return x.Template != nil
+}
+
+func (x *GetEmailTemplateResponse) ClearTemplate() {
+	x.Template = nil
+}
+
+type GetEmailTemplateResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Template *EmailTemplate
+}
+
+func (b0 GetEmailTemplateResponse_builder) Build() *GetEmailTemplateResponse {
+	m0 := &GetEmailTemplateResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Template = b.Template
+	return m0
+}
+
 // Represents a request to list email templates.
 type ListEmailTemplatesRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The maximum number of email templates to return. The service may return fewer than
 	// this value.
 	// If unspecified, at most 50 templates will be returned.
@@ -1156,11 +1710,6 @@ func (x *ListEmailTemplatesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListEmailTemplatesRequest.ProtoReflect.Descriptor instead.
-func (*ListEmailTemplatesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{19}
-}
-
 func (x *ListEmailTemplatesRequest) GetPageSize() int32 {
 	if x != nil {
 		return x.PageSize
@@ -1175,9 +1724,42 @@ func (x *ListEmailTemplatesRequest) GetPageToken() string {
 	return ""
 }
 
+func (x *ListEmailTemplatesRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListEmailTemplatesRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+type ListEmailTemplatesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The maximum number of email templates to return. The service may return fewer than
+	// this value.
+	// If unspecified, at most 50 templates will be returned.
+	// The maximum value is 1000; values above 1000 will be coerced to 1000.
+	PageSize int32
+	// A page token, received from a previous `ListEmailTemplates` call.
+	// Provide this to retrieve the subsequent page.
+	//
+	// When paginating, all other parameters provided to `ListEmailTemplates` must match
+	// the call that provided the page token.
+	PageToken string
+}
+
+func (b0 ListEmailTemplatesRequest_builder) Build() *ListEmailTemplatesRequest {
+	m0 := &ListEmailTemplatesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	return m0
+}
+
 // Represents a response to list email templates.
 type ListEmailTemplatesResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Templates     []*EmailTemplate       `protobuf:"bytes,1,rep,name=templates,proto3" json:"templates,omitempty"`
 	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1209,11 +1791,6 @@ func (x *ListEmailTemplatesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListEmailTemplatesResponse.ProtoReflect.Descriptor instead.
-func (*ListEmailTemplatesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{20}
-}
-
 func (x *ListEmailTemplatesResponse) GetTemplates() []*EmailTemplate {
 	if x != nil {
 		return x.Templates
@@ -1228,9 +1805,33 @@ func (x *ListEmailTemplatesResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListEmailTemplatesResponse) SetTemplates(v []*EmailTemplate) {
+	x.Templates = v
+}
+
+func (x *ListEmailTemplatesResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListEmailTemplatesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Templates     []*EmailTemplate
+	NextPageToken string
+}
+
+func (b0 ListEmailTemplatesResponse_builder) Build() *ListEmailTemplatesResponse {
+	m0 := &ListEmailTemplatesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Templates = b.Templates
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 // Represents a request to create an email template.
 type CreateEmailTemplateRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Template      *EmailTemplate         `protobuf:"bytes,1,opt,name=template,proto3" json:"template,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1261,11 +1862,6 @@ func (x *CreateEmailTemplateRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateEmailTemplateRequest.ProtoReflect.Descriptor instead.
-func (*CreateEmailTemplateRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{21}
-}
-
 func (x *CreateEmailTemplateRequest) GetTemplate() *EmailTemplate {
 	if x != nil {
 		return x.Template
@@ -1273,9 +1869,38 @@ func (x *CreateEmailTemplateRequest) GetTemplate() *EmailTemplate {
 	return nil
 }
 
+func (x *CreateEmailTemplateRequest) SetTemplate(v *EmailTemplate) {
+	x.Template = v
+}
+
+func (x *CreateEmailTemplateRequest) HasTemplate() bool {
+	if x == nil {
+		return false
+	}
+	return x.Template != nil
+}
+
+func (x *CreateEmailTemplateRequest) ClearTemplate() {
+	x.Template = nil
+}
+
+type CreateEmailTemplateRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Template *EmailTemplate
+}
+
+func (b0 CreateEmailTemplateRequest_builder) Build() *CreateEmailTemplateRequest {
+	m0 := &CreateEmailTemplateRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Template = b.Template
+	return m0
+}
+
 // Represents a response to create an email template.
 type CreateEmailTemplateResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Template      *EmailTemplate         `protobuf:"bytes,1,opt,name=template,proto3" json:"template,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1306,11 +1931,6 @@ func (x *CreateEmailTemplateResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateEmailTemplateResponse.ProtoReflect.Descriptor instead.
-func (*CreateEmailTemplateResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{22}
-}
-
 func (x *CreateEmailTemplateResponse) GetTemplate() *EmailTemplate {
 	if x != nil {
 		return x.Template
@@ -1318,9 +1938,38 @@ func (x *CreateEmailTemplateResponse) GetTemplate() *EmailTemplate {
 	return nil
 }
 
+func (x *CreateEmailTemplateResponse) SetTemplate(v *EmailTemplate) {
+	x.Template = v
+}
+
+func (x *CreateEmailTemplateResponse) HasTemplate() bool {
+	if x == nil {
+		return false
+	}
+	return x.Template != nil
+}
+
+func (x *CreateEmailTemplateResponse) ClearTemplate() {
+	x.Template = nil
+}
+
+type CreateEmailTemplateResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Template *EmailTemplate
+}
+
+func (b0 CreateEmailTemplateResponse_builder) Build() *CreateEmailTemplateResponse {
+	m0 := &CreateEmailTemplateResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Template = b.Template
+	return m0
+}
+
 // Represents a request to update an email template.
 type UpdateEmailTemplateRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Template      *EmailTemplate         `protobuf:"bytes,2,opt,name=template,proto3" json:"template,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1352,11 +2001,6 @@ func (x *UpdateEmailTemplateRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateEmailTemplateRequest.ProtoReflect.Descriptor instead.
-func (*UpdateEmailTemplateRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{23}
-}
-
 func (x *UpdateEmailTemplateRequest) GetId() string {
 	if x != nil {
 		return x.Id
@@ -1371,9 +2015,44 @@ func (x *UpdateEmailTemplateRequest) GetTemplate() *EmailTemplate {
 	return nil
 }
 
+func (x *UpdateEmailTemplateRequest) SetId(v string) {
+	x.Id = v
+}
+
+func (x *UpdateEmailTemplateRequest) SetTemplate(v *EmailTemplate) {
+	x.Template = v
+}
+
+func (x *UpdateEmailTemplateRequest) HasTemplate() bool {
+	if x == nil {
+		return false
+	}
+	return x.Template != nil
+}
+
+func (x *UpdateEmailTemplateRequest) ClearTemplate() {
+	x.Template = nil
+}
+
+type UpdateEmailTemplateRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id       string
+	Template *EmailTemplate
+}
+
+func (b0 UpdateEmailTemplateRequest_builder) Build() *UpdateEmailTemplateRequest {
+	m0 := &UpdateEmailTemplateRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Template = b.Template
+	return m0
+}
+
 // Represents a response to update an email template.
 type UpdateEmailTemplateResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Template      *EmailTemplate         `protobuf:"bytes,1,opt,name=template,proto3" json:"template,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1404,11 +2083,6 @@ func (x *UpdateEmailTemplateResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateEmailTemplateResponse.ProtoReflect.Descriptor instead.
-func (*UpdateEmailTemplateResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{24}
-}
-
 func (x *UpdateEmailTemplateResponse) GetTemplate() *EmailTemplate {
 	if x != nil {
 		return x.Template
@@ -1416,9 +2090,38 @@ func (x *UpdateEmailTemplateResponse) GetTemplate() *EmailTemplate {
 	return nil
 }
 
+func (x *UpdateEmailTemplateResponse) SetTemplate(v *EmailTemplate) {
+	x.Template = v
+}
+
+func (x *UpdateEmailTemplateResponse) HasTemplate() bool {
+	if x == nil {
+		return false
+	}
+	return x.Template != nil
+}
+
+func (x *UpdateEmailTemplateResponse) ClearTemplate() {
+	x.Template = nil
+}
+
+type UpdateEmailTemplateResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Template *EmailTemplate
+}
+
+func (b0 UpdateEmailTemplateResponse_builder) Build() *UpdateEmailTemplateResponse {
+	m0 := &UpdateEmailTemplateResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Template = b.Template
+	return m0
+}
+
 // Represents a request to delete an email template.
 type DeleteEmailTemplateRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1449,11 +2152,6 @@ func (x *DeleteEmailTemplateRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteEmailTemplateRequest.ProtoReflect.Descriptor instead.
-func (*DeleteEmailTemplateRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{25}
-}
-
 func (x *DeleteEmailTemplateRequest) GetId() string {
 	if x != nil {
 		return x.Id
@@ -1461,9 +2159,27 @@ func (x *DeleteEmailTemplateRequest) GetId() string {
 	return ""
 }
 
+func (x *DeleteEmailTemplateRequest) SetId(v string) {
+	x.Id = v
+}
+
+type DeleteEmailTemplateRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id string
+}
+
+func (b0 DeleteEmailTemplateRequest_builder) Build() *DeleteEmailTemplateRequest {
+	m0 := &DeleteEmailTemplateRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	return m0
+}
+
 // Represents a response to delete an email template.
 type DeleteEmailTemplateResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1494,11 +2210,6 @@ func (x *DeleteEmailTemplateResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteEmailTemplateResponse.ProtoReflect.Descriptor instead.
-func (*DeleteEmailTemplateResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{26}
-}
-
 func (x *DeleteEmailTemplateResponse) GetId() string {
 	if x != nil {
 		return x.Id
@@ -1506,9 +2217,27 @@ func (x *DeleteEmailTemplateResponse) GetId() string {
 	return ""
 }
 
+func (x *DeleteEmailTemplateResponse) SetId(v string) {
+	x.Id = v
+}
+
+type DeleteEmailTemplateResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id string
+}
+
+func (b0 DeleteEmailTemplateResponse_builder) Build() *DeleteEmailTemplateResponse {
+	m0 := &DeleteEmailTemplateResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	return m0
+}
+
 // Represents a received Email
 type ReceivedEmail struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	At            string                 `protobuf:"bytes,2,opt,name=at,proto3" json:"at,omitempty"`
 	Email         *Email                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
@@ -1541,11 +2270,6 @@ func (x *ReceivedEmail) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ReceivedEmail.ProtoReflect.Descriptor instead.
-func (*ReceivedEmail) Descriptor() ([]byte, []int) {
-	return file_dtkt_email_v1beta1_messages_proto_rawDescGZIP(), []int{27}
-}
-
 func (x *ReceivedEmail) GetId() string {
 	if x != nil {
 		return x.Id
@@ -1565,6 +2289,47 @@ func (x *ReceivedEmail) GetEmail() *Email {
 		return x.Email
 	}
 	return nil
+}
+
+func (x *ReceivedEmail) SetId(v string) {
+	x.Id = v
+}
+
+func (x *ReceivedEmail) SetAt(v string) {
+	x.At = v
+}
+
+func (x *ReceivedEmail) SetEmail(v *Email) {
+	x.Email = v
+}
+
+func (x *ReceivedEmail) HasEmail() bool {
+	if x == nil {
+		return false
+	}
+	return x.Email != nil
+}
+
+func (x *ReceivedEmail) ClearEmail() {
+	x.Email = nil
+}
+
+type ReceivedEmail_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id    string
+	At    string
+	Email *Email
+}
+
+func (b0 ReceivedEmail_builder) Build() *ReceivedEmail {
+	m0 := &ReceivedEmail{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.At = b.At
+	x.Email = b.Email
+	return m0
 }
 
 var File_dtkt_email_v1beta1_messages_proto protoreflect.FileDescriptor
@@ -1673,18 +2438,6 @@ const file_dtkt_email_v1beta1_messages_proto_rawDesc = "" +
 	"\x1dTEMPLATE_LANGUAGE_GO_TEMPLATE\x10\x01\x12\x1f\n" +
 	"\x1bTEMPLATE_LANGUAGE_MUSTACHIO\x10\x02B\xe1\x01\n" +
 	"\x18proto.dtkt.email.v1beta1B\rMessagesProtoP\x01ZLgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/email/v1beta1;emailv1beta1\xa2\x02\x03DEX\xaa\x02\x12Dtkt.Email.V1beta1\xca\x02\x12Dtkt\\Email\\V1beta1\xe2\x02\x1eDtkt\\Email\\V1beta1\\GPBMetadata\xea\x02\x14Dtkt::Email::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_email_v1beta1_messages_proto_rawDescOnce sync.Once
-	file_dtkt_email_v1beta1_messages_proto_rawDescData []byte
-)
-
-func file_dtkt_email_v1beta1_messages_proto_rawDescGZIP() []byte {
-	file_dtkt_email_v1beta1_messages_proto_rawDescOnce.Do(func() {
-		file_dtkt_email_v1beta1_messages_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_email_v1beta1_messages_proto_rawDesc), len(file_dtkt_email_v1beta1_messages_proto_rawDesc)))
-	})
-	return file_dtkt_email_v1beta1_messages_proto_rawDescData
-}
 
 var file_dtkt_email_v1beta1_messages_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_dtkt_email_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 29)

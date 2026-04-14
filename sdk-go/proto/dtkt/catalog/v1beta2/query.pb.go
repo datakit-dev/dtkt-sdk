@@ -4,13 +4,14 @@
 // 	protoc        (unknown)
 // source: dtkt/catalog/v1beta2/query.proto
 
+//go:build !protoopaque
+
 package catalogv1beta2
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -23,7 +24,7 @@ const (
 
 // Represents a query and its associated details.
 type Query struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Indicates if the query is valid.
 	Valid bool `protobuf:"varint,1,opt,name=valid,proto3" json:"valid,omitempty"`
 	// Error message, if any.
@@ -63,11 +64,6 @@ func (x *Query) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Query.ProtoReflect.Descriptor instead.
-func (*Query) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_query_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Query) GetValid() bool {
@@ -112,9 +108,63 @@ func (x *Query) GetFields() []*Field {
 	return nil
 }
 
+func (x *Query) SetValid(v bool) {
+	x.Valid = v
+}
+
+func (x *Query) SetError(v string) {
+	x.Error = v
+}
+
+func (x *Query) SetDialect(v string) {
+	x.Dialect = v
+}
+
+func (x *Query) SetQuery(v string) {
+	x.Query = v
+}
+
+func (x *Query) SetParams(v []*Param) {
+	x.Params = v
+}
+
+func (x *Query) SetFields(v []*Field) {
+	x.Fields = v
+}
+
+type Query_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Indicates if the query is valid.
+	Valid bool
+	// Error message, if any.
+	Error string
+	// The query dialect used.
+	Dialect string
+	// The query string.
+	Query string
+	// Parameters used in the query, if any.
+	Params []*Param
+	// List of fields returned by the query.
+	Fields []*Field
+}
+
+func (b0 Query_builder) Build() *Query {
+	m0 := &Query{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Valid = b.Valid
+	x.Error = b.Error
+	x.Dialect = b.Dialect
+	x.Query = b.Query
+	x.Params = b.Params
+	x.Fields = b.Fields
+	return m0
+}
+
 // Request to validate a query.
 type ValidateQueryRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The query to validate.
 	Query string `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	// Parameters used in the query.
@@ -150,11 +200,6 @@ func (x *ValidateQueryRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ValidateQueryRequest.ProtoReflect.Descriptor instead.
-func (*ValidateQueryRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_query_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *ValidateQueryRequest) GetQuery() string {
 	if x != nil {
 		return x.Query
@@ -176,9 +221,42 @@ func (x *ValidateQueryRequest) GetAccessible() []*CatalogPermission {
 	return nil
 }
 
+func (x *ValidateQueryRequest) SetQuery(v string) {
+	x.Query = v
+}
+
+func (x *ValidateQueryRequest) SetParams(v []*Param) {
+	x.Params = v
+}
+
+func (x *ValidateQueryRequest) SetAccessible(v []*CatalogPermission) {
+	x.Accessible = v
+}
+
+type ValidateQueryRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The query to validate.
+	Query string
+	// Parameters used in the query.
+	Params []*Param
+	// Accessible catalogs for validation.
+	Accessible []*CatalogPermission
+}
+
+func (b0 ValidateQueryRequest_builder) Build() *ValidateQueryRequest {
+	m0 := &ValidateQueryRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Query = b.Query
+	x.Params = b.Params
+	x.Accessible = b.Accessible
+	return m0
+}
+
 // Response for query validation.
 type ValidateQueryResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Validated query details.
 	Query *Query `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	// Permissions accessed by the query.
@@ -212,11 +290,6 @@ func (x *ValidateQueryResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ValidateQueryResponse.ProtoReflect.Descriptor instead.
-func (*ValidateQueryResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_query_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *ValidateQueryResponse) GetQuery() *Query {
 	if x != nil {
 		return x.Query
@@ -231,9 +304,46 @@ func (x *ValidateQueryResponse) GetAccessed() []*CatalogPermission {
 	return nil
 }
 
+func (x *ValidateQueryResponse) SetQuery(v *Query) {
+	x.Query = v
+}
+
+func (x *ValidateQueryResponse) SetAccessed(v []*CatalogPermission) {
+	x.Accessed = v
+}
+
+func (x *ValidateQueryResponse) HasQuery() bool {
+	if x == nil {
+		return false
+	}
+	return x.Query != nil
+}
+
+func (x *ValidateQueryResponse) ClearQuery() {
+	x.Query = nil
+}
+
+type ValidateQueryResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Validated query details.
+	Query *Query
+	// Permissions accessed by the query.
+	Accessed []*CatalogPermission
+}
+
+func (b0 ValidateQueryResponse_builder) Build() *ValidateQueryResponse {
+	m0 := &ValidateQueryResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Query = b.Query
+	x.Accessed = b.Accessed
+	return m0
+}
+
 // Request to retrieve query results.
 type ListQueryResultsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The query to execute.
 	Query string `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	// Number of rows per page.
@@ -271,11 +381,6 @@ func (x *ListQueryResultsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListQueryResultsRequest.ProtoReflect.Descriptor instead.
-func (*ListQueryResultsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_query_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *ListQueryResultsRequest) GetQuery() string {
 	if x != nil {
 		return x.Query
@@ -304,9 +409,49 @@ func (x *ListQueryResultsRequest) GetParams() []*Param {
 	return nil
 }
 
+func (x *ListQueryResultsRequest) SetQuery(v string) {
+	x.Query = v
+}
+
+func (x *ListQueryResultsRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListQueryResultsRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListQueryResultsRequest) SetParams(v []*Param) {
+	x.Params = v
+}
+
+type ListQueryResultsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The query to execute.
+	Query string
+	// Number of rows per page.
+	PageSize int32
+	// Token for the desired page (empty for first page).
+	PageToken string
+	// Parameters used in the query.
+	Params []*Param
+}
+
+func (b0 ListQueryResultsRequest_builder) Build() *ListQueryResultsRequest {
+	m0 := &ListQueryResultsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Query = b.Query
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.Params = b.Params
+	return m0
+}
+
 // Response containing query results.
 type ListQueryResultsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Details of the executed query.
 	Query *Query `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	// A list of query result rows with each row conforming to the fields defined
@@ -343,11 +488,6 @@ func (x *ListQueryResultsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListQueryResultsResponse.ProtoReflect.Descriptor instead.
-func (*ListQueryResultsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_query_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *ListQueryResultsResponse) GetQuery() *Query {
 	if x != nil {
 		return x.Query
@@ -369,9 +509,54 @@ func (x *ListQueryResultsResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListQueryResultsResponse) SetQuery(v *Query) {
+	x.Query = v
+}
+
+func (x *ListQueryResultsResponse) SetRows(v []*Row) {
+	x.Rows = v
+}
+
+func (x *ListQueryResultsResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+func (x *ListQueryResultsResponse) HasQuery() bool {
+	if x == nil {
+		return false
+	}
+	return x.Query != nil
+}
+
+func (x *ListQueryResultsResponse) ClearQuery() {
+	x.Query = nil
+}
+
+type ListQueryResultsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Details of the executed query.
+	Query *Query
+	// A list of query result rows with each row conforming to the fields defined
+	// in query.
+	Rows []*Row
+	// Next page token (empty for last page)
+	NextPageToken string
+}
+
+func (b0 ListQueryResultsResponse_builder) Build() *ListQueryResultsResponse {
+	m0 := &ListQueryResultsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Query = b.Query
+	x.Rows = b.Rows
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 // Request to stream query results.
 type StreamQueryResultsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The query to execute.
 	Query string `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	// Parameters used in the query.
@@ -405,11 +590,6 @@ func (x *StreamQueryResultsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StreamQueryResultsRequest.ProtoReflect.Descriptor instead.
-func (*StreamQueryResultsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_query_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *StreamQueryResultsRequest) GetQuery() string {
 	if x != nil {
 		return x.Query
@@ -424,9 +604,35 @@ func (x *StreamQueryResultsRequest) GetParams() []*Param {
 	return nil
 }
 
+func (x *StreamQueryResultsRequest) SetQuery(v string) {
+	x.Query = v
+}
+
+func (x *StreamQueryResultsRequest) SetParams(v []*Param) {
+	x.Params = v
+}
+
+type StreamQueryResultsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The query to execute.
+	Query string
+	// Parameters used in the query.
+	Params []*Param
+}
+
+func (b0 StreamQueryResultsRequest_builder) Build() *StreamQueryResultsRequest {
+	m0 := &StreamQueryResultsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Query = b.Query
+	x.Params = b.Params
+	return m0
+}
+
 // Response containing streamed query results.
 type StreamQueryResultsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Details of the executed query.
 	Query *Query `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	// A single query result row conforming to the fields defined in query.
@@ -460,11 +666,6 @@ func (x *StreamQueryResultsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StreamQueryResultsResponse.ProtoReflect.Descriptor instead.
-func (*StreamQueryResultsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_query_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *StreamQueryResultsResponse) GetQuery() *Query {
 	if x != nil {
 		return x.Query
@@ -479,9 +680,57 @@ func (x *StreamQueryResultsResponse) GetRow() *Row {
 	return nil
 }
 
+func (x *StreamQueryResultsResponse) SetQuery(v *Query) {
+	x.Query = v
+}
+
+func (x *StreamQueryResultsResponse) SetRow(v *Row) {
+	x.Row = v
+}
+
+func (x *StreamQueryResultsResponse) HasQuery() bool {
+	if x == nil {
+		return false
+	}
+	return x.Query != nil
+}
+
+func (x *StreamQueryResultsResponse) HasRow() bool {
+	if x == nil {
+		return false
+	}
+	return x.Row != nil
+}
+
+func (x *StreamQueryResultsResponse) ClearQuery() {
+	x.Query = nil
+}
+
+func (x *StreamQueryResultsResponse) ClearRow() {
+	x.Row = nil
+}
+
+type StreamQueryResultsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Details of the executed query.
+	Query *Query
+	// A single query result row conforming to the fields defined in query.
+	Row *Row
+}
+
+func (b0 StreamQueryResultsResponse_builder) Build() *StreamQueryResultsResponse {
+	m0 := &StreamQueryResultsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Query = b.Query
+	x.Row = b.Row
+	return m0
+}
+
 // Represents a parameterized value used in a query, input/output, etc.
 type Param struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Field describing the param data.
 	Field *Field `protobuf:"bytes,1,opt,name=field,proto3" json:"field,omitempty"`
 	// Value of the parameter, if any.
@@ -515,11 +764,6 @@ func (x *Param) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Param.ProtoReflect.Descriptor instead.
-func (*Param) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_query_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *Param) GetField() *Field {
 	if x != nil {
 		return x.Field
@@ -534,9 +778,57 @@ func (x *Param) GetValue() *Value {
 	return nil
 }
 
+func (x *Param) SetField(v *Field) {
+	x.Field = v
+}
+
+func (x *Param) SetValue(v *Value) {
+	x.Value = v
+}
+
+func (x *Param) HasField() bool {
+	if x == nil {
+		return false
+	}
+	return x.Field != nil
+}
+
+func (x *Param) HasValue() bool {
+	if x == nil {
+		return false
+	}
+	return x.Value != nil
+}
+
+func (x *Param) ClearField() {
+	x.Field = nil
+}
+
+func (x *Param) ClearValue() {
+	x.Value = nil
+}
+
+type Param_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Field describing the param data.
+	Field *Field
+	// Value of the parameter, if any.
+	Value *Value
+}
+
+func (b0 Param_builder) Build() *Param {
+	m0 := &Param{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Field = b.Field
+	x.Value = b.Value
+	return m0
+}
+
 // Represents permissions for a catalog.
 type CatalogPermission struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of the catalog.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Alias for the catalog.
@@ -572,11 +864,6 @@ func (x *CatalogPermission) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CatalogPermission.ProtoReflect.Descriptor instead.
-func (*CatalogPermission) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_query_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *CatalogPermission) GetName() string {
 	if x != nil {
 		return x.Name
@@ -598,9 +885,42 @@ func (x *CatalogPermission) GetSchemas() []*SchemaPermission {
 	return nil
 }
 
+func (x *CatalogPermission) SetName(v string) {
+	x.Name = v
+}
+
+func (x *CatalogPermission) SetAlias(v string) {
+	x.Alias = v
+}
+
+func (x *CatalogPermission) SetSchemas(v []*SchemaPermission) {
+	x.Schemas = v
+}
+
+type CatalogPermission_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of the catalog.
+	Name string
+	// Alias for the catalog.
+	Alias string
+	// Schema-level permissions.
+	Schemas []*SchemaPermission
+}
+
+func (b0 CatalogPermission_builder) Build() *CatalogPermission {
+	m0 := &CatalogPermission{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Alias = b.Alias
+	x.Schemas = b.Schemas
+	return m0
+}
+
 // Represents permissions for a schema.
 type SchemaPermission struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of the schema.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Alias for the schema.
@@ -636,11 +956,6 @@ func (x *SchemaPermission) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SchemaPermission.ProtoReflect.Descriptor instead.
-func (*SchemaPermission) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_query_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *SchemaPermission) GetName() string {
 	if x != nil {
 		return x.Name
@@ -662,9 +977,42 @@ func (x *SchemaPermission) GetTables() []*TablePermission {
 	return nil
 }
 
+func (x *SchemaPermission) SetName(v string) {
+	x.Name = v
+}
+
+func (x *SchemaPermission) SetAlias(v string) {
+	x.Alias = v
+}
+
+func (x *SchemaPermission) SetTables(v []*TablePermission) {
+	x.Tables = v
+}
+
+type SchemaPermission_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of the schema.
+	Name string
+	// Alias for the schema.
+	Alias string
+	// Table-level permissions.
+	Tables []*TablePermission
+}
+
+func (b0 SchemaPermission_builder) Build() *SchemaPermission {
+	m0 := &SchemaPermission{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Alias = b.Alias
+	x.Tables = b.Tables
+	return m0
+}
+
 // Represents permissions for a table.
 type TablePermission struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of the table.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Alias for the table.
@@ -700,11 +1048,6 @@ func (x *TablePermission) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TablePermission.ProtoReflect.Descriptor instead.
-func (*TablePermission) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_query_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *TablePermission) GetName() string {
 	if x != nil {
 		return x.Name
@@ -726,9 +1069,42 @@ func (x *TablePermission) GetColumns() []*ColumnPermission {
 	return nil
 }
 
+func (x *TablePermission) SetName(v string) {
+	x.Name = v
+}
+
+func (x *TablePermission) SetAlias(v string) {
+	x.Alias = v
+}
+
+func (x *TablePermission) SetColumns(v []*ColumnPermission) {
+	x.Columns = v
+}
+
+type TablePermission_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of the table.
+	Name string
+	// Alias for the table.
+	Alias string
+	// Column-level permissions.
+	Columns []*ColumnPermission
+}
+
+func (b0 TablePermission_builder) Build() *TablePermission {
+	m0 := &TablePermission{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Alias = b.Alias
+	x.Columns = b.Columns
+	return m0
+}
+
 // Represents permissions for a column.
 type ColumnPermission struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of the column.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Alias for the column.
@@ -764,11 +1140,6 @@ func (x *ColumnPermission) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ColumnPermission.ProtoReflect.Descriptor instead.
-func (*ColumnPermission) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_query_proto_rawDescGZIP(), []int{11}
-}
-
 func (x *ColumnPermission) GetName() string {
 	if x != nil {
 		return x.Name
@@ -788,6 +1159,39 @@ func (x *ColumnPermission) GetType() string {
 		return x.Type
 	}
 	return ""
+}
+
+func (x *ColumnPermission) SetName(v string) {
+	x.Name = v
+}
+
+func (x *ColumnPermission) SetAlias(v string) {
+	x.Alias = v
+}
+
+func (x *ColumnPermission) SetType(v string) {
+	x.Type = v
+}
+
+type ColumnPermission_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of the column.
+	Name string
+	// Alias for the column.
+	Alias string
+	// Data type of the column.
+	Type string
+}
+
+func (b0 ColumnPermission_builder) Build() *ColumnPermission {
+	m0 := &ColumnPermission{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Alias = b.Alias
+	x.Type = b.Type
+	return m0
 }
 
 var File_dtkt_catalog_v1beta2_query_proto protoreflect.FileDescriptor
@@ -854,18 +1258,6 @@ const file_dtkt_catalog_v1beta2_query_proto_rawDesc = "" +
 	"\x12StreamQueryResults\x12/.dtkt.catalog.v1beta2.StreamQueryResultsRequest\x1a0.dtkt.catalog.v1beta2.StreamQueryResultsResponse0\x01B\xec\x01\n" +
 	"\x1aproto.dtkt.catalog.v1beta2B\n" +
 	"QueryProtoP\x01ZPgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta2;catalogv1beta2\xa2\x02\x03DCX\xaa\x02\x14Dtkt.Catalog.V1beta2\xca\x02\x14Dtkt\\Catalog\\V1beta2\xe2\x02 Dtkt\\Catalog\\V1beta2\\GPBMetadata\xea\x02\x16Dtkt::Catalog::V1beta2b\x06proto3"
-
-var (
-	file_dtkt_catalog_v1beta2_query_proto_rawDescOnce sync.Once
-	file_dtkt_catalog_v1beta2_query_proto_rawDescData []byte
-)
-
-func file_dtkt_catalog_v1beta2_query_proto_rawDescGZIP() []byte {
-	file_dtkt_catalog_v1beta2_query_proto_rawDescOnce.Do(func() {
-		file_dtkt_catalog_v1beta2_query_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_catalog_v1beta2_query_proto_rawDesc), len(file_dtkt_catalog_v1beta2_query_proto_rawDesc)))
-	})
-	return file_dtkt_catalog_v1beta2_query_proto_rawDescData
-}
 
 var file_dtkt_catalog_v1beta2_query_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_dtkt_catalog_v1beta2_query_proto_goTypes = []any{

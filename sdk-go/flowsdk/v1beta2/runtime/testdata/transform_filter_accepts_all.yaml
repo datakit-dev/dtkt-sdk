@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_filter_accepts_all
+  description: "Filter accepts all values"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: all
+      value: "= inputs.x.value"
+      transforms:
+        - filter: "= true"
+  outputs:
+    - id: result
+      value: "= vars.all.value"

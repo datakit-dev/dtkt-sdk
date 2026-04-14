@@ -1,0 +1,22 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_schema_eof_in_request
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: x
+      string: {}
+  streams:
+    - id: echo
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request:
+          name: "= inputs.x.value"
+          count: "= EOF()"
+  outputs:
+    - id: result
+      value: "= streams.echo.value"

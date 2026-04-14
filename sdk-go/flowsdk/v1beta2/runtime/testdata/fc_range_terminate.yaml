@@ -1,0 +1,15 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fc_range_terminate
+  generators:
+    - id: seq
+      range:
+        start: 1
+        end: 100
+        step: 1
+  outputs:
+    - id: result
+      value: "= generators.seq.value"
+      flow_control:
+        terminate_when: "= int(generators.seq.eval_count) >= 3"

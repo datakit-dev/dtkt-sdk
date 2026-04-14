@@ -1,0 +1,13 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: two_int64_inputs_sum
+  description: "Two int64 inputs summed in a single output expression"
+  inputs:
+    - id: a
+      int64: {}
+    - id: b
+      int64: {}
+  outputs:
+    - id: sumAB
+      value: "= inputs.a.value + inputs.b.value"

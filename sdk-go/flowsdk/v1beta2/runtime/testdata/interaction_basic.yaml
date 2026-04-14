@@ -1,0 +1,13 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: interaction_basic
+  inputs:
+    - id: x
+      int64: {}
+  interactions:
+    - id: confirm
+      when: "= inputs.x.value > 0"
+  outputs:
+    - id: result
+      value: "= interactions.confirm.value"

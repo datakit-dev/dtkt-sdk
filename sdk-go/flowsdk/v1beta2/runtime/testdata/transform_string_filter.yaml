@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_string_filter
+  description: "Filter strings by length > 3"
+  inputs:
+    - id: name
+      string: {}
+  vars:
+    - id: long
+      value: "= inputs.name.value"
+      transforms:
+        - filter: "= size(this.value) > 3"
+  outputs:
+    - id: result
+      value: "= vars.long.value"

@@ -1,0 +1,23 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: join_fan_in
+  description: "Fan-in: two vars with filter feed separate outputs"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: small
+      value: "= inputs.x.value"
+      transforms:
+        - filter: "= this.value <= 5"
+    - id: large
+      value: "= inputs.x.value"
+      transforms:
+        - filter: "= this.value > 5"
+        - map: "= this.value * 10"
+  outputs:
+    - id: small
+      value: "= vars.small.value"
+    - id: large
+      value: "= vars.large.value"

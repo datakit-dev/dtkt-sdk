@@ -36,12 +36,14 @@ import (
 
 	// V1Beta2
 	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta2"
+	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
 var _ Version = versionName("")
 
 const (
 	V1Beta1 = versionName("v1beta1")
+	V1Beta2 = versionName("v1beta2")
 )
 
 type versionName string

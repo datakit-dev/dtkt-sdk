@@ -1,0 +1,13 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_valid
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: doubled
+      value: "= inputs.x.value * 2"
+  outputs:
+    - id: result
+      value: "= vars.doubled.value"

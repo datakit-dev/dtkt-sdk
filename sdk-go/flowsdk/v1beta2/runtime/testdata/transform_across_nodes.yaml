@@ -1,0 +1,20 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_across_nodes
+  description: "Input(map +1) -> Var(filter >3) -> Output(map *10)"
+  inputs:
+    - id: x
+      int64: {}
+      transforms:
+        - map: "= this.value + 1"
+  vars:
+    - id: filtered
+      value: "= inputs.x.value"
+      transforms:
+        - filter: "= this.value > 3"
+  outputs:
+    - id: result
+      value: "= vars.filtered.value"
+      transforms:
+        - map: "= this.value * 10"

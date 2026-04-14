@@ -1,0 +1,20 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_map_flatten_scan
+  description: "Map to list, flatten, running sum via scan"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: processed
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= [this.value, this.value + 1]"
+        - flatten: true
+        - scan:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+  outputs:
+    - id: result
+      value: "= vars.processed.value"

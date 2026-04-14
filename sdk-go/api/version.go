@@ -15,6 +15,7 @@ import (
 
 var validVersions = versions{
 	V1Beta1,
+	V1Beta2,
 }
 
 type (

@@ -1,0 +1,14 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_var_output
+  description: "Int64 input through a passthrough var to output"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: pass
+      value: "= inputs.x.value"
+  outputs:
+    - id: result
+      value: "= vars.pass.value"

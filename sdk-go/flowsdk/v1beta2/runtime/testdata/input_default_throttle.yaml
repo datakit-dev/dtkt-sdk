@@ -1,0 +1,11 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_default_throttle
+  inputs:
+    - id: x
+      int64: {}
+      cache: true
+  outputs:
+    - id: result
+      value: "= inputs.x.value"

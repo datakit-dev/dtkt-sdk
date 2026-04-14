@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_map_eval_error
+  description: "Map expression fails at runtime (division by zero)"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: bad
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= this.value / 0"
+  outputs:
+    - id: result
+      value: "= vars.bad.value"

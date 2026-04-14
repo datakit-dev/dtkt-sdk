@@ -1,0 +1,22 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: join_shared_intermediary
+  description: "Shared var feeding two outputs with different transforms"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: shared
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= this.value * 2"
+  outputs:
+    - id: plusOne
+      value: "= vars.shared.value"
+      transforms:
+        - map: "= this.value + 1"
+    - id: plusTen
+      value: "= vars.shared.value"
+      transforms:
+        - map: "= this.value + 10"

@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/flow/v1beta1/spec.proto
 
+//go:build !protoopaque
+
 package flowv1beta1
 
 import (
@@ -16,7 +18,6 @@ import (
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -28,7 +29,7 @@ const (
 )
 
 type Flow struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	Connections   []*Connection          `protobuf:"bytes,3,rep,name=connections,proto3" json:"connections,omitempty"`
@@ -64,11 +65,6 @@ func (x *Flow) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Flow.ProtoReflect.Descriptor instead.
-func (*Flow) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Flow) GetName() string {
@@ -127,8 +123,68 @@ func (x *Flow) GetStreams() []*Stream {
 	return nil
 }
 
+func (x *Flow) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Flow) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *Flow) SetConnections(v []*Connection) {
+	x.Connections = v
+}
+
+func (x *Flow) SetInputs(v []*Input) {
+	x.Inputs = v
+}
+
+func (x *Flow) SetVars(v []*Var) {
+	x.Vars = v
+}
+
+func (x *Flow) SetActions(v []*Action) {
+	x.Actions = v
+}
+
+func (x *Flow) SetOutputs(v []*Output) {
+	x.Outputs = v
+}
+
+func (x *Flow) SetStreams(v []*Stream) {
+	x.Streams = v
+}
+
+type Flow_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name        string
+	Description string
+	Connections []*Connection
+	Inputs      []*Input
+	Vars        []*Var
+	Actions     []*Action
+	Outputs     []*Output
+	Streams     []*Stream
+}
+
+func (b0 Flow_builder) Build() *Flow {
+	m0 := &Flow{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Description = b.Description
+	x.Connections = b.Connections
+	x.Inputs = b.Inputs
+	x.Vars = b.Vars
+	x.Actions = b.Actions
+	x.Outputs = b.Outputs
+	x.Streams = b.Streams
+	return m0
+}
+
 type Connection struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Connection must resolve to an integration with the given package identity.
 	Package *v1beta1.Package_Identity `protobuf:"bytes,2,opt,name=package,proto3" json:"package,omitempty"`
@@ -163,11 +219,6 @@ func (x *Connection) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Connection.ProtoReflect.Descriptor instead.
-func (*Connection) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *Connection) GetId() string {
 	if x != nil {
 		return x.Id
@@ -189,8 +240,51 @@ func (x *Connection) GetServices() []string {
 	return nil
 }
 
+func (x *Connection) SetId(v string) {
+	x.Id = v
+}
+
+func (x *Connection) SetPackage(v *v1beta1.Package_Identity) {
+	x.Package = v
+}
+
+func (x *Connection) SetServices(v []string) {
+	x.Services = v
+}
+
+func (x *Connection) HasPackage() bool {
+	if x == nil {
+		return false
+	}
+	return x.Package != nil
+}
+
+func (x *Connection) ClearPackage() {
+	x.Package = nil
+}
+
+type Connection_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id string
+	// Connection must resolve to an integration with the given package identity.
+	Package *v1beta1.Package_Identity
+	// Connection must resolve to a server which implements the given services.
+	Services []string
+}
+
+func (b0 Connection_builder) Build() *Connection {
+	m0 := &Connection{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Package = b.Package
+	x.Services = b.Services
+	return m0
+}
+
 type Input struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// When true input always returns its first non-null memoized value.
 	Cache *bool `protobuf:"varint,2,opt,name=cache,proto3,oneof" json:"cache,omitempty"`
@@ -236,11 +330,6 @@ func (x *Input) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Input.ProtoReflect.Descriptor instead.
-func (*Input) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Input) GetId() string {
@@ -336,13 +425,18 @@ func (x *Input) GetUint32() *Uint32 {
 	return nil
 }
 
-func (x *Input) GetString_() *String {
+func (x *Input) GetString() *String {
 	if x != nil {
 		if x, ok := x.Type.(*Input_String_); ok {
 			return x.String_
 		}
 	}
 	return nil
+}
+
+// Deprecated: Use GetString instead.
+func (x *Input) GetString_() *String {
+	return x.GetString()
 }
 
 func (x *Input) GetList() *List {
@@ -370,6 +464,425 @@ func (x *Input) GetMessage() *Message {
 		}
 	}
 	return nil
+}
+
+func (x *Input) SetId(v string) {
+	x.Id = v
+}
+
+func (x *Input) SetCache(v bool) {
+	x.Cache = &v
+}
+
+func (x *Input) SetBool(v *Bool) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Input_Bool{v}
+}
+
+func (x *Input) SetBytes(v *Bytes) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Input_Bytes{v}
+}
+
+func (x *Input) SetDouble(v *Double) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Input_Double{v}
+}
+
+func (x *Input) SetFloat(v *Float) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Input_Float{v}
+}
+
+func (x *Input) SetInt64(v *Int64) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Input_Int64{v}
+}
+
+func (x *Input) SetUint64(v *Uint64) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Input_Uint64{v}
+}
+
+func (x *Input) SetInt32(v *Int32) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Input_Int32{v}
+}
+
+func (x *Input) SetUint32(v *Uint32) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Input_Uint32{v}
+}
+
+func (x *Input) SetString(v *String) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Input_String_{v}
+}
+
+func (x *Input) SetList(v *List) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Input_List{v}
+}
+
+func (x *Input) SetMap(v *Map) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Input_Map{v}
+}
+
+func (x *Input) SetMessage(v *Message) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Input_Message{v}
+}
+
+func (x *Input) HasCache() bool {
+	if x == nil {
+		return false
+	}
+	return x.Cache != nil
+}
+
+func (x *Input) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return x.Type != nil
+}
+
+func (x *Input) HasBool() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Input_Bool)
+	return ok
+}
+
+func (x *Input) HasBytes() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Input_Bytes)
+	return ok
+}
+
+func (x *Input) HasDouble() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Input_Double)
+	return ok
+}
+
+func (x *Input) HasFloat() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Input_Float)
+	return ok
+}
+
+func (x *Input) HasInt64() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Input_Int64)
+	return ok
+}
+
+func (x *Input) HasUint64() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Input_Uint64)
+	return ok
+}
+
+func (x *Input) HasInt32() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Input_Int32)
+	return ok
+}
+
+func (x *Input) HasUint32() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Input_Uint32)
+	return ok
+}
+
+func (x *Input) HasString() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Input_String_)
+	return ok
+}
+
+func (x *Input) HasList() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Input_List)
+	return ok
+}
+
+func (x *Input) HasMap() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Input_Map)
+	return ok
+}
+
+func (x *Input) HasMessage() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Input_Message)
+	return ok
+}
+
+func (x *Input) ClearCache() {
+	x.Cache = nil
+}
+
+func (x *Input) ClearType() {
+	x.Type = nil
+}
+
+func (x *Input) ClearBool() {
+	if _, ok := x.Type.(*Input_Bool); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Input) ClearBytes() {
+	if _, ok := x.Type.(*Input_Bytes); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Input) ClearDouble() {
+	if _, ok := x.Type.(*Input_Double); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Input) ClearFloat() {
+	if _, ok := x.Type.(*Input_Float); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Input) ClearInt64() {
+	if _, ok := x.Type.(*Input_Int64); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Input) ClearUint64() {
+	if _, ok := x.Type.(*Input_Uint64); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Input) ClearInt32() {
+	if _, ok := x.Type.(*Input_Int32); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Input) ClearUint32() {
+	if _, ok := x.Type.(*Input_Uint32); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Input) ClearString() {
+	if _, ok := x.Type.(*Input_String_); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Input) ClearList() {
+	if _, ok := x.Type.(*Input_List); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Input) ClearMap() {
+	if _, ok := x.Type.(*Input_Map); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Input) ClearMessage() {
+	if _, ok := x.Type.(*Input_Message); ok {
+		x.Type = nil
+	}
+}
+
+const Input_Type_not_set_case case_Input_Type = 0
+const Input_Bool_case case_Input_Type = 3
+const Input_Bytes_case case_Input_Type = 4
+const Input_Double_case case_Input_Type = 5
+const Input_Float_case case_Input_Type = 6
+const Input_Int64_case case_Input_Type = 7
+const Input_Uint64_case case_Input_Type = 8
+const Input_Int32_case case_Input_Type = 9
+const Input_Uint32_case case_Input_Type = 10
+const Input_String__case case_Input_Type = 11
+const Input_List_case case_Input_Type = 12
+const Input_Map_case case_Input_Type = 13
+const Input_Message_case case_Input_Type = 14
+
+func (x *Input) WhichType() case_Input_Type {
+	if x == nil {
+		return Input_Type_not_set_case
+	}
+	switch x.Type.(type) {
+	case *Input_Bool:
+		return Input_Bool_case
+	case *Input_Bytes:
+		return Input_Bytes_case
+	case *Input_Double:
+		return Input_Double_case
+	case *Input_Float:
+		return Input_Float_case
+	case *Input_Int64:
+		return Input_Int64_case
+	case *Input_Uint64:
+		return Input_Uint64_case
+	case *Input_Int32:
+		return Input_Int32_case
+	case *Input_Uint32:
+		return Input_Uint32_case
+	case *Input_String_:
+		return Input_String__case
+	case *Input_List:
+		return Input_List_case
+	case *Input_Map:
+		return Input_Map_case
+	case *Input_Message:
+		return Input_Message_case
+	default:
+		return Input_Type_not_set_case
+	}
+}
+
+type Input_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id string
+	// When true input always returns its first non-null memoized value.
+	Cache *bool
+	// Fields of oneof Type:
+	Bool    *Bool
+	Bytes   *Bytes
+	Double  *Double
+	Float   *Float
+	Int64   *Int64
+	Uint64  *Uint64
+	Int32   *Int32
+	Uint32  *Uint32
+	String  *String
+	List    *List
+	Map     *Map
+	Message *Message
+	// -- end of Type
+}
+
+func (b0 Input_builder) Build() *Input {
+	m0 := &Input{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Cache = b.Cache
+	if b.Bool != nil {
+		x.Type = &Input_Bool{b.Bool}
+	}
+	if b.Bytes != nil {
+		x.Type = &Input_Bytes{b.Bytes}
+	}
+	if b.Double != nil {
+		x.Type = &Input_Double{b.Double}
+	}
+	if b.Float != nil {
+		x.Type = &Input_Float{b.Float}
+	}
+	if b.Int64 != nil {
+		x.Type = &Input_Int64{b.Int64}
+	}
+	if b.Uint64 != nil {
+		x.Type = &Input_Uint64{b.Uint64}
+	}
+	if b.Int32 != nil {
+		x.Type = &Input_Int32{b.Int32}
+	}
+	if b.Uint32 != nil {
+		x.Type = &Input_Uint32{b.Uint32}
+	}
+	if b.String != nil {
+		x.Type = &Input_String_{b.String}
+	}
+	if b.List != nil {
+		x.Type = &Input_List{b.List}
+	}
+	if b.Map != nil {
+		x.Type = &Input_Map{b.Map}
+	}
+	if b.Message != nil {
+		x.Type = &Input_Message{b.Message}
+	}
+	return m0
+}
+
+type case_Input_Type protoreflect.FieldNumber
+
+func (x case_Input_Type) String() string {
+	md := file_dtkt_flow_v1beta1_spec_proto_msgTypes[2].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
 }
 
 type isInput_Type interface {
@@ -450,7 +963,7 @@ func (*Input_Message) isInput_Type() {}
 
 // Var is an intermediate value in a Flow used to transform and/or memoize the result of a computation for reuse.
 type Var struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// When true var always returns its first non-null memoized value.
 	Cache *bool `protobuf:"varint,2,opt,name=cache,proto3,oneof" json:"cache,omitempty"`
@@ -487,11 +1000,6 @@ func (x *Var) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Var.ProtoReflect.Descriptor instead.
-func (*Var) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *Var) GetId() string {
 	if x != nil {
 		return x.Id
@@ -520,8 +1028,69 @@ func (x *Var) GetSwitch() *Switch {
 	return nil
 }
 
+func (x *Var) SetId(v string) {
+	x.Id = v
+}
+
+func (x *Var) SetCache(v bool) {
+	x.Cache = &v
+}
+
+func (x *Var) SetValue(v string) {
+	x.Value = v
+}
+
+func (x *Var) SetSwitch(v *Switch) {
+	x.Switch = v
+}
+
+func (x *Var) HasCache() bool {
+	if x == nil {
+		return false
+	}
+	return x.Cache != nil
+}
+
+func (x *Var) HasSwitch() bool {
+	if x == nil {
+		return false
+	}
+	return x.Switch != nil
+}
+
+func (x *Var) ClearCache() {
+	x.Cache = nil
+}
+
+func (x *Var) ClearSwitch() {
+	x.Switch = nil
+}
+
+type Var_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id string
+	// When true var always returns its first non-null memoized value.
+	Cache *bool
+	// Given expression evaluates to var's memoized value, example: "= inputs.foo.getValue()"
+	Value string
+	// Given switch statement's first matching case (otherwise default) evaluates to var's memoized value.
+	Switch *Switch
+}
+
+func (b0 Var_builder) Build() *Var {
+	m0 := &Var{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Cache = b.Cache
+	x.Value = b.Value
+	x.Switch = b.Switch
+	return m0
+}
+
 type Action struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// When true action always returns its first non-null memoized value.
 	Cache *bool `protobuf:"varint,2,opt,name=cache,proto3,oneof" json:"cache,omitempty"`
@@ -559,11 +1128,6 @@ func (x *Action) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Action.ProtoReflect.Descriptor instead.
-func (*Action) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Action) GetId() string {
@@ -608,8 +1172,115 @@ func (x *Action) GetUser() *UserAction {
 	return nil
 }
 
+func (x *Action) SetId(v string) {
+	x.Id = v
+}
+
+func (x *Action) SetCache(v bool) {
+	x.Cache = &v
+}
+
+func (x *Action) SetRunIf(v string) {
+	x.RunIf = &v
+}
+
+func (x *Action) SetOnError(v string) {
+	x.OnError = &v
+}
+
+func (x *Action) SetCall(v *MethodCall) {
+	x.Call = v
+}
+
+func (x *Action) SetUser(v *UserAction) {
+	x.User = v
+}
+
+func (x *Action) HasCache() bool {
+	if x == nil {
+		return false
+	}
+	return x.Cache != nil
+}
+
+func (x *Action) HasRunIf() bool {
+	if x == nil {
+		return false
+	}
+	return x.RunIf != nil
+}
+
+func (x *Action) HasOnError() bool {
+	if x == nil {
+		return false
+	}
+	return x.OnError != nil
+}
+
+func (x *Action) HasCall() bool {
+	if x == nil {
+		return false
+	}
+	return x.Call != nil
+}
+
+func (x *Action) HasUser() bool {
+	if x == nil {
+		return false
+	}
+	return x.User != nil
+}
+
+func (x *Action) ClearCache() {
+	x.Cache = nil
+}
+
+func (x *Action) ClearRunIf() {
+	x.RunIf = nil
+}
+
+func (x *Action) ClearOnError() {
+	x.OnError = nil
+}
+
+func (x *Action) ClearCall() {
+	x.Call = nil
+}
+
+func (x *Action) ClearUser() {
+	x.User = nil
+}
+
+type Action_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id string
+	// When true action always returns its first non-null memoized value.
+	Cache *bool
+	// Execute action when given expression evaluates to true; optional.
+	RunIf *string
+	// Return evaluation of given expression when an error is encountered in call
+	// or user; optional.
+	OnError *string
+	Call    *MethodCall
+	User    *UserAction
+}
+
+func (b0 Action_builder) Build() *Action {
+	m0 := &Action{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Cache = b.Cache
+	x.RunIf = b.RunIf
+	x.OnError = b.OnError
+	x.Call = b.Call
+	x.User = b.User
+	return m0
+}
+
 type Output struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Value         string                 `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -641,11 +1312,6 @@ func (x *Output) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Output.ProtoReflect.Descriptor instead.
-func (*Output) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *Output) GetId() string {
 	if x != nil {
 		return x.Id
@@ -660,8 +1326,32 @@ func (x *Output) GetValue() string {
 	return ""
 }
 
+func (x *Output) SetId(v string) {
+	x.Id = v
+}
+
+func (x *Output) SetValue(v string) {
+	x.Value = v
+}
+
+type Output_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id    string
+	Value string
+}
+
+func (b0 Output_builder) Build() *Output {
+	m0 := &Output{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Value = b.Value
+	return m0
+}
+
 type Stream struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Start stream when expression evaluates to true; optional.
 	StartIf *string `protobuf:"bytes,2,opt,name=start_if,json=startIf,proto3,oneof" json:"start_if,omitempty"`
@@ -696,11 +1386,6 @@ func (x *Stream) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Stream.ProtoReflect.Descriptor instead.
-func (*Stream) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Stream) GetId() string {
@@ -738,8 +1423,96 @@ func (x *Stream) GetGenerate() *Ticker {
 	return nil
 }
 
+func (x *Stream) SetId(v string) {
+	x.Id = v
+}
+
+func (x *Stream) SetStartIf(v string) {
+	x.StartIf = &v
+}
+
+func (x *Stream) SetStopIf(v string) {
+	x.StopIf = &v
+}
+
+func (x *Stream) SetCall(v *MethodCall) {
+	x.Call = v
+}
+
+func (x *Stream) SetGenerate(v *Ticker) {
+	x.Generate = v
+}
+
+func (x *Stream) HasStartIf() bool {
+	if x == nil {
+		return false
+	}
+	return x.StartIf != nil
+}
+
+func (x *Stream) HasStopIf() bool {
+	if x == nil {
+		return false
+	}
+	return x.StopIf != nil
+}
+
+func (x *Stream) HasCall() bool {
+	if x == nil {
+		return false
+	}
+	return x.Call != nil
+}
+
+func (x *Stream) HasGenerate() bool {
+	if x == nil {
+		return false
+	}
+	return x.Generate != nil
+}
+
+func (x *Stream) ClearStartIf() {
+	x.StartIf = nil
+}
+
+func (x *Stream) ClearStopIf() {
+	x.StopIf = nil
+}
+
+func (x *Stream) ClearCall() {
+	x.Call = nil
+}
+
+func (x *Stream) ClearGenerate() {
+	x.Generate = nil
+}
+
+type Stream_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id string
+	// Start stream when expression evaluates to true; optional.
+	StartIf *string
+	// Stop stream when expression evaluates to true; optional.
+	StopIf   *string
+	Call     *MethodCall
+	Generate *Ticker
+}
+
+func (b0 Stream_builder) Build() *Stream {
+	m0 := &Stream{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.StartIf = b.StartIf
+	x.StopIf = b.StopIf
+	x.Call = b.Call
+	x.Generate = b.Generate
+	return m0
+}
+
 type MethodCall struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Connection    string                 `protobuf:"bytes,1,opt,name=connection,proto3" json:"connection,omitempty"`
 	Method        string                 `protobuf:"bytes,2,opt,name=method,proto3" json:"method,omitempty"`
 	Request       *structpb.Value        `protobuf:"bytes,3,opt,name=request,proto3" json:"request,omitempty"`
@@ -772,11 +1545,6 @@ func (x *MethodCall) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MethodCall.ProtoReflect.Descriptor instead.
-func (*MethodCall) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *MethodCall) GetConnection() string {
 	if x != nil {
 		return x.Connection
@@ -798,8 +1566,49 @@ func (x *MethodCall) GetRequest() *structpb.Value {
 	return nil
 }
 
+func (x *MethodCall) SetConnection(v string) {
+	x.Connection = v
+}
+
+func (x *MethodCall) SetMethod(v string) {
+	x.Method = v
+}
+
+func (x *MethodCall) SetRequest(v *structpb.Value) {
+	x.Request = v
+}
+
+func (x *MethodCall) HasRequest() bool {
+	if x == nil {
+		return false
+	}
+	return x.Request != nil
+}
+
+func (x *MethodCall) ClearRequest() {
+	x.Request = nil
+}
+
+type MethodCall_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Connection string
+	Method     string
+	Request    *structpb.Value
+}
+
+func (b0 MethodCall_builder) Build() *MethodCall {
+	m0 := &MethodCall{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Connection = b.Connection
+	x.Method = b.Method
+	x.Request = b.Request
+	return m0
+}
+
 type UserAction struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Inputs        []*UserAction_Input    `protobuf:"bytes,1,rep,name=inputs,proto3" json:"inputs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -830,11 +1639,6 @@ func (x *UserAction) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserAction.ProtoReflect.Descriptor instead.
-func (*UserAction) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *UserAction) GetInputs() []*UserAction_Input {
 	if x != nil {
 		return x.Inputs
@@ -842,8 +1646,26 @@ func (x *UserAction) GetInputs() []*UserAction_Input {
 	return nil
 }
 
+func (x *UserAction) SetInputs(v []*UserAction_Input) {
+	x.Inputs = v
+}
+
+type UserAction_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Inputs []*UserAction_Input
+}
+
+func (b0 UserAction_builder) Build() *UserAction {
+	m0 := &UserAction{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Inputs = b.Inputs
+	return m0
+}
+
 type Switch struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Value         string                 `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 	Case          []*Switch_Case         `protobuf:"bytes,2,rep,name=case,proto3" json:"case,omitempty"`
 	Default       string                 `protobuf:"bytes,3,opt,name=default,proto3" json:"default,omitempty"`
@@ -876,11 +1698,6 @@ func (x *Switch) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Switch.ProtoReflect.Descriptor instead.
-func (*Switch) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *Switch) GetValue() string {
 	if x != nil {
 		return x.Value
@@ -902,8 +1719,38 @@ func (x *Switch) GetDefault() string {
 	return ""
 }
 
+func (x *Switch) SetValue(v string) {
+	x.Value = v
+}
+
+func (x *Switch) SetCase(v []*Switch_Case) {
+	x.Case = v
+}
+
+func (x *Switch) SetDefault(v string) {
+	x.Default = v
+}
+
+type Switch_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Value   string
+	Case    []*Switch_Case
+	Default string
+}
+
+func (b0 Switch_builder) Build() *Switch {
+	m0 := &Switch{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	x.Case = b.Case
+	x.Default = b.Default
+	return m0
+}
+
 type Ticker struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Every         *durationpb.Duration   `protobuf:"bytes,1,opt,name=every,proto3" json:"every,omitempty"`
 	Initial       *durationpb.Duration   `protobuf:"bytes,2,opt,name=initial,proto3" json:"initial,omitempty"`
 	Value         string                 `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
@@ -936,11 +1783,6 @@ func (x *Ticker) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Ticker.ProtoReflect.Descriptor instead.
-func (*Ticker) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *Ticker) GetEvery() *durationpb.Duration {
 	if x != nil {
 		return x.Every
@@ -962,8 +1804,60 @@ func (x *Ticker) GetValue() string {
 	return ""
 }
 
+func (x *Ticker) SetEvery(v *durationpb.Duration) {
+	x.Every = v
+}
+
+func (x *Ticker) SetInitial(v *durationpb.Duration) {
+	x.Initial = v
+}
+
+func (x *Ticker) SetValue(v string) {
+	x.Value = v
+}
+
+func (x *Ticker) HasEvery() bool {
+	if x == nil {
+		return false
+	}
+	return x.Every != nil
+}
+
+func (x *Ticker) HasInitial() bool {
+	if x == nil {
+		return false
+	}
+	return x.Initial != nil
+}
+
+func (x *Ticker) ClearEvery() {
+	x.Every = nil
+}
+
+func (x *Ticker) ClearInitial() {
+	x.Initial = nil
+}
+
+type Ticker_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Every   *durationpb.Duration
+	Initial *durationpb.Duration
+	Value   string
+}
+
+func (b0 Ticker_builder) Build() *Ticker {
+	m0 := &Ticker{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Every = b.Every
+	x.Initial = b.Initial
+	x.Value = b.Value
+	return m0
+}
+
 type UserAction_ConfirmBinding struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Value         bool                   `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -994,11 +1888,6 @@ func (x *UserAction_ConfirmBinding) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserAction_ConfirmBinding.ProtoReflect.Descriptor instead.
-func (*UserAction_ConfirmBinding) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{8, 0}
-}
-
 func (x *UserAction_ConfirmBinding) GetValue() bool {
 	if x != nil {
 		return x.Value
@@ -1006,8 +1895,26 @@ func (x *UserAction_ConfirmBinding) GetValue() bool {
 	return false
 }
 
+func (x *UserAction_ConfirmBinding) SetValue(v bool) {
+	x.Value = v
+}
+
+type UserAction_ConfirmBinding_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Value bool
+}
+
+func (b0 UserAction_ConfirmBinding_builder) Build() *UserAction_ConfirmBinding {
+	m0 := &UserAction_ConfirmBinding{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	return m0
+}
+
 type UserAction_InputBinding struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Value         string                 `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1038,11 +1945,6 @@ func (x *UserAction_InputBinding) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserAction_InputBinding.ProtoReflect.Descriptor instead.
-func (*UserAction_InputBinding) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{8, 1}
-}
-
 func (x *UserAction_InputBinding) GetValue() string {
 	if x != nil {
 		return x.Value
@@ -1050,8 +1952,26 @@ func (x *UserAction_InputBinding) GetValue() string {
 	return ""
 }
 
+func (x *UserAction_InputBinding) SetValue(v string) {
+	x.Value = v
+}
+
+type UserAction_InputBinding_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Value string
+}
+
+func (b0 UserAction_InputBinding_builder) Build() *UserAction_InputBinding {
+	m0 := &UserAction_InputBinding{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	return m0
+}
+
 type UserAction_FileBinding struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Value         []byte                 `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1082,11 +2002,6 @@ func (x *UserAction_FileBinding) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserAction_FileBinding.ProtoReflect.Descriptor instead.
-func (*UserAction_FileBinding) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{8, 2}
-}
-
 func (x *UserAction_FileBinding) GetValue() []byte {
 	if x != nil {
 		return x.Value
@@ -1094,8 +2009,29 @@ func (x *UserAction_FileBinding) GetValue() []byte {
 	return nil
 }
 
+func (x *UserAction_FileBinding) SetValue(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.Value = v
+}
+
+type UserAction_FileBinding_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Value []byte
+}
+
+func (b0 UserAction_FileBinding_builder) Build() *UserAction_FileBinding {
+	m0 := &UserAction_FileBinding{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	return m0
+}
+
 type UserAction_SelectBinding struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Value         *anypb.Any             `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1126,11 +2062,6 @@ func (x *UserAction_SelectBinding) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserAction_SelectBinding.ProtoReflect.Descriptor instead.
-func (*UserAction_SelectBinding) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{8, 3}
-}
-
 func (x *UserAction_SelectBinding) GetValue() *anypb.Any {
 	if x != nil {
 		return x.Value
@@ -1138,8 +2069,37 @@ func (x *UserAction_SelectBinding) GetValue() *anypb.Any {
 	return nil
 }
 
+func (x *UserAction_SelectBinding) SetValue(v *anypb.Any) {
+	x.Value = v
+}
+
+func (x *UserAction_SelectBinding) HasValue() bool {
+	if x == nil {
+		return false
+	}
+	return x.Value != nil
+}
+
+func (x *UserAction_SelectBinding) ClearValue() {
+	x.Value = nil
+}
+
+type UserAction_SelectBinding_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Value *anypb.Any
+}
+
+func (b0 UserAction_SelectBinding_builder) Build() *UserAction_SelectBinding {
+	m0 := &UserAction_SelectBinding{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	return m0
+}
+
 type UserAction_MultiSelectBinding struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Value         []*anypb.Any           `protobuf:"bytes,1,rep,name=value,proto3" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1170,11 +2130,6 @@ func (x *UserAction_MultiSelectBinding) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserAction_MultiSelectBinding.ProtoReflect.Descriptor instead.
-func (*UserAction_MultiSelectBinding) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{8, 4}
-}
-
 func (x *UserAction_MultiSelectBinding) GetValue() []*anypb.Any {
 	if x != nil {
 		return x.Value
@@ -1182,8 +2137,26 @@ func (x *UserAction_MultiSelectBinding) GetValue() []*anypb.Any {
 	return nil
 }
 
+func (x *UserAction_MultiSelectBinding) SetValue(v []*anypb.Any) {
+	x.Value = v
+}
+
+type UserAction_MultiSelectBinding_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Value []*anypb.Any
+}
+
+func (b0 UserAction_MultiSelectBinding_builder) Build() *UserAction_MultiSelectBinding {
+	m0 := &UserAction_MultiSelectBinding{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	return m0
+}
+
 type UserAction_Input struct {
-	state       protoimpl.MessageState `protogen:"open.v1"`
+	state       protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Title       string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	Description *string                `protobuf:"bytes,3,opt,name=description,proto3,oneof" json:"description,omitempty"`
@@ -1222,11 +2195,6 @@ func (x *UserAction_Input) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UserAction_Input.ProtoReflect.Descriptor instead.
-func (*UserAction_Input) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{8, 5}
 }
 
 func (x *UserAction_Input) GetId() string {
@@ -1302,6 +2270,227 @@ func (x *UserAction_Input) GetMultiSelect() *v1beta11.MultiSelectElement {
 	return nil
 }
 
+func (x *UserAction_Input) SetId(v string) {
+	x.Id = v
+}
+
+func (x *UserAction_Input) SetTitle(v string) {
+	x.Title = v
+}
+
+func (x *UserAction_Input) SetDescription(v string) {
+	x.Description = &v
+}
+
+func (x *UserAction_Input) SetConfirm(v *v1beta11.ConfirmElement) {
+	if v == nil {
+		x.Element = nil
+		return
+	}
+	x.Element = &UserAction_Input_Confirm{v}
+}
+
+func (x *UserAction_Input) SetInput(v *v1beta11.InputElement) {
+	if v == nil {
+		x.Element = nil
+		return
+	}
+	x.Element = &UserAction_Input_Input{v}
+}
+
+func (x *UserAction_Input) SetFile(v *v1beta11.FileElement) {
+	if v == nil {
+		x.Element = nil
+		return
+	}
+	x.Element = &UserAction_Input_File{v}
+}
+
+func (x *UserAction_Input) SetSelect(v *v1beta11.SelectElement) {
+	if v == nil {
+		x.Element = nil
+		return
+	}
+	x.Element = &UserAction_Input_Select{v}
+}
+
+func (x *UserAction_Input) SetMultiSelect(v *v1beta11.MultiSelectElement) {
+	if v == nil {
+		x.Element = nil
+		return
+	}
+	x.Element = &UserAction_Input_MultiSelect{v}
+}
+
+func (x *UserAction_Input) HasDescription() bool {
+	if x == nil {
+		return false
+	}
+	return x.Description != nil
+}
+
+func (x *UserAction_Input) HasElement() bool {
+	if x == nil {
+		return false
+	}
+	return x.Element != nil
+}
+
+func (x *UserAction_Input) HasConfirm() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Element.(*UserAction_Input_Confirm)
+	return ok
+}
+
+func (x *UserAction_Input) HasInput() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Element.(*UserAction_Input_Input)
+	return ok
+}
+
+func (x *UserAction_Input) HasFile() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Element.(*UserAction_Input_File)
+	return ok
+}
+
+func (x *UserAction_Input) HasSelect() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Element.(*UserAction_Input_Select)
+	return ok
+}
+
+func (x *UserAction_Input) HasMultiSelect() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Element.(*UserAction_Input_MultiSelect)
+	return ok
+}
+
+func (x *UserAction_Input) ClearDescription() {
+	x.Description = nil
+}
+
+func (x *UserAction_Input) ClearElement() {
+	x.Element = nil
+}
+
+func (x *UserAction_Input) ClearConfirm() {
+	if _, ok := x.Element.(*UserAction_Input_Confirm); ok {
+		x.Element = nil
+	}
+}
+
+func (x *UserAction_Input) ClearInput() {
+	if _, ok := x.Element.(*UserAction_Input_Input); ok {
+		x.Element = nil
+	}
+}
+
+func (x *UserAction_Input) ClearFile() {
+	if _, ok := x.Element.(*UserAction_Input_File); ok {
+		x.Element = nil
+	}
+}
+
+func (x *UserAction_Input) ClearSelect() {
+	if _, ok := x.Element.(*UserAction_Input_Select); ok {
+		x.Element = nil
+	}
+}
+
+func (x *UserAction_Input) ClearMultiSelect() {
+	if _, ok := x.Element.(*UserAction_Input_MultiSelect); ok {
+		x.Element = nil
+	}
+}
+
+const UserAction_Input_Element_not_set_case case_UserAction_Input_Element = 0
+const UserAction_Input_Confirm_case case_UserAction_Input_Element = 4
+const UserAction_Input_Input_case case_UserAction_Input_Element = 5
+const UserAction_Input_File_case case_UserAction_Input_Element = 6
+const UserAction_Input_Select_case case_UserAction_Input_Element = 7
+const UserAction_Input_MultiSelect_case case_UserAction_Input_Element = 8
+
+func (x *UserAction_Input) WhichElement() case_UserAction_Input_Element {
+	if x == nil {
+		return UserAction_Input_Element_not_set_case
+	}
+	switch x.Element.(type) {
+	case *UserAction_Input_Confirm:
+		return UserAction_Input_Confirm_case
+	case *UserAction_Input_Input:
+		return UserAction_Input_Input_case
+	case *UserAction_Input_File:
+		return UserAction_Input_File_case
+	case *UserAction_Input_Select:
+		return UserAction_Input_Select_case
+	case *UserAction_Input_MultiSelect:
+		return UserAction_Input_MultiSelect_case
+	default:
+		return UserAction_Input_Element_not_set_case
+	}
+}
+
+type UserAction_Input_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id          string
+	Title       string
+	Description *string
+	// Fields of oneof Element:
+	Confirm     *v1beta11.ConfirmElement
+	Input       *v1beta11.InputElement
+	File        *v1beta11.FileElement
+	Select      *v1beta11.SelectElement
+	MultiSelect *v1beta11.MultiSelectElement
+	// -- end of Element
+}
+
+func (b0 UserAction_Input_builder) Build() *UserAction_Input {
+	m0 := &UserAction_Input{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Title = b.Title
+	x.Description = b.Description
+	if b.Confirm != nil {
+		x.Element = &UserAction_Input_Confirm{b.Confirm}
+	}
+	if b.Input != nil {
+		x.Element = &UserAction_Input_Input{b.Input}
+	}
+	if b.File != nil {
+		x.Element = &UserAction_Input_File{b.File}
+	}
+	if b.Select != nil {
+		x.Element = &UserAction_Input_Select{b.Select}
+	}
+	if b.MultiSelect != nil {
+		x.Element = &UserAction_Input_MultiSelect{b.MultiSelect}
+	}
+	return m0
+}
+
+type case_UserAction_Input_Element protoreflect.FieldNumber
+
+func (x case_UserAction_Input_Element) String() string {
+	md := file_dtkt_flow_v1beta1_spec_proto_msgTypes[16].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isUserAction_Input_Element interface {
 	isUserAction_Input_Element()
 }
@@ -1337,7 +2526,7 @@ func (*UserAction_Input_Select) isUserAction_Input_Element() {}
 func (*UserAction_Input_MultiSelect) isUserAction_Input_Element() {}
 
 type Switch_Case struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Value         string                 `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 	Return        string                 `protobuf:"bytes,2,opt,name=return,proto3" json:"return,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1369,11 +2558,6 @@ func (x *Switch_Case) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Switch_Case.ProtoReflect.Descriptor instead.
-func (*Switch_Case) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{9, 0}
-}
-
 func (x *Switch_Case) GetValue() string {
 	if x != nil {
 		return x.Value
@@ -1386,6 +2570,30 @@ func (x *Switch_Case) GetReturn() string {
 		return x.Return
 	}
 	return ""
+}
+
+func (x *Switch_Case) SetValue(v string) {
+	x.Value = v
+}
+
+func (x *Switch_Case) SetReturn(v string) {
+	x.Return = v
+}
+
+type Switch_Case_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Value  string
+	Return string
+}
+
+func (b0 Switch_Case_builder) Build() *Switch_Case {
+	m0 := &Switch_Case{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	x.Return = b.Return
+	return m0
 }
 
 var File_dtkt_flow_v1beta1_spec_proto protoreflect.FileDescriptor
@@ -1516,18 +2724,6 @@ const file_dtkt_flow_v1beta1_spec_proto_rawDesc = "" +
 	"\x05value\x18\x03 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
 	"2\b^\\s?=\\s?R\x05valueB\xd6\x01\n" +
 	"\x17proto.dtkt.flow.v1beta1B\tSpecProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1;flowv1beta1\xa2\x02\x03DFX\xaa\x02\x11Dtkt.Flow.V1beta1\xca\x02\x11Dtkt\\Flow\\V1beta1\xe2\x02\x1dDtkt\\Flow\\V1beta1\\GPBMetadata\xea\x02\x13Dtkt::Flow::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_flow_v1beta1_spec_proto_rawDescOnce sync.Once
-	file_dtkt_flow_v1beta1_spec_proto_rawDescData []byte
-)
-
-func file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP() []byte {
-	file_dtkt_flow_v1beta1_spec_proto_rawDescOnce.Do(func() {
-		file_dtkt_flow_v1beta1_spec_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_flow_v1beta1_spec_proto_rawDesc), len(file_dtkt_flow_v1beta1_spec_proto_rawDesc)))
-	})
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescData
-}
 
 var file_dtkt_flow_v1beta1_spec_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_dtkt_flow_v1beta1_spec_proto_goTypes = []any{

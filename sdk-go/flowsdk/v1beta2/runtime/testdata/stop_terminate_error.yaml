@@ -1,0 +1,18 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: stop_terminate_error
+  inputs:
+    - id: msg
+      int64: {}
+  actions:
+    - id: call
+      retry_strategy:
+        terminate_when: "= this.error.code == 13"
+      call:
+        connection: echo
+        method: error.Internal
+        request: "= inputs.msg.value"
+  outputs:
+    - id: result
+      value: "= actions.call.value"

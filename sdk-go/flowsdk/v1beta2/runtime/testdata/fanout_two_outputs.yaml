@@ -1,0 +1,17 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fanout_two_outputs
+  description: "One input feeds two outputs directly"
+  inputs:
+    - id: x
+      int64: {}
+  outputs:
+    - id: doubled
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= this.value * 2"
+    - id: tripled
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= this.value * 3"

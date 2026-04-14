@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/catalog/v1beta2/catalog.proto
 
+//go:build !protoopaque
+
 package catalogv1beta2
 
 import (
@@ -12,7 +14,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	fieldmaskpb "google.golang.org/protobuf/types/known/fieldmaskpb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -26,7 +27,7 @@ const (
 // Represents a catalog resource specifying a query dialect, supported data types
 // and additional metadata (if any).
 type Catalog struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Catalog resource name, format: `catalogs/{catalog}` (e.g. catalogs/google-project-id, catalogs/postgres_database, etc.)
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Catalog identifier.
@@ -66,11 +67,6 @@ func (x *Catalog) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Catalog.ProtoReflect.Descriptor instead.
-func (*Catalog) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_catalog_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Catalog) GetName() string {
@@ -115,9 +111,63 @@ func (x *Catalog) GetMetadata() map[string]string {
 	return nil
 }
 
+func (x *Catalog) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Catalog) SetCatalogId(v string) {
+	x.CatalogId = v
+}
+
+func (x *Catalog) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *Catalog) SetQueryDialect(v string) {
+	x.QueryDialect = v
+}
+
+func (x *Catalog) SetDataTypes(v []*Type) {
+	x.DataTypes = v
+}
+
+func (x *Catalog) SetMetadata(v map[string]string) {
+	x.Metadata = v
+}
+
+type Catalog_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Catalog resource name, format: `catalogs/{catalog}` (e.g. catalogs/google-project-id, catalogs/postgres_database, etc.)
+	Name string
+	// Catalog identifier.
+	CatalogId string
+	// Description of the catalog.
+	Description string
+	// Supported query dialect (e.g., Trino, GoogleSQL, Postgres, etc.).
+	QueryDialect string
+	// List of supported data types.
+	DataTypes []*Type
+	// Additional metadata, if any.
+	Metadata map[string]string
+}
+
+func (b0 Catalog_builder) Build() *Catalog {
+	m0 := &Catalog{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.CatalogId = b.CatalogId
+	x.Description = b.Description
+	x.QueryDialect = b.QueryDialect
+	x.DataTypes = b.DataTypes
+	x.Metadata = b.Metadata
+	return m0
+}
+
 // Create catalog request.
 type CreateCatalogRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Catalog identifier, e.g. final segment in resource name: `catalogs/{catalog}`
 	CatalogId string `protobuf:"bytes,2,opt,name=catalog_id,json=catalogId,proto3" json:"catalog_id,omitempty"`
 	// Catalog to create.
@@ -151,11 +201,6 @@ func (x *CreateCatalogRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateCatalogRequest.ProtoReflect.Descriptor instead.
-func (*CreateCatalogRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_catalog_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *CreateCatalogRequest) GetCatalogId() string {
 	if x != nil {
 		return x.CatalogId
@@ -170,9 +215,46 @@ func (x *CreateCatalogRequest) GetCatalog() *Catalog {
 	return nil
 }
 
+func (x *CreateCatalogRequest) SetCatalogId(v string) {
+	x.CatalogId = v
+}
+
+func (x *CreateCatalogRequest) SetCatalog(v *Catalog) {
+	x.Catalog = v
+}
+
+func (x *CreateCatalogRequest) HasCatalog() bool {
+	if x == nil {
+		return false
+	}
+	return x.Catalog != nil
+}
+
+func (x *CreateCatalogRequest) ClearCatalog() {
+	x.Catalog = nil
+}
+
+type CreateCatalogRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Catalog identifier, e.g. final segment in resource name: `catalogs/{catalog}`
+	CatalogId string
+	// Catalog to create.
+	Catalog *Catalog
+}
+
+func (b0 CreateCatalogRequest_builder) Build() *CreateCatalogRequest {
+	m0 := &CreateCatalogRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.CatalogId = b.CatalogId
+	x.Catalog = b.Catalog
+	return m0
+}
+
 // Create catalog response.
 type CreateCatalogResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Catalog created.
 	Catalog       *Catalog `protobuf:"bytes,1,opt,name=catalog,proto3" json:"catalog,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -204,11 +286,6 @@ func (x *CreateCatalogResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateCatalogResponse.ProtoReflect.Descriptor instead.
-func (*CreateCatalogResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_catalog_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *CreateCatalogResponse) GetCatalog() *Catalog {
 	if x != nil {
 		return x.Catalog
@@ -216,9 +293,39 @@ func (x *CreateCatalogResponse) GetCatalog() *Catalog {
 	return nil
 }
 
+func (x *CreateCatalogResponse) SetCatalog(v *Catalog) {
+	x.Catalog = v
+}
+
+func (x *CreateCatalogResponse) HasCatalog() bool {
+	if x == nil {
+		return false
+	}
+	return x.Catalog != nil
+}
+
+func (x *CreateCatalogResponse) ClearCatalog() {
+	x.Catalog = nil
+}
+
+type CreateCatalogResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Catalog created.
+	Catalog *Catalog
+}
+
+func (b0 CreateCatalogResponse_builder) Build() *CreateCatalogResponse {
+	m0 := &CreateCatalogResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Catalog = b.Catalog
+	return m0
+}
+
 // Request to retrieve a catalog by name.
 type GetCatalogRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Catalog resource to retreve.
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -250,11 +357,6 @@ func (x *GetCatalogRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetCatalogRequest.ProtoReflect.Descriptor instead.
-func (*GetCatalogRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_catalog_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *GetCatalogRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -262,9 +364,28 @@ func (x *GetCatalogRequest) GetName() string {
 	return ""
 }
 
+func (x *GetCatalogRequest) SetName(v string) {
+	x.Name = v
+}
+
+type GetCatalogRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Catalog resource to retreve.
+	Name string
+}
+
+func (b0 GetCatalogRequest_builder) Build() *GetCatalogRequest {
+	m0 := &GetCatalogRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 // Response containing catalog details.
 type GetCatalogResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The requested catalog.
 	Catalog       *Catalog `protobuf:"bytes,1,opt,name=catalog,proto3" json:"catalog,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -296,11 +417,6 @@ func (x *GetCatalogResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetCatalogResponse.ProtoReflect.Descriptor instead.
-func (*GetCatalogResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_catalog_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *GetCatalogResponse) GetCatalog() *Catalog {
 	if x != nil {
 		return x.Catalog
@@ -308,9 +424,39 @@ func (x *GetCatalogResponse) GetCatalog() *Catalog {
 	return nil
 }
 
+func (x *GetCatalogResponse) SetCatalog(v *Catalog) {
+	x.Catalog = v
+}
+
+func (x *GetCatalogResponse) HasCatalog() bool {
+	if x == nil {
+		return false
+	}
+	return x.Catalog != nil
+}
+
+func (x *GetCatalogResponse) ClearCatalog() {
+	x.Catalog = nil
+}
+
+type GetCatalogResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The requested catalog.
+	Catalog *Catalog
+}
+
+func (b0 GetCatalogResponse_builder) Build() *GetCatalogResponse {
+	m0 := &GetCatalogResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Catalog = b.Catalog
+	return m0
+}
+
 // List catalogs request.
 type ListCatalogsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	Filter        string                 `protobuf:"bytes,4,opt,name=filter,proto3" json:"filter,omitempty"`
@@ -343,11 +489,6 @@ func (x *ListCatalogsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListCatalogsRequest.ProtoReflect.Descriptor instead.
-func (*ListCatalogsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_catalog_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *ListCatalogsRequest) GetPageSize() int32 {
 	if x != nil {
 		return x.PageSize
@@ -369,9 +510,39 @@ func (x *ListCatalogsRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListCatalogsRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListCatalogsRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListCatalogsRequest) SetFilter(v string) {
+	x.Filter = v
+}
+
+type ListCatalogsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	PageSize  int32
+	PageToken string
+	Filter    string
+}
+
+func (b0 ListCatalogsRequest_builder) Build() *ListCatalogsRequest {
+	m0 := &ListCatalogsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.Filter = b.Filter
+	return m0
+}
+
 // List catalogs response.
 type ListCatalogsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Catalogs      []*Catalog             `protobuf:"bytes,1,rep,name=catalogs,proto3" json:"catalogs,omitempty"`
 	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -403,11 +574,6 @@ func (x *ListCatalogsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListCatalogsResponse.ProtoReflect.Descriptor instead.
-func (*ListCatalogsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_catalog_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *ListCatalogsResponse) GetCatalogs() []*Catalog {
 	if x != nil {
 		return x.Catalogs
@@ -422,9 +588,33 @@ func (x *ListCatalogsResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListCatalogsResponse) SetCatalogs(v []*Catalog) {
+	x.Catalogs = v
+}
+
+func (x *ListCatalogsResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListCatalogsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Catalogs      []*Catalog
+	NextPageToken string
+}
+
+func (b0 ListCatalogsResponse_builder) Build() *ListCatalogsResponse {
+	m0 := &ListCatalogsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Catalogs = b.Catalogs
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 // Update catalog request.
 type UpdateCatalogRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Catalog with updated fields
 	Catalog *Catalog `protobuf:"bytes,1,opt,name=catalog,proto3" json:"catalog,omitempty"`
 	// Fields to update.
@@ -458,11 +648,6 @@ func (x *UpdateCatalogRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateCatalogRequest.ProtoReflect.Descriptor instead.
-func (*UpdateCatalogRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_catalog_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *UpdateCatalogRequest) GetCatalog() *Catalog {
 	if x != nil {
 		return x.Catalog
@@ -477,9 +662,57 @@ func (x *UpdateCatalogRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 	return nil
 }
 
+func (x *UpdateCatalogRequest) SetCatalog(v *Catalog) {
+	x.Catalog = v
+}
+
+func (x *UpdateCatalogRequest) SetUpdateMask(v *fieldmaskpb.FieldMask) {
+	x.UpdateMask = v
+}
+
+func (x *UpdateCatalogRequest) HasCatalog() bool {
+	if x == nil {
+		return false
+	}
+	return x.Catalog != nil
+}
+
+func (x *UpdateCatalogRequest) HasUpdateMask() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateMask != nil
+}
+
+func (x *UpdateCatalogRequest) ClearCatalog() {
+	x.Catalog = nil
+}
+
+func (x *UpdateCatalogRequest) ClearUpdateMask() {
+	x.UpdateMask = nil
+}
+
+type UpdateCatalogRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Catalog with updated fields
+	Catalog *Catalog
+	// Fields to update.
+	UpdateMask *fieldmaskpb.FieldMask
+}
+
+func (b0 UpdateCatalogRequest_builder) Build() *UpdateCatalogRequest {
+	m0 := &UpdateCatalogRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Catalog = b.Catalog
+	x.UpdateMask = b.UpdateMask
+	return m0
+}
+
 // Update catalog response.
 type UpdateCatalogResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The updated catalog.
 	Catalog       *Catalog `protobuf:"bytes,1,opt,name=catalog,proto3" json:"catalog,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -511,11 +744,6 @@ func (x *UpdateCatalogResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateCatalogResponse.ProtoReflect.Descriptor instead.
-func (*UpdateCatalogResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_catalog_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *UpdateCatalogResponse) GetCatalog() *Catalog {
 	if x != nil {
 		return x.Catalog
@@ -523,9 +751,39 @@ func (x *UpdateCatalogResponse) GetCatalog() *Catalog {
 	return nil
 }
 
+func (x *UpdateCatalogResponse) SetCatalog(v *Catalog) {
+	x.Catalog = v
+}
+
+func (x *UpdateCatalogResponse) HasCatalog() bool {
+	if x == nil {
+		return false
+	}
+	return x.Catalog != nil
+}
+
+func (x *UpdateCatalogResponse) ClearCatalog() {
+	x.Catalog = nil
+}
+
+type UpdateCatalogResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The updated catalog.
+	Catalog *Catalog
+}
+
+func (b0 UpdateCatalogResponse_builder) Build() *UpdateCatalogResponse {
+	m0 := &UpdateCatalogResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Catalog = b.Catalog
+	return m0
+}
+
 // Delete catalog request.
 type DeleteCatalogRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of catalog to delete.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// If set to true, any schemas in this catalog will also be deleted.
@@ -560,11 +818,6 @@ func (x *DeleteCatalogRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteCatalogRequest.ProtoReflect.Descriptor instead.
-func (*DeleteCatalogRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_catalog_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *DeleteCatalogRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -579,9 +832,36 @@ func (x *DeleteCatalogRequest) GetForce() bool {
 	return false
 }
 
+func (x *DeleteCatalogRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *DeleteCatalogRequest) SetForce(v bool) {
+	x.Force = v
+}
+
+type DeleteCatalogRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of catalog to delete.
+	Name string
+	// If set to true, any schemas in this catalog will also be deleted.
+	// (Otherwise, the request will only work if the catalog has no schemas.)
+	Force bool
+}
+
+func (b0 DeleteCatalogRequest_builder) Build() *DeleteCatalogRequest {
+	m0 := &DeleteCatalogRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Force = b.Force
+	return m0
+}
+
 // Delete catalog response.
 type DeleteCatalogResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -611,9 +891,16 @@ func (x *DeleteCatalogResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteCatalogResponse.ProtoReflect.Descriptor instead.
-func (*DeleteCatalogResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_catalog_proto_rawDescGZIP(), []int{10}
+type DeleteCatalogResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 DeleteCatalogResponse_builder) Build() *DeleteCatalogResponse {
+	m0 := &DeleteCatalogResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 var File_dtkt_catalog_v1beta2_catalog_proto protoreflect.FileDescriptor
@@ -670,18 +957,6 @@ const file_dtkt_catalog_v1beta2_catalog_proto_rawDesc = "" +
 	"\fListCatalogs\x12).dtkt.catalog.v1beta2.ListCatalogsRequest\x1a*.dtkt.catalog.v1beta2.ListCatalogsResponse\x12h\n" +
 	"\rUpdateCatalog\x12*.dtkt.catalog.v1beta2.UpdateCatalogRequest\x1a+.dtkt.catalog.v1beta2.UpdateCatalogResponseB\xee\x01\n" +
 	"\x1aproto.dtkt.catalog.v1beta2B\fCatalogProtoP\x01ZPgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta2;catalogv1beta2\xa2\x02\x03DCX\xaa\x02\x14Dtkt.Catalog.V1beta2\xca\x02\x14Dtkt\\Catalog\\V1beta2\xe2\x02 Dtkt\\Catalog\\V1beta2\\GPBMetadata\xea\x02\x16Dtkt::Catalog::V1beta2b\x06proto3"
-
-var (
-	file_dtkt_catalog_v1beta2_catalog_proto_rawDescOnce sync.Once
-	file_dtkt_catalog_v1beta2_catalog_proto_rawDescData []byte
-)
-
-func file_dtkt_catalog_v1beta2_catalog_proto_rawDescGZIP() []byte {
-	file_dtkt_catalog_v1beta2_catalog_proto_rawDescOnce.Do(func() {
-		file_dtkt_catalog_v1beta2_catalog_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_catalog_v1beta2_catalog_proto_rawDesc), len(file_dtkt_catalog_v1beta2_catalog_proto_rawDesc)))
-	})
-	return file_dtkt_catalog_v1beta2_catalog_proto_rawDescData
-}
 
 var file_dtkt_catalog_v1beta2_catalog_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_dtkt_catalog_v1beta2_catalog_proto_goTypes = []any{

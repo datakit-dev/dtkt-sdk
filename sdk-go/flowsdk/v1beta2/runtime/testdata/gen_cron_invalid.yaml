@@ -1,0 +1,11 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: gen_cron_invalid
+  generators:
+    - id: cron
+      cron:
+        expression: "not a valid cron"
+  outputs:
+    - id: result
+      value: "= generators.cron.value"

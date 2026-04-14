@@ -1,0 +1,25 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: reduce_sliding_window
+  generators:
+    - id: seq
+      range:
+        start: 1
+        end: 3
+        step: 1
+  vars:
+    - id: sliding
+      value: "= generators.seq.value"
+      transforms:
+        - reduce:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+            group_by:
+              window:
+                sliding:
+                  length: "1s"
+                  slide: "0.5s"
+  outputs:
+    - id: result
+      value: "= vars.sliding.value"

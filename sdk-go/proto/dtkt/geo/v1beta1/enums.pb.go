@@ -4,13 +4,14 @@
 // 	protoc        (unknown)
 // source: dtkt/geo/v1beta1/enums.proto
 
+//go:build !protoopaque
+
 package geov1beta1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -68,11 +69,6 @@ func (x BoundsType) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use BoundsType.Descriptor instead.
-func (BoundsType) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_geo_v1beta1_enums_proto_rawDescGZIP(), []int{0}
-}
-
 type PropertyType int32
 
 const (
@@ -120,11 +116,6 @@ func (x PropertyType) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use PropertyType.Descriptor instead.
-func (PropertyType) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_geo_v1beta1_enums_proto_rawDescGZIP(), []int{1}
-}
-
 var File_dtkt_geo_v1beta1_enums_proto protoreflect.FileDescriptor
 
 const file_dtkt_geo_v1beta1_enums_proto_rawDesc = "" +
@@ -143,18 +134,6 @@ const file_dtkt_geo_v1beta1_enums_proto_rawDesc = "" +
 	"\x14PROPERTY_TYPE_NUMBER\x10\x03B\xd0\x01\n" +
 	"\x16proto.dtkt.geo.v1beta1B\n" +
 	"EnumsProtoP\x01ZHgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/geo/v1beta1;geov1beta1\xa2\x02\x03DGX\xaa\x02\x10Dtkt.Geo.V1beta1\xca\x02\x10Dtkt\\Geo\\V1beta1\xe2\x02\x1cDtkt\\Geo\\V1beta1\\GPBMetadata\xea\x02\x12Dtkt::Geo::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_geo_v1beta1_enums_proto_rawDescOnce sync.Once
-	file_dtkt_geo_v1beta1_enums_proto_rawDescData []byte
-)
-
-func file_dtkt_geo_v1beta1_enums_proto_rawDescGZIP() []byte {
-	file_dtkt_geo_v1beta1_enums_proto_rawDescOnce.Do(func() {
-		file_dtkt_geo_v1beta1_enums_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_geo_v1beta1_enums_proto_rawDesc), len(file_dtkt_geo_v1beta1_enums_proto_rawDesc)))
-	})
-	return file_dtkt_geo_v1beta1_enums_proto_rawDescData
-}
 
 var file_dtkt_geo_v1beta1_enums_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_dtkt_geo_v1beta1_enums_proto_goTypes = []any{

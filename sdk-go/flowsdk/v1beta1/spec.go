@@ -1,4 +1,4 @@
-package flowsdk
+package flowsdkv1beta1
 
 import (
 	"context"

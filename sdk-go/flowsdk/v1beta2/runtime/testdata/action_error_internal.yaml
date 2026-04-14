@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: action_error_internal
+  inputs:
+    - id: msg
+      int64: {}
+  actions:
+    - id: call
+      call:
+        connection: echo
+        method: error.Internal
+        request: "= inputs.msg.value"
+  outputs:
+    - id: result
+      value: "= actions.call.value"

@@ -1,0 +1,13 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: output_filter
+  description: "Output with filter transform"
+  inputs:
+    - id: x
+      int64: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value"
+      transforms:
+        - filter: "= this.value > 3"

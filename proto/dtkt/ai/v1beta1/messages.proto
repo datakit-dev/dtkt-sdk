@@ -94,8 +94,6 @@ message GenerateEmbeddingsResponse {
   repeated EmbeddingOutput outputs = 1;
 }
 
-// ---------------------------------------------------------
-
 message Blob {
   // Media Type type/subtype or with parameters type/subtype;parameter=value;parameter2=value2
   string media_type = 1 [(buf.validate.field).string.pattern = "^[a-zA-Z0-9]+/[a-zA-Z0-9.+-]+( ?;[a-zA-Z0-9.+-]+=.+)*$"];

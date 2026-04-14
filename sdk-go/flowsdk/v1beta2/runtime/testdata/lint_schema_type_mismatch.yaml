@@ -1,0 +1,26 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_schema_type_mismatch
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: x
+      string: {}
+  vars:
+    - id: dummy
+      value: "= inputs.x.value"
+  actions:
+    - id: run
+      when: "= vars.dummy.value != ''"
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request:
+          name: 42
+          count: not_a_number
+  outputs:
+    - id: result
+      value: "= actions.run.value"

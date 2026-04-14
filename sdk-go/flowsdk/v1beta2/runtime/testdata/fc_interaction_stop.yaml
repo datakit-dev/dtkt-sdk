@@ -1,0 +1,15 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fc_interaction_stop
+  inputs:
+    - id: x
+      int64: {}
+  interactions:
+    - id: confirm
+      when: "= inputs.x.value > 0"
+      flow_control:
+        stop_when: "= true"
+  outputs:
+    - id: result
+      value: "= interactions.confirm.value"

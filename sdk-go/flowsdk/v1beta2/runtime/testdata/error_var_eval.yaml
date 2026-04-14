@@ -1,0 +1,14 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: var_eval_error
+  description: "CEL expression that fails at runtime (division by zero)"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: bad
+      value: "= inputs.x.value / 0"
+  outputs:
+    - id: result
+      value: "= vars.bad.value"

@@ -4,13 +4,14 @@
 // 	protoc        (unknown)
 // source: dtkt/shared/v1beta1/enums.proto
 
+//go:build !protoopaque
+
 package sharedv1beta1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -66,11 +67,6 @@ func (x AuthStyle) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use AuthStyle.Descriptor instead.
-func (AuthStyle) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{0}
-}
-
 // Which step of auth we're performing.
 type AuthType int32
 
@@ -119,11 +115,6 @@ func (x AuthType) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use AuthType.Descriptor instead.
-func (AuthType) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{1}
-}
-
 // PKCE method (when used).
 type CodeChallengeMethod int32
 
@@ -167,11 +158,6 @@ func (CodeChallengeMethod) Type() protoreflect.EnumType {
 
 func (x CodeChallengeMethod) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use CodeChallengeMethod.Descriptor instead.
-func (CodeChallengeMethod) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{2}
 }
 
 // Enum representing event types.
@@ -236,11 +222,6 @@ func (ActionType) Type() protoreflect.EnumType {
 
 func (x ActionType) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use ActionType.Descriptor instead.
-func (ActionType) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{3}
 }
 
 // Enum representing json data types.
@@ -311,11 +292,6 @@ func (x JSONType) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use JSONType.Descriptor instead.
-func (JSONType) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{4}
-}
-
 // Enum representing geo data types.
 type GeoType int32
 
@@ -368,11 +344,6 @@ func (x GeoType) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use GeoType.Descriptor instead.
-func (GeoType) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{5}
-}
-
 // Supported package types.
 type PackageType int32
 
@@ -421,11 +392,6 @@ func (x PackageType) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use PackageType.Descriptor instead.
-func (PackageType) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{6}
-}
-
 // Supported runtimes.
 type Runtime int32
 
@@ -469,11 +435,6 @@ func (Runtime) Type() protoreflect.EnumType {
 
 func (x Runtime) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use Runtime.Descriptor instead.
-func (Runtime) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{7}
 }
 
 // Supported operating systems.
@@ -543,11 +504,6 @@ func (OS) Type() protoreflect.EnumType {
 
 func (x OS) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use OS.Descriptor instead.
-func (OS) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{8}
 }
 
 // Supported CPU Architectures.
@@ -629,11 +585,6 @@ func (Arch) Type() protoreflect.EnumType {
 
 func (x Arch) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use Arch.Descriptor instead.
-func (Arch) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP(), []int{9}
 }
 
 var File_dtkt_shared_v1beta1_enums_proto protoreflect.FileDescriptor
@@ -728,18 +679,6 @@ const file_dtkt_shared_v1beta1_enums_proto_rawDesc = "" +
 	"\tARCH_WASM\x10\x0eB\xe5\x01\n" +
 	"\x19proto.dtkt.shared.v1beta1B\n" +
 	"EnumsProtoP\x01ZNgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1;sharedv1beta1\xa2\x02\x03DSX\xaa\x02\x13Dtkt.Shared.V1beta1\xca\x02\x13Dtkt\\Shared\\V1beta1\xe2\x02\x1fDtkt\\Shared\\V1beta1\\GPBMetadata\xea\x02\x15Dtkt::Shared::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_shared_v1beta1_enums_proto_rawDescOnce sync.Once
-	file_dtkt_shared_v1beta1_enums_proto_rawDescData []byte
-)
-
-func file_dtkt_shared_v1beta1_enums_proto_rawDescGZIP() []byte {
-	file_dtkt_shared_v1beta1_enums_proto_rawDescOnce.Do(func() {
-		file_dtkt_shared_v1beta1_enums_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_shared_v1beta1_enums_proto_rawDesc), len(file_dtkt_shared_v1beta1_enums_proto_rawDesc)))
-	})
-	return file_dtkt_shared_v1beta1_enums_proto_rawDescData
-}
 
 var file_dtkt_shared_v1beta1_enums_proto_enumTypes = make([]protoimpl.EnumInfo, 10)
 var file_dtkt_shared_v1beta1_enums_proto_goTypes = []any{

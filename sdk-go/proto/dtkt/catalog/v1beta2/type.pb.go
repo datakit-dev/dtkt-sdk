@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/catalog/v1beta2/type.proto
 
+//go:build !protoopaque
+
 package catalogv1beta2
 
 import (
@@ -12,7 +14,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -103,11 +104,6 @@ func (x TypeKind) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use TypeKind.Descriptor instead.
-func (TypeKind) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_type_proto_rawDescGZIP(), []int{0}
-}
-
 // Enum representing json data types.
 type JSONType int32
 
@@ -176,11 +172,6 @@ func (x JSONType) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use JSONType.Descriptor instead.
-func (JSONType) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_type_proto_rawDescGZIP(), []int{1}
-}
-
 // Enum representing geo data types.
 type GeoType int32
 
@@ -233,15 +224,10 @@ func (x GeoType) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use GeoType.Descriptor instead.
-func (GeoType) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_type_proto_rawDescGZIP(), []int{2}
-}
-
 // Type encodes a catalog implementation's native data type with a corresponding
 // kind and additional JSON, Geospatial, and type parameters.
 type Type struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of the implementation's native type: (e.g. VARCHAR, BIGINT, etc.).
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Kind of the type as defined in this package.
@@ -281,11 +267,6 @@ func (x *Type) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Type.ProtoReflect.Descriptor instead.
-func (*Type) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_type_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Type) GetName() string {
 	if x != nil {
 		return x.Name
@@ -321,10 +302,57 @@ func (x *Type) GetParameters() []string {
 	return nil
 }
 
+func (x *Type) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Type) SetKind(v TypeKind) {
+	x.Kind = v
+}
+
+func (x *Type) SetJsonType(v JSONType) {
+	x.JsonType = v
+}
+
+func (x *Type) SetGeoType(v GeoType) {
+	x.GeoType = v
+}
+
+func (x *Type) SetParameters(v []string) {
+	x.Parameters = v
+}
+
+type Type_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of the implementation's native type: (e.g. VARCHAR, BIGINT, etc.).
+	Name string
+	// Kind of the type as defined in this package.
+	Kind TypeKind
+	// Corresponding JSON type representation, if any.
+	JsonType JSONType
+	// Corresponding Geo type representation, if any.
+	GeoType GeoType
+	// Type parameters, if any: e.g. (parametric types such as VARCHAR(10), DECIMAL(22, 5), etc.)
+	Parameters []string
+}
+
+func (b0 Type_builder) Build() *Type {
+	m0 := &Type{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Kind = b.Kind
+	x.JsonType = b.JsonType
+	x.GeoType = b.GeoType
+	x.Parameters = b.Parameters
+	return m0
+}
+
 // Field encodes a named type (see above) definition of a value found in
 // the context of a table read/write or query param/result.
 type Field struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of the field.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Type of the field.
@@ -370,11 +398,6 @@ func (x *Field) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Field.ProtoReflect.Descriptor instead.
-func (*Field) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_type_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Field) GetName() string {
@@ -424,6 +447,93 @@ func (x *Field) GetElement() *v1beta1.FieldElement {
 		return x.Element
 	}
 	return nil
+}
+
+func (x *Field) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Field) SetType(v *Type) {
+	x.Type = v
+}
+
+func (x *Field) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *Field) SetNullable(v bool) {
+	x.Nullable = v
+}
+
+func (x *Field) SetRepeated(v bool) {
+	x.Repeated = v
+}
+
+func (x *Field) SetFields(v []*Field) {
+	x.Fields = v
+}
+
+func (x *Field) SetElement(v *v1beta1.FieldElement) {
+	x.Element = v
+}
+
+func (x *Field) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return x.Type != nil
+}
+
+func (x *Field) HasElement() bool {
+	if x == nil {
+		return false
+	}
+	return x.Element != nil
+}
+
+func (x *Field) ClearType() {
+	x.Type = nil
+}
+
+func (x *Field) ClearElement() {
+	x.Element = nil
+}
+
+type Field_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of the field.
+	Name string
+	// Type of the field.
+	Type *Type
+	// Description of the field.
+	Description string
+	// Indicates if the field allows null values (i.e. a corresponding value is
+	// allowed to be null in the context of a table or query).
+	Nullable bool
+	// Indicates if the field contains repeated values (i.e. value's kind is
+	// expected to be a ListValue with each value conforming to this field's
+	// type.
+	Repeated bool
+	// Fields are nested named type definitions if this field type's kind
+	// corresponds with either an object or a JSON value.
+	Fields []*Field
+	// Protoform field element for runtime dynamic form UI.
+	Element *v1beta1.FieldElement
+}
+
+func (b0 Field_builder) Build() *Field {
+	m0 := &Field{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Type = b.Type
+	x.Description = b.Description
+	x.Nullable = b.Nullable
+	x.Repeated = b.Repeated
+	x.Fields = b.Fields
+	x.Element = b.Element
+	return m0
 }
 
 var File_dtkt_catalog_v1beta2_type_proto protoreflect.FileDescriptor
@@ -480,18 +590,6 @@ const file_dtkt_catalog_v1beta2_type_proto_rawDesc = "" +
 	"\fGEO_TYPE_WKT\x10\x02\x12\x10\n" +
 	"\fGEO_TYPE_WKB\x10\x03B\xeb\x01\n" +
 	"\x1aproto.dtkt.catalog.v1beta2B\tTypeProtoP\x01ZPgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta2;catalogv1beta2\xa2\x02\x03DCX\xaa\x02\x14Dtkt.Catalog.V1beta2\xca\x02\x14Dtkt\\Catalog\\V1beta2\xe2\x02 Dtkt\\Catalog\\V1beta2\\GPBMetadata\xea\x02\x16Dtkt::Catalog::V1beta2b\x06proto3"
-
-var (
-	file_dtkt_catalog_v1beta2_type_proto_rawDescOnce sync.Once
-	file_dtkt_catalog_v1beta2_type_proto_rawDescData []byte
-)
-
-func file_dtkt_catalog_v1beta2_type_proto_rawDescGZIP() []byte {
-	file_dtkt_catalog_v1beta2_type_proto_rawDescOnce.Do(func() {
-		file_dtkt_catalog_v1beta2_type_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_catalog_v1beta2_type_proto_rawDesc), len(file_dtkt_catalog_v1beta2_type_proto_rawDesc)))
-	})
-	return file_dtkt_catalog_v1beta2_type_proto_rawDescData
-}
 
 var file_dtkt_catalog_v1beta2_type_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_dtkt_catalog_v1beta2_type_proto_msgTypes = make([]protoimpl.MessageInfo, 2)

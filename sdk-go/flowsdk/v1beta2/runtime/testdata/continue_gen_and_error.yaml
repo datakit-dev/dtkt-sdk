@@ -1,0 +1,28 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: continue_gen_and_error
+  inputs:
+    - id: fail_input
+      int64: {}
+  generators:
+    - id: gen
+      range:
+        start: 1
+        end: 3
+  actions:
+    - id: fail_action
+      call:
+        connection: echo
+        method: error.Internal
+        request: "= inputs.fail_input.value"
+    - id: ok_action
+      call:
+        connection: echo
+        method: echo.Echo
+        request: "= generators.gen.value"
+  outputs:
+    - id: fail_result
+      value: "= actions.fail_action.value"
+    - id: ok_result
+      value: "= actions.ok_action.value"

@@ -1,0 +1,11 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_uint64_to_output
+  description: "Uint64 input passed directly to output"
+  inputs:
+    - id: x
+      uint64: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value"

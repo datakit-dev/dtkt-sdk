@@ -1,0 +1,20 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: var_deep_chain_filter_middle
+  description: "Two-level var chain with filter for even values in the middle"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: even
+      value: "= inputs.x.value"
+      transforms:
+        - filter: "= this.value % 2 == 0"
+    - id: scaled
+      value: "= vars.even.value"
+      transforms:
+        - map: "= this.value * 10"
+  outputs:
+    - id: result
+      value: "= vars.scaled.value"

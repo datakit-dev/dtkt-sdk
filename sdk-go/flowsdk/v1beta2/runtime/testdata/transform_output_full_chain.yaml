@@ -1,0 +1,21 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_output_full_chain
+  description: "Output with filter, map, reduce(event window) pipeline"
+  inputs:
+    - id: x
+      int64: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value"
+      transforms:
+        - filter: "= this.value > 2"
+        - map: "= this.value * 10"
+        - reduce:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+            group_by:
+              window:
+                event:
+                  when: "= inputs.x.closed"

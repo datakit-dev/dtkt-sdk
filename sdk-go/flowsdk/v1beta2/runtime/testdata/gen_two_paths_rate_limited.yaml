@@ -1,0 +1,24 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: gen_two_paths_rate_limited
+  generators:
+    - id: gen1
+      range:
+        start: 1
+        end: 1000000
+        rate:
+          count: 100
+          interval: "1s"
+    - id: gen2
+      range:
+        start: 1
+        end: 1000000
+        rate:
+          count: 100
+          interval: "1s"
+  outputs:
+    - id: out1
+      value: "= generators.gen1.value"
+    - id: out2
+      value: "= generators.gen2.value"

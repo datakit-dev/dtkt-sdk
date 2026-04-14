@@ -4,13 +4,14 @@
 // 	protoc        (unknown)
 // source: dtkt/replication/v1beta1/enums.proto
 
+//go:build !protoopaque
+
 package replicationv1beta1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -76,11 +77,6 @@ func (x SyncStatus) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use SyncStatus.Descriptor instead.
-func (SyncStatus) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_enums_proto_rawDescGZIP(), []int{0}
-}
-
 var File_dtkt_replication_v1beta1_enums_proto protoreflect.FileDescriptor
 
 const file_dtkt_replication_v1beta1_enums_proto_rawDesc = "" +
@@ -95,18 +91,6 @@ const file_dtkt_replication_v1beta1_enums_proto_rawDesc = "" +
 	"\x12SYNC_STATUS_FAILED\x10\x04B\x88\x02\n" +
 	"\x1eproto.dtkt.replication.v1beta1B\n" +
 	"EnumsProtoP\x01ZXgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/replication/v1beta1;replicationv1beta1\xa2\x02\x03DRX\xaa\x02\x18Dtkt.Replication.V1beta1\xca\x02\x18Dtkt\\Replication\\V1beta1\xe2\x02$Dtkt\\Replication\\V1beta1\\GPBMetadata\xea\x02\x1aDtkt::Replication::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_replication_v1beta1_enums_proto_rawDescOnce sync.Once
-	file_dtkt_replication_v1beta1_enums_proto_rawDescData []byte
-)
-
-func file_dtkt_replication_v1beta1_enums_proto_rawDescGZIP() []byte {
-	file_dtkt_replication_v1beta1_enums_proto_rawDescOnce.Do(func() {
-		file_dtkt_replication_v1beta1_enums_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_replication_v1beta1_enums_proto_rawDesc), len(file_dtkt_replication_v1beta1_enums_proto_rawDesc)))
-	})
-	return file_dtkt_replication_v1beta1_enums_proto_rawDescData
-}
 
 var file_dtkt_replication_v1beta1_enums_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_dtkt_replication_v1beta1_enums_proto_goTypes = []any{

@@ -1,0 +1,13 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: gen_cron
+  generators:
+    - id: cron
+      cron:
+        expression: "@every 1s"
+  outputs:
+    - id: result
+      value: "= generators.cron.value"
+      flow_control:
+        stop_when: "= int(generators.cron.eval_count) >= 2"

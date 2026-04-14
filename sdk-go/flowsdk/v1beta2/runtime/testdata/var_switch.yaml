@@ -1,0 +1,21 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: var_switch
+  description: "Var with switch expression categorizing values as big/medium/small"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: category
+      switch:
+        value: "= inputs.x.value"
+        case:
+          - value: "= this.value > 100"
+            return: '= "big"'
+          - value: "= this.value > 10"
+            return: '= "medium"'
+        default: '= "small"'
+  outputs:
+    - id: result
+      value: "= vars.category.value"

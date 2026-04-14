@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk"
+	flowsdkv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta1/runtime"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -15,18 +15,18 @@ import (
 
 // ---- helpers ---------------------------------------------------------------
 
-// parseSpec parses a YAML flow spec and returns a fully-parsed *flowsdk.Spec.
-func parseSpec(t *testing.T, yaml string) *flowsdk.Spec {
+// parseSpec parses a YAML flow spec and returns a fully-parsed *flowsdkv1beta1.Spec.
+func parseSpec(t *testing.T, yaml string) *flowsdkv1beta1.Spec {
 	t.Helper()
 	var buf bytes.Buffer
 	buf.WriteString(yaml)
-	spec, err := flowsdk.ReadSpec(encoding.YAML, &buf)
+	spec, err := flowsdkv1beta1.ReadSpec(encoding.YAML, &buf)
 	require.NoError(t, err)
 	return spec
 }
 
 // newRun creates a Runtime + Graph + Executor from a parsed spec.
-func newRun(t *testing.T, ctx context.Context, cancel context.CancelCauseFunc, spec *flowsdk.Spec) (*runtime.Runtime, *runtime.Executor) {
+func newRun(t *testing.T, ctx context.Context, cancel context.CancelCauseFunc, spec *flowsdkv1beta1.Spec) (*runtime.Runtime, *runtime.Executor) {
 	t.Helper()
 	run := runtime.NewFromSpec(ctx, cancel, spec.GetFlow())
 	graph, err := runtime.GraphFromRuntime(run)

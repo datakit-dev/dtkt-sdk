@@ -1,0 +1,11 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_double_to_output
+  description: "Double input passed directly to output"
+  inputs:
+    - id: x
+      double: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value"

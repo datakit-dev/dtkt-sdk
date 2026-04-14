@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: var_filter_even
+  description: "Var with filter transform keeping even values"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: even
+      value: "= inputs.x.value"
+      transforms:
+        - filter: "= this.value % 2 == 0"
+  outputs:
+    - id: result
+      value: "= vars.even.value"

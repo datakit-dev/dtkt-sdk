@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/blob/v1beta1/messages.proto
 
+//go:build !protoopaque
+
 package blobv1beta1
 
 import (
@@ -14,7 +16,6 @@ import (
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -26,7 +27,7 @@ const (
 )
 
 type ListResult struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Key for this blob result.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// ModTime is the time the blob was last modified.
@@ -69,11 +70,6 @@ func (x *ListResult) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListResult.ProtoReflect.Descriptor instead.
-func (*ListResult) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *ListResult) GetKey() string {
 	if x != nil {
 		return x.Key
@@ -109,8 +105,69 @@ func (x *ListResult) GetIsDir() bool {
 	return false
 }
 
+func (x *ListResult) SetKey(v string) {
+	x.Key = v
+}
+
+func (x *ListResult) SetModTime(v *timestamppb.Timestamp) {
+	x.ModTime = v
+}
+
+func (x *ListResult) SetSize(v int64) {
+	x.Size = v
+}
+
+func (x *ListResult) SetMd5(v string) {
+	x.Md5 = v
+}
+
+func (x *ListResult) SetIsDir(v bool) {
+	x.IsDir = v
+}
+
+func (x *ListResult) HasModTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.ModTime != nil
+}
+
+func (x *ListResult) ClearModTime() {
+	x.ModTime = nil
+}
+
+type ListResult_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Key for this blob result.
+	Key string
+	// ModTime is the time the blob was last modified.
+	ModTime *timestamppb.Timestamp
+	// Size is the size of the blob's content in bytes.
+	Size int64
+	// MD5 is an MD5 hash of the blob contents or nil if not available.
+	Md5 string
+	// IsDir indicates that this result represents a "directory" in the
+	// hierarchical namespace, ending in ListOptions.Delimiter. Key can be
+	// passed as ListOptions.Prefix to list items in the "directory".
+	// Fields other than Key and IsDir will not be set if IsDir is true.
+	IsDir bool
+}
+
+func (b0 ListResult_builder) Build() *ListResult {
+	m0 := &ListResult{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Key = b.Key
+	x.ModTime = b.ModTime
+	x.Size = b.Size
+	x.Md5 = b.Md5
+	x.IsDir = b.IsDir
+	return m0
+}
+
 type ListBlobsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Prefix indicates that only blobs with a key starting with this prefix
 	// should be returned.
 	Prefix string `protobuf:"bytes,1,opt,name=prefix,proto3" json:"prefix,omitempty"`
@@ -156,11 +213,6 @@ func (x *ListBlobsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListBlobsRequest.ProtoReflect.Descriptor instead.
-func (*ListBlobsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *ListBlobsRequest) GetPrefix() string {
 	if x != nil {
 		return x.Prefix
@@ -189,8 +241,56 @@ func (x *ListBlobsRequest) GetBucket() string {
 	return ""
 }
 
+func (x *ListBlobsRequest) SetPrefix(v string) {
+	x.Prefix = v
+}
+
+func (x *ListBlobsRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListBlobsRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListBlobsRequest) SetBucket(v string) {
+	x.Bucket = v
+}
+
+type ListBlobsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Prefix indicates that only blobs with a key starting with this prefix
+	// should be returned.
+	Prefix string
+	// The maximum number of blobs to return. The service may return fewer than
+	// this value.
+	// If unspecified, at most 50 blobs will be returned.
+	// The maximum value is 1000; values above 1000 will be coerced to 1000.
+	PageSize int32
+	// A page token, received from a previous `ListBlobs` call.
+	// Provide this to retrieve the subsequent page.
+	//
+	// When paginating, all other parameters provided to `ListBlobs` must match
+	// the call that provided the page token.
+	PageToken string
+	// Bucket to write blob (may be optional).
+	Bucket string
+}
+
+func (b0 ListBlobsRequest_builder) Build() *ListBlobsRequest {
+	m0 := &ListBlobsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Prefix = b.Prefix
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.Bucket = b.Bucket
+	return m0
+}
+
 type ListBlobsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The results from the specified prefix.
 	Results []*ListResult `protobuf:"bytes,1,rep,name=results,proto3" json:"results,omitempty"`
 	// A token that can be sent as `page_token` to retrieve the next page.
@@ -225,11 +325,6 @@ func (x *ListBlobsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListBlobsResponse.ProtoReflect.Descriptor instead.
-func (*ListBlobsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *ListBlobsResponse) GetResults() []*ListResult {
 	if x != nil {
 		return x.Results
@@ -244,8 +339,35 @@ func (x *ListBlobsResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListBlobsResponse) SetResults(v []*ListResult) {
+	x.Results = v
+}
+
+func (x *ListBlobsResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListBlobsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The results from the specified prefix.
+	Results []*ListResult
+	// A token that can be sent as `page_token` to retrieve the next page.
+	// If this field is omitted, there are no subsequent pages.
+	NextPageToken string
+}
+
+func (b0 ListBlobsResponse_builder) Build() *ListBlobsResponse {
+	m0 := &ListBlobsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Results = b.Results
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 type GetBlobRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Key of blob to retrieve attributes.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// Bucket to write blob (may be optional).
@@ -279,11 +401,6 @@ func (x *GetBlobRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetBlobRequest.ProtoReflect.Descriptor instead.
-func (*GetBlobRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *GetBlobRequest) GetKey() string {
 	if x != nil {
 		return x.Key
@@ -298,8 +415,34 @@ func (x *GetBlobRequest) GetBucket() string {
 	return ""
 }
 
+func (x *GetBlobRequest) SetKey(v string) {
+	x.Key = v
+}
+
+func (x *GetBlobRequest) SetBucket(v string) {
+	x.Bucket = v
+}
+
+type GetBlobRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Key of blob to retrieve attributes.
+	Key string
+	// Bucket to write blob (may be optional).
+	Bucket string
+}
+
+func (b0 GetBlobRequest_builder) Build() *GetBlobRequest {
+	m0 := &GetBlobRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Key = b.Key
+	x.Bucket = b.Bucket
+	return m0
+}
+
 type GetBlobResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Key of blob of retrieved attributes.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// CacheControl specifies caching attributes that services may use
@@ -364,11 +507,6 @@ func (x *GetBlobResponse) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetBlobResponse.ProtoReflect.Descriptor instead.
-func (*GetBlobResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetBlobResponse) GetKey() string {
@@ -455,8 +593,139 @@ func (x *GetBlobResponse) GetEtag() string {
 	return ""
 }
 
+func (x *GetBlobResponse) SetKey(v string) {
+	x.Key = v
+}
+
+func (x *GetBlobResponse) SetCacheControl(v string) {
+	x.CacheControl = v
+}
+
+func (x *GetBlobResponse) SetContentDisposition(v string) {
+	x.ContentDisposition = v
+}
+
+func (x *GetBlobResponse) SetContentEncoding(v string) {
+	x.ContentEncoding = v
+}
+
+func (x *GetBlobResponse) SetContentLanguage(v string) {
+	x.ContentLanguage = v
+}
+
+func (x *GetBlobResponse) SetContentType(v string) {
+	x.ContentType = v
+}
+
+func (x *GetBlobResponse) SetMetadata(v map[string]string) {
+	x.Metadata = v
+}
+
+func (x *GetBlobResponse) SetCreateTime(v *timestamppb.Timestamp) {
+	x.CreateTime = v
+}
+
+func (x *GetBlobResponse) SetModTime(v *timestamppb.Timestamp) {
+	x.ModTime = v
+}
+
+func (x *GetBlobResponse) SetSize(v int64) {
+	x.Size = v
+}
+
+func (x *GetBlobResponse) SetMd5(v string) {
+	x.Md5 = v
+}
+
+func (x *GetBlobResponse) SetEtag(v string) {
+	x.Etag = v
+}
+
+func (x *GetBlobResponse) HasCreateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.CreateTime != nil
+}
+
+func (x *GetBlobResponse) HasModTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.ModTime != nil
+}
+
+func (x *GetBlobResponse) ClearCreateTime() {
+	x.CreateTime = nil
+}
+
+func (x *GetBlobResponse) ClearModTime() {
+	x.ModTime = nil
+}
+
+type GetBlobResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Key of blob of retrieved attributes.
+	Key string
+	// CacheControl specifies caching attributes that services may use
+	// when serving the blob.
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
+	CacheControl string
+	// ContentDisposition specifies whether the blob content is expected to be
+	// displayed inline or as an attachment.
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
+	ContentDisposition string
+	// ContentEncoding specifies the encoding used for the blob's content, if any.
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding
+	ContentEncoding string
+	// ContentLanguage specifies the language used in the blob's content, if any.
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Language
+	ContentLanguage string
+	// ContentType is the MIME type of the blob. It will not be empty.
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type
+	ContentType string
+	// Metadata holds key/value pairs associated with the blob.
+	// Keys are guaranteed to be in lowercase, even if the backend service
+	// has case-sensitive keys (although note that Metadata written via
+	// this package will always be lowercased). If there are duplicate
+	// case-insensitive keys (e.g., "foo" and "FOO"), only one value
+	// will be kept, and it is undefined which one.
+	Metadata map[string]string
+	// CreateTime is the time the blob was created, if available. If not available,
+	// CreateTime will be the zero time.
+	CreateTime *timestamppb.Timestamp
+	// ModTime is the time the blob was last modified.
+	ModTime *timestamppb.Timestamp
+	// Size is the size of the blob's content in bytes.
+	Size int64
+	// MD5 is an MD5 hash of the blob contents or nil if not available.
+	Md5 string
+	// ETag for the blob; see https://en.wikipedia.org/wiki/HTTP_ETag.
+	Etag string
+}
+
+func (b0 GetBlobResponse_builder) Build() *GetBlobResponse {
+	m0 := &GetBlobResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Key = b.Key
+	x.CacheControl = b.CacheControl
+	x.ContentDisposition = b.ContentDisposition
+	x.ContentEncoding = b.ContentEncoding
+	x.ContentLanguage = b.ContentLanguage
+	x.ContentType = b.ContentType
+	x.Metadata = b.Metadata
+	x.CreateTime = b.CreateTime
+	x.ModTime = b.ModTime
+	x.Size = b.Size
+	x.Md5 = b.Md5
+	x.Etag = b.Etag
+	return m0
+}
+
 type ReadBlobLinesRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Key of blob to read.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// Line delimiter; default: \n.
@@ -496,11 +765,6 @@ func (x *ReadBlobLinesRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ReadBlobLinesRequest.ProtoReflect.Descriptor instead.
-func (*ReadBlobLinesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ReadBlobLinesRequest) GetKey() string {
@@ -545,8 +809,62 @@ func (x *ReadBlobLinesRequest) GetJsonArrayMode() bool {
 	return false
 }
 
+func (x *ReadBlobLinesRequest) SetKey(v string) {
+	x.Key = v
+}
+
+func (x *ReadBlobLinesRequest) SetDelimiter(v string) {
+	x.Delimiter = v
+}
+
+func (x *ReadBlobLinesRequest) SetMaxSize(v int64) {
+	x.MaxSize = v
+}
+
+func (x *ReadBlobLinesRequest) SetBucket(v string) {
+	x.Bucket = v
+}
+
+func (x *ReadBlobLinesRequest) SetLineFormat(v LineFormat) {
+	x.LineFormat = v
+}
+
+func (x *ReadBlobLinesRequest) SetJsonArrayMode(v bool) {
+	x.JsonArrayMode = v
+}
+
+type ReadBlobLinesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Key of blob to read.
+	Key string
+	// Line delimiter; default: \n.
+	Delimiter string
+	// Max size (in bytes) of individual line.
+	MaxSize int64
+	// Bucket to read blob (may be optional).
+	Bucket string
+	// Format of lines to read (default: LINE_FORMAT_RAW if unspecified).
+	LineFormat LineFormat
+	// JSON array mode: if true (when line_format is JSON), expects root JSON array; if false, expects newline-delimited JSON (default).
+	JsonArrayMode bool
+}
+
+func (b0 ReadBlobLinesRequest_builder) Build() *ReadBlobLinesRequest {
+	m0 := &ReadBlobLinesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Key = b.Key
+	x.Delimiter = b.Delimiter
+	x.MaxSize = b.MaxSize
+	x.Bucket = b.Bucket
+	x.LineFormat = b.LineFormat
+	x.JsonArrayMode = b.JsonArrayMode
+	return m0
+}
+
 type ReadBlobLinesResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Key of blob read.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// Types that are valid to be assigned to Line:
@@ -583,11 +901,6 @@ func (x *ReadBlobLinesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ReadBlobLinesResponse.ProtoReflect.Descriptor instead.
-func (*ReadBlobLinesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *ReadBlobLinesResponse) GetKey() string {
 	if x != nil {
 		return x.Key
@@ -620,6 +933,119 @@ func (x *ReadBlobLinesResponse) GetJson() *structpb.Value {
 	return nil
 }
 
+func (x *ReadBlobLinesResponse) SetKey(v string) {
+	x.Key = v
+}
+
+func (x *ReadBlobLinesResponse) SetData(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.Line = &ReadBlobLinesResponse_Data{v}
+}
+
+func (x *ReadBlobLinesResponse) SetJson(v *structpb.Value) {
+	if v == nil {
+		x.Line = nil
+		return
+	}
+	x.Line = &ReadBlobLinesResponse_Json{v}
+}
+
+func (x *ReadBlobLinesResponse) HasLine() bool {
+	if x == nil {
+		return false
+	}
+	return x.Line != nil
+}
+
+func (x *ReadBlobLinesResponse) HasData() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Line.(*ReadBlobLinesResponse_Data)
+	return ok
+}
+
+func (x *ReadBlobLinesResponse) HasJson() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Line.(*ReadBlobLinesResponse_Json)
+	return ok
+}
+
+func (x *ReadBlobLinesResponse) ClearLine() {
+	x.Line = nil
+}
+
+func (x *ReadBlobLinesResponse) ClearData() {
+	if _, ok := x.Line.(*ReadBlobLinesResponse_Data); ok {
+		x.Line = nil
+	}
+}
+
+func (x *ReadBlobLinesResponse) ClearJson() {
+	if _, ok := x.Line.(*ReadBlobLinesResponse_Json); ok {
+		x.Line = nil
+	}
+}
+
+const ReadBlobLinesResponse_Line_not_set_case case_ReadBlobLinesResponse_Line = 0
+const ReadBlobLinesResponse_Data_case case_ReadBlobLinesResponse_Line = 2
+const ReadBlobLinesResponse_Json_case case_ReadBlobLinesResponse_Line = 3
+
+func (x *ReadBlobLinesResponse) WhichLine() case_ReadBlobLinesResponse_Line {
+	if x == nil {
+		return ReadBlobLinesResponse_Line_not_set_case
+	}
+	switch x.Line.(type) {
+	case *ReadBlobLinesResponse_Data:
+		return ReadBlobLinesResponse_Data_case
+	case *ReadBlobLinesResponse_Json:
+		return ReadBlobLinesResponse_Json_case
+	default:
+		return ReadBlobLinesResponse_Line_not_set_case
+	}
+}
+
+type ReadBlobLinesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Key of blob read.
+	Key string
+	// Fields of oneof Line:
+	// Raw line data.
+	Data []byte
+	// JSON parsed line data.
+	Json *structpb.Value
+	// -- end of Line
+}
+
+func (b0 ReadBlobLinesResponse_builder) Build() *ReadBlobLinesResponse {
+	m0 := &ReadBlobLinesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Key = b.Key
+	if b.Data != nil {
+		x.Line = &ReadBlobLinesResponse_Data{b.Data}
+	}
+	if b.Json != nil {
+		x.Line = &ReadBlobLinesResponse_Json{b.Json}
+	}
+	return m0
+}
+
+type case_ReadBlobLinesResponse_Line protoreflect.FieldNumber
+
+func (x case_ReadBlobLinesResponse_Line) String() string {
+	md := file_dtkt_blob_v1beta1_messages_proto_msgTypes[6].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isReadBlobLinesResponse_Line interface {
 	isReadBlobLinesResponse_Line()
 }
@@ -639,7 +1065,7 @@ func (*ReadBlobLinesResponse_Data) isReadBlobLinesResponse_Line() {}
 func (*ReadBlobLinesResponse_Json) isReadBlobLinesResponse_Line() {}
 
 type ReadBlobRangeRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Key of blob to read.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// Bucket to write blob (may be optional).
@@ -677,11 +1103,6 @@ func (x *ReadBlobRangeRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ReadBlobRangeRequest.ProtoReflect.Descriptor instead.
-func (*ReadBlobRangeRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *ReadBlobRangeRequest) GetKey() string {
 	if x != nil {
 		return x.Key
@@ -710,8 +1131,48 @@ func (x *ReadBlobRangeRequest) GetLength() int64 {
 	return 0
 }
 
+func (x *ReadBlobRangeRequest) SetKey(v string) {
+	x.Key = v
+}
+
+func (x *ReadBlobRangeRequest) SetBucket(v string) {
+	x.Bucket = v
+}
+
+func (x *ReadBlobRangeRequest) SetOffset(v uint64) {
+	x.Offset = v
+}
+
+func (x *ReadBlobRangeRequest) SetLength(v int64) {
+	x.Length = v
+}
+
+type ReadBlobRangeRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Key of blob to read.
+	Key string
+	// Bucket to write blob (may be optional).
+	Bucket string
+	// Read starting at offset.
+	Offset uint64
+	// Read at most length bytes if greater than 0. If less than 0, reads the whole blob.
+	Length int64
+}
+
+func (b0 ReadBlobRangeRequest_builder) Build() *ReadBlobRangeRequest {
+	m0 := &ReadBlobRangeRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Key = b.Key
+	x.Bucket = b.Bucket
+	x.Offset = b.Offset
+	x.Length = b.Length
+	return m0
+}
+
 type ReadBlobRangeResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Key of blob read.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// Data of blob range.
@@ -745,11 +1206,6 @@ func (x *ReadBlobRangeResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ReadBlobRangeResponse.ProtoReflect.Descriptor instead.
-func (*ReadBlobRangeResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *ReadBlobRangeResponse) GetKey() string {
 	if x != nil {
 		return x.Key
@@ -764,8 +1220,37 @@ func (x *ReadBlobRangeResponse) GetData() []byte {
 	return nil
 }
 
+func (x *ReadBlobRangeResponse) SetKey(v string) {
+	x.Key = v
+}
+
+func (x *ReadBlobRangeResponse) SetData(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.Data = v
+}
+
+type ReadBlobRangeResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Key of blob read.
+	Key string
+	// Data of blob range.
+	Data []byte
+}
+
+func (b0 ReadBlobRangeResponse_builder) Build() *ReadBlobRangeResponse {
+	m0 := &ReadBlobRangeResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Key = b.Key
+	x.Data = b.Data
+	return m0
+}
+
 type WriteBlobRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Key of blob to write.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// Bucket to write blob (may be optional).
@@ -817,11 +1302,6 @@ func (x *WriteBlobRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use WriteBlobRequest.ProtoReflect.Descriptor instead.
-func (*WriteBlobRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *WriteBlobRequest) GetKey() string {
@@ -908,8 +1388,107 @@ func (x *WriteBlobRequest) GetIfNotExist() bool {
 	return false
 }
 
+func (x *WriteBlobRequest) SetKey(v string) {
+	x.Key = v
+}
+
+func (x *WriteBlobRequest) SetBucket(v string) {
+	x.Bucket = v
+}
+
+func (x *WriteBlobRequest) SetData(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.Data = v
+}
+
+func (x *WriteBlobRequest) SetContentType(v string) {
+	x.ContentType = v
+}
+
+func (x *WriteBlobRequest) SetContentLanguage(v string) {
+	x.ContentLanguage = v
+}
+
+func (x *WriteBlobRequest) SetContentEncoding(v string) {
+	x.ContentEncoding = v
+}
+
+func (x *WriteBlobRequest) SetCacheControl(v string) {
+	x.CacheControl = v
+}
+
+func (x *WriteBlobRequest) SetContentDisposition(v string) {
+	x.ContentDisposition = v
+}
+
+func (x *WriteBlobRequest) SetMetadata(v map[string]string) {
+	x.Metadata = v
+}
+
+func (x *WriteBlobRequest) SetIfMatch(v string) {
+	x.IfMatch = v
+}
+
+func (x *WriteBlobRequest) SetIfNoneMatch(v string) {
+	x.IfNoneMatch = v
+}
+
+func (x *WriteBlobRequest) SetIfNotExist(v bool) {
+	x.IfNotExist = v
+}
+
+type WriteBlobRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Key of blob to write.
+	Key string
+	// Bucket to write blob (may be optional).
+	Bucket string
+	// Raw blob payload.
+	Data []byte
+	// MIME type for the blob payload.
+	ContentType string
+	// Language for the blob payload.
+	ContentLanguage string
+	// Content encoding for the blob payload.
+	ContentEncoding string
+	// Cache control directives.
+	CacheControl string
+	// Content disposition for the blob payload.
+	ContentDisposition string
+	// Blob metadata (all keys lower-case).
+	Metadata map[string]string
+	// Require the blob to match the provided ETag before writing.
+	IfMatch string
+	// Require the blob to *not* match the provided ETag before writing.
+	IfNoneMatch string
+	// Require the blob does not already exist before writing.
+	IfNotExist bool
+}
+
+func (b0 WriteBlobRequest_builder) Build() *WriteBlobRequest {
+	m0 := &WriteBlobRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Key = b.Key
+	x.Bucket = b.Bucket
+	x.Data = b.Data
+	x.ContentType = b.ContentType
+	x.ContentLanguage = b.ContentLanguage
+	x.ContentEncoding = b.ContentEncoding
+	x.CacheControl = b.CacheControl
+	x.ContentDisposition = b.ContentDisposition
+	x.Metadata = b.Metadata
+	x.IfMatch = b.IfMatch
+	x.IfNoneMatch = b.IfNoneMatch
+	x.IfNotExist = b.IfNotExist
+	return m0
+}
+
 type WriteBlobResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Key of the written blob.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// Size of the stored blob.
@@ -947,11 +1526,6 @@ func (x *WriteBlobResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WriteBlobResponse.ProtoReflect.Descriptor instead.
-func (*WriteBlobResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *WriteBlobResponse) GetKey() string {
 	if x != nil {
 		return x.Key
@@ -980,8 +1554,59 @@ func (x *WriteBlobResponse) GetEtag() string {
 	return ""
 }
 
+func (x *WriteBlobResponse) SetKey(v string) {
+	x.Key = v
+}
+
+func (x *WriteBlobResponse) SetSize(v int64) {
+	x.Size = v
+}
+
+func (x *WriteBlobResponse) SetModTime(v *timestamppb.Timestamp) {
+	x.ModTime = v
+}
+
+func (x *WriteBlobResponse) SetEtag(v string) {
+	x.Etag = v
+}
+
+func (x *WriteBlobResponse) HasModTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.ModTime != nil
+}
+
+func (x *WriteBlobResponse) ClearModTime() {
+	x.ModTime = nil
+}
+
+type WriteBlobResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Key of the written blob.
+	Key string
+	// Size of the stored blob.
+	Size int64
+	// Modification time reported by the provider.
+	ModTime *timestamppb.Timestamp
+	// ETag assigned by the provider.
+	Etag string
+}
+
+func (b0 WriteBlobResponse_builder) Build() *WriteBlobResponse {
+	m0 := &WriteBlobResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Key = b.Key
+	x.Size = b.Size
+	x.ModTime = b.ModTime
+	x.Etag = b.Etag
+	return m0
+}
+
 type WriteBlobLinesRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Key of blob to write.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// Bucket to write blob (may be optional).
@@ -1017,11 +1642,6 @@ func (x *WriteBlobLinesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WriteBlobLinesRequest.ProtoReflect.Descriptor instead.
-func (*WriteBlobLinesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{11}
-}
-
 func (x *WriteBlobLinesRequest) GetKey() string {
 	if x != nil {
 		return x.Key
@@ -1043,8 +1663,44 @@ func (x *WriteBlobLinesRequest) GetData() []byte {
 	return nil
 }
 
+func (x *WriteBlobLinesRequest) SetKey(v string) {
+	x.Key = v
+}
+
+func (x *WriteBlobLinesRequest) SetBucket(v string) {
+	x.Bucket = v
+}
+
+func (x *WriteBlobLinesRequest) SetData(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.Data = v
+}
+
+type WriteBlobLinesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Key of blob to write.
+	Key string
+	// Bucket to write blob (may be optional).
+	Bucket string
+	// Data of blob line.
+	Data []byte
+}
+
+func (b0 WriteBlobLinesRequest_builder) Build() *WriteBlobLinesRequest {
+	m0 := &WriteBlobLinesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Key = b.Key
+	x.Bucket = b.Bucket
+	x.Data = b.Data
+	return m0
+}
+
 type WriteBlobLinesResponse struct {
-	state         protoimpl.MessageState              `protogen:"open.v1"`
+	state         protoimpl.MessageState              `protogen:"hybrid.v1"`
 	Results       []*WriteBlobLinesResponse_KeyResult `protobuf:"bytes,1,rep,name=results,proto3" json:"results,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1075,11 +1731,6 @@ func (x *WriteBlobLinesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WriteBlobLinesResponse.ProtoReflect.Descriptor instead.
-func (*WriteBlobLinesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{12}
-}
-
 func (x *WriteBlobLinesResponse) GetResults() []*WriteBlobLinesResponse_KeyResult {
 	if x != nil {
 		return x.Results
@@ -1087,8 +1738,26 @@ func (x *WriteBlobLinesResponse) GetResults() []*WriteBlobLinesResponse_KeyResul
 	return nil
 }
 
+func (x *WriteBlobLinesResponse) SetResults(v []*WriteBlobLinesResponse_KeyResult) {
+	x.Results = v
+}
+
+type WriteBlobLinesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Results []*WriteBlobLinesResponse_KeyResult
+}
+
+func (b0 WriteBlobLinesResponse_builder) Build() *WriteBlobLinesResponse {
+	m0 := &WriteBlobLinesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Results = b.Results
+	return m0
+}
+
 type DeleteBlobRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Key of blob to delete.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// Bucket to write blob (may be optional).
@@ -1122,11 +1791,6 @@ func (x *DeleteBlobRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteBlobRequest.ProtoReflect.Descriptor instead.
-func (*DeleteBlobRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{13}
-}
-
 func (x *DeleteBlobRequest) GetKey() string {
 	if x != nil {
 		return x.Key
@@ -1141,8 +1805,34 @@ func (x *DeleteBlobRequest) GetBucket() string {
 	return ""
 }
 
+func (x *DeleteBlobRequest) SetKey(v string) {
+	x.Key = v
+}
+
+func (x *DeleteBlobRequest) SetBucket(v string) {
+	x.Bucket = v
+}
+
+type DeleteBlobRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Key of blob to delete.
+	Key string
+	// Bucket to write blob (may be optional).
+	Bucket string
+}
+
+func (b0 DeleteBlobRequest_builder) Build() *DeleteBlobRequest {
+	m0 := &DeleteBlobRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Key = b.Key
+	x.Bucket = b.Bucket
+	return m0
+}
+
 type DeleteBlobResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Indicates if the delete operation succeeded.
 	Deleted bool `protobuf:"varint,1,opt,name=deleted,proto3" json:"deleted,omitempty"`
 	// ETag of the deleted blob if reported.
@@ -1176,11 +1866,6 @@ func (x *DeleteBlobResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteBlobResponse.ProtoReflect.Descriptor instead.
-func (*DeleteBlobResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{14}
-}
-
 func (x *DeleteBlobResponse) GetDeleted() bool {
 	if x != nil {
 		return x.Deleted
@@ -1195,8 +1880,34 @@ func (x *DeleteBlobResponse) GetEtag() string {
 	return ""
 }
 
+func (x *DeleteBlobResponse) SetDeleted(v bool) {
+	x.Deleted = v
+}
+
+func (x *DeleteBlobResponse) SetEtag(v string) {
+	x.Etag = v
+}
+
+type DeleteBlobResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Indicates if the delete operation succeeded.
+	Deleted bool
+	// ETag of the deleted blob if reported.
+	Etag string
+}
+
+func (b0 DeleteBlobResponse_builder) Build() *DeleteBlobResponse {
+	m0 := &DeleteBlobResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Deleted = b.Deleted
+	x.Etag = b.Etag
+	return m0
+}
+
 type CopyBlobRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Source bucket name. If empty, defaults to destination bucket.
 	SourceBucket string `protobuf:"bytes,1,opt,name=source_bucket,json=sourceBucket,proto3" json:"source_bucket,omitempty"`
 	// Source key to copy from.
@@ -1236,11 +1947,6 @@ func (x *CopyBlobRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CopyBlobRequest.ProtoReflect.Descriptor instead.
-func (*CopyBlobRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *CopyBlobRequest) GetSourceBucket() string {
@@ -1285,8 +1991,62 @@ func (x *CopyBlobRequest) GetMetadata() map[string]string {
 	return nil
 }
 
+func (x *CopyBlobRequest) SetSourceBucket(v string) {
+	x.SourceBucket = v
+}
+
+func (x *CopyBlobRequest) SetSourceKey(v string) {
+	x.SourceKey = v
+}
+
+func (x *CopyBlobRequest) SetDestinationBucket(v string) {
+	x.DestinationBucket = v
+}
+
+func (x *CopyBlobRequest) SetDestinationKey(v string) {
+	x.DestinationKey = v
+}
+
+func (x *CopyBlobRequest) SetOverwrite(v bool) {
+	x.Overwrite = v
+}
+
+func (x *CopyBlobRequest) SetMetadata(v map[string]string) {
+	x.Metadata = v
+}
+
+type CopyBlobRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Source bucket name. If empty, defaults to destination bucket.
+	SourceBucket string
+	// Source key to copy from.
+	SourceKey string
+	// Destination bucket name
+	DestinationBucket string
+	// Destination key to copy to.
+	DestinationKey string
+	// Overwrite the destination blob when it already exists.
+	Overwrite bool
+	// Replacement metadata (optional).
+	Metadata map[string]string
+}
+
+func (b0 CopyBlobRequest_builder) Build() *CopyBlobRequest {
+	m0 := &CopyBlobRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.SourceBucket = b.SourceBucket
+	x.SourceKey = b.SourceKey
+	x.DestinationBucket = b.DestinationBucket
+	x.DestinationKey = b.DestinationKey
+	x.Overwrite = b.Overwrite
+	x.Metadata = b.Metadata
+	return m0
+}
+
 type CopyBlobResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Destination key of the copied blob.
 	DestinationKey string `protobuf:"bytes,1,opt,name=destination_key,json=destinationKey,proto3" json:"destination_key,omitempty"`
 	// Size of the copied blob.
@@ -1324,11 +2084,6 @@ func (x *CopyBlobResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CopyBlobResponse.ProtoReflect.Descriptor instead.
-func (*CopyBlobResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{16}
-}
-
 func (x *CopyBlobResponse) GetDestinationKey() string {
 	if x != nil {
 		return x.DestinationKey
@@ -1357,8 +2112,59 @@ func (x *CopyBlobResponse) GetEtag() string {
 	return ""
 }
 
+func (x *CopyBlobResponse) SetDestinationKey(v string) {
+	x.DestinationKey = v
+}
+
+func (x *CopyBlobResponse) SetSize(v int64) {
+	x.Size = v
+}
+
+func (x *CopyBlobResponse) SetModTime(v *timestamppb.Timestamp) {
+	x.ModTime = v
+}
+
+func (x *CopyBlobResponse) SetEtag(v string) {
+	x.Etag = v
+}
+
+func (x *CopyBlobResponse) HasModTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.ModTime != nil
+}
+
+func (x *CopyBlobResponse) ClearModTime() {
+	x.ModTime = nil
+}
+
+type CopyBlobResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Destination key of the copied blob.
+	DestinationKey string
+	// Size of the copied blob.
+	Size int64
+	// Modification time reported after copy.
+	ModTime *timestamppb.Timestamp
+	// ETag assigned at destination.
+	Etag string
+}
+
+func (b0 CopyBlobResponse_builder) Build() *CopyBlobResponse {
+	m0 := &CopyBlobResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.DestinationKey = b.DestinationKey
+	x.Size = b.Size
+	x.ModTime = b.ModTime
+	x.Etag = b.Etag
+	return m0
+}
+
 type GenerateSignedURLRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Key of blob to sign.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// Bucket to write blob (may be optional).
@@ -1400,11 +2206,6 @@ func (x *GenerateSignedURLRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GenerateSignedURLRequest.ProtoReflect.Descriptor instead.
-func (*GenerateSignedURLRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *GenerateSignedURLRequest) GetKey() string {
@@ -1456,8 +2257,80 @@ func (x *GenerateSignedURLRequest) GetHeaders() map[string]string {
 	return nil
 }
 
+func (x *GenerateSignedURLRequest) SetKey(v string) {
+	x.Key = v
+}
+
+func (x *GenerateSignedURLRequest) SetBucket(v string) {
+	x.Bucket = v
+}
+
+func (x *GenerateSignedURLRequest) SetMethod(v SignedURLMethod) {
+	x.Method = v
+}
+
+func (x *GenerateSignedURLRequest) SetExpiresIn(v *durationpb.Duration) {
+	x.ExpiresIn = v
+}
+
+func (x *GenerateSignedURLRequest) SetContentType(v string) {
+	x.ContentType = v
+}
+
+func (x *GenerateSignedURLRequest) SetQueryParameters(v map[string]string) {
+	x.QueryParameters = v
+}
+
+func (x *GenerateSignedURLRequest) SetHeaders(v map[string]string) {
+	x.Headers = v
+}
+
+func (x *GenerateSignedURLRequest) HasExpiresIn() bool {
+	if x == nil {
+		return false
+	}
+	return x.ExpiresIn != nil
+}
+
+func (x *GenerateSignedURLRequest) ClearExpiresIn() {
+	x.ExpiresIn = nil
+}
+
+type GenerateSignedURLRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Key of blob to sign.
+	Key string
+	// Bucket to write blob (may be optional).
+	Bucket string
+	// HTTP method the signed URL will permit.
+	Method SignedURLMethod
+	// Duration the signed URL remains valid.
+	ExpiresIn *durationpb.Duration
+	// Expected content type when using the signed URL.
+	ContentType string
+	// Additional query parameters enforced by the signed URL.
+	QueryParameters map[string]string
+	// Additional headers enforced by the signed URL.
+	Headers map[string]string
+}
+
+func (b0 GenerateSignedURLRequest_builder) Build() *GenerateSignedURLRequest {
+	m0 := &GenerateSignedURLRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Key = b.Key
+	x.Bucket = b.Bucket
+	x.Method = b.Method
+	x.ExpiresIn = b.ExpiresIn
+	x.ContentType = b.ContentType
+	x.QueryParameters = b.QueryParameters
+	x.Headers = b.Headers
+	return m0
+}
+
 type GenerateSignedURLResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Fully qualified signed URL.
 	Url string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
 	// Expiration timestamp when the signed URL becomes invalid.
@@ -1491,11 +2364,6 @@ func (x *GenerateSignedURLResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GenerateSignedURLResponse.ProtoReflect.Descriptor instead.
-func (*GenerateSignedURLResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{18}
-}
-
 func (x *GenerateSignedURLResponse) GetUrl() string {
 	if x != nil {
 		return x.Url
@@ -1510,8 +2378,45 @@ func (x *GenerateSignedURLResponse) GetExpiresAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *GenerateSignedURLResponse) SetUrl(v string) {
+	x.Url = v
+}
+
+func (x *GenerateSignedURLResponse) SetExpiresAt(v *timestamppb.Timestamp) {
+	x.ExpiresAt = v
+}
+
+func (x *GenerateSignedURLResponse) HasExpiresAt() bool {
+	if x == nil {
+		return false
+	}
+	return x.ExpiresAt != nil
+}
+
+func (x *GenerateSignedURLResponse) ClearExpiresAt() {
+	x.ExpiresAt = nil
+}
+
+type GenerateSignedURLResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fully qualified signed URL.
+	Url string
+	// Expiration timestamp when the signed URL becomes invalid.
+	ExpiresAt *timestamppb.Timestamp
+}
+
+func (b0 GenerateSignedURLResponse_builder) Build() *GenerateSignedURLResponse {
+	m0 := &GenerateSignedURLResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Url = b.Url
+	x.ExpiresAt = b.ExpiresAt
+	return m0
+}
+
 type WriteBlobLinesResponse_KeyResult struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Key of blob to write.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// Size of the stored blob.
@@ -1551,11 +2456,6 @@ func (x *WriteBlobLinesResponse_KeyResult) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WriteBlobLinesResponse_KeyResult.ProtoReflect.Descriptor instead.
-func (*WriteBlobLinesResponse_KeyResult) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{12, 0}
-}
-
 func (x *WriteBlobLinesResponse_KeyResult) GetKey() string {
 	if x != nil {
 		return x.Key
@@ -1589,6 +2489,64 @@ func (x *WriteBlobLinesResponse_KeyResult) GetLinesWritten() int64 {
 		return x.LinesWritten
 	}
 	return 0
+}
+
+func (x *WriteBlobLinesResponse_KeyResult) SetKey(v string) {
+	x.Key = v
+}
+
+func (x *WriteBlobLinesResponse_KeyResult) SetSize(v int64) {
+	x.Size = v
+}
+
+func (x *WriteBlobLinesResponse_KeyResult) SetModTime(v *timestamppb.Timestamp) {
+	x.ModTime = v
+}
+
+func (x *WriteBlobLinesResponse_KeyResult) SetEtag(v string) {
+	x.Etag = v
+}
+
+func (x *WriteBlobLinesResponse_KeyResult) SetLinesWritten(v int64) {
+	x.LinesWritten = v
+}
+
+func (x *WriteBlobLinesResponse_KeyResult) HasModTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.ModTime != nil
+}
+
+func (x *WriteBlobLinesResponse_KeyResult) ClearModTime() {
+	x.ModTime = nil
+}
+
+type WriteBlobLinesResponse_KeyResult_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Key of blob to write.
+	Key string
+	// Size of the stored blob.
+	Size int64
+	// Modification time reported by the provider.
+	ModTime *timestamppb.Timestamp
+	// ETag assigned by the provider.
+	Etag string
+	// Total lines written.
+	LinesWritten int64
+}
+
+func (b0 WriteBlobLinesResponse_KeyResult_builder) Build() *WriteBlobLinesResponse_KeyResult {
+	m0 := &WriteBlobLinesResponse_KeyResult{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Key = b.Key
+	x.Size = b.Size
+	x.ModTime = b.ModTime
+	x.Etag = b.Etag
+	x.LinesWritten = b.LinesWritten
+	return m0
 }
 
 var File_dtkt_blob_v1beta1_messages_proto protoreflect.FileDescriptor
@@ -1732,18 +2690,6 @@ const file_dtkt_blob_v1beta1_messages_proto_rawDesc = "" +
 	"\n" +
 	"expires_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAtB\xda\x01\n" +
 	"\x17proto.dtkt.blob.v1beta1B\rMessagesProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/blob/v1beta1;blobv1beta1\xa2\x02\x03DBX\xaa\x02\x11Dtkt.Blob.V1beta1\xca\x02\x11Dtkt\\Blob\\V1beta1\xe2\x02\x1dDtkt\\Blob\\V1beta1\\GPBMetadata\xea\x02\x13Dtkt::Blob::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_blob_v1beta1_messages_proto_rawDescOnce sync.Once
-	file_dtkt_blob_v1beta1_messages_proto_rawDescData []byte
-)
-
-func file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP() []byte {
-	file_dtkt_blob_v1beta1_messages_proto_rawDescOnce.Do(func() {
-		file_dtkt_blob_v1beta1_messages_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_blob_v1beta1_messages_proto_rawDesc), len(file_dtkt_blob_v1beta1_messages_proto_rawDesc)))
-	})
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescData
-}
 
 var file_dtkt_blob_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
 var file_dtkt_blob_v1beta1_messages_proto_goTypes = []any{

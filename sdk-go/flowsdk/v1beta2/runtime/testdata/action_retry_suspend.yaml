@@ -1,0 +1,21 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: action_retry_suspend
+  inputs:
+    - id: msg
+      int64: {}
+  actions:
+    - id: echo
+      retry_strategy:
+        suspend_when: "= this.error.code == 7"
+        backoff:
+          initial_backoff: "0.001s"
+          max_attempts: 1
+      call:
+        connection: echo
+        method: error.PermissionDenied
+        request: "= inputs.msg.value"
+  outputs:
+    - id: result
+      value: "= actions.echo.value"

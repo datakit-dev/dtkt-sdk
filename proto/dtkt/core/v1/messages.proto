@@ -5,6 +5,10 @@ package dtkt.core.v1;
 import "buf/validate/validate.proto";
 import "dtkt/flow/v1beta1/eval.proto";
 import "dtkt/flow/v1beta1/spec.proto";
+import "dtkt/flow/v1beta2/events.proto";
+import "dtkt/flow/v1beta2/graph.proto";
+import "dtkt/flow/v1beta2/spec.proto";
+import "dtkt/flow/v1beta2/state.proto";
 import "dtkt/protoform/v1beta1/protoform.proto";
 import "dtkt/shared/v1beta1/enums.proto";
 import "dtkt/shared/v1beta1/messages.proto";
@@ -277,6 +281,328 @@ message Flow {
     (buf.validate.field).required = true,
     (google.api.field_behavior) = OUTPUT_ONLY
   ];
+}
+
+// FlowRun is a runnable instance of a Flow with a tagged spec version and
+// start configuration.
+message FlowRun {
+  option (google.api.resource) = {
+    type: "FlowRun"
+    singular: "flowrun"
+    plural: "flowruns"
+    pattern: "organizations/{organization}/flowruns/{flowrun}"
+    pattern: "users/{user}/flowruns/{flowrun}"
+  };
+
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  enum State {
+    STATE_UNSPECIFIED = 0;
+    PROVISIONING = 10; // Infrastructure provisioning in progress (deployments, executor).
+    PENDING = 1; // Provisioned, waiting for start event.
+    RUNNING = 2; // Actively executing.
+    STOPPING = 3; // Inputs closed, pipeline draining.
+    SUCCEEDED = 4; // Completed cleanly (natural EOF or soft stop drained).
+    FAILED = 5; // Graceful drain after node error (error_strategy=STOP).
+    ERRORED = 6; // Node error with terminate or all paths blocked (error_strategy=TERMINATE or CONTINUE).
+    SUSPENDED = 7; // SuspendFlowEvent or all runnable paths blocked behind suspended nodes.
+    CANCELLED = 8; // Hard cancel, context killed.
+    TERMINATING = 9; // Context cancellation in progress (transient before CANCELLED).
+  }
+
+  // FlowRun state.
+  State state = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // FlowRun metadata.
+  FlowRunMetadata run_state = 4 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Name of flow resource to resolve spec.
+  string flow = 5 [
+    (buf.validate.field).required = true,
+    (google.api.resource_reference).type = "Flow",
+    (dtkt.protoform.v1beta1.field).title = "Flow",
+    (dtkt.protoform.v1beta1.field).description = "Select a flow.",
+    (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.core.v1.FlowService.ListFlows",
+    (dtkt.protoform.v1beta1.field).select.key_expr = "this.flows.map(i, i.name)",
+    (dtkt.protoform.v1beta1.field).select.val_expr = "this.flows.map(i, i.name)"
+  ];
+
+  // Checksum of flow spec must match flow when resolving spec (concurrency control).
+  string spec_etag = 6 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = INPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Connections configuration as map of connection node id to connection
+  // resource name and context (control plane).
+  // Examples:
+  // ```
+  // - "storage": {
+  //      "name": "users/bob/connections/localblob",
+  //      "context": {
+  //        "name": "users/bob",
+  //        ...
+  //      },
+  //    }
+  // ```
+  map<string, FlowConnectionMetadata> connections = 7;
+
+  // Initial inputs configuration as map of input node id to valid data of input
+  // node's declared type (well-known type wrappers used for scalar values).
+  // Format:
+  // ```
+  // - "bucketName": "my-storage-bucket"
+  // - "adSettings": { "bid": 100 }
+  // ```
+  map<string, google.protobuf.Any> inputs = 8;
+
+  // Execution is stopped if total time exceeds given duration.
+  // Default: 0 (no timeout).
+  google.protobuf.Duration timeout = 9;
+
+  // Server-assigned batch name if created within a batch (optional).
+  optional string batch = 10 [(dtkt.protoform.v1beta1.field).hidden = true];
+
+  // Enable durable persistence for this flow run. When true, events and state
+  // are written atomically to the outbox store, enabling replay and recovery.
+  // When false, events are ephemeral (in-memory only). (default: true)
+  bool persist = 11;
+
+  // Etag for concurrency control of FlowRun updates (must match current etag
+  // to update or delete).
+  string etag = 15 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true,
+    debug_redact = true
+  ];
+
+  // FlowRun create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // FlowRun update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+}
+
+message GetFlowRunRequest {
+  // Name of FlowRun resource to get.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetFlowRunResponse {
+  // The requested flowrun.
+  FlowRun flowrun = 1 [(buf.validate.field).required = true];
+}
+
+message CreateFlowRunRequest {
+  // Parent resource name.
+  string parent = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  string flowrun_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$",
+    (dtkt.protoform.v1beta1.field).description = "FlowRun ID"
+  ];
+
+  // FlowRun to create.
+  FlowRun flowrun = 3 [(buf.validate.field).required = true];
+}
+
+message CreateFlowRunResponse {
+  // The created flowrun.
+  FlowRun flowrun = 1 [(buf.validate.field).required = true];
+}
+
+message UpdateFlowRunRequest {
+  // FlowRun with updated fields. Must include `name`.
+  FlowRun flowrun = 1 [(buf.validate.field).required = true];
+
+  // Fields to update (e.g., "config,address").
+  google.protobuf.FieldMask update_mask = 2;
+
+  // Desired state of flowrun after update.
+  optional FlowRun.State desired_state = 3 [(buf.validate.field).enum = {
+    in: [
+      2,
+      3
+    ]
+  } /* RUNNING or STOPPED */];
+}
+
+message DeleteFlowRunRequest {
+  // Name of flowrun to delete.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Etag must match current flowrun etag for delete to succeed (ensures
+  // flowrun is up-to-date and prevents lost deletes).
+  string etag = 2 [(buf.validate.field).required = true];
+}
+
+message BatchCreateFlowRunsRequest {
+  option (buf.validate.message).cel = {
+    id: "batch_create_flowruns.requests"
+    message: "requests must use the same parent"
+    expression: "size(this.requests.filter(r, r.parent == this.parent)) == size(this.requests)"
+  };
+
+  // Parent resource name shared by all flowruns this batch.
+  string parent = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  repeated CreateFlowRunRequest requests = 2 [(buf.validate.field).repeated.min_items = 2];
+}
+
+message BatchCreateFlowRunsResponse {
+  // The created flowruns.
+  repeated FlowRun flowruns = 1 [(buf.validate.field).required = true];
+}
+
+message ListFlowRunsRequest {
+  // Maximum number of flowruns to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name: `organizations/{organization}` or `users/{user}`.
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListFlowRunsResponse {
+  // The list of flowruns.
+  repeated FlowRun flowruns = 1 [(buf.validate.field).required = true];
+
+  // Token for retrieving the next page.
+  string next_page_token = 2;
+}
+
+// SendFlowRunEvent represents an event sent to a flowrun (client -> executor).
+message SendFlowRunEvent {
+  oneof event {
+    option (buf.validate.oneof).required = true;
+    // Provide an input value to a specific input node.
+    dtkt.flow.v1beta2.InputEvent input = 1;
+    // Respond to an interaction request with a value and token.
+    dtkt.flow.v1beta2.InteractionResponseEvent interaction_response = 2;
+    // Request graceful shutdown: close inputs, drain pipeline.
+    dtkt.flow.v1beta2.StopFlowEvent stop = 3;
+    // Request immediate cancellation of the flow.
+    dtkt.flow.v1beta2.TerminateFlowEvent terminate = 4;
+    // Suspend all runnable nodes.
+    dtkt.flow.v1beta2.SuspendFlowEvent suspend = 5;
+    // Resume suspended/errored nodes.
+    dtkt.flow.v1beta2.ResumeFlowEvent resume = 6;
+    // Gracefully stop a specific node.
+    dtkt.flow.v1beta2.StopNodeEvent stop_node = 7;
+    // Immediately cancel a specific node.
+    dtkt.flow.v1beta2.TerminateNodeEvent terminate_node = 8;
+    // Suspend a specific node.
+    dtkt.flow.v1beta2.SuspendNodeEvent suspend_node = 9;
+    // Resume a specific suspended/errored node (optionally with a replacement value).
+    dtkt.flow.v1beta2.ResumeNodeEvent resume_node = 10;
+    // Start the flow executor. Must be sent after connecting the event stream
+    // to ensure no outputs are missed. Flow must be in PENDING state.
+    dtkt.flow.v1beta2.StartFlowEvent start = 11;
+  }
+}
+
+// ReceiveFlowRunEvent represents an event received from a flowrun (executor -> client).
+message ReceiveFlowRunEvent {
+  oneof event {
+    option (buf.validate.oneof).required = true;
+    // An output node produced a value.
+    dtkt.flow.v1beta2.OutputEvent output = 1;
+    // The executor is soliciting input for a specific input node.
+    dtkt.flow.v1beta2.InputRequestEvent input_request = 2;
+    // An interaction node needs external input (with token).
+    dtkt.flow.v1beta2.InteractionRequestEvent interaction_request = 3;
+    // FlowRun state change (phase transitions, terminal states).
+    FlowRun flowrun = 4;
+  }
+}
+
+message SendFlowRunEventRequest {
+  // Name of FlowRun resource to send event to.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Event to send.
+  SendFlowRunEvent event = 2 [(buf.validate.field).required = true];
+}
+
+message ReceiveFlowRunEventsRequest {
+  // Name of FlowRun resource to receive events from.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Optional cursor: receive only events after this event ID (UUIDv7).
+  // If empty, all available events are delivered from the beginning.
+  string after_event_id = 2;
+}
+
+message ReceiveFlowRunEventsResponse {
+  // The received event.
+  ReceiveFlowRunEvent event = 1 [(buf.validate.field).required = true];
+
+  // UUIDv7 event ID for cursor-based pagination. Pass this value as
+  // after_event_id in subsequent requests to resume from this point.
+  string event_id = 2;
+}
+
+message StreamFlowRunEventsRequest {
+  // Name of FlowRun resource.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Event to send.
+  SendFlowRunEvent event = 2;
+
+  // Optional cursor: receive only events after this event ID (UUIDv7).
+  // Only used on the first request to establish the starting position.
+  // If empty, all available events are delivered from the beginning.
+  string after_event_id = 3;
+}
+
+message StreamFlowRunEventsResponse {
+  // The received event.
+  ReceiveFlowRunEvent event = 1 [(buf.validate.field).required = true];
+
+  // UUIDv7 event ID for cursor-based pagination. Pass this value as
+  // after_event_id in subsequent requests to resume from this point.
+  string event_id = 2;
 }
 
 // Connection combines necessary components of a configured client to one of:
@@ -827,6 +1153,18 @@ message AutomationMetadata {
   google.protobuf.Timestamp stop_time = 11;
 }
 
+// FlowRunOperationMetadata contains metadata for flowrun operations.
+message FlowRunOperationMetadata {
+  // Status message.
+  string message = 1;
+
+  // Start time.
+  google.protobuf.Timestamp start_time = 10;
+
+  // Stop time.
+  google.protobuf.Timestamp stop_time = 11;
+}
+
 // DeploymentMetadata contains metadata for deployment operations.
 message DeploymentMetadata {
   // Status message.
@@ -865,11 +1203,20 @@ message FlowRuntimeMetadata {
   }
 }
 
+// FlowRunMetadata wraps a versioned executor flow run snapshot.
+message FlowRunMetadata {
+  oneof version {
+    option (buf.validate.oneof).required = true;
+    dtkt.flow.v1beta2.RunSnapshot v1beta2 = 1;
+  }
+}
+
 // FlowSpecMetadata wraps versioned flow specification.
 message FlowSpecMetadata {
   oneof version {
     option (buf.validate.oneof).required = true;
     dtkt.flow.v1beta1.Flow v1beta1 = 1;
+    dtkt.flow.v1beta2.Flow v1beta2 = 2;
   }
 }
 
@@ -878,6 +1225,7 @@ message FlowGraphMetadata {
   oneof version {
     option (buf.validate.oneof).required = true;
     dtkt.flow.v1beta1.Graph v1beta1 = 1;
+    dtkt.flow.v1beta2.Graph v1beta2 = 2;
   }
 }
 
@@ -1089,7 +1437,7 @@ message CreateAutomationRequest {
 
   string automation_id = 2 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^[a-z0-9-]+$",
+    (buf.validate.field).string.pattern = "^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$",
     (dtkt.protoform.v1beta1.field).description = "Automation ID"
   ];
 
@@ -1289,7 +1637,7 @@ message CreateConnectionRequest {
   // Client-provided ID for connection resource.
   string connection_id = 2 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^[a-z0-9-]+$",
+    (buf.validate.field).string.pattern = "^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$",
     (dtkt.protoform.v1beta1.field).description = "Connection ID"
   ];
 
@@ -1403,7 +1751,7 @@ message CreateDeploymentRequest {
   // Client-provided ID for deployment resource.
   string deployment_id = 2 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^[a-z0-9-]+$"
+    (buf.validate.field).string.pattern = "^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$"
   ];
 
   // Deployment to create (name ignored; server sets it).
@@ -1477,7 +1825,7 @@ message CreateFlowRequest {
   // Client-provided ID for flow resource.
   string flow_id = 2 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^[a-z0-9-]+$"
+    (buf.validate.field).string.pattern = "^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$"
   ];
 
   // Flow to create.
@@ -1551,7 +1899,7 @@ message CreateIntegrationRequest {
   // Client-provided ID for integration resource.
   string integration_id = 2 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^[a-z0-9-]+$"
+    (buf.validate.field).string.pattern = "^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$"
   ];
 
   // Integration to create.

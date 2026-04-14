@@ -1,0 +1,12 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fc_output_stop
+  inputs:
+    - id: x
+      int64: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value"
+      flow_control:
+        stop_when: "= true"

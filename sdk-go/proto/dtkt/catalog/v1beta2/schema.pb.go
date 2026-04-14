@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/catalog/v1beta2/schema.proto
 
+//go:build !protoopaque
+
 package catalogv1beta2
 
 import (
@@ -12,7 +14,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	fieldmaskpb "google.golang.org/protobuf/types/known/fieldmaskpb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -25,7 +26,7 @@ const (
 
 // Schema resource containing tables.
 type Schema struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Schema resource name, format: `catalogs/{catalog}/schemas/{schema}`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Schema identifier.
@@ -63,11 +64,6 @@ func (x *Schema) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Schema.ProtoReflect.Descriptor instead.
-func (*Schema) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_schema_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Schema) GetName() string {
 	if x != nil {
 		return x.Name
@@ -96,9 +92,49 @@ func (x *Schema) GetMetadata() map[string]string {
 	return nil
 }
 
+func (x *Schema) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Schema) SetSchemaId(v string) {
+	x.SchemaId = v
+}
+
+func (x *Schema) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *Schema) SetMetadata(v map[string]string) {
+	x.Metadata = v
+}
+
+type Schema_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Schema resource name, format: `catalogs/{catalog}/schemas/{schema}`.
+	Name string
+	// Schema identifier.
+	SchemaId string
+	// Description of the schema.
+	Description string
+	// Additional metadata, if any.
+	Metadata map[string]string
+}
+
+func (b0 Schema_builder) Build() *Schema {
+	m0 := &Schema{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.SchemaId = b.SchemaId
+	x.Description = b.Description
+	x.Metadata = b.Metadata
+	return m0
+}
+
 // Request message for listing schemas.
 type ListSchemasRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	Parent        string                 `protobuf:"bytes,3,opt,name=parent,proto3" json:"parent,omitempty"`
@@ -132,11 +168,6 @@ func (x *ListSchemasRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListSchemasRequest.ProtoReflect.Descriptor instead.
-func (*ListSchemasRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_schema_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *ListSchemasRequest) GetPageSize() int32 {
 	if x != nil {
 		return x.PageSize
@@ -165,9 +196,45 @@ func (x *ListSchemasRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListSchemasRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListSchemasRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListSchemasRequest) SetParent(v string) {
+	x.Parent = v
+}
+
+func (x *ListSchemasRequest) SetFilter(v string) {
+	x.Filter = v
+}
+
+type ListSchemasRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	PageSize  int32
+	PageToken string
+	Parent    string
+	Filter    string
+}
+
+func (b0 ListSchemasRequest_builder) Build() *ListSchemasRequest {
+	m0 := &ListSchemasRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.Parent = b.Parent
+	x.Filter = b.Filter
+	return m0
+}
+
 // Response message for listing schemas.
 type ListSchemasResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Schemas       []*Schema              `protobuf:"bytes,1,rep,name=schemas,proto3" json:"schemas,omitempty"`
 	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -199,11 +266,6 @@ func (x *ListSchemasResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListSchemasResponse.ProtoReflect.Descriptor instead.
-func (*ListSchemasResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_schema_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *ListSchemasResponse) GetSchemas() []*Schema {
 	if x != nil {
 		return x.Schemas
@@ -218,9 +280,33 @@ func (x *ListSchemasResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListSchemasResponse) SetSchemas(v []*Schema) {
+	x.Schemas = v
+}
+
+func (x *ListSchemasResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListSchemasResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Schemas       []*Schema
+	NextPageToken string
+}
+
+func (b0 ListSchemasResponse_builder) Build() *ListSchemasResponse {
+	m0 := &ListSchemasResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schemas = b.Schemas
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 // Get schema request.
 type GetSchemaRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Schema resource name to retrieve.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Metadata of the schema, if any.
@@ -254,11 +340,6 @@ func (x *GetSchemaRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetSchemaRequest.ProtoReflect.Descriptor instead.
-func (*GetSchemaRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_schema_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *GetSchemaRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -273,9 +354,35 @@ func (x *GetSchemaRequest) GetMetadata() map[string]string {
 	return nil
 }
 
+func (x *GetSchemaRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *GetSchemaRequest) SetMetadata(v map[string]string) {
+	x.Metadata = v
+}
+
+type GetSchemaRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Schema resource name to retrieve.
+	Name string
+	// Metadata of the schema, if any.
+	Metadata map[string]string
+}
+
+func (b0 GetSchemaRequest_builder) Build() *GetSchemaRequest {
+	m0 := &GetSchemaRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Metadata = b.Metadata
+	return m0
+}
+
 // Get schema response.
 type GetSchemaResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The retrieved schema.
 	Schema        *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -307,11 +414,6 @@ func (x *GetSchemaResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetSchemaResponse.ProtoReflect.Descriptor instead.
-func (*GetSchemaResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_schema_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *GetSchemaResponse) GetSchema() *Schema {
 	if x != nil {
 		return x.Schema
@@ -319,9 +421,39 @@ func (x *GetSchemaResponse) GetSchema() *Schema {
 	return nil
 }
 
+func (x *GetSchemaResponse) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *GetSchemaResponse) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *GetSchemaResponse) ClearSchema() {
+	x.Schema = nil
+}
+
+type GetSchemaResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The retrieved schema.
+	Schema *Schema
+}
+
+func (b0 GetSchemaResponse_builder) Build() *GetSchemaResponse {
+	m0 := &GetSchemaResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schema = b.Schema
+	return m0
+}
+
 // Create schema request.
 type CreateSchemaRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Parent catalog resource name.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// Schema identifier, e.g. final segment in resource name: `.../schemas/{schema}`
@@ -357,11 +489,6 @@ func (x *CreateSchemaRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateSchemaRequest.ProtoReflect.Descriptor instead.
-func (*CreateSchemaRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_schema_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *CreateSchemaRequest) GetParent() string {
 	if x != nil {
 		return x.Parent
@@ -383,9 +510,53 @@ func (x *CreateSchemaRequest) GetSchema() *Schema {
 	return nil
 }
 
+func (x *CreateSchemaRequest) SetParent(v string) {
+	x.Parent = v
+}
+
+func (x *CreateSchemaRequest) SetSchemaId(v string) {
+	x.SchemaId = v
+}
+
+func (x *CreateSchemaRequest) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *CreateSchemaRequest) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *CreateSchemaRequest) ClearSchema() {
+	x.Schema = nil
+}
+
+type CreateSchemaRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Parent catalog resource name.
+	Parent string
+	// Schema identifier, e.g. final segment in resource name: `.../schemas/{schema}`
+	SchemaId string
+	// Schema to create.
+	Schema *Schema
+}
+
+func (b0 CreateSchemaRequest_builder) Build() *CreateSchemaRequest {
+	m0 := &CreateSchemaRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Parent = b.Parent
+	x.SchemaId = b.SchemaId
+	x.Schema = b.Schema
+	return m0
+}
+
 // Create schema response.
 type CreateSchemaResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Schema created.
 	Schema        *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -417,11 +588,6 @@ func (x *CreateSchemaResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateSchemaResponse.ProtoReflect.Descriptor instead.
-func (*CreateSchemaResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_schema_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *CreateSchemaResponse) GetSchema() *Schema {
 	if x != nil {
 		return x.Schema
@@ -429,9 +595,39 @@ func (x *CreateSchemaResponse) GetSchema() *Schema {
 	return nil
 }
 
+func (x *CreateSchemaResponse) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *CreateSchemaResponse) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *CreateSchemaResponse) ClearSchema() {
+	x.Schema = nil
+}
+
+type CreateSchemaResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Schema created.
+	Schema *Schema
+}
+
+func (b0 CreateSchemaResponse_builder) Build() *CreateSchemaResponse {
+	m0 := &CreateSchemaResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schema = b.Schema
+	return m0
+}
+
 // Update schema request.
 type UpdateSchemaRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Schema with updated fields
 	Schema *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 	// Fields to update.
@@ -465,11 +661,6 @@ func (x *UpdateSchemaRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateSchemaRequest.ProtoReflect.Descriptor instead.
-func (*UpdateSchemaRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_schema_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *UpdateSchemaRequest) GetSchema() *Schema {
 	if x != nil {
 		return x.Schema
@@ -484,9 +675,57 @@ func (x *UpdateSchemaRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 	return nil
 }
 
+func (x *UpdateSchemaRequest) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *UpdateSchemaRequest) SetUpdateMask(v *fieldmaskpb.FieldMask) {
+	x.UpdateMask = v
+}
+
+func (x *UpdateSchemaRequest) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *UpdateSchemaRequest) HasUpdateMask() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateMask != nil
+}
+
+func (x *UpdateSchemaRequest) ClearSchema() {
+	x.Schema = nil
+}
+
+func (x *UpdateSchemaRequest) ClearUpdateMask() {
+	x.UpdateMask = nil
+}
+
+type UpdateSchemaRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Schema with updated fields
+	Schema *Schema
+	// Fields to update.
+	UpdateMask *fieldmaskpb.FieldMask
+}
+
+func (b0 UpdateSchemaRequest_builder) Build() *UpdateSchemaRequest {
+	m0 := &UpdateSchemaRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schema = b.Schema
+	x.UpdateMask = b.UpdateMask
+	return m0
+}
+
 // Update schema response.
 type UpdateSchemaResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The updated schema.
 	Schema        *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -518,11 +757,6 @@ func (x *UpdateSchemaResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateSchemaResponse.ProtoReflect.Descriptor instead.
-func (*UpdateSchemaResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_schema_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *UpdateSchemaResponse) GetSchema() *Schema {
 	if x != nil {
 		return x.Schema
@@ -530,9 +764,39 @@ func (x *UpdateSchemaResponse) GetSchema() *Schema {
 	return nil
 }
 
+func (x *UpdateSchemaResponse) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *UpdateSchemaResponse) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *UpdateSchemaResponse) ClearSchema() {
+	x.Schema = nil
+}
+
+type UpdateSchemaResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The updated schema.
+	Schema *Schema
+}
+
+func (b0 UpdateSchemaResponse_builder) Build() *UpdateSchemaResponse {
+	m0 := &UpdateSchemaResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schema = b.Schema
+	return m0
+}
+
 // Request message for deleting a schema.
 type DeleteSchemaRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of schema to delete.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// If set to true, any tables in this schema will also be deleted.
@@ -567,11 +831,6 @@ func (x *DeleteSchemaRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteSchemaRequest.ProtoReflect.Descriptor instead.
-func (*DeleteSchemaRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_schema_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *DeleteSchemaRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -586,9 +845,36 @@ func (x *DeleteSchemaRequest) GetForce() bool {
 	return false
 }
 
+func (x *DeleteSchemaRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *DeleteSchemaRequest) SetForce(v bool) {
+	x.Force = v
+}
+
+type DeleteSchemaRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of schema to delete.
+	Name string
+	// If set to true, any tables in this schema will also be deleted.
+	// (Otherwise, the request will only work if the schema has no tables.)
+	Force bool
+}
+
+func (b0 DeleteSchemaRequest_builder) Build() *DeleteSchemaRequest {
+	m0 := &DeleteSchemaRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Force = b.Force
+	return m0
+}
+
 // Response message for deleting a schema.
 type DeleteSchemaResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -618,9 +904,16 @@ func (x *DeleteSchemaResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteSchemaResponse.ProtoReflect.Descriptor instead.
-func (*DeleteSchemaResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta2_schema_proto_rawDescGZIP(), []int{10}
+type DeleteSchemaResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 DeleteSchemaResponse_builder) Build() *DeleteSchemaResponse {
+	m0 := &DeleteSchemaResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 var File_dtkt_catalog_v1beta2_schema_proto protoreflect.FileDescriptor
@@ -676,18 +969,6 @@ const file_dtkt_catalog_v1beta2_schema_proto_rawDesc = "" +
 	"\vListSchemas\x12(.dtkt.catalog.v1beta2.ListSchemasRequest\x1a).dtkt.catalog.v1beta2.ListSchemasResponse\x12e\n" +
 	"\fUpdateSchema\x12).dtkt.catalog.v1beta2.UpdateSchemaRequest\x1a*.dtkt.catalog.v1beta2.UpdateSchemaResponseB\xed\x01\n" +
 	"\x1aproto.dtkt.catalog.v1beta2B\vSchemaProtoP\x01ZPgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta2;catalogv1beta2\xa2\x02\x03DCX\xaa\x02\x14Dtkt.Catalog.V1beta2\xca\x02\x14Dtkt\\Catalog\\V1beta2\xe2\x02 Dtkt\\Catalog\\V1beta2\\GPBMetadata\xea\x02\x16Dtkt::Catalog::V1beta2b\x06proto3"
-
-var (
-	file_dtkt_catalog_v1beta2_schema_proto_rawDescOnce sync.Once
-	file_dtkt_catalog_v1beta2_schema_proto_rawDescData []byte
-)
-
-func file_dtkt_catalog_v1beta2_schema_proto_rawDescGZIP() []byte {
-	file_dtkt_catalog_v1beta2_schema_proto_rawDescOnce.Do(func() {
-		file_dtkt_catalog_v1beta2_schema_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_catalog_v1beta2_schema_proto_rawDesc), len(file_dtkt_catalog_v1beta2_schema_proto_rawDesc)))
-	})
-	return file_dtkt_catalog_v1beta2_schema_proto_rawDescData
-}
 
 var file_dtkt_catalog_v1beta2_schema_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_dtkt_catalog_v1beta2_schema_proto_goTypes = []any{

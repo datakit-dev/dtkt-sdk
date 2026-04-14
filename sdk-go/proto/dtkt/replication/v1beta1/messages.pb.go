@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/replication/v1beta1/messages.proto
 
+//go:build !protoopaque
+
 package replicationv1beta1
 
 import (
@@ -12,7 +14,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	anypb "google.golang.org/protobuf/types/known/anypb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -25,7 +26,7 @@ const (
 
 // Represents a replication Destination.
 type Destination struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier of Destination.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Unique identifier of destination type.
@@ -63,11 +64,6 @@ func (x *Destination) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Destination.ProtoReflect.Descriptor instead.
-func (*Destination) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Destination) GetId() string {
 	if x != nil {
 		return x.Id
@@ -96,9 +92,60 @@ func (x *Destination) GetConfig() *anypb.Any {
 	return nil
 }
 
+func (x *Destination) SetId(v string) {
+	x.Id = v
+}
+
+func (x *Destination) SetTypeId(v string) {
+	x.TypeId = v
+}
+
+func (x *Destination) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Destination) SetConfig(v *anypb.Any) {
+	x.Config = v
+}
+
+func (x *Destination) HasConfig() bool {
+	if x == nil {
+		return false
+	}
+	return x.Config != nil
+}
+
+func (x *Destination) ClearConfig() {
+	x.Config = nil
+}
+
+type Destination_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier of Destination.
+	Id string
+	// Unique identifier of destination type.
+	TypeId string
+	// Name assigned to Destination.
+	Name string
+	// Config for Destination.
+	Config *anypb.Any
+}
+
+func (b0 Destination_builder) Build() *Destination {
+	m0 := &Destination{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.TypeId = b.TypeId
+	x.Name = b.Name
+	x.Config = b.Config
+	return m0
+}
+
 // Represents a configured replication Source.
 type Source struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier returned by Source.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Unique identifier of source type.
@@ -140,11 +187,6 @@ func (x *Source) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Source.ProtoReflect.Descriptor instead.
-func (*Source) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Source) GetId() string {
@@ -196,9 +238,81 @@ func (x *Source) GetSyncError() string {
 	return ""
 }
 
+func (x *Source) SetId(v string) {
+	x.Id = v
+}
+
+func (x *Source) SetTypeId(v string) {
+	x.TypeId = v
+}
+
+func (x *Source) SetDestinationId(v string) {
+	x.DestinationId = v
+}
+
+func (x *Source) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Source) SetConfig(v *anypb.Any) {
+	x.Config = v
+}
+
+func (x *Source) SetSyncStatus(v SyncStatus) {
+	x.SyncStatus = v
+}
+
+func (x *Source) SetSyncError(v string) {
+	x.SyncError = v
+}
+
+func (x *Source) HasConfig() bool {
+	if x == nil {
+		return false
+	}
+	return x.Config != nil
+}
+
+func (x *Source) ClearConfig() {
+	x.Config = nil
+}
+
+type Source_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier returned by Source.
+	Id string
+	// Unique identifier of source type.
+	TypeId string
+	// Unique identifier of Destination.
+	DestinationId string
+	// Name assigned to Source.
+	Name string
+	// Config for Source.
+	Config *anypb.Any
+	// Sync status of the Source.
+	SyncStatus SyncStatus
+	// Sync error message when sync status is failed.
+	SyncError string
+}
+
+func (b0 Source_builder) Build() *Source {
+	m0 := &Source{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.TypeId = b.TypeId
+	x.DestinationId = b.DestinationId
+	x.Name = b.Name
+	x.Config = b.Config
+	x.SyncStatus = b.SyncStatus
+	x.SyncError = b.SyncError
+	return m0
+}
+
 // Represents a supported destination type.
 type DestinationType struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier for destination type.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Name of destination type.
@@ -238,11 +352,6 @@ func (x *DestinationType) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DestinationType.ProtoReflect.Descriptor instead.
-func (*DestinationType) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *DestinationType) GetId() string {
@@ -287,9 +396,74 @@ func (x *DestinationType) GetConfigSchema() *v1beta1.TypeSchema {
 	return nil
 }
 
+func (x *DestinationType) SetId(v string) {
+	x.Id = v
+}
+
+func (x *DestinationType) SetName(v string) {
+	x.Name = v
+}
+
+func (x *DestinationType) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *DestinationType) SetIconUrl(v string) {
+	x.IconUrl = v
+}
+
+func (x *DestinationType) SetCategory(v string) {
+	x.Category = v
+}
+
+func (x *DestinationType) SetConfigSchema(v *v1beta1.TypeSchema) {
+	x.ConfigSchema = v
+}
+
+func (x *DestinationType) HasConfigSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.ConfigSchema != nil
+}
+
+func (x *DestinationType) ClearConfigSchema() {
+	x.ConfigSchema = nil
+}
+
+type DestinationType_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier for destination type.
+	Id string
+	// Name of destination type.
+	Name string
+	// Description of destination type.
+	Description string
+	// Icon URL of destination type.
+	IconUrl string
+	// Category of destination type.
+	Category string
+	// Schema for destination type.
+	ConfigSchema *v1beta1.TypeSchema
+}
+
+func (b0 DestinationType_builder) Build() *DestinationType {
+	m0 := &DestinationType{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Name = b.Name
+	x.Description = b.Description
+	x.IconUrl = b.IconUrl
+	x.Category = b.Category
+	x.ConfigSchema = b.ConfigSchema
+	return m0
+}
+
 // Represents a supported replication source type.
 type SourceType struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier for source type.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Name of source type.
@@ -331,11 +505,6 @@ func (x *SourceType) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SourceType.ProtoReflect.Descriptor instead.
-func (*SourceType) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *SourceType) GetId() string {
@@ -387,9 +556,81 @@ func (x *SourceType) GetSupportedAuthTypes() []v1beta1.AuthType {
 	return nil
 }
 
+func (x *SourceType) SetId(v string) {
+	x.Id = v
+}
+
+func (x *SourceType) SetName(v string) {
+	x.Name = v
+}
+
+func (x *SourceType) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *SourceType) SetIconUrl(v string) {
+	x.IconUrl = v
+}
+
+func (x *SourceType) SetCategory(v string) {
+	x.Category = v
+}
+
+func (x *SourceType) SetConfigSchema(v *v1beta1.TypeSchema) {
+	x.ConfigSchema = v
+}
+
+func (x *SourceType) SetSupportedAuthTypes(v []v1beta1.AuthType) {
+	x.SupportedAuthTypes = v
+}
+
+func (x *SourceType) HasConfigSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.ConfigSchema != nil
+}
+
+func (x *SourceType) ClearConfigSchema() {
+	x.ConfigSchema = nil
+}
+
+type SourceType_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier for source type.
+	Id string
+	// Name of source type.
+	Name string
+	// Description of source type.
+	Description string
+	// Icon URL of source type.
+	IconUrl string
+	// Category of source type.
+	Category string
+	// Schema for source type.
+	ConfigSchema *v1beta1.TypeSchema
+	// Supported auth types for this source type.
+	SupportedAuthTypes []v1beta1.AuthType
+}
+
+func (b0 SourceType_builder) Build() *SourceType {
+	m0 := &SourceType{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Name = b.Name
+	x.Description = b.Description
+	x.IconUrl = b.IconUrl
+	x.Category = b.Category
+	x.ConfigSchema = b.ConfigSchema
+	x.SupportedAuthTypes = b.SupportedAuthTypes
+	return m0
+}
+
 // Request for checking source auth.
 type CheckSourceAuthRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier of source.
 	SourceId string `protobuf:"bytes,1,opt,name=source_id,json=sourceId,proto3" json:"source_id,omitempty"`
 	// If auth type response is OAuth.
@@ -427,11 +668,6 @@ func (x *CheckSourceAuthRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CheckSourceAuthRequest.ProtoReflect.Descriptor instead.
-func (*CheckSourceAuthRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CheckSourceAuthRequest) GetSourceId() string {
@@ -475,6 +711,152 @@ func (x *CheckSourceAuthRequest) GetRefreshRequest() *v1beta1.OAuthRefreshReques
 	return nil
 }
 
+func (x *CheckSourceAuthRequest) SetSourceId(v string) {
+	x.SourceId = v
+}
+
+func (x *CheckSourceAuthRequest) SetCodeRequest(v *v1beta1.OAuthCodeRequest) {
+	if v == nil {
+		x.Oauth = nil
+		return
+	}
+	x.Oauth = &CheckSourceAuthRequest_CodeRequest{v}
+}
+
+func (x *CheckSourceAuthRequest) SetTokenRequest(v *v1beta1.OAuthTokenRequest) {
+	if v == nil {
+		x.Oauth = nil
+		return
+	}
+	x.Oauth = &CheckSourceAuthRequest_TokenRequest{v}
+}
+
+func (x *CheckSourceAuthRequest) SetRefreshRequest(v *v1beta1.OAuthRefreshRequest) {
+	if v == nil {
+		x.Oauth = nil
+		return
+	}
+	x.Oauth = &CheckSourceAuthRequest_RefreshRequest{v}
+}
+
+func (x *CheckSourceAuthRequest) HasOauth() bool {
+	if x == nil {
+		return false
+	}
+	return x.Oauth != nil
+}
+
+func (x *CheckSourceAuthRequest) HasCodeRequest() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Oauth.(*CheckSourceAuthRequest_CodeRequest)
+	return ok
+}
+
+func (x *CheckSourceAuthRequest) HasTokenRequest() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Oauth.(*CheckSourceAuthRequest_TokenRequest)
+	return ok
+}
+
+func (x *CheckSourceAuthRequest) HasRefreshRequest() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Oauth.(*CheckSourceAuthRequest_RefreshRequest)
+	return ok
+}
+
+func (x *CheckSourceAuthRequest) ClearOauth() {
+	x.Oauth = nil
+}
+
+func (x *CheckSourceAuthRequest) ClearCodeRequest() {
+	if _, ok := x.Oauth.(*CheckSourceAuthRequest_CodeRequest); ok {
+		x.Oauth = nil
+	}
+}
+
+func (x *CheckSourceAuthRequest) ClearTokenRequest() {
+	if _, ok := x.Oauth.(*CheckSourceAuthRequest_TokenRequest); ok {
+		x.Oauth = nil
+	}
+}
+
+func (x *CheckSourceAuthRequest) ClearRefreshRequest() {
+	if _, ok := x.Oauth.(*CheckSourceAuthRequest_RefreshRequest); ok {
+		x.Oauth = nil
+	}
+}
+
+const CheckSourceAuthRequest_Oauth_not_set_case case_CheckSourceAuthRequest_Oauth = 0
+const CheckSourceAuthRequest_CodeRequest_case case_CheckSourceAuthRequest_Oauth = 3
+const CheckSourceAuthRequest_TokenRequest_case case_CheckSourceAuthRequest_Oauth = 4
+const CheckSourceAuthRequest_RefreshRequest_case case_CheckSourceAuthRequest_Oauth = 5
+
+func (x *CheckSourceAuthRequest) WhichOauth() case_CheckSourceAuthRequest_Oauth {
+	if x == nil {
+		return CheckSourceAuthRequest_Oauth_not_set_case
+	}
+	switch x.Oauth.(type) {
+	case *CheckSourceAuthRequest_CodeRequest:
+		return CheckSourceAuthRequest_CodeRequest_case
+	case *CheckSourceAuthRequest_TokenRequest:
+		return CheckSourceAuthRequest_TokenRequest_case
+	case *CheckSourceAuthRequest_RefreshRequest:
+		return CheckSourceAuthRequest_RefreshRequest_case
+	default:
+		return CheckSourceAuthRequest_Oauth_not_set_case
+	}
+}
+
+type CheckSourceAuthRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier of source.
+	SourceId string
+	// If auth type response is OAuth.
+
+	// Fields of oneof Oauth:
+	// When check type is auth code url.
+	CodeRequest *v1beta1.OAuthCodeRequest
+	// When check type is callback.
+	TokenRequest *v1beta1.OAuthTokenRequest
+	// When check type is refresh.
+	RefreshRequest *v1beta1.OAuthRefreshRequest
+	// -- end of Oauth
+}
+
+func (b0 CheckSourceAuthRequest_builder) Build() *CheckSourceAuthRequest {
+	m0 := &CheckSourceAuthRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.SourceId = b.SourceId
+	if b.CodeRequest != nil {
+		x.Oauth = &CheckSourceAuthRequest_CodeRequest{b.CodeRequest}
+	}
+	if b.TokenRequest != nil {
+		x.Oauth = &CheckSourceAuthRequest_TokenRequest{b.TokenRequest}
+	}
+	if b.RefreshRequest != nil {
+		x.Oauth = &CheckSourceAuthRequest_RefreshRequest{b.RefreshRequest}
+	}
+	return m0
+}
+
+type case_CheckSourceAuthRequest_Oauth protoreflect.FieldNumber
+
+func (x case_CheckSourceAuthRequest_Oauth) String() string {
+	md := file_dtkt_replication_v1beta1_messages_proto_msgTypes[4].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isCheckSourceAuthRequest_Oauth interface {
 	isCheckSourceAuthRequest_Oauth()
 }
@@ -502,7 +884,7 @@ func (*CheckSourceAuthRequest_RefreshRequest) isCheckSourceAuthRequest_Oauth() {
 
 // Response for checking source auth.
 type CheckSourceAuthResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The auth type of this source.
 	Type v1beta1.AuthType `protobuf:"varint,1,opt,name=type,proto3,enum=dtkt.shared.v1beta1.AuthType" json:"type,omitempty"`
 	// Indicates if the auth check was successful.
@@ -545,11 +927,6 @@ func (x *CheckSourceAuthResponse) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CheckSourceAuthResponse.ProtoReflect.Descriptor instead.
-func (*CheckSourceAuthResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CheckSourceAuthResponse) GetType() v1beta1.AuthType {
@@ -605,6 +982,150 @@ func (x *CheckSourceAuthResponse) GetConfigData() *anypb.Any {
 	return nil
 }
 
+func (x *CheckSourceAuthResponse) SetType(v v1beta1.AuthType) {
+	x.Type = v
+}
+
+func (x *CheckSourceAuthResponse) SetSuccess(v bool) {
+	x.Success = v
+}
+
+func (x *CheckSourceAuthResponse) SetError(v string) {
+	x.Error = v
+}
+
+func (x *CheckSourceAuthResponse) SetAuthCodeUrl(v string) {
+	x.Oauth = &CheckSourceAuthResponse_AuthCodeUrl{v}
+}
+
+func (x *CheckSourceAuthResponse) SetToken(v *v1beta1.OAuthToken) {
+	if v == nil {
+		x.Oauth = nil
+		return
+	}
+	x.Oauth = &CheckSourceAuthResponse_Token{v}
+}
+
+func (x *CheckSourceAuthResponse) SetConfigData(v *anypb.Any) {
+	x.ConfigData = v
+}
+
+func (x *CheckSourceAuthResponse) HasOauth() bool {
+	if x == nil {
+		return false
+	}
+	return x.Oauth != nil
+}
+
+func (x *CheckSourceAuthResponse) HasAuthCodeUrl() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Oauth.(*CheckSourceAuthResponse_AuthCodeUrl)
+	return ok
+}
+
+func (x *CheckSourceAuthResponse) HasToken() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Oauth.(*CheckSourceAuthResponse_Token)
+	return ok
+}
+
+func (x *CheckSourceAuthResponse) HasConfigData() bool {
+	if x == nil {
+		return false
+	}
+	return x.ConfigData != nil
+}
+
+func (x *CheckSourceAuthResponse) ClearOauth() {
+	x.Oauth = nil
+}
+
+func (x *CheckSourceAuthResponse) ClearAuthCodeUrl() {
+	if _, ok := x.Oauth.(*CheckSourceAuthResponse_AuthCodeUrl); ok {
+		x.Oauth = nil
+	}
+}
+
+func (x *CheckSourceAuthResponse) ClearToken() {
+	if _, ok := x.Oauth.(*CheckSourceAuthResponse_Token); ok {
+		x.Oauth = nil
+	}
+}
+
+func (x *CheckSourceAuthResponse) ClearConfigData() {
+	x.ConfigData = nil
+}
+
+const CheckSourceAuthResponse_Oauth_not_set_case case_CheckSourceAuthResponse_Oauth = 0
+const CheckSourceAuthResponse_AuthCodeUrl_case case_CheckSourceAuthResponse_Oauth = 4
+const CheckSourceAuthResponse_Token_case case_CheckSourceAuthResponse_Oauth = 5
+
+func (x *CheckSourceAuthResponse) WhichOauth() case_CheckSourceAuthResponse_Oauth {
+	if x == nil {
+		return CheckSourceAuthResponse_Oauth_not_set_case
+	}
+	switch x.Oauth.(type) {
+	case *CheckSourceAuthResponse_AuthCodeUrl:
+		return CheckSourceAuthResponse_AuthCodeUrl_case
+	case *CheckSourceAuthResponse_Token:
+		return CheckSourceAuthResponse_Token_case
+	default:
+		return CheckSourceAuthResponse_Oauth_not_set_case
+	}
+}
+
+type CheckSourceAuthResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The auth type of this source.
+	Type v1beta1.AuthType
+	// Indicates if the auth check was successful.
+	Success bool
+	// Error message if success is false.
+	Error string
+	// Present when type is OAuth.
+
+	// Fields of oneof Oauth:
+	// Returned when check is code.
+	AuthCodeUrl *string
+	// Returned when check type is token or refresh.
+	Token *v1beta1.OAuthToken
+	// -- end of Oauth
+	// Data for source type.
+	ConfigData *anypb.Any
+}
+
+func (b0 CheckSourceAuthResponse_builder) Build() *CheckSourceAuthResponse {
+	m0 := &CheckSourceAuthResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Type = b.Type
+	x.Success = b.Success
+	x.Error = b.Error
+	if b.AuthCodeUrl != nil {
+		x.Oauth = &CheckSourceAuthResponse_AuthCodeUrl{*b.AuthCodeUrl}
+	}
+	if b.Token != nil {
+		x.Oauth = &CheckSourceAuthResponse_Token{b.Token}
+	}
+	x.ConfigData = b.ConfigData
+	return m0
+}
+
+type case_CheckSourceAuthResponse_Oauth protoreflect.FieldNumber
+
+func (x case_CheckSourceAuthResponse_Oauth) String() string {
+	md := file_dtkt_replication_v1beta1_messages_proto_msgTypes[5].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isCheckSourceAuthResponse_Oauth interface {
 	isCheckSourceAuthResponse_Oauth()
 }
@@ -625,7 +1146,7 @@ func (*CheckSourceAuthResponse_Token) isCheckSourceAuthResponse_Oauth() {}
 
 // Request to retrieve a list of supported replication Sources.
 type ListSourceTypesRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -655,14 +1176,21 @@ func (x *ListSourceTypesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListSourceTypesRequest.ProtoReflect.Descriptor instead.
-func (*ListSourceTypesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{6}
+type ListSourceTypesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 ListSourceTypesRequest_builder) Build() *ListSourceTypesRequest {
+	m0 := &ListSourceTypesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 // Response to retrieve a list of supported replication Sources.
 type ListSourceTypesResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	SourceTypes   []*SourceType          `protobuf:"bytes,1,rep,name=source_types,json=sourceTypes,proto3" json:"source_types,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -693,11 +1221,6 @@ func (x *ListSourceTypesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListSourceTypesResponse.ProtoReflect.Descriptor instead.
-func (*ListSourceTypesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *ListSourceTypesResponse) GetSourceTypes() []*SourceType {
 	if x != nil {
 		return x.SourceTypes
@@ -705,9 +1228,27 @@ func (x *ListSourceTypesResponse) GetSourceTypes() []*SourceType {
 	return nil
 }
 
+func (x *ListSourceTypesResponse) SetSourceTypes(v []*SourceType) {
+	x.SourceTypes = v
+}
+
+type ListSourceTypesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	SourceTypes []*SourceType
+}
+
+func (b0 ListSourceTypesResponse_builder) Build() *ListSourceTypesResponse {
+	m0 := &ListSourceTypesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.SourceTypes = b.SourceTypes
+	return m0
+}
+
 // Request for replication Source of given provider.
 type GetSourceRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier of source type.
 	TypeId string `protobuf:"bytes,1,opt,name=type_id,json=typeId,proto3" json:"type_id,omitempty"`
 	// Unique identifier of Source.
@@ -741,11 +1282,6 @@ func (x *GetSourceRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetSourceRequest.ProtoReflect.Descriptor instead.
-func (*GetSourceRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *GetSourceRequest) GetTypeId() string {
 	if x != nil {
 		return x.TypeId
@@ -760,9 +1296,35 @@ func (x *GetSourceRequest) GetId() string {
 	return ""
 }
 
+func (x *GetSourceRequest) SetTypeId(v string) {
+	x.TypeId = v
+}
+
+func (x *GetSourceRequest) SetId(v string) {
+	x.Id = v
+}
+
+type GetSourceRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier of source type.
+	TypeId string
+	// Unique identifier of Source.
+	Id string
+}
+
+func (b0 GetSourceRequest_builder) Build() *GetSourceRequest {
+	m0 := &GetSourceRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.TypeId = b.TypeId
+	x.Id = b.Id
+	return m0
+}
+
 // Response for replication Source of given provider.
 type GetSourceResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Source        *Source                `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -793,11 +1355,6 @@ func (x *GetSourceResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetSourceResponse.ProtoReflect.Descriptor instead.
-func (*GetSourceResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *GetSourceResponse) GetSource() *Source {
 	if x != nil {
 		return x.Source
@@ -805,9 +1362,38 @@ func (x *GetSourceResponse) GetSource() *Source {
 	return nil
 }
 
+func (x *GetSourceResponse) SetSource(v *Source) {
+	x.Source = v
+}
+
+func (x *GetSourceResponse) HasSource() bool {
+	if x == nil {
+		return false
+	}
+	return x.Source != nil
+}
+
+func (x *GetSourceResponse) ClearSource() {
+	x.Source = nil
+}
+
+type GetSourceResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Source *Source
+}
+
+func (b0 GetSourceResponse_builder) Build() *GetSourceResponse {
+	m0 := &GetSourceResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Source = b.Source
+	return m0
+}
+
 // Request to create configured Source.
 type CreateSourceRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier of source type.
 	TypeId string `protobuf:"bytes,1,opt,name=type_id,json=typeId,proto3" json:"type_id,omitempty"`
 	// Name assigned to Source being created.
@@ -843,11 +1429,6 @@ func (x *CreateSourceRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateSourceRequest.ProtoReflect.Descriptor instead.
-func (*CreateSourceRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *CreateSourceRequest) GetTypeId() string {
 	if x != nil {
 		return x.TypeId
@@ -869,9 +1450,53 @@ func (x *CreateSourceRequest) GetConfig() *anypb.Any {
 	return nil
 }
 
+func (x *CreateSourceRequest) SetTypeId(v string) {
+	x.TypeId = v
+}
+
+func (x *CreateSourceRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *CreateSourceRequest) SetConfig(v *anypb.Any) {
+	x.Config = v
+}
+
+func (x *CreateSourceRequest) HasConfig() bool {
+	if x == nil {
+		return false
+	}
+	return x.Config != nil
+}
+
+func (x *CreateSourceRequest) ClearConfig() {
+	x.Config = nil
+}
+
+type CreateSourceRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier of source type.
+	TypeId string
+	// Name assigned to Source being created.
+	Name string
+	// Config assigned to Source being created.
+	Config *anypb.Any
+}
+
+func (b0 CreateSourceRequest_builder) Build() *CreateSourceRequest {
+	m0 := &CreateSourceRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.TypeId = b.TypeId
+	x.Name = b.Name
+	x.Config = b.Config
+	return m0
+}
+
 // Response from create configured Source.
 type CreateSourceResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The returned Source.
 	Source        *Source `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -903,11 +1528,6 @@ func (x *CreateSourceResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateSourceResponse.ProtoReflect.Descriptor instead.
-func (*CreateSourceResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{11}
-}
-
 func (x *CreateSourceResponse) GetSource() *Source {
 	if x != nil {
 		return x.Source
@@ -915,9 +1535,39 @@ func (x *CreateSourceResponse) GetSource() *Source {
 	return nil
 }
 
+func (x *CreateSourceResponse) SetSource(v *Source) {
+	x.Source = v
+}
+
+func (x *CreateSourceResponse) HasSource() bool {
+	if x == nil {
+		return false
+	}
+	return x.Source != nil
+}
+
+func (x *CreateSourceResponse) ClearSource() {
+	x.Source = nil
+}
+
+type CreateSourceResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The returned Source.
+	Source *Source
+}
+
+func (b0 CreateSourceResponse_builder) Build() *CreateSourceResponse {
+	m0 := &CreateSourceResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Source = b.Source
+	return m0
+}
+
 // Request to update configured Source.
 type UpdateSourceRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier of source type.
 	TypeId string `protobuf:"bytes,1,opt,name=type_id,json=typeId,proto3" json:"type_id,omitempty"`
 	// Unique identifier of Source.
@@ -953,11 +1603,6 @@ func (x *UpdateSourceRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateSourceRequest.ProtoReflect.Descriptor instead.
-func (*UpdateSourceRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{12}
-}
-
 func (x *UpdateSourceRequest) GetTypeId() string {
 	if x != nil {
 		return x.TypeId
@@ -979,9 +1624,53 @@ func (x *UpdateSourceRequest) GetConfig() *anypb.Any {
 	return nil
 }
 
+func (x *UpdateSourceRequest) SetTypeId(v string) {
+	x.TypeId = v
+}
+
+func (x *UpdateSourceRequest) SetId(v string) {
+	x.Id = v
+}
+
+func (x *UpdateSourceRequest) SetConfig(v *anypb.Any) {
+	x.Config = v
+}
+
+func (x *UpdateSourceRequest) HasConfig() bool {
+	if x == nil {
+		return false
+	}
+	return x.Config != nil
+}
+
+func (x *UpdateSourceRequest) ClearConfig() {
+	x.Config = nil
+}
+
+type UpdateSourceRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier of source type.
+	TypeId string
+	// Unique identifier of Source.
+	Id string
+	// source type overrides.
+	Config *anypb.Any
+}
+
+func (b0 UpdateSourceRequest_builder) Build() *UpdateSourceRequest {
+	m0 := &UpdateSourceRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.TypeId = b.TypeId
+	x.Id = b.Id
+	x.Config = b.Config
+	return m0
+}
+
 // Response from update configured Source.
 type UpdateSourceResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The returned Source.
 	Source        *Source `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1013,11 +1702,6 @@ func (x *UpdateSourceResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateSourceResponse.ProtoReflect.Descriptor instead.
-func (*UpdateSourceResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{13}
-}
-
 func (x *UpdateSourceResponse) GetSource() *Source {
 	if x != nil {
 		return x.Source
@@ -1025,9 +1709,39 @@ func (x *UpdateSourceResponse) GetSource() *Source {
 	return nil
 }
 
+func (x *UpdateSourceResponse) SetSource(v *Source) {
+	x.Source = v
+}
+
+func (x *UpdateSourceResponse) HasSource() bool {
+	if x == nil {
+		return false
+	}
+	return x.Source != nil
+}
+
+func (x *UpdateSourceResponse) ClearSource() {
+	x.Source = nil
+}
+
+type UpdateSourceResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The returned Source.
+	Source *Source
+}
+
+func (b0 UpdateSourceResponse_builder) Build() *UpdateSourceResponse {
+	m0 := &UpdateSourceResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Source = b.Source
+	return m0
+}
+
 // Request to delete configured Source.
 type DeleteSourceRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier of source type.
 	TypeId string `protobuf:"bytes,1,opt,name=type_id,json=typeId,proto3" json:"type_id,omitempty"`
 	// Unique identifier of Source.
@@ -1061,11 +1775,6 @@ func (x *DeleteSourceRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteSourceRequest.ProtoReflect.Descriptor instead.
-func (*DeleteSourceRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{14}
-}
-
 func (x *DeleteSourceRequest) GetTypeId() string {
 	if x != nil {
 		return x.TypeId
@@ -1080,9 +1789,35 @@ func (x *DeleteSourceRequest) GetId() string {
 	return ""
 }
 
+func (x *DeleteSourceRequest) SetTypeId(v string) {
+	x.TypeId = v
+}
+
+func (x *DeleteSourceRequest) SetId(v string) {
+	x.Id = v
+}
+
+type DeleteSourceRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier of source type.
+	TypeId string
+	// Unique identifier of Source.
+	Id string
+}
+
+func (b0 DeleteSourceRequest_builder) Build() *DeleteSourceRequest {
+	m0 := &DeleteSourceRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.TypeId = b.TypeId
+	x.Id = b.Id
+	return m0
+}
+
 // Response for delete configured Source.
 type DeleteSourceResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1112,13 +1847,20 @@ func (x *DeleteSourceResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteSourceResponse.ProtoReflect.Descriptor instead.
-func (*DeleteSourceResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{15}
+type DeleteSourceResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 DeleteSourceResponse_builder) Build() *DeleteSourceResponse {
+	m0 := &DeleteSourceResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 type StartSyncRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier of Destination.
 	DestinationId string `protobuf:"bytes,1,opt,name=destination_id,json=destinationId,proto3" json:"destination_id,omitempty"`
 	// Unique identifier of source type.
@@ -1154,11 +1896,6 @@ func (x *StartSyncRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StartSyncRequest.ProtoReflect.Descriptor instead.
-func (*StartSyncRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{16}
-}
-
 func (x *StartSyncRequest) GetDestinationId() string {
 	if x != nil {
 		return x.DestinationId
@@ -1180,8 +1917,41 @@ func (x *StartSyncRequest) GetId() string {
 	return ""
 }
 
+func (x *StartSyncRequest) SetDestinationId(v string) {
+	x.DestinationId = v
+}
+
+func (x *StartSyncRequest) SetTypeId(v string) {
+	x.TypeId = v
+}
+
+func (x *StartSyncRequest) SetId(v string) {
+	x.Id = v
+}
+
+type StartSyncRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier of Destination.
+	DestinationId string
+	// Unique identifier of source type.
+	TypeId string
+	// Unique identifier of Source.
+	Id string
+}
+
+func (b0 StartSyncRequest_builder) Build() *StartSyncRequest {
+	m0 := &StartSyncRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.DestinationId = b.DestinationId
+	x.TypeId = b.TypeId
+	x.Id = b.Id
+	return m0
+}
+
 type StartSyncResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The returned Source.
 	Source        *Source `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1213,11 +1983,6 @@ func (x *StartSyncResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StartSyncResponse.ProtoReflect.Descriptor instead.
-func (*StartSyncResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{17}
-}
-
 func (x *StartSyncResponse) GetSource() *Source {
 	if x != nil {
 		return x.Source
@@ -1225,8 +1990,38 @@ func (x *StartSyncResponse) GetSource() *Source {
 	return nil
 }
 
+func (x *StartSyncResponse) SetSource(v *Source) {
+	x.Source = v
+}
+
+func (x *StartSyncResponse) HasSource() bool {
+	if x == nil {
+		return false
+	}
+	return x.Source != nil
+}
+
+func (x *StartSyncResponse) ClearSource() {
+	x.Source = nil
+}
+
+type StartSyncResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The returned Source.
+	Source *Source
+}
+
+func (b0 StartSyncResponse_builder) Build() *StartSyncResponse {
+	m0 := &StartSyncResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Source = b.Source
+	return m0
+}
+
 type StopSyncRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier of Destination.
 	DestinationId string `protobuf:"bytes,1,opt,name=destination_id,json=destinationId,proto3" json:"destination_id,omitempty"`
 	// Unique identifier of source type.
@@ -1262,11 +2057,6 @@ func (x *StopSyncRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StopSyncRequest.ProtoReflect.Descriptor instead.
-func (*StopSyncRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{18}
-}
-
 func (x *StopSyncRequest) GetDestinationId() string {
 	if x != nil {
 		return x.DestinationId
@@ -1288,8 +2078,41 @@ func (x *StopSyncRequest) GetId() string {
 	return ""
 }
 
+func (x *StopSyncRequest) SetDestinationId(v string) {
+	x.DestinationId = v
+}
+
+func (x *StopSyncRequest) SetTypeId(v string) {
+	x.TypeId = v
+}
+
+func (x *StopSyncRequest) SetId(v string) {
+	x.Id = v
+}
+
+type StopSyncRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier of Destination.
+	DestinationId string
+	// Unique identifier of source type.
+	TypeId string
+	// Unique identifier of Source.
+	Id string
+}
+
+func (b0 StopSyncRequest_builder) Build() *StopSyncRequest {
+	m0 := &StopSyncRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.DestinationId = b.DestinationId
+	x.TypeId = b.TypeId
+	x.Id = b.Id
+	return m0
+}
+
 type StopSyncResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The returned Source.
 	Source        *Source `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1321,11 +2144,6 @@ func (x *StopSyncResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StopSyncResponse.ProtoReflect.Descriptor instead.
-func (*StopSyncResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{19}
-}
-
 func (x *StopSyncResponse) GetSource() *Source {
 	if x != nil {
 		return x.Source
@@ -1333,9 +2151,39 @@ func (x *StopSyncResponse) GetSource() *Source {
 	return nil
 }
 
+func (x *StopSyncResponse) SetSource(v *Source) {
+	x.Source = v
+}
+
+func (x *StopSyncResponse) HasSource() bool {
+	if x == nil {
+		return false
+	}
+	return x.Source != nil
+}
+
+func (x *StopSyncResponse) ClearSource() {
+	x.Source = nil
+}
+
+type StopSyncResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The returned Source.
+	Source *Source
+}
+
+func (b0 StopSyncResponse_builder) Build() *StopSyncResponse {
+	m0 := &StopSyncResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Source = b.Source
+	return m0
+}
+
 // Request to retrieve a list of supported destinations.
 type ListDestinationTypesRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1365,14 +2213,21 @@ func (x *ListDestinationTypesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListDestinationTypesRequest.ProtoReflect.Descriptor instead.
-func (*ListDestinationTypesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{20}
+type ListDestinationTypesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 ListDestinationTypesRequest_builder) Build() *ListDestinationTypesRequest {
+	m0 := &ListDestinationTypesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 // List of Destinations.
 type ListDestinationTypesResponse struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
+	state            protoimpl.MessageState `protogen:"hybrid.v1"`
 	DestinationTypes []*DestinationType     `protobuf:"bytes,1,rep,name=destination_types,json=destinationTypes,proto3" json:"destination_types,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -1403,11 +2258,6 @@ func (x *ListDestinationTypesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListDestinationTypesResponse.ProtoReflect.Descriptor instead.
-func (*ListDestinationTypesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{21}
-}
-
 func (x *ListDestinationTypesResponse) GetDestinationTypes() []*DestinationType {
 	if x != nil {
 		return x.DestinationTypes
@@ -1415,9 +2265,27 @@ func (x *ListDestinationTypesResponse) GetDestinationTypes() []*DestinationType 
 	return nil
 }
 
+func (x *ListDestinationTypesResponse) SetDestinationTypes(v []*DestinationType) {
+	x.DestinationTypes = v
+}
+
+type ListDestinationTypesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	DestinationTypes []*DestinationType
+}
+
+func (b0 ListDestinationTypesResponse_builder) Build() *ListDestinationTypesResponse {
+	m0 := &ListDestinationTypesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.DestinationTypes = b.DestinationTypes
+	return m0
+}
+
 // Request for replication Destination of given provider.
 type GetDestinationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier of destination type.
 	TypeId string `protobuf:"bytes,1,opt,name=type_id,json=typeId,proto3" json:"type_id,omitempty"`
 	// Unique identifier of Destination.
@@ -1451,11 +2319,6 @@ func (x *GetDestinationRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetDestinationRequest.ProtoReflect.Descriptor instead.
-func (*GetDestinationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{22}
-}
-
 func (x *GetDestinationRequest) GetTypeId() string {
 	if x != nil {
 		return x.TypeId
@@ -1470,9 +2333,35 @@ func (x *GetDestinationRequest) GetId() string {
 	return ""
 }
 
+func (x *GetDestinationRequest) SetTypeId(v string) {
+	x.TypeId = v
+}
+
+func (x *GetDestinationRequest) SetId(v string) {
+	x.Id = v
+}
+
+type GetDestinationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier of destination type.
+	TypeId string
+	// Unique identifier of Destination.
+	Id string
+}
+
+func (b0 GetDestinationRequest_builder) Build() *GetDestinationRequest {
+	m0 := &GetDestinationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.TypeId = b.TypeId
+	x.Id = b.Id
+	return m0
+}
+
 // Response for replication Destination of given provider.
 type GetDestinationResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Destination   *Destination           `protobuf:"bytes,1,opt,name=destination,proto3" json:"destination,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1503,11 +2392,6 @@ func (x *GetDestinationResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetDestinationResponse.ProtoReflect.Descriptor instead.
-func (*GetDestinationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{23}
-}
-
 func (x *GetDestinationResponse) GetDestination() *Destination {
 	if x != nil {
 		return x.Destination
@@ -1515,9 +2399,38 @@ func (x *GetDestinationResponse) GetDestination() *Destination {
 	return nil
 }
 
+func (x *GetDestinationResponse) SetDestination(v *Destination) {
+	x.Destination = v
+}
+
+func (x *GetDestinationResponse) HasDestination() bool {
+	if x == nil {
+		return false
+	}
+	return x.Destination != nil
+}
+
+func (x *GetDestinationResponse) ClearDestination() {
+	x.Destination = nil
+}
+
+type GetDestinationResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Destination *Destination
+}
+
+func (b0 GetDestinationResponse_builder) Build() *GetDestinationResponse {
+	m0 := &GetDestinationResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Destination = b.Destination
+	return m0
+}
+
 // Request to create configured destination.
 type CreateDestinationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier of destination type.
 	TypeId string `protobuf:"bytes,1,opt,name=type_id,json=typeId,proto3" json:"type_id,omitempty"`
 	// Name assigned to Destination.
@@ -1553,11 +2466,6 @@ func (x *CreateDestinationRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateDestinationRequest.ProtoReflect.Descriptor instead.
-func (*CreateDestinationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{24}
-}
-
 func (x *CreateDestinationRequest) GetTypeId() string {
 	if x != nil {
 		return x.TypeId
@@ -1579,9 +2487,53 @@ func (x *CreateDestinationRequest) GetConfig() *anypb.Any {
 	return nil
 }
 
+func (x *CreateDestinationRequest) SetTypeId(v string) {
+	x.TypeId = v
+}
+
+func (x *CreateDestinationRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *CreateDestinationRequest) SetConfig(v *anypb.Any) {
+	x.Config = v
+}
+
+func (x *CreateDestinationRequest) HasConfig() bool {
+	if x == nil {
+		return false
+	}
+	return x.Config != nil
+}
+
+func (x *CreateDestinationRequest) ClearConfig() {
+	x.Config = nil
+}
+
+type CreateDestinationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier of destination type.
+	TypeId string
+	// Name assigned to Destination.
+	Name string
+	// Destination type overrides.
+	Config *anypb.Any
+}
+
+func (b0 CreateDestinationRequest_builder) Build() *CreateDestinationRequest {
+	m0 := &CreateDestinationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.TypeId = b.TypeId
+	x.Name = b.Name
+	x.Config = b.Config
+	return m0
+}
+
 // Response from create configured destination.
 type CreateDestinationResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The returned destination.
 	Destination   *Destination `protobuf:"bytes,1,opt,name=destination,proto3" json:"destination,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1613,11 +2565,6 @@ func (x *CreateDestinationResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateDestinationResponse.ProtoReflect.Descriptor instead.
-func (*CreateDestinationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{25}
-}
-
 func (x *CreateDestinationResponse) GetDestination() *Destination {
 	if x != nil {
 		return x.Destination
@@ -1625,9 +2572,39 @@ func (x *CreateDestinationResponse) GetDestination() *Destination {
 	return nil
 }
 
+func (x *CreateDestinationResponse) SetDestination(v *Destination) {
+	x.Destination = v
+}
+
+func (x *CreateDestinationResponse) HasDestination() bool {
+	if x == nil {
+		return false
+	}
+	return x.Destination != nil
+}
+
+func (x *CreateDestinationResponse) ClearDestination() {
+	x.Destination = nil
+}
+
+type CreateDestinationResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The returned destination.
+	Destination *Destination
+}
+
+func (b0 CreateDestinationResponse_builder) Build() *CreateDestinationResponse {
+	m0 := &CreateDestinationResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Destination = b.Destination
+	return m0
+}
+
 // Request to update configured destination.
 type UpdateDestinationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier of destination type.
 	TypeId string `protobuf:"bytes,1,opt,name=type_id,json=typeId,proto3" json:"type_id,omitempty"`
 	// Unique identifier of Destination.
@@ -1663,11 +2640,6 @@ func (x *UpdateDestinationRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateDestinationRequest.ProtoReflect.Descriptor instead.
-func (*UpdateDestinationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{26}
-}
-
 func (x *UpdateDestinationRequest) GetTypeId() string {
 	if x != nil {
 		return x.TypeId
@@ -1689,9 +2661,53 @@ func (x *UpdateDestinationRequest) GetConfig() *anypb.Any {
 	return nil
 }
 
+func (x *UpdateDestinationRequest) SetTypeId(v string) {
+	x.TypeId = v
+}
+
+func (x *UpdateDestinationRequest) SetId(v string) {
+	x.Id = v
+}
+
+func (x *UpdateDestinationRequest) SetConfig(v *anypb.Any) {
+	x.Config = v
+}
+
+func (x *UpdateDestinationRequest) HasConfig() bool {
+	if x == nil {
+		return false
+	}
+	return x.Config != nil
+}
+
+func (x *UpdateDestinationRequest) ClearConfig() {
+	x.Config = nil
+}
+
+type UpdateDestinationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier of destination type.
+	TypeId string
+	// Unique identifier of Destination.
+	Id string
+	// Destination type overrides.
+	Config *anypb.Any
+}
+
+func (b0 UpdateDestinationRequest_builder) Build() *UpdateDestinationRequest {
+	m0 := &UpdateDestinationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.TypeId = b.TypeId
+	x.Id = b.Id
+	x.Config = b.Config
+	return m0
+}
+
 // Response from update configured destination.
 type UpdateDestinationResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The returned destination.
 	Destination   *Destination `protobuf:"bytes,1,opt,name=destination,proto3" json:"destination,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1723,11 +2739,6 @@ func (x *UpdateDestinationResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateDestinationResponse.ProtoReflect.Descriptor instead.
-func (*UpdateDestinationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{27}
-}
-
 func (x *UpdateDestinationResponse) GetDestination() *Destination {
 	if x != nil {
 		return x.Destination
@@ -1735,9 +2746,39 @@ func (x *UpdateDestinationResponse) GetDestination() *Destination {
 	return nil
 }
 
+func (x *UpdateDestinationResponse) SetDestination(v *Destination) {
+	x.Destination = v
+}
+
+func (x *UpdateDestinationResponse) HasDestination() bool {
+	if x == nil {
+		return false
+	}
+	return x.Destination != nil
+}
+
+func (x *UpdateDestinationResponse) ClearDestination() {
+	x.Destination = nil
+}
+
+type UpdateDestinationResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The returned destination.
+	Destination *Destination
+}
+
+func (b0 UpdateDestinationResponse_builder) Build() *UpdateDestinationResponse {
+	m0 := &UpdateDestinationResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Destination = b.Destination
+	return m0
+}
+
 // Request to delete configured destination.
 type DeleteDestinationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier of destination type.
 	TypeId string `protobuf:"bytes,1,opt,name=type_id,json=typeId,proto3" json:"type_id,omitempty"`
 	// Unique identifier of Destination.
@@ -1771,11 +2812,6 @@ func (x *DeleteDestinationRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteDestinationRequest.ProtoReflect.Descriptor instead.
-func (*DeleteDestinationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{28}
-}
-
 func (x *DeleteDestinationRequest) GetTypeId() string {
 	if x != nil {
 		return x.TypeId
@@ -1790,9 +2826,35 @@ func (x *DeleteDestinationRequest) GetId() string {
 	return ""
 }
 
+func (x *DeleteDestinationRequest) SetTypeId(v string) {
+	x.TypeId = v
+}
+
+func (x *DeleteDestinationRequest) SetId(v string) {
+	x.Id = v
+}
+
+type DeleteDestinationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier of destination type.
+	TypeId string
+	// Unique identifier of Destination.
+	Id string
+}
+
+func (b0 DeleteDestinationRequest_builder) Build() *DeleteDestinationRequest {
+	m0 := &DeleteDestinationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.TypeId = b.TypeId
+	x.Id = b.Id
+	return m0
+}
+
 // Response for delete configured destination.
 type DeleteDestinationResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1822,9 +2884,16 @@ func (x *DeleteDestinationResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteDestinationResponse.ProtoReflect.Descriptor instead.
-func (*DeleteDestinationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP(), []int{29}
+type DeleteDestinationResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 DeleteDestinationResponse_builder) Build() *DeleteDestinationResponse {
+	m0 := &DeleteDestinationResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 var File_dtkt_replication_v1beta1_messages_proto protoreflect.FileDescriptor
@@ -1939,18 +3008,6 @@ const file_dtkt_replication_v1beta1_messages_proto_rawDesc = "" +
 	"\x02id\x18\x02 \x01(\tR\x02id\"\x1b\n" +
 	"\x19DeleteDestinationResponseB\x8b\x02\n" +
 	"\x1eproto.dtkt.replication.v1beta1B\rMessagesProtoP\x01ZXgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/replication/v1beta1;replicationv1beta1\xa2\x02\x03DRX\xaa\x02\x18Dtkt.Replication.V1beta1\xca\x02\x18Dtkt\\Replication\\V1beta1\xe2\x02$Dtkt\\Replication\\V1beta1\\GPBMetadata\xea\x02\x1aDtkt::Replication::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_replication_v1beta1_messages_proto_rawDescOnce sync.Once
-	file_dtkt_replication_v1beta1_messages_proto_rawDescData []byte
-)
-
-func file_dtkt_replication_v1beta1_messages_proto_rawDescGZIP() []byte {
-	file_dtkt_replication_v1beta1_messages_proto_rawDescOnce.Do(func() {
-		file_dtkt_replication_v1beta1_messages_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_replication_v1beta1_messages_proto_rawDesc), len(file_dtkt_replication_v1beta1_messages_proto_rawDesc)))
-	})
-	return file_dtkt_replication_v1beta1_messages_proto_rawDescData
-}
 
 var file_dtkt_replication_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
 var file_dtkt_replication_v1beta1_messages_proto_goTypes = []any{

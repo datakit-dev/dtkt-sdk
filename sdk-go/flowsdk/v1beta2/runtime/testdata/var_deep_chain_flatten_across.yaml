@@ -1,0 +1,21 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: var_deep_chain_flatten_across
+  description: "Two-level var chain with expand-map then flatten and filter"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: expand
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= [this.value, this.value * 10]"
+    - id: flat
+      value: "= vars.expand.value"
+      transforms:
+        - flatten: true
+        - filter: "= this.value >= 10"
+  outputs:
+    - id: result
+      value: "= vars.flat.value"

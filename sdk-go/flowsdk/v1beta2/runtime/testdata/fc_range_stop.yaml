@@ -1,0 +1,18 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fc_range_stop
+  generators:
+    - id: seq
+      range:
+        start: 1
+        end: 100
+        step: 1
+        rate:
+          count: 100
+          interval: "1s"
+  outputs:
+    - id: result
+      value: "= generators.seq.value"
+      flow_control:
+        stop_when: "= int(generators.seq.eval_count) >= 5"

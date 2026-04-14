@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: action_string_echo
+  inputs:
+    - id: msg
+      string: {}
+  actions:
+    - id: echo
+      call:
+        connection: echo
+        method: echo.Echo
+        request: "= inputs.msg.value"
+  outputs:
+    - id: result
+      value: "= actions.echo.value"

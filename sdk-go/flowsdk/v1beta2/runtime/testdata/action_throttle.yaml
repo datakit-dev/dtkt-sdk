@@ -1,0 +1,19 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: action_throttle
+  inputs:
+    - id: x
+      int64: {}
+  actions:
+    - id: echo
+      throttle:
+        count: 5
+        interval: "0.5s"
+      call:
+        connection: echo
+        method: echo.Echo
+        request: "= inputs.x.value"
+  outputs:
+    - id: result
+      value: "= actions.echo.value"

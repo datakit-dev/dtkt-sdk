@@ -1,0 +1,13 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: outbox_range_generator
+  generators:
+    - id: r
+      range:
+        start: 1
+        end: 3
+        step: 1
+  outputs:
+    - id: result
+      value: "= generators.r.value"

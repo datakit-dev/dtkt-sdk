@@ -1,0 +1,26 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: var_deep_chain_scan_end
+  description: "Three-level var chain ending with scan accumulator"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: filtered
+      value: "= inputs.x.value"
+      transforms:
+        - filter: "= this.value > 2"
+    - id: doubled
+      value: "= vars.filtered.value"
+      transforms:
+        - map: "= this.value * 2"
+    - id: total
+      value: "= vars.doubled.value"
+      transforms:
+        - scan:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+  outputs:
+    - id: result
+      value: "= vars.total.value"

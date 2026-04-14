@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/geojson/v1beta1/messages.proto
 
+//go:build !protoopaque
+
 package geojsonv1beta1
 
 import (
@@ -11,7 +13,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -24,7 +25,7 @@ const (
 
 // GeoJSON Root object union
 type GeoJSON struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Geojson:
 	//
 	//	*GeoJSON_Geometry
@@ -58,11 +59,6 @@ func (x *GeoJSON) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GeoJSON.ProtoReflect.Descriptor instead.
-func (*GeoJSON) Descriptor() ([]byte, []int) {
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *GeoJSON) GetGeojson() isGeoJSON_Geojson {
@@ -99,6 +95,140 @@ func (x *GeoJSON) GetFeatureCollection() *FeatureCollection {
 	return nil
 }
 
+func (x *GeoJSON) SetGeometry(v *Geometry) {
+	if v == nil {
+		x.Geojson = nil
+		return
+	}
+	x.Geojson = &GeoJSON_Geometry{v}
+}
+
+func (x *GeoJSON) SetFeature(v *Feature) {
+	if v == nil {
+		x.Geojson = nil
+		return
+	}
+	x.Geojson = &GeoJSON_Feature{v}
+}
+
+func (x *GeoJSON) SetFeatureCollection(v *FeatureCollection) {
+	if v == nil {
+		x.Geojson = nil
+		return
+	}
+	x.Geojson = &GeoJSON_FeatureCollection{v}
+}
+
+func (x *GeoJSON) HasGeojson() bool {
+	if x == nil {
+		return false
+	}
+	return x.Geojson != nil
+}
+
+func (x *GeoJSON) HasGeometry() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Geojson.(*GeoJSON_Geometry)
+	return ok
+}
+
+func (x *GeoJSON) HasFeature() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Geojson.(*GeoJSON_Feature)
+	return ok
+}
+
+func (x *GeoJSON) HasFeatureCollection() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Geojson.(*GeoJSON_FeatureCollection)
+	return ok
+}
+
+func (x *GeoJSON) ClearGeojson() {
+	x.Geojson = nil
+}
+
+func (x *GeoJSON) ClearGeometry() {
+	if _, ok := x.Geojson.(*GeoJSON_Geometry); ok {
+		x.Geojson = nil
+	}
+}
+
+func (x *GeoJSON) ClearFeature() {
+	if _, ok := x.Geojson.(*GeoJSON_Feature); ok {
+		x.Geojson = nil
+	}
+}
+
+func (x *GeoJSON) ClearFeatureCollection() {
+	if _, ok := x.Geojson.(*GeoJSON_FeatureCollection); ok {
+		x.Geojson = nil
+	}
+}
+
+const GeoJSON_Geojson_not_set_case case_GeoJSON_Geojson = 0
+const GeoJSON_Geometry_case case_GeoJSON_Geojson = 1
+const GeoJSON_Feature_case case_GeoJSON_Geojson = 2
+const GeoJSON_FeatureCollection_case case_GeoJSON_Geojson = 3
+
+func (x *GeoJSON) WhichGeojson() case_GeoJSON_Geojson {
+	if x == nil {
+		return GeoJSON_Geojson_not_set_case
+	}
+	switch x.Geojson.(type) {
+	case *GeoJSON_Geometry:
+		return GeoJSON_Geometry_case
+	case *GeoJSON_Feature:
+		return GeoJSON_Feature_case
+	case *GeoJSON_FeatureCollection:
+		return GeoJSON_FeatureCollection_case
+	default:
+		return GeoJSON_Geojson_not_set_case
+	}
+}
+
+type GeoJSON_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Geojson:
+	Geometry          *Geometry
+	Feature           *Feature
+	FeatureCollection *FeatureCollection
+	// -- end of Geojson
+}
+
+func (b0 GeoJSON_builder) Build() *GeoJSON {
+	m0 := &GeoJSON{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Geometry != nil {
+		x.Geojson = &GeoJSON_Geometry{b.Geometry}
+	}
+	if b.Feature != nil {
+		x.Geojson = &GeoJSON_Feature{b.Feature}
+	}
+	if b.FeatureCollection != nil {
+		x.Geojson = &GeoJSON_FeatureCollection{b.FeatureCollection}
+	}
+	return m0
+}
+
+type case_GeoJSON_Geojson protoreflect.FieldNumber
+
+func (x case_GeoJSON_Geojson) String() string {
+	md := file_dtkt_geojson_v1beta1_messages_proto_msgTypes[0].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isGeoJSON_Geojson interface {
 	isGeoJSON_Geojson()
 }
@@ -123,7 +253,7 @@ func (*GeoJSON_FeatureCollection) isGeoJSON_Geojson() {}
 
 // Union type for Geometry using oneof
 type Geometry struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Geometry:
 	//
 	//	*Geometry_Point
@@ -161,11 +291,6 @@ func (x *Geometry) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Geometry.ProtoReflect.Descriptor instead.
-func (*Geometry) Descriptor() ([]byte, []int) {
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Geometry) GetGeometry() isGeometry_Geometry {
@@ -238,6 +363,256 @@ func (x *Geometry) GetGeometryCollection() *GeometryCollection {
 	return nil
 }
 
+func (x *Geometry) SetPoint(v *Point) {
+	if v == nil {
+		x.Geometry = nil
+		return
+	}
+	x.Geometry = &Geometry_Point{v}
+}
+
+func (x *Geometry) SetMultiPoint(v *MultiPoint) {
+	if v == nil {
+		x.Geometry = nil
+		return
+	}
+	x.Geometry = &Geometry_MultiPoint{v}
+}
+
+func (x *Geometry) SetLineString(v *LineString) {
+	if v == nil {
+		x.Geometry = nil
+		return
+	}
+	x.Geometry = &Geometry_LineString{v}
+}
+
+func (x *Geometry) SetMultiLineString(v *MultiLineString) {
+	if v == nil {
+		x.Geometry = nil
+		return
+	}
+	x.Geometry = &Geometry_MultiLineString{v}
+}
+
+func (x *Geometry) SetPolygon(v *Polygon) {
+	if v == nil {
+		x.Geometry = nil
+		return
+	}
+	x.Geometry = &Geometry_Polygon{v}
+}
+
+func (x *Geometry) SetMultiPolygon(v *MultiPolygon) {
+	if v == nil {
+		x.Geometry = nil
+		return
+	}
+	x.Geometry = &Geometry_MultiPolygon{v}
+}
+
+func (x *Geometry) SetGeometryCollection(v *GeometryCollection) {
+	if v == nil {
+		x.Geometry = nil
+		return
+	}
+	x.Geometry = &Geometry_GeometryCollection{v}
+}
+
+func (x *Geometry) HasGeometry() bool {
+	if x == nil {
+		return false
+	}
+	return x.Geometry != nil
+}
+
+func (x *Geometry) HasPoint() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Geometry.(*Geometry_Point)
+	return ok
+}
+
+func (x *Geometry) HasMultiPoint() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Geometry.(*Geometry_MultiPoint)
+	return ok
+}
+
+func (x *Geometry) HasLineString() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Geometry.(*Geometry_LineString)
+	return ok
+}
+
+func (x *Geometry) HasMultiLineString() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Geometry.(*Geometry_MultiLineString)
+	return ok
+}
+
+func (x *Geometry) HasPolygon() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Geometry.(*Geometry_Polygon)
+	return ok
+}
+
+func (x *Geometry) HasMultiPolygon() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Geometry.(*Geometry_MultiPolygon)
+	return ok
+}
+
+func (x *Geometry) HasGeometryCollection() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Geometry.(*Geometry_GeometryCollection)
+	return ok
+}
+
+func (x *Geometry) ClearGeometry() {
+	x.Geometry = nil
+}
+
+func (x *Geometry) ClearPoint() {
+	if _, ok := x.Geometry.(*Geometry_Point); ok {
+		x.Geometry = nil
+	}
+}
+
+func (x *Geometry) ClearMultiPoint() {
+	if _, ok := x.Geometry.(*Geometry_MultiPoint); ok {
+		x.Geometry = nil
+	}
+}
+
+func (x *Geometry) ClearLineString() {
+	if _, ok := x.Geometry.(*Geometry_LineString); ok {
+		x.Geometry = nil
+	}
+}
+
+func (x *Geometry) ClearMultiLineString() {
+	if _, ok := x.Geometry.(*Geometry_MultiLineString); ok {
+		x.Geometry = nil
+	}
+}
+
+func (x *Geometry) ClearPolygon() {
+	if _, ok := x.Geometry.(*Geometry_Polygon); ok {
+		x.Geometry = nil
+	}
+}
+
+func (x *Geometry) ClearMultiPolygon() {
+	if _, ok := x.Geometry.(*Geometry_MultiPolygon); ok {
+		x.Geometry = nil
+	}
+}
+
+func (x *Geometry) ClearGeometryCollection() {
+	if _, ok := x.Geometry.(*Geometry_GeometryCollection); ok {
+		x.Geometry = nil
+	}
+}
+
+const Geometry_Geometry_not_set_case case_Geometry_Geometry = 0
+const Geometry_Point_case case_Geometry_Geometry = 1
+const Geometry_MultiPoint_case case_Geometry_Geometry = 2
+const Geometry_LineString_case case_Geometry_Geometry = 3
+const Geometry_MultiLineString_case case_Geometry_Geometry = 4
+const Geometry_Polygon_case case_Geometry_Geometry = 5
+const Geometry_MultiPolygon_case case_Geometry_Geometry = 6
+const Geometry_GeometryCollection_case case_Geometry_Geometry = 7
+
+func (x *Geometry) WhichGeometry() case_Geometry_Geometry {
+	if x == nil {
+		return Geometry_Geometry_not_set_case
+	}
+	switch x.Geometry.(type) {
+	case *Geometry_Point:
+		return Geometry_Point_case
+	case *Geometry_MultiPoint:
+		return Geometry_MultiPoint_case
+	case *Geometry_LineString:
+		return Geometry_LineString_case
+	case *Geometry_MultiLineString:
+		return Geometry_MultiLineString_case
+	case *Geometry_Polygon:
+		return Geometry_Polygon_case
+	case *Geometry_MultiPolygon:
+		return Geometry_MultiPolygon_case
+	case *Geometry_GeometryCollection:
+		return Geometry_GeometryCollection_case
+	default:
+		return Geometry_Geometry_not_set_case
+	}
+}
+
+type Geometry_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Geometry:
+	Point              *Point
+	MultiPoint         *MultiPoint
+	LineString         *LineString
+	MultiLineString    *MultiLineString
+	Polygon            *Polygon
+	MultiPolygon       *MultiPolygon
+	GeometryCollection *GeometryCollection
+	// -- end of Geometry
+}
+
+func (b0 Geometry_builder) Build() *Geometry {
+	m0 := &Geometry{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Point != nil {
+		x.Geometry = &Geometry_Point{b.Point}
+	}
+	if b.MultiPoint != nil {
+		x.Geometry = &Geometry_MultiPoint{b.MultiPoint}
+	}
+	if b.LineString != nil {
+		x.Geometry = &Geometry_LineString{b.LineString}
+	}
+	if b.MultiLineString != nil {
+		x.Geometry = &Geometry_MultiLineString{b.MultiLineString}
+	}
+	if b.Polygon != nil {
+		x.Geometry = &Geometry_Polygon{b.Polygon}
+	}
+	if b.MultiPolygon != nil {
+		x.Geometry = &Geometry_MultiPolygon{b.MultiPolygon}
+	}
+	if b.GeometryCollection != nil {
+		x.Geometry = &Geometry_GeometryCollection{b.GeometryCollection}
+	}
+	return m0
+}
+
+type case_Geometry_Geometry protoreflect.FieldNumber
+
+func (x case_Geometry_Geometry) String() string {
+	md := file_dtkt_geojson_v1beta1_messages_proto_msgTypes[1].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isGeometry_Geometry interface {
 	isGeometry_Geometry()
 }
@@ -285,7 +660,7 @@ func (*Geometry_MultiPolygon) isGeometry_Geometry() {}
 func (*Geometry_GeometryCollection) isGeometry_Geometry() {}
 
 type Feature struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
+	state      protoimpl.MessageState `protogen:"hybrid.v1"`
 	Type       string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`         // always Feature
 	Geometry   *Geometry              `protobuf:"bytes,2,opt,name=geometry,proto3" json:"geometry,omitempty"` // may be null
 	Properties *structpb.Struct       `protobuf:"bytes,3,opt,name=properties,proto3" json:"properties,omitempty"`
@@ -322,11 +697,6 @@ func (x *Feature) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Feature.ProtoReflect.Descriptor instead.
-func (*Feature) Descriptor() ([]byte, []int) {
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Feature) GetType() string {
@@ -382,6 +752,160 @@ func (x *Feature) GetBbox() *BBox {
 	return nil
 }
 
+func (x *Feature) SetType(v string) {
+	x.Type = v
+}
+
+func (x *Feature) SetGeometry(v *Geometry) {
+	x.Geometry = v
+}
+
+func (x *Feature) SetProperties(v *structpb.Struct) {
+	x.Properties = v
+}
+
+func (x *Feature) SetIdStr(v string) {
+	x.Id = &Feature_IdStr{v}
+}
+
+func (x *Feature) SetIdNum(v int64) {
+	x.Id = &Feature_IdNum{v}
+}
+
+func (x *Feature) SetBbox(v *BBox) {
+	x.Bbox = v
+}
+
+func (x *Feature) HasGeometry() bool {
+	if x == nil {
+		return false
+	}
+	return x.Geometry != nil
+}
+
+func (x *Feature) HasProperties() bool {
+	if x == nil {
+		return false
+	}
+	return x.Properties != nil
+}
+
+func (x *Feature) HasId() bool {
+	if x == nil {
+		return false
+	}
+	return x.Id != nil
+}
+
+func (x *Feature) HasIdStr() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Id.(*Feature_IdStr)
+	return ok
+}
+
+func (x *Feature) HasIdNum() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Id.(*Feature_IdNum)
+	return ok
+}
+
+func (x *Feature) HasBbox() bool {
+	if x == nil {
+		return false
+	}
+	return x.Bbox != nil
+}
+
+func (x *Feature) ClearGeometry() {
+	x.Geometry = nil
+}
+
+func (x *Feature) ClearProperties() {
+	x.Properties = nil
+}
+
+func (x *Feature) ClearId() {
+	x.Id = nil
+}
+
+func (x *Feature) ClearIdStr() {
+	if _, ok := x.Id.(*Feature_IdStr); ok {
+		x.Id = nil
+	}
+}
+
+func (x *Feature) ClearIdNum() {
+	if _, ok := x.Id.(*Feature_IdNum); ok {
+		x.Id = nil
+	}
+}
+
+func (x *Feature) ClearBbox() {
+	x.Bbox = nil
+}
+
+const Feature_Id_not_set_case case_Feature_Id = 0
+const Feature_IdStr_case case_Feature_Id = 4
+const Feature_IdNum_case case_Feature_Id = 5
+
+func (x *Feature) WhichId() case_Feature_Id {
+	if x == nil {
+		return Feature_Id_not_set_case
+	}
+	switch x.Id.(type) {
+	case *Feature_IdStr:
+		return Feature_IdStr_case
+	case *Feature_IdNum:
+		return Feature_IdNum_case
+	default:
+		return Feature_Id_not_set_case
+	}
+}
+
+type Feature_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Type       string
+	Geometry   *Geometry
+	Properties *structpb.Struct
+	// Fields of oneof Id:
+	IdStr *string
+	IdNum *int64
+	// -- end of Id
+	Bbox *BBox
+}
+
+func (b0 Feature_builder) Build() *Feature {
+	m0 := &Feature{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Type = b.Type
+	x.Geometry = b.Geometry
+	x.Properties = b.Properties
+	if b.IdStr != nil {
+		x.Id = &Feature_IdStr{*b.IdStr}
+	}
+	if b.IdNum != nil {
+		x.Id = &Feature_IdNum{*b.IdNum}
+	}
+	x.Bbox = b.Bbox
+	return m0
+}
+
+type case_Feature_Id protoreflect.FieldNumber
+
+func (x case_Feature_Id) String() string {
+	md := file_dtkt_geojson_v1beta1_messages_proto_msgTypes[2].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isFeature_Id interface {
 	isFeature_Id()
 }
@@ -399,7 +923,7 @@ func (*Feature_IdStr) isFeature_Id() {}
 func (*Feature_IdNum) isFeature_Id() {}
 
 type FeatureCollection struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"` // always FeatureCollection
 	Features      []*Feature             `protobuf:"bytes,2,rep,name=features,proto3" json:"features,omitempty"`
 	Bbox          *BBox                  `protobuf:"bytes,3,opt,name=bbox,proto3" json:"bbox,omitempty"`
@@ -432,11 +956,6 @@ func (x *FeatureCollection) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FeatureCollection.ProtoReflect.Descriptor instead.
-func (*FeatureCollection) Descriptor() ([]byte, []int) {
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *FeatureCollection) GetType() string {
 	if x != nil {
 		return x.Type
@@ -458,9 +977,50 @@ func (x *FeatureCollection) GetBbox() *BBox {
 	return nil
 }
 
+func (x *FeatureCollection) SetType(v string) {
+	x.Type = v
+}
+
+func (x *FeatureCollection) SetFeatures(v []*Feature) {
+	x.Features = v
+}
+
+func (x *FeatureCollection) SetBbox(v *BBox) {
+	x.Bbox = v
+}
+
+func (x *FeatureCollection) HasBbox() bool {
+	if x == nil {
+		return false
+	}
+	return x.Bbox != nil
+}
+
+func (x *FeatureCollection) ClearBbox() {
+	x.Bbox = nil
+}
+
+type FeatureCollection_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Type     string
+	Features []*Feature
+	Bbox     *BBox
+}
+
+func (b0 FeatureCollection_builder) Build() *FeatureCollection {
+	m0 := &FeatureCollection{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Type = b.Type
+	x.Features = b.Features
+	x.Bbox = b.Bbox
+	return m0
+}
+
 // Represents a GeoJSON Bounding Box
 type BBox struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Coordinates   []float64              `protobuf:"fixed64,1,rep,packed,name=coordinates,proto3" json:"coordinates,omitempty"` // length 4 or 6
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -491,11 +1051,6 @@ func (x *BBox) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BBox.ProtoReflect.Descriptor instead.
-func (*BBox) Descriptor() ([]byte, []int) {
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *BBox) GetCoordinates() []float64 {
 	if x != nil {
 		return x.Coordinates
@@ -503,9 +1058,27 @@ func (x *BBox) GetCoordinates() []float64 {
 	return nil
 }
 
+func (x *BBox) SetCoordinates(v []float64) {
+	x.Coordinates = v
+}
+
+type BBox_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Coordinates []float64
+}
+
+func (b0 BBox_builder) Build() *BBox {
+	m0 := &BBox{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Coordinates = b.Coordinates
+	return m0
+}
+
 // Represents a GeoJSON Position (array of numbers: length 2 or 3)
 type Position struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Values        []float64              `protobuf:"fixed64,1,rep,packed,name=values,proto3" json:"values,omitempty"` // length 2 or 3
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -536,11 +1109,6 @@ func (x *Position) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Position.ProtoReflect.Descriptor instead.
-func (*Position) Descriptor() ([]byte, []int) {
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *Position) GetValues() []float64 {
 	if x != nil {
 		return x.Values
@@ -548,9 +1116,27 @@ func (x *Position) GetValues() []float64 {
 	return nil
 }
 
+func (x *Position) SetValues(v []float64) {
+	x.Values = v
+}
+
+type Position_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Values []float64
+}
+
+func (b0 Position_builder) Build() *Position {
+	m0 := &Position{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Values = b.Values
+	return m0
+}
+
 // GeoJSON Geometry types
 type Point struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"` // always Point
 	Coordinates   *Position              `protobuf:"bytes,2,opt,name=coordinates,proto3" json:"coordinates,omitempty"`
 	Bbox          *BBox                  `protobuf:"bytes,3,opt,name=bbox,proto3" json:"bbox,omitempty"`
@@ -583,11 +1169,6 @@ func (x *Point) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Point.ProtoReflect.Descriptor instead.
-func (*Point) Descriptor() ([]byte, []int) {
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *Point) GetType() string {
 	if x != nil {
 		return x.Type
@@ -609,8 +1190,60 @@ func (x *Point) GetBbox() *BBox {
 	return nil
 }
 
+func (x *Point) SetType(v string) {
+	x.Type = v
+}
+
+func (x *Point) SetCoordinates(v *Position) {
+	x.Coordinates = v
+}
+
+func (x *Point) SetBbox(v *BBox) {
+	x.Bbox = v
+}
+
+func (x *Point) HasCoordinates() bool {
+	if x == nil {
+		return false
+	}
+	return x.Coordinates != nil
+}
+
+func (x *Point) HasBbox() bool {
+	if x == nil {
+		return false
+	}
+	return x.Bbox != nil
+}
+
+func (x *Point) ClearCoordinates() {
+	x.Coordinates = nil
+}
+
+func (x *Point) ClearBbox() {
+	x.Bbox = nil
+}
+
+type Point_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Type        string
+	Coordinates *Position
+	Bbox        *BBox
+}
+
+func (b0 Point_builder) Build() *Point {
+	m0 := &Point{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Type = b.Type
+	x.Coordinates = b.Coordinates
+	x.Bbox = b.Bbox
+	return m0
+}
+
 type MultiPoint struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"` // always MultiPoint
 	Coordinates   []*Position            `protobuf:"bytes,2,rep,name=coordinates,proto3" json:"coordinates,omitempty"`
 	Bbox          *BBox                  `protobuf:"bytes,3,opt,name=bbox,proto3" json:"bbox,omitempty"`
@@ -643,11 +1276,6 @@ func (x *MultiPoint) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MultiPoint.ProtoReflect.Descriptor instead.
-func (*MultiPoint) Descriptor() ([]byte, []int) {
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *MultiPoint) GetType() string {
 	if x != nil {
 		return x.Type
@@ -669,8 +1297,49 @@ func (x *MultiPoint) GetBbox() *BBox {
 	return nil
 }
 
+func (x *MultiPoint) SetType(v string) {
+	x.Type = v
+}
+
+func (x *MultiPoint) SetCoordinates(v []*Position) {
+	x.Coordinates = v
+}
+
+func (x *MultiPoint) SetBbox(v *BBox) {
+	x.Bbox = v
+}
+
+func (x *MultiPoint) HasBbox() bool {
+	if x == nil {
+		return false
+	}
+	return x.Bbox != nil
+}
+
+func (x *MultiPoint) ClearBbox() {
+	x.Bbox = nil
+}
+
+type MultiPoint_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Type        string
+	Coordinates []*Position
+	Bbox        *BBox
+}
+
+func (b0 MultiPoint_builder) Build() *MultiPoint {
+	m0 := &MultiPoint{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Type = b.Type
+	x.Coordinates = b.Coordinates
+	x.Bbox = b.Bbox
+	return m0
+}
+
 type LineString struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"` // always LineString
 	Coordinates   []*Position            `protobuf:"bytes,2,rep,name=coordinates,proto3" json:"coordinates,omitempty"`
 	Bbox          *BBox                  `protobuf:"bytes,3,opt,name=bbox,proto3" json:"bbox,omitempty"`
@@ -703,11 +1372,6 @@ func (x *LineString) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use LineString.ProtoReflect.Descriptor instead.
-func (*LineString) Descriptor() ([]byte, []int) {
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *LineString) GetType() string {
 	if x != nil {
 		return x.Type
@@ -729,8 +1393,49 @@ func (x *LineString) GetBbox() *BBox {
 	return nil
 }
 
+func (x *LineString) SetType(v string) {
+	x.Type = v
+}
+
+func (x *LineString) SetCoordinates(v []*Position) {
+	x.Coordinates = v
+}
+
+func (x *LineString) SetBbox(v *BBox) {
+	x.Bbox = v
+}
+
+func (x *LineString) HasBbox() bool {
+	if x == nil {
+		return false
+	}
+	return x.Bbox != nil
+}
+
+func (x *LineString) ClearBbox() {
+	x.Bbox = nil
+}
+
+type LineString_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Type        string
+	Coordinates []*Position
+	Bbox        *BBox
+}
+
+func (b0 LineString_builder) Build() *LineString {
+	m0 := &LineString{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Type = b.Type
+	x.Coordinates = b.Coordinates
+	x.Bbox = b.Bbox
+	return m0
+}
+
 type MultiLineString struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"` // always MultiLineString
 	Coordinates   []*LineStringCoords    `protobuf:"bytes,2,rep,name=coordinates,proto3" json:"coordinates,omitempty"`
 	Bbox          *BBox                  `protobuf:"bytes,3,opt,name=bbox,proto3" json:"bbox,omitempty"`
@@ -763,11 +1468,6 @@ func (x *MultiLineString) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MultiLineString.ProtoReflect.Descriptor instead.
-func (*MultiLineString) Descriptor() ([]byte, []int) {
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *MultiLineString) GetType() string {
 	if x != nil {
 		return x.Type
@@ -789,8 +1489,49 @@ func (x *MultiLineString) GetBbox() *BBox {
 	return nil
 }
 
+func (x *MultiLineString) SetType(v string) {
+	x.Type = v
+}
+
+func (x *MultiLineString) SetCoordinates(v []*LineStringCoords) {
+	x.Coordinates = v
+}
+
+func (x *MultiLineString) SetBbox(v *BBox) {
+	x.Bbox = v
+}
+
+func (x *MultiLineString) HasBbox() bool {
+	if x == nil {
+		return false
+	}
+	return x.Bbox != nil
+}
+
+func (x *MultiLineString) ClearBbox() {
+	x.Bbox = nil
+}
+
+type MultiLineString_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Type        string
+	Coordinates []*LineStringCoords
+	Bbox        *BBox
+}
+
+func (b0 MultiLineString_builder) Build() *MultiLineString {
+	m0 := &MultiLineString{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Type = b.Type
+	x.Coordinates = b.Coordinates
+	x.Bbox = b.Bbox
+	return m0
+}
+
 type Polygon struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"` // always Polygon
 	Coordinates   []*LinearRing          `protobuf:"bytes,2,rep,name=coordinates,proto3" json:"coordinates,omitempty"`
 	Bbox          *BBox                  `protobuf:"bytes,3,opt,name=bbox,proto3" json:"bbox,omitempty"`
@@ -823,11 +1564,6 @@ func (x *Polygon) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Polygon.ProtoReflect.Descriptor instead.
-func (*Polygon) Descriptor() ([]byte, []int) {
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *Polygon) GetType() string {
 	if x != nil {
 		return x.Type
@@ -849,8 +1585,49 @@ func (x *Polygon) GetBbox() *BBox {
 	return nil
 }
 
+func (x *Polygon) SetType(v string) {
+	x.Type = v
+}
+
+func (x *Polygon) SetCoordinates(v []*LinearRing) {
+	x.Coordinates = v
+}
+
+func (x *Polygon) SetBbox(v *BBox) {
+	x.Bbox = v
+}
+
+func (x *Polygon) HasBbox() bool {
+	if x == nil {
+		return false
+	}
+	return x.Bbox != nil
+}
+
+func (x *Polygon) ClearBbox() {
+	x.Bbox = nil
+}
+
+type Polygon_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Type        string
+	Coordinates []*LinearRing
+	Bbox        *BBox
+}
+
+func (b0 Polygon_builder) Build() *Polygon {
+	m0 := &Polygon{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Type = b.Type
+	x.Coordinates = b.Coordinates
+	x.Bbox = b.Bbox
+	return m0
+}
+
 type MultiPolygon struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"` // always MultiPolygon
 	Coordinates   []*PolygonCoords       `protobuf:"bytes,2,rep,name=coordinates,proto3" json:"coordinates,omitempty"`
 	Bbox          *BBox                  `protobuf:"bytes,3,opt,name=bbox,proto3" json:"bbox,omitempty"`
@@ -883,11 +1660,6 @@ func (x *MultiPolygon) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MultiPolygon.ProtoReflect.Descriptor instead.
-func (*MultiPolygon) Descriptor() ([]byte, []int) {
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP(), []int{11}
-}
-
 func (x *MultiPolygon) GetType() string {
 	if x != nil {
 		return x.Type
@@ -909,8 +1681,49 @@ func (x *MultiPolygon) GetBbox() *BBox {
 	return nil
 }
 
+func (x *MultiPolygon) SetType(v string) {
+	x.Type = v
+}
+
+func (x *MultiPolygon) SetCoordinates(v []*PolygonCoords) {
+	x.Coordinates = v
+}
+
+func (x *MultiPolygon) SetBbox(v *BBox) {
+	x.Bbox = v
+}
+
+func (x *MultiPolygon) HasBbox() bool {
+	if x == nil {
+		return false
+	}
+	return x.Bbox != nil
+}
+
+func (x *MultiPolygon) ClearBbox() {
+	x.Bbox = nil
+}
+
+type MultiPolygon_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Type        string
+	Coordinates []*PolygonCoords
+	Bbox        *BBox
+}
+
+func (b0 MultiPolygon_builder) Build() *MultiPolygon {
+	m0 := &MultiPolygon{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Type = b.Type
+	x.Coordinates = b.Coordinates
+	x.Bbox = b.Bbox
+	return m0
+}
+
 type GeometryCollection struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"` // always GeometryCollection
 	Geometries    []*Geometry            `protobuf:"bytes,2,rep,name=geometries,proto3" json:"geometries,omitempty"`
 	Bbox          *BBox                  `protobuf:"bytes,3,opt,name=bbox,proto3" json:"bbox,omitempty"`
@@ -943,11 +1756,6 @@ func (x *GeometryCollection) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GeometryCollection.ProtoReflect.Descriptor instead.
-func (*GeometryCollection) Descriptor() ([]byte, []int) {
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP(), []int{12}
-}
-
 func (x *GeometryCollection) GetType() string {
 	if x != nil {
 		return x.Type
@@ -969,9 +1777,50 @@ func (x *GeometryCollection) GetBbox() *BBox {
 	return nil
 }
 
+func (x *GeometryCollection) SetType(v string) {
+	x.Type = v
+}
+
+func (x *GeometryCollection) SetGeometries(v []*Geometry) {
+	x.Geometries = v
+}
+
+func (x *GeometryCollection) SetBbox(v *BBox) {
+	x.Bbox = v
+}
+
+func (x *GeometryCollection) HasBbox() bool {
+	if x == nil {
+		return false
+	}
+	return x.Bbox != nil
+}
+
+func (x *GeometryCollection) ClearBbox() {
+	x.Bbox = nil
+}
+
+type GeometryCollection_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Type       string
+	Geometries []*Geometry
+	Bbox       *BBox
+}
+
+func (b0 GeometryCollection_builder) Build() *GeometryCollection {
+	m0 := &GeometryCollection{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Type = b.Type
+	x.Geometries = b.Geometries
+	x.Bbox = b.Bbox
+	return m0
+}
+
 // Helper types for nested coordinates
 type LineStringCoords struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Positions     []*Position            `protobuf:"bytes,1,rep,name=positions,proto3" json:"positions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1002,11 +1851,6 @@ func (x *LineStringCoords) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use LineStringCoords.ProtoReflect.Descriptor instead.
-func (*LineStringCoords) Descriptor() ([]byte, []int) {
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP(), []int{13}
-}
-
 func (x *LineStringCoords) GetPositions() []*Position {
 	if x != nil {
 		return x.Positions
@@ -1014,8 +1858,26 @@ func (x *LineStringCoords) GetPositions() []*Position {
 	return nil
 }
 
+func (x *LineStringCoords) SetPositions(v []*Position) {
+	x.Positions = v
+}
+
+type LineStringCoords_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Positions []*Position
+}
+
+func (b0 LineStringCoords_builder) Build() *LineStringCoords {
+	m0 := &LineStringCoords{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Positions = b.Positions
+	return m0
+}
+
 type LinearRing struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Positions     []*Position            `protobuf:"bytes,1,rep,name=positions,proto3" json:"positions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1046,11 +1908,6 @@ func (x *LinearRing) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use LinearRing.ProtoReflect.Descriptor instead.
-func (*LinearRing) Descriptor() ([]byte, []int) {
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP(), []int{14}
-}
-
 func (x *LinearRing) GetPositions() []*Position {
 	if x != nil {
 		return x.Positions
@@ -1058,8 +1915,26 @@ func (x *LinearRing) GetPositions() []*Position {
 	return nil
 }
 
+func (x *LinearRing) SetPositions(v []*Position) {
+	x.Positions = v
+}
+
+type LinearRing_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Positions []*Position
+}
+
+func (b0 LinearRing_builder) Build() *LinearRing {
+	m0 := &LinearRing{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Positions = b.Positions
+	return m0
+}
+
 type PolygonCoords struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	LinearRings   []*LinearRing          `protobuf:"bytes,1,rep,name=linear_rings,json=linearRings,proto3" json:"linear_rings,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1090,16 +1965,29 @@ func (x *PolygonCoords) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PolygonCoords.ProtoReflect.Descriptor instead.
-func (*PolygonCoords) Descriptor() ([]byte, []int) {
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP(), []int{15}
-}
-
 func (x *PolygonCoords) GetLinearRings() []*LinearRing {
 	if x != nil {
 		return x.LinearRings
 	}
 	return nil
+}
+
+func (x *PolygonCoords) SetLinearRings(v []*LinearRing) {
+	x.LinearRings = v
+}
+
+type PolygonCoords_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	LinearRings []*LinearRing
+}
+
+func (b0 PolygonCoords_builder) Build() *PolygonCoords {
+	m0 := &PolygonCoords{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.LinearRings = b.LinearRings
+	return m0
 }
 
 var File_dtkt_geojson_v1beta1_messages_proto protoreflect.FileDescriptor
@@ -1182,18 +2070,6 @@ const file_dtkt_geojson_v1beta1_messages_proto_rawDesc = "" +
 	"\rPolygonCoords\x12C\n" +
 	"\flinear_rings\x18\x01 \x03(\v2 .dtkt.geojson.v1beta1.LinearRingR\vlinearRingsB\xef\x01\n" +
 	"\x1aproto.dtkt.geojson.v1beta1B\rMessagesProtoP\x01ZPgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/geojson/v1beta1;geojsonv1beta1\xa2\x02\x03DGX\xaa\x02\x14Dtkt.Geojson.V1beta1\xca\x02\x14Dtkt\\Geojson\\V1beta1\xe2\x02 Dtkt\\Geojson\\V1beta1\\GPBMetadata\xea\x02\x16Dtkt::Geojson::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_geojson_v1beta1_messages_proto_rawDescOnce sync.Once
-	file_dtkt_geojson_v1beta1_messages_proto_rawDescData []byte
-)
-
-func file_dtkt_geojson_v1beta1_messages_proto_rawDescGZIP() []byte {
-	file_dtkt_geojson_v1beta1_messages_proto_rawDescOnce.Do(func() {
-		file_dtkt_geojson_v1beta1_messages_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_geojson_v1beta1_messages_proto_rawDesc), len(file_dtkt_geojson_v1beta1_messages_proto_rawDesc)))
-	})
-	return file_dtkt_geojson_v1beta1_messages_proto_rawDescData
-}
 
 var file_dtkt_geojson_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_dtkt_geojson_v1beta1_messages_proto_goTypes = []any{

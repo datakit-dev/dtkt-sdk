@@ -1,0 +1,15 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fc_var_suspend
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: doubled
+      value: "= inputs.x.value * 2"
+      flow_control:
+        suspend_when: "= true"
+  outputs:
+    - id: result
+      value: "= vars.doubled.value"

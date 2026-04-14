@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/flow/v1beta1/eval.proto
 
+//go:build !protoopaque
+
 package flowv1beta1
 
 import (
@@ -13,7 +15,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -75,13 +76,8 @@ func (x Node_State) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use Node_State.Descriptor instead.
-func (Node_State) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{3, 0}
-}
-
 type Runtime struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Connections   map[string]*Node       `protobuf:"bytes,1,rep,name=connections,proto3" json:"connections,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	Inputs        map[string]*Node       `protobuf:"bytes,2,rep,name=inputs,proto3" json:"inputs,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	Vars          map[string]*Node       `protobuf:"bytes,3,rep,name=vars,proto3" json:"vars,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
@@ -115,11 +111,6 @@ func (x *Runtime) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Runtime.ProtoReflect.Descriptor instead.
-func (*Runtime) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Runtime) GetConnections() map[string]*Node {
@@ -164,8 +155,56 @@ func (x *Runtime) GetOutputs() map[string]*Node {
 	return nil
 }
 
+func (x *Runtime) SetConnections(v map[string]*Node) {
+	x.Connections = v
+}
+
+func (x *Runtime) SetInputs(v map[string]*Node) {
+	x.Inputs = v
+}
+
+func (x *Runtime) SetVars(v map[string]*Node) {
+	x.Vars = v
+}
+
+func (x *Runtime) SetActions(v map[string]*Node) {
+	x.Actions = v
+}
+
+func (x *Runtime) SetStreams(v map[string]*Node) {
+	x.Streams = v
+}
+
+func (x *Runtime) SetOutputs(v map[string]*Node) {
+	x.Outputs = v
+}
+
+type Runtime_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Connections map[string]*Node
+	Inputs      map[string]*Node
+	Vars        map[string]*Node
+	Actions     map[string]*Node
+	Streams     map[string]*Node
+	Outputs     map[string]*Node
+}
+
+func (b0 Runtime_builder) Build() *Runtime {
+	m0 := &Runtime{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Connections = b.Connections
+	x.Inputs = b.Inputs
+	x.Vars = b.Vars
+	x.Actions = b.Actions
+	x.Streams = b.Streams
+	x.Outputs = b.Outputs
+	return m0
+}
+
 type Graph struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Nodes         []*Node                `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty"`
 	Edges         []*Edge                `protobuf:"bytes,2,rep,name=edges,proto3" json:"edges,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -197,11 +236,6 @@ func (x *Graph) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Graph.ProtoReflect.Descriptor instead.
-func (*Graph) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *Graph) GetNodes() []*Node {
 	if x != nil {
 		return x.Nodes
@@ -216,8 +250,32 @@ func (x *Graph) GetEdges() []*Edge {
 	return nil
 }
 
+func (x *Graph) SetNodes(v []*Node) {
+	x.Nodes = v
+}
+
+func (x *Graph) SetEdges(v []*Edge) {
+	x.Edges = v
+}
+
+type Graph_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Nodes []*Node
+	Edges []*Edge
+}
+
+func (b0 Graph_builder) Build() *Graph {
+	m0 := &Graph{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Nodes = b.Nodes
+	x.Edges = b.Edges
+	return m0
+}
+
 type Edge struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Source        string                 `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
 	Target        string                 `protobuf:"bytes,2,opt,name=target,proto3" json:"target,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -249,11 +307,6 @@ func (x *Edge) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Edge.ProtoReflect.Descriptor instead.
-func (*Edge) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *Edge) GetSource() string {
 	if x != nil {
 		return x.Source
@@ -268,8 +321,32 @@ func (x *Edge) GetTarget() string {
 	return ""
 }
 
+func (x *Edge) SetSource(v string) {
+	x.Source = v
+}
+
+func (x *Edge) SetTarget(v string) {
+	x.Target = v
+}
+
+type Edge_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Source string
+	Target string
+}
+
+func (b0 Edge_builder) Build() *Edge {
+	m0 := &Edge{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Source = b.Source
+	x.Target = b.Target
+	return m0
+}
+
 type Node struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
+	state      protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id         string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	State      Node_State             `protobuf:"varint,2,opt,name=state,proto3,enum=dtkt.flow.v1beta1.Node_State" json:"state,omitempty"`
 	CallCount  uint64                 `protobuf:"varint,4,opt,name=call_count,json=callCount,proto3" json:"call_count,omitempty"`
@@ -313,11 +390,6 @@ func (x *Node) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Node.ProtoReflect.Descriptor instead.
-func (*Node) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Node) GetId() string {
@@ -430,6 +502,313 @@ func (x *Node) GetStream() *Stream {
 	return nil
 }
 
+func (x *Node) SetId(v string) {
+	x.Id = v
+}
+
+func (x *Node) SetState(v Node_State) {
+	x.State = v
+}
+
+func (x *Node) SetCallCount(v uint64) {
+	x.CallCount = v
+}
+
+func (x *Node) SetPrevValue(v *expr.Value) {
+	x.PrevValue = v
+}
+
+func (x *Node) SetCurrValue(v *expr.Value) {
+	x.CurrValue = v
+}
+
+func (x *Node) SetStartTime(v *timestamppb.Timestamp) {
+	x.StartTime = v
+}
+
+func (x *Node) SetFinishTime(v *timestamppb.Timestamp) {
+	x.FinishTime = v
+}
+
+func (x *Node) SetConnection(v *Connection) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Node_Connection{v}
+}
+
+func (x *Node) SetInput(v *Input) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Node_Input{v}
+}
+
+func (x *Node) SetVar(v *Var) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Node_Var{v}
+}
+
+func (x *Node) SetAction(v *Action) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Node_Action{v}
+}
+
+func (x *Node) SetOutput(v *Output) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Node_Output{v}
+}
+
+func (x *Node) SetStream(v *Stream) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Node_Stream{v}
+}
+
+func (x *Node) HasPrevValue() bool {
+	if x == nil {
+		return false
+	}
+	return x.PrevValue != nil
+}
+
+func (x *Node) HasCurrValue() bool {
+	if x == nil {
+		return false
+	}
+	return x.CurrValue != nil
+}
+
+func (x *Node) HasStartTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.StartTime != nil
+}
+
+func (x *Node) HasFinishTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.FinishTime != nil
+}
+
+func (x *Node) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return x.Type != nil
+}
+
+func (x *Node) HasConnection() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Node_Connection)
+	return ok
+}
+
+func (x *Node) HasInput() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Node_Input)
+	return ok
+}
+
+func (x *Node) HasVar() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Node_Var)
+	return ok
+}
+
+func (x *Node) HasAction() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Node_Action)
+	return ok
+}
+
+func (x *Node) HasOutput() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Node_Output)
+	return ok
+}
+
+func (x *Node) HasStream() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Node_Stream)
+	return ok
+}
+
+func (x *Node) ClearPrevValue() {
+	x.PrevValue = nil
+}
+
+func (x *Node) ClearCurrValue() {
+	x.CurrValue = nil
+}
+
+func (x *Node) ClearStartTime() {
+	x.StartTime = nil
+}
+
+func (x *Node) ClearFinishTime() {
+	x.FinishTime = nil
+}
+
+func (x *Node) ClearType() {
+	x.Type = nil
+}
+
+func (x *Node) ClearConnection() {
+	if _, ok := x.Type.(*Node_Connection); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Node) ClearInput() {
+	if _, ok := x.Type.(*Node_Input); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Node) ClearVar() {
+	if _, ok := x.Type.(*Node_Var); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Node) ClearAction() {
+	if _, ok := x.Type.(*Node_Action); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Node) ClearOutput() {
+	if _, ok := x.Type.(*Node_Output); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Node) ClearStream() {
+	if _, ok := x.Type.(*Node_Stream); ok {
+		x.Type = nil
+	}
+}
+
+const Node_Type_not_set_case case_Node_Type = 0
+const Node_Connection_case case_Node_Type = 7
+const Node_Input_case case_Node_Type = 8
+const Node_Var_case case_Node_Type = 9
+const Node_Action_case case_Node_Type = 11
+const Node_Output_case case_Node_Type = 13
+const Node_Stream_case case_Node_Type = 14
+
+func (x *Node) WhichType() case_Node_Type {
+	if x == nil {
+		return Node_Type_not_set_case
+	}
+	switch x.Type.(type) {
+	case *Node_Connection:
+		return Node_Connection_case
+	case *Node_Input:
+		return Node_Input_case
+	case *Node_Var:
+		return Node_Var_case
+	case *Node_Action:
+		return Node_Action_case
+	case *Node_Output:
+		return Node_Output_case
+	case *Node_Stream:
+		return Node_Stream_case
+	default:
+		return Node_Type_not_set_case
+	}
+}
+
+type Node_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id         string
+	State      Node_State
+	CallCount  uint64
+	PrevValue  *expr.Value
+	CurrValue  *expr.Value
+	StartTime  *timestamppb.Timestamp
+	FinishTime *timestamppb.Timestamp
+	// Fields of oneof Type:
+	Connection *Connection
+	Input      *Input
+	Var        *Var
+	Action     *Action
+	Output     *Output
+	Stream     *Stream
+	// -- end of Type
+}
+
+func (b0 Node_builder) Build() *Node {
+	m0 := &Node{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.State = b.State
+	x.CallCount = b.CallCount
+	x.PrevValue = b.PrevValue
+	x.CurrValue = b.CurrValue
+	x.StartTime = b.StartTime
+	x.FinishTime = b.FinishTime
+	if b.Connection != nil {
+		x.Type = &Node_Connection{b.Connection}
+	}
+	if b.Input != nil {
+		x.Type = &Node_Input{b.Input}
+	}
+	if b.Var != nil {
+		x.Type = &Node_Var{b.Var}
+	}
+	if b.Action != nil {
+		x.Type = &Node_Action{b.Action}
+	}
+	if b.Output != nil {
+		x.Type = &Node_Output{b.Output}
+	}
+	if b.Stream != nil {
+		x.Type = &Node_Stream{b.Stream}
+	}
+	return m0
+}
+
+type case_Node_Type protoreflect.FieldNumber
+
+func (x case_Node_Type) String() string {
+	md := file_dtkt_flow_v1beta1_eval_proto_msgTypes[3].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isNode_Type interface {
 	isNode_Type()
 }
@@ -471,7 +850,7 @@ func (*Node_Output) isNode_Type() {}
 func (*Node_Stream) isNode_Type() {}
 
 type Runtime_Done struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
 	IsError       bool                   `protobuf:"varint,3,opt,name=is_error,json=isError,proto3" json:"is_error,omitempty"`
@@ -504,11 +883,6 @@ func (x *Runtime_Done) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Runtime_Done.ProtoReflect.Descriptor instead.
-func (*Runtime_Done) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{0, 0}
-}
-
 func (x *Runtime_Done) GetId() string {
 	if x != nil {
 		return x.Id
@@ -530,8 +904,38 @@ func (x *Runtime_Done) GetIsError() bool {
 	return false
 }
 
+func (x *Runtime_Done) SetId(v string) {
+	x.Id = v
+}
+
+func (x *Runtime_Done) SetReason(v string) {
+	x.Reason = v
+}
+
+func (x *Runtime_Done) SetIsError(v bool) {
+	x.IsError = v
+}
+
+type Runtime_Done_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id      string
+	Reason  string
+	IsError bool
+}
+
+func (b0 Runtime_Done_builder) Build() *Runtime_Done {
+	m0 := &Runtime_Done{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Reason = b.Reason
+	x.IsError = b.IsError
+	return m0
+}
+
 type Runtime_EOF struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -561,9 +965,16 @@ func (x *Runtime_EOF) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Runtime_EOF.ProtoReflect.Descriptor instead.
-func (*Runtime_EOF) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{0, 1}
+type Runtime_EOF_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 Runtime_EOF_builder) Build() *Runtime_EOF {
+	m0 := &Runtime_EOF{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 var File_dtkt_flow_v1beta1_eval_proto protoreflect.FileDescriptor
@@ -635,18 +1046,6 @@ const file_dtkt_flow_v1beta1_eval_proto_rawDesc = "" +
 	"\vSTATE_ERROR\x10\x03B\r\n" +
 	"\x04type\x12\x05\xbaH\x02\b\x01B\xd6\x01\n" +
 	"\x17proto.dtkt.flow.v1beta1B\tEvalProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1;flowv1beta1\xa2\x02\x03DFX\xaa\x02\x11Dtkt.Flow.V1beta1\xca\x02\x11Dtkt\\Flow\\V1beta1\xe2\x02\x1dDtkt\\Flow\\V1beta1\\GPBMetadata\xea\x02\x13Dtkt::Flow::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_flow_v1beta1_eval_proto_rawDescOnce sync.Once
-	file_dtkt_flow_v1beta1_eval_proto_rawDescData []byte
-)
-
-func file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP() []byte {
-	file_dtkt_flow_v1beta1_eval_proto_rawDescOnce.Do(func() {
-		file_dtkt_flow_v1beta1_eval_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_flow_v1beta1_eval_proto_rawDesc), len(file_dtkt_flow_v1beta1_eval_proto_rawDesc)))
-	})
-	return file_dtkt_flow_v1beta1_eval_proto_rawDescData
-}
 
 var file_dtkt_flow_v1beta1_eval_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_dtkt_flow_v1beta1_eval_proto_msgTypes = make([]protoimpl.MessageInfo, 12)

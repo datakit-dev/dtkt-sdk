@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/email/v1beta1/services.proto
 
+//go:build !protoopaque
+
 package emailv1beta1
 
 import (

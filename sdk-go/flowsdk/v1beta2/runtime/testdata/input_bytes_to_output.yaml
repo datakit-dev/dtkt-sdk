@@ -1,0 +1,11 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_bytes_to_output
+  description: "Bytes input passed directly to output"
+  inputs:
+    - id: x
+      bytes: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value"

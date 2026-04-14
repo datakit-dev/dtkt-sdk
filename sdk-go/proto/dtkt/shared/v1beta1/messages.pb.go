@@ -8,6 +8,8 @@
 // 	protoc        (unknown)
 // source: dtkt/shared/v1beta1/messages.proto
 
+//go:build !protoopaque
+
 package sharedv1beta1
 
 import (
@@ -20,7 +22,6 @@ import (
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -33,7 +34,7 @@ const (
 
 // Package provides an identity and metadata for a DataKit Integration.
 type Package struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Identity name (camel, snake, or pascal case) and version (semver) of integration.
 	Identity *Package_Identity `protobuf:"bytes,1,opt,name=identity,proto3" json:"identity,omitempty"`
 	// A helpful description of features and capabilities.
@@ -79,11 +80,6 @@ func (x *Package) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Package.ProtoReflect.Descriptor instead.
-func (*Package) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Package) GetIdentity() *Package_Identity {
 	if x != nil {
 		return x.Identity
@@ -126,11 +122,16 @@ func (x *Package) GetPlatforms() []*Platform {
 	return nil
 }
 
-func (x *Package) GetBuild() *Package_BuildConfig {
+func (x *Package) GetBuild_() *Package_BuildConfig {
 	if x != nil {
 		return x.Build
 	}
 	return nil
+}
+
+// Deprecated: Use GetBuild_ instead.
+func (x *Package) GetBuild() *Package_BuildConfig {
+	return x.GetBuild_()
 }
 
 func (x *Package) GetDeploy() *Package_DeployConfig {
@@ -140,9 +141,110 @@ func (x *Package) GetDeploy() *Package_DeployConfig {
 	return nil
 }
 
+func (x *Package) SetIdentity(v *Package_Identity) {
+	x.Identity = v
+}
+
+func (x *Package) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *Package) SetIcon(v string) {
+	x.Icon = v
+}
+
+func (x *Package) SetType(v PackageType) {
+	x.Type = v
+}
+
+func (x *Package) SetRuntimes(v []Runtime) {
+	x.Runtimes = v
+}
+
+func (x *Package) SetPlatforms(v []*Platform) {
+	x.Platforms = v
+}
+
+func (x *Package) SetBuild_(v *Package_BuildConfig) {
+	x.Build = v
+}
+
+func (x *Package) SetDeploy(v *Package_DeployConfig) {
+	x.Deploy = v
+}
+
+func (x *Package) HasIdentity() bool {
+	if x == nil {
+		return false
+	}
+	return x.Identity != nil
+}
+
+func (x *Package) HasBuild_() bool {
+	if x == nil {
+		return false
+	}
+	return x.Build != nil
+}
+
+func (x *Package) HasDeploy() bool {
+	if x == nil {
+		return false
+	}
+	return x.Deploy != nil
+}
+
+func (x *Package) ClearIdentity() {
+	x.Identity = nil
+}
+
+func (x *Package) ClearBuild_() {
+	x.Build = nil
+}
+
+func (x *Package) ClearDeploy() {
+	x.Deploy = nil
+}
+
+type Package_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Identity name (camel, snake, or pascal case) and version (semver) of integration.
+	Identity *Package_Identity
+	// A helpful description of features and capabilities.
+	Description string
+	// An icon image uri (optional).
+	Icon string
+	// Source language & SDK of integration (required).
+	Type PackageType
+	// Compatible target runtimes of integration (optional; defaults to all runtimes).
+	Runtimes []Runtime
+	// Compatible target platforms of integration (optional; defaults to all platforms).
+	Platforms []*Platform
+	// Build configuration.
+	Build_ *Package_BuildConfig
+	// Deploy configuration.
+	Deploy *Package_DeployConfig
+}
+
+func (b0 Package_builder) Build() *Package {
+	m0 := &Package{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Identity = b.Identity
+	x.Description = b.Description
+	x.Icon = b.Icon
+	x.Type = b.Type
+	x.Runtimes = b.Runtimes
+	x.Platforms = b.Platforms
+	x.Build = b.Build_
+	x.Deploy = b.Deploy
+	return m0
+}
+
 // Operating system and CPU architecture pair.
 type Platform struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Os            OS                     `protobuf:"varint,2,opt,name=os,proto3,enum=dtkt.shared.v1beta1.OS" json:"os,omitempty"`
 	Arch          Arch                   `protobuf:"varint,3,opt,name=arch,proto3,enum=dtkt.shared.v1beta1.Arch" json:"arch,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -174,11 +276,6 @@ func (x *Platform) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Platform.ProtoReflect.Descriptor instead.
-func (*Platform) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *Platform) GetOs() OS {
 	if x != nil {
 		return x.Os
@@ -193,9 +290,33 @@ func (x *Platform) GetArch() Arch {
 	return Arch_ARCH_UNSPECIFIED
 }
 
+func (x *Platform) SetOs(v OS) {
+	x.Os = v
+}
+
+func (x *Platform) SetArch(v Arch) {
+	x.Arch = v
+}
+
+type Platform_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Os   OS
+	Arch Arch
+}
+
+func (b0 Platform_builder) Build() *Platform {
+	m0 := &Platform{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Os = b.Os
+	x.Arch = b.Arch
+	return m0
+}
+
 // Represents a field within a table, query, input/output, etc.
 type Field struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of the field.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Data type of the field.
@@ -237,11 +358,6 @@ func (x *Field) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Field.ProtoReflect.Descriptor instead.
-func (*Field) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Field) GetName() string {
@@ -293,9 +409,92 @@ func (x *Field) GetElement() *v1beta1.FieldElement {
 	return nil
 }
 
+func (x *Field) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Field) SetType(v *DataType) {
+	x.Type = v
+}
+
+func (x *Field) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *Field) SetNullable(v bool) {
+	x.Nullable = v
+}
+
+func (x *Field) SetRepeated(v bool) {
+	x.Repeated = v
+}
+
+func (x *Field) SetFields(v []*Field) {
+	x.Fields = v
+}
+
+func (x *Field) SetElement(v *v1beta1.FieldElement) {
+	x.Element = v
+}
+
+func (x *Field) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return x.Type != nil
+}
+
+func (x *Field) HasElement() bool {
+	if x == nil {
+		return false
+	}
+	return x.Element != nil
+}
+
+func (x *Field) ClearType() {
+	x.Type = nil
+}
+
+func (x *Field) ClearElement() {
+	x.Element = nil
+}
+
+type Field_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of the field.
+	Name string
+	// Data type of the field.
+	Type *DataType
+	// Description of the field.
+	Description string
+	// Indicates if the field allows null values (i.e. is not required).
+	Nullable bool
+	// Indicates if the field contains repeated values (i.e. an array of the given type).
+	Repeated bool
+	// Nested fields, if the field is a complex type (i.e. the type represents an object or map type).
+	Fields []*Field
+	// Protoform field element for runtime UI configuration.
+	Element *v1beta1.FieldElement
+}
+
+func (b0 Field_builder) Build() *Field {
+	m0 := &Field{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Type = b.Type
+	x.Description = b.Description
+	x.Nullable = b.Nullable
+	x.Repeated = b.Repeated
+	x.Fields = b.Fields
+	x.Element = b.Element
+	return m0
+}
+
 // Represents a parameterized value used in a query, input/output, etc.
 type Param struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Field describing the param data.
 	Field *Field `protobuf:"bytes,1,opt,name=field,proto3" json:"field,omitempty"`
 	// Value of the parameter, if any.
@@ -329,11 +528,6 @@ func (x *Param) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Param.ProtoReflect.Descriptor instead.
-func (*Param) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *Param) GetField() *Field {
 	if x != nil {
 		return x.Field
@@ -348,9 +542,57 @@ func (x *Param) GetValue() *anypb.Any {
 	return nil
 }
 
+func (x *Param) SetField(v *Field) {
+	x.Field = v
+}
+
+func (x *Param) SetValue(v *anypb.Any) {
+	x.Value = v
+}
+
+func (x *Param) HasField() bool {
+	if x == nil {
+		return false
+	}
+	return x.Field != nil
+}
+
+func (x *Param) HasValue() bool {
+	if x == nil {
+		return false
+	}
+	return x.Value != nil
+}
+
+func (x *Param) ClearField() {
+	x.Field = nil
+}
+
+func (x *Param) ClearValue() {
+	x.Value = nil
+}
+
+type Param_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Field describing the param data.
+	Field *Field
+	// Value of the parameter, if any.
+	Value *anypb.Any
+}
+
+func (b0 Param_builder) Build() *Param {
+	m0 := &Param{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Field = b.Field
+	x.Value = b.Value
+	return m0
+}
+
 // Represents a list of strings as a message.
 type StringList struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Values        []string               `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -381,11 +623,6 @@ func (x *StringList) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StringList.ProtoReflect.Descriptor instead.
-func (*StringList) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *StringList) GetValues() []string {
 	if x != nil {
 		return x.Values
@@ -393,9 +630,27 @@ func (x *StringList) GetValues() []string {
 	return nil
 }
 
+func (x *StringList) SetValues(v []string) {
+	x.Values = v
+}
+
+type StringList_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Values []string
+}
+
+func (b0 StringList_builder) Build() *StringList {
+	m0 := &StringList{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Values = b.Values
+	return m0
+}
+
 // Represents a map of string keys to arbitrary protobuf values.
 type AnyMap struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Values        map[string]*anypb.Any  `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -426,11 +681,6 @@ func (x *AnyMap) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AnyMap.ProtoReflect.Descriptor instead.
-func (*AnyMap) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *AnyMap) GetValues() map[string]*anypb.Any {
 	if x != nil {
 		return x.Values
@@ -438,9 +688,27 @@ func (x *AnyMap) GetValues() map[string]*anypb.Any {
 	return nil
 }
 
+func (x *AnyMap) SetValues(v map[string]*anypb.Any) {
+	x.Values = v
+}
+
+type AnyMap_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Values map[string]*anypb.Any
+}
+
+func (b0 AnyMap_builder) Build() *AnyMap {
+	m0 := &AnyMap{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Values = b.Values
+	return m0
+}
+
 // TypeSchema provides a URI, JSON Schema, and fully qualified proto type name.
 type TypeSchema struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// URI of this type.
 	Uri string `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
 	// JSON Schema of referenced type; $id field within schema must be prefixed by
@@ -481,11 +749,6 @@ func (x *TypeSchema) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TypeSchema.ProtoReflect.Descriptor instead.
-func (*TypeSchema) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *TypeSchema) GetUri() string {
 	if x != nil {
 		return x.Uri
@@ -514,9 +777,74 @@ func (x *TypeSchema) GetModTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *TypeSchema) SetUri(v string) {
+	x.Uri = v
+}
+
+func (x *TypeSchema) SetJsonSchema(v *structpb.Struct) {
+	x.JsonSchema = v
+}
+
+func (x *TypeSchema) SetProtoName(v string) {
+	x.ProtoName = v
+}
+
+func (x *TypeSchema) SetModTime(v *timestamppb.Timestamp) {
+	x.ModTime = v
+}
+
+func (x *TypeSchema) HasJsonSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.JsonSchema != nil
+}
+
+func (x *TypeSchema) HasModTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.ModTime != nil
+}
+
+func (x *TypeSchema) ClearJsonSchema() {
+	x.JsonSchema = nil
+}
+
+func (x *TypeSchema) ClearModTime() {
+	x.ModTime = nil
+}
+
+type TypeSchema_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// URI of this type.
+	Uri string
+	// JSON Schema of referenced type; $id field within schema must be prefixed by
+	// uri field above.
+	JsonSchema *structpb.Struct
+	// Fully qualified Proto Type name (e.g., "dtkt.email.v1beta1.SendEmailRequest")
+	// which resolves to a protobuf message or enum type which must be compatible
+	// with above JSON Schema.
+	ProtoName string
+	// Last modified time.
+	ModTime *timestamppb.Timestamp
+}
+
+func (b0 TypeSchema_builder) Build() *TypeSchema {
+	m0 := &TypeSchema{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Uri = b.Uri
+	x.JsonSchema = b.JsonSchema
+	x.ProtoName = b.ProtoName
+	x.ModTime = b.ModTime
+	return m0
+}
+
 // Represents a native data type with json, geo, and metadata details.
 type DataType struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of the native type.
 	NativeType string `protobuf:"bytes,1,opt,name=native_type,json=nativeType,proto3" json:"native_type,omitempty"`
 	// Corresponding JSON type representation, if any.
@@ -554,11 +882,6 @@ func (x *DataType) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DataType.ProtoReflect.Descriptor instead.
-func (*DataType) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *DataType) GetNativeType() string {
 	if x != nil {
 		return x.NativeType
@@ -587,8 +910,59 @@ func (x *DataType) GetMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *DataType) SetNativeType(v string) {
+	x.NativeType = v
+}
+
+func (x *DataType) SetJsonType(v JSONType) {
+	x.JsonType = v
+}
+
+func (x *DataType) SetGeoType(v GeoType) {
+	x.GeoType = v
+}
+
+func (x *DataType) SetMetadata(v *structpb.Struct) {
+	x.Metadata = v
+}
+
+func (x *DataType) HasMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.Metadata != nil
+}
+
+func (x *DataType) ClearMetadata() {
+	x.Metadata = nil
+}
+
+type DataType_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of the native type.
+	NativeType string
+	// Corresponding JSON type representation, if any.
+	JsonType JSONType
+	// Corresponding Geo type representation, if any.
+	GeoType GeoType
+	// Additional metadata, if any.
+	Metadata *structpb.Struct
+}
+
+func (b0 DataType_builder) Build() *DataType {
+	m0 := &DataType{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.NativeType = b.NativeType
+	x.JsonType = b.JsonType
+	x.GeoType = b.GeoType
+	x.Metadata = b.Metadata
+	return m0
+}
+
 type OAuthConfig struct {
-	state        protoimpl.MessageState `protogen:"open.v1"`
+	state        protoimpl.MessageState `protogen:"hybrid.v1"`
 	ClientId     string                 `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
 	ClientSecret string                 `protobuf:"bytes,2,opt,name=client_secret,json=clientSecret,proto3" json:"client_secret,omitempty"` // inbound-only; never returned
 	Endpoint     *OAuthEndpoint         `protobuf:"bytes,3,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
@@ -627,11 +1001,6 @@ func (x *OAuthConfig) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use OAuthConfig.ProtoReflect.Descriptor instead.
-func (*OAuthConfig) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *OAuthConfig) GetClientId() string {
@@ -683,8 +1052,77 @@ func (x *OAuthConfig) GetParams() map[string]string {
 	return nil
 }
 
+func (x *OAuthConfig) SetClientId(v string) {
+	x.ClientId = v
+}
+
+func (x *OAuthConfig) SetClientSecret(v string) {
+	x.ClientSecret = v
+}
+
+func (x *OAuthConfig) SetEndpoint(v *OAuthEndpoint) {
+	x.Endpoint = v
+}
+
+func (x *OAuthConfig) SetRedirectUrl(v string) {
+	x.RedirectUrl = v
+}
+
+func (x *OAuthConfig) SetScopes(v []string) {
+	x.Scopes = v
+}
+
+func (x *OAuthConfig) SetAuthStyle(v AuthStyle) {
+	x.AuthStyle = v
+}
+
+func (x *OAuthConfig) SetParams(v map[string]string) {
+	x.Params = v
+}
+
+func (x *OAuthConfig) HasEndpoint() bool {
+	if x == nil {
+		return false
+	}
+	return x.Endpoint != nil
+}
+
+func (x *OAuthConfig) ClearEndpoint() {
+	x.Endpoint = nil
+}
+
+type OAuthConfig_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	ClientId     string
+	ClientSecret string
+	Endpoint     *OAuthEndpoint
+	// Optional redirect URL (can also be supplied per-request).
+	RedirectUrl string
+	// Requested permissions.
+	Scopes []string
+	// Optional: how to auth against token endpoint.
+	AuthStyle AuthStyle
+	// Provider-specific extra params (e.g., access_type=offline, prompt=consent).
+	Params map[string]string
+}
+
+func (b0 OAuthConfig_builder) Build() *OAuthConfig {
+	m0 := &OAuthConfig{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ClientId = b.ClientId
+	x.ClientSecret = b.ClientSecret
+	x.Endpoint = b.Endpoint
+	x.RedirectUrl = b.RedirectUrl
+	x.Scopes = b.Scopes
+	x.AuthStyle = b.AuthStyle
+	x.Params = b.Params
+	return m0
+}
+
 type OAuthEndpoint struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	AuthUrl       string                 `protobuf:"bytes,1,opt,name=auth_url,json=authUrl,proto3" json:"auth_url,omitempty"`
 	TokenUrl      string                 `protobuf:"bytes,2,opt,name=token_url,json=tokenUrl,proto3" json:"token_url,omitempty"`
 	DeviceAuthUrl *string                `protobuf:"bytes,3,opt,name=device_auth_url,json=deviceAuthUrl,proto3,oneof" json:"device_auth_url,omitempty"` // optional; device flow
@@ -717,11 +1155,6 @@ func (x *OAuthEndpoint) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use OAuthEndpoint.ProtoReflect.Descriptor instead.
-func (*OAuthEndpoint) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *OAuthEndpoint) GetAuthUrl() string {
 	if x != nil {
 		return x.AuthUrl
@@ -743,8 +1176,49 @@ func (x *OAuthEndpoint) GetDeviceAuthUrl() string {
 	return ""
 }
 
+func (x *OAuthEndpoint) SetAuthUrl(v string) {
+	x.AuthUrl = v
+}
+
+func (x *OAuthEndpoint) SetTokenUrl(v string) {
+	x.TokenUrl = v
+}
+
+func (x *OAuthEndpoint) SetDeviceAuthUrl(v string) {
+	x.DeviceAuthUrl = &v
+}
+
+func (x *OAuthEndpoint) HasDeviceAuthUrl() bool {
+	if x == nil {
+		return false
+	}
+	return x.DeviceAuthUrl != nil
+}
+
+func (x *OAuthEndpoint) ClearDeviceAuthUrl() {
+	x.DeviceAuthUrl = nil
+}
+
+type OAuthEndpoint_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	AuthUrl       string
+	TokenUrl      string
+	DeviceAuthUrl *string
+}
+
+func (b0 OAuthEndpoint_builder) Build() *OAuthEndpoint {
+	m0 := &OAuthEndpoint{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.AuthUrl = b.AuthUrl
+	x.TokenUrl = b.TokenUrl
+	x.DeviceAuthUrl = b.DeviceAuthUrl
+	return m0
+}
+
 type OAuthCodeRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// CSRF protection (highly recommended).
 	State string `protobuf:"bytes,1,opt,name=state,proto3" json:"state,omitempty"`
 	// Must match provider registration (may also live in OAuthConfig).
@@ -782,11 +1256,6 @@ func (x *OAuthCodeRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use OAuthCodeRequest.ProtoReflect.Descriptor instead.
-func (*OAuthCodeRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *OAuthCodeRequest) GetState() string {
@@ -831,8 +1300,60 @@ func (x *OAuthCodeRequest) GetParams() map[string]string {
 	return nil
 }
 
+func (x *OAuthCodeRequest) SetState(v string) {
+	x.State = v
+}
+
+func (x *OAuthCodeRequest) SetRedirectUrl(v string) {
+	x.RedirectUrl = v
+}
+
+func (x *OAuthCodeRequest) SetCodeChallenge(v string) {
+	x.CodeChallenge = v
+}
+
+func (x *OAuthCodeRequest) SetCodeChallengeMethod(v CodeChallengeMethod) {
+	x.CodeChallengeMethod = v
+}
+
+func (x *OAuthCodeRequest) SetScopes(v []string) {
+	x.Scopes = v
+}
+
+func (x *OAuthCodeRequest) SetParams(v map[string]string) {
+	x.Params = v
+}
+
+type OAuthCodeRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// CSRF protection (highly recommended).
+	State string
+	// Must match provider registration (may also live in OAuthConfig).
+	RedirectUrl string
+	// PKCE (optional but recommended).
+	CodeChallenge       string
+	CodeChallengeMethod CodeChallengeMethod
+	// Optional: override/augment scopes or pass extra params.
+	Scopes []string
+	Params map[string]string
+}
+
+func (b0 OAuthCodeRequest_builder) Build() *OAuthCodeRequest {
+	m0 := &OAuthCodeRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.State = b.State
+	x.RedirectUrl = b.RedirectUrl
+	x.CodeChallenge = b.CodeChallenge
+	x.CodeChallengeMethod = b.CodeChallengeMethod
+	x.Scopes = b.Scopes
+	x.Params = b.Params
+	return m0
+}
+
 type OAuthTokenRequest struct {
-	state       protoimpl.MessageState `protogen:"open.v1"`
+	state       protoimpl.MessageState `protogen:"hybrid.v1"`
 	Code        string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
 	RedirectUrl string                 `protobuf:"bytes,2,opt,name=redirect_url,json=redirectUrl,proto3" json:"redirect_url,omitempty"`
 	// PKCE verifier if PKCE was used.
@@ -867,11 +1388,6 @@ func (x *OAuthTokenRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use OAuthTokenRequest.ProtoReflect.Descriptor instead.
-func (*OAuthTokenRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{11}
-}
-
 func (x *OAuthTokenRequest) GetCode() string {
 	if x != nil {
 		return x.Code
@@ -900,8 +1416,45 @@ func (x *OAuthTokenRequest) GetParams() map[string]string {
 	return nil
 }
 
+func (x *OAuthTokenRequest) SetCode(v string) {
+	x.Code = v
+}
+
+func (x *OAuthTokenRequest) SetRedirectUrl(v string) {
+	x.RedirectUrl = v
+}
+
+func (x *OAuthTokenRequest) SetCodeVerifier(v string) {
+	x.CodeVerifier = v
+}
+
+func (x *OAuthTokenRequest) SetParams(v map[string]string) {
+	x.Params = v
+}
+
+type OAuthTokenRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Code        string
+	RedirectUrl string
+	// PKCE verifier if PKCE was used.
+	CodeVerifier string
+	Params       map[string]string
+}
+
+func (b0 OAuthTokenRequest_builder) Build() *OAuthTokenRequest {
+	m0 := &OAuthTokenRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Code = b.Code
+	x.RedirectUrl = b.RedirectUrl
+	x.CodeVerifier = b.CodeVerifier
+	x.Params = b.Params
+	return m0
+}
+
 type OAuthRefreshRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Token         *OAuthToken            `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -932,11 +1485,6 @@ func (x *OAuthRefreshRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use OAuthRefreshRequest.ProtoReflect.Descriptor instead.
-func (*OAuthRefreshRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{12}
-}
-
 func (x *OAuthRefreshRequest) GetToken() *OAuthToken {
 	if x != nil {
 		return x.Token
@@ -944,8 +1492,37 @@ func (x *OAuthRefreshRequest) GetToken() *OAuthToken {
 	return nil
 }
 
+func (x *OAuthRefreshRequest) SetToken(v *OAuthToken) {
+	x.Token = v
+}
+
+func (x *OAuthRefreshRequest) HasToken() bool {
+	if x == nil {
+		return false
+	}
+	return x.Token != nil
+}
+
+func (x *OAuthRefreshRequest) ClearToken() {
+	x.Token = nil
+}
+
+type OAuthRefreshRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Token *OAuthToken
+}
+
+func (b0 OAuthRefreshRequest_builder) Build() *OAuthRefreshRequest {
+	m0 := &OAuthRefreshRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Token = b.Token
+	return m0
+}
+
 type OAuthToken struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	AccessToken   string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
 	TokenType     string                 `protobuf:"bytes,2,opt,name=token_type,json=tokenType,proto3" json:"token_type,omitempty"`
 	RefreshToken  string                 `protobuf:"bytes,3,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
@@ -978,11 +1555,6 @@ func (x *OAuthToken) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use OAuthToken.ProtoReflect.Descriptor instead.
-func (*OAuthToken) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *OAuthToken) GetAccessToken() string {
@@ -1020,8 +1592,61 @@ func (x *OAuthToken) GetExpiresIn() int64 {
 	return 0
 }
 
+func (x *OAuthToken) SetAccessToken(v string) {
+	x.AccessToken = v
+}
+
+func (x *OAuthToken) SetTokenType(v string) {
+	x.TokenType = v
+}
+
+func (x *OAuthToken) SetRefreshToken(v string) {
+	x.RefreshToken = v
+}
+
+func (x *OAuthToken) SetExpiry(v *timestamppb.Timestamp) {
+	x.Expiry = v
+}
+
+func (x *OAuthToken) SetExpiresIn(v int64) {
+	x.ExpiresIn = v
+}
+
+func (x *OAuthToken) HasExpiry() bool {
+	if x == nil {
+		return false
+	}
+	return x.Expiry != nil
+}
+
+func (x *OAuthToken) ClearExpiry() {
+	x.Expiry = nil
+}
+
+type OAuthToken_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	AccessToken  string
+	TokenType    string
+	RefreshToken string
+	Expiry       *timestamppb.Timestamp
+	ExpiresIn    int64
+}
+
+func (b0 OAuthToken_builder) Build() *OAuthToken {
+	m0 := &OAuthToken{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.AccessToken = b.AccessToken
+	x.TokenType = b.TokenType
+	x.RefreshToken = b.RefreshToken
+	x.Expiry = b.Expiry
+	x.ExpiresIn = b.ExpiresIn
+	return m0
+}
+
 type PageToken struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Time          *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=time,proto3" json:"time,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1053,11 +1678,6 @@ func (x *PageToken) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PageToken.ProtoReflect.Descriptor instead.
-func (*PageToken) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{14}
-}
-
 func (x *PageToken) GetId() int64 {
 	if x != nil {
 		return x.Id
@@ -1072,28 +1692,66 @@ func (x *PageToken) GetTime() *timestamppb.Timestamp {
 	return nil
 }
 
-type Package_Identity struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Version       string                 `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
+func (x *PageToken) SetId(v int64) {
+	x.Id = v
+}
+
+func (x *PageToken) SetTime(v *timestamppb.Timestamp) {
+	x.Time = v
+}
+
+func (x *PageToken) HasTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.Time != nil
+}
+
+func (x *PageToken) ClearTime() {
+	x.Time = nil
+}
+
+type PageToken_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id   int64
+	Time *timestamppb.Timestamp
+}
+
+func (b0 PageToken_builder) Build() *PageToken {
+	m0 := &PageToken{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Time = b.Time
+	return m0
+}
+
+// TypeMeta identifies a resource's API version and kind, analogous to
+// Kubernetes' TypeMeta. It is intentionally small -- the spec payload is
+// handled separately.
+type TypeMeta struct {
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
+	ApiVersion    string                 `protobuf:"bytes,1,opt,name=api_version,json=apiVersion,proto3" json:"api_version,omitempty"`
+	Kind          string                 `protobuf:"bytes,2,opt,name=kind,proto3" json:"kind,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Package_Identity) Reset() {
-	*x = Package_Identity{}
+func (x *TypeMeta) Reset() {
+	*x = TypeMeta{}
 	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Package_Identity) String() string {
+func (x *TypeMeta) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Package_Identity) ProtoMessage() {}
+func (*TypeMeta) ProtoMessage() {}
 
-func (x *Package_Identity) ProtoReflect() protoreflect.Message {
+func (x *TypeMeta) ProtoReflect() protoreflect.Message {
 	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1105,9 +1763,75 @@ func (x *Package_Identity) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Package_Identity.ProtoReflect.Descriptor instead.
-func (*Package_Identity) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{0, 0}
+func (x *TypeMeta) GetApiVersion() string {
+	if x != nil {
+		return x.ApiVersion
+	}
+	return ""
+}
+
+func (x *TypeMeta) GetKind() string {
+	if x != nil {
+		return x.Kind
+	}
+	return ""
+}
+
+func (x *TypeMeta) SetApiVersion(v string) {
+	x.ApiVersion = v
+}
+
+func (x *TypeMeta) SetKind(v string) {
+	x.Kind = v
+}
+
+type TypeMeta_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	ApiVersion string
+	Kind       string
+}
+
+func (b0 TypeMeta_builder) Build() *TypeMeta {
+	m0 := &TypeMeta{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ApiVersion = b.ApiVersion
+	x.Kind = b.Kind
+	return m0
+}
+
+type Package_Identity struct {
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Version       string                 `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Package_Identity) Reset() {
+	*x = Package_Identity{}
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Package_Identity) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Package_Identity) ProtoMessage() {}
+
+func (x *Package_Identity) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
 }
 
 func (x *Package_Identity) GetName() string {
@@ -1124,8 +1848,32 @@ func (x *Package_Identity) GetVersion() string {
 	return ""
 }
 
+func (x *Package_Identity) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Package_Identity) SetVersion(v string) {
+	x.Version = v
+}
+
+type Package_Identity_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name    string
+	Version string
+}
+
+func (b0 Package_Identity_builder) Build() *Package_Identity {
+	m0 := &Package_Identity{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Version = b.Version
+	return m0
+}
+
 type Package_BuildConfig struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Build environment variables.
 	Env map[string]string `protobuf:"bytes,1,rep,name=env,proto3" json:"env,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Types that are valid to be assigned to Artifact:
@@ -1139,7 +1887,7 @@ type Package_BuildConfig struct {
 
 func (x *Package_BuildConfig) Reset() {
 	*x = Package_BuildConfig{}
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[16]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1151,7 +1899,7 @@ func (x *Package_BuildConfig) String() string {
 func (*Package_BuildConfig) ProtoMessage() {}
 
 func (x *Package_BuildConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[16]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1160,11 +1908,6 @@ func (x *Package_BuildConfig) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Package_BuildConfig.ProtoReflect.Descriptor instead.
-func (*Package_BuildConfig) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{0, 1}
 }
 
 func (x *Package_BuildConfig) GetEnv() map[string]string {
@@ -1199,6 +1942,118 @@ func (x *Package_BuildConfig) GetImage() *Package_BuildConfig_ImageArtifact {
 	return nil
 }
 
+func (x *Package_BuildConfig) SetEnv(v map[string]string) {
+	x.Env = v
+}
+
+func (x *Package_BuildConfig) SetBinary(v *Package_BuildConfig_BinaryArtifact) {
+	if v == nil {
+		x.Artifact = nil
+		return
+	}
+	x.Artifact = &Package_BuildConfig_Binary{v}
+}
+
+func (x *Package_BuildConfig) SetImage(v *Package_BuildConfig_ImageArtifact) {
+	if v == nil {
+		x.Artifact = nil
+		return
+	}
+	x.Artifact = &Package_BuildConfig_Image{v}
+}
+
+func (x *Package_BuildConfig) HasArtifact() bool {
+	if x == nil {
+		return false
+	}
+	return x.Artifact != nil
+}
+
+func (x *Package_BuildConfig) HasBinary() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Artifact.(*Package_BuildConfig_Binary)
+	return ok
+}
+
+func (x *Package_BuildConfig) HasImage() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Artifact.(*Package_BuildConfig_Image)
+	return ok
+}
+
+func (x *Package_BuildConfig) ClearArtifact() {
+	x.Artifact = nil
+}
+
+func (x *Package_BuildConfig) ClearBinary() {
+	if _, ok := x.Artifact.(*Package_BuildConfig_Binary); ok {
+		x.Artifact = nil
+	}
+}
+
+func (x *Package_BuildConfig) ClearImage() {
+	if _, ok := x.Artifact.(*Package_BuildConfig_Image); ok {
+		x.Artifact = nil
+	}
+}
+
+const Package_BuildConfig_Artifact_not_set_case case_Package_BuildConfig_Artifact = 0
+const Package_BuildConfig_Binary_case case_Package_BuildConfig_Artifact = 10
+const Package_BuildConfig_Image_case case_Package_BuildConfig_Artifact = 11
+
+func (x *Package_BuildConfig) WhichArtifact() case_Package_BuildConfig_Artifact {
+	if x == nil {
+		return Package_BuildConfig_Artifact_not_set_case
+	}
+	switch x.Artifact.(type) {
+	case *Package_BuildConfig_Binary:
+		return Package_BuildConfig_Binary_case
+	case *Package_BuildConfig_Image:
+		return Package_BuildConfig_Image_case
+	default:
+		return Package_BuildConfig_Artifact_not_set_case
+	}
+}
+
+type Package_BuildConfig_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Build environment variables.
+	Env map[string]string
+	// Fields of oneof Artifact:
+	Binary *Package_BuildConfig_BinaryArtifact
+	Image  *Package_BuildConfig_ImageArtifact
+	// -- end of Artifact
+}
+
+func (b0 Package_BuildConfig_builder) Build() *Package_BuildConfig {
+	m0 := &Package_BuildConfig{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Env = b.Env
+	if b.Binary != nil {
+		x.Artifact = &Package_BuildConfig_Binary{b.Binary}
+	}
+	if b.Image != nil {
+		x.Artifact = &Package_BuildConfig_Image{b.Image}
+	}
+	return m0
+}
+
+type case_Package_BuildConfig_Artifact protoreflect.FieldNumber
+
+func (x case_Package_BuildConfig_Artifact) String() string {
+	md := file_dtkt_shared_v1beta1_messages_proto_msgTypes[17].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isPackage_BuildConfig_Artifact interface {
 	isPackage_BuildConfig_Artifact()
 }
@@ -1216,7 +2071,7 @@ func (*Package_BuildConfig_Binary) isPackage_BuildConfig_Artifact() {}
 func (*Package_BuildConfig_Image) isPackage_BuildConfig_Artifact() {}
 
 type Package_DeployConfig struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Deploy environment variables.
 	Env map[string]string `protobuf:"bytes,1,rep,name=env,proto3" json:"env,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Ports exposed by package (excluding assigned gRPC bind address).
@@ -1227,7 +2082,7 @@ type Package_DeployConfig struct {
 
 func (x *Package_DeployConfig) Reset() {
 	*x = Package_DeployConfig{}
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[17]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1239,7 +2094,7 @@ func (x *Package_DeployConfig) String() string {
 func (*Package_DeployConfig) ProtoMessage() {}
 
 func (x *Package_DeployConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[17]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1248,11 +2103,6 @@ func (x *Package_DeployConfig) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Package_DeployConfig.ProtoReflect.Descriptor instead.
-func (*Package_DeployConfig) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{0, 2}
 }
 
 func (x *Package_DeployConfig) GetEnv() map[string]string {
@@ -1269,15 +2119,41 @@ func (x *Package_DeployConfig) GetPorts() []*Package_DeployConfig_Port {
 	return nil
 }
 
+func (x *Package_DeployConfig) SetEnv(v map[string]string) {
+	x.Env = v
+}
+
+func (x *Package_DeployConfig) SetPorts(v []*Package_DeployConfig_Port) {
+	x.Ports = v
+}
+
+type Package_DeployConfig_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Deploy environment variables.
+	Env map[string]string
+	// Ports exposed by package (excluding assigned gRPC bind address).
+	Ports []*Package_DeployConfig_Port
+}
+
+func (b0 Package_DeployConfig_builder) Build() *Package_DeployConfig {
+	m0 := &Package_DeployConfig{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Env = b.Env
+	x.Ports = b.Ports
+	return m0
+}
+
 type Package_BuildConfig_BinaryArtifact struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Package_BuildConfig_BinaryArtifact) Reset() {
 	*x = Package_BuildConfig_BinaryArtifact{}
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[19]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1289,7 +2165,7 @@ func (x *Package_BuildConfig_BinaryArtifact) String() string {
 func (*Package_BuildConfig_BinaryArtifact) ProtoMessage() {}
 
 func (x *Package_BuildConfig_BinaryArtifact) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[19]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1300,20 +2176,27 @@ func (x *Package_BuildConfig_BinaryArtifact) ProtoReflect() protoreflect.Message
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Package_BuildConfig_BinaryArtifact.ProtoReflect.Descriptor instead.
-func (*Package_BuildConfig_BinaryArtifact) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{0, 1, 1}
+type Package_BuildConfig_BinaryArtifact_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 Package_BuildConfig_BinaryArtifact_builder) Build() *Package_BuildConfig_BinaryArtifact {
+	m0 := &Package_BuildConfig_BinaryArtifact{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 type Package_BuildConfig_ImageArtifact struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Package_BuildConfig_ImageArtifact) Reset() {
 	*x = Package_BuildConfig_ImageArtifact{}
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[20]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1325,7 +2208,7 @@ func (x *Package_BuildConfig_ImageArtifact) String() string {
 func (*Package_BuildConfig_ImageArtifact) ProtoMessage() {}
 
 func (x *Package_BuildConfig_ImageArtifact) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[20]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1336,13 +2219,20 @@ func (x *Package_BuildConfig_ImageArtifact) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Package_BuildConfig_ImageArtifact.ProtoReflect.Descriptor instead.
-func (*Package_BuildConfig_ImageArtifact) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{0, 1, 2}
+type Package_BuildConfig_ImageArtifact_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 Package_BuildConfig_ImageArtifact_builder) Build() *Package_BuildConfig_ImageArtifact {
+	m0 := &Package_BuildConfig_ImageArtifact{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 type Package_DeployConfig_Port struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	Protocol      string                 `protobuf:"bytes,3,opt,name=protocol,proto3" json:"protocol,omitempty"`
@@ -1353,7 +2243,7 @@ type Package_DeployConfig_Port struct {
 
 func (x *Package_DeployConfig_Port) Reset() {
 	*x = Package_DeployConfig_Port{}
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[22]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1365,7 +2255,7 @@ func (x *Package_DeployConfig_Port) String() string {
 func (*Package_DeployConfig_Port) ProtoMessage() {}
 
 func (x *Package_DeployConfig_Port) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[22]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1374,11 +2264,6 @@ func (x *Package_DeployConfig_Port) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Package_DeployConfig_Port.ProtoReflect.Descriptor instead.
-func (*Package_DeployConfig_Port) Descriptor() ([]byte, []int) {
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP(), []int{0, 2, 1}
 }
 
 func (x *Package_DeployConfig_Port) GetName() string {
@@ -1407,6 +2292,42 @@ func (x *Package_DeployConfig_Port) GetPort() string {
 		return x.Port
 	}
 	return ""
+}
+
+func (x *Package_DeployConfig_Port) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Package_DeployConfig_Port) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *Package_DeployConfig_Port) SetProtocol(v string) {
+	x.Protocol = v
+}
+
+func (x *Package_DeployConfig_Port) SetPort(v string) {
+	x.Port = v
+}
+
+type Package_DeployConfig_Port_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name        string
+	Description string
+	Protocol    string
+	Port        string
+}
+
+func (b0 Package_DeployConfig_Port_builder) Build() *Package_DeployConfig_Port {
+	m0 := &Package_DeployConfig_Port{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Description = b.Description
+	x.Protocol = b.Protocol
+	x.Port = b.Port
+	return m0
 }
 
 var File_dtkt_shared_v1beta1_messages_proto protoreflect.FileDescriptor
@@ -1538,22 +2459,14 @@ const file_dtkt_shared_v1beta1_messages_proto_rawDesc = "" +
 	"expires_in\x18\x05 \x01(\x03R\texpiresIn\"[\n" +
 	"\tPageToken\x12\x16\n" +
 	"\x02id\x18\x01 \x01(\x03B\x06\xbaH\x03\xc8\x01\x01R\x02id\x126\n" +
-	"\x04time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01R\x04timeB\xe8\x01\n" +
+	"\x04time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01R\x04time\"O\n" +
+	"\bTypeMeta\x12'\n" +
+	"\vapi_version\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\n" +
+	"apiVersion\x12\x1a\n" +
+	"\x04kind\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04kindB\xe8\x01\n" +
 	"\x19proto.dtkt.shared.v1beta1B\rMessagesProtoP\x01ZNgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1;sharedv1beta1\xa2\x02\x03DSX\xaa\x02\x13Dtkt.Shared.V1beta1\xca\x02\x13Dtkt\\Shared\\V1beta1\xe2\x02\x1fDtkt\\Shared\\V1beta1\\GPBMetadata\xea\x02\x15Dtkt::Shared::V1beta1b\x06proto3"
 
-var (
-	file_dtkt_shared_v1beta1_messages_proto_rawDescOnce sync.Once
-	file_dtkt_shared_v1beta1_messages_proto_rawDescData []byte
-)
-
-func file_dtkt_shared_v1beta1_messages_proto_rawDescGZIP() []byte {
-	file_dtkt_shared_v1beta1_messages_proto_rawDescOnce.Do(func() {
-		file_dtkt_shared_v1beta1_messages_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_shared_v1beta1_messages_proto_rawDesc), len(file_dtkt_shared_v1beta1_messages_proto_rawDesc)))
-	})
-	return file_dtkt_shared_v1beta1_messages_proto_rawDescData
-}
-
-var file_dtkt_shared_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
+var file_dtkt_shared_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
 var file_dtkt_shared_v1beta1_messages_proto_goTypes = []any{
 	(*Package)(nil),                            // 0: dtkt.shared.v1beta1.Package
 	(*Platform)(nil),                           // 1: dtkt.shared.v1beta1.Platform
@@ -1570,66 +2483,67 @@ var file_dtkt_shared_v1beta1_messages_proto_goTypes = []any{
 	(*OAuthRefreshRequest)(nil),                // 12: dtkt.shared.v1beta1.OAuthRefreshRequest
 	(*OAuthToken)(nil),                         // 13: dtkt.shared.v1beta1.OAuthToken
 	(*PageToken)(nil),                          // 14: dtkt.shared.v1beta1.PageToken
-	(*Package_Identity)(nil),                   // 15: dtkt.shared.v1beta1.Package.Identity
-	(*Package_BuildConfig)(nil),                // 16: dtkt.shared.v1beta1.Package.BuildConfig
-	(*Package_DeployConfig)(nil),               // 17: dtkt.shared.v1beta1.Package.DeployConfig
-	nil,                                        // 18: dtkt.shared.v1beta1.Package.BuildConfig.EnvEntry
-	(*Package_BuildConfig_BinaryArtifact)(nil), // 19: dtkt.shared.v1beta1.Package.BuildConfig.BinaryArtifact
-	(*Package_BuildConfig_ImageArtifact)(nil),  // 20: dtkt.shared.v1beta1.Package.BuildConfig.ImageArtifact
-	nil,                               // 21: dtkt.shared.v1beta1.Package.DeployConfig.EnvEntry
-	(*Package_DeployConfig_Port)(nil), // 22: dtkt.shared.v1beta1.Package.DeployConfig.Port
-	nil,                               // 23: dtkt.shared.v1beta1.AnyMap.ValuesEntry
-	nil,                               // 24: dtkt.shared.v1beta1.OAuthConfig.ParamsEntry
-	nil,                               // 25: dtkt.shared.v1beta1.OAuthCodeRequest.ParamsEntry
-	nil,                               // 26: dtkt.shared.v1beta1.OAuthTokenRequest.ParamsEntry
-	(PackageType)(0),                  // 27: dtkt.shared.v1beta1.PackageType
-	(Runtime)(0),                      // 28: dtkt.shared.v1beta1.Runtime
-	(OS)(0),                           // 29: dtkt.shared.v1beta1.OS
-	(Arch)(0),                         // 30: dtkt.shared.v1beta1.Arch
-	(*v1beta1.FieldElement)(nil),      // 31: dtkt.protoform.v1beta1.FieldElement
-	(*anypb.Any)(nil),                 // 32: google.protobuf.Any
-	(*structpb.Struct)(nil),           // 33: google.protobuf.Struct
-	(*timestamppb.Timestamp)(nil),     // 34: google.protobuf.Timestamp
-	(JSONType)(0),                     // 35: dtkt.shared.v1beta1.JSONType
-	(GeoType)(0),                      // 36: dtkt.shared.v1beta1.GeoType
-	(AuthStyle)(0),                    // 37: dtkt.shared.v1beta1.AuthStyle
-	(CodeChallengeMethod)(0),          // 38: dtkt.shared.v1beta1.CodeChallengeMethod
+	(*TypeMeta)(nil),                           // 15: dtkt.shared.v1beta1.TypeMeta
+	(*Package_Identity)(nil),                   // 16: dtkt.shared.v1beta1.Package.Identity
+	(*Package_BuildConfig)(nil),                // 17: dtkt.shared.v1beta1.Package.BuildConfig
+	(*Package_DeployConfig)(nil),               // 18: dtkt.shared.v1beta1.Package.DeployConfig
+	nil,                                        // 19: dtkt.shared.v1beta1.Package.BuildConfig.EnvEntry
+	(*Package_BuildConfig_BinaryArtifact)(nil), // 20: dtkt.shared.v1beta1.Package.BuildConfig.BinaryArtifact
+	(*Package_BuildConfig_ImageArtifact)(nil),  // 21: dtkt.shared.v1beta1.Package.BuildConfig.ImageArtifact
+	nil,                               // 22: dtkt.shared.v1beta1.Package.DeployConfig.EnvEntry
+	(*Package_DeployConfig_Port)(nil), // 23: dtkt.shared.v1beta1.Package.DeployConfig.Port
+	nil,                               // 24: dtkt.shared.v1beta1.AnyMap.ValuesEntry
+	nil,                               // 25: dtkt.shared.v1beta1.OAuthConfig.ParamsEntry
+	nil,                               // 26: dtkt.shared.v1beta1.OAuthCodeRequest.ParamsEntry
+	nil,                               // 27: dtkt.shared.v1beta1.OAuthTokenRequest.ParamsEntry
+	(PackageType)(0),                  // 28: dtkt.shared.v1beta1.PackageType
+	(Runtime)(0),                      // 29: dtkt.shared.v1beta1.Runtime
+	(OS)(0),                           // 30: dtkt.shared.v1beta1.OS
+	(Arch)(0),                         // 31: dtkt.shared.v1beta1.Arch
+	(*v1beta1.FieldElement)(nil),      // 32: dtkt.protoform.v1beta1.FieldElement
+	(*anypb.Any)(nil),                 // 33: google.protobuf.Any
+	(*structpb.Struct)(nil),           // 34: google.protobuf.Struct
+	(*timestamppb.Timestamp)(nil),     // 35: google.protobuf.Timestamp
+	(JSONType)(0),                     // 36: dtkt.shared.v1beta1.JSONType
+	(GeoType)(0),                      // 37: dtkt.shared.v1beta1.GeoType
+	(AuthStyle)(0),                    // 38: dtkt.shared.v1beta1.AuthStyle
+	(CodeChallengeMethod)(0),          // 39: dtkt.shared.v1beta1.CodeChallengeMethod
 }
 var file_dtkt_shared_v1beta1_messages_proto_depIdxs = []int32{
-	15, // 0: dtkt.shared.v1beta1.Package.identity:type_name -> dtkt.shared.v1beta1.Package.Identity
-	27, // 1: dtkt.shared.v1beta1.Package.type:type_name -> dtkt.shared.v1beta1.PackageType
-	28, // 2: dtkt.shared.v1beta1.Package.runtimes:type_name -> dtkt.shared.v1beta1.Runtime
+	16, // 0: dtkt.shared.v1beta1.Package.identity:type_name -> dtkt.shared.v1beta1.Package.Identity
+	28, // 1: dtkt.shared.v1beta1.Package.type:type_name -> dtkt.shared.v1beta1.PackageType
+	29, // 2: dtkt.shared.v1beta1.Package.runtimes:type_name -> dtkt.shared.v1beta1.Runtime
 	1,  // 3: dtkt.shared.v1beta1.Package.platforms:type_name -> dtkt.shared.v1beta1.Platform
-	16, // 4: dtkt.shared.v1beta1.Package.build:type_name -> dtkt.shared.v1beta1.Package.BuildConfig
-	17, // 5: dtkt.shared.v1beta1.Package.deploy:type_name -> dtkt.shared.v1beta1.Package.DeployConfig
-	29, // 6: dtkt.shared.v1beta1.Platform.os:type_name -> dtkt.shared.v1beta1.OS
-	30, // 7: dtkt.shared.v1beta1.Platform.arch:type_name -> dtkt.shared.v1beta1.Arch
+	17, // 4: dtkt.shared.v1beta1.Package.build:type_name -> dtkt.shared.v1beta1.Package.BuildConfig
+	18, // 5: dtkt.shared.v1beta1.Package.deploy:type_name -> dtkt.shared.v1beta1.Package.DeployConfig
+	30, // 6: dtkt.shared.v1beta1.Platform.os:type_name -> dtkt.shared.v1beta1.OS
+	31, // 7: dtkt.shared.v1beta1.Platform.arch:type_name -> dtkt.shared.v1beta1.Arch
 	7,  // 8: dtkt.shared.v1beta1.Field.type:type_name -> dtkt.shared.v1beta1.DataType
 	2,  // 9: dtkt.shared.v1beta1.Field.fields:type_name -> dtkt.shared.v1beta1.Field
-	31, // 10: dtkt.shared.v1beta1.Field.element:type_name -> dtkt.protoform.v1beta1.FieldElement
+	32, // 10: dtkt.shared.v1beta1.Field.element:type_name -> dtkt.protoform.v1beta1.FieldElement
 	2,  // 11: dtkt.shared.v1beta1.Param.field:type_name -> dtkt.shared.v1beta1.Field
-	32, // 12: dtkt.shared.v1beta1.Param.value:type_name -> google.protobuf.Any
-	23, // 13: dtkt.shared.v1beta1.AnyMap.values:type_name -> dtkt.shared.v1beta1.AnyMap.ValuesEntry
-	33, // 14: dtkt.shared.v1beta1.TypeSchema.json_schema:type_name -> google.protobuf.Struct
-	34, // 15: dtkt.shared.v1beta1.TypeSchema.mod_time:type_name -> google.protobuf.Timestamp
-	35, // 16: dtkt.shared.v1beta1.DataType.json_type:type_name -> dtkt.shared.v1beta1.JSONType
-	36, // 17: dtkt.shared.v1beta1.DataType.geo_type:type_name -> dtkt.shared.v1beta1.GeoType
-	33, // 18: dtkt.shared.v1beta1.DataType.metadata:type_name -> google.protobuf.Struct
+	33, // 12: dtkt.shared.v1beta1.Param.value:type_name -> google.protobuf.Any
+	24, // 13: dtkt.shared.v1beta1.AnyMap.values:type_name -> dtkt.shared.v1beta1.AnyMap.ValuesEntry
+	34, // 14: dtkt.shared.v1beta1.TypeSchema.json_schema:type_name -> google.protobuf.Struct
+	35, // 15: dtkt.shared.v1beta1.TypeSchema.mod_time:type_name -> google.protobuf.Timestamp
+	36, // 16: dtkt.shared.v1beta1.DataType.json_type:type_name -> dtkt.shared.v1beta1.JSONType
+	37, // 17: dtkt.shared.v1beta1.DataType.geo_type:type_name -> dtkt.shared.v1beta1.GeoType
+	34, // 18: dtkt.shared.v1beta1.DataType.metadata:type_name -> google.protobuf.Struct
 	9,  // 19: dtkt.shared.v1beta1.OAuthConfig.endpoint:type_name -> dtkt.shared.v1beta1.OAuthEndpoint
-	37, // 20: dtkt.shared.v1beta1.OAuthConfig.auth_style:type_name -> dtkt.shared.v1beta1.AuthStyle
-	24, // 21: dtkt.shared.v1beta1.OAuthConfig.params:type_name -> dtkt.shared.v1beta1.OAuthConfig.ParamsEntry
-	38, // 22: dtkt.shared.v1beta1.OAuthCodeRequest.code_challenge_method:type_name -> dtkt.shared.v1beta1.CodeChallengeMethod
-	25, // 23: dtkt.shared.v1beta1.OAuthCodeRequest.params:type_name -> dtkt.shared.v1beta1.OAuthCodeRequest.ParamsEntry
-	26, // 24: dtkt.shared.v1beta1.OAuthTokenRequest.params:type_name -> dtkt.shared.v1beta1.OAuthTokenRequest.ParamsEntry
+	38, // 20: dtkt.shared.v1beta1.OAuthConfig.auth_style:type_name -> dtkt.shared.v1beta1.AuthStyle
+	25, // 21: dtkt.shared.v1beta1.OAuthConfig.params:type_name -> dtkt.shared.v1beta1.OAuthConfig.ParamsEntry
+	39, // 22: dtkt.shared.v1beta1.OAuthCodeRequest.code_challenge_method:type_name -> dtkt.shared.v1beta1.CodeChallengeMethod
+	26, // 23: dtkt.shared.v1beta1.OAuthCodeRequest.params:type_name -> dtkt.shared.v1beta1.OAuthCodeRequest.ParamsEntry
+	27, // 24: dtkt.shared.v1beta1.OAuthTokenRequest.params:type_name -> dtkt.shared.v1beta1.OAuthTokenRequest.ParamsEntry
 	13, // 25: dtkt.shared.v1beta1.OAuthRefreshRequest.token:type_name -> dtkt.shared.v1beta1.OAuthToken
-	34, // 26: dtkt.shared.v1beta1.OAuthToken.expiry:type_name -> google.protobuf.Timestamp
-	34, // 27: dtkt.shared.v1beta1.PageToken.time:type_name -> google.protobuf.Timestamp
-	18, // 28: dtkt.shared.v1beta1.Package.BuildConfig.env:type_name -> dtkt.shared.v1beta1.Package.BuildConfig.EnvEntry
-	19, // 29: dtkt.shared.v1beta1.Package.BuildConfig.binary:type_name -> dtkt.shared.v1beta1.Package.BuildConfig.BinaryArtifact
-	20, // 30: dtkt.shared.v1beta1.Package.BuildConfig.image:type_name -> dtkt.shared.v1beta1.Package.BuildConfig.ImageArtifact
-	21, // 31: dtkt.shared.v1beta1.Package.DeployConfig.env:type_name -> dtkt.shared.v1beta1.Package.DeployConfig.EnvEntry
-	22, // 32: dtkt.shared.v1beta1.Package.DeployConfig.ports:type_name -> dtkt.shared.v1beta1.Package.DeployConfig.Port
-	32, // 33: dtkt.shared.v1beta1.AnyMap.ValuesEntry.value:type_name -> google.protobuf.Any
+	35, // 26: dtkt.shared.v1beta1.OAuthToken.expiry:type_name -> google.protobuf.Timestamp
+	35, // 27: dtkt.shared.v1beta1.PageToken.time:type_name -> google.protobuf.Timestamp
+	19, // 28: dtkt.shared.v1beta1.Package.BuildConfig.env:type_name -> dtkt.shared.v1beta1.Package.BuildConfig.EnvEntry
+	20, // 29: dtkt.shared.v1beta1.Package.BuildConfig.binary:type_name -> dtkt.shared.v1beta1.Package.BuildConfig.BinaryArtifact
+	21, // 30: dtkt.shared.v1beta1.Package.BuildConfig.image:type_name -> dtkt.shared.v1beta1.Package.BuildConfig.ImageArtifact
+	22, // 31: dtkt.shared.v1beta1.Package.DeployConfig.env:type_name -> dtkt.shared.v1beta1.Package.DeployConfig.EnvEntry
+	23, // 32: dtkt.shared.v1beta1.Package.DeployConfig.ports:type_name -> dtkt.shared.v1beta1.Package.DeployConfig.Port
+	33, // 33: dtkt.shared.v1beta1.AnyMap.ValuesEntry.value:type_name -> google.protobuf.Any
 	34, // [34:34] is the sub-list for method output_type
 	34, // [34:34] is the sub-list for method input_type
 	34, // [34:34] is the sub-list for extension type_name
@@ -1644,7 +2558,7 @@ func file_dtkt_shared_v1beta1_messages_proto_init() {
 	}
 	file_dtkt_shared_v1beta1_enums_proto_init()
 	file_dtkt_shared_v1beta1_messages_proto_msgTypes[9].OneofWrappers = []any{}
-	file_dtkt_shared_v1beta1_messages_proto_msgTypes[16].OneofWrappers = []any{
+	file_dtkt_shared_v1beta1_messages_proto_msgTypes[17].OneofWrappers = []any{
 		(*Package_BuildConfig_Binary)(nil),
 		(*Package_BuildConfig_Image)(nil),
 	}
@@ -1654,7 +2568,7 @@ func file_dtkt_shared_v1beta1_messages_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_shared_v1beta1_messages_proto_rawDesc), len(file_dtkt_shared_v1beta1_messages_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   27,
+			NumMessages:   28,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: stream_bidi_echo
+  inputs:
+    - id: msg
+      int64: {}
+  streams:
+    - id: bidi
+      call:
+        connection: echo
+        method: echo.BidiEcho
+        request: "= inputs.msg.value"
+  outputs:
+    - id: result
+      value: "= streams.bidi.value"

@@ -1251,6 +1251,396 @@ var FlowService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
+	FlowRunService_ListFlowRuns_FullMethodName         = "/dtkt.core.v1.FlowRunService/ListFlowRuns"
+	FlowRunService_GetFlowRun_FullMethodName           = "/dtkt.core.v1.FlowRunService/GetFlowRun"
+	FlowRunService_CreateFlowRun_FullMethodName        = "/dtkt.core.v1.FlowRunService/CreateFlowRun"
+	FlowRunService_UpdateFlowRun_FullMethodName        = "/dtkt.core.v1.FlowRunService/UpdateFlowRun"
+	FlowRunService_DeleteFlowRun_FullMethodName        = "/dtkt.core.v1.FlowRunService/DeleteFlowRun"
+	FlowRunService_ReceiveFlowRunEvents_FullMethodName = "/dtkt.core.v1.FlowRunService/ReceiveFlowRunEvents"
+	FlowRunService_SendFlowRunEvent_FullMethodName     = "/dtkt.core.v1.FlowRunService/SendFlowRunEvent"
+	FlowRunService_StreamFlowRunEvents_FullMethodName  = "/dtkt.core.v1.FlowRunService/StreamFlowRunEvents"
+)
+
+// FlowRunServiceClient is the client API for FlowRunService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// FlowRunService provides operations for managing and running flowruns.
+type FlowRunServiceClient interface {
+	// List flowruns with filtering options.
+	ListFlowRuns(ctx context.Context, in *ListFlowRunsRequest, opts ...grpc.CallOption) (*ListFlowRunsResponse, error)
+	// Get a single flowrun by name.
+	GetFlowRun(ctx context.Context, in *GetFlowRunRequest, opts ...grpc.CallOption) (*GetFlowRunResponse, error)
+	// Create a new flowrun.
+	CreateFlowRun(ctx context.Context, in *CreateFlowRunRequest, opts ...grpc.CallOption) (*longrunningpb.Operation, error)
+	// Update a flowrun.
+	UpdateFlowRun(ctx context.Context, in *UpdateFlowRunRequest, opts ...grpc.CallOption) (*longrunningpb.Operation, error)
+	// Delete a flowrun.
+	DeleteFlowRun(ctx context.Context, in *DeleteFlowRunRequest, opts ...grpc.CallOption) (*longrunningpb.Operation, error)
+	// Receive a stream of executor events (outputs, input requests, interaction requests, state changes).
+	// For environments with server streaming but not client streaming (e.g. web browsers).
+	ReceiveFlowRunEvents(ctx context.Context, in *ReceiveFlowRunEventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ReceiveFlowRunEventsResponse], error)
+	// Send an input, interaction response, or flow/node command (stop, terminate, suspend, resume).
+	// For environments without client streaming (e.g. web browsers).
+	SendFlowRunEvent(ctx context.Context, in *SendFlowRunEventRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Bi-directional event stream: send inputs/commands and receive executor events.
+	StreamFlowRunEvents(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[StreamFlowRunEventsRequest, StreamFlowRunEventsResponse], error)
+}
+
+type flowRunServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewFlowRunServiceClient(cc grpc.ClientConnInterface) FlowRunServiceClient {
+	return &flowRunServiceClient{cc}
+}
+
+func (c *flowRunServiceClient) ListFlowRuns(ctx context.Context, in *ListFlowRunsRequest, opts ...grpc.CallOption) (*ListFlowRunsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListFlowRunsResponse)
+	err := c.cc.Invoke(ctx, FlowRunService_ListFlowRuns_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowRunServiceClient) GetFlowRun(ctx context.Context, in *GetFlowRunRequest, opts ...grpc.CallOption) (*GetFlowRunResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetFlowRunResponse)
+	err := c.cc.Invoke(ctx, FlowRunService_GetFlowRun_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowRunServiceClient) CreateFlowRun(ctx context.Context, in *CreateFlowRunRequest, opts ...grpc.CallOption) (*longrunningpb.Operation, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(longrunningpb.Operation)
+	err := c.cc.Invoke(ctx, FlowRunService_CreateFlowRun_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowRunServiceClient) UpdateFlowRun(ctx context.Context, in *UpdateFlowRunRequest, opts ...grpc.CallOption) (*longrunningpb.Operation, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(longrunningpb.Operation)
+	err := c.cc.Invoke(ctx, FlowRunService_UpdateFlowRun_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowRunServiceClient) DeleteFlowRun(ctx context.Context, in *DeleteFlowRunRequest, opts ...grpc.CallOption) (*longrunningpb.Operation, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(longrunningpb.Operation)
+	err := c.cc.Invoke(ctx, FlowRunService_DeleteFlowRun_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowRunServiceClient) ReceiveFlowRunEvents(ctx context.Context, in *ReceiveFlowRunEventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ReceiveFlowRunEventsResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &FlowRunService_ServiceDesc.Streams[0], FlowRunService_ReceiveFlowRunEvents_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[ReceiveFlowRunEventsRequest, ReceiveFlowRunEventsResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type FlowRunService_ReceiveFlowRunEventsClient = grpc.ServerStreamingClient[ReceiveFlowRunEventsResponse]
+
+func (c *flowRunServiceClient) SendFlowRunEvent(ctx context.Context, in *SendFlowRunEventRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, FlowRunService_SendFlowRunEvent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowRunServiceClient) StreamFlowRunEvents(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[StreamFlowRunEventsRequest, StreamFlowRunEventsResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &FlowRunService_ServiceDesc.Streams[1], FlowRunService_StreamFlowRunEvents_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[StreamFlowRunEventsRequest, StreamFlowRunEventsResponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type FlowRunService_StreamFlowRunEventsClient = grpc.BidiStreamingClient[StreamFlowRunEventsRequest, StreamFlowRunEventsResponse]
+
+// FlowRunServiceServer is the server API for FlowRunService service.
+// All implementations must embed UnimplementedFlowRunServiceServer
+// for forward compatibility.
+//
+// FlowRunService provides operations for managing and running flowruns.
+type FlowRunServiceServer interface {
+	// List flowruns with filtering options.
+	ListFlowRuns(context.Context, *ListFlowRunsRequest) (*ListFlowRunsResponse, error)
+	// Get a single flowrun by name.
+	GetFlowRun(context.Context, *GetFlowRunRequest) (*GetFlowRunResponse, error)
+	// Create a new flowrun.
+	CreateFlowRun(context.Context, *CreateFlowRunRequest) (*longrunningpb.Operation, error)
+	// Update a flowrun.
+	UpdateFlowRun(context.Context, *UpdateFlowRunRequest) (*longrunningpb.Operation, error)
+	// Delete a flowrun.
+	DeleteFlowRun(context.Context, *DeleteFlowRunRequest) (*longrunningpb.Operation, error)
+	// Receive a stream of executor events (outputs, input requests, interaction requests, state changes).
+	// For environments with server streaming but not client streaming (e.g. web browsers).
+	ReceiveFlowRunEvents(*ReceiveFlowRunEventsRequest, grpc.ServerStreamingServer[ReceiveFlowRunEventsResponse]) error
+	// Send an input, interaction response, or flow/node command (stop, terminate, suspend, resume).
+	// For environments without client streaming (e.g. web browsers).
+	SendFlowRunEvent(context.Context, *SendFlowRunEventRequest) (*emptypb.Empty, error)
+	// Bi-directional event stream: send inputs/commands and receive executor events.
+	StreamFlowRunEvents(grpc.BidiStreamingServer[StreamFlowRunEventsRequest, StreamFlowRunEventsResponse]) error
+	mustEmbedUnimplementedFlowRunServiceServer()
+}
+
+// UnimplementedFlowRunServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedFlowRunServiceServer struct{}
+
+func (UnimplementedFlowRunServiceServer) ListFlowRuns(context.Context, *ListFlowRunsRequest) (*ListFlowRunsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFlowRuns not implemented")
+}
+func (UnimplementedFlowRunServiceServer) GetFlowRun(context.Context, *GetFlowRunRequest) (*GetFlowRunResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFlowRun not implemented")
+}
+func (UnimplementedFlowRunServiceServer) CreateFlowRun(context.Context, *CreateFlowRunRequest) (*longrunningpb.Operation, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateFlowRun not implemented")
+}
+func (UnimplementedFlowRunServiceServer) UpdateFlowRun(context.Context, *UpdateFlowRunRequest) (*longrunningpb.Operation, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateFlowRun not implemented")
+}
+func (UnimplementedFlowRunServiceServer) DeleteFlowRun(context.Context, *DeleteFlowRunRequest) (*longrunningpb.Operation, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteFlowRun not implemented")
+}
+func (UnimplementedFlowRunServiceServer) ReceiveFlowRunEvents(*ReceiveFlowRunEventsRequest, grpc.ServerStreamingServer[ReceiveFlowRunEventsResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method ReceiveFlowRunEvents not implemented")
+}
+func (UnimplementedFlowRunServiceServer) SendFlowRunEvent(context.Context, *SendFlowRunEventRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendFlowRunEvent not implemented")
+}
+func (UnimplementedFlowRunServiceServer) StreamFlowRunEvents(grpc.BidiStreamingServer[StreamFlowRunEventsRequest, StreamFlowRunEventsResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method StreamFlowRunEvents not implemented")
+}
+func (UnimplementedFlowRunServiceServer) mustEmbedUnimplementedFlowRunServiceServer() {}
+func (UnimplementedFlowRunServiceServer) testEmbeddedByValue()                        {}
+
+// UnsafeFlowRunServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to FlowRunServiceServer will
+// result in compilation errors.
+type UnsafeFlowRunServiceServer interface {
+	mustEmbedUnimplementedFlowRunServiceServer()
+}
+
+func RegisterFlowRunServiceServer(s grpc.ServiceRegistrar, srv FlowRunServiceServer) {
+	// If the following call pancis, it indicates UnimplementedFlowRunServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&FlowRunService_ServiceDesc, srv)
+}
+
+func _FlowRunService_ListFlowRuns_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListFlowRunsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowRunServiceServer).ListFlowRuns(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FlowRunService_ListFlowRuns_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowRunServiceServer).ListFlowRuns(ctx, req.(*ListFlowRunsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowRunService_GetFlowRun_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFlowRunRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowRunServiceServer).GetFlowRun(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FlowRunService_GetFlowRun_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowRunServiceServer).GetFlowRun(ctx, req.(*GetFlowRunRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowRunService_CreateFlowRun_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateFlowRunRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowRunServiceServer).CreateFlowRun(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FlowRunService_CreateFlowRun_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowRunServiceServer).CreateFlowRun(ctx, req.(*CreateFlowRunRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowRunService_UpdateFlowRun_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateFlowRunRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowRunServiceServer).UpdateFlowRun(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FlowRunService_UpdateFlowRun_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowRunServiceServer).UpdateFlowRun(ctx, req.(*UpdateFlowRunRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowRunService_DeleteFlowRun_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteFlowRunRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowRunServiceServer).DeleteFlowRun(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FlowRunService_DeleteFlowRun_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowRunServiceServer).DeleteFlowRun(ctx, req.(*DeleteFlowRunRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowRunService_ReceiveFlowRunEvents_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ReceiveFlowRunEventsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(FlowRunServiceServer).ReceiveFlowRunEvents(m, &grpc.GenericServerStream[ReceiveFlowRunEventsRequest, ReceiveFlowRunEventsResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type FlowRunService_ReceiveFlowRunEventsServer = grpc.ServerStreamingServer[ReceiveFlowRunEventsResponse]
+
+func _FlowRunService_SendFlowRunEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendFlowRunEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowRunServiceServer).SendFlowRunEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FlowRunService_SendFlowRunEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowRunServiceServer).SendFlowRunEvent(ctx, req.(*SendFlowRunEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowRunService_StreamFlowRunEvents_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(FlowRunServiceServer).StreamFlowRunEvents(&grpc.GenericServerStream[StreamFlowRunEventsRequest, StreamFlowRunEventsResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type FlowRunService_StreamFlowRunEventsServer = grpc.BidiStreamingServer[StreamFlowRunEventsRequest, StreamFlowRunEventsResponse]
+
+// FlowRunService_ServiceDesc is the grpc.ServiceDesc for FlowRunService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var FlowRunService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "dtkt.core.v1.FlowRunService",
+	HandlerType: (*FlowRunServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ListFlowRuns",
+			Handler:    _FlowRunService_ListFlowRuns_Handler,
+		},
+		{
+			MethodName: "GetFlowRun",
+			Handler:    _FlowRunService_GetFlowRun_Handler,
+		},
+		{
+			MethodName: "CreateFlowRun",
+			Handler:    _FlowRunService_CreateFlowRun_Handler,
+		},
+		{
+			MethodName: "UpdateFlowRun",
+			Handler:    _FlowRunService_UpdateFlowRun_Handler,
+		},
+		{
+			MethodName: "DeleteFlowRun",
+			Handler:    _FlowRunService_DeleteFlowRun_Handler,
+		},
+		{
+			MethodName: "SendFlowRunEvent",
+			Handler:    _FlowRunService_SendFlowRunEvent_Handler,
+		},
+	},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "ReceiveFlowRunEvents",
+			Handler:       _FlowRunService_ReceiveFlowRunEvents_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "StreamFlowRunEvents",
+			Handler:       _FlowRunService_StreamFlowRunEvents_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
+	Metadata: "dtkt/core/v1/services.proto",
+}
+
+const (
 	IntegrationService_ListIntegrations_FullMethodName  = "/dtkt.core.v1.IntegrationService/ListIntegrations"
 	IntegrationService_GetIntegration_FullMethodName    = "/dtkt.core.v1.IntegrationService/GetIntegration"
 	IntegrationService_CreateIntegration_FullMethodName = "/dtkt.core.v1.IntegrationService/CreateIntegration"

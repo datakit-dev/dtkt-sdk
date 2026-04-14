@@ -1,0 +1,22 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fanout_two_vars
+  description: "One input fans out to even and odd vars"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: even
+      value: "= inputs.x.value"
+      transforms:
+        - filter: "= this.value % 2 == 0"
+    - id: odd
+      value: "= inputs.x.value"
+      transforms:
+        - filter: "= this.value % 2 != 0"
+  outputs:
+    - id: even
+      value: "= vars.even.value"
+    - id: odd
+      value: "= vars.odd.value"

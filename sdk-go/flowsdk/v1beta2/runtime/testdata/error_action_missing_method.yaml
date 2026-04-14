@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: action_missing_method
+  description: "Action referencing a non-existent method"
+  inputs:
+    - id: x
+      int64: {}
+  actions:
+    - id: missing
+      call:
+        connection: echo
+        method: nonexistent.DoSomething
+  outputs:
+    - id: result
+      value: "= actions.missing.value"

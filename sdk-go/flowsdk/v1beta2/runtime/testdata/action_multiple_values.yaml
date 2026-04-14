@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: action_multiple_values
+  inputs:
+    - id: x
+      int64: {}
+  actions:
+    - id: echo
+      call:
+        connection: echo
+        method: echo.Echo
+        request: "= inputs.x.value"
+  outputs:
+    - id: result
+      value: "= actions.echo.value"

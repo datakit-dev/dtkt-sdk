@@ -1,0 +1,17 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_double_map_filter
+  description: "Double map *2.5 then filter > 5.0"
+  inputs:
+    - id: x
+      double: {}
+  vars:
+    - id: processed
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= this.value * 2.5"
+        - filter: "= this.value > 5.0"
+  outputs:
+    - id: result
+      value: "= vars.processed.value"

@@ -1,0 +1,13 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: join_two_inputs
+  description: "Two inputs joining at output via multiplication"
+  inputs:
+    - id: a
+      int64: {}
+    - id: b
+      int64: {}
+  outputs:
+    - id: product
+      value: "= inputs.a.value * inputs.b.value"

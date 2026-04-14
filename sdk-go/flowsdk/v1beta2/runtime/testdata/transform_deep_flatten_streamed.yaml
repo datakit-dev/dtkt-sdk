@@ -1,0 +1,19 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_deep_flatten_streamed
+  description: "Three flatten steps on list input to unwrap nested lists"
+  inputs:
+    - id: x
+      list:
+        items: list
+      transforms:
+        - flatten: true
+        - flatten: true
+        - flatten: true
+  vars:
+    - id: passthrough
+      value: "= inputs.x.value"
+  outputs:
+    - id: result
+      value: "= vars.passthrough.value"

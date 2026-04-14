@@ -1,0 +1,13 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_int64_map_x2
+  description: "Int64 input with map transform doubling each value"
+  inputs:
+    - id: x
+      int64: {}
+      transforms:
+        - map: "= this.value * 2"
+  outputs:
+    - id: result
+      value: "= inputs.x.value"

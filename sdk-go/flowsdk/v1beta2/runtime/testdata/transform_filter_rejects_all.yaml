@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_filter_rejects_all
+  description: "Filter rejects all values"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: none
+      value: "= inputs.x.value"
+      transforms:
+        - filter: "= this.value > 100"
+  outputs:
+    - id: result
+      value: "= vars.none.value"

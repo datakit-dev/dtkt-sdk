@@ -192,9 +192,7 @@ message DataType {
   google.protobuf.Struct metadata = 4;
 }
 
-// -----------------------------------------------------------------------------
 // OAuth config
-// -----------------------------------------------------------------------------
 
 message OAuthConfig {
   string client_id = 1 [(buf.validate.field).required = true];
@@ -221,9 +219,7 @@ message OAuthEndpoint {
   optional string device_auth_url = 3 [(buf.validate.field).string.uri = true]; // optional; device flow
 }
 
-// -----------------------------------------------------------------------------
 // Step 1: request an authorization URL (3-legged OAuth)
-// -----------------------------------------------------------------------------
 
 message OAuthCodeRequest {
   // CSRF protection (highly recommended).
@@ -241,9 +237,7 @@ message OAuthCodeRequest {
   map<string, string> params = 6;
 }
 
-// -----------------------------------------------------------------------------
 // Step 2: exchange authorization code for tokens
-// -----------------------------------------------------------------------------
 
 message OAuthTokenRequest {
   string code = 1 [(buf.validate.field).required = true];
@@ -258,17 +252,13 @@ message OAuthTokenRequest {
   map<string, string> params = 10; // provider extras
 }
 
-// -----------------------------------------------------------------------------
 // Step 3: refresh credentials
-// -----------------------------------------------------------------------------
 
 message OAuthRefreshRequest {
   OAuthToken token = 1 [(buf.validate.field).required = true];
 }
 
-// -----------------------------------------------------------------------------
 // Token (inbound-only; never returned by BaseService)
-// -----------------------------------------------------------------------------
 
 message OAuthToken {
   string access_token = 1;
@@ -281,4 +271,12 @@ message OAuthToken {
 message PageToken {
   int64 id = 1 [(buf.validate.field).required = true];
   google.protobuf.Timestamp time = 2 [(buf.validate.field).required = true];
+}
+
+// TypeMeta identifies a resource's API version and kind, analogous to
+// Kubernetes' TypeMeta. It is intentionally small -- the spec payload is
+// handled separately.
+message TypeMeta {
+  string api_version = 1 [(buf.validate.field).required = true];
+  string kind = 2 [(buf.validate.field).required = true];
 }

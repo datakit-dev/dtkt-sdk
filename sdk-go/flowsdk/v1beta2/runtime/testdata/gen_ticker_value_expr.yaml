@@ -1,0 +1,14 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: gen_ticker_value_expr
+  generators:
+    - id: tick
+      ticker:
+        interval: "0.01s"
+        value: "= this.count * 100"
+  outputs:
+    - id: result
+      value: "= generators.tick.value"
+      flow_control:
+        stop_when: "= int(generators.tick.eval_count) >= 5"

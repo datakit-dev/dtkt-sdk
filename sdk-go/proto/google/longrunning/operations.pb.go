@@ -18,6 +18,8 @@
 // 	protoc        (unknown)
 // source: google/longrunning/operations.proto
 
+//go:build !protoopaque
+
 package longrunningpb
 
 import (
@@ -30,7 +32,6 @@ import (
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -44,7 +45,7 @@ const (
 // This resource represents a long-running operation that is the result of a
 // network API call.
 type Operation struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The server-assigned name, which is only unique within the same service that
 	// originally returns it. If you use the default HTTP mapping, the
 	// `name` should be a resource name ending with `operations/{unique_id}`.
@@ -97,11 +98,6 @@ func (x *Operation) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Operation.ProtoReflect.Descriptor instead.
-func (*Operation) Descriptor() ([]byte, []int) {
-	return file_google_longrunning_operations_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Operation) GetName() string {
 	if x != nil {
 		return x.Name
@@ -148,6 +144,164 @@ func (x *Operation) GetResponse() *anypb.Any {
 	return nil
 }
 
+func (x *Operation) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Operation) SetMetadata(v *anypb.Any) {
+	x.Metadata = v
+}
+
+func (x *Operation) SetDone(v bool) {
+	x.Done = v
+}
+
+func (x *Operation) SetError(v *status.Status) {
+	if v == nil {
+		x.Result = nil
+		return
+	}
+	x.Result = &Operation_Error{v}
+}
+
+func (x *Operation) SetResponse(v *anypb.Any) {
+	if v == nil {
+		x.Result = nil
+		return
+	}
+	x.Result = &Operation_Response{v}
+}
+
+func (x *Operation) HasMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.Metadata != nil
+}
+
+func (x *Operation) HasResult() bool {
+	if x == nil {
+		return false
+	}
+	return x.Result != nil
+}
+
+func (x *Operation) HasError() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Result.(*Operation_Error)
+	return ok
+}
+
+func (x *Operation) HasResponse() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Result.(*Operation_Response)
+	return ok
+}
+
+func (x *Operation) ClearMetadata() {
+	x.Metadata = nil
+}
+
+func (x *Operation) ClearResult() {
+	x.Result = nil
+}
+
+func (x *Operation) ClearError() {
+	if _, ok := x.Result.(*Operation_Error); ok {
+		x.Result = nil
+	}
+}
+
+func (x *Operation) ClearResponse() {
+	if _, ok := x.Result.(*Operation_Response); ok {
+		x.Result = nil
+	}
+}
+
+const Operation_Result_not_set_case case_Operation_Result = 0
+const Operation_Error_case case_Operation_Result = 4
+const Operation_Response_case case_Operation_Result = 5
+
+func (x *Operation) WhichResult() case_Operation_Result {
+	if x == nil {
+		return Operation_Result_not_set_case
+	}
+	switch x.Result.(type) {
+	case *Operation_Error:
+		return Operation_Error_case
+	case *Operation_Response:
+		return Operation_Response_case
+	default:
+		return Operation_Result_not_set_case
+	}
+}
+
+type Operation_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The server-assigned name, which is only unique within the same service that
+	// originally returns it. If you use the default HTTP mapping, the
+	// `name` should be a resource name ending with `operations/{unique_id}`.
+	Name string
+	// Service-specific metadata associated with the operation.  It typically
+	// contains progress information and common metadata such as create time.
+	// Some services might not provide such metadata.  Any method that returns a
+	// long-running operation should document the metadata type, if any.
+	Metadata *anypb.Any
+	// If the value is `false`, it means the operation is still in progress.
+	// If `true`, the operation is completed, and either `error` or `response` is
+	// available.
+	Done bool
+	// The operation result, which can be either an `error` or a valid `response`.
+	// If `done` == `false`, neither `error` nor `response` is set.
+	// If `done` == `true`, exactly one of `error` or `response` can be set.
+	// Some services might not provide the result.
+
+	// Fields of oneof Result:
+	// The error result of the operation in case of failure or cancellation.
+	Error *status.Status
+	// The normal, successful response of the operation.  If the original
+	// method returns no data on success, such as `Delete`, the response is
+	// `google.protobuf.Empty`.  If the original method is standard
+	// `Get`/`Create`/`Update`, the response should be the resource.  For other
+	// methods, the response should have the type `XxxResponse`, where `Xxx`
+	// is the original method name.  For example, if the original method name
+	// is `TakeSnapshot()`, the inferred response type is
+	// `TakeSnapshotResponse`.
+	Response *anypb.Any
+	// -- end of Result
+}
+
+func (b0 Operation_builder) Build() *Operation {
+	m0 := &Operation{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Metadata = b.Metadata
+	x.Done = b.Done
+	if b.Error != nil {
+		x.Result = &Operation_Error{b.Error}
+	}
+	if b.Response != nil {
+		x.Result = &Operation_Response{b.Response}
+	}
+	return m0
+}
+
+type case_Operation_Result protoreflect.FieldNumber
+
+func (x case_Operation_Result) String() string {
+	md := file_google_longrunning_operations_proto_msgTypes[0].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isOperation_Result interface {
 	isOperation_Result()
 }
@@ -176,7 +330,7 @@ func (*Operation_Response) isOperation_Result() {}
 // The request message for
 // [Operations.GetOperation][google.longrunning.Operations.GetOperation].
 type GetOperationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The name of the operation resource.
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -208,11 +362,6 @@ func (x *GetOperationRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetOperationRequest.ProtoReflect.Descriptor instead.
-func (*GetOperationRequest) Descriptor() ([]byte, []int) {
-	return file_google_longrunning_operations_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *GetOperationRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -220,10 +369,29 @@ func (x *GetOperationRequest) GetName() string {
 	return ""
 }
 
+func (x *GetOperationRequest) SetName(v string) {
+	x.Name = v
+}
+
+type GetOperationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The name of the operation resource.
+	Name string
+}
+
+func (b0 GetOperationRequest_builder) Build() *GetOperationRequest {
+	m0 := &GetOperationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 // The request message for
 // [Operations.ListOperations][google.longrunning.Operations.ListOperations].
 type ListOperationsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The name of the operation's parent resource.
 	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	// The standard list filter.
@@ -272,11 +440,6 @@ func (x *ListOperationsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListOperationsRequest.ProtoReflect.Descriptor instead.
-func (*ListOperationsRequest) Descriptor() ([]byte, []int) {
-	return file_google_longrunning_operations_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *ListOperationsRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -312,10 +475,66 @@ func (x *ListOperationsRequest) GetReturnPartialSuccess() bool {
 	return false
 }
 
+func (x *ListOperationsRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *ListOperationsRequest) SetFilter(v string) {
+	x.Filter = v
+}
+
+func (x *ListOperationsRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListOperationsRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListOperationsRequest) SetReturnPartialSuccess(v bool) {
+	x.ReturnPartialSuccess = v
+}
+
+type ListOperationsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The name of the operation's parent resource.
+	Name string
+	// The standard list filter.
+	Filter string
+	// The standard list page size.
+	PageSize int32
+	// The standard list page token.
+	PageToken string
+	// When set to `true`, operations that are reachable are returned as normal,
+	// and those that are unreachable are returned in the
+	// [ListOperationsResponse.unreachable] field.
+	//
+	// This can only be `true` when reading across collections e.g. when `parent`
+	// is set to `"projects/example/locations/-"`.
+	//
+	// This field is not by default supported and will result in an
+	// `UNIMPLEMENTED` error if set unless explicitly documented otherwise in
+	// service or product specific documentation.
+	ReturnPartialSuccess bool
+}
+
+func (b0 ListOperationsRequest_builder) Build() *ListOperationsRequest {
+	m0 := &ListOperationsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Filter = b.Filter
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.ReturnPartialSuccess = b.ReturnPartialSuccess
+	return m0
+}
+
 // The response message for
 // [Operations.ListOperations][google.longrunning.Operations.ListOperations].
 type ListOperationsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// A list of operations that matches the specified filter in the request.
 	Operations []*Operation `protobuf:"bytes,1,rep,name=operations,proto3" json:"operations,omitempty"`
 	// The standard List next-page token.
@@ -354,11 +573,6 @@ func (x *ListOperationsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListOperationsResponse.ProtoReflect.Descriptor instead.
-func (*ListOperationsResponse) Descriptor() ([]byte, []int) {
-	return file_google_longrunning_operations_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *ListOperationsResponse) GetOperations() []*Operation {
 	if x != nil {
 		return x.Operations
@@ -380,10 +594,46 @@ func (x *ListOperationsResponse) GetUnreachable() []string {
 	return nil
 }
 
+func (x *ListOperationsResponse) SetOperations(v []*Operation) {
+	x.Operations = v
+}
+
+func (x *ListOperationsResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+func (x *ListOperationsResponse) SetUnreachable(v []string) {
+	x.Unreachable = v
+}
+
+type ListOperationsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// A list of operations that matches the specified filter in the request.
+	Operations []*Operation
+	// The standard List next-page token.
+	NextPageToken string
+	// Unordered list. Unreachable resources. Populated when the request sets
+	// `ListOperationsRequest.return_partial_success` and reads across
+	// collections e.g. when attempting to list all resources across all supported
+	// locations.
+	Unreachable []string
+}
+
+func (b0 ListOperationsResponse_builder) Build() *ListOperationsResponse {
+	m0 := &ListOperationsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Operations = b.Operations
+	x.NextPageToken = b.NextPageToken
+	x.Unreachable = b.Unreachable
+	return m0
+}
+
 // The request message for
 // [Operations.CancelOperation][google.longrunning.Operations.CancelOperation].
 type CancelOperationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The name of the operation resource to be cancelled.
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -415,11 +665,6 @@ func (x *CancelOperationRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CancelOperationRequest.ProtoReflect.Descriptor instead.
-func (*CancelOperationRequest) Descriptor() ([]byte, []int) {
-	return file_google_longrunning_operations_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *CancelOperationRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -427,10 +672,29 @@ func (x *CancelOperationRequest) GetName() string {
 	return ""
 }
 
+func (x *CancelOperationRequest) SetName(v string) {
+	x.Name = v
+}
+
+type CancelOperationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The name of the operation resource to be cancelled.
+	Name string
+}
+
+func (b0 CancelOperationRequest_builder) Build() *CancelOperationRequest {
+	m0 := &CancelOperationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 // The request message for
 // [Operations.DeleteOperation][google.longrunning.Operations.DeleteOperation].
 type DeleteOperationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The name of the operation resource to be deleted.
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -462,11 +726,6 @@ func (x *DeleteOperationRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteOperationRequest.ProtoReflect.Descriptor instead.
-func (*DeleteOperationRequest) Descriptor() ([]byte, []int) {
-	return file_google_longrunning_operations_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *DeleteOperationRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -474,10 +733,29 @@ func (x *DeleteOperationRequest) GetName() string {
 	return ""
 }
 
+func (x *DeleteOperationRequest) SetName(v string) {
+	x.Name = v
+}
+
+type DeleteOperationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The name of the operation resource to be deleted.
+	Name string
+}
+
+func (b0 DeleteOperationRequest_builder) Build() *DeleteOperationRequest {
+	m0 := &DeleteOperationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 // The request message for
 // [Operations.WaitOperation][google.longrunning.Operations.WaitOperation].
 type WaitOperationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The name of the operation resource to wait on.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The maximum duration to wait before timing out. If left blank, the wait
@@ -513,11 +791,6 @@ func (x *WaitOperationRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WaitOperationRequest.ProtoReflect.Descriptor instead.
-func (*WaitOperationRequest) Descriptor() ([]byte, []int) {
-	return file_google_longrunning_operations_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *WaitOperationRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -532,6 +805,45 @@ func (x *WaitOperationRequest) GetTimeout() *durationpb.Duration {
 	return nil
 }
 
+func (x *WaitOperationRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *WaitOperationRequest) SetTimeout(v *durationpb.Duration) {
+	x.Timeout = v
+}
+
+func (x *WaitOperationRequest) HasTimeout() bool {
+	if x == nil {
+		return false
+	}
+	return x.Timeout != nil
+}
+
+func (x *WaitOperationRequest) ClearTimeout() {
+	x.Timeout = nil
+}
+
+type WaitOperationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The name of the operation resource to wait on.
+	Name string
+	// The maximum duration to wait before timing out. If left blank, the wait
+	// will be at most the time permitted by the underlying HTTP/RPC protocol.
+	// If RPC context deadline is also specified, the shorter one will be used.
+	Timeout *durationpb.Duration
+}
+
+func (b0 WaitOperationRequest_builder) Build() *WaitOperationRequest {
+	m0 := &WaitOperationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Timeout = b.Timeout
+	return m0
+}
+
 // A message representing the message types used by a long-running operation.
 //
 // Example:
@@ -543,7 +855,7 @@ func (x *WaitOperationRequest) GetTimeout() *durationpb.Duration {
 //	  };
 //	}
 type OperationInfo struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Required. The message name of the primary return type for this
 	// long-running operation.
 	// This type will be used to deserialize the LRO's response.
@@ -590,11 +902,6 @@ func (x *OperationInfo) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use OperationInfo.ProtoReflect.Descriptor instead.
-func (*OperationInfo) Descriptor() ([]byte, []int) {
-	return file_google_longrunning_operations_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *OperationInfo) GetResponseType() string {
 	if x != nil {
 		return x.ResponseType
@@ -607,6 +914,45 @@ func (x *OperationInfo) GetMetadataType() string {
 		return x.MetadataType
 	}
 	return ""
+}
+
+func (x *OperationInfo) SetResponseType(v string) {
+	x.ResponseType = v
+}
+
+func (x *OperationInfo) SetMetadataType(v string) {
+	x.MetadataType = v
+}
+
+type OperationInfo_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Required. The message name of the primary return type for this
+	// long-running operation.
+	// This type will be used to deserialize the LRO's response.
+	//
+	// If the response is in a different package from the rpc, a fully-qualified
+	// message name must be used (e.g. `google.protobuf.Struct`).
+	//
+	// Note: Altering this value constitutes a breaking change.
+	ResponseType string
+	// Required. The message name of the metadata type for this long-running
+	// operation.
+	//
+	// If the response is in a different package from the rpc, a fully-qualified
+	// message name must be used (e.g. `google.protobuf.Struct`).
+	//
+	// Note: Altering this value constitutes a breaking change.
+	MetadataType string
+}
+
+func (b0 OperationInfo_builder) Build() *OperationInfo {
+	m0 := &OperationInfo{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ResponseType = b.ResponseType
+	x.MetadataType = b.MetadataType
+	return m0
 }
 
 var file_google_longrunning_operations_proto_extTypes = []protoimpl.ExtensionInfo{
@@ -679,18 +1025,6 @@ const file_google_longrunning_operations_proto_rawDesc = "" +
 	"\rWaitOperation\x12(.google.longrunning.WaitOperationRequest\x1a\x1d.google.longrunning.Operation\"\x00\x1a\x1d\xcaA\x1alongrunning.googleapis.com:i\n" +
 	"\x0eoperation_info\x12\x1e.google.protobuf.MethodOptions\x18\x99\b \x01(\v2!.google.longrunning.OperationInfoR\roperationInfoB\xd9\x01\n" +
 	"\x18proto.google.longrunningB\x0fOperationsProtoP\x01ZCcloud.google.com/go/longrunning/autogen/longrunningpb;longrunningpb\xa2\x02\x03GLX\xaa\x02\x12Google.Longrunning\xca\x02\x12Google\\Longrunning\xe2\x02\x1eGoogle\\Longrunning\\GPBMetadata\xea\x02\x13Google::Longrunningb\x06proto3"
-
-var (
-	file_google_longrunning_operations_proto_rawDescOnce sync.Once
-	file_google_longrunning_operations_proto_rawDescData []byte
-)
-
-func file_google_longrunning_operations_proto_rawDescGZIP() []byte {
-	file_google_longrunning_operations_proto_rawDescOnce.Do(func() {
-		file_google_longrunning_operations_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_google_longrunning_operations_proto_rawDesc), len(file_google_longrunning_operations_proto_rawDesc)))
-	})
-	return file_google_longrunning_operations_proto_rawDescData
-}
 
 var file_google_longrunning_operations_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_google_longrunning_operations_proto_goTypes = []any{

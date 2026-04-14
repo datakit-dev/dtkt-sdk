@@ -1,0 +1,17 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_map_then_filter
+  description: "Double then filter > 5"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: processed
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= this.value * 2"
+        - filter: "= this.value > 5"
+  outputs:
+    - id: result
+      value: "= vars.processed.value"

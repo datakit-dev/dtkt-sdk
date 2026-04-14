@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/cli/v1beta1/message.proto
 
+//go:build !protoopaque
+
 package cliv1beta1
 
 import (
@@ -14,7 +16,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -70,14 +71,9 @@ func (x Telemetry) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use Telemetry.Descriptor instead.
-func (Telemetry) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{0}
-}
-
 // Legal configuration
 type Legal struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Timestamp when BSL license was accepted
 	BslAcceptedAt *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=bsl_accepted_at,json=bslAcceptedAt,proto3,oneof" json:"bsl_accepted_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -109,11 +105,6 @@ func (x *Legal) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Legal.ProtoReflect.Descriptor instead.
-func (*Legal) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Legal) GetBslAcceptedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.BslAcceptedAt
@@ -121,9 +112,39 @@ func (x *Legal) GetBslAcceptedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Legal) SetBslAcceptedAt(v *timestamppb.Timestamp) {
+	x.BslAcceptedAt = v
+}
+
+func (x *Legal) HasBslAcceptedAt() bool {
+	if x == nil {
+		return false
+	}
+	return x.BslAcceptedAt != nil
+}
+
+func (x *Legal) ClearBslAcceptedAt() {
+	x.BslAcceptedAt = nil
+}
+
+type Legal_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Timestamp when BSL license was accepted
+	BslAcceptedAt *timestamppb.Timestamp
+}
+
+func (b0 Legal_builder) Build() *Legal {
+	m0 := &Legal{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.BslAcceptedAt = b.BslAcceptedAt
+	return m0
+}
+
 // Daemon configuration
 type DaemonConfigFile struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Daemon TCP address
 	TcpAddress string `protobuf:"bytes,1,opt,name=tcp_address,json=tcpAddress,proto3" json:"tcp_address,omitempty"`
 	// Telemetry opt-in/out setting
@@ -159,11 +180,6 @@ func (x *DaemonConfigFile) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DaemonConfigFile.ProtoReflect.Descriptor instead.
-func (*DaemonConfigFile) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *DaemonConfigFile) GetTcpAddress() string {
 	if x != nil {
 		return x.TcpAddress
@@ -185,8 +201,41 @@ func (x *DaemonConfigFile) GetDockerRegistry() string {
 	return ""
 }
 
+func (x *DaemonConfigFile) SetTcpAddress(v string) {
+	x.TcpAddress = v
+}
+
+func (x *DaemonConfigFile) SetTelemetry(v Telemetry) {
+	x.Telemetry = v
+}
+
+func (x *DaemonConfigFile) SetDockerRegistry(v string) {
+	x.DockerRegistry = v
+}
+
+type DaemonConfigFile_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Daemon TCP address
+	TcpAddress string
+	// Telemetry opt-in/out setting
+	Telemetry Telemetry
+	// Docker registry for pushing/pulling integration images (e.g. "us-docker.pkg.dev/datakit-prd/us-docker-virtual")
+	DockerRegistry string
+}
+
+func (b0 DaemonConfigFile_builder) Build() *DaemonConfigFile {
+	m0 := &DaemonConfigFile{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.TcpAddress = b.TcpAddress
+	x.Telemetry = b.Telemetry
+	x.DockerRegistry = b.DockerRegistry
+	return m0
+}
+
 type DaemonConfig struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
+	state      protoimpl.MessageState `protogen:"hybrid.v1"`
 	ConfigFile *DaemonConfigFile      `protobuf:"bytes,1,opt,name=config_file,json=configFile,proto3" json:"config_file,omitempty"`
 	// Data directory
 	DataDir string `protobuf:"bytes,2,opt,name=data_dir,json=dataDir,proto3" json:"data_dir,omitempty"`
@@ -229,11 +278,6 @@ func (x *DaemonConfig) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DaemonConfig.ProtoReflect.Descriptor instead.
-func (*DaemonConfig) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *DaemonConfig) GetConfigFile() *DaemonConfigFile {
@@ -292,8 +336,86 @@ func (x *DaemonConfig) GetPidFilePath() string {
 	return ""
 }
 
+func (x *DaemonConfig) SetConfigFile(v *DaemonConfigFile) {
+	x.ConfigFile = v
+}
+
+func (x *DaemonConfig) SetDataDir(v string) {
+	x.DataDir = v
+}
+
+func (x *DaemonConfig) SetBuildDir(v string) {
+	x.BuildDir = v
+}
+
+func (x *DaemonConfig) SetCacheDir(v string) {
+	x.CacheDir = v
+}
+
+func (x *DaemonConfig) SetLogDir(v string) {
+	x.LogDir = v
+}
+
+func (x *DaemonConfig) SetRunDir(v string) {
+	x.RunDir = v
+}
+
+func (x *DaemonConfig) SetSocketPath(v string) {
+	x.SocketPath = v
+}
+
+func (x *DaemonConfig) SetPidFilePath(v string) {
+	x.PidFilePath = v
+}
+
+func (x *DaemonConfig) HasConfigFile() bool {
+	if x == nil {
+		return false
+	}
+	return x.ConfigFile != nil
+}
+
+func (x *DaemonConfig) ClearConfigFile() {
+	x.ConfigFile = nil
+}
+
+type DaemonConfig_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	ConfigFile *DaemonConfigFile
+	// Data directory
+	DataDir string
+	// Build artifacts directory
+	BuildDir string
+	// Cache directory
+	CacheDir string
+	// Log directory
+	LogDir string
+	// Runtime directory (contains socket and PID files)
+	RunDir string
+	// Socket file path
+	SocketPath string
+	// Process ID file path
+	PidFilePath string
+}
+
+func (b0 DaemonConfig_builder) Build() *DaemonConfig {
+	m0 := &DaemonConfig{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ConfigFile = b.ConfigFile
+	x.DataDir = b.DataDir
+	x.BuildDir = b.BuildDir
+	x.CacheDir = b.CacheDir
+	x.LogDir = b.LogDir
+	x.RunDir = b.RunDir
+	x.SocketPath = b.SocketPath
+	x.PidFilePath = b.PidFilePath
+	return m0
+}
+
 type DaemonStatus struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Whether or not the daemon is running
 	Running bool `protobuf:"varint,1,opt,name=running,proto3" json:"running,omitempty"`
 	// Process ID of the daemon (if running)
@@ -330,11 +452,6 @@ func (x *DaemonStatus) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DaemonStatus.ProtoReflect.Descriptor instead.
-func (*DaemonStatus) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *DaemonStatus) GetRunning() bool {
 	if x != nil {
 		return x.Running
@@ -363,9 +480,59 @@ func (x *DaemonStatus) GetMessage() string {
 	return ""
 }
 
+func (x *DaemonStatus) SetRunning(v bool) {
+	x.Running = v
+}
+
+func (x *DaemonStatus) SetPid(v int32) {
+	x.Pid = v
+}
+
+func (x *DaemonStatus) SetDaemon(v *DaemonConfig) {
+	x.Daemon = v
+}
+
+func (x *DaemonStatus) SetMessage(v string) {
+	x.Message = v
+}
+
+func (x *DaemonStatus) HasDaemon() bool {
+	if x == nil {
+		return false
+	}
+	return x.Daemon != nil
+}
+
+func (x *DaemonStatus) ClearDaemon() {
+	x.Daemon = nil
+}
+
+type DaemonStatus_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Whether or not the daemon is running
+	Running bool
+	// Process ID of the daemon (if running)
+	Pid    int32
+	Daemon *DaemonConfig
+	// Additional status message
+	Message string
+}
+
+func (b0 DaemonStatus_builder) Build() *DaemonStatus {
+	m0 := &DaemonStatus{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Running = b.Running
+	x.Pid = b.Pid
+	x.Daemon = b.Daemon
+	x.Message = b.Message
+	return m0
+}
+
 // Daemon configuration and runtime paths
 type DaemonPaths struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Mode (user or system)
 	Mode string `protobuf:"bytes,1,opt,name=mode,proto3" json:"mode,omitempty"`
 	// Path to daemon configuration file
@@ -413,11 +580,6 @@ func (x *DaemonPaths) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DaemonPaths.ProtoReflect.Descriptor instead.
-func (*DaemonPaths) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *DaemonPaths) GetMode() string {
@@ -490,8 +652,90 @@ func (x *DaemonPaths) GetRunDir() string {
 	return ""
 }
 
+func (x *DaemonPaths) SetMode(v string) {
+	x.Mode = v
+}
+
+func (x *DaemonPaths) SetConfigFile(v string) {
+	x.ConfigFile = v
+}
+
+func (x *DaemonPaths) SetSocketPath(v string) {
+	x.SocketPath = v
+}
+
+func (x *DaemonPaths) SetTcpAddress(v string) {
+	x.TcpAddress = v
+}
+
+func (x *DaemonPaths) SetDataDir(v string) {
+	x.DataDir = v
+}
+
+func (x *DaemonPaths) SetBuildDir(v string) {
+	x.BuildDir = v
+}
+
+func (x *DaemonPaths) SetCacheDir(v string) {
+	x.CacheDir = v
+}
+
+func (x *DaemonPaths) SetLogDir(v string) {
+	x.LogDir = v
+}
+
+func (x *DaemonPaths) SetPidFilePath(v string) {
+	x.PidFilePath = v
+}
+
+func (x *DaemonPaths) SetRunDir(v string) {
+	x.RunDir = v
+}
+
+type DaemonPaths_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Mode (user or system)
+	Mode string
+	// Path to daemon configuration file
+	ConfigFile string
+	// Unix socket path
+	SocketPath string
+	// TCP address
+	TcpAddress string
+	// Data directory
+	DataDir string
+	// Build artifacts directory
+	BuildDir string
+	// Cache directory
+	CacheDir string
+	// Log directory
+	LogDir string
+	// PID file path
+	PidFilePath string
+	// Runtime directory (contains socket and PID files)
+	RunDir string
+}
+
+func (b0 DaemonPaths_builder) Build() *DaemonPaths {
+	m0 := &DaemonPaths{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Mode = b.Mode
+	x.ConfigFile = b.ConfigFile
+	x.SocketPath = b.SocketPath
+	x.TcpAddress = b.TcpAddress
+	x.DataDir = b.DataDir
+	x.BuildDir = b.BuildDir
+	x.CacheDir = b.CacheDir
+	x.LogDir = b.LogDir
+	x.PidFilePath = b.PidFilePath
+	x.RunDir = b.RunDir
+	return m0
+}
+
 type ConfigFile struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Map of context label to context configuration
 	Contexts map[string]*v1.Context `protobuf:"bytes,1,rep,name=contexts,proto3" json:"contexts,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Legal acceptance tracking
@@ -529,11 +773,6 @@ func (x *ConfigFile) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ConfigFile.ProtoReflect.Descriptor instead.
-func (*ConfigFile) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *ConfigFile) GetContexts() map[string]*v1.Context {
 	if x != nil {
 		return x.Contexts
@@ -562,9 +801,60 @@ func (x *ConfigFile) GetTelemetry() Telemetry {
 	return Telemetry_TELEMETRY_UNSPECIFIED
 }
 
+func (x *ConfigFile) SetContexts(v map[string]*v1.Context) {
+	x.Contexts = v
+}
+
+func (x *ConfigFile) SetLegal(v *Legal) {
+	x.Legal = v
+}
+
+func (x *ConfigFile) SetNonInteractive(v bool) {
+	x.NonInteractive = v
+}
+
+func (x *ConfigFile) SetTelemetry(v Telemetry) {
+	x.Telemetry = v
+}
+
+func (x *ConfigFile) HasLegal() bool {
+	if x == nil {
+		return false
+	}
+	return x.Legal != nil
+}
+
+func (x *ConfigFile) ClearLegal() {
+	x.Legal = nil
+}
+
+type ConfigFile_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Map of context label to context configuration
+	Contexts map[string]*v1.Context
+	// Legal acceptance tracking
+	Legal *Legal
+	// Disable interactive prompts
+	NonInteractive bool
+	// Telemetry opt-in/out setting
+	Telemetry Telemetry
+}
+
+func (b0 ConfigFile_builder) Build() *ConfigFile {
+	m0 := &ConfigFile{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Contexts = b.Contexts
+	x.Legal = b.Legal
+	x.NonInteractive = b.NonInteractive
+	x.Telemetry = b.Telemetry
+	return m0
+}
+
 // Configuration profile
 type Config struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Configuration profile name
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Whether this is the active configuration
@@ -600,11 +890,6 @@ func (x *Config) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Config.ProtoReflect.Descriptor instead.
-func (*Config) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *Config) GetName() string {
 	if x != nil {
 		return x.Name
@@ -626,9 +911,53 @@ func (x *Config) GetConfigFile() *ConfigFile {
 	return nil
 }
 
+func (x *Config) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Config) SetIsActive(v bool) {
+	x.IsActive = v
+}
+
+func (x *Config) SetConfigFile(v *ConfigFile) {
+	x.ConfigFile = v
+}
+
+func (x *Config) HasConfigFile() bool {
+	if x == nil {
+		return false
+	}
+	return x.ConfigFile != nil
+}
+
+func (x *Config) ClearConfigFile() {
+	x.ConfigFile = nil
+}
+
+type Config_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Configuration profile name
+	Name string
+	// Whether this is the active configuration
+	IsActive bool
+	// Configuration file contents
+	ConfigFile *ConfigFile
+}
+
+func (b0 Config_builder) Build() *Config {
+	m0 := &Config{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.IsActive = b.IsActive
+	x.ConfigFile = b.ConfigFile
+	return m0
+}
+
 // List of configuration profiles
 type Configs struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Configs       []*Config              `protobuf:"bytes,1,rep,name=configs,proto3" json:"configs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -659,11 +988,6 @@ func (x *Configs) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Configs.ProtoReflect.Descriptor instead.
-func (*Configs) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *Configs) GetConfigs() []*Config {
 	if x != nil {
 		return x.Configs
@@ -671,9 +995,27 @@ func (x *Configs) GetConfigs() []*Config {
 	return nil
 }
 
+func (x *Configs) SetConfigs(v []*Config) {
+	x.Configs = v
+}
+
+type Configs_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Configs []*Config
+}
+
+func (b0 Configs_builder) Build() *Configs {
+	m0 := &Configs{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Configs = b.Configs
+	return m0
+}
+
 // Client configuration paths
 type ConfigPaths struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Configuration name
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Directory containing all configuration files
@@ -711,11 +1053,6 @@ func (x *ConfigPaths) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ConfigPaths.ProtoReflect.Descriptor instead.
-func (*ConfigPaths) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *ConfigPaths) GetName() string {
 	if x != nil {
 		return x.Name
@@ -744,8 +1081,48 @@ func (x *ConfigPaths) GetActiveFile() string {
 	return ""
 }
 
+func (x *ConfigPaths) SetName(v string) {
+	x.Name = v
+}
+
+func (x *ConfigPaths) SetConfigDir(v string) {
+	x.ConfigDir = v
+}
+
+func (x *ConfigPaths) SetConfigFile(v string) {
+	x.ConfigFile = v
+}
+
+func (x *ConfigPaths) SetActiveFile(v string) {
+	x.ActiveFile = v
+}
+
+type ConfigPaths_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Configuration name
+	Name string
+	// Directory containing all configuration files
+	ConfigDir string
+	// Path to the configuration file
+	ConfigFile string
+	// Path to the active configuration marker file
+	ActiveFile string
+}
+
+func (b0 ConfigPaths_builder) Build() *ConfigPaths {
+	m0 := &ConfigPaths{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.ConfigDir = b.ConfigDir
+	x.ConfigFile = b.ConfigFile
+	x.ActiveFile = b.ActiveFile
+	return m0
+}
+
 type Context struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Label         string                 `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"`
 	Context       *v1.Context            `protobuf:"bytes,2,opt,name=context,proto3" json:"context,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -777,11 +1154,6 @@ func (x *Context) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Context.ProtoReflect.Descriptor instead.
-func (*Context) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *Context) GetLabel() string {
 	if x != nil {
 		return x.Label
@@ -796,9 +1168,44 @@ func (x *Context) GetContext() *v1.Context {
 	return nil
 }
 
+func (x *Context) SetLabel(v string) {
+	x.Label = v
+}
+
+func (x *Context) SetContext(v *v1.Context) {
+	x.Context = v
+}
+
+func (x *Context) HasContext() bool {
+	if x == nil {
+		return false
+	}
+	return x.Context != nil
+}
+
+func (x *Context) ClearContext() {
+	x.Context = nil
+}
+
+type Context_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Label   string
+	Context *v1.Context
+}
+
+func (b0 Context_builder) Build() *Context {
+	m0 := &Context{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Label = b.Label
+	x.Context = b.Context
+	return m0
+}
+
 // CLI plugin metadata
 type Plugin struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Plugin name (must start with 'dtkt-')
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// File system path to plugin executable
@@ -832,11 +1239,6 @@ func (x *Plugin) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Plugin.ProtoReflect.Descriptor instead.
-func (*Plugin) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *Plugin) GetName() string {
 	if x != nil {
 		return x.Name
@@ -851,8 +1253,34 @@ func (x *Plugin) GetPath() string {
 	return ""
 }
 
+func (x *Plugin) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Plugin) SetPath(v string) {
+	x.Path = v
+}
+
+type Plugin_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Plugin name (must start with 'dtkt-')
+	Name string
+	// File system path to plugin executable
+	Path string
+}
+
+func (b0 Plugin_builder) Build() *Plugin {
+	m0 := &Plugin{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Path = b.Path
+	return m0
+}
+
 type PluginInfo struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Plugin name (must start with 'dtkt-')
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Plugin version
@@ -890,11 +1318,6 @@ func (x *PluginInfo) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PluginInfo.ProtoReflect.Descriptor instead.
-func (*PluginInfo) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{11}
-}
-
 func (x *PluginInfo) GetName() string {
 	if x != nil {
 		return x.Name
@@ -923,9 +1346,49 @@ func (x *PluginInfo) GetExecutableFilePath() string {
 	return ""
 }
 
+func (x *PluginInfo) SetName(v string) {
+	x.Name = v
+}
+
+func (x *PluginInfo) SetVersion(v string) {
+	x.Version = v
+}
+
+func (x *PluginInfo) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *PluginInfo) SetExecutableFilePath(v string) {
+	x.ExecutableFilePath = v
+}
+
+type PluginInfo_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Plugin name (must start with 'dtkt-')
+	Name string
+	// Plugin version
+	Version string
+	// Plugin description
+	Description string
+	// File system path to plugin executable
+	ExecutableFilePath string
+}
+
+func (b0 PluginInfo_builder) Build() *PluginInfo {
+	m0 := &PluginInfo{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Version = b.Version
+	x.Description = b.Description
+	x.ExecutableFilePath = b.ExecutableFilePath
+	return m0
+}
+
 // List of installed plugins
 type Plugins struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Plugins       []*Plugin              `protobuf:"bytes,1,rep,name=plugins,proto3" json:"plugins,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -956,16 +1419,29 @@ func (x *Plugins) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Plugins.ProtoReflect.Descriptor instead.
-func (*Plugins) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{12}
-}
-
 func (x *Plugins) GetPlugins() []*Plugin {
 	if x != nil {
 		return x.Plugins
 	}
 	return nil
+}
+
+func (x *Plugins) SetPlugins(v []*Plugin) {
+	x.Plugins = v
+}
+
+type Plugins_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Plugins []*Plugin
+}
+
+func (b0 Plugins_builder) Build() *Plugins {
+	m0 := &Plugins{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Plugins = b.Plugins
+	return m0
 }
 
 var File_dtkt_cli_v1beta1_message_proto protoreflect.FileDescriptor
@@ -1060,18 +1536,6 @@ const file_dtkt_cli_v1beta1_message_proto_rawDesc = "" +
 	"\fTELEMETRY_ON\x10\x01\x12\x11\n" +
 	"\rTELEMETRY_OFF\x10\x02B\xd2\x01\n" +
 	"\x16proto.dtkt.cli.v1beta1B\fMessageProtoP\x01ZHgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/cli/v1beta1;cliv1beta1\xa2\x02\x03DCX\xaa\x02\x10Dtkt.Cli.V1beta1\xca\x02\x10Dtkt\\Cli\\V1beta1\xe2\x02\x1cDtkt\\Cli\\V1beta1\\GPBMetadata\xea\x02\x12Dtkt::Cli::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_cli_v1beta1_message_proto_rawDescOnce sync.Once
-	file_dtkt_cli_v1beta1_message_proto_rawDescData []byte
-)
-
-func file_dtkt_cli_v1beta1_message_proto_rawDescGZIP() []byte {
-	file_dtkt_cli_v1beta1_message_proto_rawDescOnce.Do(func() {
-		file_dtkt_cli_v1beta1_message_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_cli_v1beta1_message_proto_rawDesc), len(file_dtkt_cli_v1beta1_message_proto_rawDesc)))
-	})
-	return file_dtkt_cli_v1beta1_message_proto_rawDescData
-}
 
 var file_dtkt_cli_v1beta1_message_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_dtkt_cli_v1beta1_message_proto_msgTypes = make([]protoimpl.MessageInfo, 14)

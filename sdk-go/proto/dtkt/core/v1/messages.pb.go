@@ -4,11 +4,14 @@
 // 	protoc        (unknown)
 // source: dtkt/core/v1/messages.proto
 
+//go:build !protoopaque
+
 package corev1
 
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	v1beta11 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
+	v1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protoform/v1beta1"
 	v1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
@@ -21,7 +24,6 @@ import (
 	fieldmaskpb "google.golang.org/protobuf/types/known/fieldmaskpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -80,11 +82,6 @@ func (x Auth_AuthMethod) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use Auth_AuthMethod.Descriptor instead.
-func (Auth_AuthMethod) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{1, 0}
-}
-
 type Automation_State int32
 
 const (
@@ -135,9 +132,72 @@ func (x Automation_State) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use Automation_State.Descriptor instead.
-func (Automation_State) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{4, 0}
+type FlowRun_State int32
+
+const (
+	FlowRun_STATE_UNSPECIFIED FlowRun_State = 0
+	FlowRun_PROVISIONING      FlowRun_State = 10 // Infrastructure provisioning in progress (deployments, executor).
+	FlowRun_PENDING           FlowRun_State = 1  // Provisioned, waiting for start event.
+	FlowRun_RUNNING           FlowRun_State = 2  // Actively executing.
+	FlowRun_STOPPING          FlowRun_State = 3  // Inputs closed, pipeline draining.
+	FlowRun_SUCCEEDED         FlowRun_State = 4  // Completed cleanly (natural EOF or soft stop drained).
+	FlowRun_FAILED            FlowRun_State = 5  // Graceful drain after node error (error_strategy=STOP).
+	FlowRun_ERRORED           FlowRun_State = 6  // Node error with terminate or all paths blocked (error_strategy=TERMINATE or CONTINUE).
+	FlowRun_SUSPENDED         FlowRun_State = 7  // SuspendFlowEvent or all runnable paths blocked behind suspended nodes.
+	FlowRun_CANCELLED         FlowRun_State = 8  // Hard cancel, context killed.
+	FlowRun_TERMINATING       FlowRun_State = 9  // Context cancellation in progress (transient before CANCELLED).
+)
+
+// Enum value maps for FlowRun_State.
+var (
+	FlowRun_State_name = map[int32]string{
+		0:  "STATE_UNSPECIFIED",
+		10: "PROVISIONING",
+		1:  "PENDING",
+		2:  "RUNNING",
+		3:  "STOPPING",
+		4:  "SUCCEEDED",
+		5:  "FAILED",
+		6:  "ERRORED",
+		7:  "SUSPENDED",
+		8:  "CANCELLED",
+		9:  "TERMINATING",
+	}
+	FlowRun_State_value = map[string]int32{
+		"STATE_UNSPECIFIED": 0,
+		"PROVISIONING":      10,
+		"PENDING":           1,
+		"RUNNING":           2,
+		"STOPPING":          3,
+		"SUCCEEDED":         4,
+		"FAILED":            5,
+		"ERRORED":           6,
+		"SUSPENDED":         7,
+		"CANCELLED":         8,
+		"TERMINATING":       9,
+	}
+)
+
+func (x FlowRun_State) Enum() *FlowRun_State {
+	p := new(FlowRun_State)
+	*p = x
+	return p
+}
+
+func (x FlowRun_State) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (FlowRun_State) Descriptor() protoreflect.EnumDescriptor {
+	return file_dtkt_core_v1_messages_proto_enumTypes[2].Descriptor()
+}
+
+func (FlowRun_State) Type() protoreflect.EnumType {
+	return &file_dtkt_core_v1_messages_proto_enumTypes[2]
+}
+
+func (x FlowRun_State) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
 }
 
 type Deployment_State int32
@@ -182,20 +242,15 @@ func (x Deployment_State) String() string {
 }
 
 func (Deployment_State) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_core_v1_messages_proto_enumTypes[2].Descriptor()
+	return file_dtkt_core_v1_messages_proto_enumTypes[3].Descriptor()
 }
 
 func (Deployment_State) Type() protoreflect.EnumType {
-	return &file_dtkt_core_v1_messages_proto_enumTypes[2]
+	return &file_dtkt_core_v1_messages_proto_enumTypes[3]
 }
 
 func (x Deployment_State) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use Deployment_State.Descriptor instead.
-func (Deployment_State) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{7, 0}
 }
 
 type BuildOperationMetadata_State int32
@@ -237,20 +292,15 @@ func (x BuildOperationMetadata_State) String() string {
 }
 
 func (BuildOperationMetadata_State) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_core_v1_messages_proto_enumTypes[3].Descriptor()
+	return file_dtkt_core_v1_messages_proto_enumTypes[4].Descriptor()
 }
 
 func (BuildOperationMetadata_State) Type() protoreflect.EnumType {
-	return &file_dtkt_core_v1_messages_proto_enumTypes[3]
+	return &file_dtkt_core_v1_messages_proto_enumTypes[4]
 }
 
 func (x BuildOperationMetadata_State) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use BuildOperationMetadata_State.Descriptor instead.
-func (BuildOperationMetadata_State) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{22, 0}
 }
 
 type RunOperationMetadata_State int32
@@ -292,20 +342,15 @@ func (x RunOperationMetadata_State) String() string {
 }
 
 func (RunOperationMetadata_State) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_core_v1_messages_proto_enumTypes[4].Descriptor()
+	return file_dtkt_core_v1_messages_proto_enumTypes[5].Descriptor()
 }
 
 func (RunOperationMetadata_State) Type() protoreflect.EnumType {
-	return &file_dtkt_core_v1_messages_proto_enumTypes[4]
+	return &file_dtkt_core_v1_messages_proto_enumTypes[5]
 }
 
 func (x RunOperationMetadata_State) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use RunOperationMetadata_State.Descriptor instead.
-func (RunOperationMetadata_State) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{23, 0}
 }
 
 type SyncOperationMetadata_State int32
@@ -347,20 +392,15 @@ func (x SyncOperationMetadata_State) String() string {
 }
 
 func (SyncOperationMetadata_State) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_core_v1_messages_proto_enumTypes[5].Descriptor()
+	return file_dtkt_core_v1_messages_proto_enumTypes[6].Descriptor()
 }
 
 func (SyncOperationMetadata_State) Type() protoreflect.EnumType {
-	return &file_dtkt_core_v1_messages_proto_enumTypes[5]
+	return &file_dtkt_core_v1_messages_proto_enumTypes[6]
 }
 
 func (x SyncOperationMetadata_State) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use SyncOperationMetadata_State.Descriptor instead.
-func (SyncOperationMetadata_State) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{24, 0}
 }
 
 type DialMetadata_State int32
@@ -396,25 +436,20 @@ func (x DialMetadata_State) String() string {
 }
 
 func (DialMetadata_State) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_core_v1_messages_proto_enumTypes[6].Descriptor()
+	return file_dtkt_core_v1_messages_proto_enumTypes[7].Descriptor()
 }
 
 func (DialMetadata_State) Type() protoreflect.EnumType {
-	return &file_dtkt_core_v1_messages_proto_enumTypes[6]
+	return &file_dtkt_core_v1_messages_proto_enumTypes[7]
 }
 
 func (x DialMetadata_State) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use DialMetadata_State.Descriptor instead.
-func (DialMetadata_State) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{25, 0}
-}
-
 // Address contains a supported network and compatible target.
 type Address struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Network protocol (e.g., "tcp", "unix").
 	Network string `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
 	// Target address for the network.
@@ -448,11 +483,6 @@ func (x *Address) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Address.ProtoReflect.Descriptor instead.
-func (*Address) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Address) GetNetwork() string {
 	if x != nil {
 		return x.Network
@@ -467,9 +497,35 @@ func (x *Address) GetTarget() string {
 	return ""
 }
 
+func (x *Address) SetNetwork(v string) {
+	x.Network = v
+}
+
+func (x *Address) SetTarget(v string) {
+	x.Target = v
+}
+
+type Address_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Network protocol (e.g., "tcp", "unix").
+	Network string
+	// Target address for the network.
+	Target string
+}
+
+func (b0 Address_builder) Build() *Address {
+	m0 := &Address{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Network = b.Network
+	x.Target = b.Target
+	return m0
+}
+
 // Auth contains authentication information for API requests.
 type Auth struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Authentication method used.
 	Method Auth_AuthMethod `protobuf:"varint,1,opt,name=method,proto3,enum=dtkt.core.v1.Auth_AuthMethod" json:"method,omitempty"`
 	// Access token (JWT) or Personal Access Token (PAT).
@@ -509,11 +565,6 @@ func (x *Auth) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Auth.ProtoReflect.Descriptor instead.
-func (*Auth) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Auth) GetMethod() Auth_AuthMethod {
@@ -558,13 +609,100 @@ func (x *Auth) GetSpace() string {
 	return ""
 }
 
+func (x *Auth) SetMethod(v Auth_AuthMethod) {
+	x.Method = v
+}
+
+func (x *Auth) SetAccessToken(v string) {
+	x.AccessToken = v
+}
+
+func (x *Auth) SetRefreshToken(v string) {
+	x.RefreshToken = v
+}
+
+func (x *Auth) SetExpiresAt(v *timestamppb.Timestamp) {
+	x.ExpiresAt = v
+}
+
+func (x *Auth) SetOrg(v string) {
+	x.Org = &v
+}
+
+func (x *Auth) SetSpace(v string) {
+	x.Space = &v
+}
+
+func (x *Auth) HasExpiresAt() bool {
+	if x == nil {
+		return false
+	}
+	return x.ExpiresAt != nil
+}
+
+func (x *Auth) HasOrg() bool {
+	if x == nil {
+		return false
+	}
+	return x.Org != nil
+}
+
+func (x *Auth) HasSpace() bool {
+	if x == nil {
+		return false
+	}
+	return x.Space != nil
+}
+
+func (x *Auth) ClearExpiresAt() {
+	x.ExpiresAt = nil
+}
+
+func (x *Auth) ClearOrg() {
+	x.Org = nil
+}
+
+func (x *Auth) ClearSpace() {
+	x.Space = nil
+}
+
+type Auth_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Authentication method used.
+	Method Auth_AuthMethod
+	// Access token (JWT) or Personal Access Token (PAT).
+	AccessToken string
+	// Refresh token (for token renewal).
+	RefreshToken string
+	// Token expiration timestamp.
+	ExpiresAt *timestamppb.Timestamp
+	// Scope requests to an organization (if applicable).
+	Org *string
+	// Scope requests to a space (if applicable).
+	Space *string
+}
+
+func (b0 Auth_builder) Build() *Auth {
+	m0 := &Auth{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Method = b.Method
+	x.AccessToken = b.AccessToken
+	x.RefreshToken = b.RefreshToken
+	x.ExpiresAt = b.ExpiresAt
+	x.Org = b.Org
+	x.Space = b.Space
+	return m0
+}
+
 // Context provides the name and address of a control plane for client
 // construction and resource tracing across network boundaries. Context is used
 // to resolve resources by name and provide necessary information for
 // authentication, encryption, auditing, tracing, and observability when sending
 // data across network boundaries.
 type Context struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of root control plane resource (e.g., "users/bob" or "organizations/acme").
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Address of control plane.
@@ -600,11 +738,6 @@ func (x *Context) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Context.ProtoReflect.Descriptor instead.
-func (*Context) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *Context) GetName() string {
 	if x != nil {
 		return x.Name
@@ -626,6 +759,61 @@ func (x *Context) GetAuth() *Auth {
 	return nil
 }
 
+func (x *Context) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Context) SetAddress(v *Address) {
+	x.Address = v
+}
+
+func (x *Context) SetAuth(v *Auth) {
+	x.Auth = v
+}
+
+func (x *Context) HasAddress() bool {
+	if x == nil {
+		return false
+	}
+	return x.Address != nil
+}
+
+func (x *Context) HasAuth() bool {
+	if x == nil {
+		return false
+	}
+	return x.Auth != nil
+}
+
+func (x *Context) ClearAddress() {
+	x.Address = nil
+}
+
+func (x *Context) ClearAuth() {
+	x.Auth = nil
+}
+
+type Context_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of root control plane resource (e.g., "users/bob" or "organizations/acme").
+	Name string
+	// Address of control plane.
+	Address *Address
+	// Authentication information for control plane.
+	Auth *Auth
+}
+
+func (b0 Context_builder) Build() *Context {
+	m0 := &Context{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Address = b.Address
+	x.Auth = b.Auth
+	return m0
+}
+
 // Resource is a named reference to resource from a context with optional
 // address and associated data payload. Resource is used for tracing data origin
 // across network boundaries and can represent resources such as connections,
@@ -633,7 +821,7 @@ func (x *Context) GetAuth() *Auth {
 // related to the resource (such as data plane message payloads, config data,
 // secret data, metrics data, etc.).
 type Resource struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Context of resource for tracing data origin.
 	Context *Context `protobuf:"bytes,1,opt,name=context,proto3" json:"context,omitempty"`
 	// Name of resource within context where data originated.
@@ -682,11 +870,6 @@ func (x *Resource) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Resource.ProtoReflect.Descriptor instead.
-func (*Resource) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *Resource) GetContext() *Context {
 	if x != nil {
 		return x.Context
@@ -733,6 +916,162 @@ func (x *Resource) GetDecrypted() *anypb.Any {
 	return nil
 }
 
+func (x *Resource) SetContext(v *Context) {
+	x.Context = v
+}
+
+func (x *Resource) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Resource) SetAddress(v *Address) {
+	x.Address = v
+}
+
+func (x *Resource) SetEncrypted(v *EncryptedAny) {
+	if v == nil {
+		x.Data = nil
+		return
+	}
+	x.Data = &Resource_Encrypted{v}
+}
+
+func (x *Resource) SetDecrypted(v *anypb.Any) {
+	if v == nil {
+		x.Data = nil
+		return
+	}
+	x.Data = &Resource_Decrypted{v}
+}
+
+func (x *Resource) HasContext() bool {
+	if x == nil {
+		return false
+	}
+	return x.Context != nil
+}
+
+func (x *Resource) HasAddress() bool {
+	if x == nil {
+		return false
+	}
+	return x.Address != nil
+}
+
+func (x *Resource) HasData() bool {
+	if x == nil {
+		return false
+	}
+	return x.Data != nil
+}
+
+func (x *Resource) HasEncrypted() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Data.(*Resource_Encrypted)
+	return ok
+}
+
+func (x *Resource) HasDecrypted() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Data.(*Resource_Decrypted)
+	return ok
+}
+
+func (x *Resource) ClearContext() {
+	x.Context = nil
+}
+
+func (x *Resource) ClearAddress() {
+	x.Address = nil
+}
+
+func (x *Resource) ClearData() {
+	x.Data = nil
+}
+
+func (x *Resource) ClearEncrypted() {
+	if _, ok := x.Data.(*Resource_Encrypted); ok {
+		x.Data = nil
+	}
+}
+
+func (x *Resource) ClearDecrypted() {
+	if _, ok := x.Data.(*Resource_Decrypted); ok {
+		x.Data = nil
+	}
+}
+
+const Resource_Data_not_set_case case_Resource_Data = 0
+const Resource_Encrypted_case case_Resource_Data = 10
+const Resource_Decrypted_case case_Resource_Data = 11
+
+func (x *Resource) WhichData() case_Resource_Data {
+	if x == nil {
+		return Resource_Data_not_set_case
+	}
+	switch x.Data.(type) {
+	case *Resource_Encrypted:
+		return Resource_Encrypted_case
+	case *Resource_Decrypted:
+		return Resource_Decrypted_case
+	default:
+		return Resource_Data_not_set_case
+	}
+}
+
+type Resource_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Context of resource for tracing data origin.
+	Context *Context
+	// Name of resource within context where data originated.
+	Name string
+	// Address of resource (optional; may be used for direct access to resource
+	// across network boundaries when available).
+	Address *Address
+	// Data payload, either encrypted or decrypted.
+	// Notes:
+	//  - data is not the resource itself, but a payload related to or originating
+	//    from the resource. (e.g. config data, secret data, metrics data, etc.)
+	//  - information about the type of data is provided by a field of this type.
+	//    (e.g. Deployment cloud field indicates data originated from a cloud deployment)
+
+	// Fields of oneof Data:
+	Encrypted *EncryptedAny
+	Decrypted *anypb.Any
+	// -- end of Data
+}
+
+func (b0 Resource_builder) Build() *Resource {
+	m0 := &Resource{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Context = b.Context
+	x.Name = b.Name
+	x.Address = b.Address
+	if b.Encrypted != nil {
+		x.Data = &Resource_Encrypted{b.Encrypted}
+	}
+	if b.Decrypted != nil {
+		x.Data = &Resource_Decrypted{b.Decrypted}
+	}
+	return m0
+}
+
+type case_Resource_Data protoreflect.FieldNumber
+
+func (x case_Resource_Data) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[3].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isResource_Data interface {
 	isResource_Data()
 }
@@ -752,7 +1091,7 @@ func (*Resource_Decrypted) isResource_Data() {}
 // Automation is a runnable instance of a Flow with a tagged spec version and
 // runtime configuration.
 type Automation struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	Name  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Server-assigned unique ID (UUID).
 	Uid string `protobuf:"bytes,2,opt,name=uid,proto3" json:"uid,omitempty"`
@@ -825,11 +1164,6 @@ func (x *Automation) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Automation.ProtoReflect.Descriptor instead.
-func (*Automation) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Automation) GetName() string {
@@ -923,9 +1257,186 @@ func (x *Automation) GetUpdateTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Automation) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Automation) SetUid(v string) {
+	x.Uid = v
+}
+
+func (x *Automation) SetState(v Automation_State) {
+	x.State = v
+}
+
+func (x *Automation) SetRuntime(v *FlowRuntimeMetadata) {
+	x.Runtime = v
+}
+
+func (x *Automation) SetFlow(v string) {
+	x.Flow = v
+}
+
+func (x *Automation) SetSpecEtag(v string) {
+	x.SpecEtag = v
+}
+
+func (x *Automation) SetConnections(v map[string]*FlowConnectionMetadata) {
+	x.Connections = v
+}
+
+func (x *Automation) SetInputs(v map[string]*anypb.Any) {
+	x.Inputs = v
+}
+
+func (x *Automation) SetTimeout(v *durationpb.Duration) {
+	x.Timeout = v
+}
+
+func (x *Automation) SetBatch(v string) {
+	x.Batch = &v
+}
+
+func (x *Automation) SetEtag(v string) {
+	x.Etag = v
+}
+
+func (x *Automation) SetCreateTime(v *timestamppb.Timestamp) {
+	x.CreateTime = v
+}
+
+func (x *Automation) SetUpdateTime(v *timestamppb.Timestamp) {
+	x.UpdateTime = v
+}
+
+func (x *Automation) HasRuntime() bool {
+	if x == nil {
+		return false
+	}
+	return x.Runtime != nil
+}
+
+func (x *Automation) HasTimeout() bool {
+	if x == nil {
+		return false
+	}
+	return x.Timeout != nil
+}
+
+func (x *Automation) HasBatch() bool {
+	if x == nil {
+		return false
+	}
+	return x.Batch != nil
+}
+
+func (x *Automation) HasCreateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.CreateTime != nil
+}
+
+func (x *Automation) HasUpdateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateTime != nil
+}
+
+func (x *Automation) ClearRuntime() {
+	x.Runtime = nil
+}
+
+func (x *Automation) ClearTimeout() {
+	x.Timeout = nil
+}
+
+func (x *Automation) ClearBatch() {
+	x.Batch = nil
+}
+
+func (x *Automation) ClearCreateTime() {
+	x.CreateTime = nil
+}
+
+func (x *Automation) ClearUpdateTime() {
+	x.UpdateTime = nil
+}
+
+type Automation_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name string
+	// Server-assigned unique ID (UUID).
+	Uid string
+	// Automation state.
+	State Automation_State
+	// Automation runtime metadata.
+	Runtime *FlowRuntimeMetadata
+	// Name of flow resource to resolve spec.
+	Flow string
+	// Checksum of flow spec must match flow when resolving spec (concurrency control).
+	SpecEtag string
+	// Connections configuration as map of connection node id to connection
+	// resource name and context (control plane).
+	// Examples:
+	// ```
+	//   - "storage": {
+	//     "name": "users/bob/connections/localblob",
+	//     "context": {
+	//     "name": "users/bob",
+	//     ...
+	//     },
+	//     }
+	//
+	// ```
+	Connections map[string]*FlowConnectionMetadata
+	// Initial inputs configuration as map of input node id to valid data of input
+	// node's declared type (well-known type wrappers used for scalar values).
+	// Format:
+	// ```
+	// - "bucketName": "my-storage-bucket"
+	// - "adSettings": { "bid": 100 }
+	// ```
+	Inputs map[string]*anypb.Any
+	// Execution is stopped if total time exceeds given duration.
+	// Default: 0 (no timeout).
+	Timeout *durationpb.Duration
+	// Server-assigned batch name if created within a batch (optional).
+	Batch *string
+	// Etag for concurrency control of automation updates (must match current etag
+	// to update or delete).
+	Etag string
+	// Automation create time.
+	CreateTime *timestamppb.Timestamp
+	// Automation update time.
+	UpdateTime *timestamppb.Timestamp
+}
+
+func (b0 Automation_builder) Build() *Automation {
+	m0 := &Automation{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Uid = b.Uid
+	x.State = b.State
+	x.Runtime = b.Runtime
+	x.Flow = b.Flow
+	x.SpecEtag = b.SpecEtag
+	x.Connections = b.Connections
+	x.Inputs = b.Inputs
+	x.Timeout = b.Timeout
+	x.Batch = b.Batch
+	x.Etag = b.Etag
+	x.CreateTime = b.CreateTime
+	x.UpdateTime = b.UpdateTime
+	return m0
+}
+
 // Flow is a versioned workflow spec with parsed graph representation.
 type Flow struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	Name  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Server-assigned unique ID (UUID).
 	Uid string `protobuf:"bytes,2,opt,name=uid,proto3" json:"uid,omitempty"`
@@ -968,11 +1479,6 @@ func (x *Flow) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Flow.ProtoReflect.Descriptor instead.
-func (*Flow) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Flow) GetName() string {
@@ -1031,13 +1537,2664 @@ func (x *Flow) GetUpdateTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Flow) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Flow) SetUid(v string) {
+	x.Uid = v
+}
+
+func (x *Flow) SetSpecUri(v string) {
+	x.SpecUri = v
+}
+
+func (x *Flow) SetSpecEtag(v string) {
+	x.SpecEtag = v
+}
+
+func (x *Flow) SetSpec(v *FlowSpecMetadata) {
+	x.Spec = v
+}
+
+func (x *Flow) SetGraph(v *FlowGraphMetadata) {
+	x.Graph = v
+}
+
+func (x *Flow) SetCreateTime(v *timestamppb.Timestamp) {
+	x.CreateTime = v
+}
+
+func (x *Flow) SetUpdateTime(v *timestamppb.Timestamp) {
+	x.UpdateTime = v
+}
+
+func (x *Flow) HasSpec() bool {
+	if x == nil {
+		return false
+	}
+	return x.Spec != nil
+}
+
+func (x *Flow) HasGraph() bool {
+	if x == nil {
+		return false
+	}
+	return x.Graph != nil
+}
+
+func (x *Flow) HasCreateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.CreateTime != nil
+}
+
+func (x *Flow) HasUpdateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateTime != nil
+}
+
+func (x *Flow) ClearSpec() {
+	x.Spec = nil
+}
+
+func (x *Flow) ClearGraph() {
+	x.Graph = nil
+}
+
+func (x *Flow) ClearCreateTime() {
+	x.CreateTime = nil
+}
+
+func (x *Flow) ClearUpdateTime() {
+	x.UpdateTime = nil
+}
+
+type Flow_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name string
+	// Server-assigned unique ID (UUID).
+	Uid string
+	// Flow spec URI (optional).
+	SpecUri string
+	// Flow spec checksum for concurrency control.
+	SpecEtag string
+	// Flow spec metadata (versioned).
+	Spec *FlowSpecMetadata
+	// Flow graph metadata (versioned).
+	Graph *FlowGraphMetadata
+	// Flow create time.
+	CreateTime *timestamppb.Timestamp
+	// Flow update time.
+	UpdateTime *timestamppb.Timestamp
+}
+
+func (b0 Flow_builder) Build() *Flow {
+	m0 := &Flow{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Uid = b.Uid
+	x.SpecUri = b.SpecUri
+	x.SpecEtag = b.SpecEtag
+	x.Spec = b.Spec
+	x.Graph = b.Graph
+	x.CreateTime = b.CreateTime
+	x.UpdateTime = b.UpdateTime
+	return m0
+}
+
+// FlowRun is a runnable instance of a Flow with a tagged spec version and
+// start configuration.
+type FlowRun struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	Name  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Server-assigned unique ID (UUID).
+	Uid string `protobuf:"bytes,2,opt,name=uid,proto3" json:"uid,omitempty"`
+	// FlowRun state.
+	State FlowRun_State `protobuf:"varint,3,opt,name=state,proto3,enum=dtkt.core.v1.FlowRun_State" json:"state,omitempty"`
+	// FlowRun metadata.
+	RunState *FlowRunMetadata `protobuf:"bytes,4,opt,name=run_state,json=runState,proto3" json:"run_state,omitempty"`
+	// Name of flow resource to resolve spec.
+	Flow string `protobuf:"bytes,5,opt,name=flow,proto3" json:"flow,omitempty"`
+	// Checksum of flow spec must match flow when resolving spec (concurrency control).
+	SpecEtag string `protobuf:"bytes,6,opt,name=spec_etag,json=specEtag,proto3" json:"spec_etag,omitempty"`
+	// Connections configuration as map of connection node id to connection
+	// resource name and context (control plane).
+	// Examples:
+	// ```
+	//   - "storage": {
+	//     "name": "users/bob/connections/localblob",
+	//     "context": {
+	//     "name": "users/bob",
+	//     ...
+	//     },
+	//     }
+	//
+	// ```
+	Connections map[string]*FlowConnectionMetadata `protobuf:"bytes,7,rep,name=connections,proto3" json:"connections,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// Initial inputs configuration as map of input node id to valid data of input
+	// node's declared type (well-known type wrappers used for scalar values).
+	// Format:
+	// ```
+	// - "bucketName": "my-storage-bucket"
+	// - "adSettings": { "bid": 100 }
+	// ```
+	Inputs map[string]*anypb.Any `protobuf:"bytes,8,rep,name=inputs,proto3" json:"inputs,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// Execution is stopped if total time exceeds given duration.
+	// Default: 0 (no timeout).
+	Timeout *durationpb.Duration `protobuf:"bytes,9,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	// Server-assigned batch name if created within a batch (optional).
+	Batch *string `protobuf:"bytes,10,opt,name=batch,proto3,oneof" json:"batch,omitempty"`
+	// Enable durable persistence for this flow run. When true, events and state
+	// are written atomically to the outbox store, enabling replay and recovery.
+	// When false, events are ephemeral (in-memory only). (default: true)
+	Persist bool `protobuf:"varint,11,opt,name=persist,proto3" json:"persist,omitempty"`
+	// Etag for concurrency control of FlowRun updates (must match current etag
+	// to update or delete).
+	Etag string `protobuf:"bytes,15,opt,name=etag,proto3" json:"etag,omitempty"`
+	// FlowRun create time.
+	CreateTime *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
+	// FlowRun update time.
+	UpdateTime    *timestamppb.Timestamp `protobuf:"bytes,21,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FlowRun) Reset() {
+	*x = FlowRun{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FlowRun) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlowRun) ProtoMessage() {}
+
+func (x *FlowRun) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *FlowRun) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *FlowRun) GetUid() string {
+	if x != nil {
+		return x.Uid
+	}
+	return ""
+}
+
+func (x *FlowRun) GetState() FlowRun_State {
+	if x != nil {
+		return x.State
+	}
+	return FlowRun_STATE_UNSPECIFIED
+}
+
+func (x *FlowRun) GetRunState() *FlowRunMetadata {
+	if x != nil {
+		return x.RunState
+	}
+	return nil
+}
+
+func (x *FlowRun) GetFlow() string {
+	if x != nil {
+		return x.Flow
+	}
+	return ""
+}
+
+func (x *FlowRun) GetSpecEtag() string {
+	if x != nil {
+		return x.SpecEtag
+	}
+	return ""
+}
+
+func (x *FlowRun) GetConnections() map[string]*FlowConnectionMetadata {
+	if x != nil {
+		return x.Connections
+	}
+	return nil
+}
+
+func (x *FlowRun) GetInputs() map[string]*anypb.Any {
+	if x != nil {
+		return x.Inputs
+	}
+	return nil
+}
+
+func (x *FlowRun) GetTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.Timeout
+	}
+	return nil
+}
+
+func (x *FlowRun) GetBatch() string {
+	if x != nil && x.Batch != nil {
+		return *x.Batch
+	}
+	return ""
+}
+
+func (x *FlowRun) GetPersist() bool {
+	if x != nil {
+		return x.Persist
+	}
+	return false
+}
+
+func (x *FlowRun) GetEtag() string {
+	if x != nil {
+		return x.Etag
+	}
+	return ""
+}
+
+func (x *FlowRun) GetCreateTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreateTime
+	}
+	return nil
+}
+
+func (x *FlowRun) GetUpdateTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdateTime
+	}
+	return nil
+}
+
+func (x *FlowRun) SetName(v string) {
+	x.Name = v
+}
+
+func (x *FlowRun) SetUid(v string) {
+	x.Uid = v
+}
+
+func (x *FlowRun) SetState(v FlowRun_State) {
+	x.State = v
+}
+
+func (x *FlowRun) SetRunState(v *FlowRunMetadata) {
+	x.RunState = v
+}
+
+func (x *FlowRun) SetFlow(v string) {
+	x.Flow = v
+}
+
+func (x *FlowRun) SetSpecEtag(v string) {
+	x.SpecEtag = v
+}
+
+func (x *FlowRun) SetConnections(v map[string]*FlowConnectionMetadata) {
+	x.Connections = v
+}
+
+func (x *FlowRun) SetInputs(v map[string]*anypb.Any) {
+	x.Inputs = v
+}
+
+func (x *FlowRun) SetTimeout(v *durationpb.Duration) {
+	x.Timeout = v
+}
+
+func (x *FlowRun) SetBatch(v string) {
+	x.Batch = &v
+}
+
+func (x *FlowRun) SetPersist(v bool) {
+	x.Persist = v
+}
+
+func (x *FlowRun) SetEtag(v string) {
+	x.Etag = v
+}
+
+func (x *FlowRun) SetCreateTime(v *timestamppb.Timestamp) {
+	x.CreateTime = v
+}
+
+func (x *FlowRun) SetUpdateTime(v *timestamppb.Timestamp) {
+	x.UpdateTime = v
+}
+
+func (x *FlowRun) HasRunState() bool {
+	if x == nil {
+		return false
+	}
+	return x.RunState != nil
+}
+
+func (x *FlowRun) HasTimeout() bool {
+	if x == nil {
+		return false
+	}
+	return x.Timeout != nil
+}
+
+func (x *FlowRun) HasBatch() bool {
+	if x == nil {
+		return false
+	}
+	return x.Batch != nil
+}
+
+func (x *FlowRun) HasCreateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.CreateTime != nil
+}
+
+func (x *FlowRun) HasUpdateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateTime != nil
+}
+
+func (x *FlowRun) ClearRunState() {
+	x.RunState = nil
+}
+
+func (x *FlowRun) ClearTimeout() {
+	x.Timeout = nil
+}
+
+func (x *FlowRun) ClearBatch() {
+	x.Batch = nil
+}
+
+func (x *FlowRun) ClearCreateTime() {
+	x.CreateTime = nil
+}
+
+func (x *FlowRun) ClearUpdateTime() {
+	x.UpdateTime = nil
+}
+
+type FlowRun_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name string
+	// Server-assigned unique ID (UUID).
+	Uid string
+	// FlowRun state.
+	State FlowRun_State
+	// FlowRun metadata.
+	RunState *FlowRunMetadata
+	// Name of flow resource to resolve spec.
+	Flow string
+	// Checksum of flow spec must match flow when resolving spec (concurrency control).
+	SpecEtag string
+	// Connections configuration as map of connection node id to connection
+	// resource name and context (control plane).
+	// Examples:
+	// ```
+	//   - "storage": {
+	//     "name": "users/bob/connections/localblob",
+	//     "context": {
+	//     "name": "users/bob",
+	//     ...
+	//     },
+	//     }
+	//
+	// ```
+	Connections map[string]*FlowConnectionMetadata
+	// Initial inputs configuration as map of input node id to valid data of input
+	// node's declared type (well-known type wrappers used for scalar values).
+	// Format:
+	// ```
+	// - "bucketName": "my-storage-bucket"
+	// - "adSettings": { "bid": 100 }
+	// ```
+	Inputs map[string]*anypb.Any
+	// Execution is stopped if total time exceeds given duration.
+	// Default: 0 (no timeout).
+	Timeout *durationpb.Duration
+	// Server-assigned batch name if created within a batch (optional).
+	Batch *string
+	// Enable durable persistence for this flow run. When true, events and state
+	// are written atomically to the outbox store, enabling replay and recovery.
+	// When false, events are ephemeral (in-memory only). (default: true)
+	Persist bool
+	// Etag for concurrency control of FlowRun updates (must match current etag
+	// to update or delete).
+	Etag string
+	// FlowRun create time.
+	CreateTime *timestamppb.Timestamp
+	// FlowRun update time.
+	UpdateTime *timestamppb.Timestamp
+}
+
+func (b0 FlowRun_builder) Build() *FlowRun {
+	m0 := &FlowRun{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Uid = b.Uid
+	x.State = b.State
+	x.RunState = b.RunState
+	x.Flow = b.Flow
+	x.SpecEtag = b.SpecEtag
+	x.Connections = b.Connections
+	x.Inputs = b.Inputs
+	x.Timeout = b.Timeout
+	x.Batch = b.Batch
+	x.Persist = b.Persist
+	x.Etag = b.Etag
+	x.CreateTime = b.CreateTime
+	x.UpdateTime = b.UpdateTime
+	return m0
+}
+
+type GetFlowRunRequest struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// Name of FlowRun resource to get.
+	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetFlowRunRequest) Reset() {
+	*x = GetFlowRunRequest{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetFlowRunRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFlowRunRequest) ProtoMessage() {}
+
+func (x *GetFlowRunRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *GetFlowRunRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *GetFlowRunRequest) SetName(v string) {
+	x.Name = v
+}
+
+type GetFlowRunRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of FlowRun resource to get.
+	Name string
+}
+
+func (b0 GetFlowRunRequest_builder) Build() *GetFlowRunRequest {
+	m0 := &GetFlowRunRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
+type GetFlowRunResponse struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// The requested flowrun.
+	Flowrun       *FlowRun `protobuf:"bytes,1,opt,name=flowrun,proto3" json:"flowrun,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetFlowRunResponse) Reset() {
+	*x = GetFlowRunResponse{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetFlowRunResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFlowRunResponse) ProtoMessage() {}
+
+func (x *GetFlowRunResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *GetFlowRunResponse) GetFlowrun() *FlowRun {
+	if x != nil {
+		return x.Flowrun
+	}
+	return nil
+}
+
+func (x *GetFlowRunResponse) SetFlowrun(v *FlowRun) {
+	x.Flowrun = v
+}
+
+func (x *GetFlowRunResponse) HasFlowrun() bool {
+	if x == nil {
+		return false
+	}
+	return x.Flowrun != nil
+}
+
+func (x *GetFlowRunResponse) ClearFlowrun() {
+	x.Flowrun = nil
+}
+
+type GetFlowRunResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The requested flowrun.
+	Flowrun *FlowRun
+}
+
+func (b0 GetFlowRunResponse_builder) Build() *GetFlowRunResponse {
+	m0 := &GetFlowRunResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Flowrun = b.Flowrun
+	return m0
+}
+
+type CreateFlowRunRequest struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// Parent resource name.
+	Parent    string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
+	FlowrunId string `protobuf:"bytes,2,opt,name=flowrun_id,json=flowrunId,proto3" json:"flowrun_id,omitempty"`
+	// FlowRun to create.
+	Flowrun       *FlowRun `protobuf:"bytes,3,opt,name=flowrun,proto3" json:"flowrun,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateFlowRunRequest) Reset() {
+	*x = CreateFlowRunRequest{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateFlowRunRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateFlowRunRequest) ProtoMessage() {}
+
+func (x *CreateFlowRunRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *CreateFlowRunRequest) GetParent() string {
+	if x != nil {
+		return x.Parent
+	}
+	return ""
+}
+
+func (x *CreateFlowRunRequest) GetFlowrunId() string {
+	if x != nil {
+		return x.FlowrunId
+	}
+	return ""
+}
+
+func (x *CreateFlowRunRequest) GetFlowrun() *FlowRun {
+	if x != nil {
+		return x.Flowrun
+	}
+	return nil
+}
+
+func (x *CreateFlowRunRequest) SetParent(v string) {
+	x.Parent = v
+}
+
+func (x *CreateFlowRunRequest) SetFlowrunId(v string) {
+	x.FlowrunId = v
+}
+
+func (x *CreateFlowRunRequest) SetFlowrun(v *FlowRun) {
+	x.Flowrun = v
+}
+
+func (x *CreateFlowRunRequest) HasFlowrun() bool {
+	if x == nil {
+		return false
+	}
+	return x.Flowrun != nil
+}
+
+func (x *CreateFlowRunRequest) ClearFlowrun() {
+	x.Flowrun = nil
+}
+
+type CreateFlowRunRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Parent resource name.
+	Parent    string
+	FlowrunId string
+	// FlowRun to create.
+	Flowrun *FlowRun
+}
+
+func (b0 CreateFlowRunRequest_builder) Build() *CreateFlowRunRequest {
+	m0 := &CreateFlowRunRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Parent = b.Parent
+	x.FlowrunId = b.FlowrunId
+	x.Flowrun = b.Flowrun
+	return m0
+}
+
+type CreateFlowRunResponse struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// The created flowrun.
+	Flowrun       *FlowRun `protobuf:"bytes,1,opt,name=flowrun,proto3" json:"flowrun,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateFlowRunResponse) Reset() {
+	*x = CreateFlowRunResponse{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateFlowRunResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateFlowRunResponse) ProtoMessage() {}
+
+func (x *CreateFlowRunResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *CreateFlowRunResponse) GetFlowrun() *FlowRun {
+	if x != nil {
+		return x.Flowrun
+	}
+	return nil
+}
+
+func (x *CreateFlowRunResponse) SetFlowrun(v *FlowRun) {
+	x.Flowrun = v
+}
+
+func (x *CreateFlowRunResponse) HasFlowrun() bool {
+	if x == nil {
+		return false
+	}
+	return x.Flowrun != nil
+}
+
+func (x *CreateFlowRunResponse) ClearFlowrun() {
+	x.Flowrun = nil
+}
+
+type CreateFlowRunResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The created flowrun.
+	Flowrun *FlowRun
+}
+
+func (b0 CreateFlowRunResponse_builder) Build() *CreateFlowRunResponse {
+	m0 := &CreateFlowRunResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Flowrun = b.Flowrun
+	return m0
+}
+
+type UpdateFlowRunRequest struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// FlowRun with updated fields. Must include `name`.
+	Flowrun *FlowRun `protobuf:"bytes,1,opt,name=flowrun,proto3" json:"flowrun,omitempty"`
+	// Fields to update (e.g., "config,address").
+	UpdateMask *fieldmaskpb.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
+	// Desired state of flowrun after update.
+	DesiredState  *FlowRun_State `protobuf:"varint,3,opt,name=desired_state,json=desiredState,proto3,enum=dtkt.core.v1.FlowRun_State,oneof" json:"desired_state,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateFlowRunRequest) Reset() {
+	*x = UpdateFlowRunRequest{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateFlowRunRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateFlowRunRequest) ProtoMessage() {}
+
+func (x *UpdateFlowRunRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *UpdateFlowRunRequest) GetFlowrun() *FlowRun {
+	if x != nil {
+		return x.Flowrun
+	}
+	return nil
+}
+
+func (x *UpdateFlowRunRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.UpdateMask
+	}
+	return nil
+}
+
+func (x *UpdateFlowRunRequest) GetDesiredState() FlowRun_State {
+	if x != nil && x.DesiredState != nil {
+		return *x.DesiredState
+	}
+	return FlowRun_STATE_UNSPECIFIED
+}
+
+func (x *UpdateFlowRunRequest) SetFlowrun(v *FlowRun) {
+	x.Flowrun = v
+}
+
+func (x *UpdateFlowRunRequest) SetUpdateMask(v *fieldmaskpb.FieldMask) {
+	x.UpdateMask = v
+}
+
+func (x *UpdateFlowRunRequest) SetDesiredState(v FlowRun_State) {
+	x.DesiredState = &v
+}
+
+func (x *UpdateFlowRunRequest) HasFlowrun() bool {
+	if x == nil {
+		return false
+	}
+	return x.Flowrun != nil
+}
+
+func (x *UpdateFlowRunRequest) HasUpdateMask() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateMask != nil
+}
+
+func (x *UpdateFlowRunRequest) HasDesiredState() bool {
+	if x == nil {
+		return false
+	}
+	return x.DesiredState != nil
+}
+
+func (x *UpdateFlowRunRequest) ClearFlowrun() {
+	x.Flowrun = nil
+}
+
+func (x *UpdateFlowRunRequest) ClearUpdateMask() {
+	x.UpdateMask = nil
+}
+
+func (x *UpdateFlowRunRequest) ClearDesiredState() {
+	x.DesiredState = nil
+}
+
+type UpdateFlowRunRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// FlowRun with updated fields. Must include `name`.
+	Flowrun *FlowRun
+	// Fields to update (e.g., "config,address").
+	UpdateMask *fieldmaskpb.FieldMask
+	// Desired state of flowrun after update.
+	DesiredState *FlowRun_State
+}
+
+func (b0 UpdateFlowRunRequest_builder) Build() *UpdateFlowRunRequest {
+	m0 := &UpdateFlowRunRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Flowrun = b.Flowrun
+	x.UpdateMask = b.UpdateMask
+	x.DesiredState = b.DesiredState
+	return m0
+}
+
+type DeleteFlowRunRequest struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// Name of flowrun to delete.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Etag must match current flowrun etag for delete to succeed (ensures
+	// flowrun is up-to-date and prevents lost deletes).
+	Etag          string `protobuf:"bytes,2,opt,name=etag,proto3" json:"etag,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteFlowRunRequest) Reset() {
+	*x = DeleteFlowRunRequest{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteFlowRunRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteFlowRunRequest) ProtoMessage() {}
+
+func (x *DeleteFlowRunRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *DeleteFlowRunRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *DeleteFlowRunRequest) GetEtag() string {
+	if x != nil {
+		return x.Etag
+	}
+	return ""
+}
+
+func (x *DeleteFlowRunRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *DeleteFlowRunRequest) SetEtag(v string) {
+	x.Etag = v
+}
+
+type DeleteFlowRunRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of flowrun to delete.
+	Name string
+	// Etag must match current flowrun etag for delete to succeed (ensures
+	// flowrun is up-to-date and prevents lost deletes).
+	Etag string
+}
+
+func (b0 DeleteFlowRunRequest_builder) Build() *DeleteFlowRunRequest {
+	m0 := &DeleteFlowRunRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Etag = b.Etag
+	return m0
+}
+
+type BatchCreateFlowRunsRequest struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// Parent resource name shared by all flowruns this batch.
+	Parent        string                  `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
+	Requests      []*CreateFlowRunRequest `protobuf:"bytes,2,rep,name=requests,proto3" json:"requests,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BatchCreateFlowRunsRequest) Reset() {
+	*x = BatchCreateFlowRunsRequest{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BatchCreateFlowRunsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BatchCreateFlowRunsRequest) ProtoMessage() {}
+
+func (x *BatchCreateFlowRunsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *BatchCreateFlowRunsRequest) GetParent() string {
+	if x != nil {
+		return x.Parent
+	}
+	return ""
+}
+
+func (x *BatchCreateFlowRunsRequest) GetRequests() []*CreateFlowRunRequest {
+	if x != nil {
+		return x.Requests
+	}
+	return nil
+}
+
+func (x *BatchCreateFlowRunsRequest) SetParent(v string) {
+	x.Parent = v
+}
+
+func (x *BatchCreateFlowRunsRequest) SetRequests(v []*CreateFlowRunRequest) {
+	x.Requests = v
+}
+
+type BatchCreateFlowRunsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Parent resource name shared by all flowruns this batch.
+	Parent   string
+	Requests []*CreateFlowRunRequest
+}
+
+func (b0 BatchCreateFlowRunsRequest_builder) Build() *BatchCreateFlowRunsRequest {
+	m0 := &BatchCreateFlowRunsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Parent = b.Parent
+	x.Requests = b.Requests
+	return m0
+}
+
+type BatchCreateFlowRunsResponse struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// The created flowruns.
+	Flowruns      []*FlowRun `protobuf:"bytes,1,rep,name=flowruns,proto3" json:"flowruns,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BatchCreateFlowRunsResponse) Reset() {
+	*x = BatchCreateFlowRunsResponse{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BatchCreateFlowRunsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BatchCreateFlowRunsResponse) ProtoMessage() {}
+
+func (x *BatchCreateFlowRunsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *BatchCreateFlowRunsResponse) GetFlowruns() []*FlowRun {
+	if x != nil {
+		return x.Flowruns
+	}
+	return nil
+}
+
+func (x *BatchCreateFlowRunsResponse) SetFlowruns(v []*FlowRun) {
+	x.Flowruns = v
+}
+
+type BatchCreateFlowRunsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The created flowruns.
+	Flowruns []*FlowRun
+}
+
+func (b0 BatchCreateFlowRunsResponse_builder) Build() *BatchCreateFlowRunsResponse {
+	m0 := &BatchCreateFlowRunsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Flowruns = b.Flowruns
+	return m0
+}
+
+type ListFlowRunsRequest struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// Maximum number of flowruns to return.
+	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	// Token for retrieving the next page.
+	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	// Parent resource name: `organizations/{organization}` or `users/{user}`.
+	Parent *string `protobuf:"bytes,3,opt,name=parent,proto3,oneof" json:"parent,omitempty"`
+	// Filter expression.
+	Filter        *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListFlowRunsRequest) Reset() {
+	*x = ListFlowRunsRequest{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListFlowRunsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListFlowRunsRequest) ProtoMessage() {}
+
+func (x *ListFlowRunsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *ListFlowRunsRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListFlowRunsRequest) GetPageToken() string {
+	if x != nil {
+		return x.PageToken
+	}
+	return ""
+}
+
+func (x *ListFlowRunsRequest) GetParent() string {
+	if x != nil && x.Parent != nil {
+		return *x.Parent
+	}
+	return ""
+}
+
+func (x *ListFlowRunsRequest) GetFilter() string {
+	if x != nil && x.Filter != nil {
+		return *x.Filter
+	}
+	return ""
+}
+
+func (x *ListFlowRunsRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListFlowRunsRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListFlowRunsRequest) SetParent(v string) {
+	x.Parent = &v
+}
+
+func (x *ListFlowRunsRequest) SetFilter(v string) {
+	x.Filter = &v
+}
+
+func (x *ListFlowRunsRequest) HasParent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Parent != nil
+}
+
+func (x *ListFlowRunsRequest) HasFilter() bool {
+	if x == nil {
+		return false
+	}
+	return x.Filter != nil
+}
+
+func (x *ListFlowRunsRequest) ClearParent() {
+	x.Parent = nil
+}
+
+func (x *ListFlowRunsRequest) ClearFilter() {
+	x.Filter = nil
+}
+
+type ListFlowRunsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Maximum number of flowruns to return.
+	PageSize int32
+	// Token for retrieving the next page.
+	PageToken string
+	// Parent resource name: `organizations/{organization}` or `users/{user}`.
+	Parent *string
+	// Filter expression.
+	Filter *string
+}
+
+func (b0 ListFlowRunsRequest_builder) Build() *ListFlowRunsRequest {
+	m0 := &ListFlowRunsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.Parent = b.Parent
+	x.Filter = b.Filter
+	return m0
+}
+
+type ListFlowRunsResponse struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// The list of flowruns.
+	Flowruns []*FlowRun `protobuf:"bytes,1,rep,name=flowruns,proto3" json:"flowruns,omitempty"`
+	// Token for retrieving the next page.
+	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListFlowRunsResponse) Reset() {
+	*x = ListFlowRunsResponse{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListFlowRunsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListFlowRunsResponse) ProtoMessage() {}
+
+func (x *ListFlowRunsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *ListFlowRunsResponse) GetFlowruns() []*FlowRun {
+	if x != nil {
+		return x.Flowruns
+	}
+	return nil
+}
+
+func (x *ListFlowRunsResponse) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
+}
+
+func (x *ListFlowRunsResponse) SetFlowruns(v []*FlowRun) {
+	x.Flowruns = v
+}
+
+func (x *ListFlowRunsResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListFlowRunsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The list of flowruns.
+	Flowruns []*FlowRun
+	// Token for retrieving the next page.
+	NextPageToken string
+}
+
+func (b0 ListFlowRunsResponse_builder) Build() *ListFlowRunsResponse {
+	m0 := &ListFlowRunsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Flowruns = b.Flowruns
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
+// SendFlowRunEvent represents an event sent to a flowrun (client -> executor).
+type SendFlowRunEvent struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// Types that are valid to be assigned to Event:
+	//
+	//	*SendFlowRunEvent_Input
+	//	*SendFlowRunEvent_InteractionResponse
+	//	*SendFlowRunEvent_Stop
+	//	*SendFlowRunEvent_Terminate
+	//	*SendFlowRunEvent_Suspend
+	//	*SendFlowRunEvent_Resume
+	//	*SendFlowRunEvent_StopNode
+	//	*SendFlowRunEvent_TerminateNode
+	//	*SendFlowRunEvent_SuspendNode
+	//	*SendFlowRunEvent_ResumeNode
+	//	*SendFlowRunEvent_Start
+	Event         isSendFlowRunEvent_Event `protobuf_oneof:"event"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SendFlowRunEvent) Reset() {
+	*x = SendFlowRunEvent{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SendFlowRunEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendFlowRunEvent) ProtoMessage() {}
+
+func (x *SendFlowRunEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *SendFlowRunEvent) GetEvent() isSendFlowRunEvent_Event {
+	if x != nil {
+		return x.Event
+	}
+	return nil
+}
+
+func (x *SendFlowRunEvent) GetInput() *v1beta2.InputEvent {
+	if x != nil {
+		if x, ok := x.Event.(*SendFlowRunEvent_Input); ok {
+			return x.Input
+		}
+	}
+	return nil
+}
+
+func (x *SendFlowRunEvent) GetInteractionResponse() *v1beta2.InteractionResponseEvent {
+	if x != nil {
+		if x, ok := x.Event.(*SendFlowRunEvent_InteractionResponse); ok {
+			return x.InteractionResponse
+		}
+	}
+	return nil
+}
+
+func (x *SendFlowRunEvent) GetStop() *v1beta2.StopFlowEvent {
+	if x != nil {
+		if x, ok := x.Event.(*SendFlowRunEvent_Stop); ok {
+			return x.Stop
+		}
+	}
+	return nil
+}
+
+func (x *SendFlowRunEvent) GetTerminate() *v1beta2.TerminateFlowEvent {
+	if x != nil {
+		if x, ok := x.Event.(*SendFlowRunEvent_Terminate); ok {
+			return x.Terminate
+		}
+	}
+	return nil
+}
+
+func (x *SendFlowRunEvent) GetSuspend() *v1beta2.SuspendFlowEvent {
+	if x != nil {
+		if x, ok := x.Event.(*SendFlowRunEvent_Suspend); ok {
+			return x.Suspend
+		}
+	}
+	return nil
+}
+
+func (x *SendFlowRunEvent) GetResume() *v1beta2.ResumeFlowEvent {
+	if x != nil {
+		if x, ok := x.Event.(*SendFlowRunEvent_Resume); ok {
+			return x.Resume
+		}
+	}
+	return nil
+}
+
+func (x *SendFlowRunEvent) GetStopNode() *v1beta2.StopNodeEvent {
+	if x != nil {
+		if x, ok := x.Event.(*SendFlowRunEvent_StopNode); ok {
+			return x.StopNode
+		}
+	}
+	return nil
+}
+
+func (x *SendFlowRunEvent) GetTerminateNode() *v1beta2.TerminateNodeEvent {
+	if x != nil {
+		if x, ok := x.Event.(*SendFlowRunEvent_TerminateNode); ok {
+			return x.TerminateNode
+		}
+	}
+	return nil
+}
+
+func (x *SendFlowRunEvent) GetSuspendNode() *v1beta2.SuspendNodeEvent {
+	if x != nil {
+		if x, ok := x.Event.(*SendFlowRunEvent_SuspendNode); ok {
+			return x.SuspendNode
+		}
+	}
+	return nil
+}
+
+func (x *SendFlowRunEvent) GetResumeNode() *v1beta2.ResumeNodeEvent {
+	if x != nil {
+		if x, ok := x.Event.(*SendFlowRunEvent_ResumeNode); ok {
+			return x.ResumeNode
+		}
+	}
+	return nil
+}
+
+func (x *SendFlowRunEvent) GetStart() *v1beta2.StartFlowEvent {
+	if x != nil {
+		if x, ok := x.Event.(*SendFlowRunEvent_Start); ok {
+			return x.Start
+		}
+	}
+	return nil
+}
+
+func (x *SendFlowRunEvent) SetInput(v *v1beta2.InputEvent) {
+	if v == nil {
+		x.Event = nil
+		return
+	}
+	x.Event = &SendFlowRunEvent_Input{v}
+}
+
+func (x *SendFlowRunEvent) SetInteractionResponse(v *v1beta2.InteractionResponseEvent) {
+	if v == nil {
+		x.Event = nil
+		return
+	}
+	x.Event = &SendFlowRunEvent_InteractionResponse{v}
+}
+
+func (x *SendFlowRunEvent) SetStop(v *v1beta2.StopFlowEvent) {
+	if v == nil {
+		x.Event = nil
+		return
+	}
+	x.Event = &SendFlowRunEvent_Stop{v}
+}
+
+func (x *SendFlowRunEvent) SetTerminate(v *v1beta2.TerminateFlowEvent) {
+	if v == nil {
+		x.Event = nil
+		return
+	}
+	x.Event = &SendFlowRunEvent_Terminate{v}
+}
+
+func (x *SendFlowRunEvent) SetSuspend(v *v1beta2.SuspendFlowEvent) {
+	if v == nil {
+		x.Event = nil
+		return
+	}
+	x.Event = &SendFlowRunEvent_Suspend{v}
+}
+
+func (x *SendFlowRunEvent) SetResume(v *v1beta2.ResumeFlowEvent) {
+	if v == nil {
+		x.Event = nil
+		return
+	}
+	x.Event = &SendFlowRunEvent_Resume{v}
+}
+
+func (x *SendFlowRunEvent) SetStopNode(v *v1beta2.StopNodeEvent) {
+	if v == nil {
+		x.Event = nil
+		return
+	}
+	x.Event = &SendFlowRunEvent_StopNode{v}
+}
+
+func (x *SendFlowRunEvent) SetTerminateNode(v *v1beta2.TerminateNodeEvent) {
+	if v == nil {
+		x.Event = nil
+		return
+	}
+	x.Event = &SendFlowRunEvent_TerminateNode{v}
+}
+
+func (x *SendFlowRunEvent) SetSuspendNode(v *v1beta2.SuspendNodeEvent) {
+	if v == nil {
+		x.Event = nil
+		return
+	}
+	x.Event = &SendFlowRunEvent_SuspendNode{v}
+}
+
+func (x *SendFlowRunEvent) SetResumeNode(v *v1beta2.ResumeNodeEvent) {
+	if v == nil {
+		x.Event = nil
+		return
+	}
+	x.Event = &SendFlowRunEvent_ResumeNode{v}
+}
+
+func (x *SendFlowRunEvent) SetStart(v *v1beta2.StartFlowEvent) {
+	if v == nil {
+		x.Event = nil
+		return
+	}
+	x.Event = &SendFlowRunEvent_Start{v}
+}
+
+func (x *SendFlowRunEvent) HasEvent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Event != nil
+}
+
+func (x *SendFlowRunEvent) HasInput() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Event.(*SendFlowRunEvent_Input)
+	return ok
+}
+
+func (x *SendFlowRunEvent) HasInteractionResponse() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Event.(*SendFlowRunEvent_InteractionResponse)
+	return ok
+}
+
+func (x *SendFlowRunEvent) HasStop() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Event.(*SendFlowRunEvent_Stop)
+	return ok
+}
+
+func (x *SendFlowRunEvent) HasTerminate() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Event.(*SendFlowRunEvent_Terminate)
+	return ok
+}
+
+func (x *SendFlowRunEvent) HasSuspend() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Event.(*SendFlowRunEvent_Suspend)
+	return ok
+}
+
+func (x *SendFlowRunEvent) HasResume() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Event.(*SendFlowRunEvent_Resume)
+	return ok
+}
+
+func (x *SendFlowRunEvent) HasStopNode() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Event.(*SendFlowRunEvent_StopNode)
+	return ok
+}
+
+func (x *SendFlowRunEvent) HasTerminateNode() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Event.(*SendFlowRunEvent_TerminateNode)
+	return ok
+}
+
+func (x *SendFlowRunEvent) HasSuspendNode() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Event.(*SendFlowRunEvent_SuspendNode)
+	return ok
+}
+
+func (x *SendFlowRunEvent) HasResumeNode() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Event.(*SendFlowRunEvent_ResumeNode)
+	return ok
+}
+
+func (x *SendFlowRunEvent) HasStart() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Event.(*SendFlowRunEvent_Start)
+	return ok
+}
+
+func (x *SendFlowRunEvent) ClearEvent() {
+	x.Event = nil
+}
+
+func (x *SendFlowRunEvent) ClearInput() {
+	if _, ok := x.Event.(*SendFlowRunEvent_Input); ok {
+		x.Event = nil
+	}
+}
+
+func (x *SendFlowRunEvent) ClearInteractionResponse() {
+	if _, ok := x.Event.(*SendFlowRunEvent_InteractionResponse); ok {
+		x.Event = nil
+	}
+}
+
+func (x *SendFlowRunEvent) ClearStop() {
+	if _, ok := x.Event.(*SendFlowRunEvent_Stop); ok {
+		x.Event = nil
+	}
+}
+
+func (x *SendFlowRunEvent) ClearTerminate() {
+	if _, ok := x.Event.(*SendFlowRunEvent_Terminate); ok {
+		x.Event = nil
+	}
+}
+
+func (x *SendFlowRunEvent) ClearSuspend() {
+	if _, ok := x.Event.(*SendFlowRunEvent_Suspend); ok {
+		x.Event = nil
+	}
+}
+
+func (x *SendFlowRunEvent) ClearResume() {
+	if _, ok := x.Event.(*SendFlowRunEvent_Resume); ok {
+		x.Event = nil
+	}
+}
+
+func (x *SendFlowRunEvent) ClearStopNode() {
+	if _, ok := x.Event.(*SendFlowRunEvent_StopNode); ok {
+		x.Event = nil
+	}
+}
+
+func (x *SendFlowRunEvent) ClearTerminateNode() {
+	if _, ok := x.Event.(*SendFlowRunEvent_TerminateNode); ok {
+		x.Event = nil
+	}
+}
+
+func (x *SendFlowRunEvent) ClearSuspendNode() {
+	if _, ok := x.Event.(*SendFlowRunEvent_SuspendNode); ok {
+		x.Event = nil
+	}
+}
+
+func (x *SendFlowRunEvent) ClearResumeNode() {
+	if _, ok := x.Event.(*SendFlowRunEvent_ResumeNode); ok {
+		x.Event = nil
+	}
+}
+
+func (x *SendFlowRunEvent) ClearStart() {
+	if _, ok := x.Event.(*SendFlowRunEvent_Start); ok {
+		x.Event = nil
+	}
+}
+
+const SendFlowRunEvent_Event_not_set_case case_SendFlowRunEvent_Event = 0
+const SendFlowRunEvent_Input_case case_SendFlowRunEvent_Event = 1
+const SendFlowRunEvent_InteractionResponse_case case_SendFlowRunEvent_Event = 2
+const SendFlowRunEvent_Stop_case case_SendFlowRunEvent_Event = 3
+const SendFlowRunEvent_Terminate_case case_SendFlowRunEvent_Event = 4
+const SendFlowRunEvent_Suspend_case case_SendFlowRunEvent_Event = 5
+const SendFlowRunEvent_Resume_case case_SendFlowRunEvent_Event = 6
+const SendFlowRunEvent_StopNode_case case_SendFlowRunEvent_Event = 7
+const SendFlowRunEvent_TerminateNode_case case_SendFlowRunEvent_Event = 8
+const SendFlowRunEvent_SuspendNode_case case_SendFlowRunEvent_Event = 9
+const SendFlowRunEvent_ResumeNode_case case_SendFlowRunEvent_Event = 10
+const SendFlowRunEvent_Start_case case_SendFlowRunEvent_Event = 11
+
+func (x *SendFlowRunEvent) WhichEvent() case_SendFlowRunEvent_Event {
+	if x == nil {
+		return SendFlowRunEvent_Event_not_set_case
+	}
+	switch x.Event.(type) {
+	case *SendFlowRunEvent_Input:
+		return SendFlowRunEvent_Input_case
+	case *SendFlowRunEvent_InteractionResponse:
+		return SendFlowRunEvent_InteractionResponse_case
+	case *SendFlowRunEvent_Stop:
+		return SendFlowRunEvent_Stop_case
+	case *SendFlowRunEvent_Terminate:
+		return SendFlowRunEvent_Terminate_case
+	case *SendFlowRunEvent_Suspend:
+		return SendFlowRunEvent_Suspend_case
+	case *SendFlowRunEvent_Resume:
+		return SendFlowRunEvent_Resume_case
+	case *SendFlowRunEvent_StopNode:
+		return SendFlowRunEvent_StopNode_case
+	case *SendFlowRunEvent_TerminateNode:
+		return SendFlowRunEvent_TerminateNode_case
+	case *SendFlowRunEvent_SuspendNode:
+		return SendFlowRunEvent_SuspendNode_case
+	case *SendFlowRunEvent_ResumeNode:
+		return SendFlowRunEvent_ResumeNode_case
+	case *SendFlowRunEvent_Start:
+		return SendFlowRunEvent_Start_case
+	default:
+		return SendFlowRunEvent_Event_not_set_case
+	}
+}
+
+type SendFlowRunEvent_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Event:
+	// Provide an input value to a specific input node.
+	Input *v1beta2.InputEvent
+	// Respond to an interaction request with a value and token.
+	InteractionResponse *v1beta2.InteractionResponseEvent
+	// Request graceful shutdown: close inputs, drain pipeline.
+	Stop *v1beta2.StopFlowEvent
+	// Request immediate cancellation of the flow.
+	Terminate *v1beta2.TerminateFlowEvent
+	// Suspend all runnable nodes.
+	Suspend *v1beta2.SuspendFlowEvent
+	// Resume suspended/errored nodes.
+	Resume *v1beta2.ResumeFlowEvent
+	// Gracefully stop a specific node.
+	StopNode *v1beta2.StopNodeEvent
+	// Immediately cancel a specific node.
+	TerminateNode *v1beta2.TerminateNodeEvent
+	// Suspend a specific node.
+	SuspendNode *v1beta2.SuspendNodeEvent
+	// Resume a specific suspended/errored node (optionally with a replacement value).
+	ResumeNode *v1beta2.ResumeNodeEvent
+	// Start the flow executor. Must be sent after connecting the event stream
+	// to ensure no outputs are missed. Flow must be in PENDING state.
+	Start *v1beta2.StartFlowEvent
+	// -- end of Event
+}
+
+func (b0 SendFlowRunEvent_builder) Build() *SendFlowRunEvent {
+	m0 := &SendFlowRunEvent{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Input != nil {
+		x.Event = &SendFlowRunEvent_Input{b.Input}
+	}
+	if b.InteractionResponse != nil {
+		x.Event = &SendFlowRunEvent_InteractionResponse{b.InteractionResponse}
+	}
+	if b.Stop != nil {
+		x.Event = &SendFlowRunEvent_Stop{b.Stop}
+	}
+	if b.Terminate != nil {
+		x.Event = &SendFlowRunEvent_Terminate{b.Terminate}
+	}
+	if b.Suspend != nil {
+		x.Event = &SendFlowRunEvent_Suspend{b.Suspend}
+	}
+	if b.Resume != nil {
+		x.Event = &SendFlowRunEvent_Resume{b.Resume}
+	}
+	if b.StopNode != nil {
+		x.Event = &SendFlowRunEvent_StopNode{b.StopNode}
+	}
+	if b.TerminateNode != nil {
+		x.Event = &SendFlowRunEvent_TerminateNode{b.TerminateNode}
+	}
+	if b.SuspendNode != nil {
+		x.Event = &SendFlowRunEvent_SuspendNode{b.SuspendNode}
+	}
+	if b.ResumeNode != nil {
+		x.Event = &SendFlowRunEvent_ResumeNode{b.ResumeNode}
+	}
+	if b.Start != nil {
+		x.Event = &SendFlowRunEvent_Start{b.Start}
+	}
+	return m0
+}
+
+type case_SendFlowRunEvent_Event protoreflect.FieldNumber
+
+func (x case_SendFlowRunEvent_Event) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[17].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
+type isSendFlowRunEvent_Event interface {
+	isSendFlowRunEvent_Event()
+}
+
+type SendFlowRunEvent_Input struct {
+	// Provide an input value to a specific input node.
+	Input *v1beta2.InputEvent `protobuf:"bytes,1,opt,name=input,proto3,oneof"`
+}
+
+type SendFlowRunEvent_InteractionResponse struct {
+	// Respond to an interaction request with a value and token.
+	InteractionResponse *v1beta2.InteractionResponseEvent `protobuf:"bytes,2,opt,name=interaction_response,json=interactionResponse,proto3,oneof"`
+}
+
+type SendFlowRunEvent_Stop struct {
+	// Request graceful shutdown: close inputs, drain pipeline.
+	Stop *v1beta2.StopFlowEvent `protobuf:"bytes,3,opt,name=stop,proto3,oneof"`
+}
+
+type SendFlowRunEvent_Terminate struct {
+	// Request immediate cancellation of the flow.
+	Terminate *v1beta2.TerminateFlowEvent `protobuf:"bytes,4,opt,name=terminate,proto3,oneof"`
+}
+
+type SendFlowRunEvent_Suspend struct {
+	// Suspend all runnable nodes.
+	Suspend *v1beta2.SuspendFlowEvent `protobuf:"bytes,5,opt,name=suspend,proto3,oneof"`
+}
+
+type SendFlowRunEvent_Resume struct {
+	// Resume suspended/errored nodes.
+	Resume *v1beta2.ResumeFlowEvent `protobuf:"bytes,6,opt,name=resume,proto3,oneof"`
+}
+
+type SendFlowRunEvent_StopNode struct {
+	// Gracefully stop a specific node.
+	StopNode *v1beta2.StopNodeEvent `protobuf:"bytes,7,opt,name=stop_node,json=stopNode,proto3,oneof"`
+}
+
+type SendFlowRunEvent_TerminateNode struct {
+	// Immediately cancel a specific node.
+	TerminateNode *v1beta2.TerminateNodeEvent `protobuf:"bytes,8,opt,name=terminate_node,json=terminateNode,proto3,oneof"`
+}
+
+type SendFlowRunEvent_SuspendNode struct {
+	// Suspend a specific node.
+	SuspendNode *v1beta2.SuspendNodeEvent `protobuf:"bytes,9,opt,name=suspend_node,json=suspendNode,proto3,oneof"`
+}
+
+type SendFlowRunEvent_ResumeNode struct {
+	// Resume a specific suspended/errored node (optionally with a replacement value).
+	ResumeNode *v1beta2.ResumeNodeEvent `protobuf:"bytes,10,opt,name=resume_node,json=resumeNode,proto3,oneof"`
+}
+
+type SendFlowRunEvent_Start struct {
+	// Start the flow executor. Must be sent after connecting the event stream
+	// to ensure no outputs are missed. Flow must be in PENDING state.
+	Start *v1beta2.StartFlowEvent `protobuf:"bytes,11,opt,name=start,proto3,oneof"`
+}
+
+func (*SendFlowRunEvent_Input) isSendFlowRunEvent_Event() {}
+
+func (*SendFlowRunEvent_InteractionResponse) isSendFlowRunEvent_Event() {}
+
+func (*SendFlowRunEvent_Stop) isSendFlowRunEvent_Event() {}
+
+func (*SendFlowRunEvent_Terminate) isSendFlowRunEvent_Event() {}
+
+func (*SendFlowRunEvent_Suspend) isSendFlowRunEvent_Event() {}
+
+func (*SendFlowRunEvent_Resume) isSendFlowRunEvent_Event() {}
+
+func (*SendFlowRunEvent_StopNode) isSendFlowRunEvent_Event() {}
+
+func (*SendFlowRunEvent_TerminateNode) isSendFlowRunEvent_Event() {}
+
+func (*SendFlowRunEvent_SuspendNode) isSendFlowRunEvent_Event() {}
+
+func (*SendFlowRunEvent_ResumeNode) isSendFlowRunEvent_Event() {}
+
+func (*SendFlowRunEvent_Start) isSendFlowRunEvent_Event() {}
+
+// ReceiveFlowRunEvent represents an event received from a flowrun (executor -> client).
+type ReceiveFlowRunEvent struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// Types that are valid to be assigned to Event:
+	//
+	//	*ReceiveFlowRunEvent_Output
+	//	*ReceiveFlowRunEvent_InputRequest
+	//	*ReceiveFlowRunEvent_InteractionRequest
+	//	*ReceiveFlowRunEvent_Flowrun
+	Event         isReceiveFlowRunEvent_Event `protobuf_oneof:"event"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReceiveFlowRunEvent) Reset() {
+	*x = ReceiveFlowRunEvent{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReceiveFlowRunEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReceiveFlowRunEvent) ProtoMessage() {}
+
+func (x *ReceiveFlowRunEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *ReceiveFlowRunEvent) GetEvent() isReceiveFlowRunEvent_Event {
+	if x != nil {
+		return x.Event
+	}
+	return nil
+}
+
+func (x *ReceiveFlowRunEvent) GetOutput() *v1beta2.OutputEvent {
+	if x != nil {
+		if x, ok := x.Event.(*ReceiveFlowRunEvent_Output); ok {
+			return x.Output
+		}
+	}
+	return nil
+}
+
+func (x *ReceiveFlowRunEvent) GetInputRequest() *v1beta2.InputRequestEvent {
+	if x != nil {
+		if x, ok := x.Event.(*ReceiveFlowRunEvent_InputRequest); ok {
+			return x.InputRequest
+		}
+	}
+	return nil
+}
+
+func (x *ReceiveFlowRunEvent) GetInteractionRequest() *v1beta2.InteractionRequestEvent {
+	if x != nil {
+		if x, ok := x.Event.(*ReceiveFlowRunEvent_InteractionRequest); ok {
+			return x.InteractionRequest
+		}
+	}
+	return nil
+}
+
+func (x *ReceiveFlowRunEvent) GetFlowrun() *FlowRun {
+	if x != nil {
+		if x, ok := x.Event.(*ReceiveFlowRunEvent_Flowrun); ok {
+			return x.Flowrun
+		}
+	}
+	return nil
+}
+
+func (x *ReceiveFlowRunEvent) SetOutput(v *v1beta2.OutputEvent) {
+	if v == nil {
+		x.Event = nil
+		return
+	}
+	x.Event = &ReceiveFlowRunEvent_Output{v}
+}
+
+func (x *ReceiveFlowRunEvent) SetInputRequest(v *v1beta2.InputRequestEvent) {
+	if v == nil {
+		x.Event = nil
+		return
+	}
+	x.Event = &ReceiveFlowRunEvent_InputRequest{v}
+}
+
+func (x *ReceiveFlowRunEvent) SetInteractionRequest(v *v1beta2.InteractionRequestEvent) {
+	if v == nil {
+		x.Event = nil
+		return
+	}
+	x.Event = &ReceiveFlowRunEvent_InteractionRequest{v}
+}
+
+func (x *ReceiveFlowRunEvent) SetFlowrun(v *FlowRun) {
+	if v == nil {
+		x.Event = nil
+		return
+	}
+	x.Event = &ReceiveFlowRunEvent_Flowrun{v}
+}
+
+func (x *ReceiveFlowRunEvent) HasEvent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Event != nil
+}
+
+func (x *ReceiveFlowRunEvent) HasOutput() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Event.(*ReceiveFlowRunEvent_Output)
+	return ok
+}
+
+func (x *ReceiveFlowRunEvent) HasInputRequest() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Event.(*ReceiveFlowRunEvent_InputRequest)
+	return ok
+}
+
+func (x *ReceiveFlowRunEvent) HasInteractionRequest() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Event.(*ReceiveFlowRunEvent_InteractionRequest)
+	return ok
+}
+
+func (x *ReceiveFlowRunEvent) HasFlowrun() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Event.(*ReceiveFlowRunEvent_Flowrun)
+	return ok
+}
+
+func (x *ReceiveFlowRunEvent) ClearEvent() {
+	x.Event = nil
+}
+
+func (x *ReceiveFlowRunEvent) ClearOutput() {
+	if _, ok := x.Event.(*ReceiveFlowRunEvent_Output); ok {
+		x.Event = nil
+	}
+}
+
+func (x *ReceiveFlowRunEvent) ClearInputRequest() {
+	if _, ok := x.Event.(*ReceiveFlowRunEvent_InputRequest); ok {
+		x.Event = nil
+	}
+}
+
+func (x *ReceiveFlowRunEvent) ClearInteractionRequest() {
+	if _, ok := x.Event.(*ReceiveFlowRunEvent_InteractionRequest); ok {
+		x.Event = nil
+	}
+}
+
+func (x *ReceiveFlowRunEvent) ClearFlowrun() {
+	if _, ok := x.Event.(*ReceiveFlowRunEvent_Flowrun); ok {
+		x.Event = nil
+	}
+}
+
+const ReceiveFlowRunEvent_Event_not_set_case case_ReceiveFlowRunEvent_Event = 0
+const ReceiveFlowRunEvent_Output_case case_ReceiveFlowRunEvent_Event = 1
+const ReceiveFlowRunEvent_InputRequest_case case_ReceiveFlowRunEvent_Event = 2
+const ReceiveFlowRunEvent_InteractionRequest_case case_ReceiveFlowRunEvent_Event = 3
+const ReceiveFlowRunEvent_Flowrun_case case_ReceiveFlowRunEvent_Event = 4
+
+func (x *ReceiveFlowRunEvent) WhichEvent() case_ReceiveFlowRunEvent_Event {
+	if x == nil {
+		return ReceiveFlowRunEvent_Event_not_set_case
+	}
+	switch x.Event.(type) {
+	case *ReceiveFlowRunEvent_Output:
+		return ReceiveFlowRunEvent_Output_case
+	case *ReceiveFlowRunEvent_InputRequest:
+		return ReceiveFlowRunEvent_InputRequest_case
+	case *ReceiveFlowRunEvent_InteractionRequest:
+		return ReceiveFlowRunEvent_InteractionRequest_case
+	case *ReceiveFlowRunEvent_Flowrun:
+		return ReceiveFlowRunEvent_Flowrun_case
+	default:
+		return ReceiveFlowRunEvent_Event_not_set_case
+	}
+}
+
+type ReceiveFlowRunEvent_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Event:
+	// An output node produced a value.
+	Output *v1beta2.OutputEvent
+	// The executor is soliciting input for a specific input node.
+	InputRequest *v1beta2.InputRequestEvent
+	// An interaction node needs external input (with token).
+	InteractionRequest *v1beta2.InteractionRequestEvent
+	// FlowRun state change (phase transitions, terminal states).
+	Flowrun *FlowRun
+	// -- end of Event
+}
+
+func (b0 ReceiveFlowRunEvent_builder) Build() *ReceiveFlowRunEvent {
+	m0 := &ReceiveFlowRunEvent{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Output != nil {
+		x.Event = &ReceiveFlowRunEvent_Output{b.Output}
+	}
+	if b.InputRequest != nil {
+		x.Event = &ReceiveFlowRunEvent_InputRequest{b.InputRequest}
+	}
+	if b.InteractionRequest != nil {
+		x.Event = &ReceiveFlowRunEvent_InteractionRequest{b.InteractionRequest}
+	}
+	if b.Flowrun != nil {
+		x.Event = &ReceiveFlowRunEvent_Flowrun{b.Flowrun}
+	}
+	return m0
+}
+
+type case_ReceiveFlowRunEvent_Event protoreflect.FieldNumber
+
+func (x case_ReceiveFlowRunEvent_Event) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[18].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
+type isReceiveFlowRunEvent_Event interface {
+	isReceiveFlowRunEvent_Event()
+}
+
+type ReceiveFlowRunEvent_Output struct {
+	// An output node produced a value.
+	Output *v1beta2.OutputEvent `protobuf:"bytes,1,opt,name=output,proto3,oneof"`
+}
+
+type ReceiveFlowRunEvent_InputRequest struct {
+	// The executor is soliciting input for a specific input node.
+	InputRequest *v1beta2.InputRequestEvent `protobuf:"bytes,2,opt,name=input_request,json=inputRequest,proto3,oneof"`
+}
+
+type ReceiveFlowRunEvent_InteractionRequest struct {
+	// An interaction node needs external input (with token).
+	InteractionRequest *v1beta2.InteractionRequestEvent `protobuf:"bytes,3,opt,name=interaction_request,json=interactionRequest,proto3,oneof"`
+}
+
+type ReceiveFlowRunEvent_Flowrun struct {
+	// FlowRun state change (phase transitions, terminal states).
+	Flowrun *FlowRun `protobuf:"bytes,4,opt,name=flowrun,proto3,oneof"`
+}
+
+func (*ReceiveFlowRunEvent_Output) isReceiveFlowRunEvent_Event() {}
+
+func (*ReceiveFlowRunEvent_InputRequest) isReceiveFlowRunEvent_Event() {}
+
+func (*ReceiveFlowRunEvent_InteractionRequest) isReceiveFlowRunEvent_Event() {}
+
+func (*ReceiveFlowRunEvent_Flowrun) isReceiveFlowRunEvent_Event() {}
+
+type SendFlowRunEventRequest struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// Name of FlowRun resource to send event to.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Event to send.
+	Event         *SendFlowRunEvent `protobuf:"bytes,2,opt,name=event,proto3" json:"event,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SendFlowRunEventRequest) Reset() {
+	*x = SendFlowRunEventRequest{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SendFlowRunEventRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendFlowRunEventRequest) ProtoMessage() {}
+
+func (x *SendFlowRunEventRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *SendFlowRunEventRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *SendFlowRunEventRequest) GetEvent() *SendFlowRunEvent {
+	if x != nil {
+		return x.Event
+	}
+	return nil
+}
+
+func (x *SendFlowRunEventRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *SendFlowRunEventRequest) SetEvent(v *SendFlowRunEvent) {
+	x.Event = v
+}
+
+func (x *SendFlowRunEventRequest) HasEvent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Event != nil
+}
+
+func (x *SendFlowRunEventRequest) ClearEvent() {
+	x.Event = nil
+}
+
+type SendFlowRunEventRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of FlowRun resource to send event to.
+	Name string
+	// Event to send.
+	Event *SendFlowRunEvent
+}
+
+func (b0 SendFlowRunEventRequest_builder) Build() *SendFlowRunEventRequest {
+	m0 := &SendFlowRunEventRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Event = b.Event
+	return m0
+}
+
+type ReceiveFlowRunEventsRequest struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// Name of FlowRun resource to receive events from.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Optional cursor: receive only events after this event ID (UUIDv7).
+	// If empty, all available events are delivered from the beginning.
+	AfterEventId  string `protobuf:"bytes,2,opt,name=after_event_id,json=afterEventId,proto3" json:"after_event_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReceiveFlowRunEventsRequest) Reset() {
+	*x = ReceiveFlowRunEventsRequest{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReceiveFlowRunEventsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReceiveFlowRunEventsRequest) ProtoMessage() {}
+
+func (x *ReceiveFlowRunEventsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *ReceiveFlowRunEventsRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ReceiveFlowRunEventsRequest) GetAfterEventId() string {
+	if x != nil {
+		return x.AfterEventId
+	}
+	return ""
+}
+
+func (x *ReceiveFlowRunEventsRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *ReceiveFlowRunEventsRequest) SetAfterEventId(v string) {
+	x.AfterEventId = v
+}
+
+type ReceiveFlowRunEventsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of FlowRun resource to receive events from.
+	Name string
+	// Optional cursor: receive only events after this event ID (UUIDv7).
+	// If empty, all available events are delivered from the beginning.
+	AfterEventId string
+}
+
+func (b0 ReceiveFlowRunEventsRequest_builder) Build() *ReceiveFlowRunEventsRequest {
+	m0 := &ReceiveFlowRunEventsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.AfterEventId = b.AfterEventId
+	return m0
+}
+
+type ReceiveFlowRunEventsResponse struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// The received event.
+	Event *ReceiveFlowRunEvent `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
+	// UUIDv7 event ID for cursor-based pagination. Pass this value as
+	// after_event_id in subsequent requests to resume from this point.
+	EventId       string `protobuf:"bytes,2,opt,name=event_id,json=eventId,proto3" json:"event_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReceiveFlowRunEventsResponse) Reset() {
+	*x = ReceiveFlowRunEventsResponse{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReceiveFlowRunEventsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReceiveFlowRunEventsResponse) ProtoMessage() {}
+
+func (x *ReceiveFlowRunEventsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *ReceiveFlowRunEventsResponse) GetEvent() *ReceiveFlowRunEvent {
+	if x != nil {
+		return x.Event
+	}
+	return nil
+}
+
+func (x *ReceiveFlowRunEventsResponse) GetEventId() string {
+	if x != nil {
+		return x.EventId
+	}
+	return ""
+}
+
+func (x *ReceiveFlowRunEventsResponse) SetEvent(v *ReceiveFlowRunEvent) {
+	x.Event = v
+}
+
+func (x *ReceiveFlowRunEventsResponse) SetEventId(v string) {
+	x.EventId = v
+}
+
+func (x *ReceiveFlowRunEventsResponse) HasEvent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Event != nil
+}
+
+func (x *ReceiveFlowRunEventsResponse) ClearEvent() {
+	x.Event = nil
+}
+
+type ReceiveFlowRunEventsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The received event.
+	Event *ReceiveFlowRunEvent
+	// UUIDv7 event ID for cursor-based pagination. Pass this value as
+	// after_event_id in subsequent requests to resume from this point.
+	EventId string
+}
+
+func (b0 ReceiveFlowRunEventsResponse_builder) Build() *ReceiveFlowRunEventsResponse {
+	m0 := &ReceiveFlowRunEventsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Event = b.Event
+	x.EventId = b.EventId
+	return m0
+}
+
+type StreamFlowRunEventsRequest struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// Name of FlowRun resource.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Event to send.
+	Event *SendFlowRunEvent `protobuf:"bytes,2,opt,name=event,proto3" json:"event,omitempty"`
+	// Optional cursor: receive only events after this event ID (UUIDv7).
+	// Only used on the first request to establish the starting position.
+	// If empty, all available events are delivered from the beginning.
+	AfterEventId  string `protobuf:"bytes,3,opt,name=after_event_id,json=afterEventId,proto3" json:"after_event_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamFlowRunEventsRequest) Reset() {
+	*x = StreamFlowRunEventsRequest{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamFlowRunEventsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamFlowRunEventsRequest) ProtoMessage() {}
+
+func (x *StreamFlowRunEventsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *StreamFlowRunEventsRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *StreamFlowRunEventsRequest) GetEvent() *SendFlowRunEvent {
+	if x != nil {
+		return x.Event
+	}
+	return nil
+}
+
+func (x *StreamFlowRunEventsRequest) GetAfterEventId() string {
+	if x != nil {
+		return x.AfterEventId
+	}
+	return ""
+}
+
+func (x *StreamFlowRunEventsRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *StreamFlowRunEventsRequest) SetEvent(v *SendFlowRunEvent) {
+	x.Event = v
+}
+
+func (x *StreamFlowRunEventsRequest) SetAfterEventId(v string) {
+	x.AfterEventId = v
+}
+
+func (x *StreamFlowRunEventsRequest) HasEvent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Event != nil
+}
+
+func (x *StreamFlowRunEventsRequest) ClearEvent() {
+	x.Event = nil
+}
+
+type StreamFlowRunEventsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of FlowRun resource.
+	Name string
+	// Event to send.
+	Event *SendFlowRunEvent
+	// Optional cursor: receive only events after this event ID (UUIDv7).
+	// Only used on the first request to establish the starting position.
+	// If empty, all available events are delivered from the beginning.
+	AfterEventId string
+}
+
+func (b0 StreamFlowRunEventsRequest_builder) Build() *StreamFlowRunEventsRequest {
+	m0 := &StreamFlowRunEventsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Event = b.Event
+	x.AfterEventId = b.AfterEventId
+	return m0
+}
+
+type StreamFlowRunEventsResponse struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// The received event.
+	Event *ReceiveFlowRunEvent `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
+	// UUIDv7 event ID for cursor-based pagination. Pass this value as
+	// after_event_id in subsequent requests to resume from this point.
+	EventId       string `protobuf:"bytes,2,opt,name=event_id,json=eventId,proto3" json:"event_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamFlowRunEventsResponse) Reset() {
+	*x = StreamFlowRunEventsResponse{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamFlowRunEventsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamFlowRunEventsResponse) ProtoMessage() {}
+
+func (x *StreamFlowRunEventsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *StreamFlowRunEventsResponse) GetEvent() *ReceiveFlowRunEvent {
+	if x != nil {
+		return x.Event
+	}
+	return nil
+}
+
+func (x *StreamFlowRunEventsResponse) GetEventId() string {
+	if x != nil {
+		return x.EventId
+	}
+	return ""
+}
+
+func (x *StreamFlowRunEventsResponse) SetEvent(v *ReceiveFlowRunEvent) {
+	x.Event = v
+}
+
+func (x *StreamFlowRunEventsResponse) SetEventId(v string) {
+	x.EventId = v
+}
+
+func (x *StreamFlowRunEventsResponse) HasEvent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Event != nil
+}
+
+func (x *StreamFlowRunEventsResponse) ClearEvent() {
+	x.Event = nil
+}
+
+type StreamFlowRunEventsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The received event.
+	Event *ReceiveFlowRunEvent
+	// UUIDv7 event ID for cursor-based pagination. Pass this value as
+	// after_event_id in subsequent requests to resume from this point.
+	EventId string
+}
+
+func (b0 StreamFlowRunEventsResponse_builder) Build() *StreamFlowRunEventsResponse {
+	m0 := &StreamFlowRunEventsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Event = b.Event
+	x.EventId = b.EventId
+	return m0
+}
+
 // Connection combines necessary components of a configured client to one of:
 // - Deployment server with first-class configuration support using a DataKit SDK
 // - Any reachable gRPC server with DIY configuration, one of:
 //   - Custom proto file descriptors as a URI resolving to source .proto files
 //   - Custom proto file descriptors using gRPC reflection (must be enabled on server)
 type Connection struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	Name  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Server-assigned unique ID (UUID).
 	Uid string `protobuf:"bytes,2,opt,name=uid,proto3" json:"uid,omitempty"`
@@ -1077,7 +4234,7 @@ type Connection struct {
 
 func (x *Connection) Reset() {
 	*x = Connection{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[6]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1089,7 +4246,7 @@ func (x *Connection) String() string {
 func (*Connection) ProtoMessage() {}
 
 func (x *Connection) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[6]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1098,11 +4255,6 @@ func (x *Connection) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Connection.ProtoReflect.Descriptor instead.
-func (*Connection) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Connection) GetName() string {
@@ -1252,6 +4404,416 @@ func (x *Connection) GetUpdateTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Connection) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Connection) SetUid(v string) {
+	x.Uid = v
+}
+
+func (x *Connection) SetDeployment(v string) {
+	x.Type = &Connection_Deployment{v}
+}
+
+func (x *Connection) SetCustomProtos(v string) {
+	x.Type = &Connection_CustomProtos{v}
+}
+
+func (x *Connection) SetCustomGrpc(v bool) {
+	x.Type = &Connection_CustomGrpc{v}
+}
+
+func (x *Connection) SetAddress(v *Address) {
+	x.Address = v
+}
+
+func (x *Connection) SetDecryptedConfig(v *anypb.Any) {
+	if v == nil {
+		x.Config = nil
+		return
+	}
+	x.Config = &Connection_DecryptedConfig{v}
+}
+
+func (x *Connection) SetEncryptedConfig(v *EncryptedAny) {
+	if v == nil {
+		x.Config = nil
+		return
+	}
+	x.Config = &Connection_EncryptedConfig{v}
+}
+
+func (x *Connection) SetConfigHash(v string) {
+	x.ConfigHash = v
+}
+
+func (x *Connection) SetConfigGen(v uint64) {
+	x.ConfigGen = v
+}
+
+func (x *Connection) SetConfigUri(v string) {
+	x.ConfigUri = v
+}
+
+func (x *Connection) SetDecryptedAuth(v *anypb.Any) {
+	if v == nil {
+		x.Auth = nil
+		return
+	}
+	x.Auth = &Connection_DecryptedAuth{v}
+}
+
+func (x *Connection) SetEncryptedAuth(v *EncryptedAny) {
+	if v == nil {
+		x.Auth = nil
+		return
+	}
+	x.Auth = &Connection_EncryptedAuth{v}
+}
+
+func (x *Connection) SetHeaders(v map[string]string) {
+	x.Headers = v
+}
+
+func (x *Connection) SetCreateTime(v *timestamppb.Timestamp) {
+	x.CreateTime = v
+}
+
+func (x *Connection) SetUpdateTime(v *timestamppb.Timestamp) {
+	x.UpdateTime = v
+}
+
+func (x *Connection) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return x.Type != nil
+}
+
+func (x *Connection) HasDeployment() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Connection_Deployment)
+	return ok
+}
+
+func (x *Connection) HasCustomProtos() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Connection_CustomProtos)
+	return ok
+}
+
+func (x *Connection) HasCustomGrpc() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Connection_CustomGrpc)
+	return ok
+}
+
+func (x *Connection) HasAddress() bool {
+	if x == nil {
+		return false
+	}
+	return x.Address != nil
+}
+
+func (x *Connection) HasConfig() bool {
+	if x == nil {
+		return false
+	}
+	return x.Config != nil
+}
+
+func (x *Connection) HasDecryptedConfig() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Config.(*Connection_DecryptedConfig)
+	return ok
+}
+
+func (x *Connection) HasEncryptedConfig() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Config.(*Connection_EncryptedConfig)
+	return ok
+}
+
+func (x *Connection) HasAuth() bool {
+	if x == nil {
+		return false
+	}
+	return x.Auth != nil
+}
+
+func (x *Connection) HasDecryptedAuth() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Auth.(*Connection_DecryptedAuth)
+	return ok
+}
+
+func (x *Connection) HasEncryptedAuth() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Auth.(*Connection_EncryptedAuth)
+	return ok
+}
+
+func (x *Connection) HasCreateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.CreateTime != nil
+}
+
+func (x *Connection) HasUpdateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateTime != nil
+}
+
+func (x *Connection) ClearType() {
+	x.Type = nil
+}
+
+func (x *Connection) ClearDeployment() {
+	if _, ok := x.Type.(*Connection_Deployment); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Connection) ClearCustomProtos() {
+	if _, ok := x.Type.(*Connection_CustomProtos); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Connection) ClearCustomGrpc() {
+	if _, ok := x.Type.(*Connection_CustomGrpc); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Connection) ClearAddress() {
+	x.Address = nil
+}
+
+func (x *Connection) ClearConfig() {
+	x.Config = nil
+}
+
+func (x *Connection) ClearDecryptedConfig() {
+	if _, ok := x.Config.(*Connection_DecryptedConfig); ok {
+		x.Config = nil
+	}
+}
+
+func (x *Connection) ClearEncryptedConfig() {
+	if _, ok := x.Config.(*Connection_EncryptedConfig); ok {
+		x.Config = nil
+	}
+}
+
+func (x *Connection) ClearAuth() {
+	x.Auth = nil
+}
+
+func (x *Connection) ClearDecryptedAuth() {
+	if _, ok := x.Auth.(*Connection_DecryptedAuth); ok {
+		x.Auth = nil
+	}
+}
+
+func (x *Connection) ClearEncryptedAuth() {
+	if _, ok := x.Auth.(*Connection_EncryptedAuth); ok {
+		x.Auth = nil
+	}
+}
+
+func (x *Connection) ClearCreateTime() {
+	x.CreateTime = nil
+}
+
+func (x *Connection) ClearUpdateTime() {
+	x.UpdateTime = nil
+}
+
+const Connection_Type_not_set_case case_Connection_Type = 0
+const Connection_Deployment_case case_Connection_Type = 3
+const Connection_CustomProtos_case case_Connection_Type = 4
+const Connection_CustomGrpc_case case_Connection_Type = 5
+
+func (x *Connection) WhichType() case_Connection_Type {
+	if x == nil {
+		return Connection_Type_not_set_case
+	}
+	switch x.Type.(type) {
+	case *Connection_Deployment:
+		return Connection_Deployment_case
+	case *Connection_CustomProtos:
+		return Connection_CustomProtos_case
+	case *Connection_CustomGrpc:
+		return Connection_CustomGrpc_case
+	default:
+		return Connection_Type_not_set_case
+	}
+}
+
+const Connection_Config_not_set_case case_Connection_Config = 0
+const Connection_DecryptedConfig_case case_Connection_Config = 7
+const Connection_EncryptedConfig_case case_Connection_Config = 8
+
+func (x *Connection) WhichConfig() case_Connection_Config {
+	if x == nil {
+		return Connection_Config_not_set_case
+	}
+	switch x.Config.(type) {
+	case *Connection_DecryptedConfig:
+		return Connection_DecryptedConfig_case
+	case *Connection_EncryptedConfig:
+		return Connection_EncryptedConfig_case
+	default:
+		return Connection_Config_not_set_case
+	}
+}
+
+const Connection_Auth_not_set_case case_Connection_Auth = 0
+const Connection_DecryptedAuth_case case_Connection_Auth = 9
+const Connection_EncryptedAuth_case case_Connection_Auth = 10
+
+func (x *Connection) WhichAuth() case_Connection_Auth {
+	if x == nil {
+		return Connection_Auth_not_set_case
+	}
+	switch x.Auth.(type) {
+	case *Connection_DecryptedAuth:
+		return Connection_DecryptedAuth_case
+	case *Connection_EncryptedAuth:
+		return Connection_EncryptedAuth_case
+	default:
+		return Connection_Auth_not_set_case
+	}
+}
+
+type Connection_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name string
+	// Server-assigned unique ID (UUID).
+	Uid string
+	// Fields of oneof Type:
+	// Name of a deployment resource.
+	Deployment *string
+	// Custom proto descriptors URI.
+	CustomProtos *string
+	// Custom using gRPC reflection.
+	CustomGrpc *bool
+	// -- end of Type
+	// Address of gRPC server.
+	Address *Address
+	// Fields of oneof Config:
+	// Config data compatible with deployment config schema.
+	DecryptedConfig *anypb.Any
+	// Encrypted config data.
+	EncryptedConfig *EncryptedAny
+	// -- end of Config
+	// Hash of config data.
+	ConfigHash string
+	// Generation of config data.
+	ConfigGen uint64
+	// Config source uri (optional).
+	ConfigUri string
+	// Fields of oneof Auth:
+	// Decrypted auth data.
+	DecryptedAuth *anypb.Any
+	// Encrypted auth data.
+	EncryptedAuth *EncryptedAny
+	// -- end of Auth
+	// Headers applied when dialing connection (only valid for custom connections).
+	Headers map[string]string
+	// Connection create time.
+	CreateTime *timestamppb.Timestamp
+	// Connection update time.
+	UpdateTime *timestamppb.Timestamp
+}
+
+func (b0 Connection_builder) Build() *Connection {
+	m0 := &Connection{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Uid = b.Uid
+	if b.Deployment != nil {
+		x.Type = &Connection_Deployment{*b.Deployment}
+	}
+	if b.CustomProtos != nil {
+		x.Type = &Connection_CustomProtos{*b.CustomProtos}
+	}
+	if b.CustomGrpc != nil {
+		x.Type = &Connection_CustomGrpc{*b.CustomGrpc}
+	}
+	x.Address = b.Address
+	if b.DecryptedConfig != nil {
+		x.Config = &Connection_DecryptedConfig{b.DecryptedConfig}
+	}
+	if b.EncryptedConfig != nil {
+		x.Config = &Connection_EncryptedConfig{b.EncryptedConfig}
+	}
+	x.ConfigHash = b.ConfigHash
+	x.ConfigGen = b.ConfigGen
+	x.ConfigUri = b.ConfigUri
+	if b.DecryptedAuth != nil {
+		x.Auth = &Connection_DecryptedAuth{b.DecryptedAuth}
+	}
+	if b.EncryptedAuth != nil {
+		x.Auth = &Connection_EncryptedAuth{b.EncryptedAuth}
+	}
+	x.Headers = b.Headers
+	x.CreateTime = b.CreateTime
+	x.UpdateTime = b.UpdateTime
+	return m0
+}
+
+type case_Connection_Type protoreflect.FieldNumber
+
+func (x case_Connection_Type) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[24].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
+type case_Connection_Config protoreflect.FieldNumber
+
+func (x case_Connection_Config) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[24].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
+type case_Connection_Auth protoreflect.FieldNumber
+
+func (x case_Connection_Auth) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[24].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isConnection_Type interface {
 	isConnection_Type()
 }
@@ -1319,7 +4881,7 @@ func (*Connection_EncryptedAuth) isConnection_Auth() {}
 // users to easily deploy and run their software packages in a consistent and
 // traceable manner within the DataKit ecosystem.
 type Deployment struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of deployment resource.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Server-assigned unique ID (UUID).
@@ -1361,7 +4923,7 @@ type Deployment struct {
 
 func (x *Deployment) Reset() {
 	*x = Deployment{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[7]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1373,7 +4935,7 @@ func (x *Deployment) String() string {
 func (*Deployment) ProtoMessage() {}
 
 func (x *Deployment) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[7]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1382,11 +4944,6 @@ func (x *Deployment) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Deployment.ProtoReflect.Descriptor instead.
-func (*Deployment) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *Deployment) GetName() string {
@@ -1431,11 +4988,16 @@ func (x *Deployment) GetPorts() map[string]string {
 	return nil
 }
 
-func (x *Deployment) GetBuild() *Deployment_Build {
+func (x *Deployment) GetBuild_() *Deployment_Build {
 	if x != nil {
 		return x.Build
 	}
 	return nil
+}
+
+// Deprecated: Use GetBuild_ instead.
+func (x *Deployment) GetBuild() *Deployment_Build {
+	return x.GetBuild_()
 }
 
 func (x *Deployment) GetCloud() *Deployment_Cloud {
@@ -1487,6 +5049,211 @@ func (x *Deployment) GetUpdateTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Deployment) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Deployment) SetUid(v string) {
+	x.Uid = v
+}
+
+func (x *Deployment) SetState(v Deployment_State) {
+	x.State = v
+}
+
+func (x *Deployment) SetAddress(v *Address) {
+	x.Address = v
+}
+
+func (x *Deployment) SetEnv(v map[string]string) {
+	x.Env = v
+}
+
+func (x *Deployment) SetPorts(v map[string]string) {
+	x.Ports = v
+}
+
+func (x *Deployment) SetBuild_(v *Deployment_Build) {
+	x.Build = v
+}
+
+func (x *Deployment) SetCloud(v *Deployment_Cloud) {
+	x.Cloud = v
+}
+
+func (x *Deployment) SetConfigSchema(v *TypeSchema) {
+	x.ConfigSchema = v
+}
+
+func (x *Deployment) SetPackageSpec(v *PackageSpecMetadata) {
+	x.PackageSpec = v
+}
+
+func (x *Deployment) SetRuntime(v *Deployment_RuntimeMetadata) {
+	x.Runtime = v
+}
+
+func (x *Deployment) SetEtag(v string) {
+	x.Etag = v
+}
+
+func (x *Deployment) SetCreateTime(v *timestamppb.Timestamp) {
+	x.CreateTime = v
+}
+
+func (x *Deployment) SetUpdateTime(v *timestamppb.Timestamp) {
+	x.UpdateTime = v
+}
+
+func (x *Deployment) HasAddress() bool {
+	if x == nil {
+		return false
+	}
+	return x.Address != nil
+}
+
+func (x *Deployment) HasBuild_() bool {
+	if x == nil {
+		return false
+	}
+	return x.Build != nil
+}
+
+func (x *Deployment) HasCloud() bool {
+	if x == nil {
+		return false
+	}
+	return x.Cloud != nil
+}
+
+func (x *Deployment) HasConfigSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.ConfigSchema != nil
+}
+
+func (x *Deployment) HasPackageSpec() bool {
+	if x == nil {
+		return false
+	}
+	return x.PackageSpec != nil
+}
+
+func (x *Deployment) HasRuntime() bool {
+	if x == nil {
+		return false
+	}
+	return x.Runtime != nil
+}
+
+func (x *Deployment) HasCreateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.CreateTime != nil
+}
+
+func (x *Deployment) HasUpdateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateTime != nil
+}
+
+func (x *Deployment) ClearAddress() {
+	x.Address = nil
+}
+
+func (x *Deployment) ClearBuild_() {
+	x.Build = nil
+}
+
+func (x *Deployment) ClearCloud() {
+	x.Cloud = nil
+}
+
+func (x *Deployment) ClearConfigSchema() {
+	x.ConfigSchema = nil
+}
+
+func (x *Deployment) ClearPackageSpec() {
+	x.PackageSpec = nil
+}
+
+func (x *Deployment) ClearRuntime() {
+	x.Runtime = nil
+}
+
+func (x *Deployment) ClearCreateTime() {
+	x.CreateTime = nil
+}
+
+func (x *Deployment) ClearUpdateTime() {
+	x.UpdateTime = nil
+}
+
+type Deployment_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of deployment resource.
+	Name string
+	// Server-assigned unique ID (UUID).
+	Uid string
+	// Deployment state.
+	State Deployment_State
+	// Bind address of deployment gRPC server.
+	Address *Address
+	// Env vars applied at runtime.
+	Env map[string]string
+	// Port mappings applied at runtime.
+	Ports map[string]string
+	// Build context for deployment, including reference to integration and build
+	// metadata (must include artifact etag for a successful build). This enables
+	// cross-control plane deployments where the integration resource is defined
+	// in a different control plane than where it is deployed (e.g. integration
+	// defined in shared cloud control plane and deployed to a user control plane,
+	// or vice versa).
+	Build_ *Deployment_Build
+	// Cloud context with encrypted config for binding deployment to DataKit Cloud
+	// and only present when address's network is "cloud".
+	Cloud *Deployment_Cloud
+	// Package config metadata fetched at runtime from server.
+	ConfigSchema *TypeSchema
+	// Package spec metadata fetched at runtime from server.
+	PackageSpec *PackageSpecMetadata
+	// Runtime metadata of deployment, including runtime-specific information such as process ID or container ID.
+	Runtime *Deployment_RuntimeMetadata
+	// Etag for concurrency control of deployment updates (must match current etag
+	// to update or delete).
+	Etag string
+	// Deployment create time.
+	CreateTime *timestamppb.Timestamp
+	// Deployment update time.
+	UpdateTime *timestamppb.Timestamp
+}
+
+func (b0 Deployment_builder) Build() *Deployment {
+	m0 := &Deployment{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Uid = b.Uid
+	x.State = b.State
+	x.Address = b.Address
+	x.Env = b.Env
+	x.Ports = b.Ports
+	x.Build = b.Build_
+	x.Cloud = b.Cloud
+	x.ConfigSchema = b.ConfigSchema
+	x.PackageSpec = b.PackageSpec
+	x.Runtime = b.Runtime
+	x.Etag = b.Etag
+	x.CreateTime = b.CreateTime
+	x.UpdateTime = b.UpdateTime
+	return m0
+}
+
 // Integration describes a software package which uses the DataKit SDK and can
 // be deployed to a runtime environment using a Deployment resource. An Integration
 // can represent a software package in development with a local runtime environment
@@ -1495,7 +5262,7 @@ func (x *Deployment) GetUpdateTime() *timestamppb.Timestamp {
 // lifecycle within the DataKit ecosystem, enabling users to easily deploy and
 // run their software packages in compatible runtime environments.
 type Integration struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	Name  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Server-assigned unique ID (UUID).
 	Uid string `protobuf:"bytes,2,opt,name=uid,proto3" json:"uid,omitempty"`
@@ -1518,7 +5285,7 @@ type Integration struct {
 
 func (x *Integration) Reset() {
 	*x = Integration{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[8]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1530,7 +5297,7 @@ func (x *Integration) String() string {
 func (*Integration) ProtoMessage() {}
 
 func (x *Integration) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[8]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1539,11 +5306,6 @@ func (x *Integration) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Integration.ProtoReflect.Descriptor instead.
-func (*Integration) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *Integration) GetName() string {
@@ -1602,10 +5364,133 @@ func (x *Integration) GetUpdateTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Integration) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Integration) SetUid(v string) {
+	x.Uid = v
+}
+
+func (x *Integration) SetSpec(v *PackageSpecMetadata) {
+	x.Spec = v
+}
+
+func (x *Integration) SetSpecEtag(v string) {
+	x.SpecEtag = v
+}
+
+func (x *Integration) SetSourceUri(v string) {
+	x.SourceUri = &v
+}
+
+func (x *Integration) SetSourceEtag(v string) {
+	x.SourceEtag = &v
+}
+
+func (x *Integration) SetCreateTime(v *timestamppb.Timestamp) {
+	x.CreateTime = v
+}
+
+func (x *Integration) SetUpdateTime(v *timestamppb.Timestamp) {
+	x.UpdateTime = v
+}
+
+func (x *Integration) HasSpec() bool {
+	if x == nil {
+		return false
+	}
+	return x.Spec != nil
+}
+
+func (x *Integration) HasSourceUri() bool {
+	if x == nil {
+		return false
+	}
+	return x.SourceUri != nil
+}
+
+func (x *Integration) HasSourceEtag() bool {
+	if x == nil {
+		return false
+	}
+	return x.SourceEtag != nil
+}
+
+func (x *Integration) HasCreateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.CreateTime != nil
+}
+
+func (x *Integration) HasUpdateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateTime != nil
+}
+
+func (x *Integration) ClearSpec() {
+	x.Spec = nil
+}
+
+func (x *Integration) ClearSourceUri() {
+	x.SourceUri = nil
+}
+
+func (x *Integration) ClearSourceEtag() {
+	x.SourceEtag = nil
+}
+
+func (x *Integration) ClearCreateTime() {
+	x.CreateTime = nil
+}
+
+func (x *Integration) ClearUpdateTime() {
+	x.UpdateTime = nil
+}
+
+type Integration_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name string
+	// Server-assigned unique ID (UUID).
+	Uid string
+	// Package spec metadata.
+	Spec *PackageSpecMetadata
+	// Package spec checksum for concurrency control.
+	SpecEtag string
+	// Package source URI (only present after successful build & update).
+	SourceUri *string
+	// Package source checksum or git commit hash for concurrency control
+	// (only present after successful build & update).
+	SourceEtag *string
+	// Integration create time.
+	CreateTime *timestamppb.Timestamp
+	// Integration update time.
+	UpdateTime *timestamppb.Timestamp
+}
+
+func (b0 Integration_builder) Build() *Integration {
+	m0 := &Integration{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Uid = b.Uid
+	x.Spec = b.Spec
+	x.SpecEtag = b.SpecEtag
+	x.SourceUri = b.SourceUri
+	x.SourceEtag = b.SourceEtag
+	x.CreateTime = b.CreateTime
+	x.UpdateTime = b.UpdateTime
+	return m0
+}
+
 // File represents runtime artifacts related to a Connection or Deployment, such
 // as proto file descriptors used for dynamic client construction and reflection.
 type File struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// File resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Server-assigned unique ID (UUID).
@@ -1628,7 +5513,7 @@ type File struct {
 
 func (x *File) Reset() {
 	*x = File{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[9]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1640,7 +5525,7 @@ func (x *File) String() string {
 func (*File) ProtoMessage() {}
 
 func (x *File) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[9]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1649,11 +5534,6 @@ func (x *File) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use File.ProtoReflect.Descriptor instead.
-func (*File) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *File) GetName() string {
@@ -1714,6 +5594,158 @@ func (x *File) GetUpdateTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *File) SetName(v string) {
+	x.Name = v
+}
+
+func (x *File) SetUid(v string) {
+	x.Uid = v
+}
+
+func (x *File) SetEtag(v string) {
+	x.Etag = v
+}
+
+func (x *File) SetUri(v string) {
+	x.Uri = &v
+}
+
+func (x *File) SetProtos(v *descriptorpb.FileDescriptorSet) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &File_Protos{v}
+}
+
+func (x *File) SetCreateTime(v *timestamppb.Timestamp) {
+	x.CreateTime = v
+}
+
+func (x *File) SetUpdateTime(v *timestamppb.Timestamp) {
+	x.UpdateTime = v
+}
+
+func (x *File) HasUri() bool {
+	if x == nil {
+		return false
+	}
+	return x.Uri != nil
+}
+
+func (x *File) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return x.Type != nil
+}
+
+func (x *File) HasProtos() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*File_Protos)
+	return ok
+}
+
+func (x *File) HasCreateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.CreateTime != nil
+}
+
+func (x *File) HasUpdateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateTime != nil
+}
+
+func (x *File) ClearUri() {
+	x.Uri = nil
+}
+
+func (x *File) ClearType() {
+	x.Type = nil
+}
+
+func (x *File) ClearProtos() {
+	if _, ok := x.Type.(*File_Protos); ok {
+		x.Type = nil
+	}
+}
+
+func (x *File) ClearCreateTime() {
+	x.CreateTime = nil
+}
+
+func (x *File) ClearUpdateTime() {
+	x.UpdateTime = nil
+}
+
+const File_Type_not_set_case case_File_Type = 0
+const File_Protos_case case_File_Type = 10
+
+func (x *File) WhichType() case_File_Type {
+	if x == nil {
+		return File_Type_not_set_case
+	}
+	switch x.Type.(type) {
+	case *File_Protos:
+		return File_Protos_case
+	default:
+		return File_Type_not_set_case
+	}
+}
+
+type File_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// File resource name.
+	Name string
+	// Server-assigned unique ID (UUID).
+	Uid string
+	// Checksum of file contents for concurrency control.
+	Etag string
+	// URI of file contents (e.g. source .proto files for proto descriptors).
+	Uri *string
+	// Fields of oneof Type:
+	// Proto file descriptor set.
+	Protos *descriptorpb.FileDescriptorSet
+	// -- end of Type
+	// File create time.
+	CreateTime *timestamppb.Timestamp
+	// File update time.
+	UpdateTime *timestamppb.Timestamp
+}
+
+func (b0 File_builder) Build() *File {
+	m0 := &File{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Uid = b.Uid
+	x.Etag = b.Etag
+	x.Uri = b.Uri
+	if b.Protos != nil {
+		x.Type = &File_Protos{b.Protos}
+	}
+	x.CreateTime = b.CreateTime
+	x.UpdateTime = b.UpdateTime
+	return m0
+}
+
+type case_File_Type protoreflect.FieldNumber
+
+func (x case_File_Type) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[27].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isFile_Type interface {
 	isFile_Type()
 }
@@ -1727,7 +5759,7 @@ func (*File_Protos) isFile_Type() {}
 
 // Service message for documentation and reflection indexing.
 type Service struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Service resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Server-assigned unique ID (UUID).
@@ -1744,7 +5776,7 @@ type Service struct {
 
 func (x *Service) Reset() {
 	*x = Service{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[10]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1756,7 +5788,7 @@ func (x *Service) String() string {
 func (*Service) ProtoMessage() {}
 
 func (x *Service) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[10]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1765,11 +5797,6 @@ func (x *Service) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Service.ProtoReflect.Descriptor instead.
-func (*Service) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *Service) GetName() string {
@@ -1807,9 +5834,78 @@ func (x *Service) GetUpdateTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Service) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Service) SetUid(v string) {
+	x.Uid = v
+}
+
+func (x *Service) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *Service) SetCreateTime(v *timestamppb.Timestamp) {
+	x.CreateTime = v
+}
+
+func (x *Service) SetUpdateTime(v *timestamppb.Timestamp) {
+	x.UpdateTime = v
+}
+
+func (x *Service) HasCreateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.CreateTime != nil
+}
+
+func (x *Service) HasUpdateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateTime != nil
+}
+
+func (x *Service) ClearCreateTime() {
+	x.CreateTime = nil
+}
+
+func (x *Service) ClearUpdateTime() {
+	x.UpdateTime = nil
+}
+
+type Service_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Service resource name.
+	Name string
+	// Server-assigned unique ID (UUID).
+	Uid string
+	// Service description.
+	Description string
+	// Service create time.
+	CreateTime *timestamppb.Timestamp
+	// Service update time.
+	UpdateTime *timestamppb.Timestamp
+}
+
+func (b0 Service_builder) Build() *Service {
+	m0 := &Service{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Uid = b.Uid
+	x.Description = b.Description
+	x.CreateTime = b.CreateTime
+	x.UpdateTime = b.UpdateTime
+	return m0
+}
+
 // Method message for documentation and reflection indexing.
 type Method struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Method resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Server-assigned unique ID (UUID).
@@ -1834,7 +5930,7 @@ type Method struct {
 
 func (x *Method) Reset() {
 	*x = Method{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[11]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1846,7 +5942,7 @@ func (x *Method) String() string {
 func (*Method) ProtoMessage() {}
 
 func (x *Method) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[11]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1855,11 +5951,6 @@ func (x *Method) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Method.ProtoReflect.Descriptor instead.
-func (*Method) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *Method) GetName() string {
@@ -1925,9 +6016,106 @@ func (x *Method) GetUpdateTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Method) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Method) SetUid(v string) {
+	x.Uid = v
+}
+
+func (x *Method) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *Method) SetRequest(v string) {
+	x.Request = v
+}
+
+func (x *Method) SetResponse(v string) {
+	x.Response = v
+}
+
+func (x *Method) SetRequestStreaming(v bool) {
+	x.RequestStreaming = v
+}
+
+func (x *Method) SetResponseStreaming(v bool) {
+	x.ResponseStreaming = v
+}
+
+func (x *Method) SetCreateTime(v *timestamppb.Timestamp) {
+	x.CreateTime = v
+}
+
+func (x *Method) SetUpdateTime(v *timestamppb.Timestamp) {
+	x.UpdateTime = v
+}
+
+func (x *Method) HasCreateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.CreateTime != nil
+}
+
+func (x *Method) HasUpdateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateTime != nil
+}
+
+func (x *Method) ClearCreateTime() {
+	x.CreateTime = nil
+}
+
+func (x *Method) ClearUpdateTime() {
+	x.UpdateTime = nil
+}
+
+type Method_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Method resource name.
+	Name string
+	// Server-assigned unique ID (UUID).
+	Uid string
+	// Method description.
+	Description string
+	// Request message type.
+	Request string
+	// Response message type.
+	Response string
+	// Whether request is streaming.
+	RequestStreaming bool
+	// Whether response is streaming.
+	ResponseStreaming bool
+	// Method create time.
+	CreateTime *timestamppb.Timestamp
+	// Method update time.
+	UpdateTime *timestamppb.Timestamp
+}
+
+func (b0 Method_builder) Build() *Method {
+	m0 := &Method{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Uid = b.Uid
+	x.Description = b.Description
+	x.Request = b.Request
+	x.Response = b.Response
+	x.RequestStreaming = b.RequestStreaming
+	x.ResponseStreaming = b.ResponseStreaming
+	x.CreateTime = b.CreateTime
+	x.UpdateTime = b.UpdateTime
+	return m0
+}
+
 // Type message for documentation and reflection indexing.
 type Type struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Type resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Server-assigned unique ID (UUID).
@@ -1944,7 +6132,7 @@ type Type struct {
 
 func (x *Type) Reset() {
 	*x = Type{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[12]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1956,7 +6144,7 @@ func (x *Type) String() string {
 func (*Type) ProtoMessage() {}
 
 func (x *Type) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[12]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1965,11 +6153,6 @@ func (x *Type) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Type.ProtoReflect.Descriptor instead.
-func (*Type) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *Type) GetName() string {
@@ -2007,9 +6190,89 @@ func (x *Type) GetUpdateTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Type) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Type) SetUid(v string) {
+	x.Uid = v
+}
+
+func (x *Type) SetSchema(v *TypeSchema) {
+	x.Schema = v
+}
+
+func (x *Type) SetCreateTime(v *timestamppb.Timestamp) {
+	x.CreateTime = v
+}
+
+func (x *Type) SetUpdateTime(v *timestamppb.Timestamp) {
+	x.UpdateTime = v
+}
+
+func (x *Type) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *Type) HasCreateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.CreateTime != nil
+}
+
+func (x *Type) HasUpdateTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateTime != nil
+}
+
+func (x *Type) ClearSchema() {
+	x.Schema = nil
+}
+
+func (x *Type) ClearCreateTime() {
+	x.CreateTime = nil
+}
+
+func (x *Type) ClearUpdateTime() {
+	x.UpdateTime = nil
+}
+
+type Type_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Type resource name.
+	Name string
+	// Server-assigned unique ID (UUID).
+	Uid string
+	// Type schema.
+	Schema *TypeSchema
+	// Type create time.
+	CreateTime *timestamppb.Timestamp
+	// Type update time.
+	UpdateTime *timestamppb.Timestamp
+}
+
+func (b0 Type_builder) Build() *Type {
+	m0 := &Type{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Uid = b.Uid
+	x.Schema = b.Schema
+	x.CreateTime = b.CreateTime
+	x.UpdateTime = b.UpdateTime
+	return m0
+}
+
 // TypeSchema wraps versioned type schema definitions.
 type TypeSchema struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Version:
 	//
 	//	*TypeSchema_V1Beta1
@@ -2020,7 +6283,7 @@ type TypeSchema struct {
 
 func (x *TypeSchema) Reset() {
 	*x = TypeSchema{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[13]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2032,7 +6295,7 @@ func (x *TypeSchema) String() string {
 func (*TypeSchema) ProtoMessage() {}
 
 func (x *TypeSchema) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[13]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2041,11 +6304,6 @@ func (x *TypeSchema) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TypeSchema.ProtoReflect.Descriptor instead.
-func (*TypeSchema) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *TypeSchema) GetVersion() isTypeSchema_Version {
@@ -2064,6 +6322,82 @@ func (x *TypeSchema) GetV1Beta1() *v1beta1.TypeSchema {
 	return nil
 }
 
+func (x *TypeSchema) SetV1Beta1(v *v1beta1.TypeSchema) {
+	if v == nil {
+		x.Version = nil
+		return
+	}
+	x.Version = &TypeSchema_V1Beta1{v}
+}
+
+func (x *TypeSchema) HasVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.Version != nil
+}
+
+func (x *TypeSchema) HasV1Beta1() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Version.(*TypeSchema_V1Beta1)
+	return ok
+}
+
+func (x *TypeSchema) ClearVersion() {
+	x.Version = nil
+}
+
+func (x *TypeSchema) ClearV1Beta1() {
+	if _, ok := x.Version.(*TypeSchema_V1Beta1); ok {
+		x.Version = nil
+	}
+}
+
+const TypeSchema_Version_not_set_case case_TypeSchema_Version = 0
+const TypeSchema_V1Beta1_case case_TypeSchema_Version = 1
+
+func (x *TypeSchema) WhichVersion() case_TypeSchema_Version {
+	if x == nil {
+		return TypeSchema_Version_not_set_case
+	}
+	switch x.Version.(type) {
+	case *TypeSchema_V1Beta1:
+		return TypeSchema_V1Beta1_case
+	default:
+		return TypeSchema_Version_not_set_case
+	}
+}
+
+type TypeSchema_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Version:
+	V1Beta1 *v1beta1.TypeSchema
+	// -- end of Version
+}
+
+func (b0 TypeSchema_builder) Build() *TypeSchema {
+	m0 := &TypeSchema{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.V1Beta1 != nil {
+		x.Version = &TypeSchema_V1Beta1{b.V1Beta1}
+	}
+	return m0
+}
+
+type case_TypeSchema_Version protoreflect.FieldNumber
+
+func (x case_TypeSchema_Version) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[31].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isTypeSchema_Version interface {
 	isTypeSchema_Version()
 }
@@ -2076,7 +6410,7 @@ func (*TypeSchema_V1Beta1) isTypeSchema_Version() {}
 
 // AutomationMetadata contains metadata for automation operations.
 type AutomationMetadata struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Status message.
 	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
 	// Start time.
@@ -2089,7 +6423,7 @@ type AutomationMetadata struct {
 
 func (x *AutomationMetadata) Reset() {
 	*x = AutomationMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[14]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2101,7 +6435,7 @@ func (x *AutomationMetadata) String() string {
 func (*AutomationMetadata) ProtoMessage() {}
 
 func (x *AutomationMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[14]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2110,11 +6444,6 @@ func (x *AutomationMetadata) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AutomationMetadata.ProtoReflect.Descriptor instead.
-func (*AutomationMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *AutomationMetadata) GetMessage() string {
@@ -2138,9 +6467,178 @@ func (x *AutomationMetadata) GetStopTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *AutomationMetadata) SetMessage(v string) {
+	x.Message = v
+}
+
+func (x *AutomationMetadata) SetStartTime(v *timestamppb.Timestamp) {
+	x.StartTime = v
+}
+
+func (x *AutomationMetadata) SetStopTime(v *timestamppb.Timestamp) {
+	x.StopTime = v
+}
+
+func (x *AutomationMetadata) HasStartTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.StartTime != nil
+}
+
+func (x *AutomationMetadata) HasStopTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.StopTime != nil
+}
+
+func (x *AutomationMetadata) ClearStartTime() {
+	x.StartTime = nil
+}
+
+func (x *AutomationMetadata) ClearStopTime() {
+	x.StopTime = nil
+}
+
+type AutomationMetadata_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Status message.
+	Message string
+	// Start time.
+	StartTime *timestamppb.Timestamp
+	// Stop time.
+	StopTime *timestamppb.Timestamp
+}
+
+func (b0 AutomationMetadata_builder) Build() *AutomationMetadata {
+	m0 := &AutomationMetadata{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Message = b.Message
+	x.StartTime = b.StartTime
+	x.StopTime = b.StopTime
+	return m0
+}
+
+// FlowRunOperationMetadata contains metadata for flowrun operations.
+type FlowRunOperationMetadata struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// Status message.
+	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	// Start time.
+	StartTime *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	// Stop time.
+	StopTime      *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=stop_time,json=stopTime,proto3" json:"stop_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FlowRunOperationMetadata) Reset() {
+	*x = FlowRunOperationMetadata{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FlowRunOperationMetadata) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlowRunOperationMetadata) ProtoMessage() {}
+
+func (x *FlowRunOperationMetadata) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *FlowRunOperationMetadata) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *FlowRunOperationMetadata) GetStartTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartTime
+	}
+	return nil
+}
+
+func (x *FlowRunOperationMetadata) GetStopTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StopTime
+	}
+	return nil
+}
+
+func (x *FlowRunOperationMetadata) SetMessage(v string) {
+	x.Message = v
+}
+
+func (x *FlowRunOperationMetadata) SetStartTime(v *timestamppb.Timestamp) {
+	x.StartTime = v
+}
+
+func (x *FlowRunOperationMetadata) SetStopTime(v *timestamppb.Timestamp) {
+	x.StopTime = v
+}
+
+func (x *FlowRunOperationMetadata) HasStartTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.StartTime != nil
+}
+
+func (x *FlowRunOperationMetadata) HasStopTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.StopTime != nil
+}
+
+func (x *FlowRunOperationMetadata) ClearStartTime() {
+	x.StartTime = nil
+}
+
+func (x *FlowRunOperationMetadata) ClearStopTime() {
+	x.StopTime = nil
+}
+
+type FlowRunOperationMetadata_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Status message.
+	Message string
+	// Start time.
+	StartTime *timestamppb.Timestamp
+	// Stop time.
+	StopTime *timestamppb.Timestamp
+}
+
+func (b0 FlowRunOperationMetadata_builder) Build() *FlowRunOperationMetadata {
+	m0 := &FlowRunOperationMetadata{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Message = b.Message
+	x.StartTime = b.StartTime
+	x.StopTime = b.StopTime
+	return m0
+}
+
 // DeploymentMetadata contains metadata for deployment operations.
 type DeploymentMetadata struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Status message.
 	Message string `protobuf:"bytes,10,opt,name=message,proto3" json:"message,omitempty"`
 	// Start time.
@@ -2153,7 +6651,7 @@ type DeploymentMetadata struct {
 
 func (x *DeploymentMetadata) Reset() {
 	*x = DeploymentMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[15]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2165,7 +6663,7 @@ func (x *DeploymentMetadata) String() string {
 func (*DeploymentMetadata) ProtoMessage() {}
 
 func (x *DeploymentMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[15]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2174,11 +6672,6 @@ func (x *DeploymentMetadata) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeploymentMetadata.ProtoReflect.Descriptor instead.
-func (*DeploymentMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *DeploymentMetadata) GetMessage() string {
@@ -2202,9 +6695,64 @@ func (x *DeploymentMetadata) GetStopTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *DeploymentMetadata) SetMessage(v string) {
+	x.Message = v
+}
+
+func (x *DeploymentMetadata) SetStartTime(v *timestamppb.Timestamp) {
+	x.StartTime = v
+}
+
+func (x *DeploymentMetadata) SetStopTime(v *timestamppb.Timestamp) {
+	x.StopTime = v
+}
+
+func (x *DeploymentMetadata) HasStartTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.StartTime != nil
+}
+
+func (x *DeploymentMetadata) HasStopTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.StopTime != nil
+}
+
+func (x *DeploymentMetadata) ClearStartTime() {
+	x.StartTime = nil
+}
+
+func (x *DeploymentMetadata) ClearStopTime() {
+	x.StopTime = nil
+}
+
+type DeploymentMetadata_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Status message.
+	Message string
+	// Start time.
+	StartTime *timestamppb.Timestamp
+	// Stop time.
+	StopTime *timestamppb.Timestamp
+}
+
+func (b0 DeploymentMetadata_builder) Build() *DeploymentMetadata {
+	m0 := &DeploymentMetadata{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Message = b.Message
+	x.StartTime = b.StartTime
+	x.StopTime = b.StopTime
+	return m0
+}
+
 // FlowConnectionMetadata contains connection configuration for a flow automation.
 type FlowConnectionMetadata struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of connection resource.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Optional context to resolve connection resource by name.
@@ -2216,7 +6764,7 @@ type FlowConnectionMetadata struct {
 
 func (x *FlowConnectionMetadata) Reset() {
 	*x = FlowConnectionMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[16]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2228,7 +6776,7 @@ func (x *FlowConnectionMetadata) String() string {
 func (*FlowConnectionMetadata) ProtoMessage() {}
 
 func (x *FlowConnectionMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[16]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2237,11 +6785,6 @@ func (x *FlowConnectionMetadata) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use FlowConnectionMetadata.ProtoReflect.Descriptor instead.
-func (*FlowConnectionMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *FlowConnectionMetadata) GetName() string {
@@ -2258,9 +6801,47 @@ func (x *FlowConnectionMetadata) GetContext() *Context {
 	return nil
 }
 
+func (x *FlowConnectionMetadata) SetName(v string) {
+	x.Name = v
+}
+
+func (x *FlowConnectionMetadata) SetContext(v *Context) {
+	x.Context = v
+}
+
+func (x *FlowConnectionMetadata) HasContext() bool {
+	if x == nil {
+		return false
+	}
+	return x.Context != nil
+}
+
+func (x *FlowConnectionMetadata) ClearContext() {
+	x.Context = nil
+}
+
+type FlowConnectionMetadata_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of connection resource.
+	Name string
+	// Optional context to resolve connection resource by name.
+	// If unspecified, defaults to the context where the automation runs.
+	Context *Context
+}
+
+func (b0 FlowConnectionMetadata_builder) Build() *FlowConnectionMetadata {
+	m0 := &FlowConnectionMetadata{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Context = b.Context
+	return m0
+}
+
 // FlowRuntimeMetadata wraps versioned executor runtime metadata.
 type FlowRuntimeMetadata struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Version:
 	//
 	//	*FlowRuntimeMetadata_V1Beta1
@@ -2271,7 +6852,7 @@ type FlowRuntimeMetadata struct {
 
 func (x *FlowRuntimeMetadata) Reset() {
 	*x = FlowRuntimeMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[17]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2283,7 +6864,7 @@ func (x *FlowRuntimeMetadata) String() string {
 func (*FlowRuntimeMetadata) ProtoMessage() {}
 
 func (x *FlowRuntimeMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[17]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2292,11 +6873,6 @@ func (x *FlowRuntimeMetadata) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use FlowRuntimeMetadata.ProtoReflect.Descriptor instead.
-func (*FlowRuntimeMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *FlowRuntimeMetadata) GetVersion() isFlowRuntimeMetadata_Version {
@@ -2315,6 +6891,82 @@ func (x *FlowRuntimeMetadata) GetV1Beta1() *v1beta11.Runtime {
 	return nil
 }
 
+func (x *FlowRuntimeMetadata) SetV1Beta1(v *v1beta11.Runtime) {
+	if v == nil {
+		x.Version = nil
+		return
+	}
+	x.Version = &FlowRuntimeMetadata_V1Beta1{v}
+}
+
+func (x *FlowRuntimeMetadata) HasVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.Version != nil
+}
+
+func (x *FlowRuntimeMetadata) HasV1Beta1() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Version.(*FlowRuntimeMetadata_V1Beta1)
+	return ok
+}
+
+func (x *FlowRuntimeMetadata) ClearVersion() {
+	x.Version = nil
+}
+
+func (x *FlowRuntimeMetadata) ClearV1Beta1() {
+	if _, ok := x.Version.(*FlowRuntimeMetadata_V1Beta1); ok {
+		x.Version = nil
+	}
+}
+
+const FlowRuntimeMetadata_Version_not_set_case case_FlowRuntimeMetadata_Version = 0
+const FlowRuntimeMetadata_V1Beta1_case case_FlowRuntimeMetadata_Version = 1
+
+func (x *FlowRuntimeMetadata) WhichVersion() case_FlowRuntimeMetadata_Version {
+	if x == nil {
+		return FlowRuntimeMetadata_Version_not_set_case
+	}
+	switch x.Version.(type) {
+	case *FlowRuntimeMetadata_V1Beta1:
+		return FlowRuntimeMetadata_V1Beta1_case
+	default:
+		return FlowRuntimeMetadata_Version_not_set_case
+	}
+}
+
+type FlowRuntimeMetadata_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Version:
+	V1Beta1 *v1beta11.Runtime
+	// -- end of Version
+}
+
+func (b0 FlowRuntimeMetadata_builder) Build() *FlowRuntimeMetadata {
+	m0 := &FlowRuntimeMetadata{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.V1Beta1 != nil {
+		x.Version = &FlowRuntimeMetadata_V1Beta1{b.V1Beta1}
+	}
+	return m0
+}
+
+type case_FlowRuntimeMetadata_Version protoreflect.FieldNumber
+
+func (x case_FlowRuntimeMetadata_Version) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[36].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isFlowRuntimeMetadata_Version interface {
 	isFlowRuntimeMetadata_Version()
 }
@@ -2325,12 +6977,151 @@ type FlowRuntimeMetadata_V1Beta1 struct {
 
 func (*FlowRuntimeMetadata_V1Beta1) isFlowRuntimeMetadata_Version() {}
 
+// FlowRunMetadata wraps a versioned executor flow run snapshot.
+type FlowRunMetadata struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// Types that are valid to be assigned to Version:
+	//
+	//	*FlowRunMetadata_V1Beta2
+	Version       isFlowRunMetadata_Version `protobuf_oneof:"version"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FlowRunMetadata) Reset() {
+	*x = FlowRunMetadata{}
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FlowRunMetadata) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlowRunMetadata) ProtoMessage() {}
+
+func (x *FlowRunMetadata) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *FlowRunMetadata) GetVersion() isFlowRunMetadata_Version {
+	if x != nil {
+		return x.Version
+	}
+	return nil
+}
+
+func (x *FlowRunMetadata) GetV1Beta2() *v1beta2.RunSnapshot {
+	if x != nil {
+		if x, ok := x.Version.(*FlowRunMetadata_V1Beta2); ok {
+			return x.V1Beta2
+		}
+	}
+	return nil
+}
+
+func (x *FlowRunMetadata) SetV1Beta2(v *v1beta2.RunSnapshot) {
+	if v == nil {
+		x.Version = nil
+		return
+	}
+	x.Version = &FlowRunMetadata_V1Beta2{v}
+}
+
+func (x *FlowRunMetadata) HasVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.Version != nil
+}
+
+func (x *FlowRunMetadata) HasV1Beta2() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Version.(*FlowRunMetadata_V1Beta2)
+	return ok
+}
+
+func (x *FlowRunMetadata) ClearVersion() {
+	x.Version = nil
+}
+
+func (x *FlowRunMetadata) ClearV1Beta2() {
+	if _, ok := x.Version.(*FlowRunMetadata_V1Beta2); ok {
+		x.Version = nil
+	}
+}
+
+const FlowRunMetadata_Version_not_set_case case_FlowRunMetadata_Version = 0
+const FlowRunMetadata_V1Beta2_case case_FlowRunMetadata_Version = 1
+
+func (x *FlowRunMetadata) WhichVersion() case_FlowRunMetadata_Version {
+	if x == nil {
+		return FlowRunMetadata_Version_not_set_case
+	}
+	switch x.Version.(type) {
+	case *FlowRunMetadata_V1Beta2:
+		return FlowRunMetadata_V1Beta2_case
+	default:
+		return FlowRunMetadata_Version_not_set_case
+	}
+}
+
+type FlowRunMetadata_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Version:
+	V1Beta2 *v1beta2.RunSnapshot
+	// -- end of Version
+}
+
+func (b0 FlowRunMetadata_builder) Build() *FlowRunMetadata {
+	m0 := &FlowRunMetadata{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.V1Beta2 != nil {
+		x.Version = &FlowRunMetadata_V1Beta2{b.V1Beta2}
+	}
+	return m0
+}
+
+type case_FlowRunMetadata_Version protoreflect.FieldNumber
+
+func (x case_FlowRunMetadata_Version) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[37].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
+type isFlowRunMetadata_Version interface {
+	isFlowRunMetadata_Version()
+}
+
+type FlowRunMetadata_V1Beta2 struct {
+	V1Beta2 *v1beta2.RunSnapshot `protobuf:"bytes,1,opt,name=v1beta2,proto3,oneof"`
+}
+
+func (*FlowRunMetadata_V1Beta2) isFlowRunMetadata_Version() {}
+
 // FlowSpecMetadata wraps versioned flow specification.
 type FlowSpecMetadata struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Version:
 	//
 	//	*FlowSpecMetadata_V1Beta1
+	//	*FlowSpecMetadata_V1Beta2
 	Version       isFlowSpecMetadata_Version `protobuf_oneof:"version"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2338,7 +7129,7 @@ type FlowSpecMetadata struct {
 
 func (x *FlowSpecMetadata) Reset() {
 	*x = FlowSpecMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[18]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2350,7 +7141,7 @@ func (x *FlowSpecMetadata) String() string {
 func (*FlowSpecMetadata) ProtoMessage() {}
 
 func (x *FlowSpecMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[18]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2359,11 +7150,6 @@ func (x *FlowSpecMetadata) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use FlowSpecMetadata.ProtoReflect.Descriptor instead.
-func (*FlowSpecMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *FlowSpecMetadata) GetVersion() isFlowSpecMetadata_Version {
@@ -2382,6 +7168,120 @@ func (x *FlowSpecMetadata) GetV1Beta1() *v1beta11.Flow {
 	return nil
 }
 
+func (x *FlowSpecMetadata) GetV1Beta2() *v1beta2.Flow {
+	if x != nil {
+		if x, ok := x.Version.(*FlowSpecMetadata_V1Beta2); ok {
+			return x.V1Beta2
+		}
+	}
+	return nil
+}
+
+func (x *FlowSpecMetadata) SetV1Beta1(v *v1beta11.Flow) {
+	if v == nil {
+		x.Version = nil
+		return
+	}
+	x.Version = &FlowSpecMetadata_V1Beta1{v}
+}
+
+func (x *FlowSpecMetadata) SetV1Beta2(v *v1beta2.Flow) {
+	if v == nil {
+		x.Version = nil
+		return
+	}
+	x.Version = &FlowSpecMetadata_V1Beta2{v}
+}
+
+func (x *FlowSpecMetadata) HasVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.Version != nil
+}
+
+func (x *FlowSpecMetadata) HasV1Beta1() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Version.(*FlowSpecMetadata_V1Beta1)
+	return ok
+}
+
+func (x *FlowSpecMetadata) HasV1Beta2() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Version.(*FlowSpecMetadata_V1Beta2)
+	return ok
+}
+
+func (x *FlowSpecMetadata) ClearVersion() {
+	x.Version = nil
+}
+
+func (x *FlowSpecMetadata) ClearV1Beta1() {
+	if _, ok := x.Version.(*FlowSpecMetadata_V1Beta1); ok {
+		x.Version = nil
+	}
+}
+
+func (x *FlowSpecMetadata) ClearV1Beta2() {
+	if _, ok := x.Version.(*FlowSpecMetadata_V1Beta2); ok {
+		x.Version = nil
+	}
+}
+
+const FlowSpecMetadata_Version_not_set_case case_FlowSpecMetadata_Version = 0
+const FlowSpecMetadata_V1Beta1_case case_FlowSpecMetadata_Version = 1
+const FlowSpecMetadata_V1Beta2_case case_FlowSpecMetadata_Version = 2
+
+func (x *FlowSpecMetadata) WhichVersion() case_FlowSpecMetadata_Version {
+	if x == nil {
+		return FlowSpecMetadata_Version_not_set_case
+	}
+	switch x.Version.(type) {
+	case *FlowSpecMetadata_V1Beta1:
+		return FlowSpecMetadata_V1Beta1_case
+	case *FlowSpecMetadata_V1Beta2:
+		return FlowSpecMetadata_V1Beta2_case
+	default:
+		return FlowSpecMetadata_Version_not_set_case
+	}
+}
+
+type FlowSpecMetadata_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Version:
+	V1Beta1 *v1beta11.Flow
+	V1Beta2 *v1beta2.Flow
+	// -- end of Version
+}
+
+func (b0 FlowSpecMetadata_builder) Build() *FlowSpecMetadata {
+	m0 := &FlowSpecMetadata{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.V1Beta1 != nil {
+		x.Version = &FlowSpecMetadata_V1Beta1{b.V1Beta1}
+	}
+	if b.V1Beta2 != nil {
+		x.Version = &FlowSpecMetadata_V1Beta2{b.V1Beta2}
+	}
+	return m0
+}
+
+type case_FlowSpecMetadata_Version protoreflect.FieldNumber
+
+func (x case_FlowSpecMetadata_Version) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[38].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isFlowSpecMetadata_Version interface {
 	isFlowSpecMetadata_Version()
 }
@@ -2390,14 +7290,21 @@ type FlowSpecMetadata_V1Beta1 struct {
 	V1Beta1 *v1beta11.Flow `protobuf:"bytes,1,opt,name=v1beta1,proto3,oneof"`
 }
 
+type FlowSpecMetadata_V1Beta2 struct {
+	V1Beta2 *v1beta2.Flow `protobuf:"bytes,2,opt,name=v1beta2,proto3,oneof"`
+}
+
 func (*FlowSpecMetadata_V1Beta1) isFlowSpecMetadata_Version() {}
+
+func (*FlowSpecMetadata_V1Beta2) isFlowSpecMetadata_Version() {}
 
 // FlowGraphMetadata wraps versioned flow graph representation.
 type FlowGraphMetadata struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Version:
 	//
 	//	*FlowGraphMetadata_V1Beta1
+	//	*FlowGraphMetadata_V1Beta2
 	Version       isFlowGraphMetadata_Version `protobuf_oneof:"version"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2405,7 +7312,7 @@ type FlowGraphMetadata struct {
 
 func (x *FlowGraphMetadata) Reset() {
 	*x = FlowGraphMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[19]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2417,7 +7324,7 @@ func (x *FlowGraphMetadata) String() string {
 func (*FlowGraphMetadata) ProtoMessage() {}
 
 func (x *FlowGraphMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[19]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2426,11 +7333,6 @@ func (x *FlowGraphMetadata) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use FlowGraphMetadata.ProtoReflect.Descriptor instead.
-func (*FlowGraphMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *FlowGraphMetadata) GetVersion() isFlowGraphMetadata_Version {
@@ -2449,6 +7351,120 @@ func (x *FlowGraphMetadata) GetV1Beta1() *v1beta11.Graph {
 	return nil
 }
 
+func (x *FlowGraphMetadata) GetV1Beta2() *v1beta2.Graph {
+	if x != nil {
+		if x, ok := x.Version.(*FlowGraphMetadata_V1Beta2); ok {
+			return x.V1Beta2
+		}
+	}
+	return nil
+}
+
+func (x *FlowGraphMetadata) SetV1Beta1(v *v1beta11.Graph) {
+	if v == nil {
+		x.Version = nil
+		return
+	}
+	x.Version = &FlowGraphMetadata_V1Beta1{v}
+}
+
+func (x *FlowGraphMetadata) SetV1Beta2(v *v1beta2.Graph) {
+	if v == nil {
+		x.Version = nil
+		return
+	}
+	x.Version = &FlowGraphMetadata_V1Beta2{v}
+}
+
+func (x *FlowGraphMetadata) HasVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.Version != nil
+}
+
+func (x *FlowGraphMetadata) HasV1Beta1() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Version.(*FlowGraphMetadata_V1Beta1)
+	return ok
+}
+
+func (x *FlowGraphMetadata) HasV1Beta2() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Version.(*FlowGraphMetadata_V1Beta2)
+	return ok
+}
+
+func (x *FlowGraphMetadata) ClearVersion() {
+	x.Version = nil
+}
+
+func (x *FlowGraphMetadata) ClearV1Beta1() {
+	if _, ok := x.Version.(*FlowGraphMetadata_V1Beta1); ok {
+		x.Version = nil
+	}
+}
+
+func (x *FlowGraphMetadata) ClearV1Beta2() {
+	if _, ok := x.Version.(*FlowGraphMetadata_V1Beta2); ok {
+		x.Version = nil
+	}
+}
+
+const FlowGraphMetadata_Version_not_set_case case_FlowGraphMetadata_Version = 0
+const FlowGraphMetadata_V1Beta1_case case_FlowGraphMetadata_Version = 1
+const FlowGraphMetadata_V1Beta2_case case_FlowGraphMetadata_Version = 2
+
+func (x *FlowGraphMetadata) WhichVersion() case_FlowGraphMetadata_Version {
+	if x == nil {
+		return FlowGraphMetadata_Version_not_set_case
+	}
+	switch x.Version.(type) {
+	case *FlowGraphMetadata_V1Beta1:
+		return FlowGraphMetadata_V1Beta1_case
+	case *FlowGraphMetadata_V1Beta2:
+		return FlowGraphMetadata_V1Beta2_case
+	default:
+		return FlowGraphMetadata_Version_not_set_case
+	}
+}
+
+type FlowGraphMetadata_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Version:
+	V1Beta1 *v1beta11.Graph
+	V1Beta2 *v1beta2.Graph
+	// -- end of Version
+}
+
+func (b0 FlowGraphMetadata_builder) Build() *FlowGraphMetadata {
+	m0 := &FlowGraphMetadata{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.V1Beta1 != nil {
+		x.Version = &FlowGraphMetadata_V1Beta1{b.V1Beta1}
+	}
+	if b.V1Beta2 != nil {
+		x.Version = &FlowGraphMetadata_V1Beta2{b.V1Beta2}
+	}
+	return m0
+}
+
+type case_FlowGraphMetadata_Version protoreflect.FieldNumber
+
+func (x case_FlowGraphMetadata_Version) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[39].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isFlowGraphMetadata_Version interface {
 	isFlowGraphMetadata_Version()
 }
@@ -2457,11 +7473,17 @@ type FlowGraphMetadata_V1Beta1 struct {
 	V1Beta1 *v1beta11.Graph `protobuf:"bytes,1,opt,name=v1beta1,proto3,oneof"`
 }
 
+type FlowGraphMetadata_V1Beta2 struct {
+	V1Beta2 *v1beta2.Graph `protobuf:"bytes,2,opt,name=v1beta2,proto3,oneof"`
+}
+
 func (*FlowGraphMetadata_V1Beta1) isFlowGraphMetadata_Version() {}
+
+func (*FlowGraphMetadata_V1Beta2) isFlowGraphMetadata_Version() {}
 
 // PackageSpecMetadata wraps versioned package specification.
 type PackageSpecMetadata struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Version:
 	//
 	//	*PackageSpecMetadata_V1Beta1
@@ -2472,7 +7494,7 @@ type PackageSpecMetadata struct {
 
 func (x *PackageSpecMetadata) Reset() {
 	*x = PackageSpecMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[20]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2484,7 +7506,7 @@ func (x *PackageSpecMetadata) String() string {
 func (*PackageSpecMetadata) ProtoMessage() {}
 
 func (x *PackageSpecMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[20]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2493,11 +7515,6 @@ func (x *PackageSpecMetadata) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PackageSpecMetadata.ProtoReflect.Descriptor instead.
-func (*PackageSpecMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *PackageSpecMetadata) GetVersion() isPackageSpecMetadata_Version {
@@ -2516,6 +7533,82 @@ func (x *PackageSpecMetadata) GetV1Beta1() *v1beta1.Package {
 	return nil
 }
 
+func (x *PackageSpecMetadata) SetV1Beta1(v *v1beta1.Package) {
+	if v == nil {
+		x.Version = nil
+		return
+	}
+	x.Version = &PackageSpecMetadata_V1Beta1{v}
+}
+
+func (x *PackageSpecMetadata) HasVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.Version != nil
+}
+
+func (x *PackageSpecMetadata) HasV1Beta1() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Version.(*PackageSpecMetadata_V1Beta1)
+	return ok
+}
+
+func (x *PackageSpecMetadata) ClearVersion() {
+	x.Version = nil
+}
+
+func (x *PackageSpecMetadata) ClearV1Beta1() {
+	if _, ok := x.Version.(*PackageSpecMetadata_V1Beta1); ok {
+		x.Version = nil
+	}
+}
+
+const PackageSpecMetadata_Version_not_set_case case_PackageSpecMetadata_Version = 0
+const PackageSpecMetadata_V1Beta1_case case_PackageSpecMetadata_Version = 1
+
+func (x *PackageSpecMetadata) WhichVersion() case_PackageSpecMetadata_Version {
+	if x == nil {
+		return PackageSpecMetadata_Version_not_set_case
+	}
+	switch x.Version.(type) {
+	case *PackageSpecMetadata_V1Beta1:
+		return PackageSpecMetadata_V1Beta1_case
+	default:
+		return PackageSpecMetadata_Version_not_set_case
+	}
+}
+
+type PackageSpecMetadata_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Version:
+	V1Beta1 *v1beta1.Package
+	// -- end of Version
+}
+
+func (b0 PackageSpecMetadata_builder) Build() *PackageSpecMetadata {
+	m0 := &PackageSpecMetadata{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.V1Beta1 != nil {
+		x.Version = &PackageSpecMetadata_V1Beta1{b.V1Beta1}
+	}
+	return m0
+}
+
+type case_PackageSpecMetadata_Version protoreflect.FieldNumber
+
+func (x case_PackageSpecMetadata_Version) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[40].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isPackageSpecMetadata_Version interface {
 	isPackageSpecMetadata_Version()
 }
@@ -2529,7 +7622,7 @@ func (*PackageSpecMetadata_V1Beta1) isPackageSpecMetadata_Version() {}
 // PackageBuildMetadata contains build metadata for a software package, which
 // may be used to build a deployment artifact for a compatible runtime environment.
 type PackageBuildMetadata struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Target runtime of build artifact.
 	Runtime *PackageBuildMetadata_Runtime `protobuf:"bytes,1,opt,name=runtime,proto3" json:"runtime,omitempty"`
 	// Target platform of build artifact.
@@ -2546,7 +7639,7 @@ type PackageBuildMetadata struct {
 
 func (x *PackageBuildMetadata) Reset() {
 	*x = PackageBuildMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[21]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2558,7 +7651,7 @@ func (x *PackageBuildMetadata) String() string {
 func (*PackageBuildMetadata) ProtoMessage() {}
 
 func (x *PackageBuildMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[21]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2567,11 +7660,6 @@ func (x *PackageBuildMetadata) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PackageBuildMetadata.ProtoReflect.Descriptor instead.
-func (*PackageBuildMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *PackageBuildMetadata) GetRuntime() *PackageBuildMetadata_Runtime {
@@ -2609,9 +7697,78 @@ func (x *PackageBuildMetadata) GetArtifactEtag() string {
 	return ""
 }
 
+func (x *PackageBuildMetadata) SetRuntime(v *PackageBuildMetadata_Runtime) {
+	x.Runtime = v
+}
+
+func (x *PackageBuildMetadata) SetPlatform(v *PackageBuildMetadata_Platform) {
+	x.Platform = v
+}
+
+func (x *PackageBuildMetadata) SetEnv(v map[string]string) {
+	x.Env = v
+}
+
+func (x *PackageBuildMetadata) SetArtifactUri(v string) {
+	x.ArtifactUri = v
+}
+
+func (x *PackageBuildMetadata) SetArtifactEtag(v string) {
+	x.ArtifactEtag = v
+}
+
+func (x *PackageBuildMetadata) HasRuntime() bool {
+	if x == nil {
+		return false
+	}
+	return x.Runtime != nil
+}
+
+func (x *PackageBuildMetadata) HasPlatform() bool {
+	if x == nil {
+		return false
+	}
+	return x.Platform != nil
+}
+
+func (x *PackageBuildMetadata) ClearRuntime() {
+	x.Runtime = nil
+}
+
+func (x *PackageBuildMetadata) ClearPlatform() {
+	x.Platform = nil
+}
+
+type PackageBuildMetadata_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Target runtime of build artifact.
+	Runtime *PackageBuildMetadata_Runtime
+	// Target platform of build artifact.
+	Platform *PackageBuildMetadata_Platform
+	// Build environment variables.
+	Env map[string]string
+	// URI of build artifact. (e.g. file://path/to/artifact or docker://image:tag)
+	ArtifactUri string
+	// Checksum of build artifact (present if build is successful).
+	ArtifactEtag string
+}
+
+func (b0 PackageBuildMetadata_builder) Build() *PackageBuildMetadata {
+	m0 := &PackageBuildMetadata{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Runtime = b.Runtime
+	x.Platform = b.Platform
+	x.Env = b.Env
+	x.ArtifactUri = b.ArtifactUri
+	x.ArtifactEtag = b.ArtifactEtag
+	return m0
+}
+
 // BuildOperationMetadata contains metadata for build operations.
 type BuildOperationMetadata struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Build state.
 	State BuildOperationMetadata_State `protobuf:"varint,1,opt,name=state,proto3,enum=dtkt.core.v1.BuildOperationMetadata_State" json:"state,omitempty"`
 	// Build status message.
@@ -2626,7 +7783,7 @@ type BuildOperationMetadata struct {
 
 func (x *BuildOperationMetadata) Reset() {
 	*x = BuildOperationMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[22]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2638,7 +7795,7 @@ func (x *BuildOperationMetadata) String() string {
 func (*BuildOperationMetadata) ProtoMessage() {}
 
 func (x *BuildOperationMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[22]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2647,11 +7804,6 @@ func (x *BuildOperationMetadata) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use BuildOperationMetadata.ProtoReflect.Descriptor instead.
-func (*BuildOperationMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *BuildOperationMetadata) GetState() BuildOperationMetadata_State {
@@ -2682,9 +7834,71 @@ func (x *BuildOperationMetadata) GetFinishTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *BuildOperationMetadata) SetState(v BuildOperationMetadata_State) {
+	x.State = v
+}
+
+func (x *BuildOperationMetadata) SetMessage(v string) {
+	x.Message = v
+}
+
+func (x *BuildOperationMetadata) SetStartTime(v *timestamppb.Timestamp) {
+	x.StartTime = v
+}
+
+func (x *BuildOperationMetadata) SetFinishTime(v *timestamppb.Timestamp) {
+	x.FinishTime = v
+}
+
+func (x *BuildOperationMetadata) HasStartTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.StartTime != nil
+}
+
+func (x *BuildOperationMetadata) HasFinishTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.FinishTime != nil
+}
+
+func (x *BuildOperationMetadata) ClearStartTime() {
+	x.StartTime = nil
+}
+
+func (x *BuildOperationMetadata) ClearFinishTime() {
+	x.FinishTime = nil
+}
+
+type BuildOperationMetadata_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Build state.
+	State BuildOperationMetadata_State
+	// Build status message.
+	Message string
+	// Build start time.
+	StartTime *timestamppb.Timestamp
+	// Build finish time.
+	FinishTime *timestamppb.Timestamp
+}
+
+func (b0 BuildOperationMetadata_builder) Build() *BuildOperationMetadata {
+	m0 := &BuildOperationMetadata{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.State = b.State
+	x.Message = b.Message
+	x.StartTime = b.StartTime
+	x.FinishTime = b.FinishTime
+	return m0
+}
+
 // RunOperationMetadata contains metadata for run operations.
 type RunOperationMetadata struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Run state.
 	State RunOperationMetadata_State `protobuf:"varint,1,opt,name=state,proto3,enum=dtkt.core.v1.RunOperationMetadata_State" json:"state,omitempty"`
 	// Run status message.
@@ -2699,7 +7913,7 @@ type RunOperationMetadata struct {
 
 func (x *RunOperationMetadata) Reset() {
 	*x = RunOperationMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[23]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2711,7 +7925,7 @@ func (x *RunOperationMetadata) String() string {
 func (*RunOperationMetadata) ProtoMessage() {}
 
 func (x *RunOperationMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[23]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2720,11 +7934,6 @@ func (x *RunOperationMetadata) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RunOperationMetadata.ProtoReflect.Descriptor instead.
-func (*RunOperationMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *RunOperationMetadata) GetState() RunOperationMetadata_State {
@@ -2755,9 +7964,71 @@ func (x *RunOperationMetadata) GetStopTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *RunOperationMetadata) SetState(v RunOperationMetadata_State) {
+	x.State = v
+}
+
+func (x *RunOperationMetadata) SetMessage(v string) {
+	x.Message = v
+}
+
+func (x *RunOperationMetadata) SetStartTime(v *timestamppb.Timestamp) {
+	x.StartTime = v
+}
+
+func (x *RunOperationMetadata) SetStopTime(v *timestamppb.Timestamp) {
+	x.StopTime = v
+}
+
+func (x *RunOperationMetadata) HasStartTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.StartTime != nil
+}
+
+func (x *RunOperationMetadata) HasStopTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.StopTime != nil
+}
+
+func (x *RunOperationMetadata) ClearStartTime() {
+	x.StartTime = nil
+}
+
+func (x *RunOperationMetadata) ClearStopTime() {
+	x.StopTime = nil
+}
+
+type RunOperationMetadata_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Run state.
+	State RunOperationMetadata_State
+	// Run status message.
+	Message string
+	// Run start time.
+	StartTime *timestamppb.Timestamp
+	// Run stop time.
+	StopTime *timestamppb.Timestamp
+}
+
+func (b0 RunOperationMetadata_builder) Build() *RunOperationMetadata {
+	m0 := &RunOperationMetadata{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.State = b.State
+	x.Message = b.Message
+	x.StartTime = b.StartTime
+	x.StopTime = b.StopTime
+	return m0
+}
+
 // SyncOperationMetadata contains metadata for sync operations.
 type SyncOperationMetadata struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Sync state.
 	State SyncOperationMetadata_State `protobuf:"varint,1,opt,name=state,proto3,enum=dtkt.core.v1.SyncOperationMetadata_State" json:"state,omitempty"`
 	// Sync status message.
@@ -2775,7 +8046,7 @@ type SyncOperationMetadata struct {
 
 func (x *SyncOperationMetadata) Reset() {
 	*x = SyncOperationMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[24]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2787,7 +8058,7 @@ func (x *SyncOperationMetadata) String() string {
 func (*SyncOperationMetadata) ProtoMessage() {}
 
 func (x *SyncOperationMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[24]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2796,11 +8067,6 @@ func (x *SyncOperationMetadata) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SyncOperationMetadata.ProtoReflect.Descriptor instead.
-func (*SyncOperationMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *SyncOperationMetadata) GetState() SyncOperationMetadata_State {
@@ -2852,8 +8118,88 @@ func (x *SyncOperationMetadata) GetStopTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *SyncOperationMetadata) SetState(v SyncOperationMetadata_State) {
+	x.State = v
+}
+
+func (x *SyncOperationMetadata) SetMessage(v string) {
+	x.Message = v
+}
+
+func (x *SyncOperationMetadata) SetServicesCount(v int64) {
+	x.ServicesCount = v
+}
+
+func (x *SyncOperationMetadata) SetMethodsCount(v int64) {
+	x.MethodsCount = v
+}
+
+func (x *SyncOperationMetadata) SetTypesCount(v int64) {
+	x.TypesCount = v
+}
+
+func (x *SyncOperationMetadata) SetStartTime(v *timestamppb.Timestamp) {
+	x.StartTime = v
+}
+
+func (x *SyncOperationMetadata) SetStopTime(v *timestamppb.Timestamp) {
+	x.StopTime = v
+}
+
+func (x *SyncOperationMetadata) HasStartTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.StartTime != nil
+}
+
+func (x *SyncOperationMetadata) HasStopTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.StopTime != nil
+}
+
+func (x *SyncOperationMetadata) ClearStartTime() {
+	x.StartTime = nil
+}
+
+func (x *SyncOperationMetadata) ClearStopTime() {
+	x.StopTime = nil
+}
+
+type SyncOperationMetadata_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Sync state.
+	State SyncOperationMetadata_State
+	// Sync status message.
+	Message       string
+	ServicesCount int64
+	MethodsCount  int64
+	TypesCount    int64
+	// Sync start time.
+	StartTime *timestamppb.Timestamp
+	// Sync stop time.
+	StopTime *timestamppb.Timestamp
+}
+
+func (b0 SyncOperationMetadata_builder) Build() *SyncOperationMetadata {
+	m0 := &SyncOperationMetadata{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.State = b.State
+	x.Message = b.Message
+	x.ServicesCount = b.ServicesCount
+	x.MethodsCount = b.MethodsCount
+	x.TypesCount = b.TypesCount
+	x.StartTime = b.StartTime
+	x.StopTime = b.StopTime
+	return m0
+}
+
 type DialMetadata struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Connection dial state.
 	State DialMetadata_State `protobuf:"varint,1,opt,name=state,proto3,enum=dtkt.core.v1.DialMetadata_State" json:"state,omitempty"`
 	// Connection dial message.
@@ -2866,7 +8212,7 @@ type DialMetadata struct {
 
 func (x *DialMetadata) Reset() {
 	*x = DialMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[25]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2878,7 +8224,7 @@ func (x *DialMetadata) String() string {
 func (*DialMetadata) ProtoMessage() {}
 
 func (x *DialMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[25]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2887,11 +8233,6 @@ func (x *DialMetadata) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DialMetadata.ProtoReflect.Descriptor instead.
-func (*DialMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *DialMetadata) GetState() DialMetadata_State {
@@ -2915,9 +8256,53 @@ func (x *DialMetadata) GetTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *DialMetadata) SetState(v DialMetadata_State) {
+	x.State = v
+}
+
+func (x *DialMetadata) SetMessage(v string) {
+	x.Message = v
+}
+
+func (x *DialMetadata) SetTime(v *timestamppb.Timestamp) {
+	x.Time = v
+}
+
+func (x *DialMetadata) HasTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.Time != nil
+}
+
+func (x *DialMetadata) ClearTime() {
+	x.Time = nil
+}
+
+type DialMetadata_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Connection dial state.
+	State DialMetadata_State
+	// Connection dial message.
+	Message string
+	// Connection dial time.
+	Time *timestamppb.Timestamp
+}
+
+func (b0 DialMetadata_builder) Build() *DialMetadata {
+	m0 := &DialMetadata{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.State = b.State
+	x.Message = b.Message
+	x.Time = b.Time
+	return m0
+}
+
 // BatchRunOperationMetadata contains metadata for batch run operations.
 type BatchRunOperationMetadata struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Map of request index to failure status.
 	FailedRequests map[int32]*status.Status `protobuf:"bytes,1,rep,name=failed_requests,json=failedRequests,proto3" json:"failed_requests,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields  protoimpl.UnknownFields
@@ -2926,7 +8311,7 @@ type BatchRunOperationMetadata struct {
 
 func (x *BatchRunOperationMetadata) Reset() {
 	*x = BatchRunOperationMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[26]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2938,7 +8323,7 @@ func (x *BatchRunOperationMetadata) String() string {
 func (*BatchRunOperationMetadata) ProtoMessage() {}
 
 func (x *BatchRunOperationMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[26]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2949,11 +8334,6 @@ func (x *BatchRunOperationMetadata) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BatchRunOperationMetadata.ProtoReflect.Descriptor instead.
-func (*BatchRunOperationMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{26}
-}
-
 func (x *BatchRunOperationMetadata) GetFailedRequests() map[int32]*status.Status {
 	if x != nil {
 		return x.FailedRequests
@@ -2961,9 +8341,28 @@ func (x *BatchRunOperationMetadata) GetFailedRequests() map[int32]*status.Status
 	return nil
 }
 
+func (x *BatchRunOperationMetadata) SetFailedRequests(v map[int32]*status.Status) {
+	x.FailedRequests = v
+}
+
+type BatchRunOperationMetadata_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Map of request index to failure status.
+	FailedRequests map[int32]*status.Status
+}
+
+func (b0 BatchRunOperationMetadata_builder) Build() *BatchRunOperationMetadata {
+	m0 := &BatchRunOperationMetadata{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.FailedRequests = b.FailedRequests
+	return m0
+}
+
 // EncryptedAny is an encrypted representation of google.protobuf.Any.
 type EncryptedAny struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Type URL of the encrypted message.
 	TypeUrl string `protobuf:"bytes,1,opt,name=type_url,json=typeUrl,proto3" json:"type_url,omitempty"`
 	// Encrypted message value.
@@ -2974,7 +8373,7 @@ type EncryptedAny struct {
 
 func (x *EncryptedAny) Reset() {
 	*x = EncryptedAny{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[27]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2986,7 +8385,7 @@ func (x *EncryptedAny) String() string {
 func (*EncryptedAny) ProtoMessage() {}
 
 func (x *EncryptedAny) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[27]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2995,11 +8394,6 @@ func (x *EncryptedAny) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use EncryptedAny.ProtoReflect.Descriptor instead.
-func (*EncryptedAny) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *EncryptedAny) GetTypeUrl() string {
@@ -3016,9 +8410,38 @@ func (x *EncryptedAny) GetValue() []byte {
 	return nil
 }
 
+func (x *EncryptedAny) SetTypeUrl(v string) {
+	x.TypeUrl = v
+}
+
+func (x *EncryptedAny) SetValue(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.Value = v
+}
+
+type EncryptedAny_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Type URL of the encrypted message.
+	TypeUrl string
+	// Encrypted message value.
+	Value []byte
+}
+
+func (b0 EncryptedAny_builder) Build() *EncryptedAny {
+	m0 := &EncryptedAny{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.TypeUrl = b.TypeUrl
+	x.Value = b.Value
+	return m0
+}
+
 // EncryptRequest requests encryption of a resource with decrypted data.
 type EncryptRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Resource with decrypted data to encrypt.
 	Resource      *Resource `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -3027,7 +8450,7 @@ type EncryptRequest struct {
 
 func (x *EncryptRequest) Reset() {
 	*x = EncryptRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[28]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3039,7 +8462,7 @@ func (x *EncryptRequest) String() string {
 func (*EncryptRequest) ProtoMessage() {}
 
 func (x *EncryptRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[28]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3050,11 +8473,6 @@ func (x *EncryptRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use EncryptRequest.ProtoReflect.Descriptor instead.
-func (*EncryptRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{28}
-}
-
 func (x *EncryptRequest) GetResource() *Resource {
 	if x != nil {
 		return x.Resource
@@ -3062,9 +8480,39 @@ func (x *EncryptRequest) GetResource() *Resource {
 	return nil
 }
 
+func (x *EncryptRequest) SetResource(v *Resource) {
+	x.Resource = v
+}
+
+func (x *EncryptRequest) HasResource() bool {
+	if x == nil {
+		return false
+	}
+	return x.Resource != nil
+}
+
+func (x *EncryptRequest) ClearResource() {
+	x.Resource = nil
+}
+
+type EncryptRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Resource with decrypted data to encrypt.
+	Resource *Resource
+}
+
+func (b0 EncryptRequest_builder) Build() *EncryptRequest {
+	m0 := &EncryptRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Resource = b.Resource
+	return m0
+}
+
 // EncryptResponse returns the encrypted resource.
 type EncryptResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Resource with encrypted data.
 	Resource      *Resource `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -3073,7 +8521,7 @@ type EncryptResponse struct {
 
 func (x *EncryptResponse) Reset() {
 	*x = EncryptResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[29]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3085,7 +8533,7 @@ func (x *EncryptResponse) String() string {
 func (*EncryptResponse) ProtoMessage() {}
 
 func (x *EncryptResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[29]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3096,11 +8544,6 @@ func (x *EncryptResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use EncryptResponse.ProtoReflect.Descriptor instead.
-func (*EncryptResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{29}
-}
-
 func (x *EncryptResponse) GetResource() *Resource {
 	if x != nil {
 		return x.Resource
@@ -3108,9 +8551,39 @@ func (x *EncryptResponse) GetResource() *Resource {
 	return nil
 }
 
+func (x *EncryptResponse) SetResource(v *Resource) {
+	x.Resource = v
+}
+
+func (x *EncryptResponse) HasResource() bool {
+	if x == nil {
+		return false
+	}
+	return x.Resource != nil
+}
+
+func (x *EncryptResponse) ClearResource() {
+	x.Resource = nil
+}
+
+type EncryptResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Resource with encrypted data.
+	Resource *Resource
+}
+
+func (b0 EncryptResponse_builder) Build() *EncryptResponse {
+	m0 := &EncryptResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Resource = b.Resource
+	return m0
+}
+
 // DecryptRequest requests decryption of a resource with encrypted data.
 type DecryptRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Resource with encrypted data to decrypt.
 	Resource      *Resource `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -3119,7 +8592,7 @@ type DecryptRequest struct {
 
 func (x *DecryptRequest) Reset() {
 	*x = DecryptRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[30]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3131,7 +8604,7 @@ func (x *DecryptRequest) String() string {
 func (*DecryptRequest) ProtoMessage() {}
 
 func (x *DecryptRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[30]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3142,11 +8615,6 @@ func (x *DecryptRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DecryptRequest.ProtoReflect.Descriptor instead.
-func (*DecryptRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{30}
-}
-
 func (x *DecryptRequest) GetResource() *Resource {
 	if x != nil {
 		return x.Resource
@@ -3154,9 +8622,39 @@ func (x *DecryptRequest) GetResource() *Resource {
 	return nil
 }
 
+func (x *DecryptRequest) SetResource(v *Resource) {
+	x.Resource = v
+}
+
+func (x *DecryptRequest) HasResource() bool {
+	if x == nil {
+		return false
+	}
+	return x.Resource != nil
+}
+
+func (x *DecryptRequest) ClearResource() {
+	x.Resource = nil
+}
+
+type DecryptRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Resource with encrypted data to decrypt.
+	Resource *Resource
+}
+
+func (b0 DecryptRequest_builder) Build() *DecryptRequest {
+	m0 := &DecryptRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Resource = b.Resource
+	return m0
+}
+
 // DecryptResponse returns the decrypted resource.
 type DecryptResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Resource with decrypted data.
 	Resource      *Resource `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -3165,7 +8663,7 @@ type DecryptResponse struct {
 
 func (x *DecryptResponse) Reset() {
 	*x = DecryptResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[31]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3177,7 +8675,7 @@ func (x *DecryptResponse) String() string {
 func (*DecryptResponse) ProtoMessage() {}
 
 func (x *DecryptResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[31]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3188,11 +8686,6 @@ func (x *DecryptResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DecryptResponse.ProtoReflect.Descriptor instead.
-func (*DecryptResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{31}
-}
-
 func (x *DecryptResponse) GetResource() *Resource {
 	if x != nil {
 		return x.Resource
@@ -3200,8 +8693,38 @@ func (x *DecryptResponse) GetResource() *Resource {
 	return nil
 }
 
+func (x *DecryptResponse) SetResource(v *Resource) {
+	x.Resource = v
+}
+
+func (x *DecryptResponse) HasResource() bool {
+	if x == nil {
+		return false
+	}
+	return x.Resource != nil
+}
+
+func (x *DecryptResponse) ClearResource() {
+	x.Resource = nil
+}
+
+type DecryptResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Resource with decrypted data.
+	Resource *Resource
+}
+
+func (b0 DecryptResponse_builder) Build() *DecryptResponse {
+	m0 := &DecryptResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Resource = b.Resource
+	return m0
+}
+
 type GetAutomationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of Automation resource to get.
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -3210,7 +8733,7 @@ type GetAutomationRequest struct {
 
 func (x *GetAutomationRequest) Reset() {
 	*x = GetAutomationRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[32]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3222,7 +8745,7 @@ func (x *GetAutomationRequest) String() string {
 func (*GetAutomationRequest) ProtoMessage() {}
 
 func (x *GetAutomationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[32]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3233,11 +8756,6 @@ func (x *GetAutomationRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetAutomationRequest.ProtoReflect.Descriptor instead.
-func (*GetAutomationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{32}
-}
-
 func (x *GetAutomationRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -3245,8 +8763,27 @@ func (x *GetAutomationRequest) GetName() string {
 	return ""
 }
 
+func (x *GetAutomationRequest) SetName(v string) {
+	x.Name = v
+}
+
+type GetAutomationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of Automation resource to get.
+	Name string
+}
+
+func (b0 GetAutomationRequest_builder) Build() *GetAutomationRequest {
+	m0 := &GetAutomationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 type GetAutomationResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The requested automation.
 	Automation    *Automation `protobuf:"bytes,1,opt,name=automation,proto3" json:"automation,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -3255,7 +8792,7 @@ type GetAutomationResponse struct {
 
 func (x *GetAutomationResponse) Reset() {
 	*x = GetAutomationResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[33]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3267,7 +8804,7 @@ func (x *GetAutomationResponse) String() string {
 func (*GetAutomationResponse) ProtoMessage() {}
 
 func (x *GetAutomationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[33]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3278,11 +8815,6 @@ func (x *GetAutomationResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetAutomationResponse.ProtoReflect.Descriptor instead.
-func (*GetAutomationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{33}
-}
-
 func (x *GetAutomationResponse) GetAutomation() *Automation {
 	if x != nil {
 		return x.Automation
@@ -3290,8 +8822,38 @@ func (x *GetAutomationResponse) GetAutomation() *Automation {
 	return nil
 }
 
+func (x *GetAutomationResponse) SetAutomation(v *Automation) {
+	x.Automation = v
+}
+
+func (x *GetAutomationResponse) HasAutomation() bool {
+	if x == nil {
+		return false
+	}
+	return x.Automation != nil
+}
+
+func (x *GetAutomationResponse) ClearAutomation() {
+	x.Automation = nil
+}
+
+type GetAutomationResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The requested automation.
+	Automation *Automation
+}
+
+func (b0 GetAutomationResponse_builder) Build() *GetAutomationResponse {
+	m0 := &GetAutomationResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Automation = b.Automation
+	return m0
+}
+
 type CreateAutomationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Parent resource name.
 	Parent       string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	AutomationId string `protobuf:"bytes,2,opt,name=automation_id,json=automationId,proto3" json:"automation_id,omitempty"`
@@ -3303,7 +8865,7 @@ type CreateAutomationRequest struct {
 
 func (x *CreateAutomationRequest) Reset() {
 	*x = CreateAutomationRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[34]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3315,7 +8877,7 @@ func (x *CreateAutomationRequest) String() string {
 func (*CreateAutomationRequest) ProtoMessage() {}
 
 func (x *CreateAutomationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[34]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3324,11 +8886,6 @@ func (x *CreateAutomationRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateAutomationRequest.ProtoReflect.Descriptor instead.
-func (*CreateAutomationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *CreateAutomationRequest) GetParent() string {
@@ -3352,8 +8909,51 @@ func (x *CreateAutomationRequest) GetAutomation() *Automation {
 	return nil
 }
 
+func (x *CreateAutomationRequest) SetParent(v string) {
+	x.Parent = v
+}
+
+func (x *CreateAutomationRequest) SetAutomationId(v string) {
+	x.AutomationId = v
+}
+
+func (x *CreateAutomationRequest) SetAutomation(v *Automation) {
+	x.Automation = v
+}
+
+func (x *CreateAutomationRequest) HasAutomation() bool {
+	if x == nil {
+		return false
+	}
+	return x.Automation != nil
+}
+
+func (x *CreateAutomationRequest) ClearAutomation() {
+	x.Automation = nil
+}
+
+type CreateAutomationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Parent resource name.
+	Parent       string
+	AutomationId string
+	// Automation to create.
+	Automation *Automation
+}
+
+func (b0 CreateAutomationRequest_builder) Build() *CreateAutomationRequest {
+	m0 := &CreateAutomationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Parent = b.Parent
+	x.AutomationId = b.AutomationId
+	x.Automation = b.Automation
+	return m0
+}
+
 type CreateAutomationResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The created automation.
 	Automation    *Automation `protobuf:"bytes,1,opt,name=automation,proto3" json:"automation,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -3362,7 +8962,7 @@ type CreateAutomationResponse struct {
 
 func (x *CreateAutomationResponse) Reset() {
 	*x = CreateAutomationResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[35]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3374,7 +8974,7 @@ func (x *CreateAutomationResponse) String() string {
 func (*CreateAutomationResponse) ProtoMessage() {}
 
 func (x *CreateAutomationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[35]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3385,11 +8985,6 @@ func (x *CreateAutomationResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateAutomationResponse.ProtoReflect.Descriptor instead.
-func (*CreateAutomationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{35}
-}
-
 func (x *CreateAutomationResponse) GetAutomation() *Automation {
 	if x != nil {
 		return x.Automation
@@ -3397,8 +8992,38 @@ func (x *CreateAutomationResponse) GetAutomation() *Automation {
 	return nil
 }
 
+func (x *CreateAutomationResponse) SetAutomation(v *Automation) {
+	x.Automation = v
+}
+
+func (x *CreateAutomationResponse) HasAutomation() bool {
+	if x == nil {
+		return false
+	}
+	return x.Automation != nil
+}
+
+func (x *CreateAutomationResponse) ClearAutomation() {
+	x.Automation = nil
+}
+
+type CreateAutomationResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The created automation.
+	Automation *Automation
+}
+
+func (b0 CreateAutomationResponse_builder) Build() *CreateAutomationResponse {
+	m0 := &CreateAutomationResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Automation = b.Automation
+	return m0
+}
+
 type UpdateAutomationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Automation with updated fields. Must include `name`.
 	Automation *Automation `protobuf:"bytes,1,opt,name=automation,proto3" json:"automation,omitempty"`
 	// Fields to update (e.g., "config,address").
@@ -3411,7 +9036,7 @@ type UpdateAutomationRequest struct {
 
 func (x *UpdateAutomationRequest) Reset() {
 	*x = UpdateAutomationRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[36]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3423,7 +9048,7 @@ func (x *UpdateAutomationRequest) String() string {
 func (*UpdateAutomationRequest) ProtoMessage() {}
 
 func (x *UpdateAutomationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[36]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3432,11 +9057,6 @@ func (x *UpdateAutomationRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateAutomationRequest.ProtoReflect.Descriptor instead.
-func (*UpdateAutomationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *UpdateAutomationRequest) GetAutomation() *Automation {
@@ -3460,8 +9080,74 @@ func (x *UpdateAutomationRequest) GetDesiredState() Automation_State {
 	return Automation_STATE_UNSPECIFIED
 }
 
+func (x *UpdateAutomationRequest) SetAutomation(v *Automation) {
+	x.Automation = v
+}
+
+func (x *UpdateAutomationRequest) SetUpdateMask(v *fieldmaskpb.FieldMask) {
+	x.UpdateMask = v
+}
+
+func (x *UpdateAutomationRequest) SetDesiredState(v Automation_State) {
+	x.DesiredState = &v
+}
+
+func (x *UpdateAutomationRequest) HasAutomation() bool {
+	if x == nil {
+		return false
+	}
+	return x.Automation != nil
+}
+
+func (x *UpdateAutomationRequest) HasUpdateMask() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateMask != nil
+}
+
+func (x *UpdateAutomationRequest) HasDesiredState() bool {
+	if x == nil {
+		return false
+	}
+	return x.DesiredState != nil
+}
+
+func (x *UpdateAutomationRequest) ClearAutomation() {
+	x.Automation = nil
+}
+
+func (x *UpdateAutomationRequest) ClearUpdateMask() {
+	x.UpdateMask = nil
+}
+
+func (x *UpdateAutomationRequest) ClearDesiredState() {
+	x.DesiredState = nil
+}
+
+type UpdateAutomationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Automation with updated fields. Must include `name`.
+	Automation *Automation
+	// Fields to update (e.g., "config,address").
+	UpdateMask *fieldmaskpb.FieldMask
+	// Desired state of automation after update.
+	DesiredState *Automation_State
+}
+
+func (b0 UpdateAutomationRequest_builder) Build() *UpdateAutomationRequest {
+	m0 := &UpdateAutomationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Automation = b.Automation
+	x.UpdateMask = b.UpdateMask
+	x.DesiredState = b.DesiredState
+	return m0
+}
+
 type DeleteAutomationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of automation to delete.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Etag must match current automation etag for delete to succeed (ensures
@@ -3473,7 +9159,7 @@ type DeleteAutomationRequest struct {
 
 func (x *DeleteAutomationRequest) Reset() {
 	*x = DeleteAutomationRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[37]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3485,7 +9171,7 @@ func (x *DeleteAutomationRequest) String() string {
 func (*DeleteAutomationRequest) ProtoMessage() {}
 
 func (x *DeleteAutomationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[37]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3494,11 +9180,6 @@ func (x *DeleteAutomationRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteAutomationRequest.ProtoReflect.Descriptor instead.
-func (*DeleteAutomationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *DeleteAutomationRequest) GetName() string {
@@ -3515,8 +9196,35 @@ func (x *DeleteAutomationRequest) GetEtag() string {
 	return ""
 }
 
+func (x *DeleteAutomationRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *DeleteAutomationRequest) SetEtag(v string) {
+	x.Etag = v
+}
+
+type DeleteAutomationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of automation to delete.
+	Name string
+	// Etag must match current automation etag for delete to succeed (ensures
+	// automation is up-to-date and prevents lost deletes).
+	Etag string
+}
+
+func (b0 DeleteAutomationRequest_builder) Build() *DeleteAutomationRequest {
+	m0 := &DeleteAutomationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Etag = b.Etag
+	return m0
+}
+
 type BatchCreateAutomationsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Parent resource name shared by all automations this batch.
 	Parent        string                     `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	Requests      []*CreateAutomationRequest `protobuf:"bytes,2,rep,name=requests,proto3" json:"requests,omitempty"`
@@ -3526,7 +9234,7 @@ type BatchCreateAutomationsRequest struct {
 
 func (x *BatchCreateAutomationsRequest) Reset() {
 	*x = BatchCreateAutomationsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[38]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3538,7 +9246,7 @@ func (x *BatchCreateAutomationsRequest) String() string {
 func (*BatchCreateAutomationsRequest) ProtoMessage() {}
 
 func (x *BatchCreateAutomationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[38]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3547,11 +9255,6 @@ func (x *BatchCreateAutomationsRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use BatchCreateAutomationsRequest.ProtoReflect.Descriptor instead.
-func (*BatchCreateAutomationsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *BatchCreateAutomationsRequest) GetParent() string {
@@ -3568,8 +9271,33 @@ func (x *BatchCreateAutomationsRequest) GetRequests() []*CreateAutomationRequest
 	return nil
 }
 
+func (x *BatchCreateAutomationsRequest) SetParent(v string) {
+	x.Parent = v
+}
+
+func (x *BatchCreateAutomationsRequest) SetRequests(v []*CreateAutomationRequest) {
+	x.Requests = v
+}
+
+type BatchCreateAutomationsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Parent resource name shared by all automations this batch.
+	Parent   string
+	Requests []*CreateAutomationRequest
+}
+
+func (b0 BatchCreateAutomationsRequest_builder) Build() *BatchCreateAutomationsRequest {
+	m0 := &BatchCreateAutomationsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Parent = b.Parent
+	x.Requests = b.Requests
+	return m0
+}
+
 type BatchCreateAutomationsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The created automations.
 	Automations   []*Automation `protobuf:"bytes,1,rep,name=automations,proto3" json:"automations,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -3578,7 +9306,7 @@ type BatchCreateAutomationsResponse struct {
 
 func (x *BatchCreateAutomationsResponse) Reset() {
 	*x = BatchCreateAutomationsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[39]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[59]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3590,7 +9318,7 @@ func (x *BatchCreateAutomationsResponse) String() string {
 func (*BatchCreateAutomationsResponse) ProtoMessage() {}
 
 func (x *BatchCreateAutomationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[39]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[59]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3601,11 +9329,6 @@ func (x *BatchCreateAutomationsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BatchCreateAutomationsResponse.ProtoReflect.Descriptor instead.
-func (*BatchCreateAutomationsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{39}
-}
-
 func (x *BatchCreateAutomationsResponse) GetAutomations() []*Automation {
 	if x != nil {
 		return x.Automations
@@ -3613,8 +9336,27 @@ func (x *BatchCreateAutomationsResponse) GetAutomations() []*Automation {
 	return nil
 }
 
+func (x *BatchCreateAutomationsResponse) SetAutomations(v []*Automation) {
+	x.Automations = v
+}
+
+type BatchCreateAutomationsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The created automations.
+	Automations []*Automation
+}
+
+func (b0 BatchCreateAutomationsResponse_builder) Build() *BatchCreateAutomationsResponse {
+	m0 := &BatchCreateAutomationsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Automations = b.Automations
+	return m0
+}
+
 type ListAutomationsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Maximum number of automations to return.
 	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Token for retrieving the next page.
@@ -3629,7 +9371,7 @@ type ListAutomationsRequest struct {
 
 func (x *ListAutomationsRequest) Reset() {
 	*x = ListAutomationsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[40]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3641,7 +9383,7 @@ func (x *ListAutomationsRequest) String() string {
 func (*ListAutomationsRequest) ProtoMessage() {}
 
 func (x *ListAutomationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[40]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3650,11 +9392,6 @@ func (x *ListAutomationsRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListAutomationsRequest.ProtoReflect.Descriptor instead.
-func (*ListAutomationsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *ListAutomationsRequest) GetPageSize() int32 {
@@ -3685,8 +9422,70 @@ func (x *ListAutomationsRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListAutomationsRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListAutomationsRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListAutomationsRequest) SetParent(v string) {
+	x.Parent = &v
+}
+
+func (x *ListAutomationsRequest) SetFilter(v string) {
+	x.Filter = &v
+}
+
+func (x *ListAutomationsRequest) HasParent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Parent != nil
+}
+
+func (x *ListAutomationsRequest) HasFilter() bool {
+	if x == nil {
+		return false
+	}
+	return x.Filter != nil
+}
+
+func (x *ListAutomationsRequest) ClearParent() {
+	x.Parent = nil
+}
+
+func (x *ListAutomationsRequest) ClearFilter() {
+	x.Filter = nil
+}
+
+type ListAutomationsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Maximum number of automations to return.
+	PageSize int32
+	// Token for retrieving the next page.
+	PageToken string
+	// Parent resource name: `organizations/{organization}` or `users/{user}`.
+	Parent *string
+	// Filter expression.
+	Filter *string
+}
+
+func (b0 ListAutomationsRequest_builder) Build() *ListAutomationsRequest {
+	m0 := &ListAutomationsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.Parent = b.Parent
+	x.Filter = b.Filter
+	return m0
+}
+
 type ListAutomationsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The list of automations.
 	Automations []*Automation `protobuf:"bytes,1,rep,name=automations,proto3" json:"automations,omitempty"`
 	// Token for retrieving the next page.
@@ -3697,7 +9496,7 @@ type ListAutomationsResponse struct {
 
 func (x *ListAutomationsResponse) Reset() {
 	*x = ListAutomationsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[41]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[61]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3709,7 +9508,7 @@ func (x *ListAutomationsResponse) String() string {
 func (*ListAutomationsResponse) ProtoMessage() {}
 
 func (x *ListAutomationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[41]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[61]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3718,11 +9517,6 @@ func (x *ListAutomationsResponse) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListAutomationsResponse.ProtoReflect.Descriptor instead.
-func (*ListAutomationsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *ListAutomationsResponse) GetAutomations() []*Automation {
@@ -3739,9 +9533,35 @@ func (x *ListAutomationsResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListAutomationsResponse) SetAutomations(v []*Automation) {
+	x.Automations = v
+}
+
+func (x *ListAutomationsResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListAutomationsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The list of automations.
+	Automations []*Automation
+	// Token for retrieving the next page.
+	NextPageToken string
+}
+
+func (b0 ListAutomationsResponse_builder) Build() *ListAutomationsResponse {
+	m0 := &ListAutomationsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Automations = b.Automations
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 // SendAutomationEvent represents an event sent to an automation.
 type SendAutomationEvent struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Type:
 	//
 	//	*SendAutomationEvent_InputsEvent_
@@ -3753,7 +9573,7 @@ type SendAutomationEvent struct {
 
 func (x *SendAutomationEvent) Reset() {
 	*x = SendAutomationEvent{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[42]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[62]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3765,7 +9585,7 @@ func (x *SendAutomationEvent) String() string {
 func (*SendAutomationEvent) ProtoMessage() {}
 
 func (x *SendAutomationEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[42]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[62]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3774,11 +9594,6 @@ func (x *SendAutomationEvent) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SendAutomationEvent.ProtoReflect.Descriptor instead.
-func (*SendAutomationEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *SendAutomationEvent) GetType() isSendAutomationEvent_Type {
@@ -3806,6 +9621,111 @@ func (x *SendAutomationEvent) GetUserResponseEvent() *SendAutomationEvent_UserRe
 	return nil
 }
 
+func (x *SendAutomationEvent) SetInputsEvent(v *SendAutomationEvent_InputsEvent) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &SendAutomationEvent_InputsEvent_{v}
+}
+
+func (x *SendAutomationEvent) SetUserResponseEvent(v *SendAutomationEvent_UserResponseEvent) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &SendAutomationEvent_UserResponseEvent_{v}
+}
+
+func (x *SendAutomationEvent) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return x.Type != nil
+}
+
+func (x *SendAutomationEvent) HasInputsEvent() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*SendAutomationEvent_InputsEvent_)
+	return ok
+}
+
+func (x *SendAutomationEvent) HasUserResponseEvent() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*SendAutomationEvent_UserResponseEvent_)
+	return ok
+}
+
+func (x *SendAutomationEvent) ClearType() {
+	x.Type = nil
+}
+
+func (x *SendAutomationEvent) ClearInputsEvent() {
+	if _, ok := x.Type.(*SendAutomationEvent_InputsEvent_); ok {
+		x.Type = nil
+	}
+}
+
+func (x *SendAutomationEvent) ClearUserResponseEvent() {
+	if _, ok := x.Type.(*SendAutomationEvent_UserResponseEvent_); ok {
+		x.Type = nil
+	}
+}
+
+const SendAutomationEvent_Type_not_set_case case_SendAutomationEvent_Type = 0
+const SendAutomationEvent_InputsEvent_case case_SendAutomationEvent_Type = 1
+const SendAutomationEvent_UserResponseEvent_case case_SendAutomationEvent_Type = 2
+
+func (x *SendAutomationEvent) WhichType() case_SendAutomationEvent_Type {
+	if x == nil {
+		return SendAutomationEvent_Type_not_set_case
+	}
+	switch x.Type.(type) {
+	case *SendAutomationEvent_InputsEvent_:
+		return SendAutomationEvent_InputsEvent_case
+	case *SendAutomationEvent_UserResponseEvent_:
+		return SendAutomationEvent_UserResponseEvent_case
+	default:
+		return SendAutomationEvent_Type_not_set_case
+	}
+}
+
+type SendAutomationEvent_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Type:
+	InputsEvent       *SendAutomationEvent_InputsEvent
+	UserResponseEvent *SendAutomationEvent_UserResponseEvent
+	// -- end of Type
+}
+
+func (b0 SendAutomationEvent_builder) Build() *SendAutomationEvent {
+	m0 := &SendAutomationEvent{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.InputsEvent != nil {
+		x.Type = &SendAutomationEvent_InputsEvent_{b.InputsEvent}
+	}
+	if b.UserResponseEvent != nil {
+		x.Type = &SendAutomationEvent_UserResponseEvent_{b.UserResponseEvent}
+	}
+	return m0
+}
+
+type case_SendAutomationEvent_Type protoreflect.FieldNumber
+
+func (x case_SendAutomationEvent_Type) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[62].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isSendAutomationEvent_Type interface {
 	isSendAutomationEvent_Type()
 }
@@ -3824,7 +9744,7 @@ func (*SendAutomationEvent_UserResponseEvent_) isSendAutomationEvent_Type() {}
 
 // ReceiveAutomationEvent represents an event received from an automation.
 type ReceiveAutomationEvent struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Type:
 	//
 	//	*ReceiveAutomationEvent_OutputsEvent_
@@ -3836,7 +9756,7 @@ type ReceiveAutomationEvent struct {
 
 func (x *ReceiveAutomationEvent) Reset() {
 	*x = ReceiveAutomationEvent{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[43]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[63]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3848,7 +9768,7 @@ func (x *ReceiveAutomationEvent) String() string {
 func (*ReceiveAutomationEvent) ProtoMessage() {}
 
 func (x *ReceiveAutomationEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[43]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[63]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3857,11 +9777,6 @@ func (x *ReceiveAutomationEvent) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ReceiveAutomationEvent.ProtoReflect.Descriptor instead.
-func (*ReceiveAutomationEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *ReceiveAutomationEvent) GetType() isReceiveAutomationEvent_Type {
@@ -3889,6 +9804,111 @@ func (x *ReceiveAutomationEvent) GetUserRequestEvent() *ReceiveAutomationEvent_U
 	return nil
 }
 
+func (x *ReceiveAutomationEvent) SetOutputsEvent(v *ReceiveAutomationEvent_OutputsEvent) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &ReceiveAutomationEvent_OutputsEvent_{v}
+}
+
+func (x *ReceiveAutomationEvent) SetUserRequestEvent(v *ReceiveAutomationEvent_UserRequestEvent) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &ReceiveAutomationEvent_UserRequestEvent_{v}
+}
+
+func (x *ReceiveAutomationEvent) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return x.Type != nil
+}
+
+func (x *ReceiveAutomationEvent) HasOutputsEvent() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*ReceiveAutomationEvent_OutputsEvent_)
+	return ok
+}
+
+func (x *ReceiveAutomationEvent) HasUserRequestEvent() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*ReceiveAutomationEvent_UserRequestEvent_)
+	return ok
+}
+
+func (x *ReceiveAutomationEvent) ClearType() {
+	x.Type = nil
+}
+
+func (x *ReceiveAutomationEvent) ClearOutputsEvent() {
+	if _, ok := x.Type.(*ReceiveAutomationEvent_OutputsEvent_); ok {
+		x.Type = nil
+	}
+}
+
+func (x *ReceiveAutomationEvent) ClearUserRequestEvent() {
+	if _, ok := x.Type.(*ReceiveAutomationEvent_UserRequestEvent_); ok {
+		x.Type = nil
+	}
+}
+
+const ReceiveAutomationEvent_Type_not_set_case case_ReceiveAutomationEvent_Type = 0
+const ReceiveAutomationEvent_OutputsEvent_case case_ReceiveAutomationEvent_Type = 1
+const ReceiveAutomationEvent_UserRequestEvent_case case_ReceiveAutomationEvent_Type = 2
+
+func (x *ReceiveAutomationEvent) WhichType() case_ReceiveAutomationEvent_Type {
+	if x == nil {
+		return ReceiveAutomationEvent_Type_not_set_case
+	}
+	switch x.Type.(type) {
+	case *ReceiveAutomationEvent_OutputsEvent_:
+		return ReceiveAutomationEvent_OutputsEvent_case
+	case *ReceiveAutomationEvent_UserRequestEvent_:
+		return ReceiveAutomationEvent_UserRequestEvent_case
+	default:
+		return ReceiveAutomationEvent_Type_not_set_case
+	}
+}
+
+type ReceiveAutomationEvent_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Type:
+	OutputsEvent     *ReceiveAutomationEvent_OutputsEvent
+	UserRequestEvent *ReceiveAutomationEvent_UserRequestEvent
+	// -- end of Type
+}
+
+func (b0 ReceiveAutomationEvent_builder) Build() *ReceiveAutomationEvent {
+	m0 := &ReceiveAutomationEvent{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.OutputsEvent != nil {
+		x.Type = &ReceiveAutomationEvent_OutputsEvent_{b.OutputsEvent}
+	}
+	if b.UserRequestEvent != nil {
+		x.Type = &ReceiveAutomationEvent_UserRequestEvent_{b.UserRequestEvent}
+	}
+	return m0
+}
+
+type case_ReceiveAutomationEvent_Type protoreflect.FieldNumber
+
+func (x case_ReceiveAutomationEvent_Type) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[63].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isReceiveAutomationEvent_Type interface {
 	isReceiveAutomationEvent_Type()
 }
@@ -3906,7 +9926,7 @@ func (*ReceiveAutomationEvent_OutputsEvent_) isReceiveAutomationEvent_Type() {}
 func (*ReceiveAutomationEvent_UserRequestEvent_) isReceiveAutomationEvent_Type() {}
 
 type SendAutomationEventRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of Automation resource to send event.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Event to send.
@@ -3917,7 +9937,7 @@ type SendAutomationEventRequest struct {
 
 func (x *SendAutomationEventRequest) Reset() {
 	*x = SendAutomationEventRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[44]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[64]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3929,7 +9949,7 @@ func (x *SendAutomationEventRequest) String() string {
 func (*SendAutomationEventRequest) ProtoMessage() {}
 
 func (x *SendAutomationEventRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[44]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[64]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3938,11 +9958,6 @@ func (x *SendAutomationEventRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SendAutomationEventRequest.ProtoReflect.Descriptor instead.
-func (*SendAutomationEventRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *SendAutomationEventRequest) GetName() string {
@@ -3959,8 +9974,45 @@ func (x *SendAutomationEventRequest) GetEvent() *SendAutomationEvent {
 	return nil
 }
 
+func (x *SendAutomationEventRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *SendAutomationEventRequest) SetEvent(v *SendAutomationEvent) {
+	x.Event = v
+}
+
+func (x *SendAutomationEventRequest) HasEvent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Event != nil
+}
+
+func (x *SendAutomationEventRequest) ClearEvent() {
+	x.Event = nil
+}
+
+type SendAutomationEventRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of Automation resource to send event.
+	Name string
+	// Event to send.
+	Event *SendAutomationEvent
+}
+
+func (b0 SendAutomationEventRequest_builder) Build() *SendAutomationEventRequest {
+	m0 := &SendAutomationEventRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Event = b.Event
+	return m0
+}
+
 type ReceiveAutomationEventsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of Automation resource to receive events.
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -3969,7 +10021,7 @@ type ReceiveAutomationEventsRequest struct {
 
 func (x *ReceiveAutomationEventsRequest) Reset() {
 	*x = ReceiveAutomationEventsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[45]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[65]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3981,7 +10033,7 @@ func (x *ReceiveAutomationEventsRequest) String() string {
 func (*ReceiveAutomationEventsRequest) ProtoMessage() {}
 
 func (x *ReceiveAutomationEventsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[45]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[65]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3992,11 +10044,6 @@ func (x *ReceiveAutomationEventsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ReceiveAutomationEventsRequest.ProtoReflect.Descriptor instead.
-func (*ReceiveAutomationEventsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{45}
-}
-
 func (x *ReceiveAutomationEventsRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -4004,8 +10051,27 @@ func (x *ReceiveAutomationEventsRequest) GetName() string {
 	return ""
 }
 
+func (x *ReceiveAutomationEventsRequest) SetName(v string) {
+	x.Name = v
+}
+
+type ReceiveAutomationEventsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of Automation resource to receive events.
+	Name string
+}
+
+func (b0 ReceiveAutomationEventsRequest_builder) Build() *ReceiveAutomationEventsRequest {
+	m0 := &ReceiveAutomationEventsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 type ReceiveAutomationEventsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The received event.
 	Event         *ReceiveAutomationEvent `protobuf:"bytes,2,opt,name=event,proto3" json:"event,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -4014,7 +10080,7 @@ type ReceiveAutomationEventsResponse struct {
 
 func (x *ReceiveAutomationEventsResponse) Reset() {
 	*x = ReceiveAutomationEventsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[46]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[66]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4026,7 +10092,7 @@ func (x *ReceiveAutomationEventsResponse) String() string {
 func (*ReceiveAutomationEventsResponse) ProtoMessage() {}
 
 func (x *ReceiveAutomationEventsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[46]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[66]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4037,11 +10103,6 @@ func (x *ReceiveAutomationEventsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ReceiveAutomationEventsResponse.ProtoReflect.Descriptor instead.
-func (*ReceiveAutomationEventsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{46}
-}
-
 func (x *ReceiveAutomationEventsResponse) GetEvent() *ReceiveAutomationEvent {
 	if x != nil {
 		return x.Event
@@ -4049,8 +10110,38 @@ func (x *ReceiveAutomationEventsResponse) GetEvent() *ReceiveAutomationEvent {
 	return nil
 }
 
+func (x *ReceiveAutomationEventsResponse) SetEvent(v *ReceiveAutomationEvent) {
+	x.Event = v
+}
+
+func (x *ReceiveAutomationEventsResponse) HasEvent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Event != nil
+}
+
+func (x *ReceiveAutomationEventsResponse) ClearEvent() {
+	x.Event = nil
+}
+
+type ReceiveAutomationEventsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The received event.
+	Event *ReceiveAutomationEvent
+}
+
+func (b0 ReceiveAutomationEventsResponse_builder) Build() *ReceiveAutomationEventsResponse {
+	m0 := &ReceiveAutomationEventsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Event = b.Event
+	return m0
+}
+
 type StreamAutomationEventsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of Automation resource to send event.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Event to send.
@@ -4061,7 +10152,7 @@ type StreamAutomationEventsRequest struct {
 
 func (x *StreamAutomationEventsRequest) Reset() {
 	*x = StreamAutomationEventsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[47]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[67]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4073,7 +10164,7 @@ func (x *StreamAutomationEventsRequest) String() string {
 func (*StreamAutomationEventsRequest) ProtoMessage() {}
 
 func (x *StreamAutomationEventsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[47]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[67]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4082,11 +10173,6 @@ func (x *StreamAutomationEventsRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StreamAutomationEventsRequest.ProtoReflect.Descriptor instead.
-func (*StreamAutomationEventsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *StreamAutomationEventsRequest) GetName() string {
@@ -4103,8 +10189,45 @@ func (x *StreamAutomationEventsRequest) GetEvent() *SendAutomationEvent {
 	return nil
 }
 
+func (x *StreamAutomationEventsRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *StreamAutomationEventsRequest) SetEvent(v *SendAutomationEvent) {
+	x.Event = v
+}
+
+func (x *StreamAutomationEventsRequest) HasEvent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Event != nil
+}
+
+func (x *StreamAutomationEventsRequest) ClearEvent() {
+	x.Event = nil
+}
+
+type StreamAutomationEventsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of Automation resource to send event.
+	Name string
+	// Event to send.
+	Event *SendAutomationEvent
+}
+
+func (b0 StreamAutomationEventsRequest_builder) Build() *StreamAutomationEventsRequest {
+	m0 := &StreamAutomationEventsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Event = b.Event
+	return m0
+}
+
 type StreamAutomationEventsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The received event.
 	Event         *ReceiveAutomationEvent `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -4113,7 +10236,7 @@ type StreamAutomationEventsResponse struct {
 
 func (x *StreamAutomationEventsResponse) Reset() {
 	*x = StreamAutomationEventsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[48]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[68]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4125,7 +10248,7 @@ func (x *StreamAutomationEventsResponse) String() string {
 func (*StreamAutomationEventsResponse) ProtoMessage() {}
 
 func (x *StreamAutomationEventsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[48]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[68]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4136,11 +10259,6 @@ func (x *StreamAutomationEventsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StreamAutomationEventsResponse.ProtoReflect.Descriptor instead.
-func (*StreamAutomationEventsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{48}
-}
-
 func (x *StreamAutomationEventsResponse) GetEvent() *ReceiveAutomationEvent {
 	if x != nil {
 		return x.Event
@@ -4148,8 +10266,38 @@ func (x *StreamAutomationEventsResponse) GetEvent() *ReceiveAutomationEvent {
 	return nil
 }
 
+func (x *StreamAutomationEventsResponse) SetEvent(v *ReceiveAutomationEvent) {
+	x.Event = v
+}
+
+func (x *StreamAutomationEventsResponse) HasEvent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Event != nil
+}
+
+func (x *StreamAutomationEventsResponse) ClearEvent() {
+	x.Event = nil
+}
+
+type StreamAutomationEventsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The received event.
+	Event *ReceiveAutomationEvent
+}
+
+func (b0 StreamAutomationEventsResponse_builder) Build() *StreamAutomationEventsResponse {
+	m0 := &StreamAutomationEventsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Event = b.Event
+	return m0
+}
+
 type ListConnectionsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Maximum number of connections to return.
 	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Token for retrieving the next page.
@@ -4164,7 +10312,7 @@ type ListConnectionsRequest struct {
 
 func (x *ListConnectionsRequest) Reset() {
 	*x = ListConnectionsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[49]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[69]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4176,7 +10324,7 @@ func (x *ListConnectionsRequest) String() string {
 func (*ListConnectionsRequest) ProtoMessage() {}
 
 func (x *ListConnectionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[49]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[69]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4185,11 +10333,6 @@ func (x *ListConnectionsRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListConnectionsRequest.ProtoReflect.Descriptor instead.
-func (*ListConnectionsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *ListConnectionsRequest) GetPageSize() int32 {
@@ -4220,8 +10363,70 @@ func (x *ListConnectionsRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListConnectionsRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListConnectionsRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListConnectionsRequest) SetParent(v string) {
+	x.Parent = &v
+}
+
+func (x *ListConnectionsRequest) SetFilter(v string) {
+	x.Filter = &v
+}
+
+func (x *ListConnectionsRequest) HasParent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Parent != nil
+}
+
+func (x *ListConnectionsRequest) HasFilter() bool {
+	if x == nil {
+		return false
+	}
+	return x.Filter != nil
+}
+
+func (x *ListConnectionsRequest) ClearParent() {
+	x.Parent = nil
+}
+
+func (x *ListConnectionsRequest) ClearFilter() {
+	x.Filter = nil
+}
+
+type ListConnectionsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Maximum number of connections to return.
+	PageSize int32
+	// Token for retrieving the next page.
+	PageToken string
+	// Parent resource name: `organizations/{organization}` or `users/{user}`.
+	Parent *string
+	// Filter expression.
+	Filter *string
+}
+
+func (b0 ListConnectionsRequest_builder) Build() *ListConnectionsRequest {
+	m0 := &ListConnectionsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.Parent = b.Parent
+	x.Filter = b.Filter
+	return m0
+}
+
 type ListConnectionsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The list of connections.
 	Connections []*Connection `protobuf:"bytes,1,rep,name=connections,proto3" json:"connections,omitempty"`
 	// Token for retrieving the next page.
@@ -4232,7 +10437,7 @@ type ListConnectionsResponse struct {
 
 func (x *ListConnectionsResponse) Reset() {
 	*x = ListConnectionsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[50]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[70]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4244,7 +10449,7 @@ func (x *ListConnectionsResponse) String() string {
 func (*ListConnectionsResponse) ProtoMessage() {}
 
 func (x *ListConnectionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[50]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[70]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4253,11 +10458,6 @@ func (x *ListConnectionsResponse) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListConnectionsResponse.ProtoReflect.Descriptor instead.
-func (*ListConnectionsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *ListConnectionsResponse) GetConnections() []*Connection {
@@ -4274,8 +10474,34 @@ func (x *ListConnectionsResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListConnectionsResponse) SetConnections(v []*Connection) {
+	x.Connections = v
+}
+
+func (x *ListConnectionsResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListConnectionsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The list of connections.
+	Connections []*Connection
+	// Token for retrieving the next page.
+	NextPageToken string
+}
+
+func (b0 ListConnectionsResponse_builder) Build() *ListConnectionsResponse {
+	m0 := &ListConnectionsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Connections = b.Connections
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 type GetConnectionRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of connection to get.
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -4284,7 +10510,7 @@ type GetConnectionRequest struct {
 
 func (x *GetConnectionRequest) Reset() {
 	*x = GetConnectionRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[51]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[71]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4296,7 +10522,7 @@ func (x *GetConnectionRequest) String() string {
 func (*GetConnectionRequest) ProtoMessage() {}
 
 func (x *GetConnectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[51]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[71]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4307,11 +10533,6 @@ func (x *GetConnectionRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetConnectionRequest.ProtoReflect.Descriptor instead.
-func (*GetConnectionRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{51}
-}
-
 func (x *GetConnectionRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -4319,8 +10540,27 @@ func (x *GetConnectionRequest) GetName() string {
 	return ""
 }
 
+func (x *GetConnectionRequest) SetName(v string) {
+	x.Name = v
+}
+
+type GetConnectionRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of connection to get.
+	Name string
+}
+
+func (b0 GetConnectionRequest_builder) Build() *GetConnectionRequest {
+	m0 := &GetConnectionRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 type GetConnectionResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The requested connection.
 	Connection    *Connection `protobuf:"bytes,1,opt,name=connection,proto3" json:"connection,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -4329,7 +10569,7 @@ type GetConnectionResponse struct {
 
 func (x *GetConnectionResponse) Reset() {
 	*x = GetConnectionResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[52]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[72]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4341,7 +10581,7 @@ func (x *GetConnectionResponse) String() string {
 func (*GetConnectionResponse) ProtoMessage() {}
 
 func (x *GetConnectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[52]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[72]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4352,11 +10592,6 @@ func (x *GetConnectionResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetConnectionResponse.ProtoReflect.Descriptor instead.
-func (*GetConnectionResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{52}
-}
-
 func (x *GetConnectionResponse) GetConnection() *Connection {
 	if x != nil {
 		return x.Connection
@@ -4364,8 +10599,38 @@ func (x *GetConnectionResponse) GetConnection() *Connection {
 	return nil
 }
 
+func (x *GetConnectionResponse) SetConnection(v *Connection) {
+	x.Connection = v
+}
+
+func (x *GetConnectionResponse) HasConnection() bool {
+	if x == nil {
+		return false
+	}
+	return x.Connection != nil
+}
+
+func (x *GetConnectionResponse) ClearConnection() {
+	x.Connection = nil
+}
+
+type GetConnectionResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The requested connection.
+	Connection *Connection
+}
+
+func (b0 GetConnectionResponse_builder) Build() *GetConnectionResponse {
+	m0 := &GetConnectionResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Connection = b.Connection
+	return m0
+}
+
 type CreateConnectionRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Parent resource name.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// Client-provided ID for connection resource.
@@ -4378,7 +10643,7 @@ type CreateConnectionRequest struct {
 
 func (x *CreateConnectionRequest) Reset() {
 	*x = CreateConnectionRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[53]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[73]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4390,7 +10655,7 @@ func (x *CreateConnectionRequest) String() string {
 func (*CreateConnectionRequest) ProtoMessage() {}
 
 func (x *CreateConnectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[53]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[73]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4399,11 +10664,6 @@ func (x *CreateConnectionRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateConnectionRequest.ProtoReflect.Descriptor instead.
-func (*CreateConnectionRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *CreateConnectionRequest) GetParent() string {
@@ -4427,8 +10687,52 @@ func (x *CreateConnectionRequest) GetConnection() *Connection {
 	return nil
 }
 
+func (x *CreateConnectionRequest) SetParent(v string) {
+	x.Parent = v
+}
+
+func (x *CreateConnectionRequest) SetConnectionId(v string) {
+	x.ConnectionId = v
+}
+
+func (x *CreateConnectionRequest) SetConnection(v *Connection) {
+	x.Connection = v
+}
+
+func (x *CreateConnectionRequest) HasConnection() bool {
+	if x == nil {
+		return false
+	}
+	return x.Connection != nil
+}
+
+func (x *CreateConnectionRequest) ClearConnection() {
+	x.Connection = nil
+}
+
+type CreateConnectionRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Parent resource name.
+	Parent string
+	// Client-provided ID for connection resource.
+	ConnectionId string
+	// Connection to create.
+	Connection *Connection
+}
+
+func (b0 CreateConnectionRequest_builder) Build() *CreateConnectionRequest {
+	m0 := &CreateConnectionRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Parent = b.Parent
+	x.ConnectionId = b.ConnectionId
+	x.Connection = b.Connection
+	return m0
+}
+
 type CreateConnectionResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The created connection.
 	Connection    *Connection `protobuf:"bytes,1,opt,name=connection,proto3" json:"connection,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -4437,7 +10741,7 @@ type CreateConnectionResponse struct {
 
 func (x *CreateConnectionResponse) Reset() {
 	*x = CreateConnectionResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[54]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[74]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4449,7 +10753,7 @@ func (x *CreateConnectionResponse) String() string {
 func (*CreateConnectionResponse) ProtoMessage() {}
 
 func (x *CreateConnectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[54]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[74]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4460,11 +10764,6 @@ func (x *CreateConnectionResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateConnectionResponse.ProtoReflect.Descriptor instead.
-func (*CreateConnectionResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{54}
-}
-
 func (x *CreateConnectionResponse) GetConnection() *Connection {
 	if x != nil {
 		return x.Connection
@@ -4472,8 +10771,38 @@ func (x *CreateConnectionResponse) GetConnection() *Connection {
 	return nil
 }
 
+func (x *CreateConnectionResponse) SetConnection(v *Connection) {
+	x.Connection = v
+}
+
+func (x *CreateConnectionResponse) HasConnection() bool {
+	if x == nil {
+		return false
+	}
+	return x.Connection != nil
+}
+
+func (x *CreateConnectionResponse) ClearConnection() {
+	x.Connection = nil
+}
+
+type CreateConnectionResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The created connection.
+	Connection *Connection
+}
+
+func (b0 CreateConnectionResponse_builder) Build() *CreateConnectionResponse {
+	m0 := &CreateConnectionResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Connection = b.Connection
+	return m0
+}
+
 type UpdateConnectionRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The connection with updated fields. Must include `name`.
 	Connection *Connection `protobuf:"bytes,1,opt,name=connection,proto3" json:"connection,omitempty"`
 	// Fields to update (e.g., "config_data,integration").
@@ -4484,7 +10813,7 @@ type UpdateConnectionRequest struct {
 
 func (x *UpdateConnectionRequest) Reset() {
 	*x = UpdateConnectionRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[55]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[75]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4496,7 +10825,7 @@ func (x *UpdateConnectionRequest) String() string {
 func (*UpdateConnectionRequest) ProtoMessage() {}
 
 func (x *UpdateConnectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[55]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[75]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4505,11 +10834,6 @@ func (x *UpdateConnectionRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateConnectionRequest.ProtoReflect.Descriptor instead.
-func (*UpdateConnectionRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *UpdateConnectionRequest) GetConnection() *Connection {
@@ -4526,8 +10850,56 @@ func (x *UpdateConnectionRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 	return nil
 }
 
+func (x *UpdateConnectionRequest) SetConnection(v *Connection) {
+	x.Connection = v
+}
+
+func (x *UpdateConnectionRequest) SetUpdateMask(v *fieldmaskpb.FieldMask) {
+	x.UpdateMask = v
+}
+
+func (x *UpdateConnectionRequest) HasConnection() bool {
+	if x == nil {
+		return false
+	}
+	return x.Connection != nil
+}
+
+func (x *UpdateConnectionRequest) HasUpdateMask() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateMask != nil
+}
+
+func (x *UpdateConnectionRequest) ClearConnection() {
+	x.Connection = nil
+}
+
+func (x *UpdateConnectionRequest) ClearUpdateMask() {
+	x.UpdateMask = nil
+}
+
+type UpdateConnectionRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The connection with updated fields. Must include `name`.
+	Connection *Connection
+	// Fields to update (e.g., "config_data,integration").
+	UpdateMask *fieldmaskpb.FieldMask
+}
+
+func (b0 UpdateConnectionRequest_builder) Build() *UpdateConnectionRequest {
+	m0 := &UpdateConnectionRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Connection = b.Connection
+	x.UpdateMask = b.UpdateMask
+	return m0
+}
+
 type UpdateConnectionResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The updated connection.
 	Connection    *Connection `protobuf:"bytes,1,opt,name=connection,proto3" json:"connection,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -4536,7 +10908,7 @@ type UpdateConnectionResponse struct {
 
 func (x *UpdateConnectionResponse) Reset() {
 	*x = UpdateConnectionResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[56]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[76]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4548,7 +10920,7 @@ func (x *UpdateConnectionResponse) String() string {
 func (*UpdateConnectionResponse) ProtoMessage() {}
 
 func (x *UpdateConnectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[56]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[76]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4559,11 +10931,6 @@ func (x *UpdateConnectionResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateConnectionResponse.ProtoReflect.Descriptor instead.
-func (*UpdateConnectionResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{56}
-}
-
 func (x *UpdateConnectionResponse) GetConnection() *Connection {
 	if x != nil {
 		return x.Connection
@@ -4571,8 +10938,38 @@ func (x *UpdateConnectionResponse) GetConnection() *Connection {
 	return nil
 }
 
+func (x *UpdateConnectionResponse) SetConnection(v *Connection) {
+	x.Connection = v
+}
+
+func (x *UpdateConnectionResponse) HasConnection() bool {
+	if x == nil {
+		return false
+	}
+	return x.Connection != nil
+}
+
+func (x *UpdateConnectionResponse) ClearConnection() {
+	x.Connection = nil
+}
+
+type UpdateConnectionResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The updated connection.
+	Connection *Connection
+}
+
+func (b0 UpdateConnectionResponse_builder) Build() *UpdateConnectionResponse {
+	m0 := &UpdateConnectionResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Connection = b.Connection
+	return m0
+}
+
 type DeleteConnectionRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of connection to delete.
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -4581,7 +10978,7 @@ type DeleteConnectionRequest struct {
 
 func (x *DeleteConnectionRequest) Reset() {
 	*x = DeleteConnectionRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[57]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[77]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4593,7 +10990,7 @@ func (x *DeleteConnectionRequest) String() string {
 func (*DeleteConnectionRequest) ProtoMessage() {}
 
 func (x *DeleteConnectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[57]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[77]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4604,11 +11001,6 @@ func (x *DeleteConnectionRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteConnectionRequest.ProtoReflect.Descriptor instead.
-func (*DeleteConnectionRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{57}
-}
-
 func (x *DeleteConnectionRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -4616,15 +11008,34 @@ func (x *DeleteConnectionRequest) GetName() string {
 	return ""
 }
 
+func (x *DeleteConnectionRequest) SetName(v string) {
+	x.Name = v
+}
+
+type DeleteConnectionRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of connection to delete.
+	Name string
+}
+
+func (b0 DeleteConnectionRequest_builder) Build() *DeleteConnectionRequest {
+	m0 := &DeleteConnectionRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 type DeleteConnectionResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DeleteConnectionResponse) Reset() {
 	*x = DeleteConnectionResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[58]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[78]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4636,7 +11047,7 @@ func (x *DeleteConnectionResponse) String() string {
 func (*DeleteConnectionResponse) ProtoMessage() {}
 
 func (x *DeleteConnectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[58]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[78]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4647,13 +11058,20 @@ func (x *DeleteConnectionResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteConnectionResponse.ProtoReflect.Descriptor instead.
-func (*DeleteConnectionResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{58}
+type DeleteConnectionResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 DeleteConnectionResponse_builder) Build() *DeleteConnectionResponse {
+	m0 := &DeleteConnectionResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 type DialConnectionRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Target:
 	//
 	//	*DialConnectionRequest_Name
@@ -4665,7 +11083,7 @@ type DialConnectionRequest struct {
 
 func (x *DialConnectionRequest) Reset() {
 	*x = DialConnectionRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[59]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[79]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4677,7 +11095,7 @@ func (x *DialConnectionRequest) String() string {
 func (*DialConnectionRequest) ProtoMessage() {}
 
 func (x *DialConnectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[59]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[79]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4686,11 +11104,6 @@ func (x *DialConnectionRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DialConnectionRequest.ProtoReflect.Descriptor instead.
-func (*DialConnectionRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{59}
 }
 
 func (x *DialConnectionRequest) GetTarget() isDialConnectionRequest_Target {
@@ -4718,6 +11131,105 @@ func (x *DialConnectionRequest) GetAddress() string {
 	return ""
 }
 
+func (x *DialConnectionRequest) SetName(v string) {
+	x.Target = &DialConnectionRequest_Name{v}
+}
+
+func (x *DialConnectionRequest) SetAddress(v string) {
+	x.Target = &DialConnectionRequest_Address{v}
+}
+
+func (x *DialConnectionRequest) HasTarget() bool {
+	if x == nil {
+		return false
+	}
+	return x.Target != nil
+}
+
+func (x *DialConnectionRequest) HasName() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Target.(*DialConnectionRequest_Name)
+	return ok
+}
+
+func (x *DialConnectionRequest) HasAddress() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Target.(*DialConnectionRequest_Address)
+	return ok
+}
+
+func (x *DialConnectionRequest) ClearTarget() {
+	x.Target = nil
+}
+
+func (x *DialConnectionRequest) ClearName() {
+	if _, ok := x.Target.(*DialConnectionRequest_Name); ok {
+		x.Target = nil
+	}
+}
+
+func (x *DialConnectionRequest) ClearAddress() {
+	if _, ok := x.Target.(*DialConnectionRequest_Address); ok {
+		x.Target = nil
+	}
+}
+
+const DialConnectionRequest_Target_not_set_case case_DialConnectionRequest_Target = 0
+const DialConnectionRequest_Name_case case_DialConnectionRequest_Target = 1
+const DialConnectionRequest_Address_case case_DialConnectionRequest_Target = 2
+
+func (x *DialConnectionRequest) WhichTarget() case_DialConnectionRequest_Target {
+	if x == nil {
+		return DialConnectionRequest_Target_not_set_case
+	}
+	switch x.Target.(type) {
+	case *DialConnectionRequest_Name:
+		return DialConnectionRequest_Name_case
+	case *DialConnectionRequest_Address:
+		return DialConnectionRequest_Address_case
+	default:
+		return DialConnectionRequest_Target_not_set_case
+	}
+}
+
+type DialConnectionRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Target:
+	// Name of connection to dial.
+	Name *string
+	// Address of connection to dial.
+	Address *string
+	// -- end of Target
+}
+
+func (b0 DialConnectionRequest_builder) Build() *DialConnectionRequest {
+	m0 := &DialConnectionRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Name != nil {
+		x.Target = &DialConnectionRequest_Name{*b.Name}
+	}
+	if b.Address != nil {
+		x.Target = &DialConnectionRequest_Address{*b.Address}
+	}
+	return m0
+}
+
+type case_DialConnectionRequest_Target protoreflect.FieldNumber
+
+func (x case_DialConnectionRequest_Target) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[79].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isDialConnectionRequest_Target interface {
 	isDialConnectionRequest_Target()
 }
@@ -4737,7 +11249,7 @@ func (*DialConnectionRequest_Name) isDialConnectionRequest_Target() {}
 func (*DialConnectionRequest_Address) isDialConnectionRequest_Target() {}
 
 type DialConnectionResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Dial metadata.
 	Dial          *DialMetadata `protobuf:"bytes,1,opt,name=dial,proto3" json:"dial,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -4746,7 +11258,7 @@ type DialConnectionResponse struct {
 
 func (x *DialConnectionResponse) Reset() {
 	*x = DialConnectionResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[60]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[80]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4758,7 +11270,7 @@ func (x *DialConnectionResponse) String() string {
 func (*DialConnectionResponse) ProtoMessage() {}
 
 func (x *DialConnectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[60]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[80]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4769,11 +11281,6 @@ func (x *DialConnectionResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DialConnectionResponse.ProtoReflect.Descriptor instead.
-func (*DialConnectionResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{60}
-}
-
 func (x *DialConnectionResponse) GetDial() *DialMetadata {
 	if x != nil {
 		return x.Dial
@@ -4781,8 +11288,38 @@ func (x *DialConnectionResponse) GetDial() *DialMetadata {
 	return nil
 }
 
+func (x *DialConnectionResponse) SetDial(v *DialMetadata) {
+	x.Dial = v
+}
+
+func (x *DialConnectionResponse) HasDial() bool {
+	if x == nil {
+		return false
+	}
+	return x.Dial != nil
+}
+
+func (x *DialConnectionResponse) ClearDial() {
+	x.Dial = nil
+}
+
+type DialConnectionResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Dial metadata.
+	Dial *DialMetadata
+}
+
+func (b0 DialConnectionResponse_builder) Build() *DialConnectionResponse {
+	m0 := &DialConnectionResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Dial = b.Dial
+	return m0
+}
+
 type SyncDescriptorsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of parent resource.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// Build etag must match current file etag for idempotent syncs and to ensure
@@ -4795,7 +11332,7 @@ type SyncDescriptorsRequest struct {
 
 func (x *SyncDescriptorsRequest) Reset() {
 	*x = SyncDescriptorsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[61]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[81]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4807,7 +11344,7 @@ func (x *SyncDescriptorsRequest) String() string {
 func (*SyncDescriptorsRequest) ProtoMessage() {}
 
 func (x *SyncDescriptorsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[61]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[81]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4816,11 +11353,6 @@ func (x *SyncDescriptorsRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SyncDescriptorsRequest.ProtoReflect.Descriptor instead.
-func (*SyncDescriptorsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{61}
 }
 
 func (x *SyncDescriptorsRequest) GetParent() string {
@@ -4837,8 +11369,36 @@ func (x *SyncDescriptorsRequest) GetEtag() string {
 	return ""
 }
 
+func (x *SyncDescriptorsRequest) SetParent(v string) {
+	x.Parent = v
+}
+
+func (x *SyncDescriptorsRequest) SetEtag(v string) {
+	x.Etag = v
+}
+
+type SyncDescriptorsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of parent resource.
+	Parent string
+	// Build etag must match current file etag for idempotent syncs and to ensure
+	// descriptors are up-to-date with the latest connection or deployment config/build.
+	// May be an empty string if no descriptors have been synced yet.
+	Etag string
+}
+
+func (b0 SyncDescriptorsRequest_builder) Build() *SyncDescriptorsRequest {
+	m0 := &SyncDescriptorsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Parent = b.Parent
+	x.Etag = b.Etag
+	return m0
+}
+
 type SyncDescriptorsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// File containing descriptors.
 	File          *File `protobuf:"bytes,1,opt,name=file,proto3" json:"file,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -4847,7 +11407,7 @@ type SyncDescriptorsResponse struct {
 
 func (x *SyncDescriptorsResponse) Reset() {
 	*x = SyncDescriptorsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[62]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[82]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4859,7 +11419,7 @@ func (x *SyncDescriptorsResponse) String() string {
 func (*SyncDescriptorsResponse) ProtoMessage() {}
 
 func (x *SyncDescriptorsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[62]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[82]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4870,11 +11430,6 @@ func (x *SyncDescriptorsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SyncDescriptorsResponse.ProtoReflect.Descriptor instead.
-func (*SyncDescriptorsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{62}
-}
-
 func (x *SyncDescriptorsResponse) GetFile() *File {
 	if x != nil {
 		return x.File
@@ -4882,8 +11437,38 @@ func (x *SyncDescriptorsResponse) GetFile() *File {
 	return nil
 }
 
+func (x *SyncDescriptorsResponse) SetFile(v *File) {
+	x.File = v
+}
+
+func (x *SyncDescriptorsResponse) HasFile() bool {
+	if x == nil {
+		return false
+	}
+	return x.File != nil
+}
+
+func (x *SyncDescriptorsResponse) ClearFile() {
+	x.File = nil
+}
+
+type SyncDescriptorsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// File containing descriptors.
+	File *File
+}
+
+func (b0 SyncDescriptorsResponse_builder) Build() *SyncDescriptorsResponse {
+	m0 := &SyncDescriptorsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.File = b.File
+	return m0
+}
+
 type GetDescriptorsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of parent resource.
 	Parent        string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -4892,7 +11477,7 @@ type GetDescriptorsRequest struct {
 
 func (x *GetDescriptorsRequest) Reset() {
 	*x = GetDescriptorsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[63]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[83]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4904,7 +11489,7 @@ func (x *GetDescriptorsRequest) String() string {
 func (*GetDescriptorsRequest) ProtoMessage() {}
 
 func (x *GetDescriptorsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[63]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[83]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4915,11 +11500,6 @@ func (x *GetDescriptorsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetDescriptorsRequest.ProtoReflect.Descriptor instead.
-func (*GetDescriptorsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{63}
-}
-
 func (x *GetDescriptorsRequest) GetParent() string {
 	if x != nil {
 		return x.Parent
@@ -4927,8 +11507,27 @@ func (x *GetDescriptorsRequest) GetParent() string {
 	return ""
 }
 
+func (x *GetDescriptorsRequest) SetParent(v string) {
+	x.Parent = v
+}
+
+type GetDescriptorsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of parent resource.
+	Parent string
+}
+
+func (b0 GetDescriptorsRequest_builder) Build() *GetDescriptorsRequest {
+	m0 := &GetDescriptorsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Parent = b.Parent
+	return m0
+}
+
 type GetDescriptorsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// File containing descriptors.
 	File          *File `protobuf:"bytes,1,opt,name=file,proto3" json:"file,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -4937,7 +11536,7 @@ type GetDescriptorsResponse struct {
 
 func (x *GetDescriptorsResponse) Reset() {
 	*x = GetDescriptorsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[64]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[84]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4949,7 +11548,7 @@ func (x *GetDescriptorsResponse) String() string {
 func (*GetDescriptorsResponse) ProtoMessage() {}
 
 func (x *GetDescriptorsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[64]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[84]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4960,11 +11559,6 @@ func (x *GetDescriptorsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetDescriptorsResponse.ProtoReflect.Descriptor instead.
-func (*GetDescriptorsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{64}
-}
-
 func (x *GetDescriptorsResponse) GetFile() *File {
 	if x != nil {
 		return x.File
@@ -4972,8 +11566,38 @@ func (x *GetDescriptorsResponse) GetFile() *File {
 	return nil
 }
 
+func (x *GetDescriptorsResponse) SetFile(v *File) {
+	x.File = v
+}
+
+func (x *GetDescriptorsResponse) HasFile() bool {
+	if x == nil {
+		return false
+	}
+	return x.File != nil
+}
+
+func (x *GetDescriptorsResponse) ClearFile() {
+	x.File = nil
+}
+
+type GetDescriptorsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// File containing descriptors.
+	File *File
+}
+
+func (b0 GetDescriptorsResponse_builder) Build() *GetDescriptorsResponse {
+	m0 := &GetDescriptorsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.File = b.File
+	return m0
+}
+
 type ListDeploymentsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Maximum number of deployments to return.
 	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Token for retrieving the next page.
@@ -4988,7 +11612,7 @@ type ListDeploymentsRequest struct {
 
 func (x *ListDeploymentsRequest) Reset() {
 	*x = ListDeploymentsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[65]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[85]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5000,7 +11624,7 @@ func (x *ListDeploymentsRequest) String() string {
 func (*ListDeploymentsRequest) ProtoMessage() {}
 
 func (x *ListDeploymentsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[65]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[85]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5009,11 +11633,6 @@ func (x *ListDeploymentsRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListDeploymentsRequest.ProtoReflect.Descriptor instead.
-func (*ListDeploymentsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{65}
 }
 
 func (x *ListDeploymentsRequest) GetPageSize() int32 {
@@ -5044,8 +11663,70 @@ func (x *ListDeploymentsRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListDeploymentsRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListDeploymentsRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListDeploymentsRequest) SetParent(v string) {
+	x.Parent = &v
+}
+
+func (x *ListDeploymentsRequest) SetFilter(v string) {
+	x.Filter = &v
+}
+
+func (x *ListDeploymentsRequest) HasParent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Parent != nil
+}
+
+func (x *ListDeploymentsRequest) HasFilter() bool {
+	if x == nil {
+		return false
+	}
+	return x.Filter != nil
+}
+
+func (x *ListDeploymentsRequest) ClearParent() {
+	x.Parent = nil
+}
+
+func (x *ListDeploymentsRequest) ClearFilter() {
+	x.Filter = nil
+}
+
+type ListDeploymentsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Maximum number of deployments to return.
+	PageSize int32
+	// Token for retrieving the next page.
+	PageToken string
+	// Parent resource name.
+	Parent *string
+	// Filter expression.
+	Filter *string
+}
+
+func (b0 ListDeploymentsRequest_builder) Build() *ListDeploymentsRequest {
+	m0 := &ListDeploymentsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.Parent = b.Parent
+	x.Filter = b.Filter
+	return m0
+}
+
 type ListDeploymentsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The list of deployments.
 	Deployments []*Deployment `protobuf:"bytes,1,rep,name=deployments,proto3" json:"deployments,omitempty"`
 	// Token for retrieving the next page.
@@ -5056,7 +11737,7 @@ type ListDeploymentsResponse struct {
 
 func (x *ListDeploymentsResponse) Reset() {
 	*x = ListDeploymentsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[66]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[86]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5068,7 +11749,7 @@ func (x *ListDeploymentsResponse) String() string {
 func (*ListDeploymentsResponse) ProtoMessage() {}
 
 func (x *ListDeploymentsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[66]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[86]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5077,11 +11758,6 @@ func (x *ListDeploymentsResponse) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListDeploymentsResponse.ProtoReflect.Descriptor instead.
-func (*ListDeploymentsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{66}
 }
 
 func (x *ListDeploymentsResponse) GetDeployments() []*Deployment {
@@ -5098,8 +11774,34 @@ func (x *ListDeploymentsResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListDeploymentsResponse) SetDeployments(v []*Deployment) {
+	x.Deployments = v
+}
+
+func (x *ListDeploymentsResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListDeploymentsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The list of deployments.
+	Deployments []*Deployment
+	// Token for retrieving the next page.
+	NextPageToken string
+}
+
+func (b0 ListDeploymentsResponse_builder) Build() *ListDeploymentsResponse {
+	m0 := &ListDeploymentsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Deployments = b.Deployments
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 type GetDeploymentRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of deployment to get.
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -5108,7 +11810,7 @@ type GetDeploymentRequest struct {
 
 func (x *GetDeploymentRequest) Reset() {
 	*x = GetDeploymentRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[67]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[87]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5120,7 +11822,7 @@ func (x *GetDeploymentRequest) String() string {
 func (*GetDeploymentRequest) ProtoMessage() {}
 
 func (x *GetDeploymentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[67]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[87]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5131,11 +11833,6 @@ func (x *GetDeploymentRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetDeploymentRequest.ProtoReflect.Descriptor instead.
-func (*GetDeploymentRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{67}
-}
-
 func (x *GetDeploymentRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -5143,8 +11840,27 @@ func (x *GetDeploymentRequest) GetName() string {
 	return ""
 }
 
+func (x *GetDeploymentRequest) SetName(v string) {
+	x.Name = v
+}
+
+type GetDeploymentRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of deployment to get.
+	Name string
+}
+
+func (b0 GetDeploymentRequest_builder) Build() *GetDeploymentRequest {
+	m0 := &GetDeploymentRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 type GetDeploymentResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The requested deployment.
 	Deployment    *Deployment `protobuf:"bytes,1,opt,name=deployment,proto3" json:"deployment,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -5153,7 +11869,7 @@ type GetDeploymentResponse struct {
 
 func (x *GetDeploymentResponse) Reset() {
 	*x = GetDeploymentResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[68]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[88]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5165,7 +11881,7 @@ func (x *GetDeploymentResponse) String() string {
 func (*GetDeploymentResponse) ProtoMessage() {}
 
 func (x *GetDeploymentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[68]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[88]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5176,11 +11892,6 @@ func (x *GetDeploymentResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetDeploymentResponse.ProtoReflect.Descriptor instead.
-func (*GetDeploymentResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{68}
-}
-
 func (x *GetDeploymentResponse) GetDeployment() *Deployment {
 	if x != nil {
 		return x.Deployment
@@ -5188,8 +11899,38 @@ func (x *GetDeploymentResponse) GetDeployment() *Deployment {
 	return nil
 }
 
+func (x *GetDeploymentResponse) SetDeployment(v *Deployment) {
+	x.Deployment = v
+}
+
+func (x *GetDeploymentResponse) HasDeployment() bool {
+	if x == nil {
+		return false
+	}
+	return x.Deployment != nil
+}
+
+func (x *GetDeploymentResponse) ClearDeployment() {
+	x.Deployment = nil
+}
+
+type GetDeploymentResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The requested deployment.
+	Deployment *Deployment
+}
+
+func (b0 GetDeploymentResponse_builder) Build() *GetDeploymentResponse {
+	m0 := &GetDeploymentResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Deployment = b.Deployment
+	return m0
+}
+
 type CreateDeploymentRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Parent resource name.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// Client-provided ID for deployment resource.
@@ -5202,7 +11943,7 @@ type CreateDeploymentRequest struct {
 
 func (x *CreateDeploymentRequest) Reset() {
 	*x = CreateDeploymentRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[69]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[89]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5214,7 +11955,7 @@ func (x *CreateDeploymentRequest) String() string {
 func (*CreateDeploymentRequest) ProtoMessage() {}
 
 func (x *CreateDeploymentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[69]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[89]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5223,11 +11964,6 @@ func (x *CreateDeploymentRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateDeploymentRequest.ProtoReflect.Descriptor instead.
-func (*CreateDeploymentRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{69}
 }
 
 func (x *CreateDeploymentRequest) GetParent() string {
@@ -5251,8 +11987,52 @@ func (x *CreateDeploymentRequest) GetDeployment() *Deployment {
 	return nil
 }
 
+func (x *CreateDeploymentRequest) SetParent(v string) {
+	x.Parent = v
+}
+
+func (x *CreateDeploymentRequest) SetDeploymentId(v string) {
+	x.DeploymentId = v
+}
+
+func (x *CreateDeploymentRequest) SetDeployment(v *Deployment) {
+	x.Deployment = v
+}
+
+func (x *CreateDeploymentRequest) HasDeployment() bool {
+	if x == nil {
+		return false
+	}
+	return x.Deployment != nil
+}
+
+func (x *CreateDeploymentRequest) ClearDeployment() {
+	x.Deployment = nil
+}
+
+type CreateDeploymentRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Parent resource name.
+	Parent string
+	// Client-provided ID for deployment resource.
+	DeploymentId string
+	// Deployment to create (name ignored; server sets it).
+	Deployment *Deployment
+}
+
+func (b0 CreateDeploymentRequest_builder) Build() *CreateDeploymentRequest {
+	m0 := &CreateDeploymentRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Parent = b.Parent
+	x.DeploymentId = b.DeploymentId
+	x.Deployment = b.Deployment
+	return m0
+}
+
 type UpdateDeploymentRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Deployment with updated fields. Must include `name`.
 	Deployment *Deployment `protobuf:"bytes,1,opt,name=deployment,proto3" json:"deployment,omitempty"`
 	// Fields to update (e.g., "config,address").
@@ -5265,7 +12045,7 @@ type UpdateDeploymentRequest struct {
 
 func (x *UpdateDeploymentRequest) Reset() {
 	*x = UpdateDeploymentRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[70]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[90]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5277,7 +12057,7 @@ func (x *UpdateDeploymentRequest) String() string {
 func (*UpdateDeploymentRequest) ProtoMessage() {}
 
 func (x *UpdateDeploymentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[70]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[90]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5286,11 +12066,6 @@ func (x *UpdateDeploymentRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateDeploymentRequest.ProtoReflect.Descriptor instead.
-func (*UpdateDeploymentRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{70}
 }
 
 func (x *UpdateDeploymentRequest) GetDeployment() *Deployment {
@@ -5314,8 +12089,74 @@ func (x *UpdateDeploymentRequest) GetDesiredState() Deployment_State {
 	return Deployment_STATE_UNSPECIFIED
 }
 
+func (x *UpdateDeploymentRequest) SetDeployment(v *Deployment) {
+	x.Deployment = v
+}
+
+func (x *UpdateDeploymentRequest) SetUpdateMask(v *fieldmaskpb.FieldMask) {
+	x.UpdateMask = v
+}
+
+func (x *UpdateDeploymentRequest) SetDesiredState(v Deployment_State) {
+	x.DesiredState = &v
+}
+
+func (x *UpdateDeploymentRequest) HasDeployment() bool {
+	if x == nil {
+		return false
+	}
+	return x.Deployment != nil
+}
+
+func (x *UpdateDeploymentRequest) HasUpdateMask() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateMask != nil
+}
+
+func (x *UpdateDeploymentRequest) HasDesiredState() bool {
+	if x == nil {
+		return false
+	}
+	return x.DesiredState != nil
+}
+
+func (x *UpdateDeploymentRequest) ClearDeployment() {
+	x.Deployment = nil
+}
+
+func (x *UpdateDeploymentRequest) ClearUpdateMask() {
+	x.UpdateMask = nil
+}
+
+func (x *UpdateDeploymentRequest) ClearDesiredState() {
+	x.DesiredState = nil
+}
+
+type UpdateDeploymentRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Deployment with updated fields. Must include `name`.
+	Deployment *Deployment
+	// Fields to update (e.g., "config,address").
+	UpdateMask *fieldmaskpb.FieldMask
+	// Desired state of deployment after update.
+	DesiredState *Deployment_State
+}
+
+func (b0 UpdateDeploymentRequest_builder) Build() *UpdateDeploymentRequest {
+	m0 := &UpdateDeploymentRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Deployment = b.Deployment
+	x.UpdateMask = b.UpdateMask
+	x.DesiredState = b.DesiredState
+	return m0
+}
+
 type DeleteDeploymentRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of deployment to delete.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Etag must match current deployment etag for delete to succeed (ensures
@@ -5327,7 +12168,7 @@ type DeleteDeploymentRequest struct {
 
 func (x *DeleteDeploymentRequest) Reset() {
 	*x = DeleteDeploymentRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[71]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[91]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5339,7 +12180,7 @@ func (x *DeleteDeploymentRequest) String() string {
 func (*DeleteDeploymentRequest) ProtoMessage() {}
 
 func (x *DeleteDeploymentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[71]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[91]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5348,11 +12189,6 @@ func (x *DeleteDeploymentRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteDeploymentRequest.ProtoReflect.Descriptor instead.
-func (*DeleteDeploymentRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{71}
 }
 
 func (x *DeleteDeploymentRequest) GetName() string {
@@ -5369,8 +12205,35 @@ func (x *DeleteDeploymentRequest) GetEtag() string {
 	return ""
 }
 
+func (x *DeleteDeploymentRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *DeleteDeploymentRequest) SetEtag(v string) {
+	x.Etag = v
+}
+
+type DeleteDeploymentRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of deployment to delete.
+	Name string
+	// Etag must match current deployment etag for delete to succeed (ensures
+	// deployment is up-to-date and prevents lost deletes).
+	Etag string
+}
+
+func (b0 DeleteDeploymentRequest_builder) Build() *DeleteDeploymentRequest {
+	m0 := &DeleteDeploymentRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Etag = b.Etag
+	return m0
+}
+
 type ListFlowsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Maximum number of flows to return.
 	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Token for retrieving the next page.
@@ -5385,7 +12248,7 @@ type ListFlowsRequest struct {
 
 func (x *ListFlowsRequest) Reset() {
 	*x = ListFlowsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[72]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[92]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5397,7 +12260,7 @@ func (x *ListFlowsRequest) String() string {
 func (*ListFlowsRequest) ProtoMessage() {}
 
 func (x *ListFlowsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[72]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[92]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5406,11 +12269,6 @@ func (x *ListFlowsRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListFlowsRequest.ProtoReflect.Descriptor instead.
-func (*ListFlowsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{72}
 }
 
 func (x *ListFlowsRequest) GetPageSize() int32 {
@@ -5441,8 +12299,70 @@ func (x *ListFlowsRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListFlowsRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListFlowsRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListFlowsRequest) SetParent(v string) {
+	x.Parent = &v
+}
+
+func (x *ListFlowsRequest) SetFilter(v string) {
+	x.Filter = &v
+}
+
+func (x *ListFlowsRequest) HasParent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Parent != nil
+}
+
+func (x *ListFlowsRequest) HasFilter() bool {
+	if x == nil {
+		return false
+	}
+	return x.Filter != nil
+}
+
+func (x *ListFlowsRequest) ClearParent() {
+	x.Parent = nil
+}
+
+func (x *ListFlowsRequest) ClearFilter() {
+	x.Filter = nil
+}
+
+type ListFlowsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Maximum number of flows to return.
+	PageSize int32
+	// Token for retrieving the next page.
+	PageToken string
+	// Parent resource name: `organizations/{organization}` or `users/{user}`.
+	Parent *string
+	// Filter expression.
+	Filter *string
+}
+
+func (b0 ListFlowsRequest_builder) Build() *ListFlowsRequest {
+	m0 := &ListFlowsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.Parent = b.Parent
+	x.Filter = b.Filter
+	return m0
+}
+
 type ListFlowsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The list of flows.
 	Flows []*Flow `protobuf:"bytes,1,rep,name=flows,proto3" json:"flows,omitempty"`
 	// Token for retrieving the next page.
@@ -5453,7 +12373,7 @@ type ListFlowsResponse struct {
 
 func (x *ListFlowsResponse) Reset() {
 	*x = ListFlowsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[73]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[93]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5465,7 +12385,7 @@ func (x *ListFlowsResponse) String() string {
 func (*ListFlowsResponse) ProtoMessage() {}
 
 func (x *ListFlowsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[73]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[93]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5474,11 +12394,6 @@ func (x *ListFlowsResponse) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListFlowsResponse.ProtoReflect.Descriptor instead.
-func (*ListFlowsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{73}
 }
 
 func (x *ListFlowsResponse) GetFlows() []*Flow {
@@ -5495,8 +12410,34 @@ func (x *ListFlowsResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListFlowsResponse) SetFlows(v []*Flow) {
+	x.Flows = v
+}
+
+func (x *ListFlowsResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListFlowsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The list of flows.
+	Flows []*Flow
+	// Token for retrieving the next page.
+	NextPageToken string
+}
+
+func (b0 ListFlowsResponse_builder) Build() *ListFlowsResponse {
+	m0 := &ListFlowsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Flows = b.Flows
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 type GetFlowRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Flow resource name, one of.
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -5505,7 +12446,7 @@ type GetFlowRequest struct {
 
 func (x *GetFlowRequest) Reset() {
 	*x = GetFlowRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[74]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[94]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5517,7 +12458,7 @@ func (x *GetFlowRequest) String() string {
 func (*GetFlowRequest) ProtoMessage() {}
 
 func (x *GetFlowRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[74]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[94]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5528,11 +12469,6 @@ func (x *GetFlowRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetFlowRequest.ProtoReflect.Descriptor instead.
-func (*GetFlowRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{74}
-}
-
 func (x *GetFlowRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -5540,8 +12476,27 @@ func (x *GetFlowRequest) GetName() string {
 	return ""
 }
 
+func (x *GetFlowRequest) SetName(v string) {
+	x.Name = v
+}
+
+type GetFlowRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Flow resource name, one of.
+	Name string
+}
+
+func (b0 GetFlowRequest_builder) Build() *GetFlowRequest {
+	m0 := &GetFlowRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 type GetFlowResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The requested flow.
 	Flow          *Flow `protobuf:"bytes,1,opt,name=flow,proto3" json:"flow,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -5550,7 +12505,7 @@ type GetFlowResponse struct {
 
 func (x *GetFlowResponse) Reset() {
 	*x = GetFlowResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[75]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[95]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5562,7 +12517,7 @@ func (x *GetFlowResponse) String() string {
 func (*GetFlowResponse) ProtoMessage() {}
 
 func (x *GetFlowResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[75]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[95]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5573,11 +12528,6 @@ func (x *GetFlowResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetFlowResponse.ProtoReflect.Descriptor instead.
-func (*GetFlowResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{75}
-}
-
 func (x *GetFlowResponse) GetFlow() *Flow {
 	if x != nil {
 		return x.Flow
@@ -5585,8 +12535,38 @@ func (x *GetFlowResponse) GetFlow() *Flow {
 	return nil
 }
 
+func (x *GetFlowResponse) SetFlow(v *Flow) {
+	x.Flow = v
+}
+
+func (x *GetFlowResponse) HasFlow() bool {
+	if x == nil {
+		return false
+	}
+	return x.Flow != nil
+}
+
+func (x *GetFlowResponse) ClearFlow() {
+	x.Flow = nil
+}
+
+type GetFlowResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The requested flow.
+	Flow *Flow
+}
+
+func (b0 GetFlowResponse_builder) Build() *GetFlowResponse {
+	m0 := &GetFlowResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Flow = b.Flow
+	return m0
+}
+
 type CreateFlowRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Parent resource name.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// Client-provided ID for flow resource.
@@ -5599,7 +12579,7 @@ type CreateFlowRequest struct {
 
 func (x *CreateFlowRequest) Reset() {
 	*x = CreateFlowRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[76]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[96]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5611,7 +12591,7 @@ func (x *CreateFlowRequest) String() string {
 func (*CreateFlowRequest) ProtoMessage() {}
 
 func (x *CreateFlowRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[76]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[96]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5620,11 +12600,6 @@ func (x *CreateFlowRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateFlowRequest.ProtoReflect.Descriptor instead.
-func (*CreateFlowRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{76}
 }
 
 func (x *CreateFlowRequest) GetParent() string {
@@ -5648,8 +12623,52 @@ func (x *CreateFlowRequest) GetFlow() *Flow {
 	return nil
 }
 
+func (x *CreateFlowRequest) SetParent(v string) {
+	x.Parent = v
+}
+
+func (x *CreateFlowRequest) SetFlowId(v string) {
+	x.FlowId = v
+}
+
+func (x *CreateFlowRequest) SetFlow(v *Flow) {
+	x.Flow = v
+}
+
+func (x *CreateFlowRequest) HasFlow() bool {
+	if x == nil {
+		return false
+	}
+	return x.Flow != nil
+}
+
+func (x *CreateFlowRequest) ClearFlow() {
+	x.Flow = nil
+}
+
+type CreateFlowRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Parent resource name.
+	Parent string
+	// Client-provided ID for flow resource.
+	FlowId string
+	// Flow to create.
+	Flow *Flow
+}
+
+func (b0 CreateFlowRequest_builder) Build() *CreateFlowRequest {
+	m0 := &CreateFlowRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Parent = b.Parent
+	x.FlowId = b.FlowId
+	x.Flow = b.Flow
+	return m0
+}
+
 type CreateFlowResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The created flow.
 	Flow          *Flow `protobuf:"bytes,1,opt,name=flow,proto3" json:"flow,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -5658,7 +12677,7 @@ type CreateFlowResponse struct {
 
 func (x *CreateFlowResponse) Reset() {
 	*x = CreateFlowResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[77]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[97]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5670,7 +12689,7 @@ func (x *CreateFlowResponse) String() string {
 func (*CreateFlowResponse) ProtoMessage() {}
 
 func (x *CreateFlowResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[77]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[97]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5681,11 +12700,6 @@ func (x *CreateFlowResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateFlowResponse.ProtoReflect.Descriptor instead.
-func (*CreateFlowResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{77}
-}
-
 func (x *CreateFlowResponse) GetFlow() *Flow {
 	if x != nil {
 		return x.Flow
@@ -5693,8 +12707,38 @@ func (x *CreateFlowResponse) GetFlow() *Flow {
 	return nil
 }
 
+func (x *CreateFlowResponse) SetFlow(v *Flow) {
+	x.Flow = v
+}
+
+func (x *CreateFlowResponse) HasFlow() bool {
+	if x == nil {
+		return false
+	}
+	return x.Flow != nil
+}
+
+func (x *CreateFlowResponse) ClearFlow() {
+	x.Flow = nil
+}
+
+type CreateFlowResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The created flow.
+	Flow *Flow
+}
+
+func (b0 CreateFlowResponse_builder) Build() *CreateFlowResponse {
+	m0 := &CreateFlowResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Flow = b.Flow
+	return m0
+}
+
 type UpdateFlowRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Flow with updated fields. Must include `name`.
 	Flow *Flow `protobuf:"bytes,1,opt,name=flow,proto3" json:"flow,omitempty"`
 	// Fields to update (e.g., "spec").
@@ -5705,7 +12749,7 @@ type UpdateFlowRequest struct {
 
 func (x *UpdateFlowRequest) Reset() {
 	*x = UpdateFlowRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[78]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[98]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5717,7 +12761,7 @@ func (x *UpdateFlowRequest) String() string {
 func (*UpdateFlowRequest) ProtoMessage() {}
 
 func (x *UpdateFlowRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[78]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[98]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5726,11 +12770,6 @@ func (x *UpdateFlowRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateFlowRequest.ProtoReflect.Descriptor instead.
-func (*UpdateFlowRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{78}
 }
 
 func (x *UpdateFlowRequest) GetFlow() *Flow {
@@ -5747,8 +12786,56 @@ func (x *UpdateFlowRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 	return nil
 }
 
+func (x *UpdateFlowRequest) SetFlow(v *Flow) {
+	x.Flow = v
+}
+
+func (x *UpdateFlowRequest) SetUpdateMask(v *fieldmaskpb.FieldMask) {
+	x.UpdateMask = v
+}
+
+func (x *UpdateFlowRequest) HasFlow() bool {
+	if x == nil {
+		return false
+	}
+	return x.Flow != nil
+}
+
+func (x *UpdateFlowRequest) HasUpdateMask() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateMask != nil
+}
+
+func (x *UpdateFlowRequest) ClearFlow() {
+	x.Flow = nil
+}
+
+func (x *UpdateFlowRequest) ClearUpdateMask() {
+	x.UpdateMask = nil
+}
+
+type UpdateFlowRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Flow with updated fields. Must include `name`.
+	Flow *Flow
+	// Fields to update (e.g., "spec").
+	UpdateMask *fieldmaskpb.FieldMask
+}
+
+func (b0 UpdateFlowRequest_builder) Build() *UpdateFlowRequest {
+	m0 := &UpdateFlowRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Flow = b.Flow
+	x.UpdateMask = b.UpdateMask
+	return m0
+}
+
 type UpdateFlowResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The updated flow.
 	Flow          *Flow `protobuf:"bytes,1,opt,name=flow,proto3" json:"flow,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -5757,7 +12844,7 @@ type UpdateFlowResponse struct {
 
 func (x *UpdateFlowResponse) Reset() {
 	*x = UpdateFlowResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[79]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[99]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5769,7 +12856,7 @@ func (x *UpdateFlowResponse) String() string {
 func (*UpdateFlowResponse) ProtoMessage() {}
 
 func (x *UpdateFlowResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[79]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[99]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5780,11 +12867,6 @@ func (x *UpdateFlowResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateFlowResponse.ProtoReflect.Descriptor instead.
-func (*UpdateFlowResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{79}
-}
-
 func (x *UpdateFlowResponse) GetFlow() *Flow {
 	if x != nil {
 		return x.Flow
@@ -5792,8 +12874,38 @@ func (x *UpdateFlowResponse) GetFlow() *Flow {
 	return nil
 }
 
+func (x *UpdateFlowResponse) SetFlow(v *Flow) {
+	x.Flow = v
+}
+
+func (x *UpdateFlowResponse) HasFlow() bool {
+	if x == nil {
+		return false
+	}
+	return x.Flow != nil
+}
+
+func (x *UpdateFlowResponse) ClearFlow() {
+	x.Flow = nil
+}
+
+type UpdateFlowResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The updated flow.
+	Flow *Flow
+}
+
+func (b0 UpdateFlowResponse_builder) Build() *UpdateFlowResponse {
+	m0 := &UpdateFlowResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Flow = b.Flow
+	return m0
+}
+
 type DeleteFlowRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of flow to delete.
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -5802,7 +12914,7 @@ type DeleteFlowRequest struct {
 
 func (x *DeleteFlowRequest) Reset() {
 	*x = DeleteFlowRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[80]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[100]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5814,7 +12926,7 @@ func (x *DeleteFlowRequest) String() string {
 func (*DeleteFlowRequest) ProtoMessage() {}
 
 func (x *DeleteFlowRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[80]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[100]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5825,11 +12937,6 @@ func (x *DeleteFlowRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteFlowRequest.ProtoReflect.Descriptor instead.
-func (*DeleteFlowRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{80}
-}
-
 func (x *DeleteFlowRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -5837,15 +12944,34 @@ func (x *DeleteFlowRequest) GetName() string {
 	return ""
 }
 
+func (x *DeleteFlowRequest) SetName(v string) {
+	x.Name = v
+}
+
+type DeleteFlowRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of flow to delete.
+	Name string
+}
+
+func (b0 DeleteFlowRequest_builder) Build() *DeleteFlowRequest {
+	m0 := &DeleteFlowRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 type DeleteFlowResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DeleteFlowResponse) Reset() {
 	*x = DeleteFlowResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[81]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[101]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5857,7 +12983,7 @@ func (x *DeleteFlowResponse) String() string {
 func (*DeleteFlowResponse) ProtoMessage() {}
 
 func (x *DeleteFlowResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[81]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[101]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5868,13 +12994,20 @@ func (x *DeleteFlowResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteFlowResponse.ProtoReflect.Descriptor instead.
-func (*DeleteFlowResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{81}
+type DeleteFlowResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 DeleteFlowResponse_builder) Build() *DeleteFlowResponse {
+	m0 := &DeleteFlowResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 type ListIntegrationsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Maximum number of integrations to return.
 	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Token for retrieving the next page.
@@ -5889,7 +13022,7 @@ type ListIntegrationsRequest struct {
 
 func (x *ListIntegrationsRequest) Reset() {
 	*x = ListIntegrationsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[82]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[102]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5901,7 +13034,7 @@ func (x *ListIntegrationsRequest) String() string {
 func (*ListIntegrationsRequest) ProtoMessage() {}
 
 func (x *ListIntegrationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[82]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[102]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5910,11 +13043,6 @@ func (x *ListIntegrationsRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListIntegrationsRequest.ProtoReflect.Descriptor instead.
-func (*ListIntegrationsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{82}
 }
 
 func (x *ListIntegrationsRequest) GetPageSize() int32 {
@@ -5945,8 +13073,70 @@ func (x *ListIntegrationsRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListIntegrationsRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListIntegrationsRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListIntegrationsRequest) SetParent(v string) {
+	x.Parent = &v
+}
+
+func (x *ListIntegrationsRequest) SetFilter(v string) {
+	x.Filter = &v
+}
+
+func (x *ListIntegrationsRequest) HasParent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Parent != nil
+}
+
+func (x *ListIntegrationsRequest) HasFilter() bool {
+	if x == nil {
+		return false
+	}
+	return x.Filter != nil
+}
+
+func (x *ListIntegrationsRequest) ClearParent() {
+	x.Parent = nil
+}
+
+func (x *ListIntegrationsRequest) ClearFilter() {
+	x.Filter = nil
+}
+
+type ListIntegrationsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Maximum number of integrations to return.
+	PageSize int32
+	// Token for retrieving the next page.
+	PageToken string
+	// Parent resource name: `organizations/{organization}` or `users/{user}`.
+	Parent *string
+	// Filter expression.
+	Filter *string
+}
+
+func (b0 ListIntegrationsRequest_builder) Build() *ListIntegrationsRequest {
+	m0 := &ListIntegrationsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.Parent = b.Parent
+	x.Filter = b.Filter
+	return m0
+}
+
 type ListIntegrationsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Integrations  []*Integration         `protobuf:"bytes,1,rep,name=integrations,proto3" json:"integrations,omitempty"`
 	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -5955,7 +13145,7 @@ type ListIntegrationsResponse struct {
 
 func (x *ListIntegrationsResponse) Reset() {
 	*x = ListIntegrationsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[83]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[103]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5967,7 +13157,7 @@ func (x *ListIntegrationsResponse) String() string {
 func (*ListIntegrationsResponse) ProtoMessage() {}
 
 func (x *ListIntegrationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[83]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[103]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5976,11 +13166,6 @@ func (x *ListIntegrationsResponse) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListIntegrationsResponse.ProtoReflect.Descriptor instead.
-func (*ListIntegrationsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{83}
 }
 
 func (x *ListIntegrationsResponse) GetIntegrations() []*Integration {
@@ -5997,8 +13182,32 @@ func (x *ListIntegrationsResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListIntegrationsResponse) SetIntegrations(v []*Integration) {
+	x.Integrations = v
+}
+
+func (x *ListIntegrationsResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListIntegrationsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Integrations  []*Integration
+	NextPageToken string
+}
+
+func (b0 ListIntegrationsResponse_builder) Build() *ListIntegrationsResponse {
+	m0 := &ListIntegrationsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Integrations = b.Integrations
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 type GetIntegrationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Integration resource name, one of:
 	// - `organizations/{organization}/integrations/{integration}`
 	// - `users/{user}/integrations/{integration}`
@@ -6009,7 +13218,7 @@ type GetIntegrationRequest struct {
 
 func (x *GetIntegrationRequest) Reset() {
 	*x = GetIntegrationRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[84]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[104]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6021,7 +13230,7 @@ func (x *GetIntegrationRequest) String() string {
 func (*GetIntegrationRequest) ProtoMessage() {}
 
 func (x *GetIntegrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[84]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[104]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6032,11 +13241,6 @@ func (x *GetIntegrationRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetIntegrationRequest.ProtoReflect.Descriptor instead.
-func (*GetIntegrationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{84}
-}
-
 func (x *GetIntegrationRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -6044,8 +13248,29 @@ func (x *GetIntegrationRequest) GetName() string {
 	return ""
 }
 
+func (x *GetIntegrationRequest) SetName(v string) {
+	x.Name = v
+}
+
+type GetIntegrationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Integration resource name, one of:
+	// - `organizations/{organization}/integrations/{integration}`
+	// - `users/{user}/integrations/{integration}`
+	Name string
+}
+
+func (b0 GetIntegrationRequest_builder) Build() *GetIntegrationRequest {
+	m0 := &GetIntegrationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 type GetIntegrationResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The requested integration.
 	Integration   *Integration `protobuf:"bytes,1,opt,name=integration,proto3" json:"integration,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -6054,7 +13279,7 @@ type GetIntegrationResponse struct {
 
 func (x *GetIntegrationResponse) Reset() {
 	*x = GetIntegrationResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[85]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[105]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6066,7 +13291,7 @@ func (x *GetIntegrationResponse) String() string {
 func (*GetIntegrationResponse) ProtoMessage() {}
 
 func (x *GetIntegrationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[85]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[105]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6077,11 +13302,6 @@ func (x *GetIntegrationResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetIntegrationResponse.ProtoReflect.Descriptor instead.
-func (*GetIntegrationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{85}
-}
-
 func (x *GetIntegrationResponse) GetIntegration() *Integration {
 	if x != nil {
 		return x.Integration
@@ -6089,8 +13309,38 @@ func (x *GetIntegrationResponse) GetIntegration() *Integration {
 	return nil
 }
 
+func (x *GetIntegrationResponse) SetIntegration(v *Integration) {
+	x.Integration = v
+}
+
+func (x *GetIntegrationResponse) HasIntegration() bool {
+	if x == nil {
+		return false
+	}
+	return x.Integration != nil
+}
+
+func (x *GetIntegrationResponse) ClearIntegration() {
+	x.Integration = nil
+}
+
+type GetIntegrationResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The requested integration.
+	Integration *Integration
+}
+
+func (b0 GetIntegrationResponse_builder) Build() *GetIntegrationResponse {
+	m0 := &GetIntegrationResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Integration = b.Integration
+	return m0
+}
+
 type CreateIntegrationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Parent resource name.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// Client-provided ID for integration resource.
@@ -6103,7 +13353,7 @@ type CreateIntegrationRequest struct {
 
 func (x *CreateIntegrationRequest) Reset() {
 	*x = CreateIntegrationRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[86]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[106]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6115,7 +13365,7 @@ func (x *CreateIntegrationRequest) String() string {
 func (*CreateIntegrationRequest) ProtoMessage() {}
 
 func (x *CreateIntegrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[86]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[106]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6124,11 +13374,6 @@ func (x *CreateIntegrationRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateIntegrationRequest.ProtoReflect.Descriptor instead.
-func (*CreateIntegrationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{86}
 }
 
 func (x *CreateIntegrationRequest) GetParent() string {
@@ -6152,8 +13397,52 @@ func (x *CreateIntegrationRequest) GetIntegration() *Integration {
 	return nil
 }
 
+func (x *CreateIntegrationRequest) SetParent(v string) {
+	x.Parent = v
+}
+
+func (x *CreateIntegrationRequest) SetIntegrationId(v string) {
+	x.IntegrationId = v
+}
+
+func (x *CreateIntegrationRequest) SetIntegration(v *Integration) {
+	x.Integration = v
+}
+
+func (x *CreateIntegrationRequest) HasIntegration() bool {
+	if x == nil {
+		return false
+	}
+	return x.Integration != nil
+}
+
+func (x *CreateIntegrationRequest) ClearIntegration() {
+	x.Integration = nil
+}
+
+type CreateIntegrationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Parent resource name.
+	Parent string
+	// Client-provided ID for integration resource.
+	IntegrationId string
+	// Integration to create.
+	Integration *Integration
+}
+
+func (b0 CreateIntegrationRequest_builder) Build() *CreateIntegrationRequest {
+	m0 := &CreateIntegrationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Parent = b.Parent
+	x.IntegrationId = b.IntegrationId
+	x.Integration = b.Integration
+	return m0
+}
+
 type CreateIntegrationResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The created integration.
 	Integration   *Integration `protobuf:"bytes,1,opt,name=integration,proto3" json:"integration,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -6162,7 +13451,7 @@ type CreateIntegrationResponse struct {
 
 func (x *CreateIntegrationResponse) Reset() {
 	*x = CreateIntegrationResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[87]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[107]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6174,7 +13463,7 @@ func (x *CreateIntegrationResponse) String() string {
 func (*CreateIntegrationResponse) ProtoMessage() {}
 
 func (x *CreateIntegrationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[87]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[107]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6185,11 +13474,6 @@ func (x *CreateIntegrationResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateIntegrationResponse.ProtoReflect.Descriptor instead.
-func (*CreateIntegrationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{87}
-}
-
 func (x *CreateIntegrationResponse) GetIntegration() *Integration {
 	if x != nil {
 		return x.Integration
@@ -6197,8 +13481,38 @@ func (x *CreateIntegrationResponse) GetIntegration() *Integration {
 	return nil
 }
 
+func (x *CreateIntegrationResponse) SetIntegration(v *Integration) {
+	x.Integration = v
+}
+
+func (x *CreateIntegrationResponse) HasIntegration() bool {
+	if x == nil {
+		return false
+	}
+	return x.Integration != nil
+}
+
+func (x *CreateIntegrationResponse) ClearIntegration() {
+	x.Integration = nil
+}
+
+type CreateIntegrationResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The created integration.
+	Integration *Integration
+}
+
+func (b0 CreateIntegrationResponse_builder) Build() *CreateIntegrationResponse {
+	m0 := &CreateIntegrationResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Integration = b.Integration
+	return m0
+}
+
 type BuildIntegrationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of integration resource to build.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// URI of package source to build integration from (e.g. git://repo_url or file://path/to/source).
@@ -6213,7 +13527,7 @@ type BuildIntegrationRequest struct {
 
 func (x *BuildIntegrationRequest) Reset() {
 	*x = BuildIntegrationRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[88]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[108]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6225,7 +13539,7 @@ func (x *BuildIntegrationRequest) String() string {
 func (*BuildIntegrationRequest) ProtoMessage() {}
 
 func (x *BuildIntegrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[88]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[108]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6234,11 +13548,6 @@ func (x *BuildIntegrationRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use BuildIntegrationRequest.ProtoReflect.Descriptor instead.
-func (*BuildIntegrationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{88}
 }
 
 func (x *BuildIntegrationRequest) GetName() string {
@@ -6262,15 +13571,71 @@ func (x *BuildIntegrationRequest) GetSourceEtag() string {
 	return ""
 }
 
-func (x *BuildIntegrationRequest) GetBuild() *PackageBuildMetadata {
+func (x *BuildIntegrationRequest) GetBuild_() *PackageBuildMetadata {
 	if x != nil {
 		return x.Build
 	}
 	return nil
 }
 
+// Deprecated: Use GetBuild_ instead.
+func (x *BuildIntegrationRequest) GetBuild() *PackageBuildMetadata {
+	return x.GetBuild_()
+}
+
+func (x *BuildIntegrationRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *BuildIntegrationRequest) SetSourceUri(v string) {
+	x.SourceUri = v
+}
+
+func (x *BuildIntegrationRequest) SetSourceEtag(v string) {
+	x.SourceEtag = v
+}
+
+func (x *BuildIntegrationRequest) SetBuild_(v *PackageBuildMetadata) {
+	x.Build = v
+}
+
+func (x *BuildIntegrationRequest) HasBuild_() bool {
+	if x == nil {
+		return false
+	}
+	return x.Build != nil
+}
+
+func (x *BuildIntegrationRequest) ClearBuild_() {
+	x.Build = nil
+}
+
+type BuildIntegrationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of integration resource to build.
+	Name string
+	// URI of package source to build integration from (e.g. git://repo_url or file://path/to/source).
+	SourceUri string
+	// Package source checksum or git commit hash.
+	SourceEtag string
+	// Build metadata for this build operation.
+	Build_ *PackageBuildMetadata
+}
+
+func (b0 BuildIntegrationRequest_builder) Build() *BuildIntegrationRequest {
+	m0 := &BuildIntegrationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.SourceUri = b.SourceUri
+	x.SourceEtag = b.SourceEtag
+	x.Build = b.Build_
+	return m0
+}
+
 type BuildIntegrationResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Integration resource of build.
 	Integration *Integration `protobuf:"bytes,1,opt,name=integration,proto3" json:"integration,omitempty"`
 	// Package build metadata (must include artifact etag for a successful build).
@@ -6281,7 +13646,7 @@ type BuildIntegrationResponse struct {
 
 func (x *BuildIntegrationResponse) Reset() {
 	*x = BuildIntegrationResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[89]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[109]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6293,7 +13658,7 @@ func (x *BuildIntegrationResponse) String() string {
 func (*BuildIntegrationResponse) ProtoMessage() {}
 
 func (x *BuildIntegrationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[89]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[109]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6304,11 +13669,6 @@ func (x *BuildIntegrationResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BuildIntegrationResponse.ProtoReflect.Descriptor instead.
-func (*BuildIntegrationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{89}
-}
-
 func (x *BuildIntegrationResponse) GetIntegration() *Integration {
 	if x != nil {
 		return x.Integration
@@ -6316,15 +13676,68 @@ func (x *BuildIntegrationResponse) GetIntegration() *Integration {
 	return nil
 }
 
-func (x *BuildIntegrationResponse) GetBuild() *PackageBuildMetadata {
+func (x *BuildIntegrationResponse) GetBuild_() *PackageBuildMetadata {
 	if x != nil {
 		return x.Build
 	}
 	return nil
 }
 
+// Deprecated: Use GetBuild_ instead.
+func (x *BuildIntegrationResponse) GetBuild() *PackageBuildMetadata {
+	return x.GetBuild_()
+}
+
+func (x *BuildIntegrationResponse) SetIntegration(v *Integration) {
+	x.Integration = v
+}
+
+func (x *BuildIntegrationResponse) SetBuild_(v *PackageBuildMetadata) {
+	x.Build = v
+}
+
+func (x *BuildIntegrationResponse) HasIntegration() bool {
+	if x == nil {
+		return false
+	}
+	return x.Integration != nil
+}
+
+func (x *BuildIntegrationResponse) HasBuild_() bool {
+	if x == nil {
+		return false
+	}
+	return x.Build != nil
+}
+
+func (x *BuildIntegrationResponse) ClearIntegration() {
+	x.Integration = nil
+}
+
+func (x *BuildIntegrationResponse) ClearBuild_() {
+	x.Build = nil
+}
+
+type BuildIntegrationResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Integration resource of build.
+	Integration *Integration
+	// Package build metadata (must include artifact etag for a successful build).
+	Build_ *PackageBuildMetadata
+}
+
+func (b0 BuildIntegrationResponse_builder) Build() *BuildIntegrationResponse {
+	m0 := &BuildIntegrationResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Integration = b.Integration
+	x.Build = b.Build_
+	return m0
+}
+
 type UpdateIntegrationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Integration with updated fields. Must include `name`.
 	Integration *Integration `protobuf:"bytes,1,opt,name=integration,proto3" json:"integration,omitempty"`
 	// Fields to update (e.g., "config,spec").
@@ -6335,7 +13748,7 @@ type UpdateIntegrationRequest struct {
 
 func (x *UpdateIntegrationRequest) Reset() {
 	*x = UpdateIntegrationRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[90]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[110]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6347,7 +13760,7 @@ func (x *UpdateIntegrationRequest) String() string {
 func (*UpdateIntegrationRequest) ProtoMessage() {}
 
 func (x *UpdateIntegrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[90]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[110]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6356,11 +13769,6 @@ func (x *UpdateIntegrationRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateIntegrationRequest.ProtoReflect.Descriptor instead.
-func (*UpdateIntegrationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{90}
 }
 
 func (x *UpdateIntegrationRequest) GetIntegration() *Integration {
@@ -6377,8 +13785,56 @@ func (x *UpdateIntegrationRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 	return nil
 }
 
+func (x *UpdateIntegrationRequest) SetIntegration(v *Integration) {
+	x.Integration = v
+}
+
+func (x *UpdateIntegrationRequest) SetUpdateMask(v *fieldmaskpb.FieldMask) {
+	x.UpdateMask = v
+}
+
+func (x *UpdateIntegrationRequest) HasIntegration() bool {
+	if x == nil {
+		return false
+	}
+	return x.Integration != nil
+}
+
+func (x *UpdateIntegrationRequest) HasUpdateMask() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateMask != nil
+}
+
+func (x *UpdateIntegrationRequest) ClearIntegration() {
+	x.Integration = nil
+}
+
+func (x *UpdateIntegrationRequest) ClearUpdateMask() {
+	x.UpdateMask = nil
+}
+
+type UpdateIntegrationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Integration with updated fields. Must include `name`.
+	Integration *Integration
+	// Fields to update (e.g., "config,spec").
+	UpdateMask *fieldmaskpb.FieldMask
+}
+
+func (b0 UpdateIntegrationRequest_builder) Build() *UpdateIntegrationRequest {
+	m0 := &UpdateIntegrationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Integration = b.Integration
+	x.UpdateMask = b.UpdateMask
+	return m0
+}
+
 type UpdateIntegrationResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The updated integration.
 	Integration   *Integration `protobuf:"bytes,1,opt,name=integration,proto3" json:"integration,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -6387,7 +13843,7 @@ type UpdateIntegrationResponse struct {
 
 func (x *UpdateIntegrationResponse) Reset() {
 	*x = UpdateIntegrationResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[91]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[111]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6399,7 +13855,7 @@ func (x *UpdateIntegrationResponse) String() string {
 func (*UpdateIntegrationResponse) ProtoMessage() {}
 
 func (x *UpdateIntegrationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[91]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[111]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6410,11 +13866,6 @@ func (x *UpdateIntegrationResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateIntegrationResponse.ProtoReflect.Descriptor instead.
-func (*UpdateIntegrationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{91}
-}
-
 func (x *UpdateIntegrationResponse) GetIntegration() *Integration {
 	if x != nil {
 		return x.Integration
@@ -6422,8 +13873,38 @@ func (x *UpdateIntegrationResponse) GetIntegration() *Integration {
 	return nil
 }
 
+func (x *UpdateIntegrationResponse) SetIntegration(v *Integration) {
+	x.Integration = v
+}
+
+func (x *UpdateIntegrationResponse) HasIntegration() bool {
+	if x == nil {
+		return false
+	}
+	return x.Integration != nil
+}
+
+func (x *UpdateIntegrationResponse) ClearIntegration() {
+	x.Integration = nil
+}
+
+type UpdateIntegrationResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The updated integration.
+	Integration *Integration
+}
+
+func (b0 UpdateIntegrationResponse_builder) Build() *UpdateIntegrationResponse {
+	m0 := &UpdateIntegrationResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Integration = b.Integration
+	return m0
+}
+
 type DeleteIntegrationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of integration to delete.
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -6432,7 +13913,7 @@ type DeleteIntegrationRequest struct {
 
 func (x *DeleteIntegrationRequest) Reset() {
 	*x = DeleteIntegrationRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[92]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[112]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6444,7 +13925,7 @@ func (x *DeleteIntegrationRequest) String() string {
 func (*DeleteIntegrationRequest) ProtoMessage() {}
 
 func (x *DeleteIntegrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[92]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[112]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6455,11 +13936,6 @@ func (x *DeleteIntegrationRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteIntegrationRequest.ProtoReflect.Descriptor instead.
-func (*DeleteIntegrationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{92}
-}
-
 func (x *DeleteIntegrationRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -6467,15 +13943,34 @@ func (x *DeleteIntegrationRequest) GetName() string {
 	return ""
 }
 
+func (x *DeleteIntegrationRequest) SetName(v string) {
+	x.Name = v
+}
+
+type DeleteIntegrationRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of integration to delete.
+	Name string
+}
+
+func (b0 DeleteIntegrationRequest_builder) Build() *DeleteIntegrationRequest {
+	m0 := &DeleteIntegrationRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 type DeleteIntegrationResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DeleteIntegrationResponse) Reset() {
 	*x = DeleteIntegrationResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[93]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[113]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6487,7 +13982,7 @@ func (x *DeleteIntegrationResponse) String() string {
 func (*DeleteIntegrationResponse) ProtoMessage() {}
 
 func (x *DeleteIntegrationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[93]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[113]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6498,13 +13993,20 @@ func (x *DeleteIntegrationResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteIntegrationResponse.ProtoReflect.Descriptor instead.
-func (*DeleteIntegrationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{93}
+type DeleteIntegrationResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 DeleteIntegrationResponse_builder) Build() *DeleteIntegrationResponse {
+	m0 := &DeleteIntegrationResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 type GetTypeRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Type resource name, one of:
 	// - System: "types/{type}"
 	// - Organization/User: e.g. "organizations/bar/types/{type}" or "users/foo/types/{type}"
@@ -6517,7 +14019,7 @@ type GetTypeRequest struct {
 
 func (x *GetTypeRequest) Reset() {
 	*x = GetTypeRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[94]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[114]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6529,7 +14031,7 @@ func (x *GetTypeRequest) String() string {
 func (*GetTypeRequest) ProtoMessage() {}
 
 func (x *GetTypeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[94]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[114]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6540,11 +14042,6 @@ func (x *GetTypeRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetTypeRequest.ProtoReflect.Descriptor instead.
-func (*GetTypeRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{94}
-}
-
 func (x *GetTypeRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -6552,8 +14049,31 @@ func (x *GetTypeRequest) GetName() string {
 	return ""
 }
 
+func (x *GetTypeRequest) SetName(v string) {
+	x.Name = v
+}
+
+type GetTypeRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Type resource name, one of:
+	// - System: "types/{type}"
+	// - Organization/User: e.g. "organizations/bar/types/{type}" or "users/foo/types/{type}"
+	// - Connection: e.g. "users/foo/connections/foobar/types/{type}"
+	// - Deployment: e.g. "users/foo/deployments/default/types/{type}"
+	Name string
+}
+
+func (b0 GetTypeRequest_builder) Build() *GetTypeRequest {
+	m0 := &GetTypeRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 type GetTypeResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The requested type.
 	Type          *Type `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -6562,7 +14082,7 @@ type GetTypeResponse struct {
 
 func (x *GetTypeResponse) Reset() {
 	*x = GetTypeResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[95]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[115]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6574,7 +14094,7 @@ func (x *GetTypeResponse) String() string {
 func (*GetTypeResponse) ProtoMessage() {}
 
 func (x *GetTypeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[95]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[115]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6585,11 +14105,6 @@ func (x *GetTypeResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetTypeResponse.ProtoReflect.Descriptor instead.
-func (*GetTypeResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{95}
-}
-
 func (x *GetTypeResponse) GetType() *Type {
 	if x != nil {
 		return x.Type
@@ -6597,8 +14112,38 @@ func (x *GetTypeResponse) GetType() *Type {
 	return nil
 }
 
+func (x *GetTypeResponse) SetType(v *Type) {
+	x.Type = v
+}
+
+func (x *GetTypeResponse) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return x.Type != nil
+}
+
+func (x *GetTypeResponse) ClearType() {
+	x.Type = nil
+}
+
+type GetTypeResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The requested type.
+	Type *Type
+}
+
+func (b0 GetTypeResponse_builder) Build() *GetTypeResponse {
+	m0 := &GetTypeResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Type = b.Type
+	return m0
+}
+
 type ListTypesRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Maximum number of types to return.
 	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Token for retrieving the next page.
@@ -6618,7 +14163,7 @@ type ListTypesRequest struct {
 
 func (x *ListTypesRequest) Reset() {
 	*x = ListTypesRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[96]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[116]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6630,7 +14175,7 @@ func (x *ListTypesRequest) String() string {
 func (*ListTypesRequest) ProtoMessage() {}
 
 func (x *ListTypesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[96]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[116]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6639,11 +14184,6 @@ func (x *ListTypesRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListTypesRequest.ProtoReflect.Descriptor instead.
-func (*ListTypesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{96}
 }
 
 func (x *ListTypesRequest) GetPageSize() int32 {
@@ -6674,8 +14214,75 @@ func (x *ListTypesRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListTypesRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListTypesRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListTypesRequest) SetParent(v string) {
+	x.Parent = &v
+}
+
+func (x *ListTypesRequest) SetFilter(v string) {
+	x.Filter = &v
+}
+
+func (x *ListTypesRequest) HasParent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Parent != nil
+}
+
+func (x *ListTypesRequest) HasFilter() bool {
+	if x == nil {
+		return false
+	}
+	return x.Filter != nil
+}
+
+func (x *ListTypesRequest) ClearParent() {
+	x.Parent = nil
+}
+
+func (x *ListTypesRequest) ClearFilter() {
+	x.Filter = nil
+}
+
+type ListTypesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Maximum number of types to return.
+	PageSize int32
+	// Token for retrieving the next page.
+	PageToken string
+	// Parent resource name, one of:
+	// - System (no parent): nil | ""
+	// - Organization/User: e.g. "organizations/bar" or "users/foo"
+	// - Connection: e.g. "users/foo/connections/foobar"
+	// - Deployment: e.g. "users/foo/deployments/default"
+	// - Integration (aggregates deployments): e.g. "users/foo/integrations/bar"
+	Parent *string
+	// Filter expression.
+	Filter *string
+}
+
+func (b0 ListTypesRequest_builder) Build() *ListTypesRequest {
+	m0 := &ListTypesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.Parent = b.Parent
+	x.Filter = b.Filter
+	return m0
+}
+
 type ListTypesResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The list of types.
 	Types []*Type `protobuf:"bytes,1,rep,name=types,proto3" json:"types,omitempty"`
 	// Token for retrieving the next page.
@@ -6686,7 +14293,7 @@ type ListTypesResponse struct {
 
 func (x *ListTypesResponse) Reset() {
 	*x = ListTypesResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[97]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[117]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6698,7 +14305,7 @@ func (x *ListTypesResponse) String() string {
 func (*ListTypesResponse) ProtoMessage() {}
 
 func (x *ListTypesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[97]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[117]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6707,11 +14314,6 @@ func (x *ListTypesResponse) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListTypesResponse.ProtoReflect.Descriptor instead.
-func (*ListTypesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{97}
 }
 
 func (x *ListTypesResponse) GetTypes() []*Type {
@@ -6728,8 +14330,34 @@ func (x *ListTypesResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListTypesResponse) SetTypes(v []*Type) {
+	x.Types = v
+}
+
+func (x *ListTypesResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListTypesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The list of types.
+	Types []*Type
+	// Token for retrieving the next page.
+	NextPageToken string
+}
+
+func (b0 ListTypesResponse_builder) Build() *ListTypesResponse {
+	m0 := &ListTypesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Types = b.Types
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 type GetMethodRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Method resource name, one of:
 	// - System: "methods/{method}"
 	// - Organization/User: e.g. "organizations/bar/methods/{method}" or "users/foo/methods/{method}"
@@ -6742,7 +14370,7 @@ type GetMethodRequest struct {
 
 func (x *GetMethodRequest) Reset() {
 	*x = GetMethodRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[98]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[118]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6754,7 +14382,7 @@ func (x *GetMethodRequest) String() string {
 func (*GetMethodRequest) ProtoMessage() {}
 
 func (x *GetMethodRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[98]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[118]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6765,11 +14393,6 @@ func (x *GetMethodRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetMethodRequest.ProtoReflect.Descriptor instead.
-func (*GetMethodRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{98}
-}
-
 func (x *GetMethodRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -6777,8 +14400,31 @@ func (x *GetMethodRequest) GetName() string {
 	return ""
 }
 
+func (x *GetMethodRequest) SetName(v string) {
+	x.Name = v
+}
+
+type GetMethodRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Method resource name, one of:
+	// - System: "methods/{method}"
+	// - Organization/User: e.g. "organizations/bar/methods/{method}" or "users/foo/methods/{method}"
+	// - Connection: e.g. "users/foo/connections/foobar/methods/{method}"
+	// - Deployment: e.g. "users/foo/deployments/default/methods/{method}"
+	Name string
+}
+
+func (b0 GetMethodRequest_builder) Build() *GetMethodRequest {
+	m0 := &GetMethodRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 type GetMethodResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The requested method.
 	Method        *Method `protobuf:"bytes,1,opt,name=method,proto3" json:"method,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -6787,7 +14433,7 @@ type GetMethodResponse struct {
 
 func (x *GetMethodResponse) Reset() {
 	*x = GetMethodResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[99]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[119]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6799,7 +14445,7 @@ func (x *GetMethodResponse) String() string {
 func (*GetMethodResponse) ProtoMessage() {}
 
 func (x *GetMethodResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[99]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[119]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6810,11 +14456,6 @@ func (x *GetMethodResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetMethodResponse.ProtoReflect.Descriptor instead.
-func (*GetMethodResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{99}
-}
-
 func (x *GetMethodResponse) GetMethod() *Method {
 	if x != nil {
 		return x.Method
@@ -6822,8 +14463,38 @@ func (x *GetMethodResponse) GetMethod() *Method {
 	return nil
 }
 
+func (x *GetMethodResponse) SetMethod(v *Method) {
+	x.Method = v
+}
+
+func (x *GetMethodResponse) HasMethod() bool {
+	if x == nil {
+		return false
+	}
+	return x.Method != nil
+}
+
+func (x *GetMethodResponse) ClearMethod() {
+	x.Method = nil
+}
+
+type GetMethodResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The requested method.
+	Method *Method
+}
+
+func (b0 GetMethodResponse_builder) Build() *GetMethodResponse {
+	m0 := &GetMethodResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Method = b.Method
+	return m0
+}
+
 type GetServiceRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Service resource name, one of:
 	// - System: "services/{service}"
 	// - Organization/User: e.g. "organizations/bar/services/{service}" or "users/foo/services/{service}"
@@ -6836,7 +14507,7 @@ type GetServiceRequest struct {
 
 func (x *GetServiceRequest) Reset() {
 	*x = GetServiceRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[100]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[120]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6848,7 +14519,7 @@ func (x *GetServiceRequest) String() string {
 func (*GetServiceRequest) ProtoMessage() {}
 
 func (x *GetServiceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[100]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[120]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6859,11 +14530,6 @@ func (x *GetServiceRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetServiceRequest.ProtoReflect.Descriptor instead.
-func (*GetServiceRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{100}
-}
-
 func (x *GetServiceRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -6871,8 +14537,31 @@ func (x *GetServiceRequest) GetName() string {
 	return ""
 }
 
+func (x *GetServiceRequest) SetName(v string) {
+	x.Name = v
+}
+
+type GetServiceRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Service resource name, one of:
+	// - System: "services/{service}"
+	// - Organization/User: e.g. "organizations/bar/services/{service}" or "users/foo/services/{service}"
+	// - Connection: e.g. "users/foo/connections/foobar/services/{service}"
+	// - Deployment: e.g. "users/foo/deployments/default/services/{service}"
+	Name string
+}
+
+func (b0 GetServiceRequest_builder) Build() *GetServiceRequest {
+	m0 := &GetServiceRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 type GetServiceResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The requested service.
 	Service       *Service `protobuf:"bytes,1,opt,name=service,proto3" json:"service,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -6881,7 +14570,7 @@ type GetServiceResponse struct {
 
 func (x *GetServiceResponse) Reset() {
 	*x = GetServiceResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[101]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[121]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6893,7 +14582,7 @@ func (x *GetServiceResponse) String() string {
 func (*GetServiceResponse) ProtoMessage() {}
 
 func (x *GetServiceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[101]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[121]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6904,11 +14593,6 @@ func (x *GetServiceResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetServiceResponse.ProtoReflect.Descriptor instead.
-func (*GetServiceResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{101}
-}
-
 func (x *GetServiceResponse) GetService() *Service {
 	if x != nil {
 		return x.Service
@@ -6916,8 +14600,38 @@ func (x *GetServiceResponse) GetService() *Service {
 	return nil
 }
 
+func (x *GetServiceResponse) SetService(v *Service) {
+	x.Service = v
+}
+
+func (x *GetServiceResponse) HasService() bool {
+	if x == nil {
+		return false
+	}
+	return x.Service != nil
+}
+
+func (x *GetServiceResponse) ClearService() {
+	x.Service = nil
+}
+
+type GetServiceResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The requested service.
+	Service *Service
+}
+
+func (b0 GetServiceResponse_builder) Build() *GetServiceResponse {
+	m0 := &GetServiceResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Service = b.Service
+	return m0
+}
+
 type ListServicesRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Maximum number of services to return.
 	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Token for retrieving the next page.
@@ -6937,7 +14651,7 @@ type ListServicesRequest struct {
 
 func (x *ListServicesRequest) Reset() {
 	*x = ListServicesRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[102]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[122]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6949,7 +14663,7 @@ func (x *ListServicesRequest) String() string {
 func (*ListServicesRequest) ProtoMessage() {}
 
 func (x *ListServicesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[102]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[122]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6958,11 +14672,6 @@ func (x *ListServicesRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListServicesRequest.ProtoReflect.Descriptor instead.
-func (*ListServicesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{102}
 }
 
 func (x *ListServicesRequest) GetPageSize() int32 {
@@ -6993,8 +14702,75 @@ func (x *ListServicesRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListServicesRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListServicesRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListServicesRequest) SetParent(v string) {
+	x.Parent = &v
+}
+
+func (x *ListServicesRequest) SetFilter(v string) {
+	x.Filter = &v
+}
+
+func (x *ListServicesRequest) HasParent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Parent != nil
+}
+
+func (x *ListServicesRequest) HasFilter() bool {
+	if x == nil {
+		return false
+	}
+	return x.Filter != nil
+}
+
+func (x *ListServicesRequest) ClearParent() {
+	x.Parent = nil
+}
+
+func (x *ListServicesRequest) ClearFilter() {
+	x.Filter = nil
+}
+
+type ListServicesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Maximum number of services to return.
+	PageSize int32
+	// Token for retrieving the next page.
+	PageToken string
+	// Parent resource name, one of (blank will return all):
+	// - Return all: nil
+	// - Organization/User: e.g. "organizations/bar" or "users/foo"
+	// - Connection: e.g. "users/foo/connections/foobar"
+	// - Deployment: e.g. "users/foo/deployments/default"
+	// - Integration (aggregates deployments): e.g. "users/foo/integrations/bar"
+	Parent *string
+	// Filter expression.
+	Filter *string
+}
+
+func (b0 ListServicesRequest_builder) Build() *ListServicesRequest {
+	m0 := &ListServicesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.Parent = b.Parent
+	x.Filter = b.Filter
+	return m0
+}
+
 type ListServicesResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Services      []*Service             `protobuf:"bytes,1,rep,name=services,proto3" json:"services,omitempty"`
 	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -7003,7 +14779,7 @@ type ListServicesResponse struct {
 
 func (x *ListServicesResponse) Reset() {
 	*x = ListServicesResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[103]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[123]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7015,7 +14791,7 @@ func (x *ListServicesResponse) String() string {
 func (*ListServicesResponse) ProtoMessage() {}
 
 func (x *ListServicesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[103]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[123]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7024,11 +14800,6 @@ func (x *ListServicesResponse) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListServicesResponse.ProtoReflect.Descriptor instead.
-func (*ListServicesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{103}
 }
 
 func (x *ListServicesResponse) GetServices() []*Service {
@@ -7045,8 +14816,32 @@ func (x *ListServicesResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListServicesResponse) SetServices(v []*Service) {
+	x.Services = v
+}
+
+func (x *ListServicesResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListServicesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Services      []*Service
+	NextPageToken string
+}
+
+func (b0 ListServicesResponse_builder) Build() *ListServicesResponse {
+	m0 := &ListServicesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Services = b.Services
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 type ListMethodsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Maximum number of methods to return.
 	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Token for retrieving the next page.
@@ -7066,7 +14861,7 @@ type ListMethodsRequest struct {
 
 func (x *ListMethodsRequest) Reset() {
 	*x = ListMethodsRequest{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[104]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[124]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7078,7 +14873,7 @@ func (x *ListMethodsRequest) String() string {
 func (*ListMethodsRequest) ProtoMessage() {}
 
 func (x *ListMethodsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[104]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[124]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7087,11 +14882,6 @@ func (x *ListMethodsRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListMethodsRequest.ProtoReflect.Descriptor instead.
-func (*ListMethodsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{104}
 }
 
 func (x *ListMethodsRequest) GetPageSize() int32 {
@@ -7122,8 +14912,75 @@ func (x *ListMethodsRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListMethodsRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListMethodsRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListMethodsRequest) SetParent(v string) {
+	x.Parent = &v
+}
+
+func (x *ListMethodsRequest) SetFilter(v string) {
+	x.Filter = &v
+}
+
+func (x *ListMethodsRequest) HasParent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Parent != nil
+}
+
+func (x *ListMethodsRequest) HasFilter() bool {
+	if x == nil {
+		return false
+	}
+	return x.Filter != nil
+}
+
+func (x *ListMethodsRequest) ClearParent() {
+	x.Parent = nil
+}
+
+func (x *ListMethodsRequest) ClearFilter() {
+	x.Filter = nil
+}
+
+type ListMethodsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Maximum number of methods to return.
+	PageSize int32
+	// Token for retrieving the next page.
+	PageToken string
+	// Parent resource name, one of (blank will return all):
+	// - Return all: nil
+	// - Organization/User: e.g. "organizations/bar" or "users/foo"
+	// - Connection: e.g. "users/foo/connections/foobar"
+	// - Deployment: e.g. "users/foo/deployments/default"
+	// - Integration (aggregates deployments): e.g. "users/foo/integrations/bar"
+	Parent *string
+	// Filter expression.
+	Filter *string
+}
+
+func (b0 ListMethodsRequest_builder) Build() *ListMethodsRequest {
+	m0 := &ListMethodsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.Parent = b.Parent
+	x.Filter = b.Filter
+	return m0
+}
+
 type ListMethodsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Methods       []*Method              `protobuf:"bytes,1,rep,name=methods,proto3" json:"methods,omitempty"`
 	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -7132,7 +14989,7 @@ type ListMethodsResponse struct {
 
 func (x *ListMethodsResponse) Reset() {
 	*x = ListMethodsResponse{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[105]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[125]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7144,7 +15001,7 @@ func (x *ListMethodsResponse) String() string {
 func (*ListMethodsResponse) ProtoMessage() {}
 
 func (x *ListMethodsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[105]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[125]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7153,11 +15010,6 @@ func (x *ListMethodsResponse) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListMethodsResponse.ProtoReflect.Descriptor instead.
-func (*ListMethodsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{105}
 }
 
 func (x *ListMethodsResponse) GetMethods() []*Method {
@@ -7174,8 +15026,32 @@ func (x *ListMethodsResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListMethodsResponse) SetMethods(v []*Method) {
+	x.Methods = v
+}
+
+func (x *ListMethodsResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListMethodsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Methods       []*Method
+	NextPageToken string
+}
+
+func (b0 ListMethodsResponse_builder) Build() *ListMethodsResponse {
+	m0 := &ListMethodsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Methods = b.Methods
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 type Deployment_Build struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of integration resource this build belongs to.
 	Integration string `protobuf:"bytes,1,opt,name=integration,proto3" json:"integration,omitempty"`
 	// Build metadata including artifact, platform, and runtime information.
@@ -7189,7 +15065,7 @@ type Deployment_Build struct {
 
 func (x *Deployment_Build) Reset() {
 	*x = Deployment_Build{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[111]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[133]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7201,7 +15077,7 @@ func (x *Deployment_Build) String() string {
 func (*Deployment_Build) ProtoMessage() {}
 
 func (x *Deployment_Build) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[111]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[133]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7210,11 +15086,6 @@ func (x *Deployment_Build) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Deployment_Build.ProtoReflect.Descriptor instead.
-func (*Deployment_Build) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{7, 2}
 }
 
 func (x *Deployment_Build) GetIntegration() string {
@@ -7238,8 +15109,64 @@ func (x *Deployment_Build) GetContext() *Context {
 	return nil
 }
 
+func (x *Deployment_Build) SetIntegration(v string) {
+	x.Integration = v
+}
+
+func (x *Deployment_Build) SetMetadata(v *PackageBuildMetadata) {
+	x.Metadata = v
+}
+
+func (x *Deployment_Build) SetContext(v *Context) {
+	x.Context = v
+}
+
+func (x *Deployment_Build) HasMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.Metadata != nil
+}
+
+func (x *Deployment_Build) HasContext() bool {
+	if x == nil {
+		return false
+	}
+	return x.Context != nil
+}
+
+func (x *Deployment_Build) ClearMetadata() {
+	x.Metadata = nil
+}
+
+func (x *Deployment_Build) ClearContext() {
+	x.Context = nil
+}
+
+type Deployment_Build_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of integration resource this build belongs to.
+	Integration string
+	// Build metadata including artifact, platform, and runtime information.
+	Metadata *PackageBuildMetadata
+	// Context of where the build was performed (optional if build performed
+	// within the same control plane as deployment).
+	Context *Context
+}
+
+func (b0 Deployment_Build_builder) Build() *Deployment_Build {
+	m0 := &Deployment_Build{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Integration = b.Integration
+	x.Metadata = b.Metadata
+	x.Context = b.Context
+	return m0
+}
+
 type Deployment_Cloud struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Context       *Context               `protobuf:"bytes,1,opt,name=context,proto3" json:"context,omitempty"`
 	Config        *EncryptedAny          `protobuf:"bytes,3,opt,name=config,proto3" json:"config,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -7248,7 +15175,7 @@ type Deployment_Cloud struct {
 
 func (x *Deployment_Cloud) Reset() {
 	*x = Deployment_Cloud{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[112]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[134]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7260,7 +15187,7 @@ func (x *Deployment_Cloud) String() string {
 func (*Deployment_Cloud) ProtoMessage() {}
 
 func (x *Deployment_Cloud) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[112]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[134]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7269,11 +15196,6 @@ func (x *Deployment_Cloud) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Deployment_Cloud.ProtoReflect.Descriptor instead.
-func (*Deployment_Cloud) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{7, 3}
 }
 
 func (x *Deployment_Cloud) GetContext() *Context {
@@ -7290,8 +15212,54 @@ func (x *Deployment_Cloud) GetConfig() *EncryptedAny {
 	return nil
 }
 
+func (x *Deployment_Cloud) SetContext(v *Context) {
+	x.Context = v
+}
+
+func (x *Deployment_Cloud) SetConfig(v *EncryptedAny) {
+	x.Config = v
+}
+
+func (x *Deployment_Cloud) HasContext() bool {
+	if x == nil {
+		return false
+	}
+	return x.Context != nil
+}
+
+func (x *Deployment_Cloud) HasConfig() bool {
+	if x == nil {
+		return false
+	}
+	return x.Config != nil
+}
+
+func (x *Deployment_Cloud) ClearContext() {
+	x.Context = nil
+}
+
+func (x *Deployment_Cloud) ClearConfig() {
+	x.Config = nil
+}
+
+type Deployment_Cloud_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Context *Context
+	Config  *EncryptedAny
+}
+
+func (b0 Deployment_Cloud_builder) Build() *Deployment_Cloud {
+	m0 := &Deployment_Cloud{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Context = b.Context
+	x.Config = b.Config
+	return m0
+}
+
 type Deployment_RuntimeMetadata struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Type:
 	//
 	//	*Deployment_RuntimeMetadata_Native_
@@ -7303,7 +15271,7 @@ type Deployment_RuntimeMetadata struct {
 
 func (x *Deployment_RuntimeMetadata) Reset() {
 	*x = Deployment_RuntimeMetadata{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[113]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[135]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7315,7 +15283,7 @@ func (x *Deployment_RuntimeMetadata) String() string {
 func (*Deployment_RuntimeMetadata) ProtoMessage() {}
 
 func (x *Deployment_RuntimeMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[113]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[135]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7324,11 +15292,6 @@ func (x *Deployment_RuntimeMetadata) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Deployment_RuntimeMetadata.ProtoReflect.Descriptor instead.
-func (*Deployment_RuntimeMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{7, 4}
 }
 
 func (x *Deployment_RuntimeMetadata) GetType() isDeployment_RuntimeMetadata_Type {
@@ -7356,6 +15319,111 @@ func (x *Deployment_RuntimeMetadata) GetDocker() *Deployment_RuntimeMetadata_Doc
 	return nil
 }
 
+func (x *Deployment_RuntimeMetadata) SetNative(v *Deployment_RuntimeMetadata_Native) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Deployment_RuntimeMetadata_Native_{v}
+}
+
+func (x *Deployment_RuntimeMetadata) SetDocker(v *Deployment_RuntimeMetadata_Docker) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Deployment_RuntimeMetadata_Docker_{v}
+}
+
+func (x *Deployment_RuntimeMetadata) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return x.Type != nil
+}
+
+func (x *Deployment_RuntimeMetadata) HasNative() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Deployment_RuntimeMetadata_Native_)
+	return ok
+}
+
+func (x *Deployment_RuntimeMetadata) HasDocker() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Deployment_RuntimeMetadata_Docker_)
+	return ok
+}
+
+func (x *Deployment_RuntimeMetadata) ClearType() {
+	x.Type = nil
+}
+
+func (x *Deployment_RuntimeMetadata) ClearNative() {
+	if _, ok := x.Type.(*Deployment_RuntimeMetadata_Native_); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Deployment_RuntimeMetadata) ClearDocker() {
+	if _, ok := x.Type.(*Deployment_RuntimeMetadata_Docker_); ok {
+		x.Type = nil
+	}
+}
+
+const Deployment_RuntimeMetadata_Type_not_set_case case_Deployment_RuntimeMetadata_Type = 0
+const Deployment_RuntimeMetadata_Native_case case_Deployment_RuntimeMetadata_Type = 1
+const Deployment_RuntimeMetadata_Docker_case case_Deployment_RuntimeMetadata_Type = 2
+
+func (x *Deployment_RuntimeMetadata) WhichType() case_Deployment_RuntimeMetadata_Type {
+	if x == nil {
+		return Deployment_RuntimeMetadata_Type_not_set_case
+	}
+	switch x.Type.(type) {
+	case *Deployment_RuntimeMetadata_Native_:
+		return Deployment_RuntimeMetadata_Native_case
+	case *Deployment_RuntimeMetadata_Docker_:
+		return Deployment_RuntimeMetadata_Docker_case
+	default:
+		return Deployment_RuntimeMetadata_Type_not_set_case
+	}
+}
+
+type Deployment_RuntimeMetadata_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Type:
+	Native *Deployment_RuntimeMetadata_Native
+	Docker *Deployment_RuntimeMetadata_Docker
+	// -- end of Type
+}
+
+func (b0 Deployment_RuntimeMetadata_builder) Build() *Deployment_RuntimeMetadata {
+	m0 := &Deployment_RuntimeMetadata{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Native != nil {
+		x.Type = &Deployment_RuntimeMetadata_Native_{b.Native}
+	}
+	if b.Docker != nil {
+		x.Type = &Deployment_RuntimeMetadata_Docker_{b.Docker}
+	}
+	return m0
+}
+
+type case_Deployment_RuntimeMetadata_Type protoreflect.FieldNumber
+
+func (x case_Deployment_RuntimeMetadata_Type) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[135].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isDeployment_RuntimeMetadata_Type interface {
 	isDeployment_RuntimeMetadata_Type()
 }
@@ -7373,7 +15441,7 @@ func (*Deployment_RuntimeMetadata_Native_) isDeployment_RuntimeMetadata_Type() {
 func (*Deployment_RuntimeMetadata_Docker_) isDeployment_RuntimeMetadata_Type() {}
 
 type Deployment_RuntimeMetadata_Native struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// PID of native process.
 	ProcessId     int64 `protobuf:"varint,1,opt,name=process_id,json=processId,proto3" json:"process_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -7382,7 +15450,7 @@ type Deployment_RuntimeMetadata_Native struct {
 
 func (x *Deployment_RuntimeMetadata_Native) Reset() {
 	*x = Deployment_RuntimeMetadata_Native{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[114]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[136]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7394,7 +15462,7 @@ func (x *Deployment_RuntimeMetadata_Native) String() string {
 func (*Deployment_RuntimeMetadata_Native) ProtoMessage() {}
 
 func (x *Deployment_RuntimeMetadata_Native) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[114]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[136]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7405,11 +15473,6 @@ func (x *Deployment_RuntimeMetadata_Native) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Deployment_RuntimeMetadata_Native.ProtoReflect.Descriptor instead.
-func (*Deployment_RuntimeMetadata_Native) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{7, 4, 0}
-}
-
 func (x *Deployment_RuntimeMetadata_Native) GetProcessId() int64 {
 	if x != nil {
 		return x.ProcessId
@@ -7417,8 +15480,27 @@ func (x *Deployment_RuntimeMetadata_Native) GetProcessId() int64 {
 	return 0
 }
 
+func (x *Deployment_RuntimeMetadata_Native) SetProcessId(v int64) {
+	x.ProcessId = v
+}
+
+type Deployment_RuntimeMetadata_Native_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// PID of native process.
+	ProcessId int64
+}
+
+func (b0 Deployment_RuntimeMetadata_Native_builder) Build() *Deployment_RuntimeMetadata_Native {
+	m0 := &Deployment_RuntimeMetadata_Native{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ProcessId = b.ProcessId
+	return m0
+}
+
 type Deployment_RuntimeMetadata_Docker struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Container ID of docker container.
 	ContainerId   string `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -7427,7 +15509,7 @@ type Deployment_RuntimeMetadata_Docker struct {
 
 func (x *Deployment_RuntimeMetadata_Docker) Reset() {
 	*x = Deployment_RuntimeMetadata_Docker{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[115]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[137]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7439,7 +15521,7 @@ func (x *Deployment_RuntimeMetadata_Docker) String() string {
 func (*Deployment_RuntimeMetadata_Docker) ProtoMessage() {}
 
 func (x *Deployment_RuntimeMetadata_Docker) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[115]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[137]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7450,11 +15532,6 @@ func (x *Deployment_RuntimeMetadata_Docker) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Deployment_RuntimeMetadata_Docker.ProtoReflect.Descriptor instead.
-func (*Deployment_RuntimeMetadata_Docker) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{7, 4, 1}
-}
-
 func (x *Deployment_RuntimeMetadata_Docker) GetContainerId() string {
 	if x != nil {
 		return x.ContainerId
@@ -7462,8 +15539,27 @@ func (x *Deployment_RuntimeMetadata_Docker) GetContainerId() string {
 	return ""
 }
 
+func (x *Deployment_RuntimeMetadata_Docker) SetContainerId(v string) {
+	x.ContainerId = v
+}
+
+type Deployment_RuntimeMetadata_Docker_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Container ID of docker container.
+	ContainerId string
+}
+
+func (b0 Deployment_RuntimeMetadata_Docker_builder) Build() *Deployment_RuntimeMetadata_Docker {
+	m0 := &Deployment_RuntimeMetadata_Docker{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ContainerId = b.ContainerId
+	return m0
+}
+
 type PackageBuildMetadata_Runtime struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Version:
 	//
 	//	*PackageBuildMetadata_Runtime_V1Beta1
@@ -7474,7 +15570,7 @@ type PackageBuildMetadata_Runtime struct {
 
 func (x *PackageBuildMetadata_Runtime) Reset() {
 	*x = PackageBuildMetadata_Runtime{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[116]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[138]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7486,7 +15582,7 @@ func (x *PackageBuildMetadata_Runtime) String() string {
 func (*PackageBuildMetadata_Runtime) ProtoMessage() {}
 
 func (x *PackageBuildMetadata_Runtime) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[116]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[138]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7495,11 +15591,6 @@ func (x *PackageBuildMetadata_Runtime) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PackageBuildMetadata_Runtime.ProtoReflect.Descriptor instead.
-func (*PackageBuildMetadata_Runtime) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{21, 0}
 }
 
 func (x *PackageBuildMetadata_Runtime) GetVersion() isPackageBuildMetadata_Runtime_Version {
@@ -7518,6 +15609,78 @@ func (x *PackageBuildMetadata_Runtime) GetV1Beta1() v1beta1.Runtime {
 	return v1beta1.Runtime(0)
 }
 
+func (x *PackageBuildMetadata_Runtime) SetV1Beta1(v v1beta1.Runtime) {
+	x.Version = &PackageBuildMetadata_Runtime_V1Beta1{v}
+}
+
+func (x *PackageBuildMetadata_Runtime) HasVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.Version != nil
+}
+
+func (x *PackageBuildMetadata_Runtime) HasV1Beta1() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Version.(*PackageBuildMetadata_Runtime_V1Beta1)
+	return ok
+}
+
+func (x *PackageBuildMetadata_Runtime) ClearVersion() {
+	x.Version = nil
+}
+
+func (x *PackageBuildMetadata_Runtime) ClearV1Beta1() {
+	if _, ok := x.Version.(*PackageBuildMetadata_Runtime_V1Beta1); ok {
+		x.Version = nil
+	}
+}
+
+const PackageBuildMetadata_Runtime_Version_not_set_case case_PackageBuildMetadata_Runtime_Version = 0
+const PackageBuildMetadata_Runtime_V1Beta1_case case_PackageBuildMetadata_Runtime_Version = 1
+
+func (x *PackageBuildMetadata_Runtime) WhichVersion() case_PackageBuildMetadata_Runtime_Version {
+	if x == nil {
+		return PackageBuildMetadata_Runtime_Version_not_set_case
+	}
+	switch x.Version.(type) {
+	case *PackageBuildMetadata_Runtime_V1Beta1:
+		return PackageBuildMetadata_Runtime_V1Beta1_case
+	default:
+		return PackageBuildMetadata_Runtime_Version_not_set_case
+	}
+}
+
+type PackageBuildMetadata_Runtime_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Version:
+	V1Beta1 *v1beta1.Runtime
+	// -- end of Version
+}
+
+func (b0 PackageBuildMetadata_Runtime_builder) Build() *PackageBuildMetadata_Runtime {
+	m0 := &PackageBuildMetadata_Runtime{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.V1Beta1 != nil {
+		x.Version = &PackageBuildMetadata_Runtime_V1Beta1{*b.V1Beta1}
+	}
+	return m0
+}
+
+type case_PackageBuildMetadata_Runtime_Version protoreflect.FieldNumber
+
+func (x case_PackageBuildMetadata_Runtime_Version) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[138].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isPackageBuildMetadata_Runtime_Version interface {
 	isPackageBuildMetadata_Runtime_Version()
 }
@@ -7529,7 +15692,7 @@ type PackageBuildMetadata_Runtime_V1Beta1 struct {
 func (*PackageBuildMetadata_Runtime_V1Beta1) isPackageBuildMetadata_Runtime_Version() {}
 
 type PackageBuildMetadata_Platform struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Version:
 	//
 	//	*PackageBuildMetadata_Platform_V1Beta1
@@ -7540,7 +15703,7 @@ type PackageBuildMetadata_Platform struct {
 
 func (x *PackageBuildMetadata_Platform) Reset() {
 	*x = PackageBuildMetadata_Platform{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[117]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[139]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7552,7 +15715,7 @@ func (x *PackageBuildMetadata_Platform) String() string {
 func (*PackageBuildMetadata_Platform) ProtoMessage() {}
 
 func (x *PackageBuildMetadata_Platform) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[117]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[139]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7561,11 +15724,6 @@ func (x *PackageBuildMetadata_Platform) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PackageBuildMetadata_Platform.ProtoReflect.Descriptor instead.
-func (*PackageBuildMetadata_Platform) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{21, 1}
 }
 
 func (x *PackageBuildMetadata_Platform) GetVersion() isPackageBuildMetadata_Platform_Version {
@@ -7584,6 +15742,82 @@ func (x *PackageBuildMetadata_Platform) GetV1Beta1() *v1beta1.Platform {
 	return nil
 }
 
+func (x *PackageBuildMetadata_Platform) SetV1Beta1(v *v1beta1.Platform) {
+	if v == nil {
+		x.Version = nil
+		return
+	}
+	x.Version = &PackageBuildMetadata_Platform_V1Beta1{v}
+}
+
+func (x *PackageBuildMetadata_Platform) HasVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.Version != nil
+}
+
+func (x *PackageBuildMetadata_Platform) HasV1Beta1() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Version.(*PackageBuildMetadata_Platform_V1Beta1)
+	return ok
+}
+
+func (x *PackageBuildMetadata_Platform) ClearVersion() {
+	x.Version = nil
+}
+
+func (x *PackageBuildMetadata_Platform) ClearV1Beta1() {
+	if _, ok := x.Version.(*PackageBuildMetadata_Platform_V1Beta1); ok {
+		x.Version = nil
+	}
+}
+
+const PackageBuildMetadata_Platform_Version_not_set_case case_PackageBuildMetadata_Platform_Version = 0
+const PackageBuildMetadata_Platform_V1Beta1_case case_PackageBuildMetadata_Platform_Version = 1
+
+func (x *PackageBuildMetadata_Platform) WhichVersion() case_PackageBuildMetadata_Platform_Version {
+	if x == nil {
+		return PackageBuildMetadata_Platform_Version_not_set_case
+	}
+	switch x.Version.(type) {
+	case *PackageBuildMetadata_Platform_V1Beta1:
+		return PackageBuildMetadata_Platform_V1Beta1_case
+	default:
+		return PackageBuildMetadata_Platform_Version_not_set_case
+	}
+}
+
+type PackageBuildMetadata_Platform_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Version:
+	V1Beta1 *v1beta1.Platform
+	// -- end of Version
+}
+
+func (b0 PackageBuildMetadata_Platform_builder) Build() *PackageBuildMetadata_Platform {
+	m0 := &PackageBuildMetadata_Platform{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.V1Beta1 != nil {
+		x.Version = &PackageBuildMetadata_Platform_V1Beta1{b.V1Beta1}
+	}
+	return m0
+}
+
+type case_PackageBuildMetadata_Platform_Version protoreflect.FieldNumber
+
+func (x case_PackageBuildMetadata_Platform_Version) String() string {
+	md := file_dtkt_core_v1_messages_proto_msgTypes[139].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isPackageBuildMetadata_Platform_Version interface {
 	isPackageBuildMetadata_Platform_Version()
 }
@@ -7596,7 +15830,7 @@ func (*PackageBuildMetadata_Platform_V1Beta1) isPackageBuildMetadata_Platform_Ve
 
 // InputsEvent provides initial input values for a flow.
 type SendAutomationEvent_InputsEvent struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Map of flow input node id => any proto wrapper (e.g., "ping" => Any("pong")).
 	Values        map[string]*anypb.Any `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
@@ -7605,7 +15839,7 @@ type SendAutomationEvent_InputsEvent struct {
 
 func (x *SendAutomationEvent_InputsEvent) Reset() {
 	*x = SendAutomationEvent_InputsEvent{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[120]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[142]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7617,7 +15851,7 @@ func (x *SendAutomationEvent_InputsEvent) String() string {
 func (*SendAutomationEvent_InputsEvent) ProtoMessage() {}
 
 func (x *SendAutomationEvent_InputsEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[120]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[142]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7628,11 +15862,6 @@ func (x *SendAutomationEvent_InputsEvent) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SendAutomationEvent_InputsEvent.ProtoReflect.Descriptor instead.
-func (*SendAutomationEvent_InputsEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{42, 0}
-}
-
 func (x *SendAutomationEvent_InputsEvent) GetValues() map[string]*anypb.Any {
 	if x != nil {
 		return x.Values
@@ -7640,9 +15869,28 @@ func (x *SendAutomationEvent_InputsEvent) GetValues() map[string]*anypb.Any {
 	return nil
 }
 
+func (x *SendAutomationEvent_InputsEvent) SetValues(v map[string]*anypb.Any) {
+	x.Values = v
+}
+
+type SendAutomationEvent_InputsEvent_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Map of flow input node id => any proto wrapper (e.g., "ping" => Any("pong")).
+	Values map[string]*anypb.Any
+}
+
+func (b0 SendAutomationEvent_InputsEvent_builder) Build() *SendAutomationEvent_InputsEvent {
+	m0 := &SendAutomationEvent_InputsEvent{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Values = b.Values
+	return m0
+}
+
 // UserResponseEvent is received upon a fulfilled user elicitation.
 type SendAutomationEvent_UserResponseEvent struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Flow action node id containing user action.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Map of user action input id => any proto wrapper (e.g., "ping" => Any("pong")).
@@ -7653,7 +15901,7 @@ type SendAutomationEvent_UserResponseEvent struct {
 
 func (x *SendAutomationEvent_UserResponseEvent) Reset() {
 	*x = SendAutomationEvent_UserResponseEvent{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[121]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[143]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7665,7 +15913,7 @@ func (x *SendAutomationEvent_UserResponseEvent) String() string {
 func (*SendAutomationEvent_UserResponseEvent) ProtoMessage() {}
 
 func (x *SendAutomationEvent_UserResponseEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[121]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[143]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7674,11 +15922,6 @@ func (x *SendAutomationEvent_UserResponseEvent) ProtoReflect() protoreflect.Mess
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SendAutomationEvent_UserResponseEvent.ProtoReflect.Descriptor instead.
-func (*SendAutomationEvent_UserResponseEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{42, 1}
 }
 
 func (x *SendAutomationEvent_UserResponseEvent) GetId() string {
@@ -7695,9 +15938,35 @@ func (x *SendAutomationEvent_UserResponseEvent) GetValues() map[string]*anypb.An
 	return nil
 }
 
+func (x *SendAutomationEvent_UserResponseEvent) SetId(v string) {
+	x.Id = v
+}
+
+func (x *SendAutomationEvent_UserResponseEvent) SetValues(v map[string]*anypb.Any) {
+	x.Values = v
+}
+
+type SendAutomationEvent_UserResponseEvent_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Flow action node id containing user action.
+	Id string
+	// Map of user action input id => any proto wrapper (e.g., "ping" => Any("pong")).
+	Values map[string]*anypb.Any
+}
+
+func (b0 SendAutomationEvent_UserResponseEvent_builder) Build() *SendAutomationEvent_UserResponseEvent {
+	m0 := &SendAutomationEvent_UserResponseEvent{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Values = b.Values
+	return m0
+}
+
 // OutputsEvent provides output values from a flow.
 type ReceiveAutomationEvent_OutputsEvent struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Map of output node id => any proto wrapper.
 	Values        map[string]*anypb.Any `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
@@ -7706,7 +15975,7 @@ type ReceiveAutomationEvent_OutputsEvent struct {
 
 func (x *ReceiveAutomationEvent_OutputsEvent) Reset() {
 	*x = ReceiveAutomationEvent_OutputsEvent{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[124]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[146]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7718,7 +15987,7 @@ func (x *ReceiveAutomationEvent_OutputsEvent) String() string {
 func (*ReceiveAutomationEvent_OutputsEvent) ProtoMessage() {}
 
 func (x *ReceiveAutomationEvent_OutputsEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[124]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[146]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7729,11 +15998,6 @@ func (x *ReceiveAutomationEvent_OutputsEvent) ProtoReflect() protoreflect.Messag
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ReceiveAutomationEvent_OutputsEvent.ProtoReflect.Descriptor instead.
-func (*ReceiveAutomationEvent_OutputsEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{43, 0}
-}
-
 func (x *ReceiveAutomationEvent_OutputsEvent) GetValues() map[string]*anypb.Any {
 	if x != nil {
 		return x.Values
@@ -7741,9 +16005,28 @@ func (x *ReceiveAutomationEvent_OutputsEvent) GetValues() map[string]*anypb.Any 
 	return nil
 }
 
+func (x *ReceiveAutomationEvent_OutputsEvent) SetValues(v map[string]*anypb.Any) {
+	x.Values = v
+}
+
+type ReceiveAutomationEvent_OutputsEvent_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Map of output node id => any proto wrapper.
+	Values map[string]*anypb.Any
+}
+
+func (b0 ReceiveAutomationEvent_OutputsEvent_builder) Build() *ReceiveAutomationEvent_OutputsEvent {
+	m0 := &ReceiveAutomationEvent_OutputsEvent{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Values = b.Values
+	return m0
+}
+
 // UserRequestEvent is emitted upon execution requiring elicitation from a user.
 type ReceiveAutomationEvent_UserRequestEvent struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Flow action node id containing user action.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// User action node which defines the data being requested.
@@ -7754,7 +16037,7 @@ type ReceiveAutomationEvent_UserRequestEvent struct {
 
 func (x *ReceiveAutomationEvent_UserRequestEvent) Reset() {
 	*x = ReceiveAutomationEvent_UserRequestEvent{}
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[125]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[147]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7766,7 +16049,7 @@ func (x *ReceiveAutomationEvent_UserRequestEvent) String() string {
 func (*ReceiveAutomationEvent_UserRequestEvent) ProtoMessage() {}
 
 func (x *ReceiveAutomationEvent_UserRequestEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_messages_proto_msgTypes[125]
+	mi := &file_dtkt_core_v1_messages_proto_msgTypes[147]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7775,11 +16058,6 @@ func (x *ReceiveAutomationEvent_UserRequestEvent) ProtoReflect() protoreflect.Me
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ReceiveAutomationEvent_UserRequestEvent.ProtoReflect.Descriptor instead.
-func (*ReceiveAutomationEvent_UserRequestEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_messages_proto_rawDescGZIP(), []int{43, 1}
 }
 
 func (x *ReceiveAutomationEvent_UserRequestEvent) GetId() string {
@@ -7796,11 +16074,48 @@ func (x *ReceiveAutomationEvent_UserRequestEvent) GetUserAction() *v1beta11.User
 	return nil
 }
 
+func (x *ReceiveAutomationEvent_UserRequestEvent) SetId(v string) {
+	x.Id = v
+}
+
+func (x *ReceiveAutomationEvent_UserRequestEvent) SetUserAction(v *v1beta11.UserAction) {
+	x.UserAction = v
+}
+
+func (x *ReceiveAutomationEvent_UserRequestEvent) HasUserAction() bool {
+	if x == nil {
+		return false
+	}
+	return x.UserAction != nil
+}
+
+func (x *ReceiveAutomationEvent_UserRequestEvent) ClearUserAction() {
+	x.UserAction = nil
+}
+
+type ReceiveAutomationEvent_UserRequestEvent_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Flow action node id containing user action.
+	Id string
+	// User action node which defines the data being requested.
+	UserAction *v1beta11.UserAction
+}
+
+func (b0 ReceiveAutomationEvent_UserRequestEvent_builder) Build() *ReceiveAutomationEvent_UserRequestEvent {
+	m0 := &ReceiveAutomationEvent_UserRequestEvent{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.UserAction = b.UserAction
+	return m0
+}
+
 var File_dtkt_core_v1_messages_proto protoreflect.FileDescriptor
 
 const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\n" +
-	"\x1bdtkt/core/v1/messages.proto\x12\fdtkt.core.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cdtkt/flow/v1beta1/eval.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\x1fdtkt/shared/v1beta1/enums.proto\x1a\"dtkt/shared/v1beta1/messages.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x19google/protobuf/any.proto\x1a google/protobuf/descriptor.proto\x1a\x1egoogle/protobuf/duration.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\"K\n" +
+	"\x1bdtkt/core/v1/messages.proto\x12\fdtkt.core.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cdtkt/flow/v1beta1/eval.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a\x1edtkt/flow/v1beta2/events.proto\x1a\x1ddtkt/flow/v1beta2/graph.proto\x1a\x1cdtkt/flow/v1beta2/spec.proto\x1a\x1ddtkt/flow/v1beta2/state.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\x1fdtkt/shared/v1beta1/enums.proto\x1a\"dtkt/shared/v1beta1/messages.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x19google/protobuf/any.proto\x1a google/protobuf/descriptor.proto\x1a\x1egoogle/protobuf/duration.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\"K\n" +
 	"\aAddress\x12 \n" +
 	"\anetwork\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\anetwork\x12\x1e\n" +
 	"\x06target\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06target\"\x9a\x03\n" +
@@ -7881,7 +16196,127 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"createTime\x12F\n" +
 	"\vupdate_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\n" +
 	"updateTime:\\\xeaAY\n" +
-	"\x04Flow\x12)organizations/{organization}/flows/{flow}\x12\x19users/{user}/flows/{flow}*\x05flows2\x04flow\"\xd3\x0e\n" +
+	"\x04Flow\x12)organizations/{organization}/flows/{flow}\x12\x19users/{user}/flows/{flow}*\x05flows2\x04flow\"\xcc\n" +
+	"\n" +
+	"\aFlowRun\x12#\n" +
+	"\x04name\x18\x01 \x01(\tB\x0f\xe0A\b\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x04name\x12&\n" +
+	"\x03uid\x18\x02 \x01(\tB\x14\xe0A\x03\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01\x82\xb5\x18\x02\x18\x01R\x03uid\x12A\n" +
+	"\x05state\x18\x03 \x01(\x0e2\x1b.dtkt.core.v1.FlowRun.StateB\x0e\xe0A\x03\xbaH\b\xc8\x01\x01\x82\x01\x02\x10\x01R\x05state\x12E\n" +
+	"\trun_state\x18\x04 \x01(\v2\x1d.dtkt.core.v1.FlowRunMetadataB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\brunState\x12\x9a\x01\n" +
+	"\x04flow\x18\x05 \x01(\tB\x85\x01\xfaA\x06\n" +
+	"\x04Flow\xbaH\x03\xc8\x01\x01\x82\xb5\x18r\n" +
+	"\x04Flow\x12\x0eSelect a flow.:Z\n" +
+	"\"dtkt.core.v1.FlowService.ListFlows\x12\x19this.flows.map(i, i.name)\x1a\x19this.flows.map(i, i.name)R\x04flow\x12,\n" +
+	"\tspec_etag\x18\x06 \x01(\tB\x0f\xe0A\x04\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\bspecEtag\x12H\n" +
+	"\vconnections\x18\a \x03(\v2&.dtkt.core.v1.FlowRun.ConnectionsEntryR\vconnections\x129\n" +
+	"\x06inputs\x18\b \x03(\v2!.dtkt.core.v1.FlowRun.InputsEntryR\x06inputs\x123\n" +
+	"\atimeout\x18\t \x01(\v2\x19.google.protobuf.DurationR\atimeout\x12!\n" +
+	"\x05batch\x18\n" +
+	" \x01(\tB\x06\x82\xb5\x18\x02\x18\x01H\x00R\x05batch\x88\x01\x01\x12\x18\n" +
+	"\apersist\x18\v \x01(\bR\apersist\x12&\n" +
+	"\x04etag\x18\x0f \x01(\tB\x12\xe0A\x03\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01\x80\x01\x01R\x04etag\x12L\n" +
+	"\vcreate_time\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampB\x0f\xe0A\x03\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\n" +
+	"createTime\x12L\n" +
+	"\vupdate_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampB\x0f\xe0A\x03\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\n" +
+	"updateTime\x1ad\n" +
+	"\x10ConnectionsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12:\n" +
+	"\x05value\x18\x02 \x01(\v2$.dtkt.core.v1.FlowConnectionMetadataR\x05value:\x028\x01\x1aO\n" +
+	"\vInputsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12*\n" +
+	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyR\x05value:\x028\x01\"\xaf\x01\n" +
+	"\x05State\x12\x15\n" +
+	"\x11STATE_UNSPECIFIED\x10\x00\x12\x10\n" +
+	"\fPROVISIONING\x10\n" +
+	"\x12\v\n" +
+	"\aPENDING\x10\x01\x12\v\n" +
+	"\aRUNNING\x10\x02\x12\f\n" +
+	"\bSTOPPING\x10\x03\x12\r\n" +
+	"\tSUCCEEDED\x10\x04\x12\n" +
+	"\n" +
+	"\x06FAILED\x10\x05\x12\v\n" +
+	"\aERRORED\x10\x06\x12\r\n" +
+	"\tSUSPENDED\x10\a\x12\r\n" +
+	"\tCANCELLED\x10\b\x12\x0f\n" +
+	"\vTERMINATING\x10\t:q\xeaAn\n" +
+	"\aFlowRun\x12/organizations/{organization}/flowruns/{flowrun}\x12\x1fusers/{user}/flowruns/{flowrun}*\bflowruns2\aflowrunB\b\n" +
+	"\x06_batch\"/\n" +
+	"\x11GetFlowRunRequest\x12\x1a\n" +
+	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\"M\n" +
+	"\x12GetFlowRunResponse\x127\n" +
+	"\aflowrun\x18\x01 \x01(\v2\x15.dtkt.core.v1.FlowRunB\x06\xbaH\x03\xc8\x01\x01R\aflowrun\"\xd1\x01\n" +
+	"\x14CreateFlowRunRequest\x12$\n" +
+	"\x06parent\x18\x01 \x01(\tB\f\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x06parent\x12Z\n" +
+	"\n" +
+	"flowrun_id\x18\x02 \x01(\tB;\xbaH(\xc8\x01\x01r#2!^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$\x82\xb5\x18\f\x12\n" +
+	"FlowRun IDR\tflowrunId\x127\n" +
+	"\aflowrun\x18\x03 \x01(\v2\x15.dtkt.core.v1.FlowRunB\x06\xbaH\x03\xc8\x01\x01R\aflowrun\"P\n" +
+	"\x15CreateFlowRunResponse\x127\n" +
+	"\aflowrun\x18\x01 \x01(\v2\x15.dtkt.core.v1.FlowRunB\x06\xbaH\x03\xc8\x01\x01R\aflowrun\"\xf1\x01\n" +
+	"\x14UpdateFlowRunRequest\x127\n" +
+	"\aflowrun\x18\x01 \x01(\v2\x15.dtkt.core.v1.FlowRunB\x06\xbaH\x03\xc8\x01\x01R\aflowrun\x12;\n" +
+	"\vupdate_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
+	"updateMask\x12Q\n" +
+	"\rdesired_state\x18\x03 \x01(\x0e2\x1b.dtkt.core.v1.FlowRun.StateB\n" +
+	"\xbaH\a\x82\x01\x04\x18\x02\x18\x03H\x00R\fdesiredState\x88\x01\x01B\x10\n" +
+	"\x0e_desired_state\"N\n" +
+	"\x14DeleteFlowRunRequest\x12\x1a\n" +
+	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12\x1a\n" +
+	"\x04etag\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04etag\"\xa8\x02\n" +
+	"\x1aBatchCreateFlowRunsRequest\x12$\n" +
+	"\x06parent\x18\x01 \x01(\tB\f\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x06parent\x12H\n" +
+	"\brequests\x18\x02 \x03(\v2\".dtkt.core.v1.CreateFlowRunRequestB\b\xbaH\x05\x92\x01\x02\b\x02R\brequests:\x99\x01\xbaH\x95\x01\x1a\x92\x01\n" +
+	"\x1ebatch_create_flowruns.requests\x12!requests must use the same parent\x1aMsize(this.requests.filter(r, r.parent == this.parent)) == size(this.requests)\"X\n" +
+	"\x1bBatchCreateFlowRunsResponse\x129\n" +
+	"\bflowruns\x18\x01 \x03(\v2\x15.dtkt.core.v1.FlowRunB\x06\xbaH\x03\xc8\x01\x01R\bflowruns\"\xa1\x01\n" +
+	"\x13ListFlowRunsRequest\x12\x1b\n" +
+	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x1b\n" +
+	"\x06parent\x18\x03 \x01(\tH\x00R\x06parent\x88\x01\x01\x12\x1b\n" +
+	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01B\t\n" +
+	"\a_parentB\t\n" +
+	"\a_filter\"y\n" +
+	"\x14ListFlowRunsResponse\x129\n" +
+	"\bflowruns\x18\x01 \x03(\v2\x15.dtkt.core.v1.FlowRunB\x06\xbaH\x03\xc8\x01\x01R\bflowruns\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\x96\x06\n" +
+	"\x10SendFlowRunEvent\x125\n" +
+	"\x05input\x18\x01 \x01(\v2\x1d.dtkt.flow.v1beta2.InputEventH\x00R\x05input\x12`\n" +
+	"\x14interaction_response\x18\x02 \x01(\v2+.dtkt.flow.v1beta2.InteractionResponseEventH\x00R\x13interactionResponse\x126\n" +
+	"\x04stop\x18\x03 \x01(\v2 .dtkt.flow.v1beta2.StopFlowEventH\x00R\x04stop\x12E\n" +
+	"\tterminate\x18\x04 \x01(\v2%.dtkt.flow.v1beta2.TerminateFlowEventH\x00R\tterminate\x12?\n" +
+	"\asuspend\x18\x05 \x01(\v2#.dtkt.flow.v1beta2.SuspendFlowEventH\x00R\asuspend\x12<\n" +
+	"\x06resume\x18\x06 \x01(\v2\".dtkt.flow.v1beta2.ResumeFlowEventH\x00R\x06resume\x12?\n" +
+	"\tstop_node\x18\a \x01(\v2 .dtkt.flow.v1beta2.StopNodeEventH\x00R\bstopNode\x12N\n" +
+	"\x0eterminate_node\x18\b \x01(\v2%.dtkt.flow.v1beta2.TerminateNodeEventH\x00R\rterminateNode\x12H\n" +
+	"\fsuspend_node\x18\t \x01(\v2#.dtkt.flow.v1beta2.SuspendNodeEventH\x00R\vsuspendNode\x12E\n" +
+	"\vresume_node\x18\n" +
+	" \x01(\v2\".dtkt.flow.v1beta2.ResumeNodeEventH\x00R\n" +
+	"resumeNode\x129\n" +
+	"\x05start\x18\v \x01(\v2!.dtkt.flow.v1beta2.StartFlowEventH\x00R\x05startB\x0e\n" +
+	"\x05event\x12\x05\xbaH\x02\b\x01\"\xbe\x02\n" +
+	"\x13ReceiveFlowRunEvent\x128\n" +
+	"\x06output\x18\x01 \x01(\v2\x1e.dtkt.flow.v1beta2.OutputEventH\x00R\x06output\x12K\n" +
+	"\rinput_request\x18\x02 \x01(\v2$.dtkt.flow.v1beta2.InputRequestEventH\x00R\finputRequest\x12]\n" +
+	"\x13interaction_request\x18\x03 \x01(\v2*.dtkt.flow.v1beta2.InteractionRequestEventH\x00R\x12interactionRequest\x121\n" +
+	"\aflowrun\x18\x04 \x01(\v2\x15.dtkt.core.v1.FlowRunH\x00R\aflowrunB\x0e\n" +
+	"\x05event\x12\x05\xbaH\x02\b\x01\"s\n" +
+	"\x17SendFlowRunEventRequest\x12\x1a\n" +
+	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12<\n" +
+	"\x05event\x18\x02 \x01(\v2\x1e.dtkt.core.v1.SendFlowRunEventB\x06\xbaH\x03\xc8\x01\x01R\x05event\"_\n" +
+	"\x1bReceiveFlowRunEventsRequest\x12\x1a\n" +
+	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12$\n" +
+	"\x0eafter_event_id\x18\x02 \x01(\tR\fafterEventId\"z\n" +
+	"\x1cReceiveFlowRunEventsResponse\x12?\n" +
+	"\x05event\x18\x01 \x01(\v2!.dtkt.core.v1.ReceiveFlowRunEventB\x06\xbaH\x03\xc8\x01\x01R\x05event\x12\x19\n" +
+	"\bevent_id\x18\x02 \x01(\tR\aeventId\"\x94\x01\n" +
+	"\x1aStreamFlowRunEventsRequest\x12\x1a\n" +
+	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x124\n" +
+	"\x05event\x18\x02 \x01(\v2\x1e.dtkt.core.v1.SendFlowRunEventR\x05event\x12$\n" +
+	"\x0eafter_event_id\x18\x03 \x01(\tR\fafterEventId\"y\n" +
+	"\x1bStreamFlowRunEventsResponse\x12?\n" +
+	"\x05event\x18\x01 \x01(\v2!.dtkt.core.v1.ReceiveFlowRunEventB\x06\xbaH\x03\xc8\x01\x01R\x05event\x12\x19\n" +
+	"\bevent_id\x18\x02 \x01(\tR\aeventId\"\xd3\x0e\n" +
 	"\n" +
 	"Connection\x12#\n" +
 	"\x04name\x18\x01 \x01(\tB\x0f\xe0A\b\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x04name\x12&\n" +
@@ -8052,6 +16487,12 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\n" +
 	"start_time\x18\n" +
 	" \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x127\n" +
+	"\tstop_time\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\bstopTime\"\xa8\x01\n" +
+	"\x18FlowRunOperationMetadata\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\x129\n" +
+	"\n" +
+	"start_time\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x127\n" +
 	"\tstop_time\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\bstopTime\"\xa2\x01\n" +
 	"\x12DeploymentMetadata\x12\x18\n" +
 	"\amessage\x18\n" +
@@ -8067,12 +16508,17 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\acontext\x18\x02 \x01(\v2\x15.dtkt.core.v1.ContextR\acontext\"_\n" +
 	"\x13FlowRuntimeMetadata\x126\n" +
 	"\av1beta1\x18\x01 \x01(\v2\x1a.dtkt.flow.v1beta1.RuntimeH\x00R\av1beta1B\x10\n" +
-	"\aversion\x12\x05\xbaH\x02\b\x01\"Y\n" +
+	"\aversion\x12\x05\xbaH\x02\b\x01\"_\n" +
+	"\x0fFlowRunMetadata\x12:\n" +
+	"\av1beta2\x18\x01 \x01(\v2\x1e.dtkt.flow.v1beta2.RunSnapshotH\x00R\av1beta2B\x10\n" +
+	"\aversion\x12\x05\xbaH\x02\b\x01\"\x8e\x01\n" +
 	"\x10FlowSpecMetadata\x123\n" +
-	"\av1beta1\x18\x01 \x01(\v2\x17.dtkt.flow.v1beta1.FlowH\x00R\av1beta1B\x10\n" +
-	"\aversion\x12\x05\xbaH\x02\b\x01\"[\n" +
+	"\av1beta1\x18\x01 \x01(\v2\x17.dtkt.flow.v1beta1.FlowH\x00R\av1beta1\x123\n" +
+	"\av1beta2\x18\x02 \x01(\v2\x17.dtkt.flow.v1beta2.FlowH\x00R\av1beta2B\x10\n" +
+	"\aversion\x12\x05\xbaH\x02\b\x01\"\x91\x01\n" +
 	"\x11FlowGraphMetadata\x124\n" +
-	"\av1beta1\x18\x01 \x01(\v2\x18.dtkt.flow.v1beta1.GraphH\x00R\av1beta1B\x10\n" +
+	"\av1beta1\x18\x01 \x01(\v2\x18.dtkt.flow.v1beta1.GraphH\x00R\av1beta1\x124\n" +
+	"\av1beta2\x18\x02 \x01(\v2\x18.dtkt.flow.v1beta2.GraphH\x00R\av1beta2B\x10\n" +
 	"\aversion\x12\x05\xbaH\x02\b\x01\"a\n" +
 	"\x13PackageSpecMetadata\x128\n" +
 	"\av1beta1\x18\x01 \x01(\v2\x1c.dtkt.shared.v1beta1.PackageH\x00R\av1beta1B\x10\n" +
@@ -8163,10 +16609,10 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\x15GetAutomationResponse\x12@\n" +
 	"\n" +
 	"automation\x18\x01 \x01(\v2\x18.dtkt.core.v1.AutomationB\x06\xbaH\x03\xc8\x01\x01R\n" +
-	"automation\"\xd1\x01\n" +
+	"automation\"\xe6\x01\n" +
 	"\x17CreateAutomationRequest\x12$\n" +
-	"\x06parent\x18\x01 \x01(\tB\f\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x06parent\x12N\n" +
-	"\rautomation_id\x18\x02 \x01(\tB)\xbaH\x13\xc8\x01\x01r\x0e2\f^[a-z0-9-]+$\x82\xb5\x18\x0f\x12\rAutomation IDR\fautomationId\x12@\n" +
+	"\x06parent\x18\x01 \x01(\tB\f\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x06parent\x12c\n" +
+	"\rautomation_id\x18\x02 \x01(\tB>\xbaH(\xc8\x01\x01r#2!^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$\x82\xb5\x18\x0f\x12\rAutomation IDR\fautomationId\x12@\n" +
 	"\n" +
 	"automation\x18\x03 \x01(\v2\x18.dtkt.core.v1.AutomationB\x06\xbaH\x03\xc8\x01\x01R\n" +
 	"automation\"\\\n" +
@@ -8259,10 +16705,10 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\x15GetConnectionResponse\x12@\n" +
 	"\n" +
 	"connection\x18\x01 \x01(\v2\x18.dtkt.core.v1.ConnectionB\x06\xbaH\x03\xc8\x01\x01R\n" +
-	"connection\"\xd1\x01\n" +
+	"connection\"\xe6\x01\n" +
 	"\x17CreateConnectionRequest\x12$\n" +
-	"\x06parent\x18\x01 \x01(\tB\f\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x06parent\x12N\n" +
-	"\rconnection_id\x18\x02 \x01(\tB)\xbaH\x13\xc8\x01\x01r\x0e2\f^[a-z0-9-]+$\x82\xb5\x18\x0f\x12\rConnection IDR\fconnectionId\x12@\n" +
+	"\x06parent\x18\x01 \x01(\tB\f\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x06parent\x12c\n" +
+	"\rconnection_id\x18\x02 \x01(\tB>\xbaH(\xc8\x01\x01r#2!^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$\x82\xb5\x18\x0f\x12\rConnection IDR\fconnectionId\x12@\n" +
 	"\n" +
 	"connection\x18\x03 \x01(\v2\x18.dtkt.core.v1.ConnectionB\x06\xbaH\x03\xc8\x01\x01R\n" +
 	"connection\"\\\n" +
@@ -8314,10 +16760,10 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\x15GetDeploymentResponse\x12@\n" +
 	"\n" +
 	"deployment\x18\x01 \x01(\v2\x18.dtkt.core.v1.DeploymentB\x06\xbaH\x03\xc8\x01\x01R\n" +
-	"deployment\"\xbe\x01\n" +
+	"deployment\"\xd3\x01\n" +
 	"\x17CreateDeploymentRequest\x12$\n" +
-	"\x06parent\x18\x01 \x01(\tB\f\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x06parent\x12;\n" +
-	"\rdeployment_id\x18\x02 \x01(\tB\x16\xbaH\x13\xc8\x01\x01r\x0e2\f^[a-z0-9-]+$R\fdeploymentId\x12@\n" +
+	"\x06parent\x18\x01 \x01(\tB\f\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x06parent\x12P\n" +
+	"\rdeployment_id\x18\x02 \x01(\tB+\xbaH(\xc8\x01\x01r#2!^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$R\fdeploymentId\x12@\n" +
 	"\n" +
 	"deployment\x18\x03 \x01(\v2\x18.dtkt.core.v1.DeploymentB\x06\xbaH\x03\xc8\x01\x01R\n" +
 	"deployment\"\x80\x02\n" +
@@ -8347,10 +16793,10 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\x0eGetFlowRequest\x12\x1a\n" +
 	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\"A\n" +
 	"\x0fGetFlowResponse\x12.\n" +
-	"\x04flow\x18\x01 \x01(\v2\x12.dtkt.core.v1.FlowB\x06\xbaH\x03\xc8\x01\x01R\x04flow\"\x9a\x01\n" +
+	"\x04flow\x18\x01 \x01(\v2\x12.dtkt.core.v1.FlowB\x06\xbaH\x03\xc8\x01\x01R\x04flow\"\xaf\x01\n" +
 	"\x11CreateFlowRequest\x12$\n" +
-	"\x06parent\x18\x01 \x01(\tB\f\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x06parent\x12/\n" +
-	"\aflow_id\x18\x02 \x01(\tB\x16\xbaH\x13\xc8\x01\x01r\x0e2\f^[a-z0-9-]+$R\x06flowId\x12.\n" +
+	"\x06parent\x18\x01 \x01(\tB\f\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x06parent\x12D\n" +
+	"\aflow_id\x18\x02 \x01(\tB+\xbaH(\xc8\x01\x01r#2!^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$R\x06flowId\x12.\n" +
 	"\x04flow\x18\x03 \x01(\v2\x12.dtkt.core.v1.FlowB\x06\xbaH\x03\xc8\x01\x01R\x04flow\"D\n" +
 	"\x12CreateFlowResponse\x12.\n" +
 	"\x04flow\x18\x01 \x01(\v2\x12.dtkt.core.v1.FlowB\x06\xbaH\x03\xc8\x01\x01R\x04flow\"\x80\x01\n" +
@@ -8377,10 +16823,10 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\x15GetIntegrationRequest\x12\x1a\n" +
 	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\"]\n" +
 	"\x16GetIntegrationResponse\x12C\n" +
-	"\vintegration\x18\x01 \x01(\v2\x19.dtkt.core.v1.IntegrationB\x06\xbaH\x03\xc8\x01\x01R\vintegration\"\xc4\x01\n" +
+	"\vintegration\x18\x01 \x01(\v2\x19.dtkt.core.v1.IntegrationB\x06\xbaH\x03\xc8\x01\x01R\vintegration\"\xd9\x01\n" +
 	"\x18CreateIntegrationRequest\x12$\n" +
-	"\x06parent\x18\x01 \x01(\tB\f\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x06parent\x12=\n" +
-	"\x0eintegration_id\x18\x02 \x01(\tB\x16\xbaH\x13\xc8\x01\x01r\x0e2\f^[a-z0-9-]+$R\rintegrationId\x12C\n" +
+	"\x06parent\x18\x01 \x01(\tB\f\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x06parent\x12R\n" +
+	"\x0eintegration_id\x18\x02 \x01(\tB+\xbaH(\xc8\x01\x01r#2!^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$R\rintegrationId\x12C\n" +
 	"\vintegration\x18\x03 \x01(\v2\x19.dtkt.core.v1.IntegrationB\x06\xbaH\x03\xc8\x01\x01R\vintegration\"`\n" +
 	"\x19CreateIntegrationResponse\x12C\n" +
 	"\vintegration\x18\x01 \x01(\v2\x19.dtkt.core.v1.IntegrationB\x06\xbaH\x03\xc8\x01\x01R\vintegration\"\xcc\x01\n" +
@@ -8450,330 +16896,400 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageTokenB\xb7\x01\n" +
 	"\x12proto.dtkt.core.v1B\rMessagesProtoP\x01Z@github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1\xa2\x02\x03DCX\xaa\x02\fDtkt.Core.V1\xca\x02\fDtkt\\Core\\V1\xe2\x02\x18Dtkt\\Core\\V1\\GPBMetadata\xea\x02\x0eDtkt::Core::V1b\x06proto3"
 
-var (
-	file_dtkt_core_v1_messages_proto_rawDescOnce sync.Once
-	file_dtkt_core_v1_messages_proto_rawDescData []byte
-)
-
-func file_dtkt_core_v1_messages_proto_rawDescGZIP() []byte {
-	file_dtkt_core_v1_messages_proto_rawDescOnce.Do(func() {
-		file_dtkt_core_v1_messages_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_core_v1_messages_proto_rawDesc), len(file_dtkt_core_v1_messages_proto_rawDesc)))
-	})
-	return file_dtkt_core_v1_messages_proto_rawDescData
-}
-
-var file_dtkt_core_v1_messages_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
-var file_dtkt_core_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 127)
+var file_dtkt_core_v1_messages_proto_enumTypes = make([]protoimpl.EnumInfo, 8)
+var file_dtkt_core_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 149)
 var file_dtkt_core_v1_messages_proto_goTypes = []any{
 	(Auth_AuthMethod)(0),                          // 0: dtkt.core.v1.Auth.AuthMethod
 	(Automation_State)(0),                         // 1: dtkt.core.v1.Automation.State
-	(Deployment_State)(0),                         // 2: dtkt.core.v1.Deployment.State
-	(BuildOperationMetadata_State)(0),             // 3: dtkt.core.v1.BuildOperationMetadata.State
-	(RunOperationMetadata_State)(0),               // 4: dtkt.core.v1.RunOperationMetadata.State
-	(SyncOperationMetadata_State)(0),              // 5: dtkt.core.v1.SyncOperationMetadata.State
-	(DialMetadata_State)(0),                       // 6: dtkt.core.v1.DialMetadata.State
-	(*Address)(nil),                               // 7: dtkt.core.v1.Address
-	(*Auth)(nil),                                  // 8: dtkt.core.v1.Auth
-	(*Context)(nil),                               // 9: dtkt.core.v1.Context
-	(*Resource)(nil),                              // 10: dtkt.core.v1.Resource
-	(*Automation)(nil),                            // 11: dtkt.core.v1.Automation
-	(*Flow)(nil),                                  // 12: dtkt.core.v1.Flow
-	(*Connection)(nil),                            // 13: dtkt.core.v1.Connection
-	(*Deployment)(nil),                            // 14: dtkt.core.v1.Deployment
-	(*Integration)(nil),                           // 15: dtkt.core.v1.Integration
-	(*File)(nil),                                  // 16: dtkt.core.v1.File
-	(*Service)(nil),                               // 17: dtkt.core.v1.Service
-	(*Method)(nil),                                // 18: dtkt.core.v1.Method
-	(*Type)(nil),                                  // 19: dtkt.core.v1.Type
-	(*TypeSchema)(nil),                            // 20: dtkt.core.v1.TypeSchema
-	(*AutomationMetadata)(nil),                    // 21: dtkt.core.v1.AutomationMetadata
-	(*DeploymentMetadata)(nil),                    // 22: dtkt.core.v1.DeploymentMetadata
-	(*FlowConnectionMetadata)(nil),                // 23: dtkt.core.v1.FlowConnectionMetadata
-	(*FlowRuntimeMetadata)(nil),                   // 24: dtkt.core.v1.FlowRuntimeMetadata
-	(*FlowSpecMetadata)(nil),                      // 25: dtkt.core.v1.FlowSpecMetadata
-	(*FlowGraphMetadata)(nil),                     // 26: dtkt.core.v1.FlowGraphMetadata
-	(*PackageSpecMetadata)(nil),                   // 27: dtkt.core.v1.PackageSpecMetadata
-	(*PackageBuildMetadata)(nil),                  // 28: dtkt.core.v1.PackageBuildMetadata
-	(*BuildOperationMetadata)(nil),                // 29: dtkt.core.v1.BuildOperationMetadata
-	(*RunOperationMetadata)(nil),                  // 30: dtkt.core.v1.RunOperationMetadata
-	(*SyncOperationMetadata)(nil),                 // 31: dtkt.core.v1.SyncOperationMetadata
-	(*DialMetadata)(nil),                          // 32: dtkt.core.v1.DialMetadata
-	(*BatchRunOperationMetadata)(nil),             // 33: dtkt.core.v1.BatchRunOperationMetadata
-	(*EncryptedAny)(nil),                          // 34: dtkt.core.v1.EncryptedAny
-	(*EncryptRequest)(nil),                        // 35: dtkt.core.v1.EncryptRequest
-	(*EncryptResponse)(nil),                       // 36: dtkt.core.v1.EncryptResponse
-	(*DecryptRequest)(nil),                        // 37: dtkt.core.v1.DecryptRequest
-	(*DecryptResponse)(nil),                       // 38: dtkt.core.v1.DecryptResponse
-	(*GetAutomationRequest)(nil),                  // 39: dtkt.core.v1.GetAutomationRequest
-	(*GetAutomationResponse)(nil),                 // 40: dtkt.core.v1.GetAutomationResponse
-	(*CreateAutomationRequest)(nil),               // 41: dtkt.core.v1.CreateAutomationRequest
-	(*CreateAutomationResponse)(nil),              // 42: dtkt.core.v1.CreateAutomationResponse
-	(*UpdateAutomationRequest)(nil),               // 43: dtkt.core.v1.UpdateAutomationRequest
-	(*DeleteAutomationRequest)(nil),               // 44: dtkt.core.v1.DeleteAutomationRequest
-	(*BatchCreateAutomationsRequest)(nil),         // 45: dtkt.core.v1.BatchCreateAutomationsRequest
-	(*BatchCreateAutomationsResponse)(nil),        // 46: dtkt.core.v1.BatchCreateAutomationsResponse
-	(*ListAutomationsRequest)(nil),                // 47: dtkt.core.v1.ListAutomationsRequest
-	(*ListAutomationsResponse)(nil),               // 48: dtkt.core.v1.ListAutomationsResponse
-	(*SendAutomationEvent)(nil),                   // 49: dtkt.core.v1.SendAutomationEvent
-	(*ReceiveAutomationEvent)(nil),                // 50: dtkt.core.v1.ReceiveAutomationEvent
-	(*SendAutomationEventRequest)(nil),            // 51: dtkt.core.v1.SendAutomationEventRequest
-	(*ReceiveAutomationEventsRequest)(nil),        // 52: dtkt.core.v1.ReceiveAutomationEventsRequest
-	(*ReceiveAutomationEventsResponse)(nil),       // 53: dtkt.core.v1.ReceiveAutomationEventsResponse
-	(*StreamAutomationEventsRequest)(nil),         // 54: dtkt.core.v1.StreamAutomationEventsRequest
-	(*StreamAutomationEventsResponse)(nil),        // 55: dtkt.core.v1.StreamAutomationEventsResponse
-	(*ListConnectionsRequest)(nil),                // 56: dtkt.core.v1.ListConnectionsRequest
-	(*ListConnectionsResponse)(nil),               // 57: dtkt.core.v1.ListConnectionsResponse
-	(*GetConnectionRequest)(nil),                  // 58: dtkt.core.v1.GetConnectionRequest
-	(*GetConnectionResponse)(nil),                 // 59: dtkt.core.v1.GetConnectionResponse
-	(*CreateConnectionRequest)(nil),               // 60: dtkt.core.v1.CreateConnectionRequest
-	(*CreateConnectionResponse)(nil),              // 61: dtkt.core.v1.CreateConnectionResponse
-	(*UpdateConnectionRequest)(nil),               // 62: dtkt.core.v1.UpdateConnectionRequest
-	(*UpdateConnectionResponse)(nil),              // 63: dtkt.core.v1.UpdateConnectionResponse
-	(*DeleteConnectionRequest)(nil),               // 64: dtkt.core.v1.DeleteConnectionRequest
-	(*DeleteConnectionResponse)(nil),              // 65: dtkt.core.v1.DeleteConnectionResponse
-	(*DialConnectionRequest)(nil),                 // 66: dtkt.core.v1.DialConnectionRequest
-	(*DialConnectionResponse)(nil),                // 67: dtkt.core.v1.DialConnectionResponse
-	(*SyncDescriptorsRequest)(nil),                // 68: dtkt.core.v1.SyncDescriptorsRequest
-	(*SyncDescriptorsResponse)(nil),               // 69: dtkt.core.v1.SyncDescriptorsResponse
-	(*GetDescriptorsRequest)(nil),                 // 70: dtkt.core.v1.GetDescriptorsRequest
-	(*GetDescriptorsResponse)(nil),                // 71: dtkt.core.v1.GetDescriptorsResponse
-	(*ListDeploymentsRequest)(nil),                // 72: dtkt.core.v1.ListDeploymentsRequest
-	(*ListDeploymentsResponse)(nil),               // 73: dtkt.core.v1.ListDeploymentsResponse
-	(*GetDeploymentRequest)(nil),                  // 74: dtkt.core.v1.GetDeploymentRequest
-	(*GetDeploymentResponse)(nil),                 // 75: dtkt.core.v1.GetDeploymentResponse
-	(*CreateDeploymentRequest)(nil),               // 76: dtkt.core.v1.CreateDeploymentRequest
-	(*UpdateDeploymentRequest)(nil),               // 77: dtkt.core.v1.UpdateDeploymentRequest
-	(*DeleteDeploymentRequest)(nil),               // 78: dtkt.core.v1.DeleteDeploymentRequest
-	(*ListFlowsRequest)(nil),                      // 79: dtkt.core.v1.ListFlowsRequest
-	(*ListFlowsResponse)(nil),                     // 80: dtkt.core.v1.ListFlowsResponse
-	(*GetFlowRequest)(nil),                        // 81: dtkt.core.v1.GetFlowRequest
-	(*GetFlowResponse)(nil),                       // 82: dtkt.core.v1.GetFlowResponse
-	(*CreateFlowRequest)(nil),                     // 83: dtkt.core.v1.CreateFlowRequest
-	(*CreateFlowResponse)(nil),                    // 84: dtkt.core.v1.CreateFlowResponse
-	(*UpdateFlowRequest)(nil),                     // 85: dtkt.core.v1.UpdateFlowRequest
-	(*UpdateFlowResponse)(nil),                    // 86: dtkt.core.v1.UpdateFlowResponse
-	(*DeleteFlowRequest)(nil),                     // 87: dtkt.core.v1.DeleteFlowRequest
-	(*DeleteFlowResponse)(nil),                    // 88: dtkt.core.v1.DeleteFlowResponse
-	(*ListIntegrationsRequest)(nil),               // 89: dtkt.core.v1.ListIntegrationsRequest
-	(*ListIntegrationsResponse)(nil),              // 90: dtkt.core.v1.ListIntegrationsResponse
-	(*GetIntegrationRequest)(nil),                 // 91: dtkt.core.v1.GetIntegrationRequest
-	(*GetIntegrationResponse)(nil),                // 92: dtkt.core.v1.GetIntegrationResponse
-	(*CreateIntegrationRequest)(nil),              // 93: dtkt.core.v1.CreateIntegrationRequest
-	(*CreateIntegrationResponse)(nil),             // 94: dtkt.core.v1.CreateIntegrationResponse
-	(*BuildIntegrationRequest)(nil),               // 95: dtkt.core.v1.BuildIntegrationRequest
-	(*BuildIntegrationResponse)(nil),              // 96: dtkt.core.v1.BuildIntegrationResponse
-	(*UpdateIntegrationRequest)(nil),              // 97: dtkt.core.v1.UpdateIntegrationRequest
-	(*UpdateIntegrationResponse)(nil),             // 98: dtkt.core.v1.UpdateIntegrationResponse
-	(*DeleteIntegrationRequest)(nil),              // 99: dtkt.core.v1.DeleteIntegrationRequest
-	(*DeleteIntegrationResponse)(nil),             // 100: dtkt.core.v1.DeleteIntegrationResponse
-	(*GetTypeRequest)(nil),                        // 101: dtkt.core.v1.GetTypeRequest
-	(*GetTypeResponse)(nil),                       // 102: dtkt.core.v1.GetTypeResponse
-	(*ListTypesRequest)(nil),                      // 103: dtkt.core.v1.ListTypesRequest
-	(*ListTypesResponse)(nil),                     // 104: dtkt.core.v1.ListTypesResponse
-	(*GetMethodRequest)(nil),                      // 105: dtkt.core.v1.GetMethodRequest
-	(*GetMethodResponse)(nil),                     // 106: dtkt.core.v1.GetMethodResponse
-	(*GetServiceRequest)(nil),                     // 107: dtkt.core.v1.GetServiceRequest
-	(*GetServiceResponse)(nil),                    // 108: dtkt.core.v1.GetServiceResponse
-	(*ListServicesRequest)(nil),                   // 109: dtkt.core.v1.ListServicesRequest
-	(*ListServicesResponse)(nil),                  // 110: dtkt.core.v1.ListServicesResponse
-	(*ListMethodsRequest)(nil),                    // 111: dtkt.core.v1.ListMethodsRequest
-	(*ListMethodsResponse)(nil),                   // 112: dtkt.core.v1.ListMethodsResponse
-	nil,                                           // 113: dtkt.core.v1.Automation.ConnectionsEntry
-	nil,                                           // 114: dtkt.core.v1.Automation.InputsEntry
-	nil,                                           // 115: dtkt.core.v1.Connection.HeadersEntry
-	nil,                                           // 116: dtkt.core.v1.Deployment.EnvEntry
-	nil,                                           // 117: dtkt.core.v1.Deployment.PortsEntry
-	(*Deployment_Build)(nil),                      // 118: dtkt.core.v1.Deployment.Build
-	(*Deployment_Cloud)(nil),                      // 119: dtkt.core.v1.Deployment.Cloud
-	(*Deployment_RuntimeMetadata)(nil),            // 120: dtkt.core.v1.Deployment.RuntimeMetadata
-	(*Deployment_RuntimeMetadata_Native)(nil),     // 121: dtkt.core.v1.Deployment.RuntimeMetadata.Native
-	(*Deployment_RuntimeMetadata_Docker)(nil),     // 122: dtkt.core.v1.Deployment.RuntimeMetadata.Docker
-	(*PackageBuildMetadata_Runtime)(nil),          // 123: dtkt.core.v1.PackageBuildMetadata.Runtime
-	(*PackageBuildMetadata_Platform)(nil),         // 124: dtkt.core.v1.PackageBuildMetadata.Platform
-	nil,                                           // 125: dtkt.core.v1.PackageBuildMetadata.EnvEntry
-	nil,                                           // 126: dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry
-	(*SendAutomationEvent_InputsEvent)(nil),       // 127: dtkt.core.v1.SendAutomationEvent.InputsEvent
-	(*SendAutomationEvent_UserResponseEvent)(nil), // 128: dtkt.core.v1.SendAutomationEvent.UserResponseEvent
-	nil, // 129: dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry
-	nil, // 130: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry
-	(*ReceiveAutomationEvent_OutputsEvent)(nil),     // 131: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent
-	(*ReceiveAutomationEvent_UserRequestEvent)(nil), // 132: dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent
-	nil,                                    // 133: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry
-	(*timestamppb.Timestamp)(nil),          // 134: google.protobuf.Timestamp
-	(*anypb.Any)(nil),                      // 135: google.protobuf.Any
-	(*durationpb.Duration)(nil),            // 136: google.protobuf.Duration
-	(*descriptorpb.FileDescriptorSet)(nil), // 137: google.protobuf.FileDescriptorSet
-	(*v1beta1.TypeSchema)(nil),             // 138: dtkt.shared.v1beta1.TypeSchema
-	(*v1beta11.Runtime)(nil),               // 139: dtkt.flow.v1beta1.Runtime
-	(*v1beta11.Flow)(nil),                  // 140: dtkt.flow.v1beta1.Flow
-	(*v1beta11.Graph)(nil),                 // 141: dtkt.flow.v1beta1.Graph
-	(*v1beta1.Package)(nil),                // 142: dtkt.shared.v1beta1.Package
-	(*fieldmaskpb.FieldMask)(nil),          // 143: google.protobuf.FieldMask
-	(v1beta1.Runtime)(0),                   // 144: dtkt.shared.v1beta1.Runtime
-	(*v1beta1.Platform)(nil),               // 145: dtkt.shared.v1beta1.Platform
-	(*status.Status)(nil),                  // 146: google.rpc.Status
-	(*v1beta11.UserAction)(nil),            // 147: dtkt.flow.v1beta1.UserAction
+	(FlowRun_State)(0),                            // 2: dtkt.core.v1.FlowRun.State
+	(Deployment_State)(0),                         // 3: dtkt.core.v1.Deployment.State
+	(BuildOperationMetadata_State)(0),             // 4: dtkt.core.v1.BuildOperationMetadata.State
+	(RunOperationMetadata_State)(0),               // 5: dtkt.core.v1.RunOperationMetadata.State
+	(SyncOperationMetadata_State)(0),              // 6: dtkt.core.v1.SyncOperationMetadata.State
+	(DialMetadata_State)(0),                       // 7: dtkt.core.v1.DialMetadata.State
+	(*Address)(nil),                               // 8: dtkt.core.v1.Address
+	(*Auth)(nil),                                  // 9: dtkt.core.v1.Auth
+	(*Context)(nil),                               // 10: dtkt.core.v1.Context
+	(*Resource)(nil),                              // 11: dtkt.core.v1.Resource
+	(*Automation)(nil),                            // 12: dtkt.core.v1.Automation
+	(*Flow)(nil),                                  // 13: dtkt.core.v1.Flow
+	(*FlowRun)(nil),                               // 14: dtkt.core.v1.FlowRun
+	(*GetFlowRunRequest)(nil),                     // 15: dtkt.core.v1.GetFlowRunRequest
+	(*GetFlowRunResponse)(nil),                    // 16: dtkt.core.v1.GetFlowRunResponse
+	(*CreateFlowRunRequest)(nil),                  // 17: dtkt.core.v1.CreateFlowRunRequest
+	(*CreateFlowRunResponse)(nil),                 // 18: dtkt.core.v1.CreateFlowRunResponse
+	(*UpdateFlowRunRequest)(nil),                  // 19: dtkt.core.v1.UpdateFlowRunRequest
+	(*DeleteFlowRunRequest)(nil),                  // 20: dtkt.core.v1.DeleteFlowRunRequest
+	(*BatchCreateFlowRunsRequest)(nil),            // 21: dtkt.core.v1.BatchCreateFlowRunsRequest
+	(*BatchCreateFlowRunsResponse)(nil),           // 22: dtkt.core.v1.BatchCreateFlowRunsResponse
+	(*ListFlowRunsRequest)(nil),                   // 23: dtkt.core.v1.ListFlowRunsRequest
+	(*ListFlowRunsResponse)(nil),                  // 24: dtkt.core.v1.ListFlowRunsResponse
+	(*SendFlowRunEvent)(nil),                      // 25: dtkt.core.v1.SendFlowRunEvent
+	(*ReceiveFlowRunEvent)(nil),                   // 26: dtkt.core.v1.ReceiveFlowRunEvent
+	(*SendFlowRunEventRequest)(nil),               // 27: dtkt.core.v1.SendFlowRunEventRequest
+	(*ReceiveFlowRunEventsRequest)(nil),           // 28: dtkt.core.v1.ReceiveFlowRunEventsRequest
+	(*ReceiveFlowRunEventsResponse)(nil),          // 29: dtkt.core.v1.ReceiveFlowRunEventsResponse
+	(*StreamFlowRunEventsRequest)(nil),            // 30: dtkt.core.v1.StreamFlowRunEventsRequest
+	(*StreamFlowRunEventsResponse)(nil),           // 31: dtkt.core.v1.StreamFlowRunEventsResponse
+	(*Connection)(nil),                            // 32: dtkt.core.v1.Connection
+	(*Deployment)(nil),                            // 33: dtkt.core.v1.Deployment
+	(*Integration)(nil),                           // 34: dtkt.core.v1.Integration
+	(*File)(nil),                                  // 35: dtkt.core.v1.File
+	(*Service)(nil),                               // 36: dtkt.core.v1.Service
+	(*Method)(nil),                                // 37: dtkt.core.v1.Method
+	(*Type)(nil),                                  // 38: dtkt.core.v1.Type
+	(*TypeSchema)(nil),                            // 39: dtkt.core.v1.TypeSchema
+	(*AutomationMetadata)(nil),                    // 40: dtkt.core.v1.AutomationMetadata
+	(*FlowRunOperationMetadata)(nil),              // 41: dtkt.core.v1.FlowRunOperationMetadata
+	(*DeploymentMetadata)(nil),                    // 42: dtkt.core.v1.DeploymentMetadata
+	(*FlowConnectionMetadata)(nil),                // 43: dtkt.core.v1.FlowConnectionMetadata
+	(*FlowRuntimeMetadata)(nil),                   // 44: dtkt.core.v1.FlowRuntimeMetadata
+	(*FlowRunMetadata)(nil),                       // 45: dtkt.core.v1.FlowRunMetadata
+	(*FlowSpecMetadata)(nil),                      // 46: dtkt.core.v1.FlowSpecMetadata
+	(*FlowGraphMetadata)(nil),                     // 47: dtkt.core.v1.FlowGraphMetadata
+	(*PackageSpecMetadata)(nil),                   // 48: dtkt.core.v1.PackageSpecMetadata
+	(*PackageBuildMetadata)(nil),                  // 49: dtkt.core.v1.PackageBuildMetadata
+	(*BuildOperationMetadata)(nil),                // 50: dtkt.core.v1.BuildOperationMetadata
+	(*RunOperationMetadata)(nil),                  // 51: dtkt.core.v1.RunOperationMetadata
+	(*SyncOperationMetadata)(nil),                 // 52: dtkt.core.v1.SyncOperationMetadata
+	(*DialMetadata)(nil),                          // 53: dtkt.core.v1.DialMetadata
+	(*BatchRunOperationMetadata)(nil),             // 54: dtkt.core.v1.BatchRunOperationMetadata
+	(*EncryptedAny)(nil),                          // 55: dtkt.core.v1.EncryptedAny
+	(*EncryptRequest)(nil),                        // 56: dtkt.core.v1.EncryptRequest
+	(*EncryptResponse)(nil),                       // 57: dtkt.core.v1.EncryptResponse
+	(*DecryptRequest)(nil),                        // 58: dtkt.core.v1.DecryptRequest
+	(*DecryptResponse)(nil),                       // 59: dtkt.core.v1.DecryptResponse
+	(*GetAutomationRequest)(nil),                  // 60: dtkt.core.v1.GetAutomationRequest
+	(*GetAutomationResponse)(nil),                 // 61: dtkt.core.v1.GetAutomationResponse
+	(*CreateAutomationRequest)(nil),               // 62: dtkt.core.v1.CreateAutomationRequest
+	(*CreateAutomationResponse)(nil),              // 63: dtkt.core.v1.CreateAutomationResponse
+	(*UpdateAutomationRequest)(nil),               // 64: dtkt.core.v1.UpdateAutomationRequest
+	(*DeleteAutomationRequest)(nil),               // 65: dtkt.core.v1.DeleteAutomationRequest
+	(*BatchCreateAutomationsRequest)(nil),         // 66: dtkt.core.v1.BatchCreateAutomationsRequest
+	(*BatchCreateAutomationsResponse)(nil),        // 67: dtkt.core.v1.BatchCreateAutomationsResponse
+	(*ListAutomationsRequest)(nil),                // 68: dtkt.core.v1.ListAutomationsRequest
+	(*ListAutomationsResponse)(nil),               // 69: dtkt.core.v1.ListAutomationsResponse
+	(*SendAutomationEvent)(nil),                   // 70: dtkt.core.v1.SendAutomationEvent
+	(*ReceiveAutomationEvent)(nil),                // 71: dtkt.core.v1.ReceiveAutomationEvent
+	(*SendAutomationEventRequest)(nil),            // 72: dtkt.core.v1.SendAutomationEventRequest
+	(*ReceiveAutomationEventsRequest)(nil),        // 73: dtkt.core.v1.ReceiveAutomationEventsRequest
+	(*ReceiveAutomationEventsResponse)(nil),       // 74: dtkt.core.v1.ReceiveAutomationEventsResponse
+	(*StreamAutomationEventsRequest)(nil),         // 75: dtkt.core.v1.StreamAutomationEventsRequest
+	(*StreamAutomationEventsResponse)(nil),        // 76: dtkt.core.v1.StreamAutomationEventsResponse
+	(*ListConnectionsRequest)(nil),                // 77: dtkt.core.v1.ListConnectionsRequest
+	(*ListConnectionsResponse)(nil),               // 78: dtkt.core.v1.ListConnectionsResponse
+	(*GetConnectionRequest)(nil),                  // 79: dtkt.core.v1.GetConnectionRequest
+	(*GetConnectionResponse)(nil),                 // 80: dtkt.core.v1.GetConnectionResponse
+	(*CreateConnectionRequest)(nil),               // 81: dtkt.core.v1.CreateConnectionRequest
+	(*CreateConnectionResponse)(nil),              // 82: dtkt.core.v1.CreateConnectionResponse
+	(*UpdateConnectionRequest)(nil),               // 83: dtkt.core.v1.UpdateConnectionRequest
+	(*UpdateConnectionResponse)(nil),              // 84: dtkt.core.v1.UpdateConnectionResponse
+	(*DeleteConnectionRequest)(nil),               // 85: dtkt.core.v1.DeleteConnectionRequest
+	(*DeleteConnectionResponse)(nil),              // 86: dtkt.core.v1.DeleteConnectionResponse
+	(*DialConnectionRequest)(nil),                 // 87: dtkt.core.v1.DialConnectionRequest
+	(*DialConnectionResponse)(nil),                // 88: dtkt.core.v1.DialConnectionResponse
+	(*SyncDescriptorsRequest)(nil),                // 89: dtkt.core.v1.SyncDescriptorsRequest
+	(*SyncDescriptorsResponse)(nil),               // 90: dtkt.core.v1.SyncDescriptorsResponse
+	(*GetDescriptorsRequest)(nil),                 // 91: dtkt.core.v1.GetDescriptorsRequest
+	(*GetDescriptorsResponse)(nil),                // 92: dtkt.core.v1.GetDescriptorsResponse
+	(*ListDeploymentsRequest)(nil),                // 93: dtkt.core.v1.ListDeploymentsRequest
+	(*ListDeploymentsResponse)(nil),               // 94: dtkt.core.v1.ListDeploymentsResponse
+	(*GetDeploymentRequest)(nil),                  // 95: dtkt.core.v1.GetDeploymentRequest
+	(*GetDeploymentResponse)(nil),                 // 96: dtkt.core.v1.GetDeploymentResponse
+	(*CreateDeploymentRequest)(nil),               // 97: dtkt.core.v1.CreateDeploymentRequest
+	(*UpdateDeploymentRequest)(nil),               // 98: dtkt.core.v1.UpdateDeploymentRequest
+	(*DeleteDeploymentRequest)(nil),               // 99: dtkt.core.v1.DeleteDeploymentRequest
+	(*ListFlowsRequest)(nil),                      // 100: dtkt.core.v1.ListFlowsRequest
+	(*ListFlowsResponse)(nil),                     // 101: dtkt.core.v1.ListFlowsResponse
+	(*GetFlowRequest)(nil),                        // 102: dtkt.core.v1.GetFlowRequest
+	(*GetFlowResponse)(nil),                       // 103: dtkt.core.v1.GetFlowResponse
+	(*CreateFlowRequest)(nil),                     // 104: dtkt.core.v1.CreateFlowRequest
+	(*CreateFlowResponse)(nil),                    // 105: dtkt.core.v1.CreateFlowResponse
+	(*UpdateFlowRequest)(nil),                     // 106: dtkt.core.v1.UpdateFlowRequest
+	(*UpdateFlowResponse)(nil),                    // 107: dtkt.core.v1.UpdateFlowResponse
+	(*DeleteFlowRequest)(nil),                     // 108: dtkt.core.v1.DeleteFlowRequest
+	(*DeleteFlowResponse)(nil),                    // 109: dtkt.core.v1.DeleteFlowResponse
+	(*ListIntegrationsRequest)(nil),               // 110: dtkt.core.v1.ListIntegrationsRequest
+	(*ListIntegrationsResponse)(nil),              // 111: dtkt.core.v1.ListIntegrationsResponse
+	(*GetIntegrationRequest)(nil),                 // 112: dtkt.core.v1.GetIntegrationRequest
+	(*GetIntegrationResponse)(nil),                // 113: dtkt.core.v1.GetIntegrationResponse
+	(*CreateIntegrationRequest)(nil),              // 114: dtkt.core.v1.CreateIntegrationRequest
+	(*CreateIntegrationResponse)(nil),             // 115: dtkt.core.v1.CreateIntegrationResponse
+	(*BuildIntegrationRequest)(nil),               // 116: dtkt.core.v1.BuildIntegrationRequest
+	(*BuildIntegrationResponse)(nil),              // 117: dtkt.core.v1.BuildIntegrationResponse
+	(*UpdateIntegrationRequest)(nil),              // 118: dtkt.core.v1.UpdateIntegrationRequest
+	(*UpdateIntegrationResponse)(nil),             // 119: dtkt.core.v1.UpdateIntegrationResponse
+	(*DeleteIntegrationRequest)(nil),              // 120: dtkt.core.v1.DeleteIntegrationRequest
+	(*DeleteIntegrationResponse)(nil),             // 121: dtkt.core.v1.DeleteIntegrationResponse
+	(*GetTypeRequest)(nil),                        // 122: dtkt.core.v1.GetTypeRequest
+	(*GetTypeResponse)(nil),                       // 123: dtkt.core.v1.GetTypeResponse
+	(*ListTypesRequest)(nil),                      // 124: dtkt.core.v1.ListTypesRequest
+	(*ListTypesResponse)(nil),                     // 125: dtkt.core.v1.ListTypesResponse
+	(*GetMethodRequest)(nil),                      // 126: dtkt.core.v1.GetMethodRequest
+	(*GetMethodResponse)(nil),                     // 127: dtkt.core.v1.GetMethodResponse
+	(*GetServiceRequest)(nil),                     // 128: dtkt.core.v1.GetServiceRequest
+	(*GetServiceResponse)(nil),                    // 129: dtkt.core.v1.GetServiceResponse
+	(*ListServicesRequest)(nil),                   // 130: dtkt.core.v1.ListServicesRequest
+	(*ListServicesResponse)(nil),                  // 131: dtkt.core.v1.ListServicesResponse
+	(*ListMethodsRequest)(nil),                    // 132: dtkt.core.v1.ListMethodsRequest
+	(*ListMethodsResponse)(nil),                   // 133: dtkt.core.v1.ListMethodsResponse
+	nil,                                           // 134: dtkt.core.v1.Automation.ConnectionsEntry
+	nil,                                           // 135: dtkt.core.v1.Automation.InputsEntry
+	nil,                                           // 136: dtkt.core.v1.FlowRun.ConnectionsEntry
+	nil,                                           // 137: dtkt.core.v1.FlowRun.InputsEntry
+	nil,                                           // 138: dtkt.core.v1.Connection.HeadersEntry
+	nil,                                           // 139: dtkt.core.v1.Deployment.EnvEntry
+	nil,                                           // 140: dtkt.core.v1.Deployment.PortsEntry
+	(*Deployment_Build)(nil),                      // 141: dtkt.core.v1.Deployment.Build
+	(*Deployment_Cloud)(nil),                      // 142: dtkt.core.v1.Deployment.Cloud
+	(*Deployment_RuntimeMetadata)(nil),            // 143: dtkt.core.v1.Deployment.RuntimeMetadata
+	(*Deployment_RuntimeMetadata_Native)(nil),     // 144: dtkt.core.v1.Deployment.RuntimeMetadata.Native
+	(*Deployment_RuntimeMetadata_Docker)(nil),     // 145: dtkt.core.v1.Deployment.RuntimeMetadata.Docker
+	(*PackageBuildMetadata_Runtime)(nil),          // 146: dtkt.core.v1.PackageBuildMetadata.Runtime
+	(*PackageBuildMetadata_Platform)(nil),         // 147: dtkt.core.v1.PackageBuildMetadata.Platform
+	nil,                                           // 148: dtkt.core.v1.PackageBuildMetadata.EnvEntry
+	nil,                                           // 149: dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry
+	(*SendAutomationEvent_InputsEvent)(nil),       // 150: dtkt.core.v1.SendAutomationEvent.InputsEvent
+	(*SendAutomationEvent_UserResponseEvent)(nil), // 151: dtkt.core.v1.SendAutomationEvent.UserResponseEvent
+	nil, // 152: dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry
+	nil, // 153: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry
+	(*ReceiveAutomationEvent_OutputsEvent)(nil),     // 154: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent
+	(*ReceiveAutomationEvent_UserRequestEvent)(nil), // 155: dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent
+	nil,                                      // 156: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry
+	(*timestamppb.Timestamp)(nil),            // 157: google.protobuf.Timestamp
+	(*anypb.Any)(nil),                        // 158: google.protobuf.Any
+	(*durationpb.Duration)(nil),              // 159: google.protobuf.Duration
+	(*fieldmaskpb.FieldMask)(nil),            // 160: google.protobuf.FieldMask
+	(*v1beta2.InputEvent)(nil),               // 161: dtkt.flow.v1beta2.InputEvent
+	(*v1beta2.InteractionResponseEvent)(nil), // 162: dtkt.flow.v1beta2.InteractionResponseEvent
+	(*v1beta2.StopFlowEvent)(nil),            // 163: dtkt.flow.v1beta2.StopFlowEvent
+	(*v1beta2.TerminateFlowEvent)(nil),       // 164: dtkt.flow.v1beta2.TerminateFlowEvent
+	(*v1beta2.SuspendFlowEvent)(nil),         // 165: dtkt.flow.v1beta2.SuspendFlowEvent
+	(*v1beta2.ResumeFlowEvent)(nil),          // 166: dtkt.flow.v1beta2.ResumeFlowEvent
+	(*v1beta2.StopNodeEvent)(nil),            // 167: dtkt.flow.v1beta2.StopNodeEvent
+	(*v1beta2.TerminateNodeEvent)(nil),       // 168: dtkt.flow.v1beta2.TerminateNodeEvent
+	(*v1beta2.SuspendNodeEvent)(nil),         // 169: dtkt.flow.v1beta2.SuspendNodeEvent
+	(*v1beta2.ResumeNodeEvent)(nil),          // 170: dtkt.flow.v1beta2.ResumeNodeEvent
+	(*v1beta2.StartFlowEvent)(nil),           // 171: dtkt.flow.v1beta2.StartFlowEvent
+	(*v1beta2.OutputEvent)(nil),              // 172: dtkt.flow.v1beta2.OutputEvent
+	(*v1beta2.InputRequestEvent)(nil),        // 173: dtkt.flow.v1beta2.InputRequestEvent
+	(*v1beta2.InteractionRequestEvent)(nil),  // 174: dtkt.flow.v1beta2.InteractionRequestEvent
+	(*descriptorpb.FileDescriptorSet)(nil),   // 175: google.protobuf.FileDescriptorSet
+	(*v1beta1.TypeSchema)(nil),               // 176: dtkt.shared.v1beta1.TypeSchema
+	(*v1beta11.Runtime)(nil),                 // 177: dtkt.flow.v1beta1.Runtime
+	(*v1beta2.RunSnapshot)(nil),              // 178: dtkt.flow.v1beta2.RunSnapshot
+	(*v1beta11.Flow)(nil),                    // 179: dtkt.flow.v1beta1.Flow
+	(*v1beta2.Flow)(nil),                     // 180: dtkt.flow.v1beta2.Flow
+	(*v1beta11.Graph)(nil),                   // 181: dtkt.flow.v1beta1.Graph
+	(*v1beta2.Graph)(nil),                    // 182: dtkt.flow.v1beta2.Graph
+	(*v1beta1.Package)(nil),                  // 183: dtkt.shared.v1beta1.Package
+	(v1beta1.Runtime)(0),                     // 184: dtkt.shared.v1beta1.Runtime
+	(*v1beta1.Platform)(nil),                 // 185: dtkt.shared.v1beta1.Platform
+	(*status.Status)(nil),                    // 186: google.rpc.Status
+	(*v1beta11.UserAction)(nil),              // 187: dtkt.flow.v1beta1.UserAction
 }
 var file_dtkt_core_v1_messages_proto_depIdxs = []int32{
 	0,   // 0: dtkt.core.v1.Auth.method:type_name -> dtkt.core.v1.Auth.AuthMethod
-	134, // 1: dtkt.core.v1.Auth.expires_at:type_name -> google.protobuf.Timestamp
-	7,   // 2: dtkt.core.v1.Context.address:type_name -> dtkt.core.v1.Address
-	8,   // 3: dtkt.core.v1.Context.auth:type_name -> dtkt.core.v1.Auth
-	9,   // 4: dtkt.core.v1.Resource.context:type_name -> dtkt.core.v1.Context
-	7,   // 5: dtkt.core.v1.Resource.address:type_name -> dtkt.core.v1.Address
-	34,  // 6: dtkt.core.v1.Resource.encrypted:type_name -> dtkt.core.v1.EncryptedAny
-	135, // 7: dtkt.core.v1.Resource.decrypted:type_name -> google.protobuf.Any
+	157, // 1: dtkt.core.v1.Auth.expires_at:type_name -> google.protobuf.Timestamp
+	8,   // 2: dtkt.core.v1.Context.address:type_name -> dtkt.core.v1.Address
+	9,   // 3: dtkt.core.v1.Context.auth:type_name -> dtkt.core.v1.Auth
+	10,  // 4: dtkt.core.v1.Resource.context:type_name -> dtkt.core.v1.Context
+	8,   // 5: dtkt.core.v1.Resource.address:type_name -> dtkt.core.v1.Address
+	55,  // 6: dtkt.core.v1.Resource.encrypted:type_name -> dtkt.core.v1.EncryptedAny
+	158, // 7: dtkt.core.v1.Resource.decrypted:type_name -> google.protobuf.Any
 	1,   // 8: dtkt.core.v1.Automation.state:type_name -> dtkt.core.v1.Automation.State
-	24,  // 9: dtkt.core.v1.Automation.runtime:type_name -> dtkt.core.v1.FlowRuntimeMetadata
-	113, // 10: dtkt.core.v1.Automation.connections:type_name -> dtkt.core.v1.Automation.ConnectionsEntry
-	114, // 11: dtkt.core.v1.Automation.inputs:type_name -> dtkt.core.v1.Automation.InputsEntry
-	136, // 12: dtkt.core.v1.Automation.timeout:type_name -> google.protobuf.Duration
-	134, // 13: dtkt.core.v1.Automation.create_time:type_name -> google.protobuf.Timestamp
-	134, // 14: dtkt.core.v1.Automation.update_time:type_name -> google.protobuf.Timestamp
-	25,  // 15: dtkt.core.v1.Flow.spec:type_name -> dtkt.core.v1.FlowSpecMetadata
-	26,  // 16: dtkt.core.v1.Flow.graph:type_name -> dtkt.core.v1.FlowGraphMetadata
-	134, // 17: dtkt.core.v1.Flow.create_time:type_name -> google.protobuf.Timestamp
-	134, // 18: dtkt.core.v1.Flow.update_time:type_name -> google.protobuf.Timestamp
-	7,   // 19: dtkt.core.v1.Connection.address:type_name -> dtkt.core.v1.Address
-	135, // 20: dtkt.core.v1.Connection.decrypted_config:type_name -> google.protobuf.Any
-	34,  // 21: dtkt.core.v1.Connection.encrypted_config:type_name -> dtkt.core.v1.EncryptedAny
-	135, // 22: dtkt.core.v1.Connection.decrypted_auth:type_name -> google.protobuf.Any
-	34,  // 23: dtkt.core.v1.Connection.encrypted_auth:type_name -> dtkt.core.v1.EncryptedAny
-	115, // 24: dtkt.core.v1.Connection.headers:type_name -> dtkt.core.v1.Connection.HeadersEntry
-	134, // 25: dtkt.core.v1.Connection.create_time:type_name -> google.protobuf.Timestamp
-	134, // 26: dtkt.core.v1.Connection.update_time:type_name -> google.protobuf.Timestamp
-	2,   // 27: dtkt.core.v1.Deployment.state:type_name -> dtkt.core.v1.Deployment.State
-	7,   // 28: dtkt.core.v1.Deployment.address:type_name -> dtkt.core.v1.Address
-	116, // 29: dtkt.core.v1.Deployment.env:type_name -> dtkt.core.v1.Deployment.EnvEntry
-	117, // 30: dtkt.core.v1.Deployment.ports:type_name -> dtkt.core.v1.Deployment.PortsEntry
-	118, // 31: dtkt.core.v1.Deployment.build:type_name -> dtkt.core.v1.Deployment.Build
-	119, // 32: dtkt.core.v1.Deployment.cloud:type_name -> dtkt.core.v1.Deployment.Cloud
-	20,  // 33: dtkt.core.v1.Deployment.config_schema:type_name -> dtkt.core.v1.TypeSchema
-	27,  // 34: dtkt.core.v1.Deployment.package_spec:type_name -> dtkt.core.v1.PackageSpecMetadata
-	120, // 35: dtkt.core.v1.Deployment.runtime:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata
-	134, // 36: dtkt.core.v1.Deployment.create_time:type_name -> google.protobuf.Timestamp
-	134, // 37: dtkt.core.v1.Deployment.update_time:type_name -> google.protobuf.Timestamp
-	27,  // 38: dtkt.core.v1.Integration.spec:type_name -> dtkt.core.v1.PackageSpecMetadata
-	134, // 39: dtkt.core.v1.Integration.create_time:type_name -> google.protobuf.Timestamp
-	134, // 40: dtkt.core.v1.Integration.update_time:type_name -> google.protobuf.Timestamp
-	137, // 41: dtkt.core.v1.File.protos:type_name -> google.protobuf.FileDescriptorSet
-	134, // 42: dtkt.core.v1.File.create_time:type_name -> google.protobuf.Timestamp
-	134, // 43: dtkt.core.v1.File.update_time:type_name -> google.protobuf.Timestamp
-	134, // 44: dtkt.core.v1.Service.create_time:type_name -> google.protobuf.Timestamp
-	134, // 45: dtkt.core.v1.Service.update_time:type_name -> google.protobuf.Timestamp
-	134, // 46: dtkt.core.v1.Method.create_time:type_name -> google.protobuf.Timestamp
-	134, // 47: dtkt.core.v1.Method.update_time:type_name -> google.protobuf.Timestamp
-	20,  // 48: dtkt.core.v1.Type.schema:type_name -> dtkt.core.v1.TypeSchema
-	134, // 49: dtkt.core.v1.Type.create_time:type_name -> google.protobuf.Timestamp
-	134, // 50: dtkt.core.v1.Type.update_time:type_name -> google.protobuf.Timestamp
-	138, // 51: dtkt.core.v1.TypeSchema.v1beta1:type_name -> dtkt.shared.v1beta1.TypeSchema
-	134, // 52: dtkt.core.v1.AutomationMetadata.start_time:type_name -> google.protobuf.Timestamp
-	134, // 53: dtkt.core.v1.AutomationMetadata.stop_time:type_name -> google.protobuf.Timestamp
-	134, // 54: dtkt.core.v1.DeploymentMetadata.start_time:type_name -> google.protobuf.Timestamp
-	134, // 55: dtkt.core.v1.DeploymentMetadata.stop_time:type_name -> google.protobuf.Timestamp
-	9,   // 56: dtkt.core.v1.FlowConnectionMetadata.context:type_name -> dtkt.core.v1.Context
-	139, // 57: dtkt.core.v1.FlowRuntimeMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Runtime
-	140, // 58: dtkt.core.v1.FlowSpecMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Flow
-	141, // 59: dtkt.core.v1.FlowGraphMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Graph
-	142, // 60: dtkt.core.v1.PackageSpecMetadata.v1beta1:type_name -> dtkt.shared.v1beta1.Package
-	123, // 61: dtkt.core.v1.PackageBuildMetadata.runtime:type_name -> dtkt.core.v1.PackageBuildMetadata.Runtime
-	124, // 62: dtkt.core.v1.PackageBuildMetadata.platform:type_name -> dtkt.core.v1.PackageBuildMetadata.Platform
-	125, // 63: dtkt.core.v1.PackageBuildMetadata.env:type_name -> dtkt.core.v1.PackageBuildMetadata.EnvEntry
-	3,   // 64: dtkt.core.v1.BuildOperationMetadata.state:type_name -> dtkt.core.v1.BuildOperationMetadata.State
-	134, // 65: dtkt.core.v1.BuildOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
-	134, // 66: dtkt.core.v1.BuildOperationMetadata.finish_time:type_name -> google.protobuf.Timestamp
-	4,   // 67: dtkt.core.v1.RunOperationMetadata.state:type_name -> dtkt.core.v1.RunOperationMetadata.State
-	134, // 68: dtkt.core.v1.RunOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
-	134, // 69: dtkt.core.v1.RunOperationMetadata.stop_time:type_name -> google.protobuf.Timestamp
-	5,   // 70: dtkt.core.v1.SyncOperationMetadata.state:type_name -> dtkt.core.v1.SyncOperationMetadata.State
-	134, // 71: dtkt.core.v1.SyncOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
-	134, // 72: dtkt.core.v1.SyncOperationMetadata.stop_time:type_name -> google.protobuf.Timestamp
-	6,   // 73: dtkt.core.v1.DialMetadata.state:type_name -> dtkt.core.v1.DialMetadata.State
-	134, // 74: dtkt.core.v1.DialMetadata.time:type_name -> google.protobuf.Timestamp
-	126, // 75: dtkt.core.v1.BatchRunOperationMetadata.failed_requests:type_name -> dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry
-	10,  // 76: dtkt.core.v1.EncryptRequest.resource:type_name -> dtkt.core.v1.Resource
-	10,  // 77: dtkt.core.v1.EncryptResponse.resource:type_name -> dtkt.core.v1.Resource
-	10,  // 78: dtkt.core.v1.DecryptRequest.resource:type_name -> dtkt.core.v1.Resource
-	10,  // 79: dtkt.core.v1.DecryptResponse.resource:type_name -> dtkt.core.v1.Resource
-	11,  // 80: dtkt.core.v1.GetAutomationResponse.automation:type_name -> dtkt.core.v1.Automation
-	11,  // 81: dtkt.core.v1.CreateAutomationRequest.automation:type_name -> dtkt.core.v1.Automation
-	11,  // 82: dtkt.core.v1.CreateAutomationResponse.automation:type_name -> dtkt.core.v1.Automation
-	11,  // 83: dtkt.core.v1.UpdateAutomationRequest.automation:type_name -> dtkt.core.v1.Automation
-	143, // 84: dtkt.core.v1.UpdateAutomationRequest.update_mask:type_name -> google.protobuf.FieldMask
-	1,   // 85: dtkt.core.v1.UpdateAutomationRequest.desired_state:type_name -> dtkt.core.v1.Automation.State
-	41,  // 86: dtkt.core.v1.BatchCreateAutomationsRequest.requests:type_name -> dtkt.core.v1.CreateAutomationRequest
-	11,  // 87: dtkt.core.v1.BatchCreateAutomationsResponse.automations:type_name -> dtkt.core.v1.Automation
-	11,  // 88: dtkt.core.v1.ListAutomationsResponse.automations:type_name -> dtkt.core.v1.Automation
-	127, // 89: dtkt.core.v1.SendAutomationEvent.inputs_event:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent
-	128, // 90: dtkt.core.v1.SendAutomationEvent.user_response_event:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent
-	131, // 91: dtkt.core.v1.ReceiveAutomationEvent.outputs_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent
-	132, // 92: dtkt.core.v1.ReceiveAutomationEvent.user_request_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent
-	49,  // 93: dtkt.core.v1.SendAutomationEventRequest.event:type_name -> dtkt.core.v1.SendAutomationEvent
-	50,  // 94: dtkt.core.v1.ReceiveAutomationEventsResponse.event:type_name -> dtkt.core.v1.ReceiveAutomationEvent
-	49,  // 95: dtkt.core.v1.StreamAutomationEventsRequest.event:type_name -> dtkt.core.v1.SendAutomationEvent
-	50,  // 96: dtkt.core.v1.StreamAutomationEventsResponse.event:type_name -> dtkt.core.v1.ReceiveAutomationEvent
-	13,  // 97: dtkt.core.v1.ListConnectionsResponse.connections:type_name -> dtkt.core.v1.Connection
-	13,  // 98: dtkt.core.v1.GetConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
-	13,  // 99: dtkt.core.v1.CreateConnectionRequest.connection:type_name -> dtkt.core.v1.Connection
-	13,  // 100: dtkt.core.v1.CreateConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
-	13,  // 101: dtkt.core.v1.UpdateConnectionRequest.connection:type_name -> dtkt.core.v1.Connection
-	143, // 102: dtkt.core.v1.UpdateConnectionRequest.update_mask:type_name -> google.protobuf.FieldMask
-	13,  // 103: dtkt.core.v1.UpdateConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
-	32,  // 104: dtkt.core.v1.DialConnectionResponse.dial:type_name -> dtkt.core.v1.DialMetadata
-	16,  // 105: dtkt.core.v1.SyncDescriptorsResponse.file:type_name -> dtkt.core.v1.File
-	16,  // 106: dtkt.core.v1.GetDescriptorsResponse.file:type_name -> dtkt.core.v1.File
-	14,  // 107: dtkt.core.v1.ListDeploymentsResponse.deployments:type_name -> dtkt.core.v1.Deployment
-	14,  // 108: dtkt.core.v1.GetDeploymentResponse.deployment:type_name -> dtkt.core.v1.Deployment
-	14,  // 109: dtkt.core.v1.CreateDeploymentRequest.deployment:type_name -> dtkt.core.v1.Deployment
-	14,  // 110: dtkt.core.v1.UpdateDeploymentRequest.deployment:type_name -> dtkt.core.v1.Deployment
-	143, // 111: dtkt.core.v1.UpdateDeploymentRequest.update_mask:type_name -> google.protobuf.FieldMask
-	2,   // 112: dtkt.core.v1.UpdateDeploymentRequest.desired_state:type_name -> dtkt.core.v1.Deployment.State
-	12,  // 113: dtkt.core.v1.ListFlowsResponse.flows:type_name -> dtkt.core.v1.Flow
-	12,  // 114: dtkt.core.v1.GetFlowResponse.flow:type_name -> dtkt.core.v1.Flow
-	12,  // 115: dtkt.core.v1.CreateFlowRequest.flow:type_name -> dtkt.core.v1.Flow
-	12,  // 116: dtkt.core.v1.CreateFlowResponse.flow:type_name -> dtkt.core.v1.Flow
-	12,  // 117: dtkt.core.v1.UpdateFlowRequest.flow:type_name -> dtkt.core.v1.Flow
-	143, // 118: dtkt.core.v1.UpdateFlowRequest.update_mask:type_name -> google.protobuf.FieldMask
-	12,  // 119: dtkt.core.v1.UpdateFlowResponse.flow:type_name -> dtkt.core.v1.Flow
-	15,  // 120: dtkt.core.v1.ListIntegrationsResponse.integrations:type_name -> dtkt.core.v1.Integration
-	15,  // 121: dtkt.core.v1.GetIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
-	15,  // 122: dtkt.core.v1.CreateIntegrationRequest.integration:type_name -> dtkt.core.v1.Integration
-	15,  // 123: dtkt.core.v1.CreateIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
-	28,  // 124: dtkt.core.v1.BuildIntegrationRequest.build:type_name -> dtkt.core.v1.PackageBuildMetadata
-	15,  // 125: dtkt.core.v1.BuildIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
-	28,  // 126: dtkt.core.v1.BuildIntegrationResponse.build:type_name -> dtkt.core.v1.PackageBuildMetadata
-	15,  // 127: dtkt.core.v1.UpdateIntegrationRequest.integration:type_name -> dtkt.core.v1.Integration
-	143, // 128: dtkt.core.v1.UpdateIntegrationRequest.update_mask:type_name -> google.protobuf.FieldMask
-	15,  // 129: dtkt.core.v1.UpdateIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
-	19,  // 130: dtkt.core.v1.GetTypeResponse.type:type_name -> dtkt.core.v1.Type
-	19,  // 131: dtkt.core.v1.ListTypesResponse.types:type_name -> dtkt.core.v1.Type
-	18,  // 132: dtkt.core.v1.GetMethodResponse.method:type_name -> dtkt.core.v1.Method
-	17,  // 133: dtkt.core.v1.GetServiceResponse.service:type_name -> dtkt.core.v1.Service
-	17,  // 134: dtkt.core.v1.ListServicesResponse.services:type_name -> dtkt.core.v1.Service
-	18,  // 135: dtkt.core.v1.ListMethodsResponse.methods:type_name -> dtkt.core.v1.Method
-	23,  // 136: dtkt.core.v1.Automation.ConnectionsEntry.value:type_name -> dtkt.core.v1.FlowConnectionMetadata
-	135, // 137: dtkt.core.v1.Automation.InputsEntry.value:type_name -> google.protobuf.Any
-	28,  // 138: dtkt.core.v1.Deployment.Build.metadata:type_name -> dtkt.core.v1.PackageBuildMetadata
-	9,   // 139: dtkt.core.v1.Deployment.Build.context:type_name -> dtkt.core.v1.Context
-	9,   // 140: dtkt.core.v1.Deployment.Cloud.context:type_name -> dtkt.core.v1.Context
-	34,  // 141: dtkt.core.v1.Deployment.Cloud.config:type_name -> dtkt.core.v1.EncryptedAny
-	121, // 142: dtkt.core.v1.Deployment.RuntimeMetadata.native:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata.Native
-	122, // 143: dtkt.core.v1.Deployment.RuntimeMetadata.docker:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata.Docker
-	144, // 144: dtkt.core.v1.PackageBuildMetadata.Runtime.v1beta1:type_name -> dtkt.shared.v1beta1.Runtime
-	145, // 145: dtkt.core.v1.PackageBuildMetadata.Platform.v1beta1:type_name -> dtkt.shared.v1beta1.Platform
-	146, // 146: dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry.value:type_name -> google.rpc.Status
-	129, // 147: dtkt.core.v1.SendAutomationEvent.InputsEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry
-	130, // 148: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry
-	135, // 149: dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
-	135, // 150: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry.value:type_name -> google.protobuf.Any
-	133, // 151: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.values:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry
-	147, // 152: dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent.user_action:type_name -> dtkt.flow.v1beta1.UserAction
-	135, // 153: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
-	154, // [154:154] is the sub-list for method output_type
-	154, // [154:154] is the sub-list for method input_type
-	154, // [154:154] is the sub-list for extension type_name
-	154, // [154:154] is the sub-list for extension extendee
-	0,   // [0:154] is the sub-list for field type_name
+	44,  // 9: dtkt.core.v1.Automation.runtime:type_name -> dtkt.core.v1.FlowRuntimeMetadata
+	134, // 10: dtkt.core.v1.Automation.connections:type_name -> dtkt.core.v1.Automation.ConnectionsEntry
+	135, // 11: dtkt.core.v1.Automation.inputs:type_name -> dtkt.core.v1.Automation.InputsEntry
+	159, // 12: dtkt.core.v1.Automation.timeout:type_name -> google.protobuf.Duration
+	157, // 13: dtkt.core.v1.Automation.create_time:type_name -> google.protobuf.Timestamp
+	157, // 14: dtkt.core.v1.Automation.update_time:type_name -> google.protobuf.Timestamp
+	46,  // 15: dtkt.core.v1.Flow.spec:type_name -> dtkt.core.v1.FlowSpecMetadata
+	47,  // 16: dtkt.core.v1.Flow.graph:type_name -> dtkt.core.v1.FlowGraphMetadata
+	157, // 17: dtkt.core.v1.Flow.create_time:type_name -> google.protobuf.Timestamp
+	157, // 18: dtkt.core.v1.Flow.update_time:type_name -> google.protobuf.Timestamp
+	2,   // 19: dtkt.core.v1.FlowRun.state:type_name -> dtkt.core.v1.FlowRun.State
+	45,  // 20: dtkt.core.v1.FlowRun.run_state:type_name -> dtkt.core.v1.FlowRunMetadata
+	136, // 21: dtkt.core.v1.FlowRun.connections:type_name -> dtkt.core.v1.FlowRun.ConnectionsEntry
+	137, // 22: dtkt.core.v1.FlowRun.inputs:type_name -> dtkt.core.v1.FlowRun.InputsEntry
+	159, // 23: dtkt.core.v1.FlowRun.timeout:type_name -> google.protobuf.Duration
+	157, // 24: dtkt.core.v1.FlowRun.create_time:type_name -> google.protobuf.Timestamp
+	157, // 25: dtkt.core.v1.FlowRun.update_time:type_name -> google.protobuf.Timestamp
+	14,  // 26: dtkt.core.v1.GetFlowRunResponse.flowrun:type_name -> dtkt.core.v1.FlowRun
+	14,  // 27: dtkt.core.v1.CreateFlowRunRequest.flowrun:type_name -> dtkt.core.v1.FlowRun
+	14,  // 28: dtkt.core.v1.CreateFlowRunResponse.flowrun:type_name -> dtkt.core.v1.FlowRun
+	14,  // 29: dtkt.core.v1.UpdateFlowRunRequest.flowrun:type_name -> dtkt.core.v1.FlowRun
+	160, // 30: dtkt.core.v1.UpdateFlowRunRequest.update_mask:type_name -> google.protobuf.FieldMask
+	2,   // 31: dtkt.core.v1.UpdateFlowRunRequest.desired_state:type_name -> dtkt.core.v1.FlowRun.State
+	17,  // 32: dtkt.core.v1.BatchCreateFlowRunsRequest.requests:type_name -> dtkt.core.v1.CreateFlowRunRequest
+	14,  // 33: dtkt.core.v1.BatchCreateFlowRunsResponse.flowruns:type_name -> dtkt.core.v1.FlowRun
+	14,  // 34: dtkt.core.v1.ListFlowRunsResponse.flowruns:type_name -> dtkt.core.v1.FlowRun
+	161, // 35: dtkt.core.v1.SendFlowRunEvent.input:type_name -> dtkt.flow.v1beta2.InputEvent
+	162, // 36: dtkt.core.v1.SendFlowRunEvent.interaction_response:type_name -> dtkt.flow.v1beta2.InteractionResponseEvent
+	163, // 37: dtkt.core.v1.SendFlowRunEvent.stop:type_name -> dtkt.flow.v1beta2.StopFlowEvent
+	164, // 38: dtkt.core.v1.SendFlowRunEvent.terminate:type_name -> dtkt.flow.v1beta2.TerminateFlowEvent
+	165, // 39: dtkt.core.v1.SendFlowRunEvent.suspend:type_name -> dtkt.flow.v1beta2.SuspendFlowEvent
+	166, // 40: dtkt.core.v1.SendFlowRunEvent.resume:type_name -> dtkt.flow.v1beta2.ResumeFlowEvent
+	167, // 41: dtkt.core.v1.SendFlowRunEvent.stop_node:type_name -> dtkt.flow.v1beta2.StopNodeEvent
+	168, // 42: dtkt.core.v1.SendFlowRunEvent.terminate_node:type_name -> dtkt.flow.v1beta2.TerminateNodeEvent
+	169, // 43: dtkt.core.v1.SendFlowRunEvent.suspend_node:type_name -> dtkt.flow.v1beta2.SuspendNodeEvent
+	170, // 44: dtkt.core.v1.SendFlowRunEvent.resume_node:type_name -> dtkt.flow.v1beta2.ResumeNodeEvent
+	171, // 45: dtkt.core.v1.SendFlowRunEvent.start:type_name -> dtkt.flow.v1beta2.StartFlowEvent
+	172, // 46: dtkt.core.v1.ReceiveFlowRunEvent.output:type_name -> dtkt.flow.v1beta2.OutputEvent
+	173, // 47: dtkt.core.v1.ReceiveFlowRunEvent.input_request:type_name -> dtkt.flow.v1beta2.InputRequestEvent
+	174, // 48: dtkt.core.v1.ReceiveFlowRunEvent.interaction_request:type_name -> dtkt.flow.v1beta2.InteractionRequestEvent
+	14,  // 49: dtkt.core.v1.ReceiveFlowRunEvent.flowrun:type_name -> dtkt.core.v1.FlowRun
+	25,  // 50: dtkt.core.v1.SendFlowRunEventRequest.event:type_name -> dtkt.core.v1.SendFlowRunEvent
+	26,  // 51: dtkt.core.v1.ReceiveFlowRunEventsResponse.event:type_name -> dtkt.core.v1.ReceiveFlowRunEvent
+	25,  // 52: dtkt.core.v1.StreamFlowRunEventsRequest.event:type_name -> dtkt.core.v1.SendFlowRunEvent
+	26,  // 53: dtkt.core.v1.StreamFlowRunEventsResponse.event:type_name -> dtkt.core.v1.ReceiveFlowRunEvent
+	8,   // 54: dtkt.core.v1.Connection.address:type_name -> dtkt.core.v1.Address
+	158, // 55: dtkt.core.v1.Connection.decrypted_config:type_name -> google.protobuf.Any
+	55,  // 56: dtkt.core.v1.Connection.encrypted_config:type_name -> dtkt.core.v1.EncryptedAny
+	158, // 57: dtkt.core.v1.Connection.decrypted_auth:type_name -> google.protobuf.Any
+	55,  // 58: dtkt.core.v1.Connection.encrypted_auth:type_name -> dtkt.core.v1.EncryptedAny
+	138, // 59: dtkt.core.v1.Connection.headers:type_name -> dtkt.core.v1.Connection.HeadersEntry
+	157, // 60: dtkt.core.v1.Connection.create_time:type_name -> google.protobuf.Timestamp
+	157, // 61: dtkt.core.v1.Connection.update_time:type_name -> google.protobuf.Timestamp
+	3,   // 62: dtkt.core.v1.Deployment.state:type_name -> dtkt.core.v1.Deployment.State
+	8,   // 63: dtkt.core.v1.Deployment.address:type_name -> dtkt.core.v1.Address
+	139, // 64: dtkt.core.v1.Deployment.env:type_name -> dtkt.core.v1.Deployment.EnvEntry
+	140, // 65: dtkt.core.v1.Deployment.ports:type_name -> dtkt.core.v1.Deployment.PortsEntry
+	141, // 66: dtkt.core.v1.Deployment.build:type_name -> dtkt.core.v1.Deployment.Build
+	142, // 67: dtkt.core.v1.Deployment.cloud:type_name -> dtkt.core.v1.Deployment.Cloud
+	39,  // 68: dtkt.core.v1.Deployment.config_schema:type_name -> dtkt.core.v1.TypeSchema
+	48,  // 69: dtkt.core.v1.Deployment.package_spec:type_name -> dtkt.core.v1.PackageSpecMetadata
+	143, // 70: dtkt.core.v1.Deployment.runtime:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata
+	157, // 71: dtkt.core.v1.Deployment.create_time:type_name -> google.protobuf.Timestamp
+	157, // 72: dtkt.core.v1.Deployment.update_time:type_name -> google.protobuf.Timestamp
+	48,  // 73: dtkt.core.v1.Integration.spec:type_name -> dtkt.core.v1.PackageSpecMetadata
+	157, // 74: dtkt.core.v1.Integration.create_time:type_name -> google.protobuf.Timestamp
+	157, // 75: dtkt.core.v1.Integration.update_time:type_name -> google.protobuf.Timestamp
+	175, // 76: dtkt.core.v1.File.protos:type_name -> google.protobuf.FileDescriptorSet
+	157, // 77: dtkt.core.v1.File.create_time:type_name -> google.protobuf.Timestamp
+	157, // 78: dtkt.core.v1.File.update_time:type_name -> google.protobuf.Timestamp
+	157, // 79: dtkt.core.v1.Service.create_time:type_name -> google.protobuf.Timestamp
+	157, // 80: dtkt.core.v1.Service.update_time:type_name -> google.protobuf.Timestamp
+	157, // 81: dtkt.core.v1.Method.create_time:type_name -> google.protobuf.Timestamp
+	157, // 82: dtkt.core.v1.Method.update_time:type_name -> google.protobuf.Timestamp
+	39,  // 83: dtkt.core.v1.Type.schema:type_name -> dtkt.core.v1.TypeSchema
+	157, // 84: dtkt.core.v1.Type.create_time:type_name -> google.protobuf.Timestamp
+	157, // 85: dtkt.core.v1.Type.update_time:type_name -> google.protobuf.Timestamp
+	176, // 86: dtkt.core.v1.TypeSchema.v1beta1:type_name -> dtkt.shared.v1beta1.TypeSchema
+	157, // 87: dtkt.core.v1.AutomationMetadata.start_time:type_name -> google.protobuf.Timestamp
+	157, // 88: dtkt.core.v1.AutomationMetadata.stop_time:type_name -> google.protobuf.Timestamp
+	157, // 89: dtkt.core.v1.FlowRunOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
+	157, // 90: dtkt.core.v1.FlowRunOperationMetadata.stop_time:type_name -> google.protobuf.Timestamp
+	157, // 91: dtkt.core.v1.DeploymentMetadata.start_time:type_name -> google.protobuf.Timestamp
+	157, // 92: dtkt.core.v1.DeploymentMetadata.stop_time:type_name -> google.protobuf.Timestamp
+	10,  // 93: dtkt.core.v1.FlowConnectionMetadata.context:type_name -> dtkt.core.v1.Context
+	177, // 94: dtkt.core.v1.FlowRuntimeMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Runtime
+	178, // 95: dtkt.core.v1.FlowRunMetadata.v1beta2:type_name -> dtkt.flow.v1beta2.RunSnapshot
+	179, // 96: dtkt.core.v1.FlowSpecMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Flow
+	180, // 97: dtkt.core.v1.FlowSpecMetadata.v1beta2:type_name -> dtkt.flow.v1beta2.Flow
+	181, // 98: dtkt.core.v1.FlowGraphMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Graph
+	182, // 99: dtkt.core.v1.FlowGraphMetadata.v1beta2:type_name -> dtkt.flow.v1beta2.Graph
+	183, // 100: dtkt.core.v1.PackageSpecMetadata.v1beta1:type_name -> dtkt.shared.v1beta1.Package
+	146, // 101: dtkt.core.v1.PackageBuildMetadata.runtime:type_name -> dtkt.core.v1.PackageBuildMetadata.Runtime
+	147, // 102: dtkt.core.v1.PackageBuildMetadata.platform:type_name -> dtkt.core.v1.PackageBuildMetadata.Platform
+	148, // 103: dtkt.core.v1.PackageBuildMetadata.env:type_name -> dtkt.core.v1.PackageBuildMetadata.EnvEntry
+	4,   // 104: dtkt.core.v1.BuildOperationMetadata.state:type_name -> dtkt.core.v1.BuildOperationMetadata.State
+	157, // 105: dtkt.core.v1.BuildOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
+	157, // 106: dtkt.core.v1.BuildOperationMetadata.finish_time:type_name -> google.protobuf.Timestamp
+	5,   // 107: dtkt.core.v1.RunOperationMetadata.state:type_name -> dtkt.core.v1.RunOperationMetadata.State
+	157, // 108: dtkt.core.v1.RunOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
+	157, // 109: dtkt.core.v1.RunOperationMetadata.stop_time:type_name -> google.protobuf.Timestamp
+	6,   // 110: dtkt.core.v1.SyncOperationMetadata.state:type_name -> dtkt.core.v1.SyncOperationMetadata.State
+	157, // 111: dtkt.core.v1.SyncOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
+	157, // 112: dtkt.core.v1.SyncOperationMetadata.stop_time:type_name -> google.protobuf.Timestamp
+	7,   // 113: dtkt.core.v1.DialMetadata.state:type_name -> dtkt.core.v1.DialMetadata.State
+	157, // 114: dtkt.core.v1.DialMetadata.time:type_name -> google.protobuf.Timestamp
+	149, // 115: dtkt.core.v1.BatchRunOperationMetadata.failed_requests:type_name -> dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry
+	11,  // 116: dtkt.core.v1.EncryptRequest.resource:type_name -> dtkt.core.v1.Resource
+	11,  // 117: dtkt.core.v1.EncryptResponse.resource:type_name -> dtkt.core.v1.Resource
+	11,  // 118: dtkt.core.v1.DecryptRequest.resource:type_name -> dtkt.core.v1.Resource
+	11,  // 119: dtkt.core.v1.DecryptResponse.resource:type_name -> dtkt.core.v1.Resource
+	12,  // 120: dtkt.core.v1.GetAutomationResponse.automation:type_name -> dtkt.core.v1.Automation
+	12,  // 121: dtkt.core.v1.CreateAutomationRequest.automation:type_name -> dtkt.core.v1.Automation
+	12,  // 122: dtkt.core.v1.CreateAutomationResponse.automation:type_name -> dtkt.core.v1.Automation
+	12,  // 123: dtkt.core.v1.UpdateAutomationRequest.automation:type_name -> dtkt.core.v1.Automation
+	160, // 124: dtkt.core.v1.UpdateAutomationRequest.update_mask:type_name -> google.protobuf.FieldMask
+	1,   // 125: dtkt.core.v1.UpdateAutomationRequest.desired_state:type_name -> dtkt.core.v1.Automation.State
+	62,  // 126: dtkt.core.v1.BatchCreateAutomationsRequest.requests:type_name -> dtkt.core.v1.CreateAutomationRequest
+	12,  // 127: dtkt.core.v1.BatchCreateAutomationsResponse.automations:type_name -> dtkt.core.v1.Automation
+	12,  // 128: dtkt.core.v1.ListAutomationsResponse.automations:type_name -> dtkt.core.v1.Automation
+	150, // 129: dtkt.core.v1.SendAutomationEvent.inputs_event:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent
+	151, // 130: dtkt.core.v1.SendAutomationEvent.user_response_event:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent
+	154, // 131: dtkt.core.v1.ReceiveAutomationEvent.outputs_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent
+	155, // 132: dtkt.core.v1.ReceiveAutomationEvent.user_request_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent
+	70,  // 133: dtkt.core.v1.SendAutomationEventRequest.event:type_name -> dtkt.core.v1.SendAutomationEvent
+	71,  // 134: dtkt.core.v1.ReceiveAutomationEventsResponse.event:type_name -> dtkt.core.v1.ReceiveAutomationEvent
+	70,  // 135: dtkt.core.v1.StreamAutomationEventsRequest.event:type_name -> dtkt.core.v1.SendAutomationEvent
+	71,  // 136: dtkt.core.v1.StreamAutomationEventsResponse.event:type_name -> dtkt.core.v1.ReceiveAutomationEvent
+	32,  // 137: dtkt.core.v1.ListConnectionsResponse.connections:type_name -> dtkt.core.v1.Connection
+	32,  // 138: dtkt.core.v1.GetConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
+	32,  // 139: dtkt.core.v1.CreateConnectionRequest.connection:type_name -> dtkt.core.v1.Connection
+	32,  // 140: dtkt.core.v1.CreateConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
+	32,  // 141: dtkt.core.v1.UpdateConnectionRequest.connection:type_name -> dtkt.core.v1.Connection
+	160, // 142: dtkt.core.v1.UpdateConnectionRequest.update_mask:type_name -> google.protobuf.FieldMask
+	32,  // 143: dtkt.core.v1.UpdateConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
+	53,  // 144: dtkt.core.v1.DialConnectionResponse.dial:type_name -> dtkt.core.v1.DialMetadata
+	35,  // 145: dtkt.core.v1.SyncDescriptorsResponse.file:type_name -> dtkt.core.v1.File
+	35,  // 146: dtkt.core.v1.GetDescriptorsResponse.file:type_name -> dtkt.core.v1.File
+	33,  // 147: dtkt.core.v1.ListDeploymentsResponse.deployments:type_name -> dtkt.core.v1.Deployment
+	33,  // 148: dtkt.core.v1.GetDeploymentResponse.deployment:type_name -> dtkt.core.v1.Deployment
+	33,  // 149: dtkt.core.v1.CreateDeploymentRequest.deployment:type_name -> dtkt.core.v1.Deployment
+	33,  // 150: dtkt.core.v1.UpdateDeploymentRequest.deployment:type_name -> dtkt.core.v1.Deployment
+	160, // 151: dtkt.core.v1.UpdateDeploymentRequest.update_mask:type_name -> google.protobuf.FieldMask
+	3,   // 152: dtkt.core.v1.UpdateDeploymentRequest.desired_state:type_name -> dtkt.core.v1.Deployment.State
+	13,  // 153: dtkt.core.v1.ListFlowsResponse.flows:type_name -> dtkt.core.v1.Flow
+	13,  // 154: dtkt.core.v1.GetFlowResponse.flow:type_name -> dtkt.core.v1.Flow
+	13,  // 155: dtkt.core.v1.CreateFlowRequest.flow:type_name -> dtkt.core.v1.Flow
+	13,  // 156: dtkt.core.v1.CreateFlowResponse.flow:type_name -> dtkt.core.v1.Flow
+	13,  // 157: dtkt.core.v1.UpdateFlowRequest.flow:type_name -> dtkt.core.v1.Flow
+	160, // 158: dtkt.core.v1.UpdateFlowRequest.update_mask:type_name -> google.protobuf.FieldMask
+	13,  // 159: dtkt.core.v1.UpdateFlowResponse.flow:type_name -> dtkt.core.v1.Flow
+	34,  // 160: dtkt.core.v1.ListIntegrationsResponse.integrations:type_name -> dtkt.core.v1.Integration
+	34,  // 161: dtkt.core.v1.GetIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
+	34,  // 162: dtkt.core.v1.CreateIntegrationRequest.integration:type_name -> dtkt.core.v1.Integration
+	34,  // 163: dtkt.core.v1.CreateIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
+	49,  // 164: dtkt.core.v1.BuildIntegrationRequest.build:type_name -> dtkt.core.v1.PackageBuildMetadata
+	34,  // 165: dtkt.core.v1.BuildIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
+	49,  // 166: dtkt.core.v1.BuildIntegrationResponse.build:type_name -> dtkt.core.v1.PackageBuildMetadata
+	34,  // 167: dtkt.core.v1.UpdateIntegrationRequest.integration:type_name -> dtkt.core.v1.Integration
+	160, // 168: dtkt.core.v1.UpdateIntegrationRequest.update_mask:type_name -> google.protobuf.FieldMask
+	34,  // 169: dtkt.core.v1.UpdateIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
+	38,  // 170: dtkt.core.v1.GetTypeResponse.type:type_name -> dtkt.core.v1.Type
+	38,  // 171: dtkt.core.v1.ListTypesResponse.types:type_name -> dtkt.core.v1.Type
+	37,  // 172: dtkt.core.v1.GetMethodResponse.method:type_name -> dtkt.core.v1.Method
+	36,  // 173: dtkt.core.v1.GetServiceResponse.service:type_name -> dtkt.core.v1.Service
+	36,  // 174: dtkt.core.v1.ListServicesResponse.services:type_name -> dtkt.core.v1.Service
+	37,  // 175: dtkt.core.v1.ListMethodsResponse.methods:type_name -> dtkt.core.v1.Method
+	43,  // 176: dtkt.core.v1.Automation.ConnectionsEntry.value:type_name -> dtkt.core.v1.FlowConnectionMetadata
+	158, // 177: dtkt.core.v1.Automation.InputsEntry.value:type_name -> google.protobuf.Any
+	43,  // 178: dtkt.core.v1.FlowRun.ConnectionsEntry.value:type_name -> dtkt.core.v1.FlowConnectionMetadata
+	158, // 179: dtkt.core.v1.FlowRun.InputsEntry.value:type_name -> google.protobuf.Any
+	49,  // 180: dtkt.core.v1.Deployment.Build.metadata:type_name -> dtkt.core.v1.PackageBuildMetadata
+	10,  // 181: dtkt.core.v1.Deployment.Build.context:type_name -> dtkt.core.v1.Context
+	10,  // 182: dtkt.core.v1.Deployment.Cloud.context:type_name -> dtkt.core.v1.Context
+	55,  // 183: dtkt.core.v1.Deployment.Cloud.config:type_name -> dtkt.core.v1.EncryptedAny
+	144, // 184: dtkt.core.v1.Deployment.RuntimeMetadata.native:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata.Native
+	145, // 185: dtkt.core.v1.Deployment.RuntimeMetadata.docker:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata.Docker
+	184, // 186: dtkt.core.v1.PackageBuildMetadata.Runtime.v1beta1:type_name -> dtkt.shared.v1beta1.Runtime
+	185, // 187: dtkt.core.v1.PackageBuildMetadata.Platform.v1beta1:type_name -> dtkt.shared.v1beta1.Platform
+	186, // 188: dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry.value:type_name -> google.rpc.Status
+	152, // 189: dtkt.core.v1.SendAutomationEvent.InputsEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry
+	153, // 190: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry
+	158, // 191: dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
+	158, // 192: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry.value:type_name -> google.protobuf.Any
+	156, // 193: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.values:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry
+	187, // 194: dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent.user_action:type_name -> dtkt.flow.v1beta1.UserAction
+	158, // 195: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
+	196, // [196:196] is the sub-list for method output_type
+	196, // [196:196] is the sub-list for method input_type
+	196, // [196:196] is the sub-list for extension type_name
+	196, // [196:196] is the sub-list for extension extendee
+	0,   // [0:196] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_core_v1_messages_proto_init() }
@@ -8787,7 +17303,29 @@ func file_dtkt_core_v1_messages_proto_init() {
 		(*Resource_Decrypted)(nil),
 	}
 	file_dtkt_core_v1_messages_proto_msgTypes[4].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[6].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[6].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[11].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[15].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[17].OneofWrappers = []any{
+		(*SendFlowRunEvent_Input)(nil),
+		(*SendFlowRunEvent_InteractionResponse)(nil),
+		(*SendFlowRunEvent_Stop)(nil),
+		(*SendFlowRunEvent_Terminate)(nil),
+		(*SendFlowRunEvent_Suspend)(nil),
+		(*SendFlowRunEvent_Resume)(nil),
+		(*SendFlowRunEvent_StopNode)(nil),
+		(*SendFlowRunEvent_TerminateNode)(nil),
+		(*SendFlowRunEvent_SuspendNode)(nil),
+		(*SendFlowRunEvent_ResumeNode)(nil),
+		(*SendFlowRunEvent_Start)(nil),
+	}
+	file_dtkt_core_v1_messages_proto_msgTypes[18].OneofWrappers = []any{
+		(*ReceiveFlowRunEvent_Output)(nil),
+		(*ReceiveFlowRunEvent_InputRequest)(nil),
+		(*ReceiveFlowRunEvent_InteractionRequest)(nil),
+		(*ReceiveFlowRunEvent_Flowrun)(nil),
+	}
+	file_dtkt_core_v1_messages_proto_msgTypes[24].OneofWrappers = []any{
 		(*Connection_Deployment)(nil),
 		(*Connection_CustomProtos)(nil),
 		(*Connection_CustomGrpc)(nil),
@@ -8796,55 +17334,60 @@ func file_dtkt_core_v1_messages_proto_init() {
 		(*Connection_DecryptedAuth)(nil),
 		(*Connection_EncryptedAuth)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[8].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[9].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[26].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[27].OneofWrappers = []any{
 		(*File_Protos)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[13].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[31].OneofWrappers = []any{
 		(*TypeSchema_V1Beta1)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[17].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[36].OneofWrappers = []any{
 		(*FlowRuntimeMetadata_V1Beta1)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[18].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[37].OneofWrappers = []any{
+		(*FlowRunMetadata_V1Beta2)(nil),
+	}
+	file_dtkt_core_v1_messages_proto_msgTypes[38].OneofWrappers = []any{
 		(*FlowSpecMetadata_V1Beta1)(nil),
+		(*FlowSpecMetadata_V1Beta2)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[19].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[39].OneofWrappers = []any{
 		(*FlowGraphMetadata_V1Beta1)(nil),
+		(*FlowGraphMetadata_V1Beta2)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[20].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[40].OneofWrappers = []any{
 		(*PackageSpecMetadata_V1Beta1)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[36].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[40].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[42].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[56].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[60].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[62].OneofWrappers = []any{
 		(*SendAutomationEvent_InputsEvent_)(nil),
 		(*SendAutomationEvent_UserResponseEvent_)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[43].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[63].OneofWrappers = []any{
 		(*ReceiveAutomationEvent_OutputsEvent_)(nil),
 		(*ReceiveAutomationEvent_UserRequestEvent_)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[49].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[59].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[69].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[79].OneofWrappers = []any{
 		(*DialConnectionRequest_Name)(nil),
 		(*DialConnectionRequest_Address)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[65].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[70].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[72].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[82].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[96].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[85].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[90].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[92].OneofWrappers = []any{}
 	file_dtkt_core_v1_messages_proto_msgTypes[102].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[104].OneofWrappers = []any{}
-	file_dtkt_core_v1_messages_proto_msgTypes[113].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[116].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[122].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[124].OneofWrappers = []any{}
+	file_dtkt_core_v1_messages_proto_msgTypes[135].OneofWrappers = []any{
 		(*Deployment_RuntimeMetadata_Native_)(nil),
 		(*Deployment_RuntimeMetadata_Docker_)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[116].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[138].OneofWrappers = []any{
 		(*PackageBuildMetadata_Runtime_V1Beta1)(nil),
 	}
-	file_dtkt_core_v1_messages_proto_msgTypes[117].OneofWrappers = []any{
+	file_dtkt_core_v1_messages_proto_msgTypes[139].OneofWrappers = []any{
 		(*PackageBuildMetadata_Platform_V1Beta1)(nil),
 	}
 	type x struct{}
@@ -8852,8 +17395,8 @@ func file_dtkt_core_v1_messages_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_core_v1_messages_proto_rawDesc), len(file_dtkt_core_v1_messages_proto_rawDesc)),
-			NumEnums:      7,
-			NumMessages:   127,
+			NumEnums:      8,
+			NumMessages:   149,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/ai/v1beta1/services.proto
 
+//go:build !protoopaque
+
 package aiv1beta1
 
 import (

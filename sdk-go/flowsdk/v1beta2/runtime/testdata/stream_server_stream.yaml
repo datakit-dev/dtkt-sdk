@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: stream_server_stream
+  inputs:
+    - id: count
+      int64: {}
+  streams:
+    - id: numbers
+      call:
+        connection: random
+        method: random.Numbers
+        request: "= inputs.count.value"
+  outputs:
+    - id: result
+      value: "= streams.numbers.value"

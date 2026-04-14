@@ -1,0 +1,18 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: var_scan_sum
+  description: "Var with scan transform accumulating a running sum"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: sum
+      value: "= inputs.x.value"
+      transforms:
+        - scan:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+  outputs:
+    - id: result
+      value: "= vars.sum.value"

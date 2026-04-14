@@ -1,0 +1,11 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_int32_to_output
+  description: "Int32 input passed directly to output"
+  inputs:
+    - id: x
+      int32: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value"

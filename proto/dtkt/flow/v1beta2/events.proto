@@ -1,0 +1,212 @@
+syntax = "proto3";
+
+package dtkt.flow.v1beta2;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/any.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2;flowv1beta2";
+
+// InputEvent is an externally-provided value for a specific input node.
+// Unsolicited push -- the external source sends data whenever it wants.
+message InputEvent {
+  // Input node ID to deliver the value to.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+  // The input value, serialized as a protobuf Any.
+  google.protobuf.Any value = 2 [(buf.validate.field).required = true];
+}
+
+// InputRequestEvent is emitted by the executor to solicit input for a
+// specific input node. The external source should respond with an InputEvent.
+message InputRequestEvent {
+  // Input node ID that needs a value.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+}
+
+// OutputEvent is a result emitted by a specific output node.
+message OutputEvent {
+  // Output node ID that produced the value.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+  // The output value, serialized as a protobuf Any.
+  google.protobuf.Any value = 2 [(buf.validate.field).required = true];
+}
+
+// InteractionRequestEvent is emitted by the executor when an interaction node
+// needs external input. The token is a single-use opaque UUIDv7 that the
+// responder must echo back in InteractionResponseEvent.
+message InteractionRequestEvent {
+  // Interaction node ID that needs a response.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+  // Single-use opaque UUIDv7 token. Must be echoed in InteractionResponseEvent.
+  string token = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+}
+
+// InteractionResponseEvent is sent by the external source in response to an
+// InteractionRequestEvent. The token must match the outstanding request;
+// mismatched or reused tokens are rejected.
+message InteractionResponseEvent {
+  // Interaction node ID this response is for.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+  // Token from the corresponding InteractionRequestEvent. Must match exactly.
+  string token = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  // The response value, serialized as a protobuf Any.
+  google.protobuf.Any value = 3 [(buf.validate.field).required = true];
+  // Actor is the resource name of the entity providing the response
+  // (e.g. "users/bob", "agents/claude"). Stamped by the service layer
+  // from auth context.
+  string actor = 4;
+}
+
+// Flow-level commands (external -> executor)
+
+// StopFlowEvent requests a graceful shutdown of the entire flow.
+// Behavior: close all input EOFs, let in-flight messages drain through the
+// pipeline. Generators stop firing. Nodes complete their current work then
+// transition to PHASE_SUCCEEDED. Flow transitions RUNNING -> STOPPING ->
+// SUCCEEDED once all nodes have finished.
+message StopFlowEvent {}
+
+// TerminateFlowEvent requests an immediate hard cancellation of the flow.
+// Behavior: cancel the flow context. Running nodes get their context cancelled
+// and transition to PHASE_CANCELLED (with an error if cancellation interrupted
+// an in-flight operation). No drain, no graceful flush. Flow transitions
+// RUNNING -> TERMINATING -> CANCELLED.
+message TerminateFlowEvent {}
+
+// SuspendFlowEvent requests suspension of the entire flow.
+// Behavior: all nodes finish their current in-flight operation (like suspend-
+// after-current), then pause -- no new messages are processed, generators stop
+// publishing. Each node transitions to PHASE_SUSPENDED. Flow transitions
+// RUNNING -> SUSPENDED.
+//
+// Edge case: nodes already in a terminal phase (SUCCEEDED, FAILED, ERRORED,
+// CANCELLED) are left as-is -- only PENDING and RUNNING nodes are suspended.
+message SuspendFlowEvent {}
+
+// ResumeFlowEvent requests resumption of a suspended, errored, or cancelled flow.
+// Behavior: all nodes in PHASE_SUSPENDED, PHASE_ERRORED, or PHASE_CANCELLED
+// transition back to PHASE_PENDING, then re-enter the normal execution loop.
+// Nodes already in terminal phases (SUCCEEDED, FAILED) are left as-is.
+// Flow transitions SUSPENDED/ERRORED -> RUNNING.
+//
+// If a resumed node hits the same error again, it will re-enter PHASE_ERRORED
+// and the flow's error_strategy applies as usual.
+//
+// Edge case: resuming a flow where some nodes succeeded and others errored --
+// the succeeded nodes stay done, errored nodes restart. Downstream nodes that
+// were starved (blocked waiting on the errored node) will begin receiving
+// messages again once the resumed node produces output.
+message ResumeFlowEvent {}
+
+// Node-level commands (external -> executor)
+
+// StopNodeEvent requests a graceful shutdown of a specific node.
+// Behavior varies by node type:
+//   - Input: close the input (EOF), mark PHASE_SUCCEEDED when drained.
+//   - Generator: stop firing, mark PHASE_SUCCEEDED.
+//   - Var/Output: stop evaluating, mark PHASE_SUCCEEDED.
+//   - Action (unary): if idle, mark PHASE_SUCCEEDED immediately. If mid-RPC,
+//     wait for the current call to complete, then mark PHASE_SUCCEEDED.
+//   - Stream: close the request side (EOF), wait for server to close response
+//     side, then mark PHASE_SUCCEEDED.
+//   - Interaction: cancel outstanding token (if any), mark PHASE_SUCCEEDED.
+//
+// Stopping a node does NOT trigger the flow's error_strategy -- it is a clean
+// shutdown. Downstream dependents will be starved (no more messages).
+message StopNodeEvent {
+  // Node ID to stop.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+}
+
+// TerminateNodeEvent requests immediate cancellation of a specific node.
+// Behavior varies by node type:
+//   - Input/Generator/Var/Output: mark PHASE_CANCELLED immediately.
+//   - Action (unary): if idle, mark PHASE_CANCELLED. If mid-RPC, cancel the
+//     RPC context; node transitions to PHASE_CANCELLED with a CANCELLED error.
+//   - Stream: cancel the stream context, close both sides. Node transitions
+//     to PHASE_CANCELLED, with a CANCELLED error if the stream was active.
+//   - Interaction: cancel outstanding token, mark PHASE_CANCELLED.
+//
+// Terminating a node does NOT trigger the flow's error_strategy -- PHASE_CANCELLED
+// is distinct from PHASE_ERRORED. Downstream dependents will be starved.
+message TerminateNodeEvent {
+  // Node ID to terminate.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+}
+
+// SuspendNodeEvent requests suspension of a specific node.
+// Behavior: the node finishes its current in-flight operation, then pauses.
+// No new messages are processed; generators stop publishing.
+// Node transitions to PHASE_SUSPENDED.
+//
+// Streams: the stream stays open but no new request messages are sent and
+// incoming responses are buffered (not processed) until resumed.
+//
+// Edge case: if the node is already in a terminal phase (SUCCEEDED, FAILED,
+// ERRORED, CANCELLED), the command is a no-op.
+message SuspendNodeEvent {
+  // Node ID to suspend.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+}
+
+// ResumeNodeEvent requests resumption of a specific suspended, errored, or
+// cancelled node. The node transitions back to PHASE_PENDING, then re-enters
+// the normal execution loop.
+//
+// If value is provided, it replaces the node's pending input for the next
+// evaluation. Use this to provide a corrected request when resuming an errored
+// action, or to inject a value into a suspended node. If absent, the node
+// restarts with its normal dependency resolution (re-evaluates from upstream).
+//
+// Edge case: resuming an errored action node -- the action will re-invoke the
+// RPC. If the same error occurs, it re-enters PHASE_ERRORED and error_strategy
+// applies again. The provided value (if any) is used as the MethodCall request.
+//
+// Edge case: resuming a node that is SUCCEEDED or FAILED is a no-op.
+message ResumeNodeEvent {
+  // Node ID to resume.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+  // Optional replacement value for the node's next evaluation.
+  // If present, replaces the pending input (e.g. corrected RPC request).
+  // If absent, the node re-evaluates from its upstream dependencies.
+  optional google.protobuf.Any value = 2;
+}
+
+// StartFlowEvent requests the executor to begin executing the flow graph.
+// Sent by the client after connecting to StreamFlowRunEvents to ensure the
+// event stream is established before any outputs are produced. The flow must
+// be in PENDING state; a start event on an already-running flow is a no-op.
+message StartFlowEvent {}

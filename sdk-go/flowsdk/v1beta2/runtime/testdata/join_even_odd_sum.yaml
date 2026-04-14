@@ -1,0 +1,40 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: even_odd_sum
+  description: "Fan-out + filter + reduce + event window for even/odd"
+  inputs:
+    - id: number
+      int64: {}
+  vars:
+    - id: evenNumbers
+      value: "= inputs.number.value"
+      transforms:
+        - filter: "= this.value % 2 == 0"
+    - id: oddNumbers
+      value: "= inputs.number.value"
+      transforms:
+        - filter: "= this.value % 2 != 0"
+  outputs:
+    - id: evenNumbers
+      value: "= vars.evenNumbers.value"
+    - id: oddNumbers
+      value: "= vars.oddNumbers.value"
+    - id: evenOddPairs
+      value: "= [vars.evenNumbers.value, vars.oddNumbers.value]"
+    - id: evenSum
+      value: "= vars.evenNumbers.value"
+      transforms:
+        - scan:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+    - id: oddSum
+      value: "= vars.oddNumbers.value"
+      transforms:
+        - reduce:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+            group_by:
+              window:
+                event:
+                  when: "= vars.oddNumbers.closed"

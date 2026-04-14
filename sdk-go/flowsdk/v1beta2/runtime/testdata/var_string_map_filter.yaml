@@ -1,0 +1,17 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: var_string_map_filter
+  description: "String var with map (add suffix) then filter by length"
+  inputs:
+    - id: name
+      string: {}
+  vars:
+    - id: processed
+      value: "= inputs.name.value"
+      transforms:
+        - map: '= this.value + "_suffix"'
+        - filter: "= size(this.value) > 8"
+  outputs:
+    - id: result
+      value: "= vars.processed.value"

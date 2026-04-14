@@ -1,0 +1,18 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: stop_generator_action
+  generators:
+    - id: gen
+      range:
+        start: 1
+        end: 100
+  actions:
+    - id: call
+      call:
+        connection: echo
+        method: error.Internal
+        request: "= generators.gen.value"
+  outputs:
+    - id: result
+      value: "= actions.call.value"

@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_flatten_passthrough
+  description: "Flatten with false should be a no-op"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: noop
+      value: "= inputs.x.value"
+      transforms:
+        - flatten: false
+  outputs:
+    - id: result
+      value: "= vars.noop.value"

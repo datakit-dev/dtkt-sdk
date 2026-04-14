@@ -1,0 +1,811 @@
+syntax = "proto3";
+
+package dtkt.flow.v1beta2;
+
+import "buf/validate/validate.proto";
+import "dtkt/flow/v1beta2/types.proto";
+import "dtkt/protoform/v1beta1/protoform.proto";
+import "dtkt/shared/v1beta1/messages.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2;flowv1beta2";
+
+// Flow defines a directed acyclic graph of nodes connected by data dependencies.
+//
+// CEL Expression Scoping
+// ─────────────────────────────────────────────────────────────────────────────
+// All CEL expression fields (prefixed with `= `) receive two categories of
+// variables: globals and a `this` context. Which `this` properties are
+// available depends on where the expression appears -- documented on each field.
+//
+// Globals (available in all expressions except Generator value expressions):
+//
+//   inputs.<id>.value              Last received value (per this node's subscription)
+//   inputs.<id>.closed             Input stream is closed
+//
+//   generators.<id>.value          Last received value (per this node's subscription)
+//   generators.<id>.done           Generator has finished
+//   generators.<id>.eval_count     Number of values emitted
+//
+//   vars.<id>.value                Last received value (per this node's subscription)
+//   vars.<id>.eval_count           Number of evaluations
+//
+//   actions.<id>.value             Last received value (per this node's subscription)
+//   actions.<id>.eval_count        Number of invocations
+//
+//   streams.<id>.value             Last received value (per this node's subscription)
+//   streams.<id>.request_closed    Client-side stream closed
+//   streams.<id>.response_closed   Server-side stream closed
+//   streams.<id>.request_count     Number of requests sent
+//   streams.<id>.response_count    Number of responses received
+//
+//   interactions.<id>.value        Last received value (per this node's subscription)
+//   interactions.<id>.submitted    Interaction form has been submitted
+//
+//   outputs.<id>.value             Last received value (per this node's subscription)
+//   outputs.<id>.eval_count        Number of evaluations
+//
+// Each subscriber has its own independent view of upstream values. Two nodes
+// subscribed to the same upstream may see different values at the same instant
+// depending on their processing speed.
+//
+// `this` context per expression site:
+//
+//   Var.value                              (globals only)
+//   Action.when                            (globals only)
+//   Stream.when                            (globals only)
+//   Interaction.when                       (globals only)
+//   Stream.close_request_when              (globals only)
+//   Output.value                           (globals only)
+//   Switch.value                           (globals only)
+//   MethodCall.request (embedded in Value) (globals only)
+//   Transform.Reduce.initial               (globals only)
+//   Transform.Scan.initial                 (globals only)
+//
+//   Switch.Case.value                      this.value    (switch discriminant)
+//   Switch.Case.return                     this.value    (switch discriminant)
+//   Switch.default                         this.value    (switch discriminant)
+//
+//   MethodCall.response                    this.response (raw RPC response)
+//
+//   Transform.map                          this.value    (previous stage output)
+//   Transform.filter                       this.value    (previous stage output)
+//   Transform.Reduce.accumulator           this.value       (current input)
+//                                          this.accumulator (running total)
+//   Transform.Scan.accumulator             this.value       (current input)
+//                                          this.accumulator (running total)
+//   Transform.GroupBy.key                  this.value    (current input)
+//   Transform.GroupBy.Window.Event.when    this.value    (current input)
+//
+//   RetryStrategy.when                     this.response (RPC result, if any)
+//                                          this.error    (google.rpc.Status, if any)
+//   RetryStrategy.skip_when                this.error       (google.rpc.Status)
+//   RetryStrategy.suspend_when             this.error       (google.rpc.Status)
+//   RetryStrategy.terminate_when           this.error       (google.rpc.Status)
+//   RetryStrategy.continue_when            this.error       (google.rpc.Status)
+//
+// Generator Ticker/Cron value expressions receive only a `this` context:
+//
+//   Ticker.value / Cron.value              this.count (int64), this.time (timestamp)
+//
+// Sentinel Values
+// ─────────────────────────────────────────────────────────────────────────────
+// Certain special values carry control-flow semantics when produced by CEL
+// expressions. The runtime detects these and acts accordingly.
+//
+//   EOF          Signals end-of-stream. When a CEL expression evaluates to
+//                `EOF`, the runtime treats it as a terminal value:
+//                - In a Stream's MethodCall.request: closes the client side of
+//                  the stream (equivalent to CloseSend). This is an ergonomic
+//                  alternative to `close_request_when`.
+//                - In a Generator's value: signals the generator is done.
+//                - In an Input: closes the input channel.
+//                Represented internally as a `Runtime.EOF` proto message
+//                wrapped in a `cel.expr.Value.object_value`.
+//
+// Built-in CEL Functions
+// ─────────────────────────────────────────────────────────────────────────────
+// In addition to the standard CEL functions (size, has, type, int, uint, double,
+// string, bytes, matches, contains, startsWith, endsWith, timestamp, duration,
+// list/map operations, ternary `? :`, etc.), the following are available:
+//
+//   EOF()        Returns the EOF sentinel value. Use in request expressions to
+//                close a stream: `request: "= condition ? EOF() : value"`.
+//
+// No other custom functions are defined. All data access is through the globals
+// and `this` context variables documented above.
+message Flow {
+  string name = 1 [(buf.validate.field).required = true];
+  string description = 2;
+
+  // The connections used by this flow.
+  repeated Connection connections = 3;
+
+  // External inputs to the flow, which can be provided at runtime.
+  repeated Input inputs = 4;
+
+  // Generators produce a stream of values based on some internal logic (e.g., time-based, expression-driven, etc.).
+  repeated Generator generators = 5;
+
+  // Expressions that act as intermediate variables within the flow.
+  repeated Var vars = 6;
+
+  // Unary method calls
+  repeated Action actions = 7;
+
+  // Streaming method calls
+  repeated Stream streams = 8;
+
+  // An in-flow interaction requiring a response from an external actor (e.g., AI or human)
+  repeated Interaction interactions = 9;
+
+  // External outputs from the flow, which can be consumed at runtime.
+  repeated Output outputs = 10;
+
+  // How the flow reacts when a node enters PHASE_ERRORED.
+  // Default (UNSPECIFIED) = TERMINATE.
+  ErrorStrategy error_strategy = 11 [(buf.validate.field).enum.defined_only = true];
+}
+
+// ErrorStrategy controls flow behavior when a node enters PHASE_ERRORED.
+enum ErrorStrategy {
+  // Unspecified defaults to TERMINATE (fail-fast).
+  ERROR_STRATEGY_UNSPECIFIED = 0;
+  // Kill context immediately, no drain. Flow -> TERMINATING -> ERRORED.
+  ERROR_STRATEGY_TERMINATE = 1;
+  // Graceful drain: close input EOFs, let in-flight messages flush.
+  // Flow -> STOPPING -> FAILED.
+  ERROR_STRATEGY_STOP = 2;
+  // Partial execution: errored node sits idle (starves dependents),
+  // rest of the flow continues. Operator can resume the errored node.
+  // Flow stays RUNNING until all paths are blocked, then -> ERRORED.
+  ERROR_STRATEGY_CONTINUE = 3;
+}
+
+// FlowControl allows a node to trigger flow-level lifecycle actions based on
+// CEL boolean expressions evaluated alongside the node's normal processing.
+// The expressions receive the same globals as other CEL fields on the node,
+// plus `this` context where applicable.
+//
+// When a condition evaluates to true, the corresponding action is applied to
+// the entire flow -- not just the declaring node.
+message FlowControl {
+  // Graceful stop: EOF is injected into external inputs, generator contexts
+  // are cancelled, and in-flight messages drain. Flow -> STOPPING -> SUCCEEDED.
+  string stop_when = 1 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // Immediate termination: the run context is cancelled, no drain.
+  // Flow -> TERMINATING -> ERRORED.
+  string terminate_when = 2 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // Suspend the entire flow until an external Resume. All node processing
+  // pauses. Flow -> SUSPENDED.
+  string suspend_when = 3 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+}
+
+// Connection declares a gRPC/Connect service endpoint used by actions and streams.
+message Connection {
+  option (buf.validate.message).oneof = {
+    fields: [
+      "package",
+      "services"
+    ]
+    required: true
+  };
+
+  // Unique identifier for this connection within the flow.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+
+  // Connection must resolve to an integration with the given package identity.
+  dtkt.shared.v1beta1.Package.Identity package = 2;
+
+  // Connection must resolve to a server which implements the given services.
+  repeated string services = 3;
+}
+
+// Input declares an external input to the flow, provided at runtime.
+message Input {
+  // Unique identifier for this input within the flow.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+
+  // The value type for this input. Exactly one must be set.
+  oneof type {
+    option (buf.validate.oneof).required = true;
+
+    Bool bool = 3;
+    Bytes bytes = 4;
+    Double double = 5;
+    Float float = 6;
+    Int64 int64 = 7;
+    Uint64 uint64 = 8;
+    Int32 int32 = 9;
+    Uint32 uint32 = 10;
+    String string = 11;
+    List list = 12;
+    Map map = 13;
+    Message message = 14;
+  }
+
+  // If true, reuse the last provided value when this input is re-requested
+  // within the same flow run.
+  bool cache = 20;
+
+  // Bypasses PubSub entirely. The value is provided once and never changes
+  // for the flow's lifetime. The input channel closes after the first value.
+  // Implicitly cached.
+  bool constant = 23;
+
+  // Resolution throttle. Controls how often the input resolves a fresh value.
+  // Wait window per attempt is interval/count. If no value arrives within
+  // the window, falls back to cache (if enabled), then the type's default (if
+  // set), then sends a request event to the client. If unset and cache is true
+  // or the type has a default, the executor's default throttle is injected
+  // (WithDefaultInputThrottle). If unset and neither applies, blocks until a
+  // value arrives.
+  Rate throttle = 22;
+
+  // An ordered pipeline of transforms applied to the input value.
+  // Each step receives `this.value` from the previous stage.
+  repeated Transform transforms = 21;
+}
+
+// Var declares an intermediate CEL variable or switch expression within the flow.
+message Var {
+  // Unique identifier for this var within the flow.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+
+  // If true, reuse the last evaluated value when this var is re-triggered.
+  bool cache = 2;
+
+  // The evaluation type. Exactly one must be set.
+  oneof type {
+    option (buf.validate.oneof).required = true;
+
+    // CEL expression. Globals only.
+    string value = 3 [
+      (buf.validate.field).string.pattern = "^\\s?=\\s?",
+      (buf.validate.field).string.example = " = inputs.foo.value"
+    ];
+
+    // Switch expression with cases and a default.
+    Switch switch = 4;
+  }
+
+  // An ordered pipeline of transforms applied to the var value.
+  // Each step receives `this.value` from the previous stage.
+  repeated Transform transforms = 5;
+
+  // Flow-level lifecycle control evaluated alongside the var expression.
+  FlowControl flow_control = 6;
+}
+
+// Action declares a unary RPC method call node.
+message Action {
+  // Unique identifier for this action within the flow.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+
+  // CEL boolean guard. Globals only. If false, the action is skipped.
+  string when = 2 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // If true, the executor will cache the result of this action and return the cached value for subsequent calls.
+  bool cache = 10;
+
+  // Throttle for RPC invocations. Limits how often upstream
+  // subscription changes can trigger the action's method call.
+  Rate throttle = 12;
+
+  // Error handling strategy for this action.
+  RetryStrategy retry_strategy = 11;
+
+  // If true, skip the RPC when the same request input has been seen before
+  // and return the previously cached response. Keyed by a deterministic hash
+  // of the resolved request value. Only applicable to unary RPCs (Actions);
+  // streaming RPCs have no stable request-to-response mapping.
+  bool memoize = 13;
+
+  // The RPC call type. Exactly one must be set.
+  oneof type {
+    option (buf.validate.oneof).required = true;
+    // Unary method call configuration.
+    MethodCall call = 4;
+  }
+
+  // Flow-level lifecycle control evaluated alongside the action.
+  FlowControl flow_control = 14;
+}
+
+// Output declares an external output from the flow.
+message Output {
+  // The id of the output. Must be unique among all node IDs in the flow.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+
+  // CEL expression. Globals only.
+  string value = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // An ordered pipeline of transforms applied to the output value.
+  // Each step receives `this.value` from the previous stage.
+  repeated Transform transforms = 3;
+
+  // Throttle for output evaluation. Limits how often upstream
+  // subscription changes can trigger the output's CEL evaluation.
+  Rate throttle = 4;
+
+  // Flow-level lifecycle control evaluated alongside the output.
+  FlowControl flow_control = 5;
+}
+
+// Stream declares a streaming RPC method call node.
+message Stream {
+  // Unique identifier for this stream within the flow.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+
+  // CEL boolean. Globals only. Defines when to perform a client-side action on the
+  // stream (e.g., start the stream, send a ping). For MethodCalls, automatically
+  // starts the stream if it is closed or not yet open.
+  string when = 12 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // CEL boolean. Globals only. Defines when to close the request (client) side of
+  // the stream. For MethodCalls, sends an EOF and sets request_closed.
+  string close_request_when = 13 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // Throttle for stream requests. Limits how often upstream
+  // subscription changes can trigger sending a request on the stream.
+  Rate throttle = 15;
+
+  // Error handling strategy for this stream.
+  RetryStrategy retry_strategy = 14;
+
+  // The streaming RPC call type. Exactly one must be set.
+  oneof type {
+    option (buf.validate.oneof).required = true;
+    // Streaming method call configuration.
+    MethodCall call = 2;
+  }
+
+  // Flow-level lifecycle control evaluated alongside the stream.
+  FlowControl flow_control = 16;
+}
+
+// MethodCall configures a gRPC method invocation on a Connection.
+message MethodCall {
+  // Connection ID referencing a Connection declared in the flow.
+  string connection = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+
+  // Fully-qualified gRPC method name (e.g. "package.Service/Method").
+  string method = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "[a-zA-Z._/]+"
+  ];
+
+  // Any value `= <cel expr>` is treated as a CEL expression, and the expression is evaluated at runtime to produce the request value.
+  google.protobuf.Value request = 4;
+
+  // CEL expression to post-process the RPC response.
+  // `this.response` = raw response value. Globals also available.
+  string response = 5 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+}
+
+// Interaction defines an in-flow interaction requiring a response from an
+// external actor (e.g., AI or human). Contains form input definitions and
+// optional transforms applied to the response.
+message Interaction {
+  // ConfirmBinding holds a boolean response from a confirm element.
+  message ConfirmBinding {
+    // The confirmed value.
+    bool value = 1;
+  }
+
+  // InputBinding holds a text response from an input element.
+  message InputBinding {
+    // The text value.
+    string value = 1;
+  }
+
+  // FileBinding holds a binary response from a file element.
+  message FileBinding {
+    // The file contents.
+    bytes value = 1;
+  }
+
+  // SelectBinding holds a single selection from a select element.
+  message SelectBinding {
+    // The selected value.
+    google.protobuf.Any value = 1;
+  }
+
+  // MultiSelectBinding holds multiple selections from a multi-select element.
+  message MultiSelectBinding {
+    // The selected values.
+    repeated google.protobuf.Any value = 1;
+  }
+
+  // Input defines a single form field within an interaction.
+  message Input {
+    // Unique identifier for this input within the interaction.
+    string id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+    ];
+
+    // Optionally CEL (prefix with `=`). Globals available.
+    string title = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^\\s?(=)?\\s?(.*)$"
+    ];
+
+    // Optionally CEL (prefix with `=`). Globals available.
+    optional string description = 3 [(buf.validate.field).string.pattern = "^\\s?(=)?\\s?(.*)$"];
+
+    // The form element type. Exactly one must be set.
+    oneof element {
+      option (buf.validate.oneof).required = true;
+      // Yes/no confirmation.
+      dtkt.protoform.v1beta1.ConfirmElement confirm = 4;
+      // Free-form text input.
+      dtkt.protoform.v1beta1.InputElement input = 5;
+      // File upload.
+      dtkt.protoform.v1beta1.FileElement file = 6;
+      // Single-choice selection.
+      dtkt.protoform.v1beta1.SelectElement select = 7;
+      // Multi-choice selection.
+      dtkt.protoform.v1beta1.MultiSelectElement multi_select = 8;
+    }
+  }
+
+  // Unique, human-readable identifier for this interaction within the flow.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+
+  // An ordered pipeline of transforms applied to interaction results.
+  // Each step receives `this.value` from the previous stage.
+  repeated Transform transforms = 2;
+
+  // The interaction's form fields.
+  repeated Input inputs = 3;
+
+  // CEL boolean guard. Globals only. If false, the interaction is skipped for
+  // this iteration. Also serves as the upstream trigger -- any node references
+  // in the expression create graph edges.
+  string when = 4 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // Flow-level lifecycle control evaluated alongside the interaction.
+  FlowControl flow_control = 5;
+}
+
+// Backoff configures exponential backoff for retry strategies.
+message Backoff {
+  // Initial delay before the first retry.
+  google.protobuf.Duration initial_backoff = 1 [(buf.validate.field).required = true];
+
+  // Multiplier applied to the current delay after each retry.
+  double backoff_multiplier = 2;
+
+  // Maximum delay between retries. Once the delay reaches this cap,
+  // subsequent retries use this value.
+  google.protobuf.Duration max_backoff = 3;
+
+  // Maximum number of retry attempts before escalating to the
+  // RetryStrategy's skip/suspend/terminate path.
+  uint32 max_attempts = 4 [(buf.validate.field).required = true];
+}
+
+// RetryStrategy configures error handling for Action and Stream nodes.
+message RetryStrategy {
+  // CEL boolean that activates this retry strategy.
+  // `this.response` = RPC result (if any), `this.error` = google.rpc.Status (if any).
+  // Globals also available. If omitted, activates on every response/error.
+  string when = 1 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // Automated retry with exponential backoff.
+  Backoff backoff = 2;
+
+  // CEL boolean. If true, skip the current item and continue processing.
+  // `this.error` = gRPC Status. Globals also available.
+  string skip_when = 3 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // CEL boolean. If true, suspend the node until an external Resume.
+  // The Resume call may optionally provide a new request value.
+  // `this.error` = gRPC Status. Globals also available.
+  string suspend_when = 4 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // CEL boolean. If true, terminate the entire flow.
+  // `this.error` = gRPC Status. Globals also available.
+  string terminate_when = 5 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // CEL expression. When non-null and non-false, the result is emitted as
+  // the node's output value instead of propagating the error. This allows
+  // error information to flow downstream for handling by other nodes.
+  // `this.error` = gRPC Status. Globals also available.
+  //
+  // Example: continue_when: "= this.error.code == 5 ? this.error.message : false"
+  // On NotFound (code 5), emits the error message as a string value;
+  // on any other error code, evaluates to false and does not activate.
+  string continue_when = 6 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+}
+
+// Switch evaluates a CEL discriminant and branches into ordered cases.
+message Switch {
+  // Case is a single branch in a switch expression.
+  message Case {
+    // CEL boolean condition. `this.value` = the evaluated switch discriminant.
+    string value = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^\\s?=\\s?"
+    ];
+    // CEL expression for the case result. `this.value` = the evaluated switch discriminant.
+    string return = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^\\s?=\\s?"
+    ];
+  }
+
+  // CEL expression for the switch discriminant. Globals only.
+  string value = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+  // Ordered list of cases evaluated against the discriminant.
+  repeated Case case = 2;
+  // CEL expression for the default result. `this.value` = the evaluated switch discriminant.
+  string default = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+}
+
+// Rate limits throughput to at most `count` events per `interval`.
+message Rate {
+  // Maximum number of events allowed per interval.
+  uint32 count = 1 [(buf.validate.field).required = true];
+  // Time window for the rate limit.
+  google.protobuf.Duration interval = 2 [(buf.validate.field).required = true];
+}
+
+// Generator produces a stream of values based on internal logic (time-based,
+// expression-driven, or bounded range).
+message Generator {
+  // Ticker emits on a fixed time interval.
+  message Ticker {
+    // Time between emissions.
+    google.protobuf.Duration interval = 1 [(buf.validate.field).required = true];
+    // Optional initial delay before the first emission.
+    google.protobuf.Duration delay = 2;
+    // CEL expression. `this.count` (int64) and `this.time` (timestamp) available.
+    // No globals -- generators are pure sources.
+    string value = 3 [
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+      (buf.validate.field).string.pattern = "^\\s?=\\s?"
+    ];
+  }
+
+  // Cron emits on a cron schedule expression.
+  message Cron {
+    // Cron expression (e.g. "*/5 * * * *"). Uses robfig/cron v3 syntax.
+    string expression = 1 [(buf.validate.field).required = true];
+    // CEL expression. `this.count` (int64) and `this.time` (timestamp) available.
+    // No globals -- generators are pure sources.
+    string value = 2 [
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+      (buf.validate.field).string.pattern = "^\\s?=\\s?"
+    ];
+  }
+
+  // Range emits a bounded sequence of values. Both start and end are inclusive.\n  // For example, start=1 end=3 step=1 emits [1, 2, 3].
+  message Range {
+    // Starting value (inclusive). Defaults to 0.
+    int64 start = 1;
+    // Ending value (inclusive).
+    int64 end = 2 [(buf.validate.field).required = true];
+    // Step increment between values. Defaults to 1.
+    int64 step = 3;
+    // Optional pacing. When set, values are emitted at the given rate
+    // instead of as fast as possible.
+    Rate rate = 4;
+  }
+
+  // Unique identifier for this generator within the flow.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+
+  // The generator type. Exactly one must be set.
+  oneof type {
+    option (buf.validate.oneof).required = true;
+    // Fixed-interval ticker.
+    Ticker ticker = 2;
+    // Cron-scheduled emitter.
+    Cron cron = 3;
+    // Bounded integer range.
+    Range range = 4;
+  }
+}
+
+// Transform is a single step in an ordered pipeline applied to a node's value.
+// Each step receives `this.value` from the previous stage (or the node's own value for the first step).
+message Transform {
+  // GroupBy defines how input data is partitioned for accumulation.
+  message GroupBy {
+    // Window defines a temporal boundary for grouping input data.
+    message Window {
+      // Fixed (tumbling) windows have a static size and do not overlap.
+      message Fixed {
+        // Duration of the tumbling window.
+        google.protobuf.Duration length = 1 [(buf.validate.field).required = true];
+      }
+
+      // Sliding windows have a fixed size but may overlap; `slide` controls how often a new window starts.
+      message Sliding {
+        // Total duration of each window.
+        google.protobuf.Duration length = 1 [(buf.validate.field).required = true];
+        // How often a new window starts.
+        google.protobuf.Duration slide = 2 [(buf.validate.field).required = true];
+      }
+
+      // Session windows group data based on activity; they close after `timeout` of inactivity.
+      message Session {
+        // Inactivity duration after which the session window closes.
+        google.protobuf.Duration timeout = 1 [(buf.validate.field).required = true];
+      }
+
+      // Event windows close when a CEL boolean evaluates to true.
+      // `this.value` = current input. Globals also available.
+      message Event {
+        // CEL boolean condition that closes the window when true.
+        string when = 1 [
+          (buf.validate.field).required = true,
+          (buf.validate.field).string.pattern = "^\\s?=\\s?"
+        ];
+      }
+
+      // The window type. Exactly one must be set.
+      oneof type {
+        option (buf.validate.oneof).required = true;
+        // Tumbling (non-overlapping) window.
+        Fixed fixed = 1;
+        // Sliding (overlapping) window.
+        Sliding sliding = 2;
+        // Activity-based session window.
+        Session session = 3;
+        // Condition-driven event window.
+        Event event = 4;
+      }
+    }
+
+    // CEL expression for the partitioning key.
+    // `this.value` = current input. Globals also available.
+    string key = 1 [
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+      (buf.validate.field).string.pattern = "^\\s?=\\s?"
+    ];
+
+    // The temporal window used to group input data.
+    Window window = 2;
+  }
+
+  // Reduce accumulates values into a single result, emitted when the stream ends or a window closes.
+  message Reduce {
+    // CEL expression for the initial accumulator value. Globals only.
+    string initial = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^\\s?=\\s?"
+    ];
+
+    // CEL expression combining current input with running total.
+    // `this.value` = current input, `this.accumulator` = running total. Globals also available.
+    string accumulator = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^\\s?=\\s?"
+    ];
+
+    // Groups values by key and/or temporal window before accumulation.
+    GroupBy group_by = 3;
+  }
+
+  // Scan accumulates values like Reduce but emits every intermediate accumulator value.
+  message Scan {
+    // CEL expression for the initial accumulator value. Globals only.
+    string initial = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^\\s?=\\s?"
+    ];
+
+    // CEL expression combining current input with running total.
+    // `this.value` = current input, `this.accumulator` = running total. Globals also available.
+    string accumulator = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^\\s?=\\s?"
+    ];
+
+    // Groups values by key and/or temporal window before accumulation.
+    GroupBy group_by = 3;
+  }
+
+  // The transform type. Exactly one must be set.
+  oneof type {
+    option (buf.validate.oneof).required = true;
+
+    // CEL expression. `this.value` = previous stage output. Globals also available.
+    string map = 1 [(buf.validate.field).string.pattern = "^\\s?=\\s?"];
+
+    // Flattens `this.value` (must be an array) by emitting each element individually.
+    bool flatten = 2;
+
+    // CEL boolean. `this.value` = previous stage output. Globals also available.
+    // If true, the value is emitted; if false, it is dropped.
+    string filter = 3 [(buf.validate.field).string.pattern = "^\\s?=\\s?"];
+
+    // Accumulates `this.value` into a single result over time.
+    Reduce reduce = 4;
+
+    // Accumulates like reduce but emits every intermediate value.
+    Scan scan = 5;
+  }
+}

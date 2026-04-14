@@ -1,0 +1,18 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: action_retry_no_backoff_skip
+  inputs:
+    - id: msg
+      int64: {}
+  actions:
+    - id: echo
+      retry_strategy:
+        skip_when: "= this.error.code == 5"
+      call:
+        connection: echo
+        method: error.NotFound
+        request: "= inputs.msg.value"
+  outputs:
+    - id: result
+      value: "= actions.echo.value"

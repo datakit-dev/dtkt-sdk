@@ -1,0 +1,17 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: scan_running_product
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: product
+      value: "= inputs.x.value"
+      transforms:
+        - scan:
+            initial: "= 1"
+            accumulator: "= this.accumulator * this.value"
+  outputs:
+    - id: result
+      value: "= vars.product.value"

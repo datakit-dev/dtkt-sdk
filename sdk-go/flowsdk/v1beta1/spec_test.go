@@ -1,11 +1,11 @@
-package flowsdk_test
+package flowsdkv1beta1_test
 
 import (
 	"testing"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/api"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk"
+	flowsdkv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk/v1beta1"
 )
 
@@ -37,7 +37,7 @@ func TestSpec(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	loader := flowsdk.SpecLoader()
+	loader := flowsdkv1beta1.SpecLoader()
 	_, err = loader.MarshalJSONSchema()
 	if err != nil {
 		t.Fatal(err)

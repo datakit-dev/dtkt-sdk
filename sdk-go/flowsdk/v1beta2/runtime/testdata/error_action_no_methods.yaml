@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: action_no_methods
+  description: "Action node without RPC client"
+  inputs:
+    - id: x
+      int64: {}
+  actions:
+    - id: echo
+      call:
+        connection: echo
+        method: echo.Echo
+  outputs:
+    - id: result
+      value: "= actions.echo.value"

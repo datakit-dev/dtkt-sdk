@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/action/v1beta1/messages.proto
 
+//go:build !protoopaque
+
 package actionv1beta1
 
 import (
@@ -16,7 +18,6 @@ import (
 	anypb "google.golang.org/protobuf/types/known/anypb"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -28,7 +29,7 @@ const (
 )
 
 type Action struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier for this action, e.g. `actions/send-email`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The name shown to users in the UI, e.g. "Send Email".
@@ -68,11 +69,6 @@ func (x *Action) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Action.ProtoReflect.Descriptor instead.
-func (*Action) Descriptor() ([]byte, []int) {
-	return file_dtkt_action_v1beta1_messages_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Action) GetName() string {
 	if x != nil {
 		return x.Name
@@ -108,8 +104,77 @@ func (x *Action) GetOutput() *v1beta1.TypeSchema {
 	return nil
 }
 
+func (x *Action) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Action) SetDisplayName(v string) {
+	x.DisplayName = v
+}
+
+func (x *Action) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *Action) SetInput(v *v1beta1.TypeSchema) {
+	x.Input = v
+}
+
+func (x *Action) SetOutput(v *v1beta1.TypeSchema) {
+	x.Output = v
+}
+
+func (x *Action) HasInput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Input != nil
+}
+
+func (x *Action) HasOutput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Output != nil
+}
+
+func (x *Action) ClearInput() {
+	x.Input = nil
+}
+
+func (x *Action) ClearOutput() {
+	x.Output = nil
+}
+
+type Action_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier for this action, e.g. `actions/send-email`.
+	Name string
+	// The name shown to users in the UI, e.g. "Send Email".
+	DisplayName string
+	// A short explanation of what this action does, shown to users when selecting or reviewing it.
+	Description string
+	// Describes the shape of data the user must provide when executing this action.
+	Input *v1beta1.TypeSchema
+	// Describes the shape of data returned to the user after execution.
+	Output *v1beta1.TypeSchema
+}
+
+func (b0 Action_builder) Build() *Action {
+	m0 := &Action{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.DisplayName = b.DisplayName
+	x.Description = b.Description
+	x.Input = b.Input
+	x.Output = b.Output
+	return m0
+}
+
 type ListActionsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Number of actions to return per page. Leave empty for the server default.
 	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Token from a previous response's `next_page_token` to retrieve the next page of results.
@@ -145,11 +210,6 @@ func (x *ListActionsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListActionsRequest.ProtoReflect.Descriptor instead.
-func (*ListActionsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_action_v1beta1_messages_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *ListActionsRequest) GetPageSize() int32 {
 	if x != nil {
 		return x.PageSize
@@ -171,8 +231,41 @@ func (x *ListActionsRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListActionsRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListActionsRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListActionsRequest) SetFilter(v string) {
+	x.Filter = v
+}
+
+type ListActionsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Number of actions to return per page. Leave empty for the server default.
+	PageSize int32
+	// Token from a previous response's `next_page_token` to retrieve the next page of results.
+	PageToken string
+	// Optional filter expression to narrow results. Supported fields: `display_name`, `version`, `labels.<key>`, `disabled`.
+	Filter string
+}
+
+func (b0 ListActionsRequest_builder) Build() *ListActionsRequest {
+	m0 := &ListActionsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.Filter = b.Filter
+	return m0
+}
+
 type ListActionsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The list of actions matching the request.
 	Actions []*Action `protobuf:"bytes,1,rep,name=actions,proto3" json:"actions,omitempty"`
 	// Pass this value as `page_token` in your next request to retrieve the following page. Empty when there are no more results.
@@ -206,11 +299,6 @@ func (x *ListActionsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListActionsResponse.ProtoReflect.Descriptor instead.
-func (*ListActionsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_action_v1beta1_messages_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *ListActionsResponse) GetActions() []*Action {
 	if x != nil {
 		return x.Actions
@@ -225,8 +313,34 @@ func (x *ListActionsResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListActionsResponse) SetActions(v []*Action) {
+	x.Actions = v
+}
+
+func (x *ListActionsResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListActionsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The list of actions matching the request.
+	Actions []*Action
+	// Pass this value as `page_token` in your next request to retrieve the following page. Empty when there are no more results.
+	NextPageToken string
+}
+
+func (b0 ListActionsResponse_builder) Build() *ListActionsResponse {
+	m0 := &ListActionsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Actions = b.Actions
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 type GetActionRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The action to retrieve, e.g. `actions/send-email`.
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -258,11 +372,6 @@ func (x *GetActionRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetActionRequest.ProtoReflect.Descriptor instead.
-func (*GetActionRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_action_v1beta1_messages_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *GetActionRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -270,8 +379,27 @@ func (x *GetActionRequest) GetName() string {
 	return ""
 }
 
+func (x *GetActionRequest) SetName(v string) {
+	x.Name = v
+}
+
+type GetActionRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The action to retrieve, e.g. `actions/send-email`.
+	Name string
+}
+
+func (b0 GetActionRequest_builder) Build() *GetActionRequest {
+	m0 := &GetActionRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 type GetActionResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The requested action, including its input/output schema and metadata.
 	Action        *Action `protobuf:"bytes,1,opt,name=action,proto3" json:"action,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -303,11 +431,6 @@ func (x *GetActionResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetActionResponse.ProtoReflect.Descriptor instead.
-func (*GetActionResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_action_v1beta1_messages_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *GetActionResponse) GetAction() *Action {
 	if x != nil {
 		return x.Action
@@ -315,8 +438,38 @@ func (x *GetActionResponse) GetAction() *Action {
 	return nil
 }
 
+func (x *GetActionResponse) SetAction(v *Action) {
+	x.Action = v
+}
+
+func (x *GetActionResponse) HasAction() bool {
+	if x == nil {
+		return false
+	}
+	return x.Action != nil
+}
+
+func (x *GetActionResponse) ClearAction() {
+	x.Action = nil
+}
+
+type GetActionResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The requested action, including its input/output schema and metadata.
+	Action *Action
+}
+
+func (b0 GetActionResponse_builder) Build() *GetActionResponse {
+	m0 := &GetActionResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Action = b.Action
+	return m0
+}
+
 type ExecuteActionRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The action to run, e.g. `actions/send-email`. Select from the list of available actions.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The input data to pass to the action. The required fields depend on the action's input schema.
@@ -352,11 +505,6 @@ func (x *ExecuteActionRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteActionRequest.ProtoReflect.Descriptor instead.
-func (*ExecuteActionRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_action_v1beta1_messages_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *ExecuteActionRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -378,8 +526,63 @@ func (x *ExecuteActionRequest) GetTimeout() *durationpb.Duration {
 	return nil
 }
 
+func (x *ExecuteActionRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *ExecuteActionRequest) SetInput(v *anypb.Any) {
+	x.Input = v
+}
+
+func (x *ExecuteActionRequest) SetTimeout(v *durationpb.Duration) {
+	x.Timeout = v
+}
+
+func (x *ExecuteActionRequest) HasInput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Input != nil
+}
+
+func (x *ExecuteActionRequest) HasTimeout() bool {
+	if x == nil {
+		return false
+	}
+	return x.Timeout != nil
+}
+
+func (x *ExecuteActionRequest) ClearInput() {
+	x.Input = nil
+}
+
+func (x *ExecuteActionRequest) ClearTimeout() {
+	x.Timeout = nil
+}
+
+type ExecuteActionRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The action to run, e.g. `actions/send-email`. Select from the list of available actions.
+	Name string
+	// The input data to pass to the action. The required fields depend on the action's input schema.
+	Input *anypb.Any
+	// How long to wait for the action to complete before cancelling. Leave unset to use the server default.
+	Timeout *durationpb.Duration
+}
+
+func (b0 ExecuteActionRequest_builder) Build() *ExecuteActionRequest {
+	m0 := &ExecuteActionRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Input = b.Input
+	x.Timeout = b.Timeout
+	return m0
+}
+
 type ExecuteActionResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The name of the action that was executed.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// A unique ID for this execution run, useful for looking up logs or reporting issues.
@@ -417,11 +620,6 @@ func (x *ExecuteActionResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteActionResponse.ProtoReflect.Descriptor instead.
-func (*ExecuteActionResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_action_v1beta1_messages_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *ExecuteActionResponse) GetName() string {
 	if x != nil {
 		return x.Name
@@ -448,6 +646,57 @@ func (x *ExecuteActionResponse) GetMessage() string {
 		return x.Message
 	}
 	return ""
+}
+
+func (x *ExecuteActionResponse) SetName(v string) {
+	x.Name = v
+}
+
+func (x *ExecuteActionResponse) SetRunId(v string) {
+	x.RunId = v
+}
+
+func (x *ExecuteActionResponse) SetOutput(v *anypb.Any) {
+	x.Output = v
+}
+
+func (x *ExecuteActionResponse) SetMessage(v string) {
+	x.Message = v
+}
+
+func (x *ExecuteActionResponse) HasOutput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Output != nil
+}
+
+func (x *ExecuteActionResponse) ClearOutput() {
+	x.Output = nil
+}
+
+type ExecuteActionResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The name of the action that was executed.
+	Name string
+	// A unique ID for this execution run, useful for looking up logs or reporting issues.
+	RunId string
+	// An alternate binary encoding of the output, if provided by the action.
+	Output *anypb.Any
+	// A human-readable summary of the result or any relevant status information.
+	Message string
+}
+
+func (b0 ExecuteActionResponse_builder) Build() *ExecuteActionResponse {
+	m0 := &ExecuteActionResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.RunId = b.RunId
+	x.Output = b.Output
+	x.Message = b.Message
+	return m0
 }
 
 var File_dtkt_action_v1beta1_messages_proto protoreflect.FileDescriptor
@@ -489,18 +738,6 @@ const file_dtkt_action_v1beta1_messages_proto_rawDesc = "" +
 	"\x06output\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\x06output\x12\x18\n" +
 	"\amessage\x18\x14 \x01(\tR\amessageB\xe8\x01\n" +
 	"\x19proto.dtkt.action.v1beta1B\rMessagesProtoP\x01ZNgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/action/v1beta1;actionv1beta1\xa2\x02\x03DAX\xaa\x02\x13Dtkt.Action.V1beta1\xca\x02\x13Dtkt\\Action\\V1beta1\xe2\x02\x1fDtkt\\Action\\V1beta1\\GPBMetadata\xea\x02\x15Dtkt::Action::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_action_v1beta1_messages_proto_rawDescOnce sync.Once
-	file_dtkt_action_v1beta1_messages_proto_rawDescData []byte
-)
-
-func file_dtkt_action_v1beta1_messages_proto_rawDescGZIP() []byte {
-	file_dtkt_action_v1beta1_messages_proto_rawDescOnce.Do(func() {
-		file_dtkt_action_v1beta1_messages_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_action_v1beta1_messages_proto_rawDesc), len(file_dtkt_action_v1beta1_messages_proto_rawDesc)))
-	})
-	return file_dtkt_action_v1beta1_messages_proto_rawDescData
-}
 
 var file_dtkt_action_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_dtkt_action_v1beta1_messages_proto_goTypes = []any{

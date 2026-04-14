@@ -1,0 +1,11 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_string_to_output
+  description: "String input passed directly to output"
+  inputs:
+    - id: x
+      string: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value"

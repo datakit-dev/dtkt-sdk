@@ -1,0 +1,30 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fc_ticker_var_stop_input
+  description: |
+    Ticker with stop_when on a var node that references both the generator
+    and an input. The var subscribes to the generator via its value expression,
+    and the stop_when expression references the input.
+  inputs:
+    - id: maxIters
+      uint64:
+        default: 10
+  generators:
+    - id: tick
+      ticker:
+        interval: "0.01s"
+  vars:
+    - id: evenOrOdd
+      value: |
+        = generators.tick.eval_count % 2 == 0 ? "even" : "odd"
+      flow_control:
+        stop_when: "= generators.tick.eval_count >= int(inputs.maxIters.value)"
+  outputs:
+    - id: tick
+      value: "= generators.tick.value"
+    - id: evenOrOdd
+      value: "= vars.evenOrOdd.value"
+    - id: tickAndEvenOrOdd
+      value: |
+        = [vars.evenOrOdd.eval_count, vars.evenOrOdd.value]

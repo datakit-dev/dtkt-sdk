@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/catalog/v1beta1/messages.proto
 
+//go:build !protoopaque
+
 package catalogv1beta1
 
 import (
@@ -12,7 +14,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -25,7 +26,7 @@ const (
 
 // Represents a catalog, which organizes schemas and tables.
 type Catalog struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of the catalog.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Description of the catalog.
@@ -61,11 +62,6 @@ func (x *Catalog) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Catalog.ProtoReflect.Descriptor instead.
-func (*Catalog) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Catalog) GetName() string {
 	if x != nil {
 		return x.Name
@@ -87,9 +83,53 @@ func (x *Catalog) GetMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *Catalog) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Catalog) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *Catalog) SetMetadata(v *structpb.Struct) {
+	x.Metadata = v
+}
+
+func (x *Catalog) HasMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.Metadata != nil
+}
+
+func (x *Catalog) ClearMetadata() {
+	x.Metadata = nil
+}
+
+type Catalog_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of the catalog.
+	Name string
+	// Description of the catalog.
+	Description string
+	// Additional metadata, if any.
+	Metadata *structpb.Struct
+}
+
+func (b0 Catalog_builder) Build() *Catalog {
+	m0 := &Catalog{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Description = b.Description
+	x.Metadata = b.Metadata
+	return m0
+}
+
 // Represents a schema, which organizes tables.
 type Schema struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Reference to the catalog containing the schema.
 	Catalog *Catalog `protobuf:"bytes,1,opt,name=catalog,proto3" json:"catalog,omitempty"`
 	// Name of the schema.
@@ -127,11 +167,6 @@ func (x *Schema) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Schema.ProtoReflect.Descriptor instead.
-func (*Schema) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *Schema) GetCatalog() *Catalog {
 	if x != nil {
 		return x.Catalog
@@ -160,9 +195,71 @@ func (x *Schema) GetMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *Schema) SetCatalog(v *Catalog) {
+	x.Catalog = v
+}
+
+func (x *Schema) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Schema) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *Schema) SetMetadata(v *structpb.Struct) {
+	x.Metadata = v
+}
+
+func (x *Schema) HasCatalog() bool {
+	if x == nil {
+		return false
+	}
+	return x.Catalog != nil
+}
+
+func (x *Schema) HasMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.Metadata != nil
+}
+
+func (x *Schema) ClearCatalog() {
+	x.Catalog = nil
+}
+
+func (x *Schema) ClearMetadata() {
+	x.Metadata = nil
+}
+
+type Schema_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Reference to the catalog containing the schema.
+	Catalog *Catalog
+	// Name of the schema.
+	Name string
+	// Description of the schema.
+	Description string
+	// Additional metadata, if any.
+	Metadata *structpb.Struct
+}
+
+func (b0 Schema_builder) Build() *Schema {
+	m0 := &Schema{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Catalog = b.Catalog
+	x.Name = b.Name
+	x.Description = b.Description
+	x.Metadata = b.Metadata
+	return m0
+}
+
 // Represents a table within a schema.
 type Table struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Reference to the schema containing the table.
 	Schema *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 	// Name of the table.
@@ -202,11 +299,6 @@ func (x *Table) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Table.ProtoReflect.Descriptor instead.
-func (*Table) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Table) GetSchema() *Schema {
@@ -251,9 +343,96 @@ func (x *Table) GetMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *Table) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *Table) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Table) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *Table) SetFields(v []*v1beta1.Field) {
+	x.Fields = v
+}
+
+func (x *Table) SetStats(v *TableStats) {
+	x.Stats = v
+}
+
+func (x *Table) SetMetadata(v *structpb.Struct) {
+	x.Metadata = v
+}
+
+func (x *Table) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *Table) HasStats() bool {
+	if x == nil {
+		return false
+	}
+	return x.Stats != nil
+}
+
+func (x *Table) HasMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.Metadata != nil
+}
+
+func (x *Table) ClearSchema() {
+	x.Schema = nil
+}
+
+func (x *Table) ClearStats() {
+	x.Stats = nil
+}
+
+func (x *Table) ClearMetadata() {
+	x.Metadata = nil
+}
+
+type Table_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Reference to the schema containing the table.
+	Schema *Schema
+	// Name of the table.
+	Name string
+	// Description of the table.
+	Description string
+	// List of fields contained by the table.
+	Fields []*v1beta1.Field
+	// Statistics about the table (e.g., row count), if any.
+	Stats *TableStats
+	// Additional metadata, if any.
+	Metadata *structpb.Struct
+}
+
+func (b0 Table_builder) Build() *Table {
+	m0 := &Table{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schema = b.Schema
+	x.Name = b.Name
+	x.Description = b.Description
+	x.Fields = b.Fields
+	x.Stats = b.Stats
+	x.Metadata = b.Metadata
+	return m0
+}
+
 // TableStats contains statistics about a table.
 type TableStats struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The total number of rows in the table.
 	TotalRows int64 `protobuf:"varint,1,opt,name=total_rows,json=totalRows,proto3" json:"total_rows,omitempty"`
 	// The total size of the table in bytes.
@@ -287,11 +466,6 @@ func (x *TableStats) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TableStats.ProtoReflect.Descriptor instead.
-func (*TableStats) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *TableStats) GetTotalRows() int64 {
 	if x != nil {
 		return x.TotalRows
@@ -306,9 +480,35 @@ func (x *TableStats) GetTotalBytes() int64 {
 	return 0
 }
 
+func (x *TableStats) SetTotalRows(v int64) {
+	x.TotalRows = v
+}
+
+func (x *TableStats) SetTotalBytes(v int64) {
+	x.TotalBytes = v
+}
+
+type TableStats_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The total number of rows in the table.
+	TotalRows int64
+	// The total size of the table in bytes.
+	TotalBytes int64
+}
+
+func (b0 TableStats_builder) Build() *TableStats {
+	m0 := &TableStats{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.TotalRows = b.TotalRows
+	x.TotalBytes = b.TotalBytes
+	return m0
+}
+
 // Represents a query and its associated details.
 type Query struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Indicates if the query is valid.
 	Valid bool `protobuf:"varint,1,opt,name=valid,proto3" json:"valid,omitempty"`
 	// Error message, if any.
@@ -348,11 +548,6 @@ func (x *Query) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Query.ProtoReflect.Descriptor instead.
-func (*Query) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Query) GetValid() bool {
@@ -397,9 +592,63 @@ func (x *Query) GetParams() []*v1beta1.Param {
 	return nil
 }
 
+func (x *Query) SetValid(v bool) {
+	x.Valid = v
+}
+
+func (x *Query) SetError(v string) {
+	x.Error = v
+}
+
+func (x *Query) SetDialect(v string) {
+	x.Dialect = v
+}
+
+func (x *Query) SetQuery(v string) {
+	x.Query = v
+}
+
+func (x *Query) SetFields(v []*v1beta1.Field) {
+	x.Fields = v
+}
+
+func (x *Query) SetParams(v []*v1beta1.Param) {
+	x.Params = v
+}
+
+type Query_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Indicates if the query is valid.
+	Valid bool
+	// Error message, if any.
+	Error string
+	// The query dialect used.
+	Dialect string
+	// The query string.
+	Query string
+	// List of fields returned by the query.
+	Fields []*v1beta1.Field
+	// Parameters used in the query, if any.
+	Params []*v1beta1.Param
+}
+
+func (b0 Query_builder) Build() *Query {
+	m0 := &Query{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Valid = b.Valid
+	x.Error = b.Error
+	x.Dialect = b.Dialect
+	x.Query = b.Query
+	x.Fields = b.Fields
+	x.Params = b.Params
+	return m0
+}
+
 // Request for retrieving the query dialect.
 type GetQueryDialectRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -429,14 +678,21 @@ func (x *GetQueryDialectRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetQueryDialectRequest.ProtoReflect.Descriptor instead.
-func (*GetQueryDialectRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{5}
+type GetQueryDialectRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 GetQueryDialectRequest_builder) Build() *GetQueryDialectRequest {
+	m0 := &GetQueryDialectRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 // Response containing the query dialect used by the service.
 type GetQueryDialectResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The query dialect (e.g., SQL).
 	Dialect       string `protobuf:"bytes,1,opt,name=dialect,proto3" json:"dialect,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -468,11 +724,6 @@ func (x *GetQueryDialectResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetQueryDialectResponse.ProtoReflect.Descriptor instead.
-func (*GetQueryDialectResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *GetQueryDialectResponse) GetDialect() string {
 	if x != nil {
 		return x.Dialect
@@ -480,9 +731,28 @@ func (x *GetQueryDialectResponse) GetDialect() string {
 	return ""
 }
 
+func (x *GetQueryDialectResponse) SetDialect(v string) {
+	x.Dialect = v
+}
+
+type GetQueryDialectResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The query dialect (e.g., SQL).
+	Dialect string
+}
+
+func (b0 GetQueryDialectResponse_builder) Build() *GetQueryDialectResponse {
+	m0 := &GetQueryDialectResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Dialect = b.Dialect
+	return m0
+}
+
 // Request for retrieving data types.
 type ListDataTypesRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -512,14 +782,21 @@ func (x *ListDataTypesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListDataTypesRequest.ProtoReflect.Descriptor instead.
-func (*ListDataTypesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{7}
+type ListDataTypesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 ListDataTypesRequest_builder) Build() *ListDataTypesRequest {
+	m0 := &ListDataTypesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 // Response containing supported data types.
 type ListDataTypesResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// List of supported data types.
 	Types         []*v1beta1.DataType `protobuf:"bytes,1,rep,name=types,proto3" json:"types,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -551,11 +828,6 @@ func (x *ListDataTypesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListDataTypesResponse.ProtoReflect.Descriptor instead.
-func (*ListDataTypesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *ListDataTypesResponse) GetTypes() []*v1beta1.DataType {
 	if x != nil {
 		return x.Types
@@ -563,9 +835,28 @@ func (x *ListDataTypesResponse) GetTypes() []*v1beta1.DataType {
 	return nil
 }
 
+func (x *ListDataTypesResponse) SetTypes(v []*v1beta1.DataType) {
+	x.Types = v
+}
+
+type ListDataTypesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// List of supported data types.
+	Types []*v1beta1.DataType
+}
+
+func (b0 ListDataTypesResponse_builder) Build() *ListDataTypesResponse {
+	m0 := &ListDataTypesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Types = b.Types
+	return m0
+}
+
 // Request to retrieve a catalog by name.
 type GetCatalogRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of the catalog.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Metadata of the catalog, if any.
@@ -599,11 +890,6 @@ func (x *GetCatalogRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetCatalogRequest.ProtoReflect.Descriptor instead.
-func (*GetCatalogRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *GetCatalogRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -618,9 +904,46 @@ func (x *GetCatalogRequest) GetMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *GetCatalogRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *GetCatalogRequest) SetMetadata(v *structpb.Struct) {
+	x.Metadata = v
+}
+
+func (x *GetCatalogRequest) HasMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.Metadata != nil
+}
+
+func (x *GetCatalogRequest) ClearMetadata() {
+	x.Metadata = nil
+}
+
+type GetCatalogRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of the catalog.
+	Name string
+	// Metadata of the catalog, if any.
+	Metadata *structpb.Struct
+}
+
+func (b0 GetCatalogRequest_builder) Build() *GetCatalogRequest {
+	m0 := &GetCatalogRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Metadata = b.Metadata
+	return m0
+}
+
 // Response containing catalog details.
 type GetCatalogResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The requested catalog.
 	Catalog       *Catalog `protobuf:"bytes,1,opt,name=catalog,proto3" json:"catalog,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -652,11 +975,6 @@ func (x *GetCatalogResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetCatalogResponse.ProtoReflect.Descriptor instead.
-func (*GetCatalogResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *GetCatalogResponse) GetCatalog() *Catalog {
 	if x != nil {
 		return x.Catalog
@@ -664,9 +982,39 @@ func (x *GetCatalogResponse) GetCatalog() *Catalog {
 	return nil
 }
 
+func (x *GetCatalogResponse) SetCatalog(v *Catalog) {
+	x.Catalog = v
+}
+
+func (x *GetCatalogResponse) HasCatalog() bool {
+	if x == nil {
+		return false
+	}
+	return x.Catalog != nil
+}
+
+func (x *GetCatalogResponse) ClearCatalog() {
+	x.Catalog = nil
+}
+
+type GetCatalogResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The requested catalog.
+	Catalog *Catalog
+}
+
+func (b0 GetCatalogResponse_builder) Build() *GetCatalogResponse {
+	m0 := &GetCatalogResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Catalog = b.Catalog
+	return m0
+}
+
 // Request message for retrieving all schemas.
 type ListSchemasRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The catalog request containing catalog information.
 	Catalog       *Catalog `protobuf:"bytes,1,opt,name=catalog,proto3" json:"catalog,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -698,11 +1046,6 @@ func (x *ListSchemasRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListSchemasRequest.ProtoReflect.Descriptor instead.
-func (*ListSchemasRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{11}
-}
-
 func (x *ListSchemasRequest) GetCatalog() *Catalog {
 	if x != nil {
 		return x.Catalog
@@ -710,9 +1053,39 @@ func (x *ListSchemasRequest) GetCatalog() *Catalog {
 	return nil
 }
 
+func (x *ListSchemasRequest) SetCatalog(v *Catalog) {
+	x.Catalog = v
+}
+
+func (x *ListSchemasRequest) HasCatalog() bool {
+	if x == nil {
+		return false
+	}
+	return x.Catalog != nil
+}
+
+func (x *ListSchemasRequest) ClearCatalog() {
+	x.Catalog = nil
+}
+
+type ListSchemasRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The catalog request containing catalog information.
+	Catalog *Catalog
+}
+
+func (b0 ListSchemasRequest_builder) Build() *ListSchemasRequest {
+	m0 := &ListSchemasRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Catalog = b.Catalog
+	return m0
+}
+
 // Response message for getting schemas.
 type ListSchemasResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The retrieved schema.
 	Schema        *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -744,11 +1117,6 @@ func (x *ListSchemasResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListSchemasResponse.ProtoReflect.Descriptor instead.
-func (*ListSchemasResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{12}
-}
-
 func (x *ListSchemasResponse) GetSchema() *Schema {
 	if x != nil {
 		return x.Schema
@@ -756,9 +1124,39 @@ func (x *ListSchemasResponse) GetSchema() *Schema {
 	return nil
 }
 
+func (x *ListSchemasResponse) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *ListSchemasResponse) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *ListSchemasResponse) ClearSchema() {
+	x.Schema = nil
+}
+
+type ListSchemasResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The retrieved schema.
+	Schema *Schema
+}
+
+func (b0 ListSchemasResponse_builder) Build() *ListSchemasResponse {
+	m0 := &ListSchemasResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schema = b.Schema
+	return m0
+}
+
 // Request message for retrieving a specific schema.
 type GetSchemaRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The catalog request containing catalog information.
 	Catalog *Catalog `protobuf:"bytes,1,opt,name=catalog,proto3" json:"catalog,omitempty"`
 	// The name of the schema to retrieve.
@@ -794,11 +1192,6 @@ func (x *GetSchemaRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetSchemaRequest.ProtoReflect.Descriptor instead.
-func (*GetSchemaRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{13}
-}
-
 func (x *GetSchemaRequest) GetCatalog() *Catalog {
 	if x != nil {
 		return x.Catalog
@@ -820,9 +1213,64 @@ func (x *GetSchemaRequest) GetMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *GetSchemaRequest) SetCatalog(v *Catalog) {
+	x.Catalog = v
+}
+
+func (x *GetSchemaRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *GetSchemaRequest) SetMetadata(v *structpb.Struct) {
+	x.Metadata = v
+}
+
+func (x *GetSchemaRequest) HasCatalog() bool {
+	if x == nil {
+		return false
+	}
+	return x.Catalog != nil
+}
+
+func (x *GetSchemaRequest) HasMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.Metadata != nil
+}
+
+func (x *GetSchemaRequest) ClearCatalog() {
+	x.Catalog = nil
+}
+
+func (x *GetSchemaRequest) ClearMetadata() {
+	x.Metadata = nil
+}
+
+type GetSchemaRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The catalog request containing catalog information.
+	Catalog *Catalog
+	// The name of the schema to retrieve.
+	Name string
+	// Metadata of the schema, if any.
+	Metadata *structpb.Struct
+}
+
+func (b0 GetSchemaRequest_builder) Build() *GetSchemaRequest {
+	m0 := &GetSchemaRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Catalog = b.Catalog
+	x.Name = b.Name
+	x.Metadata = b.Metadata
+	return m0
+}
+
 // Response message for getting a schema.
 type GetSchemaResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The retrieved schema.
 	Schema        *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -854,11 +1302,6 @@ func (x *GetSchemaResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetSchemaResponse.ProtoReflect.Descriptor instead.
-func (*GetSchemaResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{14}
-}
-
 func (x *GetSchemaResponse) GetSchema() *Schema {
 	if x != nil {
 		return x.Schema
@@ -866,9 +1309,39 @@ func (x *GetSchemaResponse) GetSchema() *Schema {
 	return nil
 }
 
+func (x *GetSchemaResponse) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *GetSchemaResponse) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *GetSchemaResponse) ClearSchema() {
+	x.Schema = nil
+}
+
+type GetSchemaResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The retrieved schema.
+	Schema *Schema
+}
+
+func (b0 GetSchemaResponse_builder) Build() *GetSchemaResponse {
+	m0 := &GetSchemaResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schema = b.Schema
+	return m0
+}
+
 // Request message for creating a schema.
 type CreateSchemaRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Reference to the catalog where the schema will be created.
 	Catalog *Catalog `protobuf:"bytes,1,opt,name=catalog,proto3" json:"catalog,omitempty"`
 	// Name of the new schema.
@@ -906,11 +1379,6 @@ func (x *CreateSchemaRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateSchemaRequest.ProtoReflect.Descriptor instead.
-func (*CreateSchemaRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{15}
-}
-
 func (x *CreateSchemaRequest) GetCatalog() *Catalog {
 	if x != nil {
 		return x.Catalog
@@ -939,9 +1407,71 @@ func (x *CreateSchemaRequest) GetMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *CreateSchemaRequest) SetCatalog(v *Catalog) {
+	x.Catalog = v
+}
+
+func (x *CreateSchemaRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *CreateSchemaRequest) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *CreateSchemaRequest) SetMetadata(v *structpb.Struct) {
+	x.Metadata = v
+}
+
+func (x *CreateSchemaRequest) HasCatalog() bool {
+	if x == nil {
+		return false
+	}
+	return x.Catalog != nil
+}
+
+func (x *CreateSchemaRequest) HasMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.Metadata != nil
+}
+
+func (x *CreateSchemaRequest) ClearCatalog() {
+	x.Catalog = nil
+}
+
+func (x *CreateSchemaRequest) ClearMetadata() {
+	x.Metadata = nil
+}
+
+type CreateSchemaRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Reference to the catalog where the schema will be created.
+	Catalog *Catalog
+	// Name of the new schema.
+	Name string
+	// Description of the new schema.
+	Description string
+	// Metadata of the schema, if any.
+	Metadata *structpb.Struct
+}
+
+func (b0 CreateSchemaRequest_builder) Build() *CreateSchemaRequest {
+	m0 := &CreateSchemaRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Catalog = b.Catalog
+	x.Name = b.Name
+	x.Description = b.Description
+	x.Metadata = b.Metadata
+	return m0
+}
+
 // Response message for creating a schema.
 type CreateSchemaResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The created schema.
 	Schema *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 	// Indicates if the schema was successfully created.
@@ -977,11 +1507,6 @@ func (x *CreateSchemaResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateSchemaResponse.ProtoReflect.Descriptor instead.
-func (*CreateSchemaResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{16}
-}
-
 func (x *CreateSchemaResponse) GetSchema() *Schema {
 	if x != nil {
 		return x.Schema
@@ -1003,9 +1528,53 @@ func (x *CreateSchemaResponse) GetError() string {
 	return ""
 }
 
+func (x *CreateSchemaResponse) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *CreateSchemaResponse) SetCreated(v bool) {
+	x.Created = v
+}
+
+func (x *CreateSchemaResponse) SetError(v string) {
+	x.Error = v
+}
+
+func (x *CreateSchemaResponse) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *CreateSchemaResponse) ClearSchema() {
+	x.Schema = nil
+}
+
+type CreateSchemaResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The created schema.
+	Schema *Schema
+	// Indicates if the schema was successfully created.
+	Created bool
+	// Error message, if any.
+	Error string
+}
+
+func (b0 CreateSchemaResponse_builder) Build() *CreateSchemaResponse {
+	m0 := &CreateSchemaResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schema = b.Schema
+	x.Created = b.Created
+	x.Error = b.Error
+	return m0
+}
+
 // Request message for updating a schema.
 type UpdateSchemaRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Reference to the catalog containing the schema.
 	Catalog *Catalog `protobuf:"bytes,1,opt,name=catalog,proto3" json:"catalog,omitempty"`
 	// Name of the schema to update.
@@ -1043,11 +1612,6 @@ func (x *UpdateSchemaRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateSchemaRequest.ProtoReflect.Descriptor instead.
-func (*UpdateSchemaRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{17}
-}
-
 func (x *UpdateSchemaRequest) GetCatalog() *Catalog {
 	if x != nil {
 		return x.Catalog
@@ -1076,9 +1640,71 @@ func (x *UpdateSchemaRequest) GetMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *UpdateSchemaRequest) SetCatalog(v *Catalog) {
+	x.Catalog = v
+}
+
+func (x *UpdateSchemaRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *UpdateSchemaRequest) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *UpdateSchemaRequest) SetMetadata(v *structpb.Struct) {
+	x.Metadata = v
+}
+
+func (x *UpdateSchemaRequest) HasCatalog() bool {
+	if x == nil {
+		return false
+	}
+	return x.Catalog != nil
+}
+
+func (x *UpdateSchemaRequest) HasMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.Metadata != nil
+}
+
+func (x *UpdateSchemaRequest) ClearCatalog() {
+	x.Catalog = nil
+}
+
+func (x *UpdateSchemaRequest) ClearMetadata() {
+	x.Metadata = nil
+}
+
+type UpdateSchemaRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Reference to the catalog containing the schema.
+	Catalog *Catalog
+	// Name of the schema to update.
+	Name string
+	// New description of the schema.
+	Description string
+	// Metadata of the schema, if any.
+	Metadata *structpb.Struct
+}
+
+func (b0 UpdateSchemaRequest_builder) Build() *UpdateSchemaRequest {
+	m0 := &UpdateSchemaRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Catalog = b.Catalog
+	x.Name = b.Name
+	x.Description = b.Description
+	x.Metadata = b.Metadata
+	return m0
+}
+
 // Response message for updating a schema.
 type UpdateSchemaResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The updated schema.
 	Schema *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 	// Indicates if the schema was successfully updated.
@@ -1114,11 +1740,6 @@ func (x *UpdateSchemaResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateSchemaResponse.ProtoReflect.Descriptor instead.
-func (*UpdateSchemaResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{18}
-}
-
 func (x *UpdateSchemaResponse) GetSchema() *Schema {
 	if x != nil {
 		return x.Schema
@@ -1140,9 +1761,53 @@ func (x *UpdateSchemaResponse) GetError() string {
 	return ""
 }
 
+func (x *UpdateSchemaResponse) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *UpdateSchemaResponse) SetUpdated(v bool) {
+	x.Updated = v
+}
+
+func (x *UpdateSchemaResponse) SetError(v string) {
+	x.Error = v
+}
+
+func (x *UpdateSchemaResponse) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *UpdateSchemaResponse) ClearSchema() {
+	x.Schema = nil
+}
+
+type UpdateSchemaResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The updated schema.
+	Schema *Schema
+	// Indicates if the schema was successfully updated.
+	Updated bool
+	// Error message, if any.
+	Error string
+}
+
+func (b0 UpdateSchemaResponse_builder) Build() *UpdateSchemaResponse {
+	m0 := &UpdateSchemaResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schema = b.Schema
+	x.Updated = b.Updated
+	x.Error = b.Error
+	return m0
+}
+
 // Request message for deleting a schema.
 type DeleteSchemaRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Reference to the catalog containing the schema.
 	Catalog *Catalog `protobuf:"bytes,1,opt,name=catalog,proto3" json:"catalog,omitempty"`
 	// Name of the schema to delete.
@@ -1176,11 +1841,6 @@ func (x *DeleteSchemaRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteSchemaRequest.ProtoReflect.Descriptor instead.
-func (*DeleteSchemaRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{19}
-}
-
 func (x *DeleteSchemaRequest) GetCatalog() *Catalog {
 	if x != nil {
 		return x.Catalog
@@ -1195,9 +1855,46 @@ func (x *DeleteSchemaRequest) GetName() string {
 	return ""
 }
 
+func (x *DeleteSchemaRequest) SetCatalog(v *Catalog) {
+	x.Catalog = v
+}
+
+func (x *DeleteSchemaRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *DeleteSchemaRequest) HasCatalog() bool {
+	if x == nil {
+		return false
+	}
+	return x.Catalog != nil
+}
+
+func (x *DeleteSchemaRequest) ClearCatalog() {
+	x.Catalog = nil
+}
+
+type DeleteSchemaRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Reference to the catalog containing the schema.
+	Catalog *Catalog
+	// Name of the schema to delete.
+	Name string
+}
+
+func (b0 DeleteSchemaRequest_builder) Build() *DeleteSchemaRequest {
+	m0 := &DeleteSchemaRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Catalog = b.Catalog
+	x.Name = b.Name
+	return m0
+}
+
 // Response message for deleting a schema.
 type DeleteSchemaResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The deleted schema.
 	Schema *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 	// Indicates if the schema was successfully deleted.
@@ -1233,11 +1930,6 @@ func (x *DeleteSchemaResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteSchemaResponse.ProtoReflect.Descriptor instead.
-func (*DeleteSchemaResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{20}
-}
-
 func (x *DeleteSchemaResponse) GetSchema() *Schema {
 	if x != nil {
 		return x.Schema
@@ -1259,9 +1951,53 @@ func (x *DeleteSchemaResponse) GetError() string {
 	return ""
 }
 
+func (x *DeleteSchemaResponse) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *DeleteSchemaResponse) SetDeleted(v bool) {
+	x.Deleted = v
+}
+
+func (x *DeleteSchemaResponse) SetError(v string) {
+	x.Error = v
+}
+
+func (x *DeleteSchemaResponse) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *DeleteSchemaResponse) ClearSchema() {
+	x.Schema = nil
+}
+
+type DeleteSchemaResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The deleted schema.
+	Schema *Schema
+	// Indicates if the schema was successfully deleted.
+	Deleted bool
+	// Error message, if any.
+	Error string
+}
+
+func (b0 DeleteSchemaResponse_builder) Build() *DeleteSchemaResponse {
+	m0 := &DeleteSchemaResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schema = b.Schema
+	x.Deleted = b.Deleted
+	x.Error = b.Error
+	return m0
+}
+
 // Request message for getting tables in a schema.
 type ListTablesRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Reference to the schema containing the tables.
 	Schema        *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1293,11 +2029,6 @@ func (x *ListTablesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListTablesRequest.ProtoReflect.Descriptor instead.
-func (*ListTablesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{21}
-}
-
 func (x *ListTablesRequest) GetSchema() *Schema {
 	if x != nil {
 		return x.Schema
@@ -1305,9 +2036,39 @@ func (x *ListTablesRequest) GetSchema() *Schema {
 	return nil
 }
 
+func (x *ListTablesRequest) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *ListTablesRequest) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *ListTablesRequest) ClearSchema() {
+	x.Schema = nil
+}
+
+type ListTablesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Reference to the schema containing the tables.
+	Schema *Schema
+}
+
+func (b0 ListTablesRequest_builder) Build() *ListTablesRequest {
+	m0 := &ListTablesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schema = b.Schema
+	return m0
+}
+
 // Response message for getting tables.
 type ListTablesResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The retrieved table.
 	Table         *Table `protobuf:"bytes,1,opt,name=table,proto3" json:"table,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1339,11 +2100,6 @@ func (x *ListTablesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListTablesResponse.ProtoReflect.Descriptor instead.
-func (*ListTablesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{22}
-}
-
 func (x *ListTablesResponse) GetTable() *Table {
 	if x != nil {
 		return x.Table
@@ -1351,9 +2107,39 @@ func (x *ListTablesResponse) GetTable() *Table {
 	return nil
 }
 
+func (x *ListTablesResponse) SetTable(v *Table) {
+	x.Table = v
+}
+
+func (x *ListTablesResponse) HasTable() bool {
+	if x == nil {
+		return false
+	}
+	return x.Table != nil
+}
+
+func (x *ListTablesResponse) ClearTable() {
+	x.Table = nil
+}
+
+type ListTablesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The retrieved table.
+	Table *Table
+}
+
+func (b0 ListTablesResponse_builder) Build() *ListTablesResponse {
+	m0 := &ListTablesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Table = b.Table
+	return m0
+}
+
 // Request message for getting a specific table in a schema.
 type GetTableRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Reference to the schema containing the table.
 	Schema *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 	// Name of the table to retrieve.
@@ -1389,11 +2175,6 @@ func (x *GetTableRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetTableRequest.ProtoReflect.Descriptor instead.
-func (*GetTableRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{23}
-}
-
 func (x *GetTableRequest) GetSchema() *Schema {
 	if x != nil {
 		return x.Schema
@@ -1415,9 +2196,64 @@ func (x *GetTableRequest) GetMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *GetTableRequest) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *GetTableRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *GetTableRequest) SetMetadata(v *structpb.Struct) {
+	x.Metadata = v
+}
+
+func (x *GetTableRequest) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *GetTableRequest) HasMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.Metadata != nil
+}
+
+func (x *GetTableRequest) ClearSchema() {
+	x.Schema = nil
+}
+
+func (x *GetTableRequest) ClearMetadata() {
+	x.Metadata = nil
+}
+
+type GetTableRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Reference to the schema containing the table.
+	Schema *Schema
+	// Name of the table to retrieve.
+	Name string
+	// Metadata of the table, if any.
+	Metadata *structpb.Struct
+}
+
+func (b0 GetTableRequest_builder) Build() *GetTableRequest {
+	m0 := &GetTableRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schema = b.Schema
+	x.Name = b.Name
+	x.Metadata = b.Metadata
+	return m0
+}
+
 // Response message for getting a specific table.
 type GetTableResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The retrieved table.
 	Table         *Table `protobuf:"bytes,1,opt,name=table,proto3" json:"table,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1449,11 +2285,6 @@ func (x *GetTableResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetTableResponse.ProtoReflect.Descriptor instead.
-func (*GetTableResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{24}
-}
-
 func (x *GetTableResponse) GetTable() *Table {
 	if x != nil {
 		return x.Table
@@ -1461,9 +2292,39 @@ func (x *GetTableResponse) GetTable() *Table {
 	return nil
 }
 
+func (x *GetTableResponse) SetTable(v *Table) {
+	x.Table = v
+}
+
+func (x *GetTableResponse) HasTable() bool {
+	if x == nil {
+		return false
+	}
+	return x.Table != nil
+}
+
+func (x *GetTableResponse) ClearTable() {
+	x.Table = nil
+}
+
+type GetTableResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The retrieved table.
+	Table *Table
+}
+
+func (b0 GetTableResponse_builder) Build() *GetTableResponse {
+	m0 := &GetTableResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Table = b.Table
+	return m0
+}
+
 // Request message for creating a table in a schema.
 type CreateTableRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Reference to the schema where the table will be created.
 	Schema *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 	// Name of the new table.
@@ -1503,11 +2364,6 @@ func (x *CreateTableRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateTableRequest.ProtoReflect.Descriptor instead.
-func (*CreateTableRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{25}
-}
-
 func (x *CreateTableRequest) GetSchema() *Schema {
 	if x != nil {
 		return x.Schema
@@ -1543,9 +2399,78 @@ func (x *CreateTableRequest) GetMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *CreateTableRequest) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *CreateTableRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *CreateTableRequest) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *CreateTableRequest) SetFields(v []*v1beta1.Field) {
+	x.Fields = v
+}
+
+func (x *CreateTableRequest) SetMetadata(v *structpb.Struct) {
+	x.Metadata = v
+}
+
+func (x *CreateTableRequest) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *CreateTableRequest) HasMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.Metadata != nil
+}
+
+func (x *CreateTableRequest) ClearSchema() {
+	x.Schema = nil
+}
+
+func (x *CreateTableRequest) ClearMetadata() {
+	x.Metadata = nil
+}
+
+type CreateTableRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Reference to the schema where the table will be created.
+	Schema *Schema
+	// Name of the new table.
+	Name string
+	// Description of the new table.
+	Description string
+	// Fields of the new table.
+	Fields []*v1beta1.Field
+	// Metadata of the table, if any.
+	Metadata *structpb.Struct
+}
+
+func (b0 CreateTableRequest_builder) Build() *CreateTableRequest {
+	m0 := &CreateTableRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schema = b.Schema
+	x.Name = b.Name
+	x.Description = b.Description
+	x.Fields = b.Fields
+	x.Metadata = b.Metadata
+	return m0
+}
+
 // Response message for creating a table.
 type CreateTableResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The created table.
 	Table *Table `protobuf:"bytes,1,opt,name=table,proto3" json:"table,omitempty"`
 	// Indicates if the table was successfully created.
@@ -1581,11 +2506,6 @@ func (x *CreateTableResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateTableResponse.ProtoReflect.Descriptor instead.
-func (*CreateTableResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{26}
-}
-
 func (x *CreateTableResponse) GetTable() *Table {
 	if x != nil {
 		return x.Table
@@ -1607,9 +2527,53 @@ func (x *CreateTableResponse) GetError() string {
 	return ""
 }
 
+func (x *CreateTableResponse) SetTable(v *Table) {
+	x.Table = v
+}
+
+func (x *CreateTableResponse) SetCreated(v bool) {
+	x.Created = v
+}
+
+func (x *CreateTableResponse) SetError(v string) {
+	x.Error = v
+}
+
+func (x *CreateTableResponse) HasTable() bool {
+	if x == nil {
+		return false
+	}
+	return x.Table != nil
+}
+
+func (x *CreateTableResponse) ClearTable() {
+	x.Table = nil
+}
+
+type CreateTableResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The created table.
+	Table *Table
+	// Indicates if the table was successfully created.
+	Created bool
+	// Error message, if any.
+	Error string
+}
+
+func (b0 CreateTableResponse_builder) Build() *CreateTableResponse {
+	m0 := &CreateTableResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Table = b.Table
+	x.Created = b.Created
+	x.Error = b.Error
+	return m0
+}
+
 // Request message for updating a table in a schema.
 type UpdateTableRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Reference to the schema containing the table.
 	Schema *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 	// Name of the table to update.
@@ -1649,11 +2613,6 @@ func (x *UpdateTableRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateTableRequest.ProtoReflect.Descriptor instead.
-func (*UpdateTableRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{27}
-}
-
 func (x *UpdateTableRequest) GetSchema() *Schema {
 	if x != nil {
 		return x.Schema
@@ -1689,9 +2648,78 @@ func (x *UpdateTableRequest) GetMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *UpdateTableRequest) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *UpdateTableRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *UpdateTableRequest) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *UpdateTableRequest) SetFields(v []*v1beta1.Field) {
+	x.Fields = v
+}
+
+func (x *UpdateTableRequest) SetMetadata(v *structpb.Struct) {
+	x.Metadata = v
+}
+
+func (x *UpdateTableRequest) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *UpdateTableRequest) HasMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.Metadata != nil
+}
+
+func (x *UpdateTableRequest) ClearSchema() {
+	x.Schema = nil
+}
+
+func (x *UpdateTableRequest) ClearMetadata() {
+	x.Metadata = nil
+}
+
+type UpdateTableRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Reference to the schema containing the table.
+	Schema *Schema
+	// Name of the table to update.
+	Name string
+	// New description of the table.
+	Description string
+	// Fields of the table.
+	Fields []*v1beta1.Field
+	// Metadata of the table, if any.
+	Metadata *structpb.Struct
+}
+
+func (b0 UpdateTableRequest_builder) Build() *UpdateTableRequest {
+	m0 := &UpdateTableRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schema = b.Schema
+	x.Name = b.Name
+	x.Description = b.Description
+	x.Fields = b.Fields
+	x.Metadata = b.Metadata
+	return m0
+}
+
 // Response message for updating a table.
 type UpdateTableResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The updated table.
 	Table *Table `protobuf:"bytes,1,opt,name=table,proto3" json:"table,omitempty"`
 	// Indicates if the table was successfully updated.
@@ -1727,11 +2755,6 @@ func (x *UpdateTableResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateTableResponse.ProtoReflect.Descriptor instead.
-func (*UpdateTableResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{28}
-}
-
 func (x *UpdateTableResponse) GetTable() *Table {
 	if x != nil {
 		return x.Table
@@ -1753,9 +2776,53 @@ func (x *UpdateTableResponse) GetError() string {
 	return ""
 }
 
+func (x *UpdateTableResponse) SetTable(v *Table) {
+	x.Table = v
+}
+
+func (x *UpdateTableResponse) SetUpdated(v bool) {
+	x.Updated = v
+}
+
+func (x *UpdateTableResponse) SetError(v string) {
+	x.Error = v
+}
+
+func (x *UpdateTableResponse) HasTable() bool {
+	if x == nil {
+		return false
+	}
+	return x.Table != nil
+}
+
+func (x *UpdateTableResponse) ClearTable() {
+	x.Table = nil
+}
+
+type UpdateTableResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The updated table.
+	Table *Table
+	// Indicates if the table was successfully updated.
+	Updated bool
+	// Error message, if any.
+	Error string
+}
+
+func (b0 UpdateTableResponse_builder) Build() *UpdateTableResponse {
+	m0 := &UpdateTableResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Table = b.Table
+	x.Updated = b.Updated
+	x.Error = b.Error
+	return m0
+}
+
 // Request message for deleting a table in a schema.
 type DeleteTableRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Reference to the schema containing the table.
 	Schema *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 	// Name of the table to delete.
@@ -1789,11 +2856,6 @@ func (x *DeleteTableRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteTableRequest.ProtoReflect.Descriptor instead.
-func (*DeleteTableRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{29}
-}
-
 func (x *DeleteTableRequest) GetSchema() *Schema {
 	if x != nil {
 		return x.Schema
@@ -1808,9 +2870,46 @@ func (x *DeleteTableRequest) GetName() string {
 	return ""
 }
 
+func (x *DeleteTableRequest) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *DeleteTableRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *DeleteTableRequest) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *DeleteTableRequest) ClearSchema() {
+	x.Schema = nil
+}
+
+type DeleteTableRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Reference to the schema containing the table.
+	Schema *Schema
+	// Name of the table to delete.
+	Name string
+}
+
+func (b0 DeleteTableRequest_builder) Build() *DeleteTableRequest {
+	m0 := &DeleteTableRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schema = b.Schema
+	x.Name = b.Name
+	return m0
+}
+
 // Response message for deleting a table.
 type DeleteTableResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The deleted table.
 	Table *Table `protobuf:"bytes,1,opt,name=table,proto3" json:"table,omitempty"`
 	// Indicates if the table was successfully deleted.
@@ -1846,11 +2945,6 @@ func (x *DeleteTableResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteTableResponse.ProtoReflect.Descriptor instead.
-func (*DeleteTableResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{30}
-}
-
 func (x *DeleteTableResponse) GetTable() *Table {
 	if x != nil {
 		return x.Table
@@ -1872,9 +2966,53 @@ func (x *DeleteTableResponse) GetError() string {
 	return ""
 }
 
+func (x *DeleteTableResponse) SetTable(v *Table) {
+	x.Table = v
+}
+
+func (x *DeleteTableResponse) SetDeleted(v bool) {
+	x.Deleted = v
+}
+
+func (x *DeleteTableResponse) SetError(v string) {
+	x.Error = v
+}
+
+func (x *DeleteTableResponse) HasTable() bool {
+	if x == nil {
+		return false
+	}
+	return x.Table != nil
+}
+
+func (x *DeleteTableResponse) ClearTable() {
+	x.Table = nil
+}
+
+type DeleteTableResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The deleted table.
+	Table *Table
+	// Indicates if the table was successfully deleted.
+	Deleted bool
+	// Error message, if any.
+	Error string
+}
+
+func (b0 DeleteTableResponse_builder) Build() *DeleteTableResponse {
+	m0 := &DeleteTableResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Table = b.Table
+	x.Deleted = b.Deleted
+	x.Error = b.Error
+	return m0
+}
+
 // Request message for writing to a table.
 type WriteTablesRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Reference to the table where row will be written.
 	Table *Table `protobuf:"bytes,1,opt,name=table,proto3" json:"table,omitempty"`
 	// Row to write to the table.
@@ -1908,11 +3046,6 @@ func (x *WriteTablesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WriteTablesRequest.ProtoReflect.Descriptor instead.
-func (*WriteTablesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{31}
-}
-
 func (x *WriteTablesRequest) GetTable() *Table {
 	if x != nil {
 		return x.Table
@@ -1927,9 +3060,57 @@ func (x *WriteTablesRequest) GetRow() *structpb.Struct {
 	return nil
 }
 
+func (x *WriteTablesRequest) SetTable(v *Table) {
+	x.Table = v
+}
+
+func (x *WriteTablesRequest) SetRow(v *structpb.Struct) {
+	x.Row = v
+}
+
+func (x *WriteTablesRequest) HasTable() bool {
+	if x == nil {
+		return false
+	}
+	return x.Table != nil
+}
+
+func (x *WriteTablesRequest) HasRow() bool {
+	if x == nil {
+		return false
+	}
+	return x.Row != nil
+}
+
+func (x *WriteTablesRequest) ClearTable() {
+	x.Table = nil
+}
+
+func (x *WriteTablesRequest) ClearRow() {
+	x.Row = nil
+}
+
+type WriteTablesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Reference to the table where row will be written.
+	Table *Table
+	// Row to write to the table.
+	Row *structpb.Struct
+}
+
+func (b0 WriteTablesRequest_builder) Build() *WriteTablesRequest {
+	m0 := &WriteTablesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Table = b.Table
+	x.Row = b.Row
+	return m0
+}
+
 // Response message for rows written to a table.
 type WriteTableResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Reference to the table where rows were written.
 	Table *Table `protobuf:"bytes,1,opt,name=table,proto3" json:"table,omitempty"`
 	// Number of rows successfully written.
@@ -1963,11 +3144,6 @@ func (x *WriteTableResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WriteTableResponse.ProtoReflect.Descriptor instead.
-func (*WriteTableResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{32}
-}
-
 func (x *WriteTableResponse) GetTable() *Table {
 	if x != nil {
 		return x.Table
@@ -1982,9 +3158,46 @@ func (x *WriteTableResponse) GetRowsWritten() int64 {
 	return 0
 }
 
+func (x *WriteTableResponse) SetTable(v *Table) {
+	x.Table = v
+}
+
+func (x *WriteTableResponse) SetRowsWritten(v int64) {
+	x.RowsWritten = v
+}
+
+func (x *WriteTableResponse) HasTable() bool {
+	if x == nil {
+		return false
+	}
+	return x.Table != nil
+}
+
+func (x *WriteTableResponse) ClearTable() {
+	x.Table = nil
+}
+
+type WriteTableResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Reference to the table where rows were written.
+	Table *Table
+	// Number of rows successfully written.
+	RowsWritten int64
+}
+
+func (b0 WriteTableResponse_builder) Build() *WriteTableResponse {
+	m0 := &WriteTableResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Table = b.Table
+	x.RowsWritten = b.RowsWritten
+	return m0
+}
+
 // Response message for writing rows to multiple tables.
 type WriteTablesResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Results for each table written.
 	Tables        []*WriteTableResponse `protobuf:"bytes,1,rep,name=tables,proto3" json:"tables,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -2016,11 +3229,6 @@ func (x *WriteTablesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WriteTablesResponse.ProtoReflect.Descriptor instead.
-func (*WriteTablesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{33}
-}
-
 func (x *WriteTablesResponse) GetTables() []*WriteTableResponse {
 	if x != nil {
 		return x.Tables
@@ -2028,9 +3236,28 @@ func (x *WriteTablesResponse) GetTables() []*WriteTableResponse {
 	return nil
 }
 
+func (x *WriteTablesResponse) SetTables(v []*WriteTableResponse) {
+	x.Tables = v
+}
+
+type WriteTablesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Results for each table written.
+	Tables []*WriteTableResponse
+}
+
+func (b0 WriteTablesResponse_builder) Build() *WriteTablesResponse {
+	m0 := &WriteTablesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Tables = b.Tables
+	return m0
+}
+
 // Request message for reading rows from a table.
 type ReadTableRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Reference to the schema containing the table.
 	Schema *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 	// Name of the table to read from.
@@ -2068,11 +3295,6 @@ func (x *ReadTableRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ReadTableRequest.ProtoReflect.Descriptor instead.
-func (*ReadTableRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{34}
-}
-
 func (x *ReadTableRequest) GetSchema() *Schema {
 	if x != nil {
 		return x.Schema
@@ -2101,9 +3323,60 @@ func (x *ReadTableRequest) GetSelectedFields() []string {
 	return nil
 }
 
+func (x *ReadTableRequest) SetSchema(v *Schema) {
+	x.Schema = v
+}
+
+func (x *ReadTableRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *ReadTableRequest) SetOffset(v int64) {
+	x.Offset = v
+}
+
+func (x *ReadTableRequest) SetSelectedFields(v []string) {
+	x.SelectedFields = v
+}
+
+func (x *ReadTableRequest) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.Schema != nil
+}
+
+func (x *ReadTableRequest) ClearSchema() {
+	x.Schema = nil
+}
+
+type ReadTableRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Reference to the schema containing the table.
+	Schema *Schema
+	// Name of the table to read from.
+	Name string
+	// Offset for reading rows.
+	Offset int64
+	// Selected fields to read from the table.
+	SelectedFields []string
+}
+
+func (b0 ReadTableRequest_builder) Build() *ReadTableRequest {
+	m0 := &ReadTableRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Schema = b.Schema
+	x.Name = b.Name
+	x.Offset = b.Offset
+	x.SelectedFields = b.SelectedFields
+	return m0
+}
+
 // Response message for reading rows from a table.
 type ReadTableResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Reference to the table from which rows were read.
 	Table *Table `protobuf:"bytes,1,opt,name=table,proto3" json:"table,omitempty"`
 	// A row read from the table.
@@ -2137,11 +3410,6 @@ func (x *ReadTableResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ReadTableResponse.ProtoReflect.Descriptor instead.
-func (*ReadTableResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{35}
-}
-
 func (x *ReadTableResponse) GetTable() *Table {
 	if x != nil {
 		return x.Table
@@ -2156,9 +3424,57 @@ func (x *ReadTableResponse) GetRow() *structpb.Struct {
 	return nil
 }
 
+func (x *ReadTableResponse) SetTable(v *Table) {
+	x.Table = v
+}
+
+func (x *ReadTableResponse) SetRow(v *structpb.Struct) {
+	x.Row = v
+}
+
+func (x *ReadTableResponse) HasTable() bool {
+	if x == nil {
+		return false
+	}
+	return x.Table != nil
+}
+
+func (x *ReadTableResponse) HasRow() bool {
+	if x == nil {
+		return false
+	}
+	return x.Row != nil
+}
+
+func (x *ReadTableResponse) ClearTable() {
+	x.Table = nil
+}
+
+func (x *ReadTableResponse) ClearRow() {
+	x.Row = nil
+}
+
+type ReadTableResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Reference to the table from which rows were read.
+	Table *Table
+	// A row read from the table.
+	Row *structpb.Struct
+}
+
+func (b0 ReadTableResponse_builder) Build() *ReadTableResponse {
+	m0 := &ReadTableResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Table = b.Table
+	x.Row = b.Row
+	return m0
+}
+
 // Request to validate a query.
 type ValidateQueryRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The query to validate.
 	Query string `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	// Accessible catalogs for validation.
@@ -2194,11 +3510,6 @@ func (x *ValidateQueryRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ValidateQueryRequest.ProtoReflect.Descriptor instead.
-func (*ValidateQueryRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{36}
-}
-
 func (x *ValidateQueryRequest) GetQuery() string {
 	if x != nil {
 		return x.Query
@@ -2220,9 +3531,42 @@ func (x *ValidateQueryRequest) GetParams() []*v1beta1.Param {
 	return nil
 }
 
+func (x *ValidateQueryRequest) SetQuery(v string) {
+	x.Query = v
+}
+
+func (x *ValidateQueryRequest) SetAccessible(v []*CatalogPermission) {
+	x.Accessible = v
+}
+
+func (x *ValidateQueryRequest) SetParams(v []*v1beta1.Param) {
+	x.Params = v
+}
+
+type ValidateQueryRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The query to validate.
+	Query string
+	// Accessible catalogs for validation.
+	Accessible []*CatalogPermission
+	// Parameters used in the query.
+	Params []*v1beta1.Param
+}
+
+func (b0 ValidateQueryRequest_builder) Build() *ValidateQueryRequest {
+	m0 := &ValidateQueryRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Query = b.Query
+	x.Accessible = b.Accessible
+	x.Params = b.Params
+	return m0
+}
+
 // Response for query validation.
 type ValidateQueryResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Validated query details.
 	Query *Query `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	// Permissions accessed by the query.
@@ -2256,11 +3600,6 @@ func (x *ValidateQueryResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ValidateQueryResponse.ProtoReflect.Descriptor instead.
-func (*ValidateQueryResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{37}
-}
-
 func (x *ValidateQueryResponse) GetQuery() *Query {
 	if x != nil {
 		return x.Query
@@ -2275,9 +3614,46 @@ func (x *ValidateQueryResponse) GetAccessed() []*CatalogPermission {
 	return nil
 }
 
+func (x *ValidateQueryResponse) SetQuery(v *Query) {
+	x.Query = v
+}
+
+func (x *ValidateQueryResponse) SetAccessed(v []*CatalogPermission) {
+	x.Accessed = v
+}
+
+func (x *ValidateQueryResponse) HasQuery() bool {
+	if x == nil {
+		return false
+	}
+	return x.Query != nil
+}
+
+func (x *ValidateQueryResponse) ClearQuery() {
+	x.Query = nil
+}
+
+type ValidateQueryResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Validated query details.
+	Query *Query
+	// Permissions accessed by the query.
+	Accessed []*CatalogPermission
+}
+
+func (b0 ValidateQueryResponse_builder) Build() *ValidateQueryResponse {
+	m0 := &ValidateQueryResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Query = b.Query
+	x.Accessed = b.Accessed
+	return m0
+}
+
 // Request to retrieve query results.
 type GetQueryResultsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The query to execute.
 	Query string `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	// Parameters used in the query.
@@ -2315,11 +3691,6 @@ func (x *GetQueryResultsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetQueryResultsRequest.ProtoReflect.Descriptor instead.
-func (*GetQueryResultsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{38}
-}
-
 func (x *GetQueryResultsRequest) GetQuery() string {
 	if x != nil {
 		return x.Query
@@ -2348,9 +3719,49 @@ func (x *GetQueryResultsRequest) GetPage() string {
 	return ""
 }
 
+func (x *GetQueryResultsRequest) SetQuery(v string) {
+	x.Query = v
+}
+
+func (x *GetQueryResultsRequest) SetParams(v []*v1beta1.Param) {
+	x.Params = v
+}
+
+func (x *GetQueryResultsRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *GetQueryResultsRequest) SetPage(v string) {
+	x.Page = v
+}
+
+type GetQueryResultsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The query to execute.
+	Query string
+	// Parameters used in the query.
+	Params []*v1beta1.Param
+	// Number of rows per page.
+	PageSize int32
+	// Token for the desired page.
+	Page string
+}
+
+func (b0 GetQueryResultsRequest_builder) Build() *GetQueryResultsRequest {
+	m0 := &GetQueryResultsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Query = b.Query
+	x.Params = b.Params
+	x.PageSize = b.PageSize
+	x.Page = b.Page
+	return m0
+}
+
 // Response containing query results.
 type GetQueryResultsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Details of the executed query.
 	Query *Query `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	// Results page containing rows.
@@ -2384,11 +3795,6 @@ func (x *GetQueryResultsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetQueryResultsResponse.ProtoReflect.Descriptor instead.
-func (*GetQueryResultsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{39}
-}
-
 func (x *GetQueryResultsResponse) GetQuery() *Query {
 	if x != nil {
 		return x.Query
@@ -2403,9 +3809,57 @@ func (x *GetQueryResultsResponse) GetResultsPage() *QueryResultsPage {
 	return nil
 }
 
+func (x *GetQueryResultsResponse) SetQuery(v *Query) {
+	x.Query = v
+}
+
+func (x *GetQueryResultsResponse) SetResultsPage(v *QueryResultsPage) {
+	x.ResultsPage = v
+}
+
+func (x *GetQueryResultsResponse) HasQuery() bool {
+	if x == nil {
+		return false
+	}
+	return x.Query != nil
+}
+
+func (x *GetQueryResultsResponse) HasResultsPage() bool {
+	if x == nil {
+		return false
+	}
+	return x.ResultsPage != nil
+}
+
+func (x *GetQueryResultsResponse) ClearQuery() {
+	x.Query = nil
+}
+
+func (x *GetQueryResultsResponse) ClearResultsPage() {
+	x.ResultsPage = nil
+}
+
+type GetQueryResultsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Details of the executed query.
+	Query *Query
+	// Results page containing rows.
+	ResultsPage *QueryResultsPage
+}
+
+func (b0 GetQueryResultsResponse_builder) Build() *GetQueryResultsResponse {
+	m0 := &GetQueryResultsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Query = b.Query
+	x.ResultsPage = b.ResultsPage
+	return m0
+}
+
 // Request to stream query results.
 type StreamQueryResultsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The query to execute.
 	Query string `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	// Parameters used in the query.
@@ -2439,11 +3893,6 @@ func (x *StreamQueryResultsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StreamQueryResultsRequest.ProtoReflect.Descriptor instead.
-func (*StreamQueryResultsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{40}
-}
-
 func (x *StreamQueryResultsRequest) GetQuery() string {
 	if x != nil {
 		return x.Query
@@ -2458,9 +3907,35 @@ func (x *StreamQueryResultsRequest) GetParams() []*v1beta1.Param {
 	return nil
 }
 
+func (x *StreamQueryResultsRequest) SetQuery(v string) {
+	x.Query = v
+}
+
+func (x *StreamQueryResultsRequest) SetParams(v []*v1beta1.Param) {
+	x.Params = v
+}
+
+type StreamQueryResultsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The query to execute.
+	Query string
+	// Parameters used in the query.
+	Params []*v1beta1.Param
+}
+
+func (b0 StreamQueryResultsRequest_builder) Build() *StreamQueryResultsRequest {
+	m0 := &StreamQueryResultsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Query = b.Query
+	x.Params = b.Params
+	return m0
+}
+
 // Response containing streamed query results.
 type StreamQueryResultsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Details of the executed query.
 	Query *Query `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	// A row of query results.
@@ -2494,11 +3969,6 @@ func (x *StreamQueryResultsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StreamQueryResultsResponse.ProtoReflect.Descriptor instead.
-func (*StreamQueryResultsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{41}
-}
-
 func (x *StreamQueryResultsResponse) GetQuery() *Query {
 	if x != nil {
 		return x.Query
@@ -2513,9 +3983,57 @@ func (x *StreamQueryResultsResponse) GetRow() *structpb.Struct {
 	return nil
 }
 
+func (x *StreamQueryResultsResponse) SetQuery(v *Query) {
+	x.Query = v
+}
+
+func (x *StreamQueryResultsResponse) SetRow(v *structpb.Struct) {
+	x.Row = v
+}
+
+func (x *StreamQueryResultsResponse) HasQuery() bool {
+	if x == nil {
+		return false
+	}
+	return x.Query != nil
+}
+
+func (x *StreamQueryResultsResponse) HasRow() bool {
+	if x == nil {
+		return false
+	}
+	return x.Row != nil
+}
+
+func (x *StreamQueryResultsResponse) ClearQuery() {
+	x.Query = nil
+}
+
+func (x *StreamQueryResultsResponse) ClearRow() {
+	x.Row = nil
+}
+
+type StreamQueryResultsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Details of the executed query.
+	Query *Query
+	// A row of query results.
+	Row *structpb.Struct
+}
+
+func (b0 StreamQueryResultsResponse_builder) Build() *StreamQueryResultsResponse {
+	m0 := &StreamQueryResultsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Query = b.Query
+	x.Row = b.Row
+	return m0
+}
+
 // Represents permissions for a column.
 type ColumnPermission struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of the column.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Alias for the column.
@@ -2551,11 +4069,6 @@ func (x *ColumnPermission) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ColumnPermission.ProtoReflect.Descriptor instead.
-func (*ColumnPermission) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{42}
-}
-
 func (x *ColumnPermission) GetName() string {
 	if x != nil {
 		return x.Name
@@ -2577,9 +4090,42 @@ func (x *ColumnPermission) GetType() string {
 	return ""
 }
 
+func (x *ColumnPermission) SetName(v string) {
+	x.Name = v
+}
+
+func (x *ColumnPermission) SetAlias(v string) {
+	x.Alias = v
+}
+
+func (x *ColumnPermission) SetType(v string) {
+	x.Type = v
+}
+
+type ColumnPermission_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of the column.
+	Name string
+	// Alias for the column.
+	Alias string
+	// Data type of the column.
+	Type string
+}
+
+func (b0 ColumnPermission_builder) Build() *ColumnPermission {
+	m0 := &ColumnPermission{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Alias = b.Alias
+	x.Type = b.Type
+	return m0
+}
+
 // Represents permissions for a table.
 type TablePermission struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of the table.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Alias for the table.
@@ -2615,11 +4161,6 @@ func (x *TablePermission) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TablePermission.ProtoReflect.Descriptor instead.
-func (*TablePermission) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{43}
-}
-
 func (x *TablePermission) GetName() string {
 	if x != nil {
 		return x.Name
@@ -2641,9 +4182,42 @@ func (x *TablePermission) GetColumns() []*ColumnPermission {
 	return nil
 }
 
+func (x *TablePermission) SetName(v string) {
+	x.Name = v
+}
+
+func (x *TablePermission) SetAlias(v string) {
+	x.Alias = v
+}
+
+func (x *TablePermission) SetColumns(v []*ColumnPermission) {
+	x.Columns = v
+}
+
+type TablePermission_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of the table.
+	Name string
+	// Alias for the table.
+	Alias string
+	// Column-level permissions.
+	Columns []*ColumnPermission
+}
+
+func (b0 TablePermission_builder) Build() *TablePermission {
+	m0 := &TablePermission{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Alias = b.Alias
+	x.Columns = b.Columns
+	return m0
+}
+
 // Represents permissions for a schema.
 type SchemaPermission struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of the schema.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Alias for the schema.
@@ -2679,11 +4253,6 @@ func (x *SchemaPermission) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SchemaPermission.ProtoReflect.Descriptor instead.
-func (*SchemaPermission) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{44}
-}
-
 func (x *SchemaPermission) GetName() string {
 	if x != nil {
 		return x.Name
@@ -2705,9 +4274,42 @@ func (x *SchemaPermission) GetTables() []*TablePermission {
 	return nil
 }
 
+func (x *SchemaPermission) SetName(v string) {
+	x.Name = v
+}
+
+func (x *SchemaPermission) SetAlias(v string) {
+	x.Alias = v
+}
+
+func (x *SchemaPermission) SetTables(v []*TablePermission) {
+	x.Tables = v
+}
+
+type SchemaPermission_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of the schema.
+	Name string
+	// Alias for the schema.
+	Alias string
+	// Table-level permissions.
+	Tables []*TablePermission
+}
+
+func (b0 SchemaPermission_builder) Build() *SchemaPermission {
+	m0 := &SchemaPermission{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Alias = b.Alias
+	x.Tables = b.Tables
+	return m0
+}
+
 // Represents permissions for a catalog.
 type CatalogPermission struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of the catalog.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Alias for the catalog.
@@ -2743,11 +4345,6 @@ func (x *CatalogPermission) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CatalogPermission.ProtoReflect.Descriptor instead.
-func (*CatalogPermission) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{45}
-}
-
 func (x *CatalogPermission) GetName() string {
 	if x != nil {
 		return x.Name
@@ -2769,9 +4366,42 @@ func (x *CatalogPermission) GetSchemas() []*SchemaPermission {
 	return nil
 }
 
+func (x *CatalogPermission) SetName(v string) {
+	x.Name = v
+}
+
+func (x *CatalogPermission) SetAlias(v string) {
+	x.Alias = v
+}
+
+func (x *CatalogPermission) SetSchemas(v []*SchemaPermission) {
+	x.Schemas = v
+}
+
+type CatalogPermission_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of the catalog.
+	Name string
+	// Alias for the catalog.
+	Alias string
+	// Schema-level permissions.
+	Schemas []*SchemaPermission
+}
+
+func (b0 CatalogPermission_builder) Build() *CatalogPermission {
+	m0 := &CatalogPermission{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Alias = b.Alias
+	x.Schemas = b.Schemas
+	return m0
+}
+
 // Represents a page of query results.
 type QueryResultsPage struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Token for the previous page of results.
 	PrevPage string `protobuf:"bytes,1,opt,name=prev_page,json=prevPage,proto3" json:"prev_page,omitempty"`
 	// Token for the next page of results.
@@ -2811,11 +4441,6 @@ func (x *QueryResultsPage) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use QueryResultsPage.ProtoReflect.Descriptor instead.
-func (*QueryResultsPage) Descriptor() ([]byte, []int) {
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *QueryResultsPage) GetPrevPage() string {
@@ -2858,6 +4483,60 @@ func (x *QueryResultsPage) GetRows() []*structpb.Struct {
 		return x.Rows
 	}
 	return nil
+}
+
+func (x *QueryResultsPage) SetPrevPage(v string) {
+	x.PrevPage = v
+}
+
+func (x *QueryResultsPage) SetNextPage(v string) {
+	x.NextPage = v
+}
+
+func (x *QueryResultsPage) SetTotalPages(v uint64) {
+	x.TotalPages = v
+}
+
+func (x *QueryResultsPage) SetTotalRows(v uint64) {
+	x.TotalRows = v
+}
+
+func (x *QueryResultsPage) SetRowsCount(v uint64) {
+	x.RowsCount = v
+}
+
+func (x *QueryResultsPage) SetRows(v []*structpb.Struct) {
+	x.Rows = v
+}
+
+type QueryResultsPage_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Token for the previous page of results.
+	PrevPage string
+	// Token for the next page of results.
+	NextPage string
+	// Total number of pages available.
+	TotalPages uint64
+	// Total number of rows available.
+	TotalRows uint64
+	// Number of rows in the current page.
+	RowsCount uint64
+	// Rows in the current page.
+	Rows []*structpb.Struct
+}
+
+func (b0 QueryResultsPage_builder) Build() *QueryResultsPage {
+	m0 := &QueryResultsPage{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PrevPage = b.PrevPage
+	x.NextPage = b.NextPage
+	x.TotalPages = b.TotalPages
+	x.TotalRows = b.TotalRows
+	x.RowsCount = b.RowsCount
+	x.Rows = b.Rows
+	return m0
 }
 
 var File_dtkt_catalog_v1beta1_messages_proto protoreflect.FileDescriptor
@@ -3043,18 +4722,6 @@ const file_dtkt_catalog_v1beta1_messages_proto_rawDesc = "" +
 	"rows_count\x18\x05 \x01(\x04R\trowsCount\x12+\n" +
 	"\x04rows\x18\x06 \x03(\v2\x17.google.protobuf.StructR\x04rowsB\xef\x01\n" +
 	"\x1aproto.dtkt.catalog.v1beta1B\rMessagesProtoP\x01ZPgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta1;catalogv1beta1\xa2\x02\x03DCX\xaa\x02\x14Dtkt.Catalog.V1beta1\xca\x02\x14Dtkt\\Catalog\\V1beta1\xe2\x02 Dtkt\\Catalog\\V1beta1\\GPBMetadata\xea\x02\x16Dtkt::Catalog::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_catalog_v1beta1_messages_proto_rawDescOnce sync.Once
-	file_dtkt_catalog_v1beta1_messages_proto_rawDescData []byte
-)
-
-func file_dtkt_catalog_v1beta1_messages_proto_rawDescGZIP() []byte {
-	file_dtkt_catalog_v1beta1_messages_proto_rawDescOnce.Do(func() {
-		file_dtkt_catalog_v1beta1_messages_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_catalog_v1beta1_messages_proto_rawDesc), len(file_dtkt_catalog_v1beta1_messages_proto_rawDesc)))
-	})
-	return file_dtkt_catalog_v1beta1_messages_proto_rawDescData
-}
 
 var file_dtkt_catalog_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
 var file_dtkt_catalog_v1beta1_messages_proto_goTypes = []any{

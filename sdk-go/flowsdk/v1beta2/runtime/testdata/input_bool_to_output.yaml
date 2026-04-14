@@ -1,0 +1,11 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_bool_to_output
+  description: "Bool input passed directly to output"
+  inputs:
+    - id: x
+      bool: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value"

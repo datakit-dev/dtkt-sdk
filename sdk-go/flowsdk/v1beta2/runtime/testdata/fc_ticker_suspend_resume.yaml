@@ -1,0 +1,14 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fc_ticker_suspend_resume
+  generators:
+    - id: tick
+      ticker:
+        interval: "0.01s"
+  outputs:
+    - id: result
+      value: "= generators.tick.value"
+      flow_control:
+        suspend_when: "= int(generators.tick.eval_count) == 3"
+        stop_when: "= int(generators.tick.eval_count) >= 6"

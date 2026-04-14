@@ -1,0 +1,10 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_invalid_stream_close_when
+  streams:
+    - id: bad
+      close_request_when: "= +++invalid"
+      call:
+        connection: echo
+        method: echo.Echo

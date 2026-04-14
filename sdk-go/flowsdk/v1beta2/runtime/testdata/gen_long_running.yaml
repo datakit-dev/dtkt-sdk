@@ -1,0 +1,12 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: gen_long_running
+  generators:
+    - id: seq
+      range:
+        start: 1
+        end: 1000000
+  outputs:
+    - id: result
+      value: "= generators.seq.value"

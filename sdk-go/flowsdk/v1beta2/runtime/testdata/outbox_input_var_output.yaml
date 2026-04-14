@@ -1,0 +1,13 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: outbox_input_var_output
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: double
+      value: "= inputs.x.value * 2"
+  outputs:
+    - id: result
+      value: "= vars.double.value"

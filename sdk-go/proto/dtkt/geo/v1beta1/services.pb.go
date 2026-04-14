@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/geo/v1beta1/services.proto
 
+//go:build !protoopaque
+
 package geov1beta1
 
 import (

@@ -1,0 +1,21 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: action_map_transform
+  inputs:
+    - id: x
+      int64: {}
+  actions:
+    - id: echo
+      call:
+        connection: echo
+        method: echo.Echo
+        request: "= inputs.x.value"
+  vars:
+    - id: mapped
+      value: "= actions.echo.value"
+      transforms:
+        - map: "= this.value * 100"
+  outputs:
+    - id: result
+      value: "= vars.mapped.value"

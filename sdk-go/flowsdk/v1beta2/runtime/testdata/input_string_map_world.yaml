@@ -1,0 +1,13 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_string_map_world
+  description: "String input with map transform appending ' world'"
+  inputs:
+    - id: name
+      string: {}
+      transforms:
+        - map: '= this.value + " world"'
+  outputs:
+    - id: result
+      value: "= inputs.name.value"

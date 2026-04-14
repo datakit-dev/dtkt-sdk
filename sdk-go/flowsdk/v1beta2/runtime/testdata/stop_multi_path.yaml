@@ -1,0 +1,23 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: stop_multi_path
+  inputs:
+    - id: fail_input
+      int64: {}
+    - id: ok_input
+      int64: {}
+  actions:
+    - id: fail_action
+      call:
+        connection: echo
+        method: error.Internal
+        request: "= inputs.fail_input.value"
+    - id: ok_action
+      call:
+        connection: echo
+        method: echo.Echo
+        request: "= inputs.ok_input.value"
+  outputs:
+    - id: result
+      value: "= actions.ok_action.value"

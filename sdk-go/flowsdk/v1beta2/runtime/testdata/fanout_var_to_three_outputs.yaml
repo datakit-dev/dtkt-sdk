@@ -1,0 +1,24 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fanout_var_to_three_outputs
+  description: "Input to var to three outputs with different transforms"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: base
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= this.value + 100"
+  outputs:
+    - id: raw
+      value: "= vars.base.value"
+    - id: doubled
+      value: "= vars.base.value"
+      transforms:
+        - map: "= this.value * 2"
+    - id: filtered
+      value: "= vars.base.value"
+      transforms:
+        - filter: "= this.value > 103"

@@ -1,0 +1,21 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: reduce_event_nonzero
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: total
+      value: "= inputs.x.value"
+      transforms:
+        - reduce:
+            initial: "= 50"
+            accumulator: "= this.accumulator + this.value"
+            group_by:
+              window:
+                event:
+                  when: "= inputs.x.closed"
+  outputs:
+    - id: result
+      value: "= vars.total.value"

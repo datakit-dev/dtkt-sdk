@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/event/v1beta1/messages.proto
 
+//go:build !protoopaque
+
 package eventv1beta1
 
 import (
@@ -16,7 +18,6 @@ import (
 	anypb "google.golang.org/protobuf/types/known/anypb"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -74,15 +75,10 @@ func (x EventSource_State) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use EventSource_State.Descriptor instead.
-func (EventSource_State) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{1, 0}
-}
-
 // Represents an event deliverable by an event source with its associated
 // metadata including a schema of the event payload.
 type Event struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier for this event, e.g. `events/new-email-received`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The name shown to users in the UI, e.g. "New Email Received".
@@ -120,11 +116,6 @@ func (x *Event) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Event.ProtoReflect.Descriptor instead.
-func (*Event) Descriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Event) GetName() string {
 	if x != nil {
 		return x.Name
@@ -153,9 +144,60 @@ func (x *Event) GetPayloadSchema() *v1beta1.TypeSchema {
 	return nil
 }
 
+func (x *Event) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Event) SetDisplayName(v string) {
+	x.DisplayName = v
+}
+
+func (x *Event) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *Event) SetPayloadSchema(v *v1beta1.TypeSchema) {
+	x.PayloadSchema = v
+}
+
+func (x *Event) HasPayloadSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.PayloadSchema != nil
+}
+
+func (x *Event) ClearPayloadSchema() {
+	x.PayloadSchema = nil
+}
+
+type Event_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier for this event, e.g. `events/new-email-received`.
+	Name string
+	// The name shown to users in the UI, e.g. "New Email Received".
+	DisplayName string
+	// A short explanation of the event, shown to users when selecting or reviewing it.
+	Description string
+	// Schema describing the payload of the event.
+	PayloadSchema *v1beta1.TypeSchema
+}
+
+func (b0 Event_builder) Build() *Event {
+	m0 := &Event{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.DisplayName = b.DisplayName
+	x.Description = b.Description
+	x.PayloadSchema = b.PayloadSchema
+	return m0
+}
+
 // Represents an event source supported by the service.
 type EventSource struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier for this event source, e.g. `event_sources/new-email-received-source`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The name shown to users in the UI, e.g. "New Email Received".
@@ -205,11 +247,6 @@ func (x *EventSource) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use EventSource.ProtoReflect.Descriptor instead.
-func (*EventSource) Descriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *EventSource) GetName() string {
@@ -293,6 +330,188 @@ func (x *EventSource) GetPushUrl() string {
 	return ""
 }
 
+func (x *EventSource) SetName(v string) {
+	x.Name = v
+}
+
+func (x *EventSource) SetDisplayName(v string) {
+	x.DisplayName = v
+}
+
+func (x *EventSource) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *EventSource) SetConfigSchema(v *v1beta1.TypeSchema) {
+	x.ConfigSchema = v
+}
+
+func (x *EventSource) SetRequiresConfig(v bool) {
+	x.RequiresConfig = v
+}
+
+func (x *EventSource) SetContinueOnError(v bool) {
+	x.ContinueOnError = v
+}
+
+func (x *EventSource) SetConfig(v *anypb.Any) {
+	x.Config = v
+}
+
+func (x *EventSource) SetState(v EventSource_State) {
+	x.State = v
+}
+
+func (x *EventSource) SetPullFreq(v *durationpb.Duration) {
+	if v == nil {
+		x.Strategy = nil
+		return
+	}
+	x.Strategy = &EventSource_PullFreq{v}
+}
+
+func (x *EventSource) SetPushUrl(v string) {
+	x.Strategy = &EventSource_PushUrl{v}
+}
+
+func (x *EventSource) HasConfigSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.ConfigSchema != nil
+}
+
+func (x *EventSource) HasConfig() bool {
+	if x == nil {
+		return false
+	}
+	return x.Config != nil
+}
+
+func (x *EventSource) HasStrategy() bool {
+	if x == nil {
+		return false
+	}
+	return x.Strategy != nil
+}
+
+func (x *EventSource) HasPullFreq() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Strategy.(*EventSource_PullFreq)
+	return ok
+}
+
+func (x *EventSource) HasPushUrl() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Strategy.(*EventSource_PushUrl)
+	return ok
+}
+
+func (x *EventSource) ClearConfigSchema() {
+	x.ConfigSchema = nil
+}
+
+func (x *EventSource) ClearConfig() {
+	x.Config = nil
+}
+
+func (x *EventSource) ClearStrategy() {
+	x.Strategy = nil
+}
+
+func (x *EventSource) ClearPullFreq() {
+	if _, ok := x.Strategy.(*EventSource_PullFreq); ok {
+		x.Strategy = nil
+	}
+}
+
+func (x *EventSource) ClearPushUrl() {
+	if _, ok := x.Strategy.(*EventSource_PushUrl); ok {
+		x.Strategy = nil
+	}
+}
+
+const EventSource_Strategy_not_set_case case_EventSource_Strategy = 0
+const EventSource_PullFreq_case case_EventSource_Strategy = 9
+const EventSource_PushUrl_case case_EventSource_Strategy = 10
+
+func (x *EventSource) WhichStrategy() case_EventSource_Strategy {
+	if x == nil {
+		return EventSource_Strategy_not_set_case
+	}
+	switch x.Strategy.(type) {
+	case *EventSource_PullFreq:
+		return EventSource_PullFreq_case
+	case *EventSource_PushUrl:
+		return EventSource_PushUrl_case
+	default:
+		return EventSource_Strategy_not_set_case
+	}
+}
+
+type EventSource_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier for this event source, e.g. `event_sources/new-email-received-source`.
+	Name string
+	// The name shown to users in the UI, e.g. "New Email Received".
+	DisplayName string
+	// A short explanation of the event, shown to users when selecting or reviewing it.
+	Description string
+	// Schema for configuring the event source.
+	ConfigSchema *v1beta1.TypeSchema
+	// Specifies if configuration is required before using the event source.
+	RequiresConfig bool
+	// Specifies if the event source should continue delivering events even if
+	// errors are encountered.
+	ContinueOnError bool
+	// Configuration of the event source.
+	Config *anypb.Any
+	// Current state of the event source.
+	State EventSource_State
+	// Fields of oneof Strategy:
+	// Pull frequency of the event source.
+	PullFreq *durationpb.Duration
+	// Push URL of the event source.
+	PushUrl *string
+	// -- end of Strategy
+}
+
+func (b0 EventSource_builder) Build() *EventSource {
+	m0 := &EventSource{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.DisplayName = b.DisplayName
+	x.Description = b.Description
+	x.ConfigSchema = b.ConfigSchema
+	x.RequiresConfig = b.RequiresConfig
+	x.ContinueOnError = b.ContinueOnError
+	x.Config = b.Config
+	x.State = b.State
+	if b.PullFreq != nil {
+		x.Strategy = &EventSource_PullFreq{b.PullFreq}
+	}
+	if b.PushUrl != nil {
+		x.Strategy = &EventSource_PushUrl{*b.PushUrl}
+	}
+	return m0
+}
+
+type case_EventSource_Strategy protoreflect.FieldNumber
+
+func (x case_EventSource_Strategy) String() string {
+	md := file_dtkt_event_v1beta1_messages_proto_msgTypes[1].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isEventSource_Strategy interface {
 	isEventSource_Strategy()
 }
@@ -313,7 +532,7 @@ func (*EventSource_PushUrl) isEventSource_Strategy() {}
 
 // Request for retrieving events.
 type ListEventsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Number of events to return per page. Leave empty for the server default.
 	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Token from a previous response's `next_page_token` to retrieve the next page of results.
@@ -349,11 +568,6 @@ func (x *ListEventsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListEventsRequest.ProtoReflect.Descriptor instead.
-func (*ListEventsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *ListEventsRequest) GetPageSize() int32 {
 	if x != nil {
 		return x.PageSize
@@ -375,9 +589,42 @@ func (x *ListEventsRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListEventsRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListEventsRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListEventsRequest) SetFilter(v string) {
+	x.Filter = v
+}
+
+type ListEventsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Number of events to return per page. Leave empty for the server default.
+	PageSize int32
+	// Token from a previous response's `next_page_token` to retrieve the next page of results.
+	PageToken string
+	// Optional filter expression to narrow results..
+	Filter string
+}
+
+func (b0 ListEventsRequest_builder) Build() *ListEventsRequest {
+	m0 := &ListEventsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.Filter = b.Filter
+	return m0
+}
+
 // Response containing a list of events.
 type ListEventsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// List of events.
 	Events []*Event `protobuf:"bytes,1,rep,name=events,proto3" json:"events,omitempty"`
 	// Pass this value as `page_token` in your next request to retrieve the following page. Empty when there are no more results.
@@ -411,11 +658,6 @@ func (x *ListEventsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListEventsResponse.ProtoReflect.Descriptor instead.
-func (*ListEventsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *ListEventsResponse) GetEvents() []*Event {
 	if x != nil {
 		return x.Events
@@ -430,9 +672,35 @@ func (x *ListEventsResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListEventsResponse) SetEvents(v []*Event) {
+	x.Events = v
+}
+
+func (x *ListEventsResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListEventsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// List of events.
+	Events []*Event
+	// Pass this value as `page_token` in your next request to retrieve the following page. Empty when there are no more results.
+	NextPageToken string
+}
+
+func (b0 ListEventsResponse_builder) Build() *ListEventsResponse {
+	m0 := &ListEventsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Events = b.Events
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 // Request for retrieving event source types supported by this service.
 type ListEventSourcesRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Number of event sources to return per page. Leave empty for the server default.
 	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Token from a previous response's `next_page_token` to retrieve the next page of results.
@@ -468,11 +736,6 @@ func (x *ListEventSourcesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListEventSourcesRequest.ProtoReflect.Descriptor instead.
-func (*ListEventSourcesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *ListEventSourcesRequest) GetPageSize() int32 {
 	if x != nil {
 		return x.PageSize
@@ -494,9 +757,42 @@ func (x *ListEventSourcesRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListEventSourcesRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListEventSourcesRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+func (x *ListEventSourcesRequest) SetFilter(v string) {
+	x.Filter = v
+}
+
+type ListEventSourcesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Number of event sources to return per page. Leave empty for the server default.
+	PageSize int32
+	// Token from a previous response's `next_page_token` to retrieve the next page of results.
+	PageToken string
+	// Optional filter expression to narrow results..
+	Filter string
+}
+
+func (b0 ListEventSourcesRequest_builder) Build() *ListEventSourcesRequest {
+	m0 := &ListEventSourcesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	x.Filter = b.Filter
+	return m0
+}
+
 // List of event sources supported by or configured for this service.
 type ListEventSourcesResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// List of event sources.
 	EventSources []*EventSource `protobuf:"bytes,1,rep,name=event_sources,json=eventSources,proto3" json:"event_sources,omitempty"`
 	// Pass this value as `page_token` in your next request to retrieve the following page. Empty when there are no more results.
@@ -530,11 +826,6 @@ func (x *ListEventSourcesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListEventSourcesResponse.ProtoReflect.Descriptor instead.
-func (*ListEventSourcesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *ListEventSourcesResponse) GetEventSources() []*EventSource {
 	if x != nil {
 		return x.EventSources
@@ -549,9 +840,35 @@ func (x *ListEventSourcesResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListEventSourcesResponse) SetEventSources(v []*EventSource) {
+	x.EventSources = v
+}
+
+func (x *ListEventSourcesResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListEventSourcesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// List of event sources.
+	EventSources []*EventSource
+	// Pass this value as `page_token` in your next request to retrieve the following page. Empty when there are no more results.
+	NextPageToken string
+}
+
+func (b0 ListEventSourcesResponse_builder) Build() *ListEventSourcesResponse {
+	m0 := &ListEventSourcesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.EventSources = b.EventSources
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 // Request to pull events from a PULL event source.
 type StreamPullEventsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of pull event source.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Configuration of the event source.
@@ -587,11 +904,6 @@ func (x *StreamPullEventsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StreamPullEventsRequest.ProtoReflect.Descriptor instead.
-func (*StreamPullEventsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *StreamPullEventsRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -613,9 +925,64 @@ func (x *StreamPullEventsRequest) GetPullFreq() *durationpb.Duration {
 	return nil
 }
 
+func (x *StreamPullEventsRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *StreamPullEventsRequest) SetConfig(v *anypb.Any) {
+	x.Config = v
+}
+
+func (x *StreamPullEventsRequest) SetPullFreq(v *durationpb.Duration) {
+	x.PullFreq = v
+}
+
+func (x *StreamPullEventsRequest) HasConfig() bool {
+	if x == nil {
+		return false
+	}
+	return x.Config != nil
+}
+
+func (x *StreamPullEventsRequest) HasPullFreq() bool {
+	if x == nil {
+		return false
+	}
+	return x.PullFreq != nil
+}
+
+func (x *StreamPullEventsRequest) ClearConfig() {
+	x.Config = nil
+}
+
+func (x *StreamPullEventsRequest) ClearPullFreq() {
+	x.PullFreq = nil
+}
+
+type StreamPullEventsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of pull event source.
+	Name string
+	// Configuration of the event source.
+	Config *anypb.Any
+	// Pull frequency of the event source.
+	PullFreq *durationpb.Duration
+}
+
+func (b0 StreamPullEventsRequest_builder) Build() *StreamPullEventsRequest {
+	m0 := &StreamPullEventsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Config = b.Config
+	x.PullFreq = b.PullFreq
+	return m0
+}
+
 // Response from pulling events.
 type StreamPullEventsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of pull event source from request.
 	EventSource string `protobuf:"bytes,1,opt,name=event_source,json=eventSource,proto3" json:"event_source,omitempty"`
 	// Name of event delivered by event source.
@@ -653,11 +1020,6 @@ func (x *StreamPullEventsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StreamPullEventsResponse.ProtoReflect.Descriptor instead.
-func (*StreamPullEventsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *StreamPullEventsResponse) GetEventSource() string {
 	if x != nil {
 		return x.EventSource
@@ -686,9 +1048,71 @@ func (x *StreamPullEventsResponse) GetAction() v1beta1.ActionType {
 	return v1beta1.ActionType(0)
 }
 
+func (x *StreamPullEventsResponse) SetEventSource(v string) {
+	x.EventSource = v
+}
+
+func (x *StreamPullEventsResponse) SetEvent(v string) {
+	x.Event = v
+}
+
+func (x *StreamPullEventsResponse) SetPayload(v *anypb.Any) {
+	x.Payload = v
+}
+
+func (x *StreamPullEventsResponse) SetAction(v v1beta1.ActionType) {
+	x.Action = &v
+}
+
+func (x *StreamPullEventsResponse) HasPayload() bool {
+	if x == nil {
+		return false
+	}
+	return x.Payload != nil
+}
+
+func (x *StreamPullEventsResponse) HasAction() bool {
+	if x == nil {
+		return false
+	}
+	return x.Action != nil
+}
+
+func (x *StreamPullEventsResponse) ClearPayload() {
+	x.Payload = nil
+}
+
+func (x *StreamPullEventsResponse) ClearAction() {
+	x.Action = nil
+}
+
+type StreamPullEventsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of pull event source from request.
+	EventSource string
+	// Name of event delivered by event source.
+	Event string
+	// Payload of the event.
+	Payload *anypb.Any
+	// Type of action associated with event.
+	Action *v1beta1.ActionType
+}
+
+func (b0 StreamPullEventsResponse_builder) Build() *StreamPullEventsResponse {
+	m0 := &StreamPullEventsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.EventSource = b.EventSource
+	x.Event = b.Event
+	x.Payload = b.Payload
+	x.Action = b.Action
+	return m0
+}
+
 // Request to validate an event from a push event source.
 type StreamPushEventsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of push event source.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Headers of the event (if any).
@@ -724,11 +1148,6 @@ func (x *StreamPushEventsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StreamPushEventsRequest.ProtoReflect.Descriptor instead.
-func (*StreamPushEventsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *StreamPushEventsRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -750,9 +1169,45 @@ func (x *StreamPushEventsRequest) GetBody() []byte {
 	return nil
 }
 
+func (x *StreamPushEventsRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *StreamPushEventsRequest) SetHeaders(v map[string]*v1beta1.StringList) {
+	x.Headers = v
+}
+
+func (x *StreamPushEventsRequest) SetBody(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.Body = v
+}
+
+type StreamPushEventsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of push event source.
+	Name string
+	// Headers of the event (if any).
+	Headers map[string]*v1beta1.StringList
+	// Body of the event.
+	Body []byte
+}
+
+func (b0 StreamPushEventsRequest_builder) Build() *StreamPushEventsRequest {
+	m0 := &StreamPushEventsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Headers = b.Headers
+	x.Body = b.Body
+	return m0
+}
+
 // Response of a valid event from a push event source.
 type StreamPushEventsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Name of push event source from request.
 	EventSource string `protobuf:"bytes,1,opt,name=event_source,json=eventSource,proto3" json:"event_source,omitempty"`
 	// Name of event delivered by event source.
@@ -790,11 +1245,6 @@ func (x *StreamPushEventsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StreamPushEventsResponse.ProtoReflect.Descriptor instead.
-func (*StreamPushEventsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *StreamPushEventsResponse) GetEventSource() string {
 	if x != nil {
 		return x.EventSource
@@ -823,9 +1273,71 @@ func (x *StreamPushEventsResponse) GetAction() v1beta1.ActionType {
 	return v1beta1.ActionType(0)
 }
 
+func (x *StreamPushEventsResponse) SetEventSource(v string) {
+	x.EventSource = v
+}
+
+func (x *StreamPushEventsResponse) SetEvent(v string) {
+	x.Event = v
+}
+
+func (x *StreamPushEventsResponse) SetPayload(v *anypb.Any) {
+	x.Payload = v
+}
+
+func (x *StreamPushEventsResponse) SetAction(v v1beta1.ActionType) {
+	x.Action = &v
+}
+
+func (x *StreamPushEventsResponse) HasPayload() bool {
+	if x == nil {
+		return false
+	}
+	return x.Payload != nil
+}
+
+func (x *StreamPushEventsResponse) HasAction() bool {
+	if x == nil {
+		return false
+	}
+	return x.Action != nil
+}
+
+func (x *StreamPushEventsResponse) ClearPayload() {
+	x.Payload = nil
+}
+
+func (x *StreamPushEventsResponse) ClearAction() {
+	x.Action = nil
+}
+
+type StreamPushEventsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Name of push event source from request.
+	EventSource string
+	// Name of event delivered by event source.
+	Event string
+	// Payload of the event.
+	Payload *anypb.Any
+	// Type of action associated with event.
+	Action *v1beta1.ActionType
+}
+
+func (b0 StreamPushEventsResponse_builder) Build() *StreamPushEventsResponse {
+	m0 := &StreamPushEventsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.EventSource = b.EventSource
+	x.Event = b.Event
+	x.Payload = b.Payload
+	x.Action = b.Action
+	return m0
+}
+
 // Request to create a new event source.
 type CreateEventSourceRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// ID of event source to create (e.g. `new-email-received-source`). This will
 	// be combined with the prefix `event_sources/` to form the full name of the
 	// event source (e.g. `event_sources/new-email-received-source`).
@@ -861,11 +1373,6 @@ func (x *CreateEventSourceRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateEventSourceRequest.ProtoReflect.Descriptor instead.
-func (*CreateEventSourceRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *CreateEventSourceRequest) GetEventSourceId() string {
 	if x != nil {
 		return x.EventSourceId
@@ -880,9 +1387,48 @@ func (x *CreateEventSourceRequest) GetEventSource() *EventSource {
 	return nil
 }
 
+func (x *CreateEventSourceRequest) SetEventSourceId(v string) {
+	x.EventSourceId = v
+}
+
+func (x *CreateEventSourceRequest) SetEventSource(v *EventSource) {
+	x.EventSource = v
+}
+
+func (x *CreateEventSourceRequest) HasEventSource() bool {
+	if x == nil {
+		return false
+	}
+	return x.EventSource != nil
+}
+
+func (x *CreateEventSourceRequest) ClearEventSource() {
+	x.EventSource = nil
+}
+
+type CreateEventSourceRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// ID of event source to create (e.g. `new-email-received-source`). This will
+	// be combined with the prefix `event_sources/` to form the full name of the
+	// event source (e.g. `event_sources/new-email-received-source`).
+	EventSourceId string
+	// Configuration of the event source.
+	EventSource *EventSource
+}
+
+func (b0 CreateEventSourceRequest_builder) Build() *CreateEventSourceRequest {
+	m0 := &CreateEventSourceRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.EventSourceId = b.EventSourceId
+	x.EventSource = b.EventSource
+	return m0
+}
+
 // Response for creating an event source.
 type CreateEventSourceResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The created event source.
 	EventSource   *EventSource `protobuf:"bytes,1,opt,name=event_source,json=eventSource,proto3" json:"event_source,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -914,11 +1460,6 @@ func (x *CreateEventSourceResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateEventSourceResponse.ProtoReflect.Descriptor instead.
-func (*CreateEventSourceResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{11}
-}
-
 func (x *CreateEventSourceResponse) GetEventSource() *EventSource {
 	if x != nil {
 		return x.EventSource
@@ -926,9 +1467,39 @@ func (x *CreateEventSourceResponse) GetEventSource() *EventSource {
 	return nil
 }
 
+func (x *CreateEventSourceResponse) SetEventSource(v *EventSource) {
+	x.EventSource = v
+}
+
+func (x *CreateEventSourceResponse) HasEventSource() bool {
+	if x == nil {
+		return false
+	}
+	return x.EventSource != nil
+}
+
+func (x *CreateEventSourceResponse) ClearEventSource() {
+	x.EventSource = nil
+}
+
+type CreateEventSourceResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The created event source.
+	EventSource *EventSource
+}
+
+func (b0 CreateEventSourceResponse_builder) Build() *CreateEventSourceResponse {
+	m0 := &CreateEventSourceResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.EventSource = b.EventSource
+	return m0
+}
+
 // Request to update an event source.
 type UpdateEventSourceRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The event source to update, identified by its full name (e.g. `event_sources/new-email-received-source`).
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Event source to update.
@@ -962,11 +1533,6 @@ func (x *UpdateEventSourceRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateEventSourceRequest.ProtoReflect.Descriptor instead.
-func (*UpdateEventSourceRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{12}
-}
-
 func (x *UpdateEventSourceRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -981,9 +1547,46 @@ func (x *UpdateEventSourceRequest) GetEventSource() *EventSource {
 	return nil
 }
 
+func (x *UpdateEventSourceRequest) SetName(v string) {
+	x.Name = v
+}
+
+func (x *UpdateEventSourceRequest) SetEventSource(v *EventSource) {
+	x.EventSource = v
+}
+
+func (x *UpdateEventSourceRequest) HasEventSource() bool {
+	if x == nil {
+		return false
+	}
+	return x.EventSource != nil
+}
+
+func (x *UpdateEventSourceRequest) ClearEventSource() {
+	x.EventSource = nil
+}
+
+type UpdateEventSourceRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The event source to update, identified by its full name (e.g. `event_sources/new-email-received-source`).
+	Name string
+	// Event source to update.
+	EventSource *EventSource
+}
+
+func (b0 UpdateEventSourceRequest_builder) Build() *UpdateEventSourceRequest {
+	m0 := &UpdateEventSourceRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.EventSource = b.EventSource
+	return m0
+}
+
 // Response for updating an event source.
 type UpdateEventSourceResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The updated event source.
 	EventSource   *EventSource `protobuf:"bytes,3,opt,name=event_source,json=eventSource,proto3" json:"event_source,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1015,11 +1618,6 @@ func (x *UpdateEventSourceResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateEventSourceResponse.ProtoReflect.Descriptor instead.
-func (*UpdateEventSourceResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{13}
-}
-
 func (x *UpdateEventSourceResponse) GetEventSource() *EventSource {
 	if x != nil {
 		return x.EventSource
@@ -1027,9 +1625,39 @@ func (x *UpdateEventSourceResponse) GetEventSource() *EventSource {
 	return nil
 }
 
+func (x *UpdateEventSourceResponse) SetEventSource(v *EventSource) {
+	x.EventSource = v
+}
+
+func (x *UpdateEventSourceResponse) HasEventSource() bool {
+	if x == nil {
+		return false
+	}
+	return x.EventSource != nil
+}
+
+func (x *UpdateEventSourceResponse) ClearEventSource() {
+	x.EventSource = nil
+}
+
+type UpdateEventSourceResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The updated event source.
+	EventSource *EventSource
+}
+
+func (b0 UpdateEventSourceResponse_builder) Build() *UpdateEventSourceResponse {
+	m0 := &UpdateEventSourceResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.EventSource = b.EventSource
+	return m0
+}
+
 // Request to delete an event source.
 type DeleteEventSourceRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The event source to delete, identified by its full name (e.g. `event_sources/new-email-received-source`).
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1061,11 +1689,6 @@ func (x *DeleteEventSourceRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteEventSourceRequest.ProtoReflect.Descriptor instead.
-func (*DeleteEventSourceRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{14}
-}
-
 func (x *DeleteEventSourceRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -1073,9 +1696,28 @@ func (x *DeleteEventSourceRequest) GetName() string {
 	return ""
 }
 
+func (x *DeleteEventSourceRequest) SetName(v string) {
+	x.Name = v
+}
+
+type DeleteEventSourceRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The event source to delete, identified by its full name (e.g. `event_sources/new-email-received-source`).
+	Name string
+}
+
+func (b0 DeleteEventSourceRequest_builder) Build() *DeleteEventSourceRequest {
+	m0 := &DeleteEventSourceRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 // Response for deleting an event source.
 type DeleteEventSourceResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1105,9 +1747,16 @@ func (x *DeleteEventSourceResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteEventSourceResponse.ProtoReflect.Descriptor instead.
-func (*DeleteEventSourceResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_event_v1beta1_messages_proto_rawDescGZIP(), []int{15}
+type DeleteEventSourceResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 DeleteEventSourceResponse_builder) Build() *DeleteEventSourceResponse {
+	m0 := &DeleteEventSourceResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 var File_dtkt_event_v1beta1_messages_proto protoreflect.FileDescriptor
@@ -1199,18 +1848,6 @@ const file_dtkt_event_v1beta1_messages_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\"\x1b\n" +
 	"\x19DeleteEventSourceResponseB\xe1\x01\n" +
 	"\x18proto.dtkt.event.v1beta1B\rMessagesProtoP\x01ZLgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/event/v1beta1;eventv1beta1\xa2\x02\x03DEX\xaa\x02\x12Dtkt.Event.V1beta1\xca\x02\x12Dtkt\\Event\\V1beta1\xe2\x02\x1eDtkt\\Event\\V1beta1\\GPBMetadata\xea\x02\x14Dtkt::Event::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_event_v1beta1_messages_proto_rawDescOnce sync.Once
-	file_dtkt_event_v1beta1_messages_proto_rawDescData []byte
-)
-
-func file_dtkt_event_v1beta1_messages_proto_rawDescGZIP() []byte {
-	file_dtkt_event_v1beta1_messages_proto_rawDescOnce.Do(func() {
-		file_dtkt_event_v1beta1_messages_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_event_v1beta1_messages_proto_rawDesc), len(file_dtkt_event_v1beta1_messages_proto_rawDesc)))
-	})
-	return file_dtkt_event_v1beta1_messages_proto_rawDescData
-}
 
 var file_dtkt_event_v1beta1_messages_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_dtkt_event_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 17)

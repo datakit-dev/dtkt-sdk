@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/protostore/v1beta1/protostore.proto
 
+//go:build !protoopaque
+
 package protostorev1beta1
 
 import (
@@ -11,7 +13,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	descriptorpb "google.golang.org/protobuf/types/descriptorpb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -23,7 +24,7 @@ const (
 )
 
 type Field struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Name          *string                `protobuf:"bytes,1,opt,name=name,proto3,oneof" json:"name,omitempty"`
 	Optional      *bool                  `protobuf:"varint,2,opt,name=optional,proto3,oneof" json:"optional,omitempty"`
 	Nillable      *bool                  `protobuf:"varint,3,opt,name=nillable,proto3,oneof" json:"nillable,omitempty"`
@@ -59,11 +60,6 @@ func (x *Field) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Field.ProtoReflect.Descriptor instead.
-func (*Field) Descriptor() ([]byte, []int) {
-	return file_dtkt_protostore_v1beta1_protostore_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Field) GetName() string {
@@ -122,8 +118,156 @@ func (x *Field) GetPrimary() bool {
 	return false
 }
 
+func (x *Field) SetName(v string) {
+	x.Name = &v
+}
+
+func (x *Field) SetOptional(v bool) {
+	x.Optional = &v
+}
+
+func (x *Field) SetNillable(v bool) {
+	x.Nillable = &v
+}
+
+func (x *Field) SetUnique(v bool) {
+	x.Unique = &v
+}
+
+func (x *Field) SetSensitive(v bool) {
+	x.Sensitive = &v
+}
+
+func (x *Field) SetImmutable(v bool) {
+	x.Immutable = &v
+}
+
+func (x *Field) SetSkip(v bool) {
+	x.Skip = &v
+}
+
+func (x *Field) SetPrimary(v bool) {
+	x.Primary = &v
+}
+
+func (x *Field) HasName() bool {
+	if x == nil {
+		return false
+	}
+	return x.Name != nil
+}
+
+func (x *Field) HasOptional() bool {
+	if x == nil {
+		return false
+	}
+	return x.Optional != nil
+}
+
+func (x *Field) HasNillable() bool {
+	if x == nil {
+		return false
+	}
+	return x.Nillable != nil
+}
+
+func (x *Field) HasUnique() bool {
+	if x == nil {
+		return false
+	}
+	return x.Unique != nil
+}
+
+func (x *Field) HasSensitive() bool {
+	if x == nil {
+		return false
+	}
+	return x.Sensitive != nil
+}
+
+func (x *Field) HasImmutable() bool {
+	if x == nil {
+		return false
+	}
+	return x.Immutable != nil
+}
+
+func (x *Field) HasSkip() bool {
+	if x == nil {
+		return false
+	}
+	return x.Skip != nil
+}
+
+func (x *Field) HasPrimary() bool {
+	if x == nil {
+		return false
+	}
+	return x.Primary != nil
+}
+
+func (x *Field) ClearName() {
+	x.Name = nil
+}
+
+func (x *Field) ClearOptional() {
+	x.Optional = nil
+}
+
+func (x *Field) ClearNillable() {
+	x.Nillable = nil
+}
+
+func (x *Field) ClearUnique() {
+	x.Unique = nil
+}
+
+func (x *Field) ClearSensitive() {
+	x.Sensitive = nil
+}
+
+func (x *Field) ClearImmutable() {
+	x.Immutable = nil
+}
+
+func (x *Field) ClearSkip() {
+	x.Skip = nil
+}
+
+func (x *Field) ClearPrimary() {
+	x.Primary = nil
+}
+
+type Field_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name      *string
+	Optional  *bool
+	Nillable  *bool
+	Unique    *bool
+	Sensitive *bool
+	Immutable *bool
+	Skip      *bool
+	Primary   *bool
+}
+
+func (b0 Field_builder) Build() *Field {
+	m0 := &Field{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Optional = b.Optional
+	x.Nillable = b.Nillable
+	x.Unique = b.Unique
+	x.Sensitive = b.Sensitive
+	x.Immutable = b.Immutable
+	x.Skip = b.Skip
+	x.Primary = b.Primary
+	return m0
+}
+
 type Edge struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Unique        *bool                  `protobuf:"varint,1,opt,name=unique,proto3,oneof" json:"unique,omitempty"`
 	Ref           *string                `protobuf:"bytes,2,opt,name=ref,proto3,oneof" json:"ref,omitempty"`
 	Required      *bool                  `protobuf:"varint,3,opt,name=required,proto3,oneof" json:"required,omitempty"`
@@ -157,11 +301,6 @@ func (x *Edge) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Edge.ProtoReflect.Descriptor instead.
-func (*Edge) Descriptor() ([]byte, []int) {
-	return file_dtkt_protostore_v1beta1_protostore_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *Edge) GetUnique() bool {
 	if x != nil && x.Unique != nil {
 		return *x.Unique
@@ -188,6 +327,86 @@ func (x *Edge) GetField() string {
 		return *x.Field
 	}
 	return ""
+}
+
+func (x *Edge) SetUnique(v bool) {
+	x.Unique = &v
+}
+
+func (x *Edge) SetRef(v string) {
+	x.Ref = &v
+}
+
+func (x *Edge) SetRequired(v bool) {
+	x.Required = &v
+}
+
+func (x *Edge) SetField(v string) {
+	x.Field = &v
+}
+
+func (x *Edge) HasUnique() bool {
+	if x == nil {
+		return false
+	}
+	return x.Unique != nil
+}
+
+func (x *Edge) HasRef() bool {
+	if x == nil {
+		return false
+	}
+	return x.Ref != nil
+}
+
+func (x *Edge) HasRequired() bool {
+	if x == nil {
+		return false
+	}
+	return x.Required != nil
+}
+
+func (x *Edge) HasField() bool {
+	if x == nil {
+		return false
+	}
+	return x.Field != nil
+}
+
+func (x *Edge) ClearUnique() {
+	x.Unique = nil
+}
+
+func (x *Edge) ClearRef() {
+	x.Ref = nil
+}
+
+func (x *Edge) ClearRequired() {
+	x.Required = nil
+}
+
+func (x *Edge) ClearField() {
+	x.Field = nil
+}
+
+type Edge_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Unique   *bool
+	Ref      *string
+	Required *bool
+	Field    *string
+}
+
+func (b0 Edge_builder) Build() *Edge {
+	m0 := &Edge{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Unique = b.Unique
+	x.Ref = b.Ref
+	x.Required = b.Required
+	x.Field = b.Field
+	return m0
 }
 
 var file_dtkt_protostore_v1beta1_protostore_proto_extTypes = []protoimpl.ExtensionInfo{
@@ -260,18 +479,6 @@ const file_dtkt_protostore_v1beta1_protostore_proto_rawDesc = "" +
 	"\x05edges\x12\x1f.google.protobuf.MessageOptions\x18ֆ\x03 \x03(\v2\x1d.dtkt.protostore.v1beta1.EdgeR\x05edges:X\n" +
 	"\x05field\x12\x1d.google.protobuf.FieldOptions\x18Ն\x03 \x01(\v2\x1e.dtkt.protostore.v1beta1.FieldR\x05field\x88\x01\x01B\x86\x02\n" +
 	"\x1dproto.dtkt.protostore.v1beta1B\x0fProtostoreProtoP\x01ZVgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protostore/v1beta1;protostorev1beta1\xa2\x02\x03DPX\xaa\x02\x17Dtkt.Protostore.V1beta1\xca\x02\x17Dtkt\\Protostore\\V1beta1\xe2\x02#Dtkt\\Protostore\\V1beta1\\GPBMetadata\xea\x02\x19Dtkt::Protostore::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_protostore_v1beta1_protostore_proto_rawDescOnce sync.Once
-	file_dtkt_protostore_v1beta1_protostore_proto_rawDescData []byte
-)
-
-func file_dtkt_protostore_v1beta1_protostore_proto_rawDescGZIP() []byte {
-	file_dtkt_protostore_v1beta1_protostore_proto_rawDescOnce.Do(func() {
-		file_dtkt_protostore_v1beta1_protostore_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_protostore_v1beta1_protostore_proto_rawDesc), len(file_dtkt_protostore_v1beta1_protostore_proto_rawDesc)))
-	})
-	return file_dtkt_protostore_v1beta1_protostore_proto_rawDescData
-}
 
 var file_dtkt_protostore_v1beta1_protostore_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_dtkt_protostore_v1beta1_protostore_proto_goTypes = []any{

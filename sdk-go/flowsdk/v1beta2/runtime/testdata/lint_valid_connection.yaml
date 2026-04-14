@@ -1,0 +1,21 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_valid_connection
+  connections:
+    - id: myconn
+      services:
+        - some.Service
+  inputs:
+    - id: x
+      string: {}
+  actions:
+    - id: run
+      call:
+        connection: myconn
+        method: some.Service.Do
+        request:
+          value: "= inputs.x.value"
+  outputs:
+    - id: result
+      value: "= actions.run.value"

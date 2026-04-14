@@ -1,0 +1,21 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_invalid_retry_cel
+  inputs:
+    - id: msg
+      int64: {}
+  actions:
+    - id: bad
+      retry_strategy:
+        skip_when: "= +++invalid"
+        backoff:
+          initial_backoff: "0.001s"
+          max_attempts: 1
+      call:
+        connection: echo
+        method: echo.Echo
+        request: "= inputs.msg.value"
+  outputs:
+    - id: result
+      value: "= actions.bad.value"

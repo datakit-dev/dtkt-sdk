@@ -1,0 +1,17 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: scan_string_concat
+  inputs:
+    - id: word
+      string: {}
+  vars:
+    - id: sentence
+      value: "= inputs.word.value"
+      transforms:
+        - scan:
+            initial: '= ""'
+            accumulator: '= this.accumulator + this.value + " "'
+  outputs:
+    - id: result
+      value: "= vars.sentence.value"

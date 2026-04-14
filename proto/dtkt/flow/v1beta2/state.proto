@@ -1,0 +1,358 @@
+syntax = "proto3";
+
+package dtkt.flow.v1beta2;
+
+import "buf/validate/validate.proto";
+import "cel/expr/value.proto";
+import "google/protobuf/timestamp.proto";
+import "google/rpc/status.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2;flowv1beta2";
+
+// EOF is a sentinel message signaling end-of-stream.
+// Wrapped in cel.expr.Value.object_value for internal transport.
+message EOF {}
+
+// RunSnapshot is the materialized state of all nodes at a point in time.
+message RunSnapshot {
+  // Phase tracks the lifecycle of an individual node within the flow.
+  enum Phase {
+    PHASE_UNSPECIFIED = 0;
+    // Node is registered but has not received its first message.
+    PHASE_PENDING = 1;
+    // Node has received at least one message and is actively processing.
+    PHASE_RUNNING = 2;
+    // Node completed successfully (clean EOF propagation or soft stop drain).
+    PHASE_SUCCEEDED = 3;
+    // Node returned an expected/operational error the graph can branch on
+    // (e.g. action returned a handled error code). Does not trigger fail-fast.
+    PHASE_FAILED = 4;
+    // Node encountered an unexpected error (e.g. infrastructure failure,
+    // retries exhausted on transient errors). Triggers error_strategy.
+    PHASE_ERRORED = 5;
+    // Node is suspended: paused evaluation, no new messages processed.
+    // Triggered by suspend_when (RetryStrategy), SuspendNodeEvent, or
+    // SuspendFlowEvent. Resumable via ResumeNodeEvent/ResumeFlowEvent.
+    PHASE_SUSPENDED = 6;
+    // Node was terminated by operator action. May have an error if
+    // cancellation interrupted an in-flight operation (e.g. mid-RPC).
+    PHASE_CANCELLED = 7;
+    // Flow or node is draining: stop requested, waiting for in-flight
+    // operations to complete before transitioning to a terminal phase.
+    PHASE_STOPPING = 8;
+  }
+
+  // Transform pipeline state for a single step in the transform pipeline.
+  // Positionally matches the flow definition's `transforms` list.
+  // Stateless steps (map, filter, flatten) have no accumulator.
+  // Stateful steps (reduce, scan) store their running value here for
+  // snapshot/resume.
+  message Transform {
+    // Current accumulator value for reduce/scan transforms.
+    // Absent for stateless transforms (map, filter, flatten).
+    cel.expr.Value accumulator = 1;
+  }
+
+  // Flat typed node messages. Each node kind has its own message with common
+  // fields (id, value, error, event_time) plus type-specific fields promoted
+  // to the top level. CEL expressions access fields directly:
+  //   inputs.number.closed, vars.sum.eval_count, streams.echo.response_closed
+
+  // InputNode is the runtime state of an input node.
+  message InputNode {
+    // Node identifier, matches the Input.id from the flow spec.
+    string id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+    ];
+    // UUIDv7 of the event that produced this node's current snapshot state.
+    // Usable as an after_event_id cursor for replay.
+    string event_id = 2 [
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+      (buf.validate.field).string.uuid = true
+    ];
+    // Last received input value.
+    cel.expr.Value value = 3;
+    // Error status if the node encountered a failure.
+    google.rpc.Status error = 4;
+    // Timestamp of the last event on this node.
+    google.protobuf.Timestamp event_time = 5;
+    // Whether the input stream has been closed (EOF received).
+    bool closed = 6;
+    // Per-step transform pipeline state.
+    repeated Transform transforms = 7;
+    // Current lifecycle phase of this node.
+    Phase phase = 8 [(buf.validate.field).enum.defined_only = true];
+  }
+
+  // GeneratorNode is the runtime state of a generator node.
+  message GeneratorNode {
+    // Node identifier, matches the Generator.id from the flow spec.
+    string id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+    ];
+    // UUIDv7 of the event that produced this node's current snapshot state.
+    // Usable as an after_event_id cursor for replay.
+    string event_id = 2 [
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+      (buf.validate.field).string.uuid = true
+    ];
+    // Last generated value.
+    cel.expr.Value value = 3;
+    // Error status if the node encountered a failure.
+    google.rpc.Status error = 4;
+    // Timestamp of the last event on this node.
+    google.protobuf.Timestamp event_time = 5;
+    // Whether the generator has finished producing values.
+    bool done = 6;
+    // Number of values emitted by this generator.
+    uint64 eval_count = 7;
+    // Per-step transform pipeline state.
+    repeated Transform transforms = 8;
+    // Current lifecycle phase of this node.
+    Phase phase = 9 [(buf.validate.field).enum.defined_only = true];
+  }
+
+  // VarNode is the runtime state of a var (intermediate variable) node.
+  message VarNode {
+    // Node identifier, matches the Var.id from the flow spec.
+    string id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+    ];
+    // UUIDv7 of the event that produced this node's current snapshot state.
+    // Usable as an after_event_id cursor for replay.
+    string event_id = 2 [
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+      (buf.validate.field).string.uuid = true
+    ];
+    // Last evaluated value.
+    cel.expr.Value value = 3;
+    // Error status if the node encountered a failure.
+    google.rpc.Status error = 4;
+    // Timestamp of the last event on this node.
+    google.protobuf.Timestamp event_time = 5;
+    // Number of times this var has been evaluated.
+    uint64 eval_count = 6;
+    // Per-step transform pipeline state.
+    repeated Transform transforms = 7;
+    // Current lifecycle phase of this node.
+    Phase phase = 8 [(buf.validate.field).enum.defined_only = true];
+  }
+
+  // ActionNode is the runtime state of a unary RPC action node.
+  message ActionNode {
+    // Node identifier, matches the Action.id from the flow spec.
+    string id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+    ];
+    // UUIDv7 of the event that produced this node's current snapshot state.
+    // Usable as an after_event_id cursor for replay.
+    string event_id = 2 [
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+      (buf.validate.field).string.uuid = true
+    ];
+    // Last RPC response value.
+    cel.expr.Value value = 3;
+    // Error status if the RPC or node encountered a failure.
+    google.rpc.Status error = 4;
+    // Timestamp of the last event on this node.
+    google.protobuf.Timestamp event_time = 5;
+    // Number of times this action has been invoked.
+    uint64 eval_count = 6;
+    // Timestamp when the current/last RPC call started.
+    google.protobuf.Timestamp start = 7;
+    // Timestamp when the current/last RPC call completed.
+    google.protobuf.Timestamp end = 8;
+    // Current lifecycle phase of this node.
+    Phase phase = 9 [(buf.validate.field).enum.defined_only = true];
+  }
+
+  // StreamNode is the runtime state of a streaming RPC node.
+  message StreamNode {
+    // Node identifier, matches the Stream.id from the flow spec.
+    string id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+    ];
+    // UUIDv7 of the event that produced this node's current snapshot state.
+    // Usable as an after_event_id cursor for replay.
+    string event_id = 2 [
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+      (buf.validate.field).string.uuid = true
+    ];
+    // Last received response value from the stream.
+    cel.expr.Value value = 3;
+    // Error status if the stream or node encountered a failure.
+    google.rpc.Status error = 4;
+    // Timestamp of the last event on this node.
+    google.protobuf.Timestamp event_time = 5;
+    // Whether the client (request) side of the stream has been closed.
+    bool request_closed = 6;
+    // Whether the server (response) side of the stream has been closed.
+    bool response_closed = 7;
+    // Number of request messages sent on the stream.
+    uint64 request_count = 8;
+    // Number of response messages received from the stream.
+    uint64 response_count = 9;
+    // Timestamp when the stream was opened.
+    google.protobuf.Timestamp start = 10;
+    // Timestamp when the stream was fully closed.
+    google.protobuf.Timestamp end = 11;
+    // Current lifecycle phase of this node.
+    Phase phase = 12 [(buf.validate.field).enum.defined_only = true];
+  }
+
+  // OutputNode is the runtime state of an output node.
+  message OutputNode {
+    // Node identifier, matches the Output.id from the flow spec.
+    string id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+    ];
+    // UUIDv7 of the event that produced this node's current snapshot state.
+    // Usable as an after_event_id cursor for replay.
+    string event_id = 2 [
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+      (buf.validate.field).string.uuid = true
+    ];
+    // Last evaluated output value.
+    cel.expr.Value value = 3;
+    // Error status if the node encountered a failure.
+    google.rpc.Status error = 4;
+    // Timestamp of the last event on this node.
+    google.protobuf.Timestamp event_time = 5;
+    // Number of times this output has been evaluated.
+    uint64 eval_count = 6;
+    // Per-step transform pipeline state.
+    repeated Transform transforms = 7;
+    // Whether the output has been closed.
+    bool closed = 8;
+    // Current lifecycle phase of this node.
+    Phase phase = 9 [(buf.validate.field).enum.defined_only = true];
+  }
+
+  // InteractionNode is the runtime state of an interaction node.
+  message InteractionNode {
+    // Node identifier, matches the Interaction inputs' container from the flow spec.
+    string id = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+    ];
+    // UUIDv7 of the event that produced this node's current snapshot state.
+    // Usable as an after_event_id cursor for replay.
+    string event_id = 2 [
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+      (buf.validate.field).string.uuid = true
+    ];
+    // Last received interaction response value.
+    cel.expr.Value value = 3;
+    // Error status if the node encountered a failure.
+    google.rpc.Status error = 4;
+    // Timestamp of the last event on this node.
+    google.protobuf.Timestamp event_time = 5;
+    // Whether the interaction form has been submitted.
+    bool submitted = 6;
+    // Per-step transform pipeline state.
+    repeated Transform transforms = 7;
+    // Current lifecycle phase of this node.
+    Phase phase = 8 [(buf.validate.field).enum.defined_only = true];
+    // Single-use opaque UUIDv7 token for the outstanding interaction request.
+    // Presence indicates the node is waiting for an InteractionResponseEvent.
+    // Cleared when a matching response is consumed.
+    string token = 9 [
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+      (buf.validate.field).string.uuid = true
+    ];
+  }
+
+  // FlowState is the flow-level runtime state. Stored in both the snapshot
+  // (materialized latest) and in FlowEvent (for persistent phase transitions).
+  message FlowState {
+    // Current flow-level phase.
+    Phase phase = 1 [(buf.validate.field).enum.defined_only = true];
+    // Error status when the flow fails or errors.
+    google.rpc.Status error = 2;
+    // Timestamp when execution started (PENDING -> RUNNING).
+    google.protobuf.Timestamp start_time = 3;
+    // Timestamp when execution ended (any terminal phase).
+    google.protobuf.Timestamp stop_time = 4;
+    // Timestamp of this state change event.
+    google.protobuf.Timestamp event_time = 5;
+    // UUIDv7 cursor for replay.
+    string event_id = 6 [
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+      (buf.validate.field).string.uuid = true
+    ];
+  }
+
+  // FlowEvent is the single event type stored in the outbox, in-memory buffer,
+  // and persistent FlowEvent table. Covers both node state changes and
+  // flow-level phase transitions.
+  //
+  // event_type rules:
+  //   EVENT_TYPE_NODE_OUTPUT -- node produced a value (or EOF). Downstream CEL
+  //                            expressions evaluate against this event.
+  //   EVENT_TYPE_NODE_UPDATE -- node has new internal state (e.g. reduce
+  //                            accumulator) but produced no output value yet.
+  //                            Downstream subscribers skip.
+  //   EVENT_TYPE_FLOW_UPDATE -- flow-level phase transition (e.g. PENDING ->
+  //                            RUNNING, RUNNING -> SUCCEEDED). Stored for
+  //                            replay; projected to ReceiveFlowRunEvent.flowrun.
+  message FlowEvent {
+    enum EventType {
+      EVENT_TYPE_UNSPECIFIED = 0;
+      EVENT_TYPE_NODE_OUTPUT = 1;
+      EVENT_TYPE_NODE_UPDATE = 2;
+      EVENT_TYPE_FLOW_UPDATE = 3;
+    }
+
+    // Discriminates the event's purpose.
+    EventType event_type = 1 [(buf.validate.field).enum.defined_only = true];
+
+    // The typed data associated with this event. Node events carry a node
+    // variant; flow events carry FlowState.
+    oneof data {
+      option (buf.validate.oneof).required = true;
+      // Input node state.
+      InputNode input = 2;
+      // Generator node state.
+      GeneratorNode generator = 3;
+      // Var node state.
+      VarNode var = 4;
+      // Action node state.
+      ActionNode action = 5;
+      // Stream node state.
+      StreamNode stream = 6;
+      // Output node state.
+      OutputNode output = 7;
+      // Interaction node state.
+      InteractionNode interaction = 8;
+      // Flow-level state change.
+      FlowState flow = 9;
+    }
+  }
+
+  // Snapshot: the full materialized state at a point in time.
+  // Built from the latest FlowEvent per node ID (+ flow state) in the outbox.
+
+  // Flow-level state (latest FlowState applied).
+  FlowState flow = 1;
+
+  // Input node states keyed by node ID.
+  map<string, InputNode> inputs = 2;
+  // Generator node states keyed by node ID.
+  map<string, GeneratorNode> generators = 3;
+  // Var node states keyed by node ID.
+  map<string, VarNode> vars = 4;
+  // Action node states keyed by node ID.
+  map<string, ActionNode> actions = 5;
+  // Stream node states keyed by node ID.
+  map<string, StreamNode> streams = 6;
+  // Output node states keyed by node ID.
+  map<string, OutputNode> outputs = 7;
+  // Interaction node states keyed by node ID.
+  map<string, InteractionNode> interactions = 8;
+}

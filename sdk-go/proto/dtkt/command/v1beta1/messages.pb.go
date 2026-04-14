@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/command/v1beta1/messages.proto
 
+//go:build !protoopaque
+
 package commandv1beta1
 
 import (
@@ -12,7 +14,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -73,14 +74,9 @@ func (x CommandResult_Reason) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use CommandResult_Reason.Descriptor instead.
-func (CommandResult_Reason) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{11, 0}
-}
-
 // Configuration for remote SSH execution.
 type SSHConfig struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Hostname or IP address and port of the SSH server
 	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
 	// Username for SSH authentication
@@ -140,11 +136,6 @@ func (x *SSHConfig) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SSHConfig.ProtoReflect.Descriptor instead.
-func (*SSHConfig) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *SSHConfig) GetAddress() string {
@@ -252,6 +243,325 @@ func (x *SSHConfig) GetConfigFilePath() string {
 	return ""
 }
 
+func (x *SSHConfig) SetAddress(v string) {
+	x.Address = v
+}
+
+func (x *SSHConfig) SetUser(v string) {
+	x.User = v
+}
+
+func (x *SSHConfig) SetPrivateKey(v *SSHConfig_PrivateKeyAuth) {
+	if v == nil {
+		x.Auth = nil
+		return
+	}
+	x.Auth = &SSHConfig_PrivateKey{v}
+}
+
+func (x *SSHConfig) SetIdentityFile(v *SSHConfig_IdentityFileAuth) {
+	if v == nil {
+		x.Auth = nil
+		return
+	}
+	x.Auth = &SSHConfig_IdentityFile{v}
+}
+
+func (x *SSHConfig) SetPassword(v string) {
+	x.Auth = &SSHConfig_Password{v}
+}
+
+func (x *SSHConfig) SetTofuFilePath(v string) {
+	x.HostKeyVerification = &SSHConfig_TofuFilePath{v}
+}
+
+func (x *SSHConfig) SetKnownHosts(v *SSHConfig_KnownHosts) {
+	if v == nil {
+		x.HostKeyVerification = nil
+		return
+	}
+	x.HostKeyVerification = &SSHConfig_KnownHosts_{v}
+}
+
+func (x *SSHConfig) SetFingerprint(v string) {
+	x.HostKeyVerification = &SSHConfig_Fingerprint{v}
+}
+
+func (x *SSHConfig) SetInsecureSkipVerify(v bool) {
+	x.HostKeyVerification = &SSHConfig_InsecureSkipVerify{v}
+}
+
+func (x *SSHConfig) SetProxyCommand(v string) {
+	x.ProxyCommand = v
+}
+
+func (x *SSHConfig) SetConfigFilePath(v string) {
+	x.ConfigFilePath = v
+}
+
+func (x *SSHConfig) HasAuth() bool {
+	if x == nil {
+		return false
+	}
+	return x.Auth != nil
+}
+
+func (x *SSHConfig) HasPrivateKey() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Auth.(*SSHConfig_PrivateKey)
+	return ok
+}
+
+func (x *SSHConfig) HasIdentityFile() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Auth.(*SSHConfig_IdentityFile)
+	return ok
+}
+
+func (x *SSHConfig) HasPassword() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Auth.(*SSHConfig_Password)
+	return ok
+}
+
+func (x *SSHConfig) HasHostKeyVerification() bool {
+	if x == nil {
+		return false
+	}
+	return x.HostKeyVerification != nil
+}
+
+func (x *SSHConfig) HasTofuFilePath() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.HostKeyVerification.(*SSHConfig_TofuFilePath)
+	return ok
+}
+
+func (x *SSHConfig) HasKnownHosts() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.HostKeyVerification.(*SSHConfig_KnownHosts_)
+	return ok
+}
+
+func (x *SSHConfig) HasFingerprint() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.HostKeyVerification.(*SSHConfig_Fingerprint)
+	return ok
+}
+
+func (x *SSHConfig) HasInsecureSkipVerify() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.HostKeyVerification.(*SSHConfig_InsecureSkipVerify)
+	return ok
+}
+
+func (x *SSHConfig) ClearAuth() {
+	x.Auth = nil
+}
+
+func (x *SSHConfig) ClearPrivateKey() {
+	if _, ok := x.Auth.(*SSHConfig_PrivateKey); ok {
+		x.Auth = nil
+	}
+}
+
+func (x *SSHConfig) ClearIdentityFile() {
+	if _, ok := x.Auth.(*SSHConfig_IdentityFile); ok {
+		x.Auth = nil
+	}
+}
+
+func (x *SSHConfig) ClearPassword() {
+	if _, ok := x.Auth.(*SSHConfig_Password); ok {
+		x.Auth = nil
+	}
+}
+
+func (x *SSHConfig) ClearHostKeyVerification() {
+	x.HostKeyVerification = nil
+}
+
+func (x *SSHConfig) ClearTofuFilePath() {
+	if _, ok := x.HostKeyVerification.(*SSHConfig_TofuFilePath); ok {
+		x.HostKeyVerification = nil
+	}
+}
+
+func (x *SSHConfig) ClearKnownHosts() {
+	if _, ok := x.HostKeyVerification.(*SSHConfig_KnownHosts_); ok {
+		x.HostKeyVerification = nil
+	}
+}
+
+func (x *SSHConfig) ClearFingerprint() {
+	if _, ok := x.HostKeyVerification.(*SSHConfig_Fingerprint); ok {
+		x.HostKeyVerification = nil
+	}
+}
+
+func (x *SSHConfig) ClearInsecureSkipVerify() {
+	if _, ok := x.HostKeyVerification.(*SSHConfig_InsecureSkipVerify); ok {
+		x.HostKeyVerification = nil
+	}
+}
+
+const SSHConfig_Auth_not_set_case case_SSHConfig_Auth = 0
+const SSHConfig_PrivateKey_case case_SSHConfig_Auth = 3
+const SSHConfig_IdentityFile_case case_SSHConfig_Auth = 4
+const SSHConfig_Password_case case_SSHConfig_Auth = 5
+
+func (x *SSHConfig) WhichAuth() case_SSHConfig_Auth {
+	if x == nil {
+		return SSHConfig_Auth_not_set_case
+	}
+	switch x.Auth.(type) {
+	case *SSHConfig_PrivateKey:
+		return SSHConfig_PrivateKey_case
+	case *SSHConfig_IdentityFile:
+		return SSHConfig_IdentityFile_case
+	case *SSHConfig_Password:
+		return SSHConfig_Password_case
+	default:
+		return SSHConfig_Auth_not_set_case
+	}
+}
+
+const SSHConfig_HostKeyVerification_not_set_case case_SSHConfig_HostKeyVerification = 0
+const SSHConfig_TofuFilePath_case case_SSHConfig_HostKeyVerification = 6
+const SSHConfig_KnownHosts_case case_SSHConfig_HostKeyVerification = 7
+const SSHConfig_Fingerprint_case case_SSHConfig_HostKeyVerification = 8
+const SSHConfig_InsecureSkipVerify_case case_SSHConfig_HostKeyVerification = 9
+
+func (x *SSHConfig) WhichHostKeyVerification() case_SSHConfig_HostKeyVerification {
+	if x == nil {
+		return SSHConfig_HostKeyVerification_not_set_case
+	}
+	switch x.HostKeyVerification.(type) {
+	case *SSHConfig_TofuFilePath:
+		return SSHConfig_TofuFilePath_case
+	case *SSHConfig_KnownHosts_:
+		return SSHConfig_KnownHosts_case
+	case *SSHConfig_Fingerprint:
+		return SSHConfig_Fingerprint_case
+	case *SSHConfig_InsecureSkipVerify:
+		return SSHConfig_InsecureSkipVerify_case
+	default:
+		return SSHConfig_HostKeyVerification_not_set_case
+	}
+}
+
+type SSHConfig_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Hostname or IP address and port of the SSH server
+	Address string
+	// Username for SSH authentication
+	User string
+	// Authentication method
+	// If not provided, uses SSH agent by default (matches SSH CLI behavior)
+
+	// Fields of oneof Auth:
+	// Private key authentication
+	PrivateKey *SSHConfig_PrivateKeyAuth
+	// Identity file authentication
+	IdentityFile *SSHConfig_IdentityFileAuth
+	// Password authentication (not recommended - use key-based auth)
+	Password *string
+	// -- end of Auth
+	// Host key verification method
+	// If unset, defaults to Trust On First Use (TOFU) using ~/.ssh/known_hosts_tofu
+
+	// Fields of oneof HostKeyVerification:
+	// Trust On First Use: Accept any key on first connection, store it,
+	// then verify against stored key on subsequent connections.
+	// Specifies custom path for storing trusted keys.
+	TofuFilePath *string
+	// Verify against known_hosts files (uses default locations if empty)
+	KnownHosts *SSHConfig_KnownHosts
+	// Verify against specific fingerprint (SHA256 or MD5 format)
+	// Examples: "SHA256:abc123..." or "MD5:12:34:56:..."
+	// Get fingerprint: `ssh-keyscan -p <port> <host> 2>/dev/null | ssh-keygen -lf -`
+	Fingerprint *string
+	// Skip verification (INSECURE)
+	InsecureSkipVerify *bool
+	// -- end of HostKeyVerification
+	// ProxyCommand to tunnel SSH connection through another command
+	// Example: `cloudflared access ssh --hostname %h`
+	// Supports variable expansion: `%h=hostname`, `%p=port`, `%r=remote-user`
+	// Takes precedence over config_file_path ProxyCommand if both are set
+	ProxyCommand string
+	// Path to SSH config file for default settings
+	// If unset, defaults to ~/.ssh/config
+	// Explicit settings above take precedence over config file values
+	ConfigFilePath string
+}
+
+func (b0 SSHConfig_builder) Build() *SSHConfig {
+	m0 := &SSHConfig{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Address = b.Address
+	x.User = b.User
+	if b.PrivateKey != nil {
+		x.Auth = &SSHConfig_PrivateKey{b.PrivateKey}
+	}
+	if b.IdentityFile != nil {
+		x.Auth = &SSHConfig_IdentityFile{b.IdentityFile}
+	}
+	if b.Password != nil {
+		x.Auth = &SSHConfig_Password{*b.Password}
+	}
+	if b.TofuFilePath != nil {
+		x.HostKeyVerification = &SSHConfig_TofuFilePath{*b.TofuFilePath}
+	}
+	if b.KnownHosts != nil {
+		x.HostKeyVerification = &SSHConfig_KnownHosts_{b.KnownHosts}
+	}
+	if b.Fingerprint != nil {
+		x.HostKeyVerification = &SSHConfig_Fingerprint{*b.Fingerprint}
+	}
+	if b.InsecureSkipVerify != nil {
+		x.HostKeyVerification = &SSHConfig_InsecureSkipVerify{*b.InsecureSkipVerify}
+	}
+	x.ProxyCommand = b.ProxyCommand
+	x.ConfigFilePath = b.ConfigFilePath
+	return m0
+}
+
+type case_SSHConfig_Auth protoreflect.FieldNumber
+
+func (x case_SSHConfig_Auth) String() string {
+	md := file_dtkt_command_v1beta1_messages_proto_msgTypes[0].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
+type case_SSHConfig_HostKeyVerification protoreflect.FieldNumber
+
+func (x case_SSHConfig_HostKeyVerification) String() string {
+	md := file_dtkt_command_v1beta1_messages_proto_msgTypes[0].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isSSHConfig_Auth interface {
 	isSSHConfig_Auth()
 }
@@ -315,7 +625,7 @@ func (*SSHConfig_InsecureSkipVerify) isSSHConfig_HostKeyVerification() {}
 
 // Describes a command.
 type CommandDoc struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
+	state          protoimpl.MessageState `protogen:"hybrid.v1"`
 	Usage          string                 `protobuf:"bytes,1,opt,name=usage,proto3" json:"usage,omitempty"`
 	Short          string                 `protobuf:"bytes,2,opt,name=short,proto3" json:"short,omitempty"`
 	Long           string                 `protobuf:"bytes,3,opt,name=long,proto3" json:"long,omitempty"`
@@ -349,11 +659,6 @@ func (x *CommandDoc) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CommandDoc.ProtoReflect.Descriptor instead.
-func (*CommandDoc) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *CommandDoc) GetUsage() string {
@@ -398,9 +703,57 @@ func (x *CommandDoc) GetInheritedFlags() []*FlagDoc {
 	return nil
 }
 
+func (x *CommandDoc) SetUsage(v string) {
+	x.Usage = v
+}
+
+func (x *CommandDoc) SetShort(v string) {
+	x.Short = v
+}
+
+func (x *CommandDoc) SetLong(v string) {
+	x.Long = v
+}
+
+func (x *CommandDoc) SetExamples(v []string) {
+	x.Examples = v
+}
+
+func (x *CommandDoc) SetFlags(v []*FlagDoc) {
+	x.Flags = v
+}
+
+func (x *CommandDoc) SetInheritedFlags(v []*FlagDoc) {
+	x.InheritedFlags = v
+}
+
+type CommandDoc_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Usage          string
+	Short          string
+	Long           string
+	Examples       []string
+	Flags          []*FlagDoc
+	InheritedFlags []*FlagDoc
+}
+
+func (b0 CommandDoc_builder) Build() *CommandDoc {
+	m0 := &CommandDoc{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Usage = b.Usage
+	x.Short = b.Short
+	x.Long = b.Long
+	x.Examples = b.Examples
+	x.Flags = b.Flags
+	x.InheritedFlags = b.InheritedFlags
+	return m0
+}
+
 // Describes a command flag.
 type FlagDoc struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Shorthand     string                 `protobuf:"bytes,2,opt,name=shorthand,proto3" json:"shorthand,omitempty"`
 	Usage         string                 `protobuf:"bytes,3,opt,name=usage,proto3" json:"usage,omitempty"`
@@ -434,11 +787,6 @@ func (x *FlagDoc) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FlagDoc.ProtoReflect.Descriptor instead.
-func (*FlagDoc) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *FlagDoc) GetName() string {
 	if x != nil {
 		return x.Name
@@ -467,8 +815,44 @@ func (x *FlagDoc) GetDefaultValue() string {
 	return ""
 }
 
+func (x *FlagDoc) SetName(v string) {
+	x.Name = v
+}
+
+func (x *FlagDoc) SetShorthand(v string) {
+	x.Shorthand = v
+}
+
+func (x *FlagDoc) SetUsage(v string) {
+	x.Usage = v
+}
+
+func (x *FlagDoc) SetDefaultValue(v string) {
+	x.DefaultValue = v
+}
+
+type FlagDoc_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name         string
+	Shorthand    string
+	Usage        string
+	DefaultValue string
+}
+
+func (b0 FlagDoc_builder) Build() *FlagDoc {
+	m0 := &FlagDoc{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Shorthand = b.Shorthand
+	x.Usage = b.Usage
+	x.DefaultValue = b.DefaultValue
+	return m0
+}
+
 type Command struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	Commands      []*CommandDoc          `protobuf:"bytes,3,rep,name=commands,proto3" json:"commands,omitempty"`
@@ -501,11 +885,6 @@ func (x *Command) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Command.ProtoReflect.Descriptor instead.
-func (*Command) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *Command) GetName() string {
 	if x != nil {
 		return x.Name
@@ -527,8 +906,38 @@ func (x *Command) GetCommands() []*CommandDoc {
 	return nil
 }
 
+func (x *Command) SetName(v string) {
+	x.Name = v
+}
+
+func (x *Command) SetDescription(v string) {
+	x.Description = v
+}
+
+func (x *Command) SetCommands(v []*CommandDoc) {
+	x.Commands = v
+}
+
+type Command_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name        string
+	Description string
+	Commands    []*CommandDoc
+}
+
+func (b0 Command_builder) Build() *Command {
+	m0 := &Command{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Description = b.Description
+	x.Commands = b.Commands
+	return m0
+}
+
 type ListCommandsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Commands      []*Command             `protobuf:"bytes,1,rep,name=commands,proto3" json:"commands,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -559,11 +968,6 @@ func (x *ListCommandsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListCommandsResponse.ProtoReflect.Descriptor instead.
-func (*ListCommandsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *ListCommandsResponse) GetCommands() []*Command {
 	if x != nil {
 		return x.Commands
@@ -571,8 +975,26 @@ func (x *ListCommandsResponse) GetCommands() []*Command {
 	return nil
 }
 
+func (x *ListCommandsResponse) SetCommands(v []*Command) {
+	x.Commands = v
+}
+
+type ListCommandsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Commands []*Command
+}
+
+func (b0 ListCommandsResponse_builder) Build() *ListCommandsResponse {
+	m0 := &ListCommandsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Commands = b.Commands
+	return m0
+}
+
 type GetCommandRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -603,11 +1025,6 @@ func (x *GetCommandRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetCommandRequest.ProtoReflect.Descriptor instead.
-func (*GetCommandRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *GetCommandRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -615,8 +1032,26 @@ func (x *GetCommandRequest) GetName() string {
 	return ""
 }
 
+func (x *GetCommandRequest) SetName(v string) {
+	x.Name = v
+}
+
+type GetCommandRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name string
+}
+
+func (b0 GetCommandRequest_builder) Build() *GetCommandRequest {
+	m0 := &GetCommandRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 type GetCommandResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Command       []*Command             `protobuf:"bytes,1,rep,name=command,proto3" json:"command,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -647,11 +1082,6 @@ func (x *GetCommandResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetCommandResponse.ProtoReflect.Descriptor instead.
-func (*GetCommandResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *GetCommandResponse) GetCommand() []*Command {
 	if x != nil {
 		return x.Command
@@ -659,9 +1089,27 @@ func (x *GetCommandResponse) GetCommand() []*Command {
 	return nil
 }
 
+func (x *GetCommandResponse) SetCommand(v []*Command) {
+	x.Command = v
+}
+
+type GetCommandResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Command []*Command
+}
+
+func (b0 GetCommandResponse_builder) Build() *GetCommandResponse {
+	m0 := &GetCommandResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Command = b.Command
+	return m0
+}
+
 // A command to execute.
 type ExecutableCommand struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Command executable.
 	Command string               `protobuf:"bytes,1,opt,name=command,proto3" json:"command,omitempty"`
 	Args    []string             `protobuf:"bytes,2,rep,name=args,proto3" json:"args,omitempty"`                                                                         // Arguments to pass to the command
@@ -700,11 +1148,6 @@ func (x *ExecutableCommand) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ExecutableCommand.ProtoReflect.Descriptor instead.
-func (*ExecutableCommand) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ExecutableCommand) GetCommand() string {
@@ -749,9 +1192,73 @@ func (x *ExecutableCommand) GetExpectsStdin() bool {
 	return false
 }
 
+func (x *ExecutableCommand) SetCommand(v string) {
+	x.Command = v
+}
+
+func (x *ExecutableCommand) SetArgs(v []string) {
+	x.Args = v
+}
+
+func (x *ExecutableCommand) SetWorkdir(v string) {
+	x.Workdir = v
+}
+
+func (x *ExecutableCommand) SetEnv(v map[string]string) {
+	x.Env = v
+}
+
+func (x *ExecutableCommand) SetTimeout(v *durationpb.Duration) {
+	x.Timeout = v
+}
+
+func (x *ExecutableCommand) SetExpectsStdin(v bool) {
+	x.ExpectsStdin = v
+}
+
+func (x *ExecutableCommand) HasTimeout() bool {
+	if x == nil {
+		return false
+	}
+	return x.Timeout != nil
+}
+
+func (x *ExecutableCommand) ClearTimeout() {
+	x.Timeout = nil
+}
+
+type ExecutableCommand_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Command executable.
+	Command string
+	Args    []string
+	Workdir string
+	Env     map[string]string
+	Timeout *durationpb.Duration
+	// Indicates whether this command expects stdin input.
+	// When false, stdin is not opened (command has no stdin).
+	// When true, stdin is opened and remains available for streaming input until EOF is explicitly sent.
+	// Default: false (most commands don't need stdin)
+	ExpectsStdin bool
+}
+
+func (b0 ExecutableCommand_builder) Build() *ExecutableCommand {
+	m0 := &ExecutableCommand{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Command = b.Command
+	x.Args = b.Args
+	x.Workdir = b.Workdir
+	x.Env = b.Env
+	x.Timeout = b.Timeout
+	x.ExpectsStdin = b.ExpectsStdin
+	return m0
+}
+
 // A shell command to execute.
 type ShellCommand struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The shell command (supports pipes and redirects).
 	Command string               `protobuf:"bytes,1,opt,name=command,proto3" json:"command,omitempty"`
 	Workdir string               `protobuf:"bytes,3,opt,name=workdir,proto3" json:"workdir,omitempty"`                                                                   // Optional working directory
@@ -791,11 +1298,6 @@ func (x *ShellCommand) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ShellCommand.ProtoReflect.Descriptor instead.
-func (*ShellCommand) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *ShellCommand) GetCommand() string {
 	if x != nil {
 		return x.Command
@@ -831,9 +1333,67 @@ func (x *ShellCommand) GetExpectsStdin() bool {
 	return false
 }
 
+func (x *ShellCommand) SetCommand(v string) {
+	x.Command = v
+}
+
+func (x *ShellCommand) SetWorkdir(v string) {
+	x.Workdir = v
+}
+
+func (x *ShellCommand) SetEnv(v map[string]string) {
+	x.Env = v
+}
+
+func (x *ShellCommand) SetTimeout(v *durationpb.Duration) {
+	x.Timeout = v
+}
+
+func (x *ShellCommand) SetExpectsStdin(v bool) {
+	x.ExpectsStdin = v
+}
+
+func (x *ShellCommand) HasTimeout() bool {
+	if x == nil {
+		return false
+	}
+	return x.Timeout != nil
+}
+
+func (x *ShellCommand) ClearTimeout() {
+	x.Timeout = nil
+}
+
+type ShellCommand_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The shell command (supports pipes and redirects).
+	Command string
+	Workdir string
+	Env     map[string]string
+	Timeout *durationpb.Duration
+	// Indicates whether this command expects stdin input.
+	// When false, stdin is not opened (command has no stdin).
+	// When true, stdin is opened and remains available for streaming input until EOF is explicitly sent.
+	// Default: false (most commands don't need stdin)
+	ExpectsStdin bool
+}
+
+func (b0 ShellCommand_builder) Build() *ShellCommand {
+	m0 := &ShellCommand{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Command = b.Command
+	x.Workdir = b.Workdir
+	x.Env = b.Env
+	x.Timeout = b.Timeout
+	x.ExpectsStdin = b.ExpectsStdin
+	return m0
+}
+
 // A single stdin chunk or signal for streaming commands.
 type CommandInput struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Stdin         []byte                 `protobuf:"bytes,1,opt,name=stdin,proto3" json:"stdin,omitempty"`                                     // User input
 	Eof           bool                   `protobuf:"varint,2,opt,name=eof,proto3" json:"eof,omitempty"`                                        // End of input
 	Signal        Signal                 `protobuf:"varint,3,opt,name=signal,proto3,enum=dtkt.command.v1beta1.Signal" json:"signal,omitempty"` // Signal to send (e.g., SIGTERM)
@@ -866,11 +1426,6 @@ func (x *CommandInput) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CommandInput.ProtoReflect.Descriptor instead.
-func (*CommandInput) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *CommandInput) GetStdin() []byte {
 	if x != nil {
 		return x.Stdin
@@ -892,9 +1447,42 @@ func (x *CommandInput) GetSignal() Signal {
 	return Signal_SIGNAL_UNSPECIFIED
 }
 
+func (x *CommandInput) SetStdin(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.Stdin = v
+}
+
+func (x *CommandInput) SetEof(v bool) {
+	x.Eof = v
+}
+
+func (x *CommandInput) SetSignal(v Signal) {
+	x.Signal = v
+}
+
+type CommandInput_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Stdin  []byte
+	Eof    bool
+	Signal Signal
+}
+
+func (b0 CommandInput_builder) Build() *CommandInput {
+	m0 := &CommandInput{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Stdin = b.Stdin
+	x.Eof = b.Eof
+	x.Signal = b.Signal
+	return m0
+}
+
 // stdout and stderr chunks
 type CommandOutput struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Stdout        []byte                 `protobuf:"bytes,1,opt,name=stdout,proto3" json:"stdout,omitempty"` // Standard output chunk
 	Stderr        []byte                 `protobuf:"bytes,2,opt,name=stderr,proto3" json:"stderr,omitempty"` // Standard error chunk
 	unknownFields protoimpl.UnknownFields
@@ -926,11 +1514,6 @@ func (x *CommandOutput) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CommandOutput.ProtoReflect.Descriptor instead.
-func (*CommandOutput) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *CommandOutput) GetStdout() []byte {
 	if x != nil {
 		return x.Stdout
@@ -945,9 +1528,39 @@ func (x *CommandOutput) GetStderr() []byte {
 	return nil
 }
 
+func (x *CommandOutput) SetStdout(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.Stdout = v
+}
+
+func (x *CommandOutput) SetStderr(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.Stderr = v
+}
+
+type CommandOutput_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Stdout []byte
+	Stderr []byte
+}
+
+func (b0 CommandOutput_builder) Build() *CommandOutput {
+	m0 := &CommandOutput{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Stdout = b.Stdout
+	x.Stderr = b.Stderr
+	return m0
+}
+
 // The result of a command execution.
 type CommandResult struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	ExitCode      int32                  `protobuf:"varint,1,opt,name=exit_code,json=exitCode,proto3" json:"exit_code,omitempty"`                            // Exit code of the command
 	Reason        CommandResult_Reason   `protobuf:"varint,2,opt,name=reason,proto3,enum=dtkt.command.v1beta1.CommandResult_Reason" json:"reason,omitempty"` // Reason for command termination
 	Duration      *durationpb.Duration   `protobuf:"bytes,3,opt,name=duration,proto3" json:"duration,omitempty"`                                             // Duration of the command execution
@@ -980,11 +1593,6 @@ func (x *CommandResult) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CommandResult.ProtoReflect.Descriptor instead.
-func (*CommandResult) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{11}
-}
-
 func (x *CommandResult) GetExitCode() int32 {
 	if x != nil {
 		return x.ExitCode
@@ -1006,8 +1614,49 @@ func (x *CommandResult) GetDuration() *durationpb.Duration {
 	return nil
 }
 
+func (x *CommandResult) SetExitCode(v int32) {
+	x.ExitCode = v
+}
+
+func (x *CommandResult) SetReason(v CommandResult_Reason) {
+	x.Reason = v
+}
+
+func (x *CommandResult) SetDuration(v *durationpb.Duration) {
+	x.Duration = v
+}
+
+func (x *CommandResult) HasDuration() bool {
+	if x == nil {
+		return false
+	}
+	return x.Duration != nil
+}
+
+func (x *CommandResult) ClearDuration() {
+	x.Duration = nil
+}
+
+type CommandResult_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	ExitCode int32
+	Reason   CommandResult_Reason
+	Duration *durationpb.Duration
+}
+
+func (b0 CommandResult_builder) Build() *CommandResult {
+	m0 := &CommandResult{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ExitCode = b.ExitCode
+	x.Reason = b.Reason
+	x.Duration = b.Duration
+	return m0
+}
+
 type BatchResult struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Output        *CommandOutput         `protobuf:"bytes,1,opt,name=output,proto3" json:"output,omitempty"` // Output (stdout/stderr)
 	Result        *CommandResult         `protobuf:"bytes,2,opt,name=result,proto3" json:"result,omitempty"` // Final command result
 	unknownFields protoimpl.UnknownFields
@@ -1039,11 +1688,6 @@ func (x *BatchResult) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BatchResult.ProtoReflect.Descriptor instead.
-func (*BatchResult) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{12}
-}
-
 func (x *BatchResult) GetOutput() *CommandOutput {
 	if x != nil {
 		return x.Output
@@ -1058,9 +1702,55 @@ func (x *BatchResult) GetResult() *CommandResult {
 	return nil
 }
 
+func (x *BatchResult) SetOutput(v *CommandOutput) {
+	x.Output = v
+}
+
+func (x *BatchResult) SetResult(v *CommandResult) {
+	x.Result = v
+}
+
+func (x *BatchResult) HasOutput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Output != nil
+}
+
+func (x *BatchResult) HasResult() bool {
+	if x == nil {
+		return false
+	}
+	return x.Result != nil
+}
+
+func (x *BatchResult) ClearOutput() {
+	x.Output = nil
+}
+
+func (x *BatchResult) ClearResult() {
+	x.Result = nil
+}
+
+type BatchResult_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Output *CommandOutput
+	Result *CommandResult
+}
+
+func (b0 BatchResult_builder) Build() *BatchResult {
+	m0 := &BatchResult{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Output = b.Output
+	x.Result = b.Result
+	return m0
+}
+
 // The request for executing a command.
 type ExecuteCommandRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The command to execute
 	Command       *ExecutableCommand `protobuf:"bytes,1,opt,name=command,proto3" json:"command,omitempty"`
 	Input         *CommandInput      `protobuf:"bytes,2,opt,name=input,proto3" json:"input,omitempty"`
@@ -1093,11 +1783,6 @@ func (x *ExecuteCommandRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteCommandRequest.ProtoReflect.Descriptor instead.
-func (*ExecuteCommandRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{13}
-}
-
 func (x *ExecuteCommandRequest) GetCommand() *ExecutableCommand {
 	if x != nil {
 		return x.Command
@@ -1112,9 +1797,56 @@ func (x *ExecuteCommandRequest) GetInput() *CommandInput {
 	return nil
 }
 
+func (x *ExecuteCommandRequest) SetCommand(v *ExecutableCommand) {
+	x.Command = v
+}
+
+func (x *ExecuteCommandRequest) SetInput(v *CommandInput) {
+	x.Input = v
+}
+
+func (x *ExecuteCommandRequest) HasCommand() bool {
+	if x == nil {
+		return false
+	}
+	return x.Command != nil
+}
+
+func (x *ExecuteCommandRequest) HasInput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Input != nil
+}
+
+func (x *ExecuteCommandRequest) ClearCommand() {
+	x.Command = nil
+}
+
+func (x *ExecuteCommandRequest) ClearInput() {
+	x.Input = nil
+}
+
+type ExecuteCommandRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The command to execute
+	Command *ExecutableCommand
+	Input   *CommandInput
+}
+
+func (b0 ExecuteCommandRequest_builder) Build() *ExecuteCommandRequest {
+	m0 := &ExecuteCommandRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Command = b.Command
+	x.Input = b.Input
+	return m0
+}
+
 // The response for executing a command.
 type ExecuteCommandResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Result        *CommandResult         `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"` // The command result
 	Output        *CommandOutput         `protobuf:"bytes,2,opt,name=output,proto3" json:"output,omitempty"` // Output (stdout/stderr)
 	unknownFields protoimpl.UnknownFields
@@ -1146,11 +1878,6 @@ func (x *ExecuteCommandResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteCommandResponse.ProtoReflect.Descriptor instead.
-func (*ExecuteCommandResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{14}
-}
-
 func (x *ExecuteCommandResponse) GetResult() *CommandResult {
 	if x != nil {
 		return x.Result
@@ -1165,9 +1892,55 @@ func (x *ExecuteCommandResponse) GetOutput() *CommandOutput {
 	return nil
 }
 
+func (x *ExecuteCommandResponse) SetResult(v *CommandResult) {
+	x.Result = v
+}
+
+func (x *ExecuteCommandResponse) SetOutput(v *CommandOutput) {
+	x.Output = v
+}
+
+func (x *ExecuteCommandResponse) HasResult() bool {
+	if x == nil {
+		return false
+	}
+	return x.Result != nil
+}
+
+func (x *ExecuteCommandResponse) HasOutput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Output != nil
+}
+
+func (x *ExecuteCommandResponse) ClearResult() {
+	x.Result = nil
+}
+
+func (x *ExecuteCommandResponse) ClearOutput() {
+	x.Output = nil
+}
+
+type ExecuteCommandResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Result *CommandResult
+	Output *CommandOutput
+}
+
+func (b0 ExecuteCommandResponse_builder) Build() *ExecuteCommandResponse {
+	m0 := &ExecuteCommandResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Result = b.Result
+	x.Output = b.Output
+	return m0
+}
+
 // The request for executing a stream of commands.
 type ExecuteCommandsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Command to execute
 	Command       *ExecutableCommand `protobuf:"bytes,1,opt,name=command,proto3" json:"command,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1199,11 +1972,6 @@ func (x *ExecuteCommandsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteCommandsRequest.ProtoReflect.Descriptor instead.
-func (*ExecuteCommandsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{15}
-}
-
 func (x *ExecuteCommandsRequest) GetCommand() *ExecutableCommand {
 	if x != nil {
 		return x.Command
@@ -1211,9 +1979,39 @@ func (x *ExecuteCommandsRequest) GetCommand() *ExecutableCommand {
 	return nil
 }
 
+func (x *ExecuteCommandsRequest) SetCommand(v *ExecutableCommand) {
+	x.Command = v
+}
+
+func (x *ExecuteCommandsRequest) HasCommand() bool {
+	if x == nil {
+		return false
+	}
+	return x.Command != nil
+}
+
+func (x *ExecuteCommandsRequest) ClearCommand() {
+	x.Command = nil
+}
+
+type ExecuteCommandsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Command to execute
+	Command *ExecutableCommand
+}
+
+func (b0 ExecuteCommandsRequest_builder) Build() *ExecuteCommandsRequest {
+	m0 := &ExecuteCommandsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Command = b.Command
+	return m0
+}
+
 // The response for executing a stream of commands.
 type ExecuteCommandsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Result        *CommandResult         `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"` // Final command result
 	Output        *CommandOutput         `protobuf:"bytes,2,opt,name=output,proto3" json:"output,omitempty"` // Output (stdout/stderr)
 	unknownFields protoimpl.UnknownFields
@@ -1245,11 +2043,6 @@ func (x *ExecuteCommandsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteCommandsResponse.ProtoReflect.Descriptor instead.
-func (*ExecuteCommandsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{16}
-}
-
 func (x *ExecuteCommandsResponse) GetResult() *CommandResult {
 	if x != nil {
 		return x.Result
@@ -1264,9 +2057,55 @@ func (x *ExecuteCommandsResponse) GetOutput() *CommandOutput {
 	return nil
 }
 
+func (x *ExecuteCommandsResponse) SetResult(v *CommandResult) {
+	x.Result = v
+}
+
+func (x *ExecuteCommandsResponse) SetOutput(v *CommandOutput) {
+	x.Output = v
+}
+
+func (x *ExecuteCommandsResponse) HasResult() bool {
+	if x == nil {
+		return false
+	}
+	return x.Result != nil
+}
+
+func (x *ExecuteCommandsResponse) HasOutput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Output != nil
+}
+
+func (x *ExecuteCommandsResponse) ClearResult() {
+	x.Result = nil
+}
+
+func (x *ExecuteCommandsResponse) ClearOutput() {
+	x.Output = nil
+}
+
+type ExecuteCommandsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Result *CommandResult
+	Output *CommandOutput
+}
+
+func (b0 ExecuteCommandsResponse_builder) Build() *ExecuteCommandsResponse {
+	m0 := &ExecuteCommandsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Result = b.Result
+	x.Output = b.Output
+	return m0
+}
+
 // The request for streaming a single command.
 type ExecuteStreamedCommandRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Command       *ExecutableCommand     `protobuf:"bytes,1,opt,name=command,proto3" json:"command,omitempty"` // First message to initialize the command
 	Input         *CommandInput          `protobuf:"bytes,2,opt,name=input,proto3" json:"input,omitempty"`     // Subsequent messages for stdin or signals
 	unknownFields protoimpl.UnknownFields
@@ -1298,11 +2137,6 @@ func (x *ExecuteStreamedCommandRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteStreamedCommandRequest.ProtoReflect.Descriptor instead.
-func (*ExecuteStreamedCommandRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{17}
-}
-
 func (x *ExecuteStreamedCommandRequest) GetCommand() *ExecutableCommand {
 	if x != nil {
 		return x.Command
@@ -1317,9 +2151,55 @@ func (x *ExecuteStreamedCommandRequest) GetInput() *CommandInput {
 	return nil
 }
 
+func (x *ExecuteStreamedCommandRequest) SetCommand(v *ExecutableCommand) {
+	x.Command = v
+}
+
+func (x *ExecuteStreamedCommandRequest) SetInput(v *CommandInput) {
+	x.Input = v
+}
+
+func (x *ExecuteStreamedCommandRequest) HasCommand() bool {
+	if x == nil {
+		return false
+	}
+	return x.Command != nil
+}
+
+func (x *ExecuteStreamedCommandRequest) HasInput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Input != nil
+}
+
+func (x *ExecuteStreamedCommandRequest) ClearCommand() {
+	x.Command = nil
+}
+
+func (x *ExecuteStreamedCommandRequest) ClearInput() {
+	x.Input = nil
+}
+
+type ExecuteStreamedCommandRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Command *ExecutableCommand
+	Input   *CommandInput
+}
+
+func (b0 ExecuteStreamedCommandRequest_builder) Build() *ExecuteStreamedCommandRequest {
+	m0 := &ExecuteStreamedCommandRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Command = b.Command
+	x.Input = b.Input
+	return m0
+}
+
 // The response for streaming a single command.
 type ExecuteStreamedCommandResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Output        *CommandOutput         `protobuf:"bytes,1,opt,name=output,proto3" json:"output,omitempty"` // Output (stdout/stderr)
 	Result        *CommandResult         `protobuf:"bytes,2,opt,name=result,proto3" json:"result,omitempty"` // Final command result
 	unknownFields protoimpl.UnknownFields
@@ -1351,11 +2231,6 @@ func (x *ExecuteStreamedCommandResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteStreamedCommandResponse.ProtoReflect.Descriptor instead.
-func (*ExecuteStreamedCommandResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{18}
-}
-
 func (x *ExecuteStreamedCommandResponse) GetOutput() *CommandOutput {
 	if x != nil {
 		return x.Output
@@ -1370,9 +2245,55 @@ func (x *ExecuteStreamedCommandResponse) GetResult() *CommandResult {
 	return nil
 }
 
+func (x *ExecuteStreamedCommandResponse) SetOutput(v *CommandOutput) {
+	x.Output = v
+}
+
+func (x *ExecuteStreamedCommandResponse) SetResult(v *CommandResult) {
+	x.Result = v
+}
+
+func (x *ExecuteStreamedCommandResponse) HasOutput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Output != nil
+}
+
+func (x *ExecuteStreamedCommandResponse) HasResult() bool {
+	if x == nil {
+		return false
+	}
+	return x.Result != nil
+}
+
+func (x *ExecuteStreamedCommandResponse) ClearOutput() {
+	x.Output = nil
+}
+
+func (x *ExecuteStreamedCommandResponse) ClearResult() {
+	x.Result = nil
+}
+
+type ExecuteStreamedCommandResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Output *CommandOutput
+	Result *CommandResult
+}
+
+func (b0 ExecuteStreamedCommandResponse_builder) Build() *ExecuteStreamedCommandResponse {
+	m0 := &ExecuteStreamedCommandResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Output = b.Output
+	x.Result = b.Result
+	return m0
+}
+
 // The request for executing a batch of commands.
 type ExecuteBatchCommandsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Commands      []*ExecutableCommand   `protobuf:"bytes,1,rep,name=commands,proto3" json:"commands,omitempty"` // Commands to execute
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1403,11 +2324,6 @@ func (x *ExecuteBatchCommandsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteBatchCommandsRequest.ProtoReflect.Descriptor instead.
-func (*ExecuteBatchCommandsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{19}
-}
-
 func (x *ExecuteBatchCommandsRequest) GetCommands() []*ExecutableCommand {
 	if x != nil {
 		return x.Commands
@@ -1415,9 +2331,27 @@ func (x *ExecuteBatchCommandsRequest) GetCommands() []*ExecutableCommand {
 	return nil
 }
 
+func (x *ExecuteBatchCommandsRequest) SetCommands(v []*ExecutableCommand) {
+	x.Commands = v
+}
+
+type ExecuteBatchCommandsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Commands []*ExecutableCommand
+}
+
+func (b0 ExecuteBatchCommandsRequest_builder) Build() *ExecuteBatchCommandsRequest {
+	m0 := &ExecuteBatchCommandsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Commands = b.Commands
+	return m0
+}
+
 // The response for executing a batch of commands.
 type ExecuteBatchCommandsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Results       []*BatchResult         `protobuf:"bytes,1,rep,name=results,proto3" json:"results,omitempty"` // Results for each command
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1448,11 +2382,6 @@ func (x *ExecuteBatchCommandsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteBatchCommandsResponse.ProtoReflect.Descriptor instead.
-func (*ExecuteBatchCommandsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{20}
-}
-
 func (x *ExecuteBatchCommandsResponse) GetResults() []*BatchResult {
 	if x != nil {
 		return x.Results
@@ -1460,9 +2389,27 @@ func (x *ExecuteBatchCommandsResponse) GetResults() []*BatchResult {
 	return nil
 }
 
+func (x *ExecuteBatchCommandsResponse) SetResults(v []*BatchResult) {
+	x.Results = v
+}
+
+type ExecuteBatchCommandsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Results []*BatchResult
+}
+
+func (b0 ExecuteBatchCommandsResponse_builder) Build() *ExecuteBatchCommandsResponse {
+	m0 := &ExecuteBatchCommandsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Results = b.Results
+	return m0
+}
+
 // The request for executing a shell command.
 type ExecuteShellCommandRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The shell command to execute
 	Command       *ShellCommand `protobuf:"bytes,1,opt,name=command,proto3" json:"command,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1494,11 +2441,6 @@ func (x *ExecuteShellCommandRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteShellCommandRequest.ProtoReflect.Descriptor instead.
-func (*ExecuteShellCommandRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{21}
-}
-
 func (x *ExecuteShellCommandRequest) GetCommand() *ShellCommand {
 	if x != nil {
 		return x.Command
@@ -1506,9 +2448,39 @@ func (x *ExecuteShellCommandRequest) GetCommand() *ShellCommand {
 	return nil
 }
 
+func (x *ExecuteShellCommandRequest) SetCommand(v *ShellCommand) {
+	x.Command = v
+}
+
+func (x *ExecuteShellCommandRequest) HasCommand() bool {
+	if x == nil {
+		return false
+	}
+	return x.Command != nil
+}
+
+func (x *ExecuteShellCommandRequest) ClearCommand() {
+	x.Command = nil
+}
+
+type ExecuteShellCommandRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The shell command to execute
+	Command *ShellCommand
+}
+
+func (b0 ExecuteShellCommandRequest_builder) Build() *ExecuteShellCommandRequest {
+	m0 := &ExecuteShellCommandRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Command = b.Command
+	return m0
+}
+
 // The response for executing a shell command.
 type ExecuteShellCommandResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Result        *CommandResult         `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"` // The command result
 	Output        *CommandOutput         `protobuf:"bytes,2,opt,name=output,proto3" json:"output,omitempty"` // Output (stdout/stderr)
 	unknownFields protoimpl.UnknownFields
@@ -1540,11 +2512,6 @@ func (x *ExecuteShellCommandResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteShellCommandResponse.ProtoReflect.Descriptor instead.
-func (*ExecuteShellCommandResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{22}
-}
-
 func (x *ExecuteShellCommandResponse) GetResult() *CommandResult {
 	if x != nil {
 		return x.Result
@@ -1559,9 +2526,55 @@ func (x *ExecuteShellCommandResponse) GetOutput() *CommandOutput {
 	return nil
 }
 
+func (x *ExecuteShellCommandResponse) SetResult(v *CommandResult) {
+	x.Result = v
+}
+
+func (x *ExecuteShellCommandResponse) SetOutput(v *CommandOutput) {
+	x.Output = v
+}
+
+func (x *ExecuteShellCommandResponse) HasResult() bool {
+	if x == nil {
+		return false
+	}
+	return x.Result != nil
+}
+
+func (x *ExecuteShellCommandResponse) HasOutput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Output != nil
+}
+
+func (x *ExecuteShellCommandResponse) ClearResult() {
+	x.Result = nil
+}
+
+func (x *ExecuteShellCommandResponse) ClearOutput() {
+	x.Output = nil
+}
+
+type ExecuteShellCommandResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Result *CommandResult
+	Output *CommandOutput
+}
+
+func (b0 ExecuteShellCommandResponse_builder) Build() *ExecuteShellCommandResponse {
+	m0 := &ExecuteShellCommandResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Result = b.Result
+	x.Output = b.Output
+	return m0
+}
+
 // The request for executing a stream of shell commands.
 type ExecuteShellCommandsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Shell command to execute
 	Command       *ShellCommand `protobuf:"bytes,1,opt,name=command,proto3" json:"command,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1593,11 +2606,6 @@ func (x *ExecuteShellCommandsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteShellCommandsRequest.ProtoReflect.Descriptor instead.
-func (*ExecuteShellCommandsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{23}
-}
-
 func (x *ExecuteShellCommandsRequest) GetCommand() *ShellCommand {
 	if x != nil {
 		return x.Command
@@ -1605,9 +2613,39 @@ func (x *ExecuteShellCommandsRequest) GetCommand() *ShellCommand {
 	return nil
 }
 
+func (x *ExecuteShellCommandsRequest) SetCommand(v *ShellCommand) {
+	x.Command = v
+}
+
+func (x *ExecuteShellCommandsRequest) HasCommand() bool {
+	if x == nil {
+		return false
+	}
+	return x.Command != nil
+}
+
+func (x *ExecuteShellCommandsRequest) ClearCommand() {
+	x.Command = nil
+}
+
+type ExecuteShellCommandsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Shell command to execute
+	Command *ShellCommand
+}
+
+func (b0 ExecuteShellCommandsRequest_builder) Build() *ExecuteShellCommandsRequest {
+	m0 := &ExecuteShellCommandsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Command = b.Command
+	return m0
+}
+
 // The response for executing a stream of shell commands.
 type ExecuteShellCommandsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Result        *CommandResult         `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"` // The command result
 	Output        *CommandOutput         `protobuf:"bytes,2,opt,name=output,proto3" json:"output,omitempty"` // Output (stdout/stderr)
 	unknownFields protoimpl.UnknownFields
@@ -1639,11 +2677,6 @@ func (x *ExecuteShellCommandsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteShellCommandsResponse.ProtoReflect.Descriptor instead.
-func (*ExecuteShellCommandsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{24}
-}
-
 func (x *ExecuteShellCommandsResponse) GetResult() *CommandResult {
 	if x != nil {
 		return x.Result
@@ -1658,9 +2691,55 @@ func (x *ExecuteShellCommandsResponse) GetOutput() *CommandOutput {
 	return nil
 }
 
+func (x *ExecuteShellCommandsResponse) SetResult(v *CommandResult) {
+	x.Result = v
+}
+
+func (x *ExecuteShellCommandsResponse) SetOutput(v *CommandOutput) {
+	x.Output = v
+}
+
+func (x *ExecuteShellCommandsResponse) HasResult() bool {
+	if x == nil {
+		return false
+	}
+	return x.Result != nil
+}
+
+func (x *ExecuteShellCommandsResponse) HasOutput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Output != nil
+}
+
+func (x *ExecuteShellCommandsResponse) ClearResult() {
+	x.Result = nil
+}
+
+func (x *ExecuteShellCommandsResponse) ClearOutput() {
+	x.Output = nil
+}
+
+type ExecuteShellCommandsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Result *CommandResult
+	Output *CommandOutput
+}
+
+func (b0 ExecuteShellCommandsResponse_builder) Build() *ExecuteShellCommandsResponse {
+	m0 := &ExecuteShellCommandsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Result = b.Result
+	x.Output = b.Output
+	return m0
+}
+
 // The request for streaming a single shell command.
 type ExecuteStreamedShellCommandRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Command       *ShellCommand          `protobuf:"bytes,1,opt,name=command,proto3" json:"command,omitempty"` // First message to initialize the command
 	Input         *CommandInput          `protobuf:"bytes,2,opt,name=input,proto3" json:"input,omitempty"`     // Subsequent messages for stdin or signals
 	unknownFields protoimpl.UnknownFields
@@ -1692,11 +2771,6 @@ func (x *ExecuteStreamedShellCommandRequest) ProtoReflect() protoreflect.Message
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteStreamedShellCommandRequest.ProtoReflect.Descriptor instead.
-func (*ExecuteStreamedShellCommandRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{25}
-}
-
 func (x *ExecuteStreamedShellCommandRequest) GetCommand() *ShellCommand {
 	if x != nil {
 		return x.Command
@@ -1711,9 +2785,55 @@ func (x *ExecuteStreamedShellCommandRequest) GetInput() *CommandInput {
 	return nil
 }
 
+func (x *ExecuteStreamedShellCommandRequest) SetCommand(v *ShellCommand) {
+	x.Command = v
+}
+
+func (x *ExecuteStreamedShellCommandRequest) SetInput(v *CommandInput) {
+	x.Input = v
+}
+
+func (x *ExecuteStreamedShellCommandRequest) HasCommand() bool {
+	if x == nil {
+		return false
+	}
+	return x.Command != nil
+}
+
+func (x *ExecuteStreamedShellCommandRequest) HasInput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Input != nil
+}
+
+func (x *ExecuteStreamedShellCommandRequest) ClearCommand() {
+	x.Command = nil
+}
+
+func (x *ExecuteStreamedShellCommandRequest) ClearInput() {
+	x.Input = nil
+}
+
+type ExecuteStreamedShellCommandRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Command *ShellCommand
+	Input   *CommandInput
+}
+
+func (b0 ExecuteStreamedShellCommandRequest_builder) Build() *ExecuteStreamedShellCommandRequest {
+	m0 := &ExecuteStreamedShellCommandRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Command = b.Command
+	x.Input = b.Input
+	return m0
+}
+
 // The response for streaming a single shell command.
 type ExecuteStreamedShellCommandResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Result        *CommandResult         `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"` // Final command result
 	Output        *CommandOutput         `protobuf:"bytes,2,opt,name=output,proto3" json:"output,omitempty"` // Output (stdout/stderr)
 	unknownFields protoimpl.UnknownFields
@@ -1745,11 +2865,6 @@ func (x *ExecuteStreamedShellCommandResponse) ProtoReflect() protoreflect.Messag
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteStreamedShellCommandResponse.ProtoReflect.Descriptor instead.
-func (*ExecuteStreamedShellCommandResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{26}
-}
-
 func (x *ExecuteStreamedShellCommandResponse) GetResult() *CommandResult {
 	if x != nil {
 		return x.Result
@@ -1764,9 +2879,55 @@ func (x *ExecuteStreamedShellCommandResponse) GetOutput() *CommandOutput {
 	return nil
 }
 
+func (x *ExecuteStreamedShellCommandResponse) SetResult(v *CommandResult) {
+	x.Result = v
+}
+
+func (x *ExecuteStreamedShellCommandResponse) SetOutput(v *CommandOutput) {
+	x.Output = v
+}
+
+func (x *ExecuteStreamedShellCommandResponse) HasResult() bool {
+	if x == nil {
+		return false
+	}
+	return x.Result != nil
+}
+
+func (x *ExecuteStreamedShellCommandResponse) HasOutput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Output != nil
+}
+
+func (x *ExecuteStreamedShellCommandResponse) ClearResult() {
+	x.Result = nil
+}
+
+func (x *ExecuteStreamedShellCommandResponse) ClearOutput() {
+	x.Output = nil
+}
+
+type ExecuteStreamedShellCommandResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Result *CommandResult
+	Output *CommandOutput
+}
+
+func (b0 ExecuteStreamedShellCommandResponse_builder) Build() *ExecuteStreamedShellCommandResponse {
+	m0 := &ExecuteStreamedShellCommandResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Result = b.Result
+	x.Output = b.Output
+	return m0
+}
+
 // The request for executing a batch of shell commands.
 type ExecuteBatchShellCommandsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Commands      []*ShellCommand        `protobuf:"bytes,1,rep,name=commands,proto3" json:"commands,omitempty"` // Commands to execute
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1797,11 +2958,6 @@ func (x *ExecuteBatchShellCommandsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteBatchShellCommandsRequest.ProtoReflect.Descriptor instead.
-func (*ExecuteBatchShellCommandsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{27}
-}
-
 func (x *ExecuteBatchShellCommandsRequest) GetCommands() []*ShellCommand {
 	if x != nil {
 		return x.Commands
@@ -1809,9 +2965,27 @@ func (x *ExecuteBatchShellCommandsRequest) GetCommands() []*ShellCommand {
 	return nil
 }
 
+func (x *ExecuteBatchShellCommandsRequest) SetCommands(v []*ShellCommand) {
+	x.Commands = v
+}
+
+type ExecuteBatchShellCommandsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Commands []*ShellCommand
+}
+
+func (b0 ExecuteBatchShellCommandsRequest_builder) Build() *ExecuteBatchShellCommandsRequest {
+	m0 := &ExecuteBatchShellCommandsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Commands = b.Commands
+	return m0
+}
+
 // The response for executing a batch of shell commands.
 type ExecuteBatchShellCommandsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Results       []*BatchResult         `protobuf:"bytes,1,rep,name=results,proto3" json:"results,omitempty"` // Results for each shell command
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1842,11 +3016,6 @@ func (x *ExecuteBatchShellCommandsResponse) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecuteBatchShellCommandsResponse.ProtoReflect.Descriptor instead.
-func (*ExecuteBatchShellCommandsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{28}
-}
-
 func (x *ExecuteBatchShellCommandsResponse) GetResults() []*BatchResult {
 	if x != nil {
 		return x.Results
@@ -1854,9 +3023,27 @@ func (x *ExecuteBatchShellCommandsResponse) GetResults() []*BatchResult {
 	return nil
 }
 
+func (x *ExecuteBatchShellCommandsResponse) SetResults(v []*BatchResult) {
+	x.Results = v
+}
+
+type ExecuteBatchShellCommandsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Results []*BatchResult
+}
+
+func (b0 ExecuteBatchShellCommandsResponse_builder) Build() *ExecuteBatchShellCommandsResponse {
+	m0 := &ExecuteBatchShellCommandsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Results = b.Results
+	return m0
+}
+
 // The request for a terminal session and streaming in input.
 type TerminalSessionRequest struct {
-	state         protoimpl.MessageState              `protogen:"open.v1"`
+	state         protoimpl.MessageState              `protogen:"hybrid.v1"`
 	Start         *TerminalSessionRequest_StartEvent  `protobuf:"bytes,1,opt,name=start,proto3" json:"start,omitempty"`   // First message to initialize the terminal session
 	Resize        *TerminalSessionRequest_ResizeEvent `protobuf:"bytes,2,opt,name=resize,proto3" json:"resize,omitempty"` // Resize event for the terminal
 	Input         *CommandInput                       `protobuf:"bytes,3,opt,name=input,proto3" json:"input,omitempty"`   // Subsequent messages for stdin or signals
@@ -1889,11 +3076,6 @@ func (x *TerminalSessionRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TerminalSessionRequest.ProtoReflect.Descriptor instead.
-func (*TerminalSessionRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{29}
-}
-
 func (x *TerminalSessionRequest) GetStart() *TerminalSessionRequest_StartEvent {
 	if x != nil {
 		return x.Start
@@ -1915,9 +3097,72 @@ func (x *TerminalSessionRequest) GetInput() *CommandInput {
 	return nil
 }
 
+func (x *TerminalSessionRequest) SetStart(v *TerminalSessionRequest_StartEvent) {
+	x.Start = v
+}
+
+func (x *TerminalSessionRequest) SetResize(v *TerminalSessionRequest_ResizeEvent) {
+	x.Resize = v
+}
+
+func (x *TerminalSessionRequest) SetInput(v *CommandInput) {
+	x.Input = v
+}
+
+func (x *TerminalSessionRequest) HasStart() bool {
+	if x == nil {
+		return false
+	}
+	return x.Start != nil
+}
+
+func (x *TerminalSessionRequest) HasResize() bool {
+	if x == nil {
+		return false
+	}
+	return x.Resize != nil
+}
+
+func (x *TerminalSessionRequest) HasInput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Input != nil
+}
+
+func (x *TerminalSessionRequest) ClearStart() {
+	x.Start = nil
+}
+
+func (x *TerminalSessionRequest) ClearResize() {
+	x.Resize = nil
+}
+
+func (x *TerminalSessionRequest) ClearInput() {
+	x.Input = nil
+}
+
+type TerminalSessionRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Start  *TerminalSessionRequest_StartEvent
+	Resize *TerminalSessionRequest_ResizeEvent
+	Input  *CommandInput
+}
+
+func (b0 TerminalSessionRequest_builder) Build() *TerminalSessionRequest {
+	m0 := &TerminalSessionRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Start = b.Start
+	x.Resize = b.Resize
+	x.Input = b.Input
+	return m0
+}
+
 // The response for a terminal session.
 type TerminalSessionResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Output        *CommandOutput         `protobuf:"bytes,1,opt,name=output,proto3" json:"output,omitempty"` // Output from the terminal session
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1948,11 +3193,6 @@ func (x *TerminalSessionResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TerminalSessionResponse.ProtoReflect.Descriptor instead.
-func (*TerminalSessionResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{30}
-}
-
 func (x *TerminalSessionResponse) GetOutput() *CommandOutput {
 	if x != nil {
 		return x.Output
@@ -1960,9 +3200,38 @@ func (x *TerminalSessionResponse) GetOutput() *CommandOutput {
 	return nil
 }
 
+func (x *TerminalSessionResponse) SetOutput(v *CommandOutput) {
+	x.Output = v
+}
+
+func (x *TerminalSessionResponse) HasOutput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Output != nil
+}
+
+func (x *TerminalSessionResponse) ClearOutput() {
+	x.Output = nil
+}
+
+type TerminalSessionResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Output *CommandOutput
+}
+
+func (b0 TerminalSessionResponse_builder) Build() *TerminalSessionResponse {
+	m0 := &TerminalSessionResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Output = b.Output
+	return m0
+}
+
 // Private key authentication
 type SSHConfig_PrivateKeyAuth struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Private key in raw bytes (PEM or OpenSSH format)
 	KeyData []byte `protobuf:"bytes,1,opt,name=key_data,json=keyData,proto3" json:"key_data,omitempty"`
 	// Passphrase to decrypt encrypted private key (empty if not encrypted)
@@ -1996,11 +3265,6 @@ func (x *SSHConfig_PrivateKeyAuth) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SSHConfig_PrivateKeyAuth.ProtoReflect.Descriptor instead.
-func (*SSHConfig_PrivateKeyAuth) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{0, 0}
-}
-
 func (x *SSHConfig_PrivateKeyAuth) GetKeyData() []byte {
 	if x != nil {
 		return x.KeyData
@@ -2015,9 +3279,38 @@ func (x *SSHConfig_PrivateKeyAuth) GetPassphrase() string {
 	return ""
 }
 
+func (x *SSHConfig_PrivateKeyAuth) SetKeyData(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.KeyData = v
+}
+
+func (x *SSHConfig_PrivateKeyAuth) SetPassphrase(v string) {
+	x.Passphrase = v
+}
+
+type SSHConfig_PrivateKeyAuth_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Private key in raw bytes (PEM or OpenSSH format)
+	KeyData []byte
+	// Passphrase to decrypt encrypted private key (empty if not encrypted)
+	Passphrase string
+}
+
+func (b0 SSHConfig_PrivateKeyAuth_builder) Build() *SSHConfig_PrivateKeyAuth {
+	m0 := &SSHConfig_PrivateKeyAuth{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.KeyData = b.KeyData
+	x.Passphrase = b.Passphrase
+	return m0
+}
+
 // Identity file authentication
 type SSHConfig_IdentityFileAuth struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Path to SSH private key file (e.g., ~/.ssh/id_ed25519)
 	FilePath string `protobuf:"bytes,1,opt,name=file_path,json=filePath,proto3" json:"file_path,omitempty"`
 	// Passphrase to decrypt encrypted key file (empty if not encrypted)
@@ -2051,11 +3344,6 @@ func (x *SSHConfig_IdentityFileAuth) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SSHConfig_IdentityFileAuth.ProtoReflect.Descriptor instead.
-func (*SSHConfig_IdentityFileAuth) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{0, 1}
-}
-
 func (x *SSHConfig_IdentityFileAuth) GetFilePath() string {
 	if x != nil {
 		return x.FilePath
@@ -2070,9 +3358,35 @@ func (x *SSHConfig_IdentityFileAuth) GetPassphrase() string {
 	return ""
 }
 
+func (x *SSHConfig_IdentityFileAuth) SetFilePath(v string) {
+	x.FilePath = v
+}
+
+func (x *SSHConfig_IdentityFileAuth) SetPassphrase(v string) {
+	x.Passphrase = v
+}
+
+type SSHConfig_IdentityFileAuth_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Path to SSH private key file (e.g., ~/.ssh/id_ed25519)
+	FilePath string
+	// Passphrase to decrypt encrypted key file (empty if not encrypted)
+	Passphrase string
+}
+
+func (b0 SSHConfig_IdentityFileAuth_builder) Build() *SSHConfig_IdentityFileAuth {
+	m0 := &SSHConfig_IdentityFileAuth{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.FilePath = b.FilePath
+	x.Passphrase = b.Passphrase
+	return m0
+}
+
 // Known hosts configuration
 type SSHConfig_KnownHosts struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	FilePaths     []string               `protobuf:"bytes,1,rep,name=file_paths,json=filePaths,proto3" json:"file_paths,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2103,11 +3417,6 @@ func (x *SSHConfig_KnownHosts) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SSHConfig_KnownHosts.ProtoReflect.Descriptor instead.
-func (*SSHConfig_KnownHosts) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{0, 2}
-}
-
 func (x *SSHConfig_KnownHosts) GetFilePaths() []string {
 	if x != nil {
 		return x.FilePaths
@@ -2115,8 +3424,26 @@ func (x *SSHConfig_KnownHosts) GetFilePaths() []string {
 	return nil
 }
 
+func (x *SSHConfig_KnownHosts) SetFilePaths(v []string) {
+	x.FilePaths = v
+}
+
+type SSHConfig_KnownHosts_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	FilePaths []string
+}
+
+func (b0 SSHConfig_KnownHosts_builder) Build() *SSHConfig_KnownHosts {
+	m0 := &SSHConfig_KnownHosts{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.FilePaths = b.FilePaths
+	return m0
+}
+
 type TerminalSessionRequest_Dimensions struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Cols          int32                  `protobuf:"varint,1,opt,name=cols,proto3" json:"cols,omitempty"` // Number of columns in the terminal
 	Rows          int32                  `protobuf:"varint,2,opt,name=rows,proto3" json:"rows,omitempty"` // Number of rows in the terminal
 	unknownFields protoimpl.UnknownFields
@@ -2148,11 +3475,6 @@ func (x *TerminalSessionRequest_Dimensions) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TerminalSessionRequest_Dimensions.ProtoReflect.Descriptor instead.
-func (*TerminalSessionRequest_Dimensions) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{29, 0}
-}
-
 func (x *TerminalSessionRequest_Dimensions) GetCols() int32 {
 	if x != nil {
 		return x.Cols
@@ -2167,9 +3489,33 @@ func (x *TerminalSessionRequest_Dimensions) GetRows() int32 {
 	return 0
 }
 
+func (x *TerminalSessionRequest_Dimensions) SetCols(v int32) {
+	x.Cols = v
+}
+
+func (x *TerminalSessionRequest_Dimensions) SetRows(v int32) {
+	x.Rows = v
+}
+
+type TerminalSessionRequest_Dimensions_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Cols int32
+	Rows int32
+}
+
+func (b0 TerminalSessionRequest_Dimensions_builder) Build() *TerminalSessionRequest_Dimensions {
+	m0 := &TerminalSessionRequest_Dimensions{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Cols = b.Cols
+	x.Rows = b.Rows
+	return m0
+}
+
 // Configuration for starting a terminal session.
 type TerminalSessionRequest_StartEvent struct {
-	state   protoimpl.MessageState `protogen:"open.v1"`
+	state   protoimpl.MessageState `protogen:"hybrid.v1"`
 	Workdir string                 `protobuf:"bytes,2,opt,name=workdir,proto3" json:"workdir,omitempty"`                                                                   // Optional working directory
 	Env     map[string]string      `protobuf:"bytes,3,rep,name=env,proto3" json:"env,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // Optional environment variables
 	// Terminal dimensions
@@ -2203,11 +3549,6 @@ func (x *TerminalSessionRequest_StartEvent) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TerminalSessionRequest_StartEvent.ProtoReflect.Descriptor instead.
-func (*TerminalSessionRequest_StartEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{29, 1}
-}
-
 func (x *TerminalSessionRequest_StartEvent) GetWorkdir() string {
 	if x != nil {
 		return x.Workdir
@@ -2229,8 +3570,50 @@ func (x *TerminalSessionRequest_StartEvent) GetDimensions() *TerminalSessionRequ
 	return nil
 }
 
+func (x *TerminalSessionRequest_StartEvent) SetWorkdir(v string) {
+	x.Workdir = v
+}
+
+func (x *TerminalSessionRequest_StartEvent) SetEnv(v map[string]string) {
+	x.Env = v
+}
+
+func (x *TerminalSessionRequest_StartEvent) SetDimensions(v *TerminalSessionRequest_Dimensions) {
+	x.Dimensions = v
+}
+
+func (x *TerminalSessionRequest_StartEvent) HasDimensions() bool {
+	if x == nil {
+		return false
+	}
+	return x.Dimensions != nil
+}
+
+func (x *TerminalSessionRequest_StartEvent) ClearDimensions() {
+	x.Dimensions = nil
+}
+
+type TerminalSessionRequest_StartEvent_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Workdir string
+	Env     map[string]string
+	// Terminal dimensions
+	Dimensions *TerminalSessionRequest_Dimensions
+}
+
+func (b0 TerminalSessionRequest_StartEvent_builder) Build() *TerminalSessionRequest_StartEvent {
+	m0 := &TerminalSessionRequest_StartEvent{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Workdir = b.Workdir
+	x.Env = b.Env
+	x.Dimensions = b.Dimensions
+	return m0
+}
+
 type TerminalSessionRequest_ResizeEvent struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// New terminal dimensions
 	Dimensions    *TerminalSessionRequest_Dimensions `protobuf:"bytes,1,opt,name=dimensions,proto3" json:"dimensions,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -2262,16 +3645,41 @@ func (x *TerminalSessionRequest_ResizeEvent) ProtoReflect() protoreflect.Message
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TerminalSessionRequest_ResizeEvent.ProtoReflect.Descriptor instead.
-func (*TerminalSessionRequest_ResizeEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_command_v1beta1_messages_proto_rawDescGZIP(), []int{29, 2}
-}
-
 func (x *TerminalSessionRequest_ResizeEvent) GetDimensions() *TerminalSessionRequest_Dimensions {
 	if x != nil {
 		return x.Dimensions
 	}
 	return nil
+}
+
+func (x *TerminalSessionRequest_ResizeEvent) SetDimensions(v *TerminalSessionRequest_Dimensions) {
+	x.Dimensions = v
+}
+
+func (x *TerminalSessionRequest_ResizeEvent) HasDimensions() bool {
+	if x == nil {
+		return false
+	}
+	return x.Dimensions != nil
+}
+
+func (x *TerminalSessionRequest_ResizeEvent) ClearDimensions() {
+	x.Dimensions = nil
+}
+
+type TerminalSessionRequest_ResizeEvent_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// New terminal dimensions
+	Dimensions *TerminalSessionRequest_Dimensions
+}
+
+func (b0 TerminalSessionRequest_ResizeEvent_builder) Build() *TerminalSessionRequest_ResizeEvent {
+	m0 := &TerminalSessionRequest_ResizeEvent{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Dimensions = b.Dimensions
+	return m0
 }
 
 var File_dtkt_command_v1beta1_messages_proto protoreflect.FileDescriptor
@@ -2442,18 +3850,6 @@ const file_dtkt_command_v1beta1_messages_proto_rawDesc = "" +
 	"\x17TerminalSessionResponse\x12;\n" +
 	"\x06output\x18\x01 \x01(\v2#.dtkt.command.v1beta1.CommandOutputR\x06outputB\xef\x01\n" +
 	"\x1aproto.dtkt.command.v1beta1B\rMessagesProtoP\x01ZPgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/command/v1beta1;commandv1beta1\xa2\x02\x03DCX\xaa\x02\x14Dtkt.Command.V1beta1\xca\x02\x14Dtkt\\Command\\V1beta1\xe2\x02 Dtkt\\Command\\V1beta1\\GPBMetadata\xea\x02\x16Dtkt::Command::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_command_v1beta1_messages_proto_rawDescOnce sync.Once
-	file_dtkt_command_v1beta1_messages_proto_rawDescData []byte
-)
-
-func file_dtkt_command_v1beta1_messages_proto_rawDescGZIP() []byte {
-	file_dtkt_command_v1beta1_messages_proto_rawDescOnce.Do(func() {
-		file_dtkt_command_v1beta1_messages_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_command_v1beta1_messages_proto_rawDesc), len(file_dtkt_command_v1beta1_messages_proto_rawDesc)))
-	})
-	return file_dtkt_command_v1beta1_messages_proto_rawDescData
-}
 
 var file_dtkt_command_v1beta1_messages_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_dtkt_command_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 40)

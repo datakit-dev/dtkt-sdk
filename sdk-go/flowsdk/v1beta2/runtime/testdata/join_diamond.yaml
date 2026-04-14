@@ -1,0 +1,20 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: join_diamond
+  description: "Diamond: input to left(*2) + right(*3), output(left+right)"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: left
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= this.value * 2"
+    - id: right
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= this.value * 3"
+  outputs:
+    - id: combined
+      value: "= vars.left.value + vars.right.value"

@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: gen_range_rate
+  generators:
+    - id: seq
+      range:
+        start: 1
+        end: 5
+        step: 1
+        rate:
+          count: 5
+          interval: "0.1s"
+  outputs:
+    - id: result
+      value: "= generators.seq.value"

@@ -1,0 +1,17 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_input_full_chain
+  description: "Input with map, filter, scan pipeline"
+  inputs:
+    - id: x
+      int64: {}
+      transforms:
+        - map: "= this.value + 1"
+        - filter: "= this.value % 2 == 0"
+        - scan:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+  outputs:
+    - id: result
+      value: "= inputs.x.value"

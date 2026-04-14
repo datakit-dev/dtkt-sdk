@@ -1,0 +1,13 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: outbox_snapshot
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: v
+      value: "= inputs.x.value * 10"
+  outputs:
+    - id: result
+      value: "= vars.v.value"

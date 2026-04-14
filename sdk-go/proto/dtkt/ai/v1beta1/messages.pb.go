@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/ai/v1beta1/messages.proto
 
+//go:build !protoopaque
+
 package aiv1beta1
 
 import (
@@ -16,7 +18,6 @@ import (
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -29,7 +30,7 @@ const (
 
 // Represents an embedding model, including its ID, name, and supported dimensions.
 type EmbeddingModel struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier for the embedding model.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Name of the embedding model.
@@ -67,11 +68,6 @@ func (x *EmbeddingModel) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use EmbeddingModel.ProtoReflect.Descriptor instead.
-func (*EmbeddingModel) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *EmbeddingModel) GetId() string {
 	if x != nil {
 		return x.Id
@@ -100,9 +96,49 @@ func (x *EmbeddingModel) GetMaxDimensions() uint32 {
 	return 0
 }
 
+func (x *EmbeddingModel) SetId(v string) {
+	x.Id = v
+}
+
+func (x *EmbeddingModel) SetName(v string) {
+	x.Name = v
+}
+
+func (x *EmbeddingModel) SetMinDimensions(v uint32) {
+	x.MinDimensions = v
+}
+
+func (x *EmbeddingModel) SetMaxDimensions(v uint32) {
+	x.MaxDimensions = v
+}
+
+type EmbeddingModel_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier for the embedding model.
+	Id string
+	// Name of the embedding model.
+	Name string
+	// Minimum number of dimensions supported by the model.
+	MinDimensions uint32
+	// Maximum number of dimensions supported by the model.
+	MaxDimensions uint32
+}
+
+func (b0 EmbeddingModel_builder) Build() *EmbeddingModel {
+	m0 := &EmbeddingModel{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Name = b.Name
+	x.MinDimensions = b.MinDimensions
+	x.MaxDimensions = b.MaxDimensions
+	return m0
+}
+
 // Represents an input for generating embeddings.
 type EmbeddingInput struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Unique identifier for the input.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Text data to generate embeddings for.
@@ -136,11 +172,6 @@ func (x *EmbeddingInput) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use EmbeddingInput.ProtoReflect.Descriptor instead.
-func (*EmbeddingInput) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *EmbeddingInput) GetId() string {
 	if x != nil {
 		return x.Id
@@ -155,9 +186,35 @@ func (x *EmbeddingInput) GetText() string {
 	return ""
 }
 
+func (x *EmbeddingInput) SetId(v string) {
+	x.Id = v
+}
+
+func (x *EmbeddingInput) SetText(v string) {
+	x.Text = v
+}
+
+type EmbeddingInput_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Unique identifier for the input.
+	Id string
+	// Text data to generate embeddings for.
+	Text string
+}
+
+func (b0 EmbeddingInput_builder) Build() *EmbeddingInput {
+	m0 := &EmbeddingInput{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Text = b.Text
+	return m0
+}
+
 // Represents the output of an embedding operation.
 type EmbeddingOutput struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The input data for which the embedding was generated.
 	Input *EmbeddingInput `protobuf:"bytes,1,opt,name=input,proto3" json:"input,omitempty"`
 	// The generated embedding vector.
@@ -195,11 +252,6 @@ func (x *EmbeddingOutput) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use EmbeddingOutput.ProtoReflect.Descriptor instead.
-func (*EmbeddingOutput) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *EmbeddingOutput) GetInput() *EmbeddingInput {
 	if x != nil {
 		return x.Input
@@ -228,9 +280,60 @@ func (x *EmbeddingOutput) GetError() string {
 	return ""
 }
 
+func (x *EmbeddingOutput) SetInput(v *EmbeddingInput) {
+	x.Input = v
+}
+
+func (x *EmbeddingOutput) SetVector(v []float64) {
+	x.Vector = v
+}
+
+func (x *EmbeddingOutput) SetSuccess(v bool) {
+	x.Success = v
+}
+
+func (x *EmbeddingOutput) SetError(v string) {
+	x.Error = v
+}
+
+func (x *EmbeddingOutput) HasInput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Input != nil
+}
+
+func (x *EmbeddingOutput) ClearInput() {
+	x.Input = nil
+}
+
+type EmbeddingOutput_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The input data for which the embedding was generated.
+	Input *EmbeddingInput
+	// The generated embedding vector.
+	Vector []float64
+	// Indicates if the embedding generation was successful.
+	Success bool
+	// Error message, if any.
+	Error string
+}
+
+func (b0 EmbeddingOutput_builder) Build() *EmbeddingOutput {
+	m0 := &EmbeddingOutput{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Input = b.Input
+	x.Vector = b.Vector
+	x.Success = b.Success
+	x.Error = b.Error
+	return m0
+}
+
 // Request to retrieve a list of available embedding models.
 type ListEmbeddingModelsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -260,14 +363,21 @@ func (x *ListEmbeddingModelsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListEmbeddingModelsRequest.ProtoReflect.Descriptor instead.
-func (*ListEmbeddingModelsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{3}
+type ListEmbeddingModelsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 ListEmbeddingModelsRequest_builder) Build() *ListEmbeddingModelsRequest {
+	m0 := &ListEmbeddingModelsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 // Response containing a list of available embedding models.
 type ListEmbeddingModelsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// List of embedding models.
 	Models        []*EmbeddingModel `protobuf:"bytes,1,rep,name=models,proto3" json:"models,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -299,11 +409,6 @@ func (x *ListEmbeddingModelsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListEmbeddingModelsResponse.ProtoReflect.Descriptor instead.
-func (*ListEmbeddingModelsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *ListEmbeddingModelsResponse) GetModels() []*EmbeddingModel {
 	if x != nil {
 		return x.Models
@@ -311,9 +416,28 @@ func (x *ListEmbeddingModelsResponse) GetModels() []*EmbeddingModel {
 	return nil
 }
 
+func (x *ListEmbeddingModelsResponse) SetModels(v []*EmbeddingModel) {
+	x.Models = v
+}
+
+type ListEmbeddingModelsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// List of embedding models.
+	Models []*EmbeddingModel
+}
+
+func (b0 ListEmbeddingModelsResponse_builder) Build() *ListEmbeddingModelsResponse {
+	m0 := &ListEmbeddingModelsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Models = b.Models
+	return m0
+}
+
 // Request to retrieve details of a specific embedding model.
 type GetEmbeddingModelRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// ID of the embedding model to retrieve.
 	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -345,11 +469,6 @@ func (x *GetEmbeddingModelRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetEmbeddingModelRequest.ProtoReflect.Descriptor instead.
-func (*GetEmbeddingModelRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *GetEmbeddingModelRequest) GetId() string {
 	if x != nil {
 		return x.Id
@@ -357,9 +476,28 @@ func (x *GetEmbeddingModelRequest) GetId() string {
 	return ""
 }
 
+func (x *GetEmbeddingModelRequest) SetId(v string) {
+	x.Id = v
+}
+
+type GetEmbeddingModelRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// ID of the embedding model to retrieve.
+	Id string
+}
+
+func (b0 GetEmbeddingModelRequest_builder) Build() *GetEmbeddingModelRequest {
+	m0 := &GetEmbeddingModelRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	return m0
+}
+
 // Response containing details of a specific embedding model.
 type GetEmbeddingModelResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Details of the requested embedding model.
 	Model         *EmbeddingModel `protobuf:"bytes,1,opt,name=model,proto3" json:"model,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -391,11 +529,6 @@ func (x *GetEmbeddingModelResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetEmbeddingModelResponse.ProtoReflect.Descriptor instead.
-func (*GetEmbeddingModelResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *GetEmbeddingModelResponse) GetModel() *EmbeddingModel {
 	if x != nil {
 		return x.Model
@@ -403,9 +536,39 @@ func (x *GetEmbeddingModelResponse) GetModel() *EmbeddingModel {
 	return nil
 }
 
+func (x *GetEmbeddingModelResponse) SetModel(v *EmbeddingModel) {
+	x.Model = v
+}
+
+func (x *GetEmbeddingModelResponse) HasModel() bool {
+	if x == nil {
+		return false
+	}
+	return x.Model != nil
+}
+
+func (x *GetEmbeddingModelResponse) ClearModel() {
+	x.Model = nil
+}
+
+type GetEmbeddingModelResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Details of the requested embedding model.
+	Model *EmbeddingModel
+}
+
+func (b0 GetEmbeddingModelResponse_builder) Build() *GetEmbeddingModelResponse {
+	m0 := &GetEmbeddingModelResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Model = b.Model
+	return m0
+}
+
 // Request to generate embeddings for input text using a specified model.
 type GenerateEmbeddingsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// ID of the embedding model to use.
 	ModelId string `protobuf:"bytes,1,opt,name=model_id,json=modelId,proto3" json:"model_id,omitempty"`
 	// Desired number of dimensions for the embedding.
@@ -441,11 +604,6 @@ func (x *GenerateEmbeddingsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GenerateEmbeddingsRequest.ProtoReflect.Descriptor instead.
-func (*GenerateEmbeddingsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *GenerateEmbeddingsRequest) GetModelId() string {
 	if x != nil {
 		return x.ModelId
@@ -467,9 +625,42 @@ func (x *GenerateEmbeddingsRequest) GetInputs() []*EmbeddingInput {
 	return nil
 }
 
+func (x *GenerateEmbeddingsRequest) SetModelId(v string) {
+	x.ModelId = v
+}
+
+func (x *GenerateEmbeddingsRequest) SetDimensions(v uint32) {
+	x.Dimensions = v
+}
+
+func (x *GenerateEmbeddingsRequest) SetInputs(v []*EmbeddingInput) {
+	x.Inputs = v
+}
+
+type GenerateEmbeddingsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// ID of the embedding model to use.
+	ModelId string
+	// Desired number of dimensions for the embedding.
+	Dimensions uint32
+	// List of text inputs to generate embeddings for.
+	Inputs []*EmbeddingInput
+}
+
+func (b0 GenerateEmbeddingsRequest_builder) Build() *GenerateEmbeddingsRequest {
+	m0 := &GenerateEmbeddingsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ModelId = b.ModelId
+	x.Dimensions = b.Dimensions
+	x.Inputs = b.Inputs
+	return m0
+}
+
 // Response containing the generated embeddings for the input text.
 type GenerateEmbeddingsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// List of embedding outputs corresponding to the inputs.
 	Outputs       []*EmbeddingOutput `protobuf:"bytes,1,rep,name=outputs,proto3" json:"outputs,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -501,11 +692,6 @@ func (x *GenerateEmbeddingsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GenerateEmbeddingsResponse.ProtoReflect.Descriptor instead.
-func (*GenerateEmbeddingsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *GenerateEmbeddingsResponse) GetOutputs() []*EmbeddingOutput {
 	if x != nil {
 		return x.Outputs
@@ -513,8 +699,27 @@ func (x *GenerateEmbeddingsResponse) GetOutputs() []*EmbeddingOutput {
 	return nil
 }
 
+func (x *GenerateEmbeddingsResponse) SetOutputs(v []*EmbeddingOutput) {
+	x.Outputs = v
+}
+
+type GenerateEmbeddingsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// List of embedding outputs corresponding to the inputs.
+	Outputs []*EmbeddingOutput
+}
+
+func (b0 GenerateEmbeddingsResponse_builder) Build() *GenerateEmbeddingsResponse {
+	m0 := &GenerateEmbeddingsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Outputs = b.Outputs
+	return m0
+}
+
 type Blob struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Media Type type/subtype or with parameters type/subtype;parameter=value;parameter2=value2
 	MediaType     string  `protobuf:"bytes,1,opt,name=media_type,json=mediaType,proto3" json:"media_type,omitempty"`
 	Data          []byte  `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
@@ -548,11 +753,6 @@ func (x *Blob) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Blob.ProtoReflect.Descriptor instead.
-func (*Blob) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *Blob) GetMediaType() string {
 	if x != nil {
 		return x.MediaType
@@ -574,8 +774,53 @@ func (x *Blob) GetName() string {
 	return ""
 }
 
+func (x *Blob) SetMediaType(v string) {
+	x.MediaType = v
+}
+
+func (x *Blob) SetData(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.Data = v
+}
+
+func (x *Blob) SetName(v string) {
+	x.Name = &v
+}
+
+func (x *Blob) HasName() bool {
+	if x == nil {
+		return false
+	}
+	return x.Name != nil
+}
+
+func (x *Blob) ClearName() {
+	x.Name = nil
+}
+
+type Blob_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Media Type type/subtype or with parameters type/subtype;parameter=value;parameter2=value2
+	MediaType string
+	Data      []byte
+	Name      *string
+}
+
+func (b0 Blob_builder) Build() *Blob {
+	m0 := &Blob{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.MediaType = b.MediaType
+	x.Data = b.Data
+	x.Name = b.Name
+	return m0
+}
+
 type Message struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
+	state           protoimpl.MessageState `protogen:"hybrid.v1"`
 	ProviderOptions *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_options,json=providerOptions,proto3" json:"provider_options,omitempty"`
 	Role            string                 `protobuf:"bytes,2,opt,name=role,proto3" json:"role,omitempty"`
 	Content         []*Message_Content     `protobuf:"bytes,3,rep,name=content,proto3" json:"content,omitempty"`
@@ -608,11 +853,6 @@ func (x *Message) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Message.ProtoReflect.Descriptor instead.
-func (*Message) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *Message) GetProviderOptions() *structpb.Struct {
 	if x != nil {
 		return x.ProviderOptions
@@ -634,8 +874,49 @@ func (x *Message) GetContent() []*Message_Content {
 	return nil
 }
 
+func (x *Message) SetProviderOptions(v *structpb.Struct) {
+	x.ProviderOptions = v
+}
+
+func (x *Message) SetRole(v string) {
+	x.Role = v
+}
+
+func (x *Message) SetContent(v []*Message_Content) {
+	x.Content = v
+}
+
+func (x *Message) HasProviderOptions() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderOptions != nil
+}
+
+func (x *Message) ClearProviderOptions() {
+	x.ProviderOptions = nil
+}
+
+type Message_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	ProviderOptions *structpb.Struct
+	Role            string
+	Content         []*Message_Content
+}
+
+func (b0 Message_builder) Build() *Message {
+	m0 := &Message{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ProviderOptions = b.ProviderOptions
+	x.Role = b.Role
+	x.Content = b.Content
+	return m0
+}
+
 type GenerateTextRequest struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
+	state           protoimpl.MessageState `protogen:"hybrid.v1"`
 	Messages        []*Message             `protobuf:"bytes,1,rep,name=messages,proto3" json:"messages,omitempty"`
 	ProviderOptions *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_options,json=providerOptions,proto3" json:"provider_options,omitempty"`
 	unknownFields   protoimpl.UnknownFields
@@ -667,11 +948,6 @@ func (x *GenerateTextRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GenerateTextRequest.ProtoReflect.Descriptor instead.
-func (*GenerateTextRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{11}
-}
-
 func (x *GenerateTextRequest) GetMessages() []*Message {
 	if x != nil {
 		return x.Messages
@@ -686,8 +962,43 @@ func (x *GenerateTextRequest) GetProviderOptions() *structpb.Struct {
 	return nil
 }
 
+func (x *GenerateTextRequest) SetMessages(v []*Message) {
+	x.Messages = v
+}
+
+func (x *GenerateTextRequest) SetProviderOptions(v *structpb.Struct) {
+	x.ProviderOptions = v
+}
+
+func (x *GenerateTextRequest) HasProviderOptions() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderOptions != nil
+}
+
+func (x *GenerateTextRequest) ClearProviderOptions() {
+	x.ProviderOptions = nil
+}
+
+type GenerateTextRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Messages        []*Message
+	ProviderOptions *structpb.Struct
+}
+
+func (b0 GenerateTextRequest_builder) Build() *GenerateTextRequest {
+	m0 := &GenerateTextRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Messages = b.Messages
+	x.ProviderOptions = b.ProviderOptions
+	return m0
+}
+
 type GenerateTextResponse struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
+	state            protoimpl.MessageState `protogen:"hybrid.v1"`
 	ProviderMetadata *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_metadata,json=providerMetadata,proto3" json:"provider_metadata,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -718,11 +1029,6 @@ func (x *GenerateTextResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GenerateTextResponse.ProtoReflect.Descriptor instead.
-func (*GenerateTextResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{12}
-}
-
 func (x *GenerateTextResponse) GetProviderMetadata() *structpb.Struct {
 	if x != nil {
 		return x.ProviderMetadata
@@ -730,8 +1036,37 @@ func (x *GenerateTextResponse) GetProviderMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *GenerateTextResponse) SetProviderMetadata(v *structpb.Struct) {
+	x.ProviderMetadata = v
+}
+
+func (x *GenerateTextResponse) HasProviderMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderMetadata != nil
+}
+
+func (x *GenerateTextResponse) ClearProviderMetadata() {
+	x.ProviderMetadata = nil
+}
+
+type GenerateTextResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	ProviderMetadata *structpb.Struct
+}
+
+func (b0 GenerateTextResponse_builder) Build() *GenerateTextResponse {
+	m0 := &GenerateTextResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ProviderMetadata = b.ProviderMetadata
+	return m0
+}
+
 type StreamTextRequest struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
+	state           protoimpl.MessageState `protogen:"hybrid.v1"`
 	Messages        []*Message             `protobuf:"bytes,1,rep,name=messages,proto3" json:"messages,omitempty"`
 	ProviderOptions *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_options,json=providerOptions,proto3" json:"provider_options,omitempty"`
 	unknownFields   protoimpl.UnknownFields
@@ -763,11 +1098,6 @@ func (x *StreamTextRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StreamTextRequest.ProtoReflect.Descriptor instead.
-func (*StreamTextRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{13}
-}
-
 func (x *StreamTextRequest) GetMessages() []*Message {
 	if x != nil {
 		return x.Messages
@@ -782,8 +1112,43 @@ func (x *StreamTextRequest) GetProviderOptions() *structpb.Struct {
 	return nil
 }
 
+func (x *StreamTextRequest) SetMessages(v []*Message) {
+	x.Messages = v
+}
+
+func (x *StreamTextRequest) SetProviderOptions(v *structpb.Struct) {
+	x.ProviderOptions = v
+}
+
+func (x *StreamTextRequest) HasProviderOptions() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderOptions != nil
+}
+
+func (x *StreamTextRequest) ClearProviderOptions() {
+	x.ProviderOptions = nil
+}
+
+type StreamTextRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Messages        []*Message
+	ProviderOptions *structpb.Struct
+}
+
+func (b0 StreamTextRequest_builder) Build() *StreamTextRequest {
+	m0 := &StreamTextRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Messages = b.Messages
+	x.ProviderOptions = b.ProviderOptions
+	return m0
+}
+
 type StreamTextResponse struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
+	state            protoimpl.MessageState `protogen:"hybrid.v1"`
 	ProviderMetadata *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_metadata,json=providerMetadata,proto3" json:"provider_metadata,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -814,11 +1179,6 @@ func (x *StreamTextResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StreamTextResponse.ProtoReflect.Descriptor instead.
-func (*StreamTextResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{14}
-}
-
 func (x *StreamTextResponse) GetProviderMetadata() *structpb.Struct {
 	if x != nil {
 		return x.ProviderMetadata
@@ -826,8 +1186,37 @@ func (x *StreamTextResponse) GetProviderMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *StreamTextResponse) SetProviderMetadata(v *structpb.Struct) {
+	x.ProviderMetadata = v
+}
+
+func (x *StreamTextResponse) HasProviderMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderMetadata != nil
+}
+
+func (x *StreamTextResponse) ClearProviderMetadata() {
+	x.ProviderMetadata = nil
+}
+
+type StreamTextResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	ProviderMetadata *structpb.Struct
+}
+
+func (b0 StreamTextResponse_builder) Build() *StreamTextResponse {
+	m0 := &StreamTextResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ProviderMetadata = b.ProviderMetadata
+	return m0
+}
+
 type GenerateObjectRequest struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
+	state           protoimpl.MessageState `protogen:"hybrid.v1"`
 	Messages        []*Message             `protobuf:"bytes,1,rep,name=messages,proto3" json:"messages,omitempty"`
 	ProviderOptions *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_options,json=providerOptions,proto3" json:"provider_options,omitempty"`
 	unknownFields   protoimpl.UnknownFields
@@ -859,11 +1248,6 @@ func (x *GenerateObjectRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GenerateObjectRequest.ProtoReflect.Descriptor instead.
-func (*GenerateObjectRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{15}
-}
-
 func (x *GenerateObjectRequest) GetMessages() []*Message {
 	if x != nil {
 		return x.Messages
@@ -878,8 +1262,43 @@ func (x *GenerateObjectRequest) GetProviderOptions() *structpb.Struct {
 	return nil
 }
 
+func (x *GenerateObjectRequest) SetMessages(v []*Message) {
+	x.Messages = v
+}
+
+func (x *GenerateObjectRequest) SetProviderOptions(v *structpb.Struct) {
+	x.ProviderOptions = v
+}
+
+func (x *GenerateObjectRequest) HasProviderOptions() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderOptions != nil
+}
+
+func (x *GenerateObjectRequest) ClearProviderOptions() {
+	x.ProviderOptions = nil
+}
+
+type GenerateObjectRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Messages        []*Message
+	ProviderOptions *structpb.Struct
+}
+
+func (b0 GenerateObjectRequest_builder) Build() *GenerateObjectRequest {
+	m0 := &GenerateObjectRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Messages = b.Messages
+	x.ProviderOptions = b.ProviderOptions
+	return m0
+}
+
 type GenerateObjectResponse struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
+	state            protoimpl.MessageState `protogen:"hybrid.v1"`
 	ProviderMetadata *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_metadata,json=providerMetadata,proto3" json:"provider_metadata,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -910,11 +1329,6 @@ func (x *GenerateObjectResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GenerateObjectResponse.ProtoReflect.Descriptor instead.
-func (*GenerateObjectResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{16}
-}
-
 func (x *GenerateObjectResponse) GetProviderMetadata() *structpb.Struct {
 	if x != nil {
 		return x.ProviderMetadata
@@ -922,8 +1336,37 @@ func (x *GenerateObjectResponse) GetProviderMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *GenerateObjectResponse) SetProviderMetadata(v *structpb.Struct) {
+	x.ProviderMetadata = v
+}
+
+func (x *GenerateObjectResponse) HasProviderMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderMetadata != nil
+}
+
+func (x *GenerateObjectResponse) ClearProviderMetadata() {
+	x.ProviderMetadata = nil
+}
+
+type GenerateObjectResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	ProviderMetadata *structpb.Struct
+}
+
+func (b0 GenerateObjectResponse_builder) Build() *GenerateObjectResponse {
+	m0 := &GenerateObjectResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ProviderMetadata = b.ProviderMetadata
+	return m0
+}
+
 type StreamObjectsRequest struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
+	state           protoimpl.MessageState `protogen:"hybrid.v1"`
 	Messages        []*Message             `protobuf:"bytes,1,rep,name=messages,proto3" json:"messages,omitempty"`
 	ProviderOptions *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_options,json=providerOptions,proto3" json:"provider_options,omitempty"`
 	unknownFields   protoimpl.UnknownFields
@@ -955,11 +1398,6 @@ func (x *StreamObjectsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StreamObjectsRequest.ProtoReflect.Descriptor instead.
-func (*StreamObjectsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{17}
-}
-
 func (x *StreamObjectsRequest) GetMessages() []*Message {
 	if x != nil {
 		return x.Messages
@@ -974,8 +1412,43 @@ func (x *StreamObjectsRequest) GetProviderOptions() *structpb.Struct {
 	return nil
 }
 
+func (x *StreamObjectsRequest) SetMessages(v []*Message) {
+	x.Messages = v
+}
+
+func (x *StreamObjectsRequest) SetProviderOptions(v *structpb.Struct) {
+	x.ProviderOptions = v
+}
+
+func (x *StreamObjectsRequest) HasProviderOptions() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderOptions != nil
+}
+
+func (x *StreamObjectsRequest) ClearProviderOptions() {
+	x.ProviderOptions = nil
+}
+
+type StreamObjectsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Messages        []*Message
+	ProviderOptions *structpb.Struct
+}
+
+func (b0 StreamObjectsRequest_builder) Build() *StreamObjectsRequest {
+	m0 := &StreamObjectsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Messages = b.Messages
+	x.ProviderOptions = b.ProviderOptions
+	return m0
+}
+
 type StreamObjectsResponse struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
+	state            protoimpl.MessageState `protogen:"hybrid.v1"`
 	ProviderMetadata *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_metadata,json=providerMetadata,proto3" json:"provider_metadata,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -1006,11 +1479,6 @@ func (x *StreamObjectsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StreamObjectsResponse.ProtoReflect.Descriptor instead.
-func (*StreamObjectsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{18}
-}
-
 func (x *StreamObjectsResponse) GetProviderMetadata() *structpb.Struct {
 	if x != nil {
 		return x.ProviderMetadata
@@ -1018,8 +1486,37 @@ func (x *StreamObjectsResponse) GetProviderMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *StreamObjectsResponse) SetProviderMetadata(v *structpb.Struct) {
+	x.ProviderMetadata = v
+}
+
+func (x *StreamObjectsResponse) HasProviderMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderMetadata != nil
+}
+
+func (x *StreamObjectsResponse) ClearProviderMetadata() {
+	x.ProviderMetadata = nil
+}
+
+type StreamObjectsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	ProviderMetadata *structpb.Struct
+}
+
+func (b0 StreamObjectsResponse_builder) Build() *StreamObjectsResponse {
+	m0 := &StreamObjectsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ProviderMetadata = b.ProviderMetadata
+	return m0
+}
+
 type GenerateImageRequest struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
+	state           protoimpl.MessageState `protogen:"hybrid.v1"`
 	Messages        []*Message             `protobuf:"bytes,1,rep,name=messages,proto3" json:"messages,omitempty"`
 	ProviderOptions *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_options,json=providerOptions,proto3" json:"provider_options,omitempty"`
 	unknownFields   protoimpl.UnknownFields
@@ -1051,11 +1548,6 @@ func (x *GenerateImageRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GenerateImageRequest.ProtoReflect.Descriptor instead.
-func (*GenerateImageRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{19}
-}
-
 func (x *GenerateImageRequest) GetMessages() []*Message {
 	if x != nil {
 		return x.Messages
@@ -1070,8 +1562,43 @@ func (x *GenerateImageRequest) GetProviderOptions() *structpb.Struct {
 	return nil
 }
 
+func (x *GenerateImageRequest) SetMessages(v []*Message) {
+	x.Messages = v
+}
+
+func (x *GenerateImageRequest) SetProviderOptions(v *structpb.Struct) {
+	x.ProviderOptions = v
+}
+
+func (x *GenerateImageRequest) HasProviderOptions() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderOptions != nil
+}
+
+func (x *GenerateImageRequest) ClearProviderOptions() {
+	x.ProviderOptions = nil
+}
+
+type GenerateImageRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Messages        []*Message
+	ProviderOptions *structpb.Struct
+}
+
+func (b0 GenerateImageRequest_builder) Build() *GenerateImageRequest {
+	m0 := &GenerateImageRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Messages = b.Messages
+	x.ProviderOptions = b.ProviderOptions
+	return m0
+}
+
 type GenerateImageResponse struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
+	state            protoimpl.MessageState `protogen:"hybrid.v1"`
 	ProviderMetadata *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_metadata,json=providerMetadata,proto3" json:"provider_metadata,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -1102,11 +1629,6 @@ func (x *GenerateImageResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GenerateImageResponse.ProtoReflect.Descriptor instead.
-func (*GenerateImageResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{20}
-}
-
 func (x *GenerateImageResponse) GetProviderMetadata() *structpb.Struct {
 	if x != nil {
 		return x.ProviderMetadata
@@ -1114,8 +1636,37 @@ func (x *GenerateImageResponse) GetProviderMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *GenerateImageResponse) SetProviderMetadata(v *structpb.Struct) {
+	x.ProviderMetadata = v
+}
+
+func (x *GenerateImageResponse) HasProviderMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderMetadata != nil
+}
+
+func (x *GenerateImageResponse) ClearProviderMetadata() {
+	x.ProviderMetadata = nil
+}
+
+type GenerateImageResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	ProviderMetadata *structpb.Struct
+}
+
+func (b0 GenerateImageResponse_builder) Build() *GenerateImageResponse {
+	m0 := &GenerateImageResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ProviderMetadata = b.ProviderMetadata
+	return m0
+}
+
 type GenerateImagesRequest struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
+	state           protoimpl.MessageState `protogen:"hybrid.v1"`
 	Messages        []*Message             `protobuf:"bytes,1,rep,name=messages,proto3" json:"messages,omitempty"`
 	ProviderOptions *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_options,json=providerOptions,proto3" json:"provider_options,omitempty"`
 	unknownFields   protoimpl.UnknownFields
@@ -1147,11 +1698,6 @@ func (x *GenerateImagesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GenerateImagesRequest.ProtoReflect.Descriptor instead.
-func (*GenerateImagesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{21}
-}
-
 func (x *GenerateImagesRequest) GetMessages() []*Message {
 	if x != nil {
 		return x.Messages
@@ -1166,8 +1712,43 @@ func (x *GenerateImagesRequest) GetProviderOptions() *structpb.Struct {
 	return nil
 }
 
+func (x *GenerateImagesRequest) SetMessages(v []*Message) {
+	x.Messages = v
+}
+
+func (x *GenerateImagesRequest) SetProviderOptions(v *structpb.Struct) {
+	x.ProviderOptions = v
+}
+
+func (x *GenerateImagesRequest) HasProviderOptions() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderOptions != nil
+}
+
+func (x *GenerateImagesRequest) ClearProviderOptions() {
+	x.ProviderOptions = nil
+}
+
+type GenerateImagesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Messages        []*Message
+	ProviderOptions *structpb.Struct
+}
+
+func (b0 GenerateImagesRequest_builder) Build() *GenerateImagesRequest {
+	m0 := &GenerateImagesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Messages = b.Messages
+	x.ProviderOptions = b.ProviderOptions
+	return m0
+}
+
 type GenerateImagesResponse struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
+	state            protoimpl.MessageState `protogen:"hybrid.v1"`
 	ProviderMetadata *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_metadata,json=providerMetadata,proto3" json:"provider_metadata,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -1198,11 +1779,6 @@ func (x *GenerateImagesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GenerateImagesResponse.ProtoReflect.Descriptor instead.
-func (*GenerateImagesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{22}
-}
-
 func (x *GenerateImagesResponse) GetProviderMetadata() *structpb.Struct {
 	if x != nil {
 		return x.ProviderMetadata
@@ -1210,8 +1786,37 @@ func (x *GenerateImagesResponse) GetProviderMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *GenerateImagesResponse) SetProviderMetadata(v *structpb.Struct) {
+	x.ProviderMetadata = v
+}
+
+func (x *GenerateImagesResponse) HasProviderMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderMetadata != nil
+}
+
+func (x *GenerateImagesResponse) ClearProviderMetadata() {
+	x.ProviderMetadata = nil
+}
+
+type GenerateImagesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	ProviderMetadata *structpb.Struct
+}
+
+func (b0 GenerateImagesResponse_builder) Build() *GenerateImagesResponse {
+	m0 := &GenerateImagesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ProviderMetadata = b.ProviderMetadata
+	return m0
+}
+
 type GenerateBatchImagesRequest struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
+	state           protoimpl.MessageState `protogen:"hybrid.v1"`
 	Messages        []*Message             `protobuf:"bytes,1,rep,name=messages,proto3" json:"messages,omitempty"`
 	ProviderOptions *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_options,json=providerOptions,proto3" json:"provider_options,omitempty"`
 	unknownFields   protoimpl.UnknownFields
@@ -1243,11 +1848,6 @@ func (x *GenerateBatchImagesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GenerateBatchImagesRequest.ProtoReflect.Descriptor instead.
-func (*GenerateBatchImagesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{23}
-}
-
 func (x *GenerateBatchImagesRequest) GetMessages() []*Message {
 	if x != nil {
 		return x.Messages
@@ -1262,8 +1862,43 @@ func (x *GenerateBatchImagesRequest) GetProviderOptions() *structpb.Struct {
 	return nil
 }
 
+func (x *GenerateBatchImagesRequest) SetMessages(v []*Message) {
+	x.Messages = v
+}
+
+func (x *GenerateBatchImagesRequest) SetProviderOptions(v *structpb.Struct) {
+	x.ProviderOptions = v
+}
+
+func (x *GenerateBatchImagesRequest) HasProviderOptions() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderOptions != nil
+}
+
+func (x *GenerateBatchImagesRequest) ClearProviderOptions() {
+	x.ProviderOptions = nil
+}
+
+type GenerateBatchImagesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Messages        []*Message
+	ProviderOptions *structpb.Struct
+}
+
+func (b0 GenerateBatchImagesRequest_builder) Build() *GenerateBatchImagesRequest {
+	m0 := &GenerateBatchImagesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Messages = b.Messages
+	x.ProviderOptions = b.ProviderOptions
+	return m0
+}
+
 type GenerateBatchImagesResponse struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
+	state            protoimpl.MessageState `protogen:"hybrid.v1"`
 	ProviderMetadata *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_metadata,json=providerMetadata,proto3" json:"provider_metadata,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -1294,11 +1929,6 @@ func (x *GenerateBatchImagesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GenerateBatchImagesResponse.ProtoReflect.Descriptor instead.
-func (*GenerateBatchImagesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{24}
-}
-
 func (x *GenerateBatchImagesResponse) GetProviderMetadata() *structpb.Struct {
 	if x != nil {
 		return x.ProviderMetadata
@@ -1306,8 +1936,37 @@ func (x *GenerateBatchImagesResponse) GetProviderMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *GenerateBatchImagesResponse) SetProviderMetadata(v *structpb.Struct) {
+	x.ProviderMetadata = v
+}
+
+func (x *GenerateBatchImagesResponse) HasProviderMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderMetadata != nil
+}
+
+func (x *GenerateBatchImagesResponse) ClearProviderMetadata() {
+	x.ProviderMetadata = nil
+}
+
+type GenerateBatchImagesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	ProviderMetadata *structpb.Struct
+}
+
+func (b0 GenerateBatchImagesResponse_builder) Build() *GenerateBatchImagesResponse {
+	m0 := &GenerateBatchImagesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ProviderMetadata = b.ProviderMetadata
+	return m0
+}
+
 type TranscribeRequest struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
+	state           protoimpl.MessageState `protogen:"hybrid.v1"`
 	Audio           *Blob                  `protobuf:"bytes,1,opt,name=audio,proto3" json:"audio,omitempty"`
 	ProviderOptions *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_options,json=providerOptions,proto3" json:"provider_options,omitempty"`
 	unknownFields   protoimpl.UnknownFields
@@ -1339,11 +1998,6 @@ func (x *TranscribeRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TranscribeRequest.ProtoReflect.Descriptor instead.
-func (*TranscribeRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{25}
-}
-
 func (x *TranscribeRequest) GetAudio() *Blob {
 	if x != nil {
 		return x.Audio
@@ -1358,8 +2012,54 @@ func (x *TranscribeRequest) GetProviderOptions() *structpb.Struct {
 	return nil
 }
 
+func (x *TranscribeRequest) SetAudio(v *Blob) {
+	x.Audio = v
+}
+
+func (x *TranscribeRequest) SetProviderOptions(v *structpb.Struct) {
+	x.ProviderOptions = v
+}
+
+func (x *TranscribeRequest) HasAudio() bool {
+	if x == nil {
+		return false
+	}
+	return x.Audio != nil
+}
+
+func (x *TranscribeRequest) HasProviderOptions() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderOptions != nil
+}
+
+func (x *TranscribeRequest) ClearAudio() {
+	x.Audio = nil
+}
+
+func (x *TranscribeRequest) ClearProviderOptions() {
+	x.ProviderOptions = nil
+}
+
+type TranscribeRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Audio           *Blob
+	ProviderOptions *structpb.Struct
+}
+
+func (b0 TranscribeRequest_builder) Build() *TranscribeRequest {
+	m0 := &TranscribeRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Audio = b.Audio
+	x.ProviderOptions = b.ProviderOptions
+	return m0
+}
+
 type TranscribeResponse struct {
-	state    protoimpl.MessageState        `protogen:"open.v1"`
+	state    protoimpl.MessageState        `protogen:"hybrid.v1"`
 	Text     string                        `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
 	Segments []*TranscribeResponse_Segment `protobuf:"bytes,2,rep,name=segments,proto3" json:"segments,omitempty"`
 	Duration *durationpb.Duration          `protobuf:"bytes,3,opt,name=duration,proto3" json:"duration,omitempty"`
@@ -1393,11 +2093,6 @@ func (x *TranscribeResponse) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TranscribeResponse.ProtoReflect.Descriptor instead.
-func (*TranscribeResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *TranscribeResponse) GetText() string {
@@ -1435,8 +2130,73 @@ func (x *TranscribeResponse) GetProviderMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *TranscribeResponse) SetText(v string) {
+	x.Text = v
+}
+
+func (x *TranscribeResponse) SetSegments(v []*TranscribeResponse_Segment) {
+	x.Segments = v
+}
+
+func (x *TranscribeResponse) SetDuration(v *durationpb.Duration) {
+	x.Duration = v
+}
+
+func (x *TranscribeResponse) SetLanguage(v string) {
+	x.Language = v
+}
+
+func (x *TranscribeResponse) SetProviderMetadata(v *structpb.Struct) {
+	x.ProviderMetadata = v
+}
+
+func (x *TranscribeResponse) HasDuration() bool {
+	if x == nil {
+		return false
+	}
+	return x.Duration != nil
+}
+
+func (x *TranscribeResponse) HasProviderMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderMetadata != nil
+}
+
+func (x *TranscribeResponse) ClearDuration() {
+	x.Duration = nil
+}
+
+func (x *TranscribeResponse) ClearProviderMetadata() {
+	x.ProviderMetadata = nil
+}
+
+type TranscribeResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Text     string
+	Segments []*TranscribeResponse_Segment
+	Duration *durationpb.Duration
+	// Detected language; an ISO-639-1 language code
+	Language         string
+	ProviderMetadata *structpb.Struct
+}
+
+func (b0 TranscribeResponse_builder) Build() *TranscribeResponse {
+	m0 := &TranscribeResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Text = b.Text
+	x.Segments = b.Segments
+	x.Duration = b.Duration
+	x.Language = b.Language
+	x.ProviderMetadata = b.ProviderMetadata
+	return m0
+}
+
 type GenerateSpeechRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	Text  string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
 	// The input messages / prompts to be synthesized into speech
 	Messages []*Message `protobuf:"bytes,2,rep,name=messages,proto3" json:"messages,omitempty"`
@@ -1477,11 +2237,6 @@ func (x *GenerateSpeechRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GenerateSpeechRequest.ProtoReflect.Descriptor instead.
-func (*GenerateSpeechRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *GenerateSpeechRequest) GetText() string {
@@ -1533,8 +2288,123 @@ func (x *GenerateSpeechRequest) GetProviderOptions() *structpb.Struct {
 	return nil
 }
 
+func (x *GenerateSpeechRequest) SetText(v string) {
+	x.Text = v
+}
+
+func (x *GenerateSpeechRequest) SetMessages(v []*Message) {
+	x.Messages = v
+}
+
+func (x *GenerateSpeechRequest) SetVoice(v string) {
+	x.Voice = &v
+}
+
+func (x *GenerateSpeechRequest) SetMediaType(v string) {
+	x.MediaType = &v
+}
+
+func (x *GenerateSpeechRequest) SetSpeed(v float32) {
+	x.Speed = &v
+}
+
+func (x *GenerateSpeechRequest) SetLanguage(v string) {
+	x.Language = &v
+}
+
+func (x *GenerateSpeechRequest) SetProviderOptions(v *structpb.Struct) {
+	x.ProviderOptions = v
+}
+
+func (x *GenerateSpeechRequest) HasVoice() bool {
+	if x == nil {
+		return false
+	}
+	return x.Voice != nil
+}
+
+func (x *GenerateSpeechRequest) HasMediaType() bool {
+	if x == nil {
+		return false
+	}
+	return x.MediaType != nil
+}
+
+func (x *GenerateSpeechRequest) HasSpeed() bool {
+	if x == nil {
+		return false
+	}
+	return x.Speed != nil
+}
+
+func (x *GenerateSpeechRequest) HasLanguage() bool {
+	if x == nil {
+		return false
+	}
+	return x.Language != nil
+}
+
+func (x *GenerateSpeechRequest) HasProviderOptions() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderOptions != nil
+}
+
+func (x *GenerateSpeechRequest) ClearVoice() {
+	x.Voice = nil
+}
+
+func (x *GenerateSpeechRequest) ClearMediaType() {
+	x.MediaType = nil
+}
+
+func (x *GenerateSpeechRequest) ClearSpeed() {
+	x.Speed = nil
+}
+
+func (x *GenerateSpeechRequest) ClearLanguage() {
+	x.Language = nil
+}
+
+func (x *GenerateSpeechRequest) ClearProviderOptions() {
+	x.ProviderOptions = nil
+}
+
+type GenerateSpeechRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Text string
+	// The input messages / prompts to be synthesized into speech
+	Messages []*Message
+	// Provider specific voice identifier
+	Voice *string
+	// Output media type, e.g., "audio/mpeg", "audio/wav", "audio/ogg"
+	MediaType *string
+	// Speech synthesis speed; range and meaning may vary by provider.
+	Speed *float32
+	// The language (input and output); an ISO-639-1 language code or 'auto' to auto-detect.
+	// Provider support may vary.
+	Language        *string
+	ProviderOptions *structpb.Struct
+}
+
+func (b0 GenerateSpeechRequest_builder) Build() *GenerateSpeechRequest {
+	m0 := &GenerateSpeechRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Text = b.Text
+	x.Messages = b.Messages
+	x.Voice = b.Voice
+	x.MediaType = b.MediaType
+	x.Speed = b.Speed
+	x.Language = b.Language
+	x.ProviderOptions = b.ProviderOptions
+	return m0
+}
+
 type GenerateSpeechResponse struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
+	state            protoimpl.MessageState `protogen:"hybrid.v1"`
 	Audio            *Blob                  `protobuf:"bytes,1,opt,name=audio,proto3" json:"audio,omitempty"`
 	ProviderMetadata *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_metadata,json=providerMetadata,proto3" json:"provider_metadata,omitempty"`
 	unknownFields    protoimpl.UnknownFields
@@ -1566,11 +2436,6 @@ func (x *GenerateSpeechResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GenerateSpeechResponse.ProtoReflect.Descriptor instead.
-func (*GenerateSpeechResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{28}
-}
-
 func (x *GenerateSpeechResponse) GetAudio() *Blob {
 	if x != nil {
 		return x.Audio
@@ -1585,8 +2450,54 @@ func (x *GenerateSpeechResponse) GetProviderMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *GenerateSpeechResponse) SetAudio(v *Blob) {
+	x.Audio = v
+}
+
+func (x *GenerateSpeechResponse) SetProviderMetadata(v *structpb.Struct) {
+	x.ProviderMetadata = v
+}
+
+func (x *GenerateSpeechResponse) HasAudio() bool {
+	if x == nil {
+		return false
+	}
+	return x.Audio != nil
+}
+
+func (x *GenerateSpeechResponse) HasProviderMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderMetadata != nil
+}
+
+func (x *GenerateSpeechResponse) ClearAudio() {
+	x.Audio = nil
+}
+
+func (x *GenerateSpeechResponse) ClearProviderMetadata() {
+	x.ProviderMetadata = nil
+}
+
+type GenerateSpeechResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Audio            *Blob
+	ProviderMetadata *structpb.Struct
+}
+
+func (b0 GenerateSpeechResponse_builder) Build() *GenerateSpeechResponse {
+	m0 := &GenerateSpeechResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Audio = b.Audio
+	x.ProviderMetadata = b.ProviderMetadata
+	return m0
+}
+
 type StreamSpeechRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	Text  string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
 	// The input messages / prompts to be synthesized into speech
 	Messages []*Message `protobuf:"bytes,2,rep,name=messages,proto3" json:"messages,omitempty"`
@@ -1627,11 +2538,6 @@ func (x *StreamSpeechRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StreamSpeechRequest.ProtoReflect.Descriptor instead.
-func (*StreamSpeechRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *StreamSpeechRequest) GetText() string {
@@ -1683,8 +2589,123 @@ func (x *StreamSpeechRequest) GetProviderOptions() *structpb.Struct {
 	return nil
 }
 
+func (x *StreamSpeechRequest) SetText(v string) {
+	x.Text = v
+}
+
+func (x *StreamSpeechRequest) SetMessages(v []*Message) {
+	x.Messages = v
+}
+
+func (x *StreamSpeechRequest) SetVoice(v string) {
+	x.Voice = &v
+}
+
+func (x *StreamSpeechRequest) SetOutputMediaType(v string) {
+	x.OutputMediaType = &v
+}
+
+func (x *StreamSpeechRequest) SetSpeed(v float32) {
+	x.Speed = &v
+}
+
+func (x *StreamSpeechRequest) SetLanguage(v string) {
+	x.Language = &v
+}
+
+func (x *StreamSpeechRequest) SetProviderOptions(v *structpb.Struct) {
+	x.ProviderOptions = v
+}
+
+func (x *StreamSpeechRequest) HasVoice() bool {
+	if x == nil {
+		return false
+	}
+	return x.Voice != nil
+}
+
+func (x *StreamSpeechRequest) HasOutputMediaType() bool {
+	if x == nil {
+		return false
+	}
+	return x.OutputMediaType != nil
+}
+
+func (x *StreamSpeechRequest) HasSpeed() bool {
+	if x == nil {
+		return false
+	}
+	return x.Speed != nil
+}
+
+func (x *StreamSpeechRequest) HasLanguage() bool {
+	if x == nil {
+		return false
+	}
+	return x.Language != nil
+}
+
+func (x *StreamSpeechRequest) HasProviderOptions() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderOptions != nil
+}
+
+func (x *StreamSpeechRequest) ClearVoice() {
+	x.Voice = nil
+}
+
+func (x *StreamSpeechRequest) ClearOutputMediaType() {
+	x.OutputMediaType = nil
+}
+
+func (x *StreamSpeechRequest) ClearSpeed() {
+	x.Speed = nil
+}
+
+func (x *StreamSpeechRequest) ClearLanguage() {
+	x.Language = nil
+}
+
+func (x *StreamSpeechRequest) ClearProviderOptions() {
+	x.ProviderOptions = nil
+}
+
+type StreamSpeechRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Text string
+	// The input messages / prompts to be synthesized into speech
+	Messages []*Message
+	// Provider specific voice identifier
+	Voice *string
+	// Output media type, e.g., "audio/mpeg", "audio/wav", "audio/ogg"
+	OutputMediaType *string
+	// Speech synthesis speed; range and meaning may vary by provider.
+	Speed *float32
+	// The language (input and output); an ISO-639-1 language code or 'auto' to auto-detect.
+	// Provider support may vary.
+	Language        *string
+	ProviderOptions *structpb.Struct
+}
+
+func (b0 StreamSpeechRequest_builder) Build() *StreamSpeechRequest {
+	m0 := &StreamSpeechRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Text = b.Text
+	x.Messages = b.Messages
+	x.Voice = b.Voice
+	x.OutputMediaType = b.OutputMediaType
+	x.Speed = b.Speed
+	x.Language = b.Language
+	x.ProviderOptions = b.ProviderOptions
+	return m0
+}
+
 type StreamSpeechResponse struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
+	state            protoimpl.MessageState `protogen:"hybrid.v1"`
 	Audio            *Blob                  `protobuf:"bytes,1,opt,name=audio,proto3" json:"audio,omitempty"`
 	ProviderMetadata *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_metadata,json=providerMetadata,proto3" json:"provider_metadata,omitempty"`
 	unknownFields    protoimpl.UnknownFields
@@ -1716,11 +2737,6 @@ func (x *StreamSpeechResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StreamSpeechResponse.ProtoReflect.Descriptor instead.
-func (*StreamSpeechResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{30}
-}
-
 func (x *StreamSpeechResponse) GetAudio() *Blob {
 	if x != nil {
 		return x.Audio
@@ -1735,8 +2751,54 @@ func (x *StreamSpeechResponse) GetProviderMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *StreamSpeechResponse) SetAudio(v *Blob) {
+	x.Audio = v
+}
+
+func (x *StreamSpeechResponse) SetProviderMetadata(v *structpb.Struct) {
+	x.ProviderMetadata = v
+}
+
+func (x *StreamSpeechResponse) HasAudio() bool {
+	if x == nil {
+		return false
+	}
+	return x.Audio != nil
+}
+
+func (x *StreamSpeechResponse) HasProviderMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderMetadata != nil
+}
+
+func (x *StreamSpeechResponse) ClearAudio() {
+	x.Audio = nil
+}
+
+func (x *StreamSpeechResponse) ClearProviderMetadata() {
+	x.ProviderMetadata = nil
+}
+
+type StreamSpeechResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Audio            *Blob
+	ProviderMetadata *structpb.Struct
+}
+
+func (b0 StreamSpeechResponse_builder) Build() *StreamSpeechResponse {
+	m0 := &StreamSpeechResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Audio = b.Audio
+	x.ProviderMetadata = b.ProviderMetadata
+	return m0
+}
+
 type Message_Content struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
+	state           protoimpl.MessageState `protogen:"hybrid.v1"`
 	ProviderOptions *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_options,json=providerOptions,proto3" json:"provider_options,omitempty"`
 	// Types that are valid to be assigned to Type:
 	//
@@ -1773,11 +2835,6 @@ func (x *Message_Content) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Message_Content.ProtoReflect.Descriptor instead.
-func (*Message_Content) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{10, 0}
 }
 
 func (x *Message_Content) GetProviderOptions() *structpb.Struct {
@@ -1839,6 +2896,215 @@ func (x *Message_Content) GetToolResult() *Message_Content_ToolResult {
 	return nil
 }
 
+func (x *Message_Content) SetProviderOptions(v *structpb.Struct) {
+	x.ProviderOptions = v
+}
+
+func (x *Message_Content) SetText(v *Message_Content_Text) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Message_Content_Text_{v}
+}
+
+func (x *Message_Content) SetBlob(v *Blob) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Message_Content_Blob{v}
+}
+
+func (x *Message_Content) SetSource(v *Message_Content_Source) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Message_Content_Source_{v}
+}
+
+func (x *Message_Content) SetToolCall(v *Message_Content_ToolCall) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Message_Content_ToolCall_{v}
+}
+
+func (x *Message_Content) SetToolResult(v *Message_Content_ToolResult) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Message_Content_ToolResult_{v}
+}
+
+func (x *Message_Content) HasProviderOptions() bool {
+	if x == nil {
+		return false
+	}
+	return x.ProviderOptions != nil
+}
+
+func (x *Message_Content) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return x.Type != nil
+}
+
+func (x *Message_Content) HasText() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Message_Content_Text_)
+	return ok
+}
+
+func (x *Message_Content) HasBlob() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Message_Content_Blob)
+	return ok
+}
+
+func (x *Message_Content) HasSource() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Message_Content_Source_)
+	return ok
+}
+
+func (x *Message_Content) HasToolCall() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Message_Content_ToolCall_)
+	return ok
+}
+
+func (x *Message_Content) HasToolResult() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Message_Content_ToolResult_)
+	return ok
+}
+
+func (x *Message_Content) ClearProviderOptions() {
+	x.ProviderOptions = nil
+}
+
+func (x *Message_Content) ClearType() {
+	x.Type = nil
+}
+
+func (x *Message_Content) ClearText() {
+	if _, ok := x.Type.(*Message_Content_Text_); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Message_Content) ClearBlob() {
+	if _, ok := x.Type.(*Message_Content_Blob); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Message_Content) ClearSource() {
+	if _, ok := x.Type.(*Message_Content_Source_); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Message_Content) ClearToolCall() {
+	if _, ok := x.Type.(*Message_Content_ToolCall_); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Message_Content) ClearToolResult() {
+	if _, ok := x.Type.(*Message_Content_ToolResult_); ok {
+		x.Type = nil
+	}
+}
+
+const Message_Content_Type_not_set_case case_Message_Content_Type = 0
+const Message_Content_Text_case case_Message_Content_Type = 2
+const Message_Content_Blob_case case_Message_Content_Type = 3
+const Message_Content_Source_case case_Message_Content_Type = 4
+const Message_Content_ToolCall_case case_Message_Content_Type = 5
+const Message_Content_ToolResult_case case_Message_Content_Type = 6
+
+func (x *Message_Content) WhichType() case_Message_Content_Type {
+	if x == nil {
+		return Message_Content_Type_not_set_case
+	}
+	switch x.Type.(type) {
+	case *Message_Content_Text_:
+		return Message_Content_Text_case
+	case *Message_Content_Blob:
+		return Message_Content_Blob_case
+	case *Message_Content_Source_:
+		return Message_Content_Source_case
+	case *Message_Content_ToolCall_:
+		return Message_Content_ToolCall_case
+	case *Message_Content_ToolResult_:
+		return Message_Content_ToolResult_case
+	default:
+		return Message_Content_Type_not_set_case
+	}
+}
+
+type Message_Content_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	ProviderOptions *structpb.Struct
+	// Fields of oneof Type:
+	Text       *Message_Content_Text
+	Blob       *Blob
+	Source     *Message_Content_Source
+	ToolCall   *Message_Content_ToolCall
+	ToolResult *Message_Content_ToolResult
+	// -- end of Type
+}
+
+func (b0 Message_Content_builder) Build() *Message_Content {
+	m0 := &Message_Content{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ProviderOptions = b.ProviderOptions
+	if b.Text != nil {
+		x.Type = &Message_Content_Text_{b.Text}
+	}
+	if b.Blob != nil {
+		x.Type = &Message_Content_Blob{b.Blob}
+	}
+	if b.Source != nil {
+		x.Type = &Message_Content_Source_{b.Source}
+	}
+	if b.ToolCall != nil {
+		x.Type = &Message_Content_ToolCall_{b.ToolCall}
+	}
+	if b.ToolResult != nil {
+		x.Type = &Message_Content_ToolResult_{b.ToolResult}
+	}
+	return m0
+}
+
+type case_Message_Content_Type protoreflect.FieldNumber
+
+func (x case_Message_Content_Type) String() string {
+	md := file_dtkt_ai_v1beta1_messages_proto_msgTypes[31].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isMessage_Content_Type interface {
 	isMessage_Content_Type()
 }
@@ -1874,7 +3140,7 @@ func (*Message_Content_ToolCall_) isMessage_Content_Type() {}
 func (*Message_Content_ToolResult_) isMessage_Content_Type() {}
 
 type Message_Content_Text struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Text          string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1905,11 +3171,6 @@ func (x *Message_Content_Text) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Message_Content_Text.ProtoReflect.Descriptor instead.
-func (*Message_Content_Text) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{10, 0, 0}
-}
-
 func (x *Message_Content_Text) GetText() string {
 	if x != nil {
 		return x.Text
@@ -1917,8 +3178,26 @@ func (x *Message_Content_Text) GetText() string {
 	return ""
 }
 
+func (x *Message_Content_Text) SetText(v string) {
+	x.Text = v
+}
+
+type Message_Content_Text_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Text string
+}
+
+func (b0 Message_Content_Text_builder) Build() *Message_Content_Text {
+	m0 := &Message_Content_Text{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Text = b.Text
+	return m0
+}
+
 type Message_Content_Reasoning struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Text          string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1949,11 +3228,6 @@ func (x *Message_Content_Reasoning) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Message_Content_Reasoning.ProtoReflect.Descriptor instead.
-func (*Message_Content_Reasoning) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{10, 0, 1}
-}
-
 func (x *Message_Content_Reasoning) GetText() string {
 	if x != nil {
 		return x.Text
@@ -1961,8 +3235,26 @@ func (x *Message_Content_Reasoning) GetText() string {
 	return ""
 }
 
+func (x *Message_Content_Reasoning) SetText(v string) {
+	x.Text = v
+}
+
+type Message_Content_Reasoning_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Text string
+}
+
+func (b0 Message_Content_Reasoning_builder) Build() *Message_Content_Reasoning {
+	m0 := &Message_Content_Reasoning{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Text = b.Text
+	return m0
+}
+
 type Message_Content_Source struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Type:
 	//
 	//	*Message_Content_Source_Url
@@ -1997,11 +3289,6 @@ func (x *Message_Content_Source) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Message_Content_Source.ProtoReflect.Descriptor instead.
-func (*Message_Content_Source) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{10, 0, 2}
-}
-
 func (x *Message_Content_Source) GetType() isMessage_Content_Source_Type {
 	if x != nil {
 		return x.Type
@@ -2027,6 +3314,107 @@ func (x *Message_Content_Source) GetBlob() *Blob {
 	return nil
 }
 
+func (x *Message_Content_Source) SetUrl(v string) {
+	x.Type = &Message_Content_Source_Url{v}
+}
+
+func (x *Message_Content_Source) SetBlob(v *Blob) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &Message_Content_Source_Blob{v}
+}
+
+func (x *Message_Content_Source) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return x.Type != nil
+}
+
+func (x *Message_Content_Source) HasUrl() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Message_Content_Source_Url)
+	return ok
+}
+
+func (x *Message_Content_Source) HasBlob() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*Message_Content_Source_Blob)
+	return ok
+}
+
+func (x *Message_Content_Source) ClearType() {
+	x.Type = nil
+}
+
+func (x *Message_Content_Source) ClearUrl() {
+	if _, ok := x.Type.(*Message_Content_Source_Url); ok {
+		x.Type = nil
+	}
+}
+
+func (x *Message_Content_Source) ClearBlob() {
+	if _, ok := x.Type.(*Message_Content_Source_Blob); ok {
+		x.Type = nil
+	}
+}
+
+const Message_Content_Source_Type_not_set_case case_Message_Content_Source_Type = 0
+const Message_Content_Source_Url_case case_Message_Content_Source_Type = 1
+const Message_Content_Source_Blob_case case_Message_Content_Source_Type = 2
+
+func (x *Message_Content_Source) WhichType() case_Message_Content_Source_Type {
+	if x == nil {
+		return Message_Content_Source_Type_not_set_case
+	}
+	switch x.Type.(type) {
+	case *Message_Content_Source_Url:
+		return Message_Content_Source_Url_case
+	case *Message_Content_Source_Blob:
+		return Message_Content_Source_Blob_case
+	default:
+		return Message_Content_Source_Type_not_set_case
+	}
+}
+
+type Message_Content_Source_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Type:
+	Url  *string
+	Blob *Blob
+	// -- end of Type
+}
+
+func (b0 Message_Content_Source_builder) Build() *Message_Content_Source {
+	m0 := &Message_Content_Source{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Url != nil {
+		x.Type = &Message_Content_Source_Url{*b.Url}
+	}
+	if b.Blob != nil {
+		x.Type = &Message_Content_Source_Blob{b.Blob}
+	}
+	return m0
+}
+
+type case_Message_Content_Source_Type protoreflect.FieldNumber
+
+func (x case_Message_Content_Source_Type) String() string {
+	md := file_dtkt_ai_v1beta1_messages_proto_msgTypes[34].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isMessage_Content_Source_Type interface {
 	isMessage_Content_Source_Type()
 }
@@ -2044,7 +3432,7 @@ func (*Message_Content_Source_Url) isMessage_Content_Source_Type() {}
 func (*Message_Content_Source_Blob) isMessage_Content_Source_Type() {}
 
 type Message_Content_ToolCall struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
+	state      protoimpl.MessageState `protogen:"hybrid.v1"`
 	ToolCallId string                 `protobuf:"bytes,1,opt,name=tool_call_id,json=toolCallId,proto3" json:"tool_call_id,omitempty"`
 	ToolName   string                 `protobuf:"bytes,2,opt,name=tool_name,json=toolName,proto3" json:"tool_name,omitempty"`
 	// Types that are valid to be assigned to Input:
@@ -2082,11 +3470,6 @@ func (x *Message_Content_ToolCall) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Message_Content_ToolCall.ProtoReflect.Descriptor instead.
-func (*Message_Content_ToolCall) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{10, 0, 3}
 }
 
 func (x *Message_Content_ToolCall) GetToolCallId() string {
@@ -2135,6 +3518,131 @@ func (x *Message_Content_ToolCall) GetProviderExecuted() bool {
 	return false
 }
 
+func (x *Message_Content_ToolCall) SetToolCallId(v string) {
+	x.ToolCallId = v
+}
+
+func (x *Message_Content_ToolCall) SetToolName(v string) {
+	x.ToolName = v
+}
+
+func (x *Message_Content_ToolCall) SetJson(v *structpb.Struct) {
+	if v == nil {
+		x.Input = nil
+		return
+	}
+	x.Input = &Message_Content_ToolCall_Json{v}
+}
+
+func (x *Message_Content_ToolCall) SetProto(v *anypb.Any) {
+	if v == nil {
+		x.Input = nil
+		return
+	}
+	x.Input = &Message_Content_ToolCall_Proto{v}
+}
+
+func (x *Message_Content_ToolCall) SetProviderExecuted(v bool) {
+	x.ProviderExecuted = v
+}
+
+func (x *Message_Content_ToolCall) HasInput() bool {
+	if x == nil {
+		return false
+	}
+	return x.Input != nil
+}
+
+func (x *Message_Content_ToolCall) HasJson() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Input.(*Message_Content_ToolCall_Json)
+	return ok
+}
+
+func (x *Message_Content_ToolCall) HasProto() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Input.(*Message_Content_ToolCall_Proto)
+	return ok
+}
+
+func (x *Message_Content_ToolCall) ClearInput() {
+	x.Input = nil
+}
+
+func (x *Message_Content_ToolCall) ClearJson() {
+	if _, ok := x.Input.(*Message_Content_ToolCall_Json); ok {
+		x.Input = nil
+	}
+}
+
+func (x *Message_Content_ToolCall) ClearProto() {
+	if _, ok := x.Input.(*Message_Content_ToolCall_Proto); ok {
+		x.Input = nil
+	}
+}
+
+const Message_Content_ToolCall_Input_not_set_case case_Message_Content_ToolCall_Input = 0
+const Message_Content_ToolCall_Json_case case_Message_Content_ToolCall_Input = 3
+const Message_Content_ToolCall_Proto_case case_Message_Content_ToolCall_Input = 4
+
+func (x *Message_Content_ToolCall) WhichInput() case_Message_Content_ToolCall_Input {
+	if x == nil {
+		return Message_Content_ToolCall_Input_not_set_case
+	}
+	switch x.Input.(type) {
+	case *Message_Content_ToolCall_Json:
+		return Message_Content_ToolCall_Json_case
+	case *Message_Content_ToolCall_Proto:
+		return Message_Content_ToolCall_Proto_case
+	default:
+		return Message_Content_ToolCall_Input_not_set_case
+	}
+}
+
+type Message_Content_ToolCall_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	ToolCallId string
+	ToolName   string
+	// Fields of oneof Input:
+	Json  *structpb.Struct
+	Proto *anypb.Any
+	// -- end of Input
+	// If the tool is executed by the provider or the client
+	// TODO: This is if ChatGPT calls our tool or if we call it for ChatGPT.
+	ProviderExecuted bool
+}
+
+func (b0 Message_Content_ToolCall_builder) Build() *Message_Content_ToolCall {
+	m0 := &Message_Content_ToolCall{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ToolCallId = b.ToolCallId
+	x.ToolName = b.ToolName
+	if b.Json != nil {
+		x.Input = &Message_Content_ToolCall_Json{b.Json}
+	}
+	if b.Proto != nil {
+		x.Input = &Message_Content_ToolCall_Proto{b.Proto}
+	}
+	x.ProviderExecuted = b.ProviderExecuted
+	return m0
+}
+
+type case_Message_Content_ToolCall_Input protoreflect.FieldNumber
+
+func (x case_Message_Content_ToolCall_Input) String() string {
+	md := file_dtkt_ai_v1beta1_messages_proto_msgTypes[35].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isMessage_Content_ToolCall_Input interface {
 	isMessage_Content_ToolCall_Input()
 }
@@ -2152,7 +3660,7 @@ func (*Message_Content_ToolCall_Json) isMessage_Content_ToolCall_Input() {}
 func (*Message_Content_ToolCall_Proto) isMessage_Content_ToolCall_Input() {}
 
 type Message_Content_ToolResult struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
+	state      protoimpl.MessageState `protogen:"hybrid.v1"`
 	ToolCallId string                 `protobuf:"bytes,1,opt,name=tool_call_id,json=toolCallId,proto3" json:"tool_call_id,omitempty"`
 	ToolName   string                 `protobuf:"bytes,2,opt,name=tool_name,json=toolName,proto3" json:"tool_name,omitempty"`
 	// Types that are valid to be assigned to Result:
@@ -2188,11 +3696,6 @@ func (x *Message_Content_ToolResult) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Message_Content_ToolResult.ProtoReflect.Descriptor instead.
-func (*Message_Content_ToolResult) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{10, 0, 4}
 }
 
 func (x *Message_Content_ToolResult) GetToolCallId() string {
@@ -2241,6 +3744,129 @@ func (x *Message_Content_ToolResult) GetIsError() bool {
 	return false
 }
 
+func (x *Message_Content_ToolResult) SetToolCallId(v string) {
+	x.ToolCallId = v
+}
+
+func (x *Message_Content_ToolResult) SetToolName(v string) {
+	x.ToolName = v
+}
+
+func (x *Message_Content_ToolResult) SetJson(v *structpb.Struct) {
+	if v == nil {
+		x.Result = nil
+		return
+	}
+	x.Result = &Message_Content_ToolResult_Json{v}
+}
+
+func (x *Message_Content_ToolResult) SetProto(v *anypb.Any) {
+	if v == nil {
+		x.Result = nil
+		return
+	}
+	x.Result = &Message_Content_ToolResult_Proto{v}
+}
+
+func (x *Message_Content_ToolResult) SetIsError(v bool) {
+	x.IsError = v
+}
+
+func (x *Message_Content_ToolResult) HasResult() bool {
+	if x == nil {
+		return false
+	}
+	return x.Result != nil
+}
+
+func (x *Message_Content_ToolResult) HasJson() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Result.(*Message_Content_ToolResult_Json)
+	return ok
+}
+
+func (x *Message_Content_ToolResult) HasProto() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Result.(*Message_Content_ToolResult_Proto)
+	return ok
+}
+
+func (x *Message_Content_ToolResult) ClearResult() {
+	x.Result = nil
+}
+
+func (x *Message_Content_ToolResult) ClearJson() {
+	if _, ok := x.Result.(*Message_Content_ToolResult_Json); ok {
+		x.Result = nil
+	}
+}
+
+func (x *Message_Content_ToolResult) ClearProto() {
+	if _, ok := x.Result.(*Message_Content_ToolResult_Proto); ok {
+		x.Result = nil
+	}
+}
+
+const Message_Content_ToolResult_Result_not_set_case case_Message_Content_ToolResult_Result = 0
+const Message_Content_ToolResult_Json_case case_Message_Content_ToolResult_Result = 3
+const Message_Content_ToolResult_Proto_case case_Message_Content_ToolResult_Result = 4
+
+func (x *Message_Content_ToolResult) WhichResult() case_Message_Content_ToolResult_Result {
+	if x == nil {
+		return Message_Content_ToolResult_Result_not_set_case
+	}
+	switch x.Result.(type) {
+	case *Message_Content_ToolResult_Json:
+		return Message_Content_ToolResult_Json_case
+	case *Message_Content_ToolResult_Proto:
+		return Message_Content_ToolResult_Proto_case
+	default:
+		return Message_Content_ToolResult_Result_not_set_case
+	}
+}
+
+type Message_Content_ToolResult_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	ToolCallId string
+	ToolName   string
+	// Fields of oneof Result:
+	Json  *structpb.Struct
+	Proto *anypb.Any
+	// -- end of Result
+	IsError bool
+}
+
+func (b0 Message_Content_ToolResult_builder) Build() *Message_Content_ToolResult {
+	m0 := &Message_Content_ToolResult{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ToolCallId = b.ToolCallId
+	x.ToolName = b.ToolName
+	if b.Json != nil {
+		x.Result = &Message_Content_ToolResult_Json{b.Json}
+	}
+	if b.Proto != nil {
+		x.Result = &Message_Content_ToolResult_Proto{b.Proto}
+	}
+	x.IsError = b.IsError
+	return m0
+}
+
+type case_Message_Content_ToolResult_Result protoreflect.FieldNumber
+
+func (x case_Message_Content_ToolResult_Result) String() string {
+	md := file_dtkt_ai_v1beta1_messages_proto_msgTypes[36].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isMessage_Content_ToolResult_Result interface {
 	isMessage_Content_ToolResult_Result()
 }
@@ -2258,7 +3884,7 @@ func (*Message_Content_ToolResult_Json) isMessage_Content_ToolResult_Result() {}
 func (*Message_Content_ToolResult_Proto) isMessage_Content_ToolResult_Result() {}
 
 type TranscribeResponse_Segment struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Text          string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
 	StartTime     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	EndTime       *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
@@ -2291,11 +3917,6 @@ func (x *TranscribeResponse_Segment) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TranscribeResponse_Segment.ProtoReflect.Descriptor instead.
-func (*TranscribeResponse_Segment) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{26, 0}
-}
-
 func (x *TranscribeResponse_Segment) GetText() string {
 	if x != nil {
 		return x.Text
@@ -2315,6 +3936,58 @@ func (x *TranscribeResponse_Segment) GetEndTime() *timestamppb.Timestamp {
 		return x.EndTime
 	}
 	return nil
+}
+
+func (x *TranscribeResponse_Segment) SetText(v string) {
+	x.Text = v
+}
+
+func (x *TranscribeResponse_Segment) SetStartTime(v *timestamppb.Timestamp) {
+	x.StartTime = v
+}
+
+func (x *TranscribeResponse_Segment) SetEndTime(v *timestamppb.Timestamp) {
+	x.EndTime = v
+}
+
+func (x *TranscribeResponse_Segment) HasStartTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.StartTime != nil
+}
+
+func (x *TranscribeResponse_Segment) HasEndTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.EndTime != nil
+}
+
+func (x *TranscribeResponse_Segment) ClearStartTime() {
+	x.StartTime = nil
+}
+
+func (x *TranscribeResponse_Segment) ClearEndTime() {
+	x.EndTime = nil
+}
+
+type TranscribeResponse_Segment_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Text      string
+	StartTime *timestamppb.Timestamp
+	EndTime   *timestamppb.Timestamp
+}
+
+func (b0 TranscribeResponse_Segment_builder) Build() *TranscribeResponse_Segment {
+	m0 := &TranscribeResponse_Segment{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Text = b.Text
+	x.StartTime = b.StartTime
+	x.EndTime = b.EndTime
+	return m0
 }
 
 var File_dtkt_ai_v1beta1_messages_proto protoreflect.FileDescriptor
@@ -2502,18 +4175,6 @@ const file_dtkt_ai_v1beta1_messages_proto_rawDesc = "" +
 	"\x11provider_metadata\x18\n" +
 	" \x01(\v2\x17.google.protobuf.StructR\x10providerMetadataB\xcc\x01\n" +
 	"\x15proto.dtkt.ai.v1beta1B\rMessagesProtoP\x01ZFgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/ai/v1beta1;aiv1beta1\xa2\x02\x03DAX\xaa\x02\x0fDtkt.Ai.V1beta1\xca\x02\x0fDtkt\\Ai\\V1beta1\xe2\x02\x1bDtkt\\Ai\\V1beta1\\GPBMetadata\xea\x02\x11Dtkt::Ai::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_ai_v1beta1_messages_proto_rawDescOnce sync.Once
-	file_dtkt_ai_v1beta1_messages_proto_rawDescData []byte
-)
-
-func file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP() []byte {
-	file_dtkt_ai_v1beta1_messages_proto_rawDescOnce.Do(func() {
-		file_dtkt_ai_v1beta1_messages_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_ai_v1beta1_messages_proto_rawDesc), len(file_dtkt_ai_v1beta1_messages_proto_rawDesc)))
-	})
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescData
-}
 
 var file_dtkt_ai_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
 var file_dtkt_ai_v1beta1_messages_proto_goTypes = []any{

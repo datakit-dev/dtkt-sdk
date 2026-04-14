@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/protoform/v1beta1/protoform.proto
 
+//go:build !protoopaque
+
 package protoformv1beta1
 
 import (
@@ -12,7 +14,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	descriptorpb "google.golang.org/protobuf/types/descriptorpb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -24,7 +25,7 @@ const (
 )
 
 type FieldElement struct {
-	state       protoimpl.MessageState `protogen:"open.v1"`
+	state       protoimpl.MessageState `protogen:"hybrid.v1"`
 	Title       *string                `protobuf:"bytes,1,opt,name=title,proto3,oneof" json:"title,omitempty"`
 	Description *string                `protobuf:"bytes,2,opt,name=description,proto3,oneof" json:"description,omitempty"`
 	Hidden      *bool                  `protobuf:"varint,3,opt,name=hidden,proto3,oneof" json:"hidden,omitempty"`
@@ -63,11 +64,6 @@ func (x *FieldElement) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use FieldElement.ProtoReflect.Descriptor instead.
-func (*FieldElement) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoform_v1beta1_protoform_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *FieldElement) GetTitle() string {
@@ -143,6 +139,249 @@ func (x *FieldElement) GetMultiSelect() *MultiSelectElement {
 	return nil
 }
 
+func (x *FieldElement) SetTitle(v string) {
+	x.Title = &v
+}
+
+func (x *FieldElement) SetDescription(v string) {
+	x.Description = &v
+}
+
+func (x *FieldElement) SetHidden(v bool) {
+	x.Hidden = &v
+}
+
+func (x *FieldElement) SetConfirm(v *ConfirmElement) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &FieldElement_Confirm{v}
+}
+
+func (x *FieldElement) SetInput(v *InputElement) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &FieldElement_Input{v}
+}
+
+func (x *FieldElement) SetFile(v *FileElement) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &FieldElement_File{v}
+}
+
+func (x *FieldElement) SetSelect(v *SelectElement) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &FieldElement_Select{v}
+}
+
+func (x *FieldElement) SetMultiSelect(v *MultiSelectElement) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &FieldElement_MultiSelect{v}
+}
+
+func (x *FieldElement) HasTitle() bool {
+	if x == nil {
+		return false
+	}
+	return x.Title != nil
+}
+
+func (x *FieldElement) HasDescription() bool {
+	if x == nil {
+		return false
+	}
+	return x.Description != nil
+}
+
+func (x *FieldElement) HasHidden() bool {
+	if x == nil {
+		return false
+	}
+	return x.Hidden != nil
+}
+
+func (x *FieldElement) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return x.Type != nil
+}
+
+func (x *FieldElement) HasConfirm() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*FieldElement_Confirm)
+	return ok
+}
+
+func (x *FieldElement) HasInput() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*FieldElement_Input)
+	return ok
+}
+
+func (x *FieldElement) HasFile() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*FieldElement_File)
+	return ok
+}
+
+func (x *FieldElement) HasSelect() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*FieldElement_Select)
+	return ok
+}
+
+func (x *FieldElement) HasMultiSelect() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*FieldElement_MultiSelect)
+	return ok
+}
+
+func (x *FieldElement) ClearTitle() {
+	x.Title = nil
+}
+
+func (x *FieldElement) ClearDescription() {
+	x.Description = nil
+}
+
+func (x *FieldElement) ClearHidden() {
+	x.Hidden = nil
+}
+
+func (x *FieldElement) ClearType() {
+	x.Type = nil
+}
+
+func (x *FieldElement) ClearConfirm() {
+	if _, ok := x.Type.(*FieldElement_Confirm); ok {
+		x.Type = nil
+	}
+}
+
+func (x *FieldElement) ClearInput() {
+	if _, ok := x.Type.(*FieldElement_Input); ok {
+		x.Type = nil
+	}
+}
+
+func (x *FieldElement) ClearFile() {
+	if _, ok := x.Type.(*FieldElement_File); ok {
+		x.Type = nil
+	}
+}
+
+func (x *FieldElement) ClearSelect() {
+	if _, ok := x.Type.(*FieldElement_Select); ok {
+		x.Type = nil
+	}
+}
+
+func (x *FieldElement) ClearMultiSelect() {
+	if _, ok := x.Type.(*FieldElement_MultiSelect); ok {
+		x.Type = nil
+	}
+}
+
+const FieldElement_Type_not_set_case case_FieldElement_Type = 0
+const FieldElement_Confirm_case case_FieldElement_Type = 4
+const FieldElement_Input_case case_FieldElement_Type = 5
+const FieldElement_File_case case_FieldElement_Type = 6
+const FieldElement_Select_case case_FieldElement_Type = 7
+const FieldElement_MultiSelect_case case_FieldElement_Type = 8
+
+func (x *FieldElement) WhichType() case_FieldElement_Type {
+	if x == nil {
+		return FieldElement_Type_not_set_case
+	}
+	switch x.Type.(type) {
+	case *FieldElement_Confirm:
+		return FieldElement_Confirm_case
+	case *FieldElement_Input:
+		return FieldElement_Input_case
+	case *FieldElement_File:
+		return FieldElement_File_case
+	case *FieldElement_Select:
+		return FieldElement_Select_case
+	case *FieldElement_MultiSelect:
+		return FieldElement_MultiSelect_case
+	default:
+		return FieldElement_Type_not_set_case
+	}
+}
+
+type FieldElement_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Title       *string
+	Description *string
+	Hidden      *bool
+	// Fields of oneof Type:
+	Confirm     *ConfirmElement
+	Input       *InputElement
+	File        *FileElement
+	Select      *SelectElement
+	MultiSelect *MultiSelectElement
+	// -- end of Type
+}
+
+func (b0 FieldElement_builder) Build() *FieldElement {
+	m0 := &FieldElement{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Title = b.Title
+	x.Description = b.Description
+	x.Hidden = b.Hidden
+	if b.Confirm != nil {
+		x.Type = &FieldElement_Confirm{b.Confirm}
+	}
+	if b.Input != nil {
+		x.Type = &FieldElement_Input{b.Input}
+	}
+	if b.File != nil {
+		x.Type = &FieldElement_File{b.File}
+	}
+	if b.Select != nil {
+		x.Type = &FieldElement_Select{b.Select}
+	}
+	if b.MultiSelect != nil {
+		x.Type = &FieldElement_MultiSelect{b.MultiSelect}
+	}
+	return m0
+}
+
+type case_FieldElement_Type protoreflect.FieldNumber
+
+func (x case_FieldElement_Type) String() string {
+	md := file_dtkt_protoform_v1beta1_protoform_proto_msgTypes[0].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isFieldElement_Type interface {
 	isFieldElement_Type()
 }
@@ -179,7 +418,7 @@ func (*FieldElement_MultiSelect) isFieldElement_Type() {}
 
 // Confirm element (approve/decline)
 type ConfirmElement struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
+	state           protoimpl.MessageState `protogen:"hybrid.v1"`
 	Approve         string                 `protobuf:"bytes,1,opt,name=approve,proto3" json:"approve,omitempty"`
 	Decline         string                 `protobuf:"bytes,2,opt,name=decline,proto3" json:"decline,omitempty"`
 	DefaultSelected bool                   `protobuf:"varint,3,opt,name=default_selected,json=defaultSelected,proto3" json:"default_selected,omitempty"`
@@ -212,11 +451,6 @@ func (x *ConfirmElement) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ConfirmElement.ProtoReflect.Descriptor instead.
-func (*ConfirmElement) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoform_v1beta1_protoform_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *ConfirmElement) GetApprove() string {
 	if x != nil {
 		return x.Approve
@@ -238,9 +472,39 @@ func (x *ConfirmElement) GetDefaultSelected() bool {
 	return false
 }
 
+func (x *ConfirmElement) SetApprove(v string) {
+	x.Approve = v
+}
+
+func (x *ConfirmElement) SetDecline(v string) {
+	x.Decline = v
+}
+
+func (x *ConfirmElement) SetDefaultSelected(v bool) {
+	x.DefaultSelected = v
+}
+
+type ConfirmElement_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Approve         string
+	Decline         string
+	DefaultSelected bool
+}
+
+func (b0 ConfirmElement_builder) Build() *ConfirmElement {
+	m0 := &ConfirmElement{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Approve = b.Approve
+	x.Decline = b.Decline
+	x.DefaultSelected = b.DefaultSelected
+	return m0
+}
+
 // Input element with multi-line text option
 type InputElement struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	MultilineText *bool                  `protobuf:"varint,1,opt,name=multiline_text,json=multilineText,proto3,oneof" json:"multiline_text,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -271,11 +535,6 @@ func (x *InputElement) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use InputElement.ProtoReflect.Descriptor instead.
-func (*InputElement) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoform_v1beta1_protoform_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *InputElement) GetMultilineText() bool {
 	if x != nil && x.MultilineText != nil {
 		return *x.MultilineText
@@ -283,9 +542,38 @@ func (x *InputElement) GetMultilineText() bool {
 	return false
 }
 
+func (x *InputElement) SetMultilineText(v bool) {
+	x.MultilineText = &v
+}
+
+func (x *InputElement) HasMultilineText() bool {
+	if x == nil {
+		return false
+	}
+	return x.MultilineText != nil
+}
+
+func (x *InputElement) ClearMultilineText() {
+	x.MultilineText = nil
+}
+
+type InputElement_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	MultilineText *bool
+}
+
+func (b0 InputElement_builder) Build() *InputElement {
+	m0 := &InputElement{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.MultilineText = b.MultilineText
+	return m0
+}
+
 // File element
 type FileElement struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	AllowedTypes  []string               `protobuf:"bytes,2,rep,name=allowed_types,json=allowedTypes,proto3" json:"allowed_types,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -316,11 +604,6 @@ func (x *FileElement) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FileElement.ProtoReflect.Descriptor instead.
-func (*FileElement) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoform_v1beta1_protoform_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *FileElement) GetAllowedTypes() []string {
 	if x != nil {
 		return x.AllowedTypes
@@ -328,9 +611,27 @@ func (x *FileElement) GetAllowedTypes() []string {
 	return nil
 }
 
+func (x *FileElement) SetAllowedTypes(v []string) {
+	x.AllowedTypes = v
+}
+
+type FileElement_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	AllowedTypes []string
+}
+
+func (b0 FileElement_builder) Build() *FileElement {
+	m0 := &FileElement{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.AllowedTypes = b.AllowedTypes
+	return m0
+}
+
 // Select element
 type SelectElement struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// A fully-qualified method name to call at runtime to retrieve options for
 	// this select element. The method must return a message containing a repeated
 	// field to be used as the options for this select element.
@@ -374,11 +675,6 @@ func (x *SelectElement) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SelectElement.ProtoReflect.Descriptor instead.
-func (*SelectElement) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoform_v1beta1_protoform_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *SelectElement) GetMethodName() string {
 	if x != nil {
 		return x.MethodName
@@ -400,9 +696,50 @@ func (x *SelectElement) GetValExpr() string {
 	return ""
 }
 
+func (x *SelectElement) SetMethodName(v string) {
+	x.MethodName = v
+}
+
+func (x *SelectElement) SetKeyExpr(v string) {
+	x.KeyExpr = v
+}
+
+func (x *SelectElement) SetValExpr(v string) {
+	x.ValExpr = v
+}
+
+type SelectElement_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// A fully-qualified method name to call at runtime to retrieve options for
+	// this select element. The method must return a message containing a repeated
+	// field to be used as the options for this select element.
+	MethodName string
+	// CEL expression to extract the key for each option from the method response.
+	// The method response will be available as `this` in the CEL expression context.
+	// Example key_expr: "this.options.map(i, i.name)" if the method response has a repeated
+	// field `options` with a `name` field to be used as the option key.
+	KeyExpr string
+	// CEL expression to extract the value for each option from the method response.
+	// The method response will be available as `this` in the CEL expression context.
+	// Example val_expr: "this.options.map(i, i.display_name)" if the method response has a repeated
+	// field `options` with a `display_name` field to be used as the option value.
+	ValExpr string
+}
+
+func (b0 SelectElement_builder) Build() *SelectElement {
+	m0 := &SelectElement{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.MethodName = b.MethodName
+	x.KeyExpr = b.KeyExpr
+	x.ValExpr = b.ValExpr
+	return m0
+}
+
 // Multi-select element
 type MultiSelectElement struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// A fully-qualified method name to call at runtime to retrieve options for
 	// this select element. The method must return a message containing a repeated
 	// field to be used as the options for this select element.
@@ -446,11 +783,6 @@ func (x *MultiSelectElement) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MultiSelectElement.ProtoReflect.Descriptor instead.
-func (*MultiSelectElement) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoform_v1beta1_protoform_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *MultiSelectElement) GetMethodName() string {
 	if x != nil {
 		return x.MethodName
@@ -470,6 +802,47 @@ func (x *MultiSelectElement) GetValExpr() string {
 		return x.ValExpr
 	}
 	return ""
+}
+
+func (x *MultiSelectElement) SetMethodName(v string) {
+	x.MethodName = v
+}
+
+func (x *MultiSelectElement) SetKeyExpr(v string) {
+	x.KeyExpr = v
+}
+
+func (x *MultiSelectElement) SetValExpr(v string) {
+	x.ValExpr = v
+}
+
+type MultiSelectElement_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// A fully-qualified method name to call at runtime to retrieve options for
+	// this select element. The method must return a message containing a repeated
+	// field to be used as the options for this select element.
+	MethodName string
+	// CEL expression to extract the key for each option from the method response.
+	// The method response will be available as `this` in the CEL expression context.
+	// Example key_expr: "this.options.map(i, i.name)" if the method response has a repeated
+	// field `options` with a `name` field to be used as the option key.
+	KeyExpr string
+	// CEL expression to extract the value for each option from the method response.
+	// The method response will be available as `this` in the CEL expression context.
+	// Example val_expr: "this.options.map(i, i.display_name)" if the method response has a repeated
+	// field `options` with a `display_name` field to be used as the option value.
+	ValExpr string
+}
+
+func (b0 MultiSelectElement_builder) Build() *MultiSelectElement {
+	m0 := &MultiSelectElement{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.MethodName = b.MethodName
+	x.KeyExpr = b.KeyExpr
+	x.ValExpr = b.ValExpr
+	return m0
 }
 
 var file_dtkt_protoform_v1beta1_protoform_proto_extTypes = []protoimpl.ExtensionInfo{
@@ -528,18 +901,6 @@ const file_dtkt_protoform_v1beta1_protoform_proto_rawDesc = "" +
 	"\bval_expr\x18\x03 \x01(\tR\avalExpr:^\n" +
 	"\x05field\x12\x1d.google.protobuf.FieldOptions\x18І\x03 \x01(\v2$.dtkt.protoform.v1beta1.FieldElementR\x05field\x88\x01\x01B\xfe\x01\n" +
 	"\x1cproto.dtkt.protoform.v1beta1B\x0eProtoformProtoP\x01ZTgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protoform/v1beta1;protoformv1beta1\xa2\x02\x03DPX\xaa\x02\x16Dtkt.Protoform.V1beta1\xca\x02\x16Dtkt\\Protoform\\V1beta1\xe2\x02\"Dtkt\\Protoform\\V1beta1\\GPBMetadata\xea\x02\x18Dtkt::Protoform::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_protoform_v1beta1_protoform_proto_rawDescOnce sync.Once
-	file_dtkt_protoform_v1beta1_protoform_proto_rawDescData []byte
-)
-
-func file_dtkt_protoform_v1beta1_protoform_proto_rawDescGZIP() []byte {
-	file_dtkt_protoform_v1beta1_protoform_proto_rawDescOnce.Do(func() {
-		file_dtkt_protoform_v1beta1_protoform_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_protoform_v1beta1_protoform_proto_rawDesc), len(file_dtkt_protoform_v1beta1_protoform_proto_rawDesc)))
-	})
-	return file_dtkt_protoform_v1beta1_protoform_proto_rawDescData
-}
 
 var file_dtkt_protoform_v1beta1_protoform_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_dtkt_protoform_v1beta1_protoform_proto_goTypes = []any{

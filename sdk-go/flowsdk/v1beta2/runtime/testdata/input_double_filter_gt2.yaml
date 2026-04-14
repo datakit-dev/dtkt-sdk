@@ -1,0 +1,13 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_double_filter_gt2
+  description: "Double input with filter transform keeping values > 2.0"
+  inputs:
+    - id: x
+      double: {}
+      transforms:
+        - filter: "= this.value > 2.0"
+  outputs:
+    - id: result
+      value: "= inputs.x.value"

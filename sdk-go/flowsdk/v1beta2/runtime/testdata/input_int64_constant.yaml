@@ -1,0 +1,12 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_int64_constant
+  description: "Int64 input marked as constant (single-value)"
+  inputs:
+    - id: x
+      int64: {}
+      constant: true
+  outputs:
+    - id: result
+      value: "= inputs.x.value"

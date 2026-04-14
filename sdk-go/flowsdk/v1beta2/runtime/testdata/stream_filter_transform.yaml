@@ -1,0 +1,21 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: stream_filter_transform
+  inputs:
+    - id: x
+      int64: {}
+  streams:
+    - id: echo
+      call:
+        connection: echo
+        method: echo.Echo
+        request: "= inputs.x.value"
+  vars:
+    - id: filtered
+      value: "= streams.echo.value"
+      transforms:
+        - filter: "= this.value > 3"
+  outputs:
+    - id: result
+      value: "= vars.filtered.value"

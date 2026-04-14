@@ -1,0 +1,17 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: action_memoize
+  inputs:
+    - id: x
+      int64: {}
+  actions:
+    - id: echo
+      memoize: true
+      call:
+        connection: echo
+        method: echo.Echo
+        request: "= inputs.x.value"
+  outputs:
+    - id: result
+      value: "= actions.echo.value"

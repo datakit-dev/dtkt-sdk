@@ -1,0 +1,14 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: output_throttle
+  description: "Output with throttle rate limit"
+  inputs:
+    - id: x
+      int64: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value"
+      throttle:
+        count: 5
+        interval: "0.5s"

@@ -1,0 +1,17 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fc_ticker_stop_input
+  inputs:
+    - id: maxIters
+      uint64:
+        default: 10
+  generators:
+    - id: tick
+      ticker:
+        interval: "0.05s"
+  outputs:
+    - id: result
+      value: "= generators.tick.value"
+      flow_control:
+        stop_when: "= int(generators.tick.eval_count) >= int(inputs.maxIters.value)"

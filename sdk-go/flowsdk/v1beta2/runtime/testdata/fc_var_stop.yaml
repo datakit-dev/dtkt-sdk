@@ -1,0 +1,15 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fc_var_stop
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: doubled
+      value: "= inputs.x.value * 2"
+      flow_control:
+        stop_when: "= inputs.x.value >= 3"
+  outputs:
+    - id: result
+      value: "= vars.doubled.value"

@@ -1,0 +1,20 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: action_retry_backoff
+  inputs:
+    - id: msg
+      int64: {}
+  actions:
+    - id: echo
+      retry_strategy:
+        backoff:
+          initial_backoff: "0.001s"
+          max_attempts: 3
+      call:
+        connection: echo
+        method: error.UnavailableThenOK
+        request: "= inputs.msg.value"
+  outputs:
+    - id: result
+      value: "= actions.echo.value"

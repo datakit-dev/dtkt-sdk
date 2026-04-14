@@ -1,0 +1,28 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_schema_valid
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: x
+      string: {}
+  actions:
+    - id: run
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request:
+          name: "= inputs.x.value"
+          count: 42
+          active: true
+          tags:
+            - one
+            - two
+          nested:
+            value: nested_val
+  outputs:
+    - id: result
+      value: "= actions.run.value"

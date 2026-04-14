@@ -1,0 +1,13 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: gen_range_step
+  generators:
+    - id: seq
+      range:
+        start: 0
+        end: 10
+        step: 3
+  outputs:
+    - id: result
+      value: "= generators.seq.value"

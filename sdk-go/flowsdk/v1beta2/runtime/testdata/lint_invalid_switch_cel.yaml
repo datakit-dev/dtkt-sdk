@@ -1,0 +1,9 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_invalid_switch_cel
+  vars:
+    - id: sw
+      switch:
+        value: "= +++bad"
+        default: "= 0"

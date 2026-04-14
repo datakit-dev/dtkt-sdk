@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_map_int64_to_string
+  description: "Map converts int64 to string using string()"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: str
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= string(this.value)"
+  outputs:
+    - id: result
+      value: "= vars.str.value"

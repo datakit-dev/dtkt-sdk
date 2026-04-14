@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/geo/v1beta1/messages.proto
 
+//go:build !protoopaque
+
 package geov1beta1
 
 import (
@@ -13,7 +15,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -25,7 +26,7 @@ const (
 )
 
 type GeoSource struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
+	state      protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id         string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	GeoFields  []string               `protobuf:"bytes,2,rep,name=geo_fields,json=geoFields,proto3" json:"geo_fields,omitempty"`
 	PropFields []*PropertyField       `protobuf:"bytes,3,rep,name=prop_fields,json=propFields,proto3" json:"prop_fields,omitempty"`
@@ -62,11 +63,6 @@ func (x *GeoSource) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GeoSource.ProtoReflect.Descriptor instead.
-func (*GeoSource) Descriptor() ([]byte, []int) {
-	return file_dtkt_geo_v1beta1_messages_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *GeoSource) GetId() string {
@@ -122,6 +118,146 @@ func (x *GeoSource) GetQuery() *v1beta1.Query {
 	return nil
 }
 
+func (x *GeoSource) SetId(v string) {
+	x.Id = v
+}
+
+func (x *GeoSource) SetGeoFields(v []string) {
+	x.GeoFields = v
+}
+
+func (x *GeoSource) SetPropFields(v []*PropertyField) {
+	x.PropFields = v
+}
+
+func (x *GeoSource) SetUpdateFreq(v *durationpb.Duration) {
+	x.UpdateFreq = v
+}
+
+func (x *GeoSource) SetTable(v *v1beta1.Table) {
+	if v == nil {
+		x.Source = nil
+		return
+	}
+	x.Source = &GeoSource_Table{v}
+}
+
+func (x *GeoSource) SetQuery(v *v1beta1.Query) {
+	if v == nil {
+		x.Source = nil
+		return
+	}
+	x.Source = &GeoSource_Query{v}
+}
+
+func (x *GeoSource) HasUpdateFreq() bool {
+	if x == nil {
+		return false
+	}
+	return x.UpdateFreq != nil
+}
+
+func (x *GeoSource) HasSource() bool {
+	if x == nil {
+		return false
+	}
+	return x.Source != nil
+}
+
+func (x *GeoSource) HasTable() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Source.(*GeoSource_Table)
+	return ok
+}
+
+func (x *GeoSource) HasQuery() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Source.(*GeoSource_Query)
+	return ok
+}
+
+func (x *GeoSource) ClearUpdateFreq() {
+	x.UpdateFreq = nil
+}
+
+func (x *GeoSource) ClearSource() {
+	x.Source = nil
+}
+
+func (x *GeoSource) ClearTable() {
+	if _, ok := x.Source.(*GeoSource_Table); ok {
+		x.Source = nil
+	}
+}
+
+func (x *GeoSource) ClearQuery() {
+	if _, ok := x.Source.(*GeoSource_Query); ok {
+		x.Source = nil
+	}
+}
+
+const GeoSource_Source_not_set_case case_GeoSource_Source = 0
+const GeoSource_Table_case case_GeoSource_Source = 5
+const GeoSource_Query_case case_GeoSource_Source = 6
+
+func (x *GeoSource) WhichSource() case_GeoSource_Source {
+	if x == nil {
+		return GeoSource_Source_not_set_case
+	}
+	switch x.Source.(type) {
+	case *GeoSource_Table:
+		return GeoSource_Table_case
+	case *GeoSource_Query:
+		return GeoSource_Query_case
+	default:
+		return GeoSource_Source_not_set_case
+	}
+}
+
+type GeoSource_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id         string
+	GeoFields  []string
+	PropFields []*PropertyField
+	UpdateFreq *durationpb.Duration
+	// Fields of oneof Source:
+	Table *v1beta1.Table
+	Query *v1beta1.Query
+	// -- end of Source
+}
+
+func (b0 GeoSource_builder) Build() *GeoSource {
+	m0 := &GeoSource{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.GeoFields = b.GeoFields
+	x.PropFields = b.PropFields
+	x.UpdateFreq = b.UpdateFreq
+	if b.Table != nil {
+		x.Source = &GeoSource_Table{b.Table}
+	}
+	if b.Query != nil {
+		x.Source = &GeoSource_Query{b.Query}
+	}
+	return m0
+}
+
+type case_GeoSource_Source protoreflect.FieldNumber
+
+func (x case_GeoSource_Source) String() string {
+	md := file_dtkt_geo_v1beta1_messages_proto_msgTypes[0].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isGeoSource_Source interface {
 	isGeoSource_Source()
 }
@@ -139,7 +275,7 @@ func (*GeoSource_Table) isGeoSource_Source() {}
 func (*GeoSource_Query) isGeoSource_Source() {}
 
 type PropertyField struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Type          PropertyType           `protobuf:"varint,2,opt,name=type,proto3,enum=dtkt.geo.v1beta1.PropertyType" json:"type,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -171,11 +307,6 @@ func (x *PropertyField) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PropertyField.ProtoReflect.Descriptor instead.
-func (*PropertyField) Descriptor() ([]byte, []int) {
-	return file_dtkt_geo_v1beta1_messages_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *PropertyField) GetName() string {
 	if x != nil {
 		return x.Name
@@ -190,8 +321,32 @@ func (x *PropertyField) GetType() PropertyType {
 	return PropertyType_PROPERTY_TYPE_UNSPECIFIED
 }
 
+func (x *PropertyField) SetName(v string) {
+	x.Name = v
+}
+
+func (x *PropertyField) SetType(v PropertyType) {
+	x.Type = v
+}
+
+type PropertyField_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name string
+	Type PropertyType
+}
+
+func (b0 PropertyField_builder) Build() *PropertyField {
+	m0 := &PropertyField{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	x.Type = b.Type
+	return m0
+}
+
 type Bounds struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Type          BoundsType             `protobuf:"varint,1,opt,name=type,proto3,enum=dtkt.geo.v1beta1.BoundsType" json:"type,omitempty"`
 	Geom          *v1beta11.Geometry     `protobuf:"bytes,2,opt,name=geom,proto3" json:"geom,omitempty"`
 	Centroid      bool                   `protobuf:"varint,3,opt,name=centroid,proto3" json:"centroid,omitempty"`
@@ -224,11 +379,6 @@ func (x *Bounds) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Bounds.ProtoReflect.Descriptor instead.
-func (*Bounds) Descriptor() ([]byte, []int) {
-	return file_dtkt_geo_v1beta1_messages_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *Bounds) GetType() BoundsType {
 	if x != nil {
 		return x.Type
@@ -250,8 +400,49 @@ func (x *Bounds) GetCentroid() bool {
 	return false
 }
 
+func (x *Bounds) SetType(v BoundsType) {
+	x.Type = v
+}
+
+func (x *Bounds) SetGeom(v *v1beta11.Geometry) {
+	x.Geom = v
+}
+
+func (x *Bounds) SetCentroid(v bool) {
+	x.Centroid = v
+}
+
+func (x *Bounds) HasGeom() bool {
+	if x == nil {
+		return false
+	}
+	return x.Geom != nil
+}
+
+func (x *Bounds) ClearGeom() {
+	x.Geom = nil
+}
+
+type Bounds_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Type     BoundsType
+	Geom     *v1beta11.Geometry
+	Centroid bool
+}
+
+func (b0 Bounds_builder) Build() *Bounds {
+	m0 := &Bounds{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Type = b.Type
+	x.Geom = b.Geom
+	x.Centroid = b.Centroid
+	return m0
+}
+
 type ListGeoSourcesRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Scope:
 	//
 	//	*ListGeoSourcesRequest_Catalog
@@ -286,11 +477,6 @@ func (x *ListGeoSourcesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListGeoSourcesRequest.ProtoReflect.Descriptor instead.
-func (*ListGeoSourcesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_geo_v1beta1_messages_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *ListGeoSourcesRequest) GetScope() isListGeoSourcesRequest_Scope {
 	if x != nil {
 		return x.Scope
@@ -316,6 +502,111 @@ func (x *ListGeoSourcesRequest) GetSchema() *v1beta1.Schema {
 	return nil
 }
 
+func (x *ListGeoSourcesRequest) SetCatalog(v *v1beta1.Catalog) {
+	if v == nil {
+		x.Scope = nil
+		return
+	}
+	x.Scope = &ListGeoSourcesRequest_Catalog{v}
+}
+
+func (x *ListGeoSourcesRequest) SetSchema(v *v1beta1.Schema) {
+	if v == nil {
+		x.Scope = nil
+		return
+	}
+	x.Scope = &ListGeoSourcesRequest_Schema{v}
+}
+
+func (x *ListGeoSourcesRequest) HasScope() bool {
+	if x == nil {
+		return false
+	}
+	return x.Scope != nil
+}
+
+func (x *ListGeoSourcesRequest) HasCatalog() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Scope.(*ListGeoSourcesRequest_Catalog)
+	return ok
+}
+
+func (x *ListGeoSourcesRequest) HasSchema() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Scope.(*ListGeoSourcesRequest_Schema)
+	return ok
+}
+
+func (x *ListGeoSourcesRequest) ClearScope() {
+	x.Scope = nil
+}
+
+func (x *ListGeoSourcesRequest) ClearCatalog() {
+	if _, ok := x.Scope.(*ListGeoSourcesRequest_Catalog); ok {
+		x.Scope = nil
+	}
+}
+
+func (x *ListGeoSourcesRequest) ClearSchema() {
+	if _, ok := x.Scope.(*ListGeoSourcesRequest_Schema); ok {
+		x.Scope = nil
+	}
+}
+
+const ListGeoSourcesRequest_Scope_not_set_case case_ListGeoSourcesRequest_Scope = 0
+const ListGeoSourcesRequest_Catalog_case case_ListGeoSourcesRequest_Scope = 1
+const ListGeoSourcesRequest_Schema_case case_ListGeoSourcesRequest_Scope = 2
+
+func (x *ListGeoSourcesRequest) WhichScope() case_ListGeoSourcesRequest_Scope {
+	if x == nil {
+		return ListGeoSourcesRequest_Scope_not_set_case
+	}
+	switch x.Scope.(type) {
+	case *ListGeoSourcesRequest_Catalog:
+		return ListGeoSourcesRequest_Catalog_case
+	case *ListGeoSourcesRequest_Schema:
+		return ListGeoSourcesRequest_Schema_case
+	default:
+		return ListGeoSourcesRequest_Scope_not_set_case
+	}
+}
+
+type ListGeoSourcesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Scope:
+	Catalog *v1beta1.Catalog
+	Schema  *v1beta1.Schema
+	// -- end of Scope
+}
+
+func (b0 ListGeoSourcesRequest_builder) Build() *ListGeoSourcesRequest {
+	m0 := &ListGeoSourcesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Catalog != nil {
+		x.Scope = &ListGeoSourcesRequest_Catalog{b.Catalog}
+	}
+	if b.Schema != nil {
+		x.Scope = &ListGeoSourcesRequest_Schema{b.Schema}
+	}
+	return m0
+}
+
+type case_ListGeoSourcesRequest_Scope protoreflect.FieldNumber
+
+func (x case_ListGeoSourcesRequest_Scope) String() string {
+	md := file_dtkt_geo_v1beta1_messages_proto_msgTypes[3].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isListGeoSourcesRequest_Scope interface {
 	isListGeoSourcesRequest_Scope()
 }
@@ -333,7 +624,7 @@ func (*ListGeoSourcesRequest_Catalog) isListGeoSourcesRequest_Scope() {}
 func (*ListGeoSourcesRequest_Schema) isListGeoSourcesRequest_Scope() {}
 
 type ListGeoSourcesResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	GeoSource     *GeoSource             `protobuf:"bytes,1,opt,name=geo_source,json=geoSource,proto3" json:"geo_source,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -364,11 +655,6 @@ func (x *ListGeoSourcesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListGeoSourcesResponse.ProtoReflect.Descriptor instead.
-func (*ListGeoSourcesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_geo_v1beta1_messages_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *ListGeoSourcesResponse) GetGeoSource() *GeoSource {
 	if x != nil {
 		return x.GeoSource
@@ -376,8 +662,37 @@ func (x *ListGeoSourcesResponse) GetGeoSource() *GeoSource {
 	return nil
 }
 
+func (x *ListGeoSourcesResponse) SetGeoSource(v *GeoSource) {
+	x.GeoSource = v
+}
+
+func (x *ListGeoSourcesResponse) HasGeoSource() bool {
+	if x == nil {
+		return false
+	}
+	return x.GeoSource != nil
+}
+
+func (x *ListGeoSourcesResponse) ClearGeoSource() {
+	x.GeoSource = nil
+}
+
+type ListGeoSourcesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	GeoSource *GeoSource
+}
+
+func (b0 ListGeoSourcesResponse_builder) Build() *ListGeoSourcesResponse {
+	m0 := &ListGeoSourcesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.GeoSource = b.GeoSource
+	return m0
+}
+
 type StreamGeoJsonRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Source        *GeoSource             `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
 	Bounds        *Bounds                `protobuf:"bytes,2,opt,name=bounds,proto3" json:"bounds,omitempty"`
 	GeoField      string                 `protobuf:"bytes,3,opt,name=geo_field,json=geoField,proto3" json:"geo_field,omitempty"`
@@ -411,11 +726,6 @@ func (x *StreamGeoJsonRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StreamGeoJsonRequest.ProtoReflect.Descriptor instead.
-func (*StreamGeoJsonRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_geo_v1beta1_messages_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *StreamGeoJsonRequest) GetSource() *GeoSource {
 	if x != nil {
 		return x.Source
@@ -444,8 +754,66 @@ func (x *StreamGeoJsonRequest) GetPropFields() []string {
 	return nil
 }
 
+func (x *StreamGeoJsonRequest) SetSource(v *GeoSource) {
+	x.Source = v
+}
+
+func (x *StreamGeoJsonRequest) SetBounds(v *Bounds) {
+	x.Bounds = v
+}
+
+func (x *StreamGeoJsonRequest) SetGeoField(v string) {
+	x.GeoField = v
+}
+
+func (x *StreamGeoJsonRequest) SetPropFields(v []string) {
+	x.PropFields = v
+}
+
+func (x *StreamGeoJsonRequest) HasSource() bool {
+	if x == nil {
+		return false
+	}
+	return x.Source != nil
+}
+
+func (x *StreamGeoJsonRequest) HasBounds() bool {
+	if x == nil {
+		return false
+	}
+	return x.Bounds != nil
+}
+
+func (x *StreamGeoJsonRequest) ClearSource() {
+	x.Source = nil
+}
+
+func (x *StreamGeoJsonRequest) ClearBounds() {
+	x.Bounds = nil
+}
+
+type StreamGeoJsonRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Source     *GeoSource
+	Bounds     *Bounds
+	GeoField   string
+	PropFields []string
+}
+
+func (b0 StreamGeoJsonRequest_builder) Build() *StreamGeoJsonRequest {
+	m0 := &StreamGeoJsonRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Source = b.Source
+	x.Bounds = b.Bounds
+	x.GeoField = b.GeoField
+	x.PropFields = b.PropFields
+	return m0
+}
+
 type StreamGeoJsonResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Result        *v1beta11.GeoJSON      `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -476,16 +844,40 @@ func (x *StreamGeoJsonResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StreamGeoJsonResponse.ProtoReflect.Descriptor instead.
-func (*StreamGeoJsonResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_geo_v1beta1_messages_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *StreamGeoJsonResponse) GetResult() *v1beta11.GeoJSON {
 	if x != nil {
 		return x.Result
 	}
 	return nil
+}
+
+func (x *StreamGeoJsonResponse) SetResult(v *v1beta11.GeoJSON) {
+	x.Result = v
+}
+
+func (x *StreamGeoJsonResponse) HasResult() bool {
+	if x == nil {
+		return false
+	}
+	return x.Result != nil
+}
+
+func (x *StreamGeoJsonResponse) ClearResult() {
+	x.Result = nil
+}
+
+type StreamGeoJsonResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Result *v1beta11.GeoJSON
+}
+
+func (b0 StreamGeoJsonResponse_builder) Build() *StreamGeoJsonResponse {
+	m0 := &StreamGeoJsonResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Result = b.Result
+	return m0
 }
 
 var File_dtkt_geo_v1beta1_messages_proto protoreflect.FileDescriptor
@@ -527,18 +919,6 @@ const file_dtkt_geo_v1beta1_messages_proto_rawDesc = "" +
 	"\x15StreamGeoJsonResponse\x125\n" +
 	"\x06result\x18\x01 \x01(\v2\x1d.dtkt.geojson.v1beta1.GeoJSONR\x06resultB\xd3\x01\n" +
 	"\x16proto.dtkt.geo.v1beta1B\rMessagesProtoP\x01ZHgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/geo/v1beta1;geov1beta1\xa2\x02\x03DGX\xaa\x02\x10Dtkt.Geo.V1beta1\xca\x02\x10Dtkt\\Geo\\V1beta1\xe2\x02\x1cDtkt\\Geo\\V1beta1\\GPBMetadata\xea\x02\x12Dtkt::Geo::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_geo_v1beta1_messages_proto_rawDescOnce sync.Once
-	file_dtkt_geo_v1beta1_messages_proto_rawDescData []byte
-)
-
-func file_dtkt_geo_v1beta1_messages_proto_rawDescGZIP() []byte {
-	file_dtkt_geo_v1beta1_messages_proto_rawDescOnce.Do(func() {
-		file_dtkt_geo_v1beta1_messages_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_geo_v1beta1_messages_proto_rawDesc), len(file_dtkt_geo_v1beta1_messages_proto_rawDesc)))
-	})
-	return file_dtkt_geo_v1beta1_messages_proto_rawDescData
-}
 
 var file_dtkt_geo_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_dtkt_geo_v1beta1_messages_proto_goTypes = []any{

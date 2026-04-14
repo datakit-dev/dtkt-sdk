@@ -1,0 +1,14 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_type_default
+  inputs:
+    - id: x
+      int64:
+        default: 99
+      throttle:
+        count: 1
+        interval: "0.05s"
+  outputs:
+    - id: result
+      value: "= inputs.x.value"

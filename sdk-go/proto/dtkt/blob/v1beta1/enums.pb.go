@@ -4,13 +4,14 @@
 // 	protoc        (unknown)
 // source: dtkt/blob/v1beta1/enums.proto
 
+//go:build !protoopaque
+
 package blobv1beta1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -72,11 +73,6 @@ func (x SignedURLMethod) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use SignedURLMethod.Descriptor instead.
-func (SignedURLMethod) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_enums_proto_rawDescGZIP(), []int{0}
-}
-
 // LineFormat specifies the format of lines read from a blob.
 type LineFormat int32
 
@@ -122,11 +118,6 @@ func (x LineFormat) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use LineFormat.Descriptor instead.
-func (LineFormat) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_enums_proto_rawDescGZIP(), []int{1}
-}
-
 var File_dtkt_blob_v1beta1_enums_proto protoreflect.FileDescriptor
 
 const file_dtkt_blob_v1beta1_enums_proto_rawDesc = "" +
@@ -145,18 +136,6 @@ const file_dtkt_blob_v1beta1_enums_proto_rawDesc = "" +
 	"\x10LINE_FORMAT_JSON\x10\x02B\xd7\x01\n" +
 	"\x17proto.dtkt.blob.v1beta1B\n" +
 	"EnumsProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/blob/v1beta1;blobv1beta1\xa2\x02\x03DBX\xaa\x02\x11Dtkt.Blob.V1beta1\xca\x02\x11Dtkt\\Blob\\V1beta1\xe2\x02\x1dDtkt\\Blob\\V1beta1\\GPBMetadata\xea\x02\x13Dtkt::Blob::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_blob_v1beta1_enums_proto_rawDescOnce sync.Once
-	file_dtkt_blob_v1beta1_enums_proto_rawDescData []byte
-)
-
-func file_dtkt_blob_v1beta1_enums_proto_rawDescGZIP() []byte {
-	file_dtkt_blob_v1beta1_enums_proto_rawDescOnce.Do(func() {
-		file_dtkt_blob_v1beta1_enums_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_blob_v1beta1_enums_proto_rawDesc), len(file_dtkt_blob_v1beta1_enums_proto_rawDesc)))
-	})
-	return file_dtkt_blob_v1beta1_enums_proto_rawDescData
-}
 
 var file_dtkt_blob_v1beta1_enums_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_dtkt_blob_v1beta1_enums_proto_goTypes = []any{

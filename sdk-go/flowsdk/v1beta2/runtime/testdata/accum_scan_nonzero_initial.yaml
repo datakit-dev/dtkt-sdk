@@ -1,0 +1,17 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: scan_nonzero_initial
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: sum
+      value: "= inputs.x.value"
+      transforms:
+        - scan:
+            initial: "= 100"
+            accumulator: "= this.accumulator + this.value"
+  outputs:
+    - id: result
+      value: "= vars.sum.value"

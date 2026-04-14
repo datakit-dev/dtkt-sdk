@@ -1,0 +1,17 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_flatten
+  description: "Map producing a list, then flatten to individual elements"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: expanded
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= [this.value, this.value * 10]"
+        - flatten: true
+  outputs:
+    - id: result
+      value: "= vars.expanded.value"

@@ -1,0 +1,18 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_deep_flatten
+  description: "Map to nested list, flatten twice for deep flattening"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: deep
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= [[this.value, this.value + 1], [this.value + 2, this.value + 3]]"
+        - flatten: true
+        - flatten: true
+  outputs:
+    - id: result
+      value: "= vars.deep.value"

@@ -1,0 +1,24 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fanout_parallel_chains
+  description: "Input to two parallel var chains with different transforms"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: chainA
+      value: "= inputs.x.value"
+      transforms:
+        - filter: "= this.value % 2 == 0"
+        - map: "= this.value * 10"
+    - id: chainB
+      value: "= inputs.x.value"
+      transforms:
+        - map: "= this.value + 1"
+        - filter: "= this.value > 3"
+  outputs:
+    - id: a
+      value: "= vars.chainA.value"
+    - id: b
+      value: "= vars.chainB.value"

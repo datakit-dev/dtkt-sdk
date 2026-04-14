@@ -8,6 +8,11 @@ import (
 // NameType represents a resource name type.
 type NameType string
 
+func IsNameType(input string) (NameType, bool) {
+	nt, ok := coreAliases[strings.ToLower(input)]
+	return nt, ok
+}
+
 // NewName constructs a single Name segment with the given short name for this
 // NameType for easy construction of child resource names. For example, given a
 // NameType of "flows" and a short name of "my-flow", this would return a Name

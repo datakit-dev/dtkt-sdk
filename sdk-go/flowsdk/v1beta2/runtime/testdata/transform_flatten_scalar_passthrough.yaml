@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_flatten_scalar_passthrough
+  description: "Flatten on scalar value passes through unchanged"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: flat
+      value: "= inputs.x.value"
+      transforms:
+        - flatten: true
+  outputs:
+    - id: result
+      value: "= vars.flat.value"

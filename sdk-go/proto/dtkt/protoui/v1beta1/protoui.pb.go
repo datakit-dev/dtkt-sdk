@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/protoui/v1beta1/protoui.proto
 
+//go:build !protoopaque
+
 package protouiv1beta1
 
 import (
@@ -14,7 +16,6 @@ import (
 	anypb "google.golang.org/protobuf/types/known/anypb"
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -66,11 +67,6 @@ func (x Template_Language) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use Template_Language.Descriptor instead.
-func (Template_Language) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{4, 0}
-}
-
 type List_Style int32
 
 const (
@@ -113,11 +109,6 @@ func (List_Style) Type() protoreflect.EnumType {
 
 func (x List_Style) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use List_Style.Descriptor instead.
-func (List_Style) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{8, 0}
 }
 
 // Text color variant.
@@ -168,14 +159,9 @@ func (x Text_Color) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use Text_Color.Descriptor instead.
-func (Text_Color) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{15, 0}
-}
-
 // Determines how a Message should be displayed in the UI.
 type MessageOption struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Components    []*Component           `protobuf:"bytes,1,rep,name=components,proto3" json:"components,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -206,11 +192,6 @@ func (x *MessageOption) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MessageOption.ProtoReflect.Descriptor instead.
-func (*MessageOption) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *MessageOption) GetComponents() []*Component {
 	if x != nil {
 		return x.Components
@@ -218,9 +199,27 @@ func (x *MessageOption) GetComponents() []*Component {
 	return nil
 }
 
+func (x *MessageOption) SetComponents(v []*Component) {
+	x.Components = v
+}
+
+type MessageOption_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Components []*Component
+}
+
+func (b0 MessageOption_builder) Build() *MessageOption {
+	m0 := &MessageOption{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Components = b.Components
+	return m0
+}
+
 // Determines how a Field should be displayed in the UI.
 type FieldOption struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Components    []*Component           `protobuf:"bytes,1,rep,name=components,proto3" json:"components,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -251,11 +250,6 @@ func (x *FieldOption) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FieldOption.ProtoReflect.Descriptor instead.
-func (*FieldOption) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *FieldOption) GetComponents() []*Component {
 	if x != nil {
 		return x.Components
@@ -263,8 +257,26 @@ func (x *FieldOption) GetComponents() []*Component {
 	return nil
 }
 
+func (x *FieldOption) SetComponents(v []*Component) {
+	x.Components = v
+}
+
+type FieldOption_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Components []*Component
+}
+
+func (b0 FieldOption_builder) Build() *FieldOption {
+	m0 := &FieldOption{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Components = b.Components
+	return m0
+}
+
 type Data struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The evaluated context data to pass to the component.
 	// If none of the data options are specified, data will be the message or field as is.
 	//
@@ -303,11 +315,6 @@ func (x *Data) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Data.ProtoReflect.Descriptor instead.
-func (*Data) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *Data) GetData() isData_Data {
 	if x != nil {
 		return x.Data
@@ -342,6 +349,138 @@ func (x *Data) GetTemplate() *Template {
 	return nil
 }
 
+func (x *Data) SetText(v string) {
+	x.Data = &Data_Text{v}
+}
+
+func (x *Data) SetExpr(v string) {
+	x.Data = &Data_Expr{v}
+}
+
+func (x *Data) SetTemplate(v *Template) {
+	if v == nil {
+		x.Data = nil
+		return
+	}
+	x.Data = &Data_Template{v}
+}
+
+func (x *Data) HasData() bool {
+	if x == nil {
+		return false
+	}
+	return x.Data != nil
+}
+
+func (x *Data) HasText() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Data.(*Data_Text)
+	return ok
+}
+
+func (x *Data) HasExpr() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Data.(*Data_Expr)
+	return ok
+}
+
+func (x *Data) HasTemplate() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Data.(*Data_Template)
+	return ok
+}
+
+func (x *Data) ClearData() {
+	x.Data = nil
+}
+
+func (x *Data) ClearText() {
+	if _, ok := x.Data.(*Data_Text); ok {
+		x.Data = nil
+	}
+}
+
+func (x *Data) ClearExpr() {
+	if _, ok := x.Data.(*Data_Expr); ok {
+		x.Data = nil
+	}
+}
+
+func (x *Data) ClearTemplate() {
+	if _, ok := x.Data.(*Data_Template); ok {
+		x.Data = nil
+	}
+}
+
+const Data_Data_not_set_case case_Data_Data = 0
+const Data_Text_case case_Data_Data = 1
+const Data_Expr_case case_Data_Data = 2
+const Data_Template_case case_Data_Data = 3
+
+func (x *Data) WhichData() case_Data_Data {
+	if x == nil {
+		return Data_Data_not_set_case
+	}
+	switch x.Data.(type) {
+	case *Data_Text:
+		return Data_Text_case
+	case *Data_Expr:
+		return Data_Expr_case
+	case *Data_Template:
+		return Data_Template_case
+	default:
+		return Data_Data_not_set_case
+	}
+}
+
+type Data_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The evaluated context data to pass to the component.
+	// If none of the data options are specified, data will be the message or field as is.
+
+	// Fields of oneof Data:
+	// Evaluate the data as plain text.
+	Text *string
+	// Evaluate the data using a CEL expression.  The message or field is passed as `this` to the expression data context.
+	Expr *string
+	// Evaluate the data using a template.  The message or field is passed as the template data context.
+	Template *Template
+	// -- end of Data
+}
+
+func (b0 Data_builder) Build() *Data {
+	m0 := &Data{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Text != nil {
+		x.Data = &Data_Text{*b.Text}
+	}
+	if b.Expr != nil {
+		x.Data = &Data_Expr{*b.Expr}
+	}
+	if b.Template != nil {
+		x.Data = &Data_Template{b.Template}
+	}
+	return m0
+}
+
+type case_Data_Data protoreflect.FieldNumber
+
+func (x case_Data_Data) String() string {
+	md := file_dtkt_protoui_v1beta1_protoui_proto_msgTypes[2].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isData_Data interface {
 	isData_Data()
 }
@@ -369,7 +508,7 @@ func (*Data_Template) isData_Data() {}
 
 // A Block represents a component in the UI that displays data from a message or field.
 type Component struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id    *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
 	// Determine how the data should be displayed.
 	// If none of the display options are specified, the data will be displayed using a default renderer based on the data type.
@@ -424,11 +563,6 @@ func (x *Component) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Component.ProtoReflect.Descriptor instead.
-func (*Component) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Component) GetId() string {
@@ -614,6 +748,630 @@ func (x *Component) GetMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *Component) SetId(v string) {
+	x.Id = &v
+}
+
+func (x *Component) SetMarkdown(v *Markdown) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_Markdown{v}
+}
+
+func (x *Component) SetHeading(v *Heading) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_Heading{v}
+}
+
+func (x *Component) SetTable(v *Table) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_Table{v}
+}
+
+func (x *Component) SetList(v *List) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_List{v}
+}
+
+func (x *Component) SetBadge(v *Badge) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_Badge{v}
+}
+
+func (x *Component) SetProgress(v *Progress) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_Progress{v}
+}
+
+func (x *Component) SetCodeBlock(v *CodeBlock) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_CodeBlock{v}
+}
+
+func (x *Component) SetCard(v *Card) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_Card{v}
+}
+
+func (x *Component) SetDescriptionList(v *DescriptionList) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_DescriptionList{v}
+}
+
+func (x *Component) SetTree(v *Tree) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_Tree{v}
+}
+
+func (x *Component) SetText(v *Text) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_Text{v}
+}
+
+func (x *Component) SetAvatar(v *Avatar) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_Avatar{v}
+}
+
+func (x *Component) SetDivider(v *Divider) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_Divider{v}
+}
+
+func (x *Component) SetSecret(v *Secret) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_Secret{v}
+}
+
+func (x *Component) SetLabel(v *Label) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_Label{v}
+}
+
+func (x *Component) SetDescription(v *Description) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_Description{v}
+}
+
+func (x *Component) SetError(v *Error) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_Error{v}
+}
+
+func (x *Component) SetCustom(v *anypb.Any) {
+	if v == nil {
+		x.Component = nil
+		return
+	}
+	x.Component = &Component_Custom{v}
+}
+
+func (x *Component) SetMetadata(v *structpb.Struct) {
+	x.Metadata = v
+}
+
+func (x *Component) HasId() bool {
+	if x == nil {
+		return false
+	}
+	return x.Id != nil
+}
+
+func (x *Component) HasComponent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Component != nil
+}
+
+func (x *Component) HasMarkdown() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_Markdown)
+	return ok
+}
+
+func (x *Component) HasHeading() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_Heading)
+	return ok
+}
+
+func (x *Component) HasTable() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_Table)
+	return ok
+}
+
+func (x *Component) HasList() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_List)
+	return ok
+}
+
+func (x *Component) HasBadge() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_Badge)
+	return ok
+}
+
+func (x *Component) HasProgress() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_Progress)
+	return ok
+}
+
+func (x *Component) HasCodeBlock() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_CodeBlock)
+	return ok
+}
+
+func (x *Component) HasCard() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_Card)
+	return ok
+}
+
+func (x *Component) HasDescriptionList() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_DescriptionList)
+	return ok
+}
+
+func (x *Component) HasTree() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_Tree)
+	return ok
+}
+
+func (x *Component) HasText() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_Text)
+	return ok
+}
+
+func (x *Component) HasAvatar() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_Avatar)
+	return ok
+}
+
+func (x *Component) HasDivider() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_Divider)
+	return ok
+}
+
+func (x *Component) HasSecret() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_Secret)
+	return ok
+}
+
+func (x *Component) HasLabel() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_Label)
+	return ok
+}
+
+func (x *Component) HasDescription() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_Description)
+	return ok
+}
+
+func (x *Component) HasError() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_Error)
+	return ok
+}
+
+func (x *Component) HasCustom() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Component.(*Component_Custom)
+	return ok
+}
+
+func (x *Component) HasMetadata() bool {
+	if x == nil {
+		return false
+	}
+	return x.Metadata != nil
+}
+
+func (x *Component) ClearId() {
+	x.Id = nil
+}
+
+func (x *Component) ClearComponent() {
+	x.Component = nil
+}
+
+func (x *Component) ClearMarkdown() {
+	if _, ok := x.Component.(*Component_Markdown); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearHeading() {
+	if _, ok := x.Component.(*Component_Heading); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearTable() {
+	if _, ok := x.Component.(*Component_Table); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearList() {
+	if _, ok := x.Component.(*Component_List); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearBadge() {
+	if _, ok := x.Component.(*Component_Badge); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearProgress() {
+	if _, ok := x.Component.(*Component_Progress); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearCodeBlock() {
+	if _, ok := x.Component.(*Component_CodeBlock); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearCard() {
+	if _, ok := x.Component.(*Component_Card); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearDescriptionList() {
+	if _, ok := x.Component.(*Component_DescriptionList); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearTree() {
+	if _, ok := x.Component.(*Component_Tree); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearText() {
+	if _, ok := x.Component.(*Component_Text); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearAvatar() {
+	if _, ok := x.Component.(*Component_Avatar); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearDivider() {
+	if _, ok := x.Component.(*Component_Divider); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearSecret() {
+	if _, ok := x.Component.(*Component_Secret); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearLabel() {
+	if _, ok := x.Component.(*Component_Label); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearDescription() {
+	if _, ok := x.Component.(*Component_Description); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearError() {
+	if _, ok := x.Component.(*Component_Error); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearCustom() {
+	if _, ok := x.Component.(*Component_Custom); ok {
+		x.Component = nil
+	}
+}
+
+func (x *Component) ClearMetadata() {
+	x.Metadata = nil
+}
+
+const Component_Component_not_set_case case_Component_Component = 0
+const Component_Markdown_case case_Component_Component = 2
+const Component_Heading_case case_Component_Component = 3
+const Component_Table_case case_Component_Component = 4
+const Component_List_case case_Component_Component = 5
+const Component_Badge_case case_Component_Component = 6
+const Component_Progress_case case_Component_Component = 7
+const Component_CodeBlock_case case_Component_Component = 8
+const Component_Card_case case_Component_Component = 9
+const Component_DescriptionList_case case_Component_Component = 10
+const Component_Tree_case case_Component_Component = 11
+const Component_Text_case case_Component_Component = 12
+const Component_Avatar_case case_Component_Component = 14
+const Component_Divider_case case_Component_Component = 15
+const Component_Secret_case case_Component_Component = 19
+const Component_Label_case case_Component_Component = 20
+const Component_Description_case case_Component_Component = 21
+const Component_Error_case case_Component_Component = 22
+const Component_Custom_case case_Component_Component = 40
+
+func (x *Component) WhichComponent() case_Component_Component {
+	if x == nil {
+		return Component_Component_not_set_case
+	}
+	switch x.Component.(type) {
+	case *Component_Markdown:
+		return Component_Markdown_case
+	case *Component_Heading:
+		return Component_Heading_case
+	case *Component_Table:
+		return Component_Table_case
+	case *Component_List:
+		return Component_List_case
+	case *Component_Badge:
+		return Component_Badge_case
+	case *Component_Progress:
+		return Component_Progress_case
+	case *Component_CodeBlock:
+		return Component_CodeBlock_case
+	case *Component_Card:
+		return Component_Card_case
+	case *Component_DescriptionList:
+		return Component_DescriptionList_case
+	case *Component_Tree:
+		return Component_Tree_case
+	case *Component_Text:
+		return Component_Text_case
+	case *Component_Avatar:
+		return Component_Avatar_case
+	case *Component_Divider:
+		return Component_Divider_case
+	case *Component_Secret:
+		return Component_Secret_case
+	case *Component_Label:
+		return Component_Label_case
+	case *Component_Description:
+		return Component_Description_case
+	case *Component_Error:
+		return Component_Error_case
+	case *Component_Custom:
+		return Component_Custom_case
+	default:
+		return Component_Component_not_set_case
+	}
+}
+
+type Component_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id *string
+	// Determine how the data should be displayed.
+	// If none of the display options are specified, the data will be displayed using a default renderer based on the data type.
+
+	// Fields of oneof Component:
+	// Render as markdown.  Only valid for string type data.
+	Markdown *Markdown
+	// Render as a heading.  Only valid for string type data.
+	Heading *Heading
+	// Render the data as a table.  Only valid for repeated Message fields.
+	Table *Table
+	// Render the data as a list.  Only valid for repeated scalar fields.
+	List *List
+	// Render the data as a badge.  Only valid for string type data.
+	Badge *Badge
+	// Render the data as progress.  Only valid for numeric type data.
+	Progress *Progress
+	// Render the data as a code block.  Only valid for string type data.
+	// Optionally, a language can be specified for syntax highlighting.
+	CodeBlock *CodeBlock
+	// Render the data as a card.  Can contain other components.
+	Card *Card
+	// Render the data as a description list (key-value pairs).
+	DescriptionList *DescriptionList
+	// Render the data as a tree structure.  Only valid for hierarchical data.
+	Tree *Tree
+	// Render the data as text with optional styling.
+	Text *Text
+	// Render the data as an avatar.
+	Avatar *Avatar
+	// Render the data as a divider/separator.
+	Divider *Divider
+	// Render the data as a secret (masked text with reveal option).
+	Secret *Secret
+	// Render as a label.  Only valid for string type data.
+	Label       *Label
+	Description *Description
+	Error       *Error
+	// Custom component.  The data will be passed to the custom component as is.
+	Custom *anypb.Any
+	// -- end of Component
+	// Arbitrary metadata that can be used by the UI renderer.
+	Metadata *structpb.Struct
+}
+
+func (b0 Component_builder) Build() *Component {
+	m0 := &Component{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	if b.Markdown != nil {
+		x.Component = &Component_Markdown{b.Markdown}
+	}
+	if b.Heading != nil {
+		x.Component = &Component_Heading{b.Heading}
+	}
+	if b.Table != nil {
+		x.Component = &Component_Table{b.Table}
+	}
+	if b.List != nil {
+		x.Component = &Component_List{b.List}
+	}
+	if b.Badge != nil {
+		x.Component = &Component_Badge{b.Badge}
+	}
+	if b.Progress != nil {
+		x.Component = &Component_Progress{b.Progress}
+	}
+	if b.CodeBlock != nil {
+		x.Component = &Component_CodeBlock{b.CodeBlock}
+	}
+	if b.Card != nil {
+		x.Component = &Component_Card{b.Card}
+	}
+	if b.DescriptionList != nil {
+		x.Component = &Component_DescriptionList{b.DescriptionList}
+	}
+	if b.Tree != nil {
+		x.Component = &Component_Tree{b.Tree}
+	}
+	if b.Text != nil {
+		x.Component = &Component_Text{b.Text}
+	}
+	if b.Avatar != nil {
+		x.Component = &Component_Avatar{b.Avatar}
+	}
+	if b.Divider != nil {
+		x.Component = &Component_Divider{b.Divider}
+	}
+	if b.Secret != nil {
+		x.Component = &Component_Secret{b.Secret}
+	}
+	if b.Label != nil {
+		x.Component = &Component_Label{b.Label}
+	}
+	if b.Description != nil {
+		x.Component = &Component_Description{b.Description}
+	}
+	if b.Error != nil {
+		x.Component = &Component_Error{b.Error}
+	}
+	if b.Custom != nil {
+		x.Component = &Component_Custom{b.Custom}
+	}
+	x.Metadata = b.Metadata
+	return m0
+}
+
+type case_Component_Component protoreflect.FieldNumber
+
+func (x case_Component_Component) String() string {
+	md := file_dtkt_protoui_v1beta1_protoui_proto_msgTypes[3].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isComponent_Component interface {
 	isComponent_Component()
 }
@@ -744,7 +1502,7 @@ func (*Component_Error) isComponent_Component() {}
 func (*Component_Custom) isComponent_Component() {}
 
 type Template struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Language      Template_Language      `protobuf:"varint,1,opt,name=language,proto3,enum=dtkt.protoui.v1beta1.Template_Language" json:"language,omitempty"`
 	Template      string                 `protobuf:"bytes,2,opt,name=template,proto3" json:"template,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -776,11 +1534,6 @@ func (x *Template) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Template.ProtoReflect.Descriptor instead.
-func (*Template) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *Template) GetLanguage() Template_Language {
 	if x != nil {
 		return x.Language
@@ -795,13 +1548,37 @@ func (x *Template) GetTemplate() string {
 	return ""
 }
 
+func (x *Template) SetLanguage(v Template_Language) {
+	x.Language = v
+}
+
+func (x *Template) SetTemplate(v string) {
+	x.Template = v
+}
+
+type Template_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Language Template_Language
+	Template string
+}
+
+func (b0 Template_builder) Build() *Template {
+	m0 := &Template{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Language = b.Language
+	x.Template = b.Template
+	return m0
+}
+
 // Render as markdown. Supports text, CEL expressions, and templates for generating markdown content.
 // Maps to markdown rendering in @dtkt/mdx
 // The message or field is available as `this` in expression/template context.
 // Example expr: `"# " + this.title + "\n\n" + this.body`
 // Example template: Use Go templates with access to message fields
 type Markdown struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The markdown content. Can be plain text, a CEL expression, or a template.
 	// Context: `this` is the message or field being rendered.
 	Content       *Data `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
@@ -834,16 +1611,42 @@ func (x *Markdown) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Markdown.ProtoReflect.Descriptor instead.
-func (*Markdown) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *Markdown) GetContent() *Data {
 	if x != nil {
 		return x.Content
 	}
 	return nil
+}
+
+func (x *Markdown) SetContent(v *Data) {
+	x.Content = v
+}
+
+func (x *Markdown) HasContent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Content != nil
+}
+
+func (x *Markdown) ClearContent() {
+	x.Content = nil
+}
+
+type Markdown_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The markdown content. Can be plain text, a CEL expression, or a template.
+	// Context: `this` is the message or field being rendered.
+	Content *Data
+}
+
+func (b0 Markdown_builder) Build() *Markdown {
+	m0 := &Markdown{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Content = b.Content
+	return m0
 }
 
 // Table component to display repeated Message fields.
@@ -855,7 +1658,7 @@ func (x *Markdown) GetContent() *Data {
 // - Direct field binding (no rows expression): each item is a proto message, use `field` in columns
 // - List of lists (positional): `this.users.map(u, [u.name, u.email, u.active ? "Active" : "Inactive"])`
 type Table struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// CEL expression that evaluates to a list of objects (repeated messages or structured data).
 	// Context: `this` is the message or field being rendered.
 	// If not specified, uses the field value directly.
@@ -893,11 +1696,6 @@ func (x *Table) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Table.ProtoReflect.Descriptor instead.
-func (*Table) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *Table) GetRows() string {
 	if x != nil && x.Rows != nil {
 		return *x.Rows
@@ -919,13 +1717,59 @@ func (x *Table) GetActions() []*Table_Action {
 	return nil
 }
 
+func (x *Table) SetRows(v string) {
+	x.Rows = &v
+}
+
+func (x *Table) SetColumns(v []*Table_Column) {
+	x.Columns = v
+}
+
+func (x *Table) SetActions(v []*Table_Action) {
+	x.Actions = v
+}
+
+func (x *Table) HasRows() bool {
+	if x == nil {
+		return false
+	}
+	return x.Rows != nil
+}
+
+func (x *Table) ClearRows() {
+	x.Rows = nil
+}
+
+type Table_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// CEL expression that evaluates to a list of objects (repeated messages or structured data).
+	// Context: `this` is the message or field being rendered.
+	// If not specified, uses the field value directly.
+	Rows *string
+	// Columns to be displayed in the table. If not specified, all fields will be displayed.
+	Columns []*Table_Column
+	// Actions that can be performed on the table rows.
+	Actions []*Table_Action
+}
+
+func (b0 Table_builder) Build() *Table {
+	m0 := &Table{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Rows = b.Rows
+	x.Columns = b.Columns
+	x.Actions = b.Actions
+	return m0
+}
+
 // Render as a heading with specified level.
 // Maps to Heading in @dtkt/ui/heading
 // Use CEL expressions to generate heading text.
 // The message or field is available as `this` in the expression context.
 // Example: `this.title` or `"Section " + string(this.section_num) + ": " + this.name`
 type Heading struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// CEL expression that evaluates to a string for the heading text.
 	// Context: `this` is the message or field being rendered.
 	// If not specified, uses the field value directly.
@@ -961,11 +1805,6 @@ func (x *Heading) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Heading.ProtoReflect.Descriptor instead.
-func (*Heading) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *Heading) GetContent() string {
 	if x != nil && x.Content != nil {
 		return *x.Content
@@ -980,13 +1819,52 @@ func (x *Heading) GetLevel() uint32 {
 	return 0
 }
 
+func (x *Heading) SetContent(v string) {
+	x.Content = &v
+}
+
+func (x *Heading) SetLevel(v uint32) {
+	x.Level = v
+}
+
+func (x *Heading) HasContent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Content != nil
+}
+
+func (x *Heading) ClearContent() {
+	x.Content = nil
+}
+
+type Heading_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// CEL expression that evaluates to a string for the heading text.
+	// Context: `this` is the message or field being rendered.
+	// If not specified, uses the field value directly.
+	Content *string
+	// Heading level (1-6).
+	Level uint32
+}
+
+func (b0 Heading_builder) Build() *Heading {
+	m0 := &Heading{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Content = b.Content
+	x.Level = b.Level
+	return m0
+}
+
 // Render as a list (bulleted or numbered).
 // Maps to HTML list elements (ul/ol)
 // Use CEL expressions to generate a list of items.
 // The message or field is available as `this` in the expression context.
 // Example: `this.tags` or `this.items.map(i, i.name)` or `this.permissions.filter(p, p.enabled).map(p, p.label)`
 type List struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// CEL expression that evaluates to a repeated/list value.
 	// Context: `this` is the message or field being rendered.
 	// If not specified, uses the field value directly.
@@ -1021,11 +1899,6 @@ func (x *List) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use List.ProtoReflect.Descriptor instead.
-func (*List) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *List) GetItems() string {
 	if x != nil && x.Items != nil {
 		return *x.Items
@@ -1040,13 +1913,51 @@ func (x *List) GetStyle() List_Style {
 	return List_STYLE_UNSPECIFIED
 }
 
+func (x *List) SetItems(v string) {
+	x.Items = &v
+}
+
+func (x *List) SetStyle(v List_Style) {
+	x.Style = v
+}
+
+func (x *List) HasItems() bool {
+	if x == nil {
+		return false
+	}
+	return x.Items != nil
+}
+
+func (x *List) ClearItems() {
+	x.Items = nil
+}
+
+type List_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// CEL expression that evaluates to a repeated/list value.
+	// Context: `this` is the message or field being rendered.
+	// If not specified, uses the field value directly.
+	Items *string
+	Style List_Style
+}
+
+func (b0 List_builder) Build() *List {
+	m0 := &List{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Items = b.Items
+	x.Style = b.Style
+	return m0
+}
+
 // Render as a badge with optional color.
 // Maps to Badge in @dtkt/ui/badge
 // Use CEL expressions to generate badge text.
 // The message or field is available as `this` in the expression context.
 // Example: `this.status` or `string(this.count) + " items"` or `this.is_active ? "Active" : "Inactive"`
 type Badge struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// CEL expression that evaluates to a string for the badge text.
 	// Context: `this` is the message or field being rendered.
 	// If not specified, uses the field value directly.
@@ -1083,11 +1994,6 @@ func (x *Badge) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Badge.ProtoReflect.Descriptor instead.
-func (*Badge) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *Badge) GetContent() string {
 	if x != nil && x.Content != nil {
 		return *x.Content
@@ -1102,13 +2008,64 @@ func (x *Badge) GetColor() string {
 	return ""
 }
 
+func (x *Badge) SetContent(v string) {
+	x.Content = &v
+}
+
+func (x *Badge) SetColor(v string) {
+	x.Color = &v
+}
+
+func (x *Badge) HasContent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Content != nil
+}
+
+func (x *Badge) HasColor() bool {
+	if x == nil {
+		return false
+	}
+	return x.Color != nil
+}
+
+func (x *Badge) ClearContent() {
+	x.Content = nil
+}
+
+func (x *Badge) ClearColor() {
+	x.Color = nil
+}
+
+type Badge_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// CEL expression that evaluates to a string for the badge text.
+	// Context: `this` is the message or field being rendered.
+	// If not specified, uses the field value directly.
+	Content *string
+	// Color name from the UI theme (e.g., "red", "blue", "green", "zinc").
+	// Defaults to "zinc" if not specified.
+	Color *string
+}
+
+func (b0 Badge_builder) Build() *Badge {
+	m0 := &Badge{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Content = b.Content
+	x.Color = b.Color
+	return m0
+}
+
 // Render as a progress bar.
 // Maps to Progress in @dtkt/ui/components/progress
 // Use CEL expressions to calculate progress value (0-100).
 // The message or field is available as `this` in the expression context.
 // Example: `double(this.completed) / double(this.total) * 100.0` or `this.progress_percentage`
 type Progress struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// CEL expression that evaluates to a numeric value representing progress (0-100).
 	// Context: `this` is the message or field being rendered.
 	// If not specified, uses the field value directly.
@@ -1142,16 +2099,43 @@ func (x *Progress) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Progress.ProtoReflect.Descriptor instead.
-func (*Progress) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *Progress) GetValue() string {
 	if x != nil && x.Value != nil {
 		return *x.Value
 	}
 	return ""
+}
+
+func (x *Progress) SetValue(v string) {
+	x.Value = &v
+}
+
+func (x *Progress) HasValue() bool {
+	if x == nil {
+		return false
+	}
+	return x.Value != nil
+}
+
+func (x *Progress) ClearValue() {
+	x.Value = nil
+}
+
+type Progress_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// CEL expression that evaluates to a numeric value representing progress (0-100).
+	// Context: `this` is the message or field being rendered.
+	// If not specified, uses the field value directly.
+	Value *string
+}
+
+func (b0 Progress_builder) Build() *Progress {
+	m0 := &Progress{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	return m0
 }
 
 // Render as a code block with optional syntax highlighting.
@@ -1161,7 +2145,7 @@ func (x *Progress) GetValue() string {
 // Example expr: `this.code` or `this.function_body`
 // Example template: Use Go templates to format code
 type CodeBlock struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The code content. Can be plain text, a CEL expression, or a template.
 	// Context: `this` is the message or field being rendered.
 	Content *Data `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
@@ -1202,11 +2186,6 @@ func (x *CodeBlock) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CodeBlock.ProtoReflect.Descriptor instead.
-func (*CodeBlock) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{11}
-}
-
 func (x *CodeBlock) GetContent() *Data {
 	if x != nil {
 		return x.Content
@@ -1242,13 +2221,116 @@ func (x *CodeBlock) GetHighlightLines() string {
 	return ""
 }
 
+func (x *CodeBlock) SetContent(v *Data) {
+	x.Content = v
+}
+
+func (x *CodeBlock) SetLanguage(v string) {
+	x.Language = &v
+}
+
+func (x *CodeBlock) SetFilename(v string) {
+	x.Filename = &v
+}
+
+func (x *CodeBlock) SetShowLineNumbers(v bool) {
+	x.ShowLineNumbers = &v
+}
+
+func (x *CodeBlock) SetHighlightLines(v string) {
+	x.HighlightLines = &v
+}
+
+func (x *CodeBlock) HasContent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Content != nil
+}
+
+func (x *CodeBlock) HasLanguage() bool {
+	if x == nil {
+		return false
+	}
+	return x.Language != nil
+}
+
+func (x *CodeBlock) HasFilename() bool {
+	if x == nil {
+		return false
+	}
+	return x.Filename != nil
+}
+
+func (x *CodeBlock) HasShowLineNumbers() bool {
+	if x == nil {
+		return false
+	}
+	return x.ShowLineNumbers != nil
+}
+
+func (x *CodeBlock) HasHighlightLines() bool {
+	if x == nil {
+		return false
+	}
+	return x.HighlightLines != nil
+}
+
+func (x *CodeBlock) ClearContent() {
+	x.Content = nil
+}
+
+func (x *CodeBlock) ClearLanguage() {
+	x.Language = nil
+}
+
+func (x *CodeBlock) ClearFilename() {
+	x.Filename = nil
+}
+
+func (x *CodeBlock) ClearShowLineNumbers() {
+	x.ShowLineNumbers = nil
+}
+
+func (x *CodeBlock) ClearHighlightLines() {
+	x.HighlightLines = nil
+}
+
+type CodeBlock_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The code content. Can be plain text, a CEL expression, or a template.
+	// Context: `this` is the message or field being rendered.
+	Content *Data
+	// Language for syntax highlighting (e.g., "go", "python", "javascript").
+	Language *string
+	// Optional filename to display.
+	Filename *string
+	// Show line numbers.
+	ShowLineNumbers *bool
+	// Highlight specific lines (e.g., "1-3,5,7-9").
+	HighlightLines *string
+}
+
+func (b0 CodeBlock_builder) Build() *CodeBlock {
+	m0 := &CodeBlock{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Content = b.Content
+	x.Language = b.Language
+	x.Filename = b.Filename
+	x.ShowLineNumbers = b.ShowLineNumbers
+	x.HighlightLines = b.HighlightLines
+	return m0
+}
+
 // Render as a card with optional header and footer sections.
 // Maps to Card in @dtkt/ui/card
 // Supports text, CEL expressions, and templates for each section.
 // The message or field is available as `this` in expression/template context.
 // Example: header: `this.title`, content: `this.body`
 type Card struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Optional card header. Can be plain text, a CEL expression, or a template.
 	// Context: `this` is the message or field being rendered.
 	Header *Data `protobuf:"bytes,1,opt,name=header,proto3,oneof" json:"header,omitempty"`
@@ -1287,11 +2369,6 @@ func (x *Card) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Card.ProtoReflect.Descriptor instead.
-func (*Card) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{12}
-}
-
 func (x *Card) GetHeader() *Data {
 	if x != nil {
 		return x.Header
@@ -1313,13 +2390,82 @@ func (x *Card) GetFooter() *Data {
 	return nil
 }
 
+func (x *Card) SetHeader(v *Data) {
+	x.Header = v
+}
+
+func (x *Card) SetContent(v *Data) {
+	x.Content = v
+}
+
+func (x *Card) SetFooter(v *Data) {
+	x.Footer = v
+}
+
+func (x *Card) HasHeader() bool {
+	if x == nil {
+		return false
+	}
+	return x.Header != nil
+}
+
+func (x *Card) HasContent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Content != nil
+}
+
+func (x *Card) HasFooter() bool {
+	if x == nil {
+		return false
+	}
+	return x.Footer != nil
+}
+
+func (x *Card) ClearHeader() {
+	x.Header = nil
+}
+
+func (x *Card) ClearContent() {
+	x.Content = nil
+}
+
+func (x *Card) ClearFooter() {
+	x.Footer = nil
+}
+
+type Card_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Optional card header. Can be plain text, a CEL expression, or a template.
+	// Context: `this` is the message or field being rendered.
+	Header *Data
+	// Card content - the main body. Can be plain text, a CEL expression, or a template.
+	// Context: `this` is the message or field being rendered.
+	Content *Data
+	// Optional card footer. Can be plain text, a CEL expression, or a template.
+	// Context: `this` is the message or field being rendered.
+	Footer *Data
+}
+
+func (b0 Card_builder) Build() *Card {
+	m0 := &Card{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Header = b.Header
+	x.Content = b.Content
+	x.Footer = b.Footer
+	return m0
+}
+
 // Render as a description list (key-value pairs).
 // Maps to DescriptionList in @dtkt/ui/description-list
 // Use CEL expressions to generate a list of [term, description] tuples.
 // The message or field is available as `this` in the expression context.
 // Example: `[["Name", this.name], ["Email", this.email], ["Status", this.is_active ? "Active" : "Inactive"]]`
 type DescriptionList struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// CEL expression that evaluates to a list of 2-element lists (tuples) where:
 	// - First element is the term/label (string)
 	// - Second element is the description/value (string)
@@ -1355,16 +2501,45 @@ func (x *DescriptionList) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DescriptionList.ProtoReflect.Descriptor instead.
-func (*DescriptionList) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{13}
-}
-
 func (x *DescriptionList) GetItems() string {
 	if x != nil && x.Items != nil {
 		return *x.Items
 	}
 	return ""
+}
+
+func (x *DescriptionList) SetItems(v string) {
+	x.Items = &v
+}
+
+func (x *DescriptionList) HasItems() bool {
+	if x == nil {
+		return false
+	}
+	return x.Items != nil
+}
+
+func (x *DescriptionList) ClearItems() {
+	x.Items = nil
+}
+
+type DescriptionList_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// CEL expression that evaluates to a list of 2-element lists (tuples) where:
+	// - First element is the term/label (string)
+	// - Second element is the description/value (string)
+	// Context: `this` is the message or field being rendered.
+	// If not specified, uses the field value directly (expects map or message).
+	Items *string
+}
+
+func (b0 DescriptionList_builder) Build() *DescriptionList {
+	m0 := &DescriptionList{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Items = b.Items
+	return m0
 }
 
 // Render as a tree structure with expandable nodes.
@@ -1373,7 +2548,7 @@ func (x *DescriptionList) GetItems() string {
 // The message or field is available as `this` in the expression context.
 // Example: `this.folders.map(f, dtkt.protoui.v1beta1.Tree.TreeNode{label: dtkt.protoui.v1beta1.Data{text: f.name}, children: f.files.map(file, dtkt.protoui.v1beta1.Tree.TreeNode{label: dtkt.protoui.v1beta1.Data{text: file.name}})})`
 type Tree struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// CEL expression that evaluates to a list of TreeNode messages.
 	// Context: `this` is the message or field being rendered.
 	// If not specified, uses the field value directly.
@@ -1407,16 +2582,43 @@ func (x *Tree) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Tree.ProtoReflect.Descriptor instead.
-func (*Tree) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{14}
-}
-
 func (x *Tree) GetNodes() string {
 	if x != nil && x.Nodes != nil {
 		return *x.Nodes
 	}
 	return ""
+}
+
+func (x *Tree) SetNodes(v string) {
+	x.Nodes = &v
+}
+
+func (x *Tree) HasNodes() bool {
+	if x == nil {
+		return false
+	}
+	return x.Nodes != nil
+}
+
+func (x *Tree) ClearNodes() {
+	x.Nodes = nil
+}
+
+type Tree_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// CEL expression that evaluates to a list of TreeNode messages.
+	// Context: `this` is the message or field being rendered.
+	// If not specified, uses the field value directly.
+	Nodes *string
+}
+
+func (b0 Tree_builder) Build() *Tree {
+	m0 := &Tree{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Nodes = b.Nodes
+	return m0
 }
 
 // Render as styled text with color options.
@@ -1425,7 +2627,7 @@ func (x *Tree) GetNodes() string {
 // The message or field is available as `this` in expression/template context.
 // Example expr: `this.message` or `"Updated: " + string(this.updated_at)`
 type Text struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The text content. Can be plain text, a CEL expression, or a template.
 	// Context: `this` is the message or field being rendered.
 	Content       *Data       `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
@@ -1459,11 +2661,6 @@ func (x *Text) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Text.ProtoReflect.Descriptor instead.
-func (*Text) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{15}
-}
-
 func (x *Text) GetContent() *Data {
 	if x != nil {
 		return x.Content
@@ -1478,13 +2675,61 @@ func (x *Text) GetColor() Text_Color {
 	return Text_COLOR_UNSPECIFIED
 }
 
+func (x *Text) SetContent(v *Data) {
+	x.Content = v
+}
+
+func (x *Text) SetColor(v Text_Color) {
+	x.Color = &v
+}
+
+func (x *Text) HasContent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Content != nil
+}
+
+func (x *Text) HasColor() bool {
+	if x == nil {
+		return false
+	}
+	return x.Color != nil
+}
+
+func (x *Text) ClearContent() {
+	x.Content = nil
+}
+
+func (x *Text) ClearColor() {
+	x.Color = nil
+}
+
+type Text_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The text content. Can be plain text, a CEL expression, or a template.
+	// Context: `this` is the message or field being rendered.
+	Content *Data
+	Color   *Text_Color
+}
+
+func (b0 Text_builder) Build() *Text {
+	m0 := &Text{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Content = b.Content
+	x.Color = b.Color
+	return m0
+}
+
 // Render as an avatar with image or initials.
 // Maps to Avatar in @dtkt/ui/avatar
 // Use CEL expressions to generate src URL, initials, and alt text.
 // The message or field is available as `this` in the expression context.
 // Example src: `this.avatar_url`, initials: `this.first_name.substring(0, 1) + this.last_name.substring(0, 1)`, alt: `this.first_name + " " + this.last_name`
 type Avatar struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Optional CEL expression for the source URL of the avatar image.
 	// Context: `this` is the message or field being rendered.
 	Src *string `protobuf:"bytes,1,opt,name=src,proto3,oneof" json:"src,omitempty"`
@@ -1525,11 +2770,6 @@ func (x *Avatar) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Avatar.ProtoReflect.Descriptor instead.
-func (*Avatar) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{16}
-}
-
 func (x *Avatar) GetSrc() string {
 	if x != nil && x.Src != nil {
 		return *x.Src
@@ -1558,11 +2798,98 @@ func (x *Avatar) GetSquare() bool {
 	return false
 }
 
+func (x *Avatar) SetSrc(v string) {
+	x.Src = &v
+}
+
+func (x *Avatar) SetInitials(v string) {
+	x.Initials = &v
+}
+
+func (x *Avatar) SetAlt(v string) {
+	x.Alt = &v
+}
+
+func (x *Avatar) SetSquare(v bool) {
+	x.Square = &v
+}
+
+func (x *Avatar) HasSrc() bool {
+	if x == nil {
+		return false
+	}
+	return x.Src != nil
+}
+
+func (x *Avatar) HasInitials() bool {
+	if x == nil {
+		return false
+	}
+	return x.Initials != nil
+}
+
+func (x *Avatar) HasAlt() bool {
+	if x == nil {
+		return false
+	}
+	return x.Alt != nil
+}
+
+func (x *Avatar) HasSquare() bool {
+	if x == nil {
+		return false
+	}
+	return x.Square != nil
+}
+
+func (x *Avatar) ClearSrc() {
+	x.Src = nil
+}
+
+func (x *Avatar) ClearInitials() {
+	x.Initials = nil
+}
+
+func (x *Avatar) ClearAlt() {
+	x.Alt = nil
+}
+
+func (x *Avatar) ClearSquare() {
+	x.Square = nil
+}
+
+type Avatar_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Optional CEL expression for the source URL of the avatar image.
+	// Context: `this` is the message or field being rendered.
+	Src *string
+	// Optional CEL expression for initials to display when no image is available.
+	// Context: `this` is the message or field being rendered.
+	Initials *string
+	// Optional CEL expression for alternative text.
+	// Context: `this` is the message or field being rendered.
+	Alt *string
+	// Whether to render as square instead of circle.
+	Square *bool
+}
+
+func (b0 Avatar_builder) Build() *Avatar {
+	m0 := &Avatar{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Src = b.Src
+	x.Initials = b.Initials
+	x.Alt = b.Alt
+	x.Square = b.Square
+	return m0
+}
+
 // Render as a horizontal divider/separator.
 // Maps to Divider in @dtkt/ui/divider
 // Simple visual separator with soft styling option.
 type Divider struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Whether to use softer border color.
 	Soft          *bool `protobuf:"varint,1,opt,name=soft,proto3,oneof" json:"soft,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1594,16 +2921,41 @@ func (x *Divider) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Divider.ProtoReflect.Descriptor instead.
-func (*Divider) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{17}
-}
-
 func (x *Divider) GetSoft() bool {
 	if x != nil && x.Soft != nil {
 		return *x.Soft
 	}
 	return false
+}
+
+func (x *Divider) SetSoft(v bool) {
+	x.Soft = &v
+}
+
+func (x *Divider) HasSoft() bool {
+	if x == nil {
+		return false
+	}
+	return x.Soft != nil
+}
+
+func (x *Divider) ClearSoft() {
+	x.Soft = nil
+}
+
+type Divider_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Whether to use softer border color.
+	Soft *bool
+}
+
+func (b0 Divider_builder) Build() *Divider {
+	m0 := &Divider{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Soft = b.Soft
+	return m0
 }
 
 // Render as masked secret text with reveal button.
@@ -1612,7 +2964,7 @@ func (x *Divider) GetSoft() bool {
 // The message or field is available as `this` in the expression context.
 // Example: `"*".repeat(size(this.api_key))` or `"••••" + this.api_key.substring(size(this.api_key) - 4)`
 type Secret struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// CEL expression for the placeholder text (the masked representation).
 	// Context: `this` is the message or field being rendered.
 	// If not specified, masks the field value automatically.
@@ -1646,11 +2998,6 @@ func (x *Secret) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Secret.ProtoReflect.Descriptor instead.
-func (*Secret) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{18}
-}
-
 func (x *Secret) GetPlaceholder() string {
 	if x != nil && x.Placeholder != nil {
 		return *x.Placeholder
@@ -1658,11 +3005,43 @@ func (x *Secret) GetPlaceholder() string {
 	return ""
 }
 
+func (x *Secret) SetPlaceholder(v string) {
+	x.Placeholder = &v
+}
+
+func (x *Secret) HasPlaceholder() bool {
+	if x == nil {
+		return false
+	}
+	return x.Placeholder != nil
+}
+
+func (x *Secret) ClearPlaceholder() {
+	x.Placeholder = nil
+}
+
+type Secret_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// CEL expression for the placeholder text (the masked representation).
+	// Context: `this` is the message or field being rendered.
+	// If not specified, masks the field value automatically.
+	Placeholder *string
+}
+
+func (b0 Secret_builder) Build() *Secret {
+	m0 := &Secret{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Placeholder = b.Placeholder
+	return m0
+}
+
 // Render as a form label.
 // Maps to Label in @dtkt/ui/components/label or fieldset
 // Example expr: `this.field_name` or `"Enter your " + this.label`
 type Label struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The label text. Can be plain text, a CEL expression, or a template.
 	// Context: `this` is the message or field being rendered.
 	Content       *Data `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
@@ -1695,11 +3074,6 @@ func (x *Label) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Label.ProtoReflect.Descriptor instead.
-func (*Label) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{19}
-}
-
 func (x *Label) GetContent() *Data {
 	if x != nil {
 		return x.Content
@@ -1707,11 +3081,42 @@ func (x *Label) GetContent() *Data {
 	return nil
 }
 
+func (x *Label) SetContent(v *Data) {
+	x.Content = v
+}
+
+func (x *Label) HasContent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Content != nil
+}
+
+func (x *Label) ClearContent() {
+	x.Content = nil
+}
+
+type Label_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The label text. Can be plain text, a CEL expression, or a template.
+	// Context: `this` is the message or field being rendered.
+	Content *Data
+}
+
+func (b0 Label_builder) Build() *Label {
+	m0 := &Label{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Content = b.Content
+	return m0
+}
+
 // Render as a form description/help text.
 // Maps to description/help text in form components
 // Example expr: `this.help_text` or `"This field is " + (this.required ? "required" : "optional")`
 type Description struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The description text. Can be plain text, a CEL expression, or a template.
 	// Context: `this` is the message or field being rendered.
 	Content       *Data `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
@@ -1744,11 +3149,6 @@ func (x *Description) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Description.ProtoReflect.Descriptor instead.
-func (*Description) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{20}
-}
-
 func (x *Description) GetContent() *Data {
 	if x != nil {
 		return x.Content
@@ -1756,11 +3156,42 @@ func (x *Description) GetContent() *Data {
 	return nil
 }
 
+func (x *Description) SetContent(v *Data) {
+	x.Content = v
+}
+
+func (x *Description) HasContent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Content != nil
+}
+
+func (x *Description) ClearContent() {
+	x.Content = nil
+}
+
+type Description_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The description text. Can be plain text, a CEL expression, or a template.
+	// Context: `this` is the message or field being rendered.
+	Content *Data
+}
+
+func (b0 Description_builder) Build() *Description {
+	m0 := &Description{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Content = b.Content
+	return m0
+}
+
 // Render as a form error message.
 // Maps to error message display in form components
 // Example expr: `this.error` or `this.field_name + " is invalid"`
 type Error struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// The error message. Can be plain text, a CEL expression, or a template.
 	// Context: `this` is the message or field being rendered.
 	Content       *Data `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
@@ -1793,11 +3224,6 @@ func (x *Error) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Error.ProtoReflect.Descriptor instead.
-func (*Error) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{21}
-}
-
 func (x *Error) GetContent() *Data {
 	if x != nil {
 		return x.Content
@@ -1805,11 +3231,42 @@ func (x *Error) GetContent() *Data {
 	return nil
 }
 
+func (x *Error) SetContent(v *Data) {
+	x.Content = v
+}
+
+func (x *Error) HasContent() bool {
+	if x == nil {
+		return false
+	}
+	return x.Content != nil
+}
+
+func (x *Error) ClearContent() {
+	x.Content = nil
+}
+
+type Error_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The error message. Can be plain text, a CEL expression, or a template.
+	// Context: `this` is the message or field being rendered.
+	Content *Data
+}
+
+func (b0 Error_builder) Build() *Error {
+	m0 := &Error{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Content = b.Content
+	return m0
+}
+
 // Confirmation dialog with accept, decline, and cancel options.
 // Maps to dialog/confirmation components with buttons
 // Example expr: accept: `"Yes, " + this.action`, decline: `"No, cancel " + this.action`
 type Confirm struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Accept button text. Can be plain text, a CEL expression, or a template.
 	// Context: `this` is the message or field being rendered.
 	Accept *Data `protobuf:"bytes,1,opt,name=accept,proto3" json:"accept,omitempty"`
@@ -1848,11 +3305,6 @@ func (x *Confirm) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Confirm.ProtoReflect.Descriptor instead.
-func (*Confirm) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{22}
-}
-
 func (x *Confirm) GetAccept() *Data {
 	if x != nil {
 		return x.Accept
@@ -1874,10 +3326,79 @@ func (x *Confirm) GetCancel() *Data {
 	return nil
 }
 
+func (x *Confirm) SetAccept(v *Data) {
+	x.Accept = v
+}
+
+func (x *Confirm) SetDecline(v *Data) {
+	x.Decline = v
+}
+
+func (x *Confirm) SetCancel(v *Data) {
+	x.Cancel = v
+}
+
+func (x *Confirm) HasAccept() bool {
+	if x == nil {
+		return false
+	}
+	return x.Accept != nil
+}
+
+func (x *Confirm) HasDecline() bool {
+	if x == nil {
+		return false
+	}
+	return x.Decline != nil
+}
+
+func (x *Confirm) HasCancel() bool {
+	if x == nil {
+		return false
+	}
+	return x.Cancel != nil
+}
+
+func (x *Confirm) ClearAccept() {
+	x.Accept = nil
+}
+
+func (x *Confirm) ClearDecline() {
+	x.Decline = nil
+}
+
+func (x *Confirm) ClearCancel() {
+	x.Cancel = nil
+}
+
+type Confirm_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Accept button text. Can be plain text, a CEL expression, or a template.
+	// Context: `this` is the message or field being rendered.
+	Accept *Data
+	// Decline button text. Can be plain text, a CEL expression, or a template.
+	// Context: `this` is the message or field being rendered.
+	Decline *Data
+	// Cancel button text. Can be plain text, a CEL expression, or a template.
+	// Context: `this` is the message or field being rendered.
+	Cancel *Data
+}
+
+func (b0 Confirm_builder) Build() *Confirm {
+	m0 := &Confirm{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Accept = b.Accept
+	x.Decline = b.Decline
+	x.Cancel = b.Cancel
+	return m0
+}
+
 // Input element with multi-line text option
 // Maps to Input or Textarea in @dtkt/ui/input or @dtkt/ui/textarea
 type Input struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	MultilineText *bool                  `protobuf:"varint,1,opt,name=multiline_text,json=multilineText,proto3,oneof" json:"multiline_text,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1908,11 +3429,6 @@ func (x *Input) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Input.ProtoReflect.Descriptor instead.
-func (*Input) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{23}
-}
-
 func (x *Input) GetMultilineText() bool {
 	if x != nil && x.MultilineText != nil {
 		return *x.MultilineText
@@ -1920,10 +3436,39 @@ func (x *Input) GetMultilineText() bool {
 	return false
 }
 
+func (x *Input) SetMultilineText(v bool) {
+	x.MultilineText = &v
+}
+
+func (x *Input) HasMultilineText() bool {
+	if x == nil {
+		return false
+	}
+	return x.MultilineText != nil
+}
+
+func (x *Input) ClearMultilineText() {
+	x.MultilineText = nil
+}
+
+type Input_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	MultilineText *bool
+}
+
+func (b0 Input_builder) Build() *Input {
+	m0 := &Input{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.MultilineText = b.MultilineText
+	return m0
+}
+
 // File upload input
 // Maps to file input components
 type File struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	AllowedTypes  []string               `protobuf:"bytes,2,rep,name=allowed_types,json=allowedTypes,proto3" json:"allowed_types,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1954,16 +3499,29 @@ func (x *File) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use File.ProtoReflect.Descriptor instead.
-func (*File) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{24}
-}
-
 func (x *File) GetAllowedTypes() []string {
 	if x != nil {
 		return x.AllowedTypes
 	}
 	return nil
+}
+
+func (x *File) SetAllowedTypes(v []string) {
+	x.AllowedTypes = v
+}
+
+type File_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	AllowedTypes []string
+}
+
+func (b0 File_builder) Build() *File {
+	m0 := &File{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.AllowedTypes = b.AllowedTypes
+	return m0
 }
 
 // Select input with options.
@@ -1972,7 +3530,7 @@ func (x *File) GetAllowedTypes() []string {
 // The message or field is available as `this` in the expression context.
 // Example options: `this.available_items`
 type Select struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Field name to be used as the option value.
 	ItemField string `protobuf:"bytes,1,opt,name=item_field,json=itemField,proto3" json:"item_field,omitempty"`
 	// Field name to be used as the option label.
@@ -2012,11 +3570,6 @@ func (x *Select) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Select.ProtoReflect.Descriptor instead.
-func (*Select) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{25}
-}
-
 func (x *Select) GetItemField() string {
 	if x != nil {
 		return x.ItemField
@@ -2045,13 +3598,55 @@ func (x *Select) GetOptionValue() string {
 	return ""
 }
 
+func (x *Select) SetItemField(v string) {
+	x.ItemField = v
+}
+
+func (x *Select) SetLabelField(v string) {
+	x.LabelField = v
+}
+
+func (x *Select) SetOptionKey(v string) {
+	x.OptionKey = v
+}
+
+func (x *Select) SetOptionValue(v string) {
+	x.OptionValue = v
+}
+
+type Select_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Field name to be used as the option value.
+	ItemField string
+	// Field name to be used as the option label.
+	LabelField string
+	// CEL expression for option keys.
+	// Context: `this` is the message or field being rendered.
+	OptionKey string
+	// CEL expression for option values.
+	// Context: `this` is the message or field being rendered.
+	OptionValue string
+}
+
+func (b0 Select_builder) Build() *Select {
+	m0 := &Select{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ItemField = b.ItemField
+	x.LabelField = b.LabelField
+	x.OptionKey = b.OptionKey
+	x.OptionValue = b.OptionValue
+	return m0
+}
+
 // Multi-select input allowing multiple selections.
 // Maps to multi-select or checkbox group components
 // Use CEL expressions to generate select options.
 // The message or field is available as `this` in the expression context.
 // Example options: `this.available_tags`
 type MultiSelect struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Field name to be used as the option value.
 	ItemField string `protobuf:"bytes,1,opt,name=item_field,json=itemField,proto3" json:"item_field,omitempty"`
 	// Field name to be used as the option label.
@@ -2091,11 +3686,6 @@ func (x *MultiSelect) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MultiSelect.ProtoReflect.Descriptor instead.
-func (*MultiSelect) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{26}
-}
-
 func (x *MultiSelect) GetItemField() string {
 	if x != nil {
 		return x.ItemField
@@ -2124,9 +3714,51 @@ func (x *MultiSelect) GetOptionValue() string {
 	return ""
 }
 
+func (x *MultiSelect) SetItemField(v string) {
+	x.ItemField = v
+}
+
+func (x *MultiSelect) SetLabelField(v string) {
+	x.LabelField = v
+}
+
+func (x *MultiSelect) SetOptionKey(v string) {
+	x.OptionKey = v
+}
+
+func (x *MultiSelect) SetOptionValue(v string) {
+	x.OptionValue = v
+}
+
+type MultiSelect_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Field name to be used as the option value.
+	ItemField string
+	// Field name to be used as the option label.
+	LabelField string
+	// CEL expression for option keys.
+	// Context: `this` is the message or field being rendered.
+	OptionKey string
+	// CEL expression for option values.
+	// Context: `this` is the message or field being rendered.
+	OptionValue string
+}
+
+func (b0 MultiSelect_builder) Build() *MultiSelect {
+	m0 := &MultiSelect{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.ItemField = b.ItemField
+	x.LabelField = b.LabelField
+	x.OptionKey = b.OptionKey
+	x.OptionValue = b.OptionValue
+	return m0
+}
+
 // Column definition for the table.
 type Table_Column struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Field name to be used as the column value (for proto message row data).
 	// Not needed when using positional list-of-lists format.
 	Field string `protobuf:"bytes,1,opt,name=field,proto3" json:"field,omitempty"`
@@ -2161,11 +3793,6 @@ func (x *Table_Column) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Table_Column.ProtoReflect.Descriptor instead.
-func (*Table_Column) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{6, 0}
-}
-
 func (x *Table_Column) GetField() string {
 	if x != nil {
 		return x.Field
@@ -2180,8 +3807,46 @@ func (x *Table_Column) GetLabel() string {
 	return ""
 }
 
+func (x *Table_Column) SetField(v string) {
+	x.Field = v
+}
+
+func (x *Table_Column) SetLabel(v string) {
+	x.Label = &v
+}
+
+func (x *Table_Column) HasLabel() bool {
+	if x == nil {
+		return false
+	}
+	return x.Label != nil
+}
+
+func (x *Table_Column) ClearLabel() {
+	x.Label = nil
+}
+
+type Table_Column_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Field name to be used as the column value (for proto message row data).
+	// Not needed when using positional list-of-lists format.
+	Field string
+	// Column label to be used in the table header. If not specified, the field name will be used.
+	Label *string
+}
+
+func (b0 Table_Column_builder) Build() *Table_Column {
+	m0 := &Table_Column{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Field = b.Field
+	x.Label = b.Label
+	return m0
+}
+
 type Table_Action struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Action label to be displayed (e.g., Edit).
 	Label string `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"`
 	// CEL expression for the action command.
@@ -2216,11 +3881,6 @@ func (x *Table_Action) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Table_Action.ProtoReflect.Descriptor instead.
-func (*Table_Action) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{6, 1}
-}
-
 func (x *Table_Action) GetLabel() string {
 	if x != nil {
 		return x.Label
@@ -2235,9 +3895,36 @@ func (x *Table_Action) GetHref() string {
 	return ""
 }
 
+func (x *Table_Action) SetLabel(v string) {
+	x.Label = v
+}
+
+func (x *Table_Action) SetHref(v string) {
+	x.Href = v
+}
+
+type Table_Action_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Action label to be displayed (e.g., Edit).
+	Label string
+	// CEL expression for the action command.
+	// Context: `this` is the current row item.
+	Href string
+}
+
+func (b0 Table_Action_builder) Build() *Table_Action {
+	m0 := &Table_Action{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Label = b.Label
+	x.Href = b.Href
+	return m0
+}
+
 // Node in a tree structure. Construct this message type in CEL expressions.
 type Tree_TreeNode struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Label/content for the node. Can be plain text, CEL expression, or template.
 	Label *Data `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"`
 	// Child nodes.
@@ -2273,11 +3960,6 @@ func (x *Tree_TreeNode) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Tree_TreeNode.ProtoReflect.Descriptor instead.
-func (*Tree_TreeNode) Descriptor() ([]byte, []int) {
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP(), []int{14, 0}
-}
-
 func (x *Tree_TreeNode) GetLabel() *Data {
 	if x != nil {
 		return x.Label
@@ -2297,6 +3979,61 @@ func (x *Tree_TreeNode) GetDefaultOpen() bool {
 		return *x.DefaultOpen
 	}
 	return false
+}
+
+func (x *Tree_TreeNode) SetLabel(v *Data) {
+	x.Label = v
+}
+
+func (x *Tree_TreeNode) SetChildren(v []*Tree_TreeNode) {
+	x.Children = v
+}
+
+func (x *Tree_TreeNode) SetDefaultOpen(v bool) {
+	x.DefaultOpen = &v
+}
+
+func (x *Tree_TreeNode) HasLabel() bool {
+	if x == nil {
+		return false
+	}
+	return x.Label != nil
+}
+
+func (x *Tree_TreeNode) HasDefaultOpen() bool {
+	if x == nil {
+		return false
+	}
+	return x.DefaultOpen != nil
+}
+
+func (x *Tree_TreeNode) ClearLabel() {
+	x.Label = nil
+}
+
+func (x *Tree_TreeNode) ClearDefaultOpen() {
+	x.DefaultOpen = nil
+}
+
+type Tree_TreeNode_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Label/content for the node. Can be plain text, CEL expression, or template.
+	Label *Data
+	// Child nodes.
+	Children []*Tree_TreeNode
+	// Whether the node should be expanded by default.
+	DefaultOpen *bool
+}
+
+func (b0 Tree_TreeNode_builder) Build() *Tree_TreeNode {
+	m0 := &Tree_TreeNode{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Label = b.Label
+	x.Children = b.Children
+	x.DefaultOpen = b.DefaultOpen
+	return m0
 }
 
 var file_dtkt_protoui_v1beta1_protoui_proto_extTypes = []protoimpl.ExtensionInfo{
@@ -2500,18 +4237,6 @@ const file_dtkt_protoui_v1beta1_protoui_proto_rawDesc = "" +
 	"\amessage\x12\x1f.google.protobuf.MessageOptions\x18چ\x03 \x01(\v2#.dtkt.protoui.v1beta1.MessageOptionR\amessage\x88\x01\x01:[\n" +
 	"\x05field\x12\x1d.google.protobuf.FieldOptions\x18چ\x03 \x01(\v2!.dtkt.protoui.v1beta1.FieldOptionR\x05field\x88\x01\x01B\xee\x01\n" +
 	"\x1aproto.dtkt.protoui.v1beta1B\fProtouiProtoP\x01ZPgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protoui/v1beta1;protouiv1beta1\xa2\x02\x03DPX\xaa\x02\x14Dtkt.Protoui.V1beta1\xca\x02\x14Dtkt\\Protoui\\V1beta1\xe2\x02 Dtkt\\Protoui\\V1beta1\\GPBMetadata\xea\x02\x16Dtkt::Protoui::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_protoui_v1beta1_protoui_proto_rawDescOnce sync.Once
-	file_dtkt_protoui_v1beta1_protoui_proto_rawDescData []byte
-)
-
-func file_dtkt_protoui_v1beta1_protoui_proto_rawDescGZIP() []byte {
-	file_dtkt_protoui_v1beta1_protoui_proto_rawDescOnce.Do(func() {
-		file_dtkt_protoui_v1beta1_protoui_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_protoui_v1beta1_protoui_proto_rawDesc), len(file_dtkt_protoui_v1beta1_protoui_proto_rawDesc)))
-	})
-	return file_dtkt_protoui_v1beta1_protoui_proto_rawDescData
-}
 
 var file_dtkt_protoui_v1beta1_protoui_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_dtkt_protoui_v1beta1_protoui_proto_msgTypes = make([]protoimpl.MessageInfo, 30)

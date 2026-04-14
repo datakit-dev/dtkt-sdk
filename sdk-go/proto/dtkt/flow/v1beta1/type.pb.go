@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/flow/v1beta1/type.proto
 
+//go:build !protoopaque
+
 package flowv1beta1
 
 import (
@@ -12,7 +14,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -24,7 +25,7 @@ const (
 )
 
 type Bool struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Default       *bool                  `protobuf:"varint,1,opt,name=default,proto3,oneof" json:"default,omitempty"`
 	Nullable      bool                   `protobuf:"varint,2,opt,name=nullable,proto3" json:"nullable,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -56,11 +57,6 @@ func (x *Bool) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Bool.ProtoReflect.Descriptor instead.
-func (*Bool) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_type_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Bool) GetDefault() bool {
 	if x != nil && x.Default != nil {
 		return *x.Default
@@ -75,8 +71,43 @@ func (x *Bool) GetNullable() bool {
 	return false
 }
 
+func (x *Bool) SetDefault(v bool) {
+	x.Default = &v
+}
+
+func (x *Bool) SetNullable(v bool) {
+	x.Nullable = v
+}
+
+func (x *Bool) HasDefault() bool {
+	if x == nil {
+		return false
+	}
+	return x.Default != nil
+}
+
+func (x *Bool) ClearDefault() {
+	x.Default = nil
+}
+
+type Bool_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Default  *bool
+	Nullable bool
+}
+
+func (b0 Bool_builder) Build() *Bool {
+	m0 := &Bool{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Default = b.Default
+	x.Nullable = b.Nullable
+	return m0
+}
+
 type Bytes struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Default       []byte                 `protobuf:"bytes,1,opt,name=default,proto3,oneof" json:"default,omitempty"`
 	Nullable      bool                   `protobuf:"varint,2,opt,name=nullable,proto3" json:"nullable,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -108,11 +139,6 @@ func (x *Bytes) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Bytes.ProtoReflect.Descriptor instead.
-func (*Bytes) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_type_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *Bytes) GetDefault() []byte {
 	if x != nil {
 		return x.Default
@@ -127,8 +153,46 @@ func (x *Bytes) GetNullable() bool {
 	return false
 }
 
+func (x *Bytes) SetDefault(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.Default = v
+}
+
+func (x *Bytes) SetNullable(v bool) {
+	x.Nullable = v
+}
+
+func (x *Bytes) HasDefault() bool {
+	if x == nil {
+		return false
+	}
+	return x.Default != nil
+}
+
+func (x *Bytes) ClearDefault() {
+	x.Default = nil
+}
+
+type Bytes_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Default  []byte
+	Nullable bool
+}
+
+func (b0 Bytes_builder) Build() *Bytes {
+	m0 := &Bytes{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Default = b.Default
+	x.Nullable = b.Nullable
+	return m0
+}
+
 type Double struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Default       *float64               `protobuf:"fixed64,1,opt,name=default,proto3,oneof" json:"default,omitempty"`
 	Nullable      bool                   `protobuf:"varint,2,opt,name=nullable,proto3" json:"nullable,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -160,11 +224,6 @@ func (x *Double) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Double.ProtoReflect.Descriptor instead.
-func (*Double) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_type_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *Double) GetDefault() float64 {
 	if x != nil && x.Default != nil {
 		return *x.Default
@@ -179,8 +238,43 @@ func (x *Double) GetNullable() bool {
 	return false
 }
 
+func (x *Double) SetDefault(v float64) {
+	x.Default = &v
+}
+
+func (x *Double) SetNullable(v bool) {
+	x.Nullable = v
+}
+
+func (x *Double) HasDefault() bool {
+	if x == nil {
+		return false
+	}
+	return x.Default != nil
+}
+
+func (x *Double) ClearDefault() {
+	x.Default = nil
+}
+
+type Double_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Default  *float64
+	Nullable bool
+}
+
+func (b0 Double_builder) Build() *Double {
+	m0 := &Double{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Default = b.Default
+	x.Nullable = b.Nullable
+	return m0
+}
+
 type Float struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Default       *float32               `protobuf:"fixed32,1,opt,name=default,proto3,oneof" json:"default,omitempty"`
 	Nullable      bool                   `protobuf:"varint,2,opt,name=nullable,proto3" json:"nullable,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -212,11 +306,6 @@ func (x *Float) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Float.ProtoReflect.Descriptor instead.
-func (*Float) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_type_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *Float) GetDefault() float32 {
 	if x != nil && x.Default != nil {
 		return *x.Default
@@ -231,8 +320,43 @@ func (x *Float) GetNullable() bool {
 	return false
 }
 
+func (x *Float) SetDefault(v float32) {
+	x.Default = &v
+}
+
+func (x *Float) SetNullable(v bool) {
+	x.Nullable = v
+}
+
+func (x *Float) HasDefault() bool {
+	if x == nil {
+		return false
+	}
+	return x.Default != nil
+}
+
+func (x *Float) ClearDefault() {
+	x.Default = nil
+}
+
+type Float_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Default  *float32
+	Nullable bool
+}
+
+func (b0 Float_builder) Build() *Float {
+	m0 := &Float{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Default = b.Default
+	x.Nullable = b.Nullable
+	return m0
+}
+
 type Int64 struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Default       *int64                 `protobuf:"varint,1,opt,name=default,proto3,oneof" json:"default,omitempty"`
 	Nullable      bool                   `protobuf:"varint,2,opt,name=nullable,proto3" json:"nullable,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -264,11 +388,6 @@ func (x *Int64) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Int64.ProtoReflect.Descriptor instead.
-func (*Int64) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_type_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *Int64) GetDefault() int64 {
 	if x != nil && x.Default != nil {
 		return *x.Default
@@ -283,8 +402,43 @@ func (x *Int64) GetNullable() bool {
 	return false
 }
 
+func (x *Int64) SetDefault(v int64) {
+	x.Default = &v
+}
+
+func (x *Int64) SetNullable(v bool) {
+	x.Nullable = v
+}
+
+func (x *Int64) HasDefault() bool {
+	if x == nil {
+		return false
+	}
+	return x.Default != nil
+}
+
+func (x *Int64) ClearDefault() {
+	x.Default = nil
+}
+
+type Int64_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Default  *int64
+	Nullable bool
+}
+
+func (b0 Int64_builder) Build() *Int64 {
+	m0 := &Int64{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Default = b.Default
+	x.Nullable = b.Nullable
+	return m0
+}
+
 type Uint64 struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Default       *uint64                `protobuf:"varint,1,opt,name=default,proto3,oneof" json:"default,omitempty"`
 	Nullable      bool                   `protobuf:"varint,2,opt,name=nullable,proto3" json:"nullable,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -316,11 +470,6 @@ func (x *Uint64) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Uint64.ProtoReflect.Descriptor instead.
-func (*Uint64) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_type_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *Uint64) GetDefault() uint64 {
 	if x != nil && x.Default != nil {
 		return *x.Default
@@ -335,8 +484,43 @@ func (x *Uint64) GetNullable() bool {
 	return false
 }
 
+func (x *Uint64) SetDefault(v uint64) {
+	x.Default = &v
+}
+
+func (x *Uint64) SetNullable(v bool) {
+	x.Nullable = v
+}
+
+func (x *Uint64) HasDefault() bool {
+	if x == nil {
+		return false
+	}
+	return x.Default != nil
+}
+
+func (x *Uint64) ClearDefault() {
+	x.Default = nil
+}
+
+type Uint64_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Default  *uint64
+	Nullable bool
+}
+
+func (b0 Uint64_builder) Build() *Uint64 {
+	m0 := &Uint64{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Default = b.Default
+	x.Nullable = b.Nullable
+	return m0
+}
+
 type Int32 struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Default       *int32                 `protobuf:"varint,1,opt,name=default,proto3,oneof" json:"default,omitempty"`
 	Nullable      bool                   `protobuf:"varint,2,opt,name=nullable,proto3" json:"nullable,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -368,11 +552,6 @@ func (x *Int32) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Int32.ProtoReflect.Descriptor instead.
-func (*Int32) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_type_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *Int32) GetDefault() int32 {
 	if x != nil && x.Default != nil {
 		return *x.Default
@@ -387,8 +566,43 @@ func (x *Int32) GetNullable() bool {
 	return false
 }
 
+func (x *Int32) SetDefault(v int32) {
+	x.Default = &v
+}
+
+func (x *Int32) SetNullable(v bool) {
+	x.Nullable = v
+}
+
+func (x *Int32) HasDefault() bool {
+	if x == nil {
+		return false
+	}
+	return x.Default != nil
+}
+
+func (x *Int32) ClearDefault() {
+	x.Default = nil
+}
+
+type Int32_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Default  *int32
+	Nullable bool
+}
+
+func (b0 Int32_builder) Build() *Int32 {
+	m0 := &Int32{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Default = b.Default
+	x.Nullable = b.Nullable
+	return m0
+}
+
 type Uint32 struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Default       *uint32                `protobuf:"varint,1,opt,name=default,proto3,oneof" json:"default,omitempty"`
 	Nullable      bool                   `protobuf:"varint,2,opt,name=nullable,proto3" json:"nullable,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -420,11 +634,6 @@ func (x *Uint32) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Uint32.ProtoReflect.Descriptor instead.
-func (*Uint32) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_type_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *Uint32) GetDefault() uint32 {
 	if x != nil && x.Default != nil {
 		return *x.Default
@@ -439,8 +648,43 @@ func (x *Uint32) GetNullable() bool {
 	return false
 }
 
+func (x *Uint32) SetDefault(v uint32) {
+	x.Default = &v
+}
+
+func (x *Uint32) SetNullable(v bool) {
+	x.Nullable = v
+}
+
+func (x *Uint32) HasDefault() bool {
+	if x == nil {
+		return false
+	}
+	return x.Default != nil
+}
+
+func (x *Uint32) ClearDefault() {
+	x.Default = nil
+}
+
+type Uint32_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Default  *uint32
+	Nullable bool
+}
+
+func (b0 Uint32_builder) Build() *Uint32 {
+	m0 := &Uint32{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Default = b.Default
+	x.Nullable = b.Nullable
+	return m0
+}
+
 type String struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Default       *string                `protobuf:"bytes,1,opt,name=default,proto3,oneof" json:"default,omitempty"`
 	Nullable      bool                   `protobuf:"varint,2,opt,name=nullable,proto3" json:"nullable,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -472,11 +716,6 @@ func (x *String) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use String.ProtoReflect.Descriptor instead.
-func (*String) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_type_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *String) GetDefault() string {
 	if x != nil && x.Default != nil {
 		return *x.Default
@@ -491,8 +730,43 @@ func (x *String) GetNullable() bool {
 	return false
 }
 
+func (x *String) SetDefault(v string) {
+	x.Default = &v
+}
+
+func (x *String) SetNullable(v bool) {
+	x.Nullable = v
+}
+
+func (x *String) HasDefault() bool {
+	if x == nil {
+		return false
+	}
+	return x.Default != nil
+}
+
+func (x *String) ClearDefault() {
+	x.Default = nil
+}
+
+type String_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Default  *string
+	Nullable bool
+}
+
+func (b0 String_builder) Build() *String {
+	m0 := &String{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Default = b.Default
+	x.Nullable = b.Nullable
+	return m0
+}
+
 type List struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Type of list items: scalar type, nested list/map, or message type
 	Items         string              `protobuf:"bytes,1,opt,name=items,proto3" json:"items,omitempty"`
 	Nullable      bool                `protobuf:"varint,2,opt,name=nullable,proto3" json:"nullable,omitempty"`
@@ -526,11 +800,6 @@ func (x *List) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use List.ProtoReflect.Descriptor instead.
-func (*List) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_type_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *List) GetItems() string {
 	if x != nil {
 		return x.Items
@@ -552,8 +821,50 @@ func (x *List) GetDefault() *structpb.ListValue {
 	return nil
 }
 
+func (x *List) SetItems(v string) {
+	x.Items = v
+}
+
+func (x *List) SetNullable(v bool) {
+	x.Nullable = v
+}
+
+func (x *List) SetDefault(v *structpb.ListValue) {
+	x.Default = v
+}
+
+func (x *List) HasDefault() bool {
+	if x == nil {
+		return false
+	}
+	return x.Default != nil
+}
+
+func (x *List) ClearDefault() {
+	x.Default = nil
+}
+
+type List_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Type of list items: scalar type, nested list/map, or message type
+	Items    string
+	Nullable bool
+	Default  *structpb.ListValue
+}
+
+func (b0 List_builder) Build() *List {
+	m0 := &List{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Items = b.Items
+	x.Nullable = b.Nullable
+	x.Default = b.Default
+	return m0
+}
+
 type Map struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Key type: bool, int32, int64, uint32, uint64, or string (default)
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// Value type: scalar type, nested list/map, or message type
@@ -589,11 +900,6 @@ func (x *Map) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Map.ProtoReflect.Descriptor instead.
-func (*Map) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_type_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *Map) GetKey() string {
 	if x != nil {
 		return x.Key
@@ -622,9 +928,58 @@ func (x *Map) GetDefault() *structpb.Struct {
 	return nil
 }
 
+func (x *Map) SetKey(v string) {
+	x.Key = v
+}
+
+func (x *Map) SetValue(v string) {
+	x.Value = v
+}
+
+func (x *Map) SetNullable(v bool) {
+	x.Nullable = v
+}
+
+func (x *Map) SetDefault(v *structpb.Struct) {
+	x.Default = v
+}
+
+func (x *Map) HasDefault() bool {
+	if x == nil {
+		return false
+	}
+	return x.Default != nil
+}
+
+func (x *Map) ClearDefault() {
+	x.Default = nil
+}
+
+type Map_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Key type: bool, int32, int64, uint32, uint64, or string (default)
+	Key string
+	// Value type: scalar type, nested list/map, or message type
+	Value    string
+	Nullable bool
+	Default  *structpb.Struct
+}
+
+func (b0 Map_builder) Build() *Map {
+	m0 := &Map{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Key = b.Key
+	x.Value = b.Value
+	x.Nullable = b.Nullable
+	x.Default = b.Default
+	return m0
+}
+
 // Proto message type
 type Message struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Fully qualified message name: "google.protobuf.Struct", "google.protobuf.Timestamp", etc.
 	Type          string           `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
 	Nullable      bool             `protobuf:"varint,2,opt,name=nullable,proto3" json:"nullable,omitempty"`
@@ -658,11 +1013,6 @@ func (x *Message) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Message.ProtoReflect.Descriptor instead.
-func (*Message) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_type_proto_rawDescGZIP(), []int{11}
-}
-
 func (x *Message) GetType() string {
 	if x != nil {
 		return x.Type
@@ -682,6 +1032,48 @@ func (x *Message) GetDefault() *structpb.Struct {
 		return x.Default
 	}
 	return nil
+}
+
+func (x *Message) SetType(v string) {
+	x.Type = v
+}
+
+func (x *Message) SetNullable(v bool) {
+	x.Nullable = v
+}
+
+func (x *Message) SetDefault(v *structpb.Struct) {
+	x.Default = v
+}
+
+func (x *Message) HasDefault() bool {
+	if x == nil {
+		return false
+	}
+	return x.Default != nil
+}
+
+func (x *Message) ClearDefault() {
+	x.Default = nil
+}
+
+type Message_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fully qualified message name: "google.protobuf.Struct", "google.protobuf.Timestamp", etc.
+	Type     string
+	Nullable bool
+	Default  *structpb.Struct
+}
+
+func (b0 Message_builder) Build() *Message {
+	m0 := &Message{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Type = b.Type
+	x.Nullable = b.Nullable
+	x.Default = b.Default
+	return m0
 }
 
 var File_dtkt_flow_v1beta1_type_proto protoreflect.FileDescriptor
@@ -750,18 +1142,6 @@ const file_dtkt_flow_v1beta1_type_proto_rawDesc = "" +
 	"\bnullable\x18\x02 \x01(\bR\bnullable\x121\n" +
 	"\adefault\x18\x03 \x01(\v2\x17.google.protobuf.StructR\adefaultB\xd6\x01\n" +
 	"\x17proto.dtkt.flow.v1beta1B\tTypeProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1;flowv1beta1\xa2\x02\x03DFX\xaa\x02\x11Dtkt.Flow.V1beta1\xca\x02\x11Dtkt\\Flow\\V1beta1\xe2\x02\x1dDtkt\\Flow\\V1beta1\\GPBMetadata\xea\x02\x13Dtkt::Flow::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_flow_v1beta1_type_proto_rawDescOnce sync.Once
-	file_dtkt_flow_v1beta1_type_proto_rawDescData []byte
-)
-
-func file_dtkt_flow_v1beta1_type_proto_rawDescGZIP() []byte {
-	file_dtkt_flow_v1beta1_type_proto_rawDescOnce.Do(func() {
-		file_dtkt_flow_v1beta1_type_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_flow_v1beta1_type_proto_rawDesc), len(file_dtkt_flow_v1beta1_type_proto_rawDesc)))
-	})
-	return file_dtkt_flow_v1beta1_type_proto_rawDescData
-}
 
 var file_dtkt_flow_v1beta1_type_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_dtkt_flow_v1beta1_type_proto_goTypes = []any{

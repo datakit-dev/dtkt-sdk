@@ -1,0 +1,22 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: transform_input_var_chained_reduces
+  description: "Reduce on input node (sum), then scan on downstream var (product of sums)"
+  inputs:
+    - id: x
+      int64: {}
+      transforms:
+        - reduce:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+  vars:
+    - id: product
+      value: "= inputs.x.value"
+      transforms:
+        - scan:
+            initial: "= 1"
+            accumulator: "= this.accumulator * this.value"
+  outputs:
+    - id: result
+      value: "= vars.product.value"

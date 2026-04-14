@@ -1,0 +1,20 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: stream_retry_backoff
+  inputs:
+    - id: msg
+      int64: {}
+  streams:
+    - id: echo
+      retry_strategy:
+        backoff:
+          initial_backoff: "0.001s"
+          max_attempts: 3
+      call:
+        connection: echo
+        method: error.StreamUnavailableThenOK
+        request: "= inputs.msg.value"
+  outputs:
+    - id: result
+      value: "= streams.echo.value"

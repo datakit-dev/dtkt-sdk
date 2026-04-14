@@ -1,0 +1,18 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fc_stream_terminate
+  inputs:
+    - id: msg
+      string: {}
+  streams:
+    - id: echo
+      call:
+        connection: echo
+        method: echo.Echo
+        request: "= inputs.msg.value"
+      flow_control:
+        terminate_when: "= true"
+  outputs:
+    - id: result
+      value: "= streams.echo.value"

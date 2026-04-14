@@ -1,0 +1,22 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: reduce_group_by_fixed
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: grouped
+      value: "= inputs.x.value"
+      transforms:
+        - reduce:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+            group_by:
+              key: '= this.value % 2 == 0 ? "even" : "odd"'
+              window:
+                fixed:
+                  length: "0.1s"
+  outputs:
+    - id: result
+      value: "= vars.grouped.value"

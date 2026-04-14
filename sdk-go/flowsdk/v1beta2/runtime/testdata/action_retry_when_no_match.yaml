@@ -1,0 +1,21 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: action_retry_when_no_match
+  inputs:
+    - id: msg
+      int64: {}
+  actions:
+    - id: echo
+      retry_strategy:
+        when: "= this.error.code == 14"
+        backoff:
+          initial_backoff: "0.001s"
+          max_attempts: 3
+      call:
+        connection: echo
+        method: error.NotFound
+        request: "= inputs.msg.value"
+  outputs:
+    - id: result
+      value: "= actions.echo.value"

@@ -1,0 +1,13 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fc_ticker_stop
+  generators:
+    - id: tick
+      ticker:
+        interval: "0.05s"
+  outputs:
+    - id: result
+      value: "= generators.tick.value"
+      flow_control:
+        stop_when: "= int(generators.tick.eval_count) >= 3"

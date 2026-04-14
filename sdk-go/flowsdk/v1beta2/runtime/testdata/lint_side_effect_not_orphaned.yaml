@@ -1,0 +1,10 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_side_effect_not_orphaned
+  inputs:
+    - id: x
+      int64: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value"

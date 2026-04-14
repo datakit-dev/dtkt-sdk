@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/blob/v1beta1/services.proto
 
+//go:build !protoopaque
+
 package blobv1beta1
 
 import (

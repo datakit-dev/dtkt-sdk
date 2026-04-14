@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/base/v1beta1/messages.proto
 
+//go:build !protoopaque
+
 package basev1beta1
 
 import (
@@ -13,7 +15,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	anypb "google.golang.org/protobuf/types/known/anypb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -26,7 +27,7 @@ const (
 
 // Request for getting package spec and config schema.
 type GetPackageRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -56,14 +57,21 @@ func (x *GetPackageRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetPackageRequest.ProtoReflect.Descriptor instead.
-func (*GetPackageRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{0}
+type GetPackageRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 GetPackageRequest_builder) Build() *GetPackageRequest {
+	m0 := &GetPackageRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 // Response for getting package spec and config schema.
 type GetPackageResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Embedded package spec (package.dtkt.yaml).
 	Package *v1beta1.Package `protobuf:"bytes,1,opt,name=package,proto3" json:"package,omitempty"`
 	// Integration config schema used to validate CheckConfig.
@@ -97,11 +105,6 @@ func (x *GetPackageResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetPackageResponse.ProtoReflect.Descriptor instead.
-func (*GetPackageResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *GetPackageResponse) GetPackage() *v1beta1.Package {
 	if x != nil {
 		return x.Package
@@ -116,9 +119,57 @@ func (x *GetPackageResponse) GetConfigSchema() *v1beta1.TypeSchema {
 	return nil
 }
 
+func (x *GetPackageResponse) SetPackage(v *v1beta1.Package) {
+	x.Package = v
+}
+
+func (x *GetPackageResponse) SetConfigSchema(v *v1beta1.TypeSchema) {
+	x.ConfigSchema = v
+}
+
+func (x *GetPackageResponse) HasPackage() bool {
+	if x == nil {
+		return false
+	}
+	return x.Package != nil
+}
+
+func (x *GetPackageResponse) HasConfigSchema() bool {
+	if x == nil {
+		return false
+	}
+	return x.ConfigSchema != nil
+}
+
+func (x *GetPackageResponse) ClearPackage() {
+	x.Package = nil
+}
+
+func (x *GetPackageResponse) ClearConfigSchema() {
+	x.ConfigSchema = nil
+}
+
+type GetPackageResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Embedded package spec (package.dtkt.yaml).
+	Package *v1beta1.Package
+	// Integration config schema used to validate CheckConfig.
+	ConfigSchema *v1beta1.TypeSchema
+}
+
+func (b0 GetPackageResponse_builder) Build() *GetPackageResponse {
+	m0 := &GetPackageResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Package = b.Package
+	x.ConfigSchema = b.ConfigSchema
+	return m0
+}
+
 // Request for checking config.
 type CheckConfigRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Connection resource of provided config.
 	Connection string `protobuf:"bytes,1,opt,name=connection,proto3" json:"connection,omitempty"`
 	// Config to validate.
@@ -156,11 +207,6 @@ func (x *CheckConfigRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CheckConfigRequest.ProtoReflect.Descriptor instead.
-func (*CheckConfigRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *CheckConfigRequest) GetConnection() string {
 	if x != nil {
 		return x.Connection
@@ -189,9 +235,60 @@ func (x *CheckConfigRequest) GetConfigGen() uint64 {
 	return 0
 }
 
+func (x *CheckConfigRequest) SetConnection(v string) {
+	x.Connection = v
+}
+
+func (x *CheckConfigRequest) SetConfigData(v *anypb.Any) {
+	x.ConfigData = v
+}
+
+func (x *CheckConfigRequest) SetConfigHash(v string) {
+	x.ConfigHash = v
+}
+
+func (x *CheckConfigRequest) SetConfigGen(v uint64) {
+	x.ConfigGen = v
+}
+
+func (x *CheckConfigRequest) HasConfigData() bool {
+	if x == nil {
+		return false
+	}
+	return x.ConfigData != nil
+}
+
+func (x *CheckConfigRequest) ClearConfigData() {
+	x.ConfigData = nil
+}
+
+type CheckConfigRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Connection resource of provided config.
+	Connection string
+	// Config to validate.
+	ConfigData *anypb.Any
+	// Hash of provided config.
+	ConfigHash string
+	// Generation of provided config.
+	ConfigGen uint64
+}
+
+func (b0 CheckConfigRequest_builder) Build() *CheckConfigRequest {
+	m0 := &CheckConfigRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Connection = b.Connection
+	x.ConfigData = b.ConfigData
+	x.ConfigHash = b.ConfigHash
+	x.ConfigGen = b.ConfigGen
+	return m0
+}
+
 // Response for checking config.
 type CheckConfigResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Auth type if auth is required.
 	AuthRequired  *v1beta1.AuthType `protobuf:"varint,1,opt,name=auth_required,json=authRequired,proto3,enum=dtkt.shared.v1beta1.AuthType,oneof" json:"auth_required,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -223,11 +320,6 @@ func (x *CheckConfigResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CheckConfigResponse.ProtoReflect.Descriptor instead.
-func (*CheckConfigResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *CheckConfigResponse) GetAuthRequired() v1beta1.AuthType {
 	if x != nil && x.AuthRequired != nil {
 		return *x.AuthRequired
@@ -235,9 +327,39 @@ func (x *CheckConfigResponse) GetAuthRequired() v1beta1.AuthType {
 	return v1beta1.AuthType(0)
 }
 
+func (x *CheckConfigResponse) SetAuthRequired(v v1beta1.AuthType) {
+	x.AuthRequired = &v
+}
+
+func (x *CheckConfigResponse) HasAuthRequired() bool {
+	if x == nil {
+		return false
+	}
+	return x.AuthRequired != nil
+}
+
+func (x *CheckConfigResponse) ClearAuthRequired() {
+	x.AuthRequired = nil
+}
+
+type CheckConfigResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Auth type if auth is required.
+	AuthRequired *v1beta1.AuthType
+}
+
+func (b0 CheckConfigResponse_builder) Build() *CheckConfigResponse {
+	m0 := &CheckConfigResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.AuthRequired = b.AuthRequired
+	return m0
+}
+
 // Request for checking auth (3-legged OAuth over gRPC).
 type CheckAuthRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Type:
 	//
 	//	*CheckAuthRequest_CodeRequest
@@ -271,11 +393,6 @@ func (x *CheckAuthRequest) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CheckAuthRequest.ProtoReflect.Descriptor instead.
-func (*CheckAuthRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CheckAuthRequest) GetType() isCheckAuthRequest_Type {
@@ -312,6 +429,140 @@ func (x *CheckAuthRequest) GetRefreshRequest() *v1beta1.OAuthRefreshRequest {
 	return nil
 }
 
+func (x *CheckAuthRequest) SetCodeRequest(v *v1beta1.OAuthCodeRequest) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &CheckAuthRequest_CodeRequest{v}
+}
+
+func (x *CheckAuthRequest) SetTokenRequest(v *v1beta1.OAuthTokenRequest) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &CheckAuthRequest_TokenRequest{v}
+}
+
+func (x *CheckAuthRequest) SetRefreshRequest(v *v1beta1.OAuthRefreshRequest) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &CheckAuthRequest_RefreshRequest{v}
+}
+
+func (x *CheckAuthRequest) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return x.Type != nil
+}
+
+func (x *CheckAuthRequest) HasCodeRequest() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*CheckAuthRequest_CodeRequest)
+	return ok
+}
+
+func (x *CheckAuthRequest) HasTokenRequest() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*CheckAuthRequest_TokenRequest)
+	return ok
+}
+
+func (x *CheckAuthRequest) HasRefreshRequest() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*CheckAuthRequest_RefreshRequest)
+	return ok
+}
+
+func (x *CheckAuthRequest) ClearType() {
+	x.Type = nil
+}
+
+func (x *CheckAuthRequest) ClearCodeRequest() {
+	if _, ok := x.Type.(*CheckAuthRequest_CodeRequest); ok {
+		x.Type = nil
+	}
+}
+
+func (x *CheckAuthRequest) ClearTokenRequest() {
+	if _, ok := x.Type.(*CheckAuthRequest_TokenRequest); ok {
+		x.Type = nil
+	}
+}
+
+func (x *CheckAuthRequest) ClearRefreshRequest() {
+	if _, ok := x.Type.(*CheckAuthRequest_RefreshRequest); ok {
+		x.Type = nil
+	}
+}
+
+const CheckAuthRequest_Type_not_set_case case_CheckAuthRequest_Type = 0
+const CheckAuthRequest_CodeRequest_case case_CheckAuthRequest_Type = 2
+const CheckAuthRequest_TokenRequest_case case_CheckAuthRequest_Type = 3
+const CheckAuthRequest_RefreshRequest_case case_CheckAuthRequest_Type = 4
+
+func (x *CheckAuthRequest) WhichType() case_CheckAuthRequest_Type {
+	if x == nil {
+		return CheckAuthRequest_Type_not_set_case
+	}
+	switch x.Type.(type) {
+	case *CheckAuthRequest_CodeRequest:
+		return CheckAuthRequest_CodeRequest_case
+	case *CheckAuthRequest_TokenRequest:
+		return CheckAuthRequest_TokenRequest_case
+	case *CheckAuthRequest_RefreshRequest:
+		return CheckAuthRequest_RefreshRequest_case
+	default:
+		return CheckAuthRequest_Type_not_set_case
+	}
+}
+
+type CheckAuthRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof Type:
+	CodeRequest    *v1beta1.OAuthCodeRequest
+	TokenRequest   *v1beta1.OAuthTokenRequest
+	RefreshRequest *v1beta1.OAuthRefreshRequest
+	// -- end of Type
+}
+
+func (b0 CheckAuthRequest_builder) Build() *CheckAuthRequest {
+	m0 := &CheckAuthRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.CodeRequest != nil {
+		x.Type = &CheckAuthRequest_CodeRequest{b.CodeRequest}
+	}
+	if b.TokenRequest != nil {
+		x.Type = &CheckAuthRequest_TokenRequest{b.TokenRequest}
+	}
+	if b.RefreshRequest != nil {
+		x.Type = &CheckAuthRequest_RefreshRequest{b.RefreshRequest}
+	}
+	return m0
+}
+
+type case_CheckAuthRequest_Type protoreflect.FieldNumber
+
+func (x case_CheckAuthRequest_Type) String() string {
+	md := file_dtkt_base_v1beta1_messages_proto_msgTypes[4].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isCheckAuthRequest_Type interface {
 	isCheckAuthRequest_Type()
 }
@@ -336,7 +587,7 @@ func (*CheckAuthRequest_RefreshRequest) isCheckAuthRequest_Type() {}
 
 // Response for checking auth.
 type CheckAuthResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Auth type if auth is required.
 	AuthRequired v1beta1.AuthType `protobuf:"varint,1,opt,name=auth_required,json=authRequired,proto3,enum=dtkt.shared.v1beta1.AuthType" json:"auth_required,omitempty"`
 	// Types that are valid to be assigned to Type:
@@ -373,11 +624,6 @@ func (x *CheckAuthResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CheckAuthResponse.ProtoReflect.Descriptor instead.
-func (*CheckAuthResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *CheckAuthResponse) GetAuthRequired() v1beta1.AuthType {
 	if x != nil {
 		return x.AuthRequired
@@ -410,6 +656,116 @@ func (x *CheckAuthResponse) GetToken() *v1beta1.OAuthToken {
 	return nil
 }
 
+func (x *CheckAuthResponse) SetAuthRequired(v v1beta1.AuthType) {
+	x.AuthRequired = v
+}
+
+func (x *CheckAuthResponse) SetOauthCodeUrl(v string) {
+	x.Type = &CheckAuthResponse_OauthCodeUrl{v}
+}
+
+func (x *CheckAuthResponse) SetToken(v *v1beta1.OAuthToken) {
+	if v == nil {
+		x.Type = nil
+		return
+	}
+	x.Type = &CheckAuthResponse_Token{v}
+}
+
+func (x *CheckAuthResponse) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return x.Type != nil
+}
+
+func (x *CheckAuthResponse) HasOauthCodeUrl() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*CheckAuthResponse_OauthCodeUrl)
+	return ok
+}
+
+func (x *CheckAuthResponse) HasToken() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.Type.(*CheckAuthResponse_Token)
+	return ok
+}
+
+func (x *CheckAuthResponse) ClearType() {
+	x.Type = nil
+}
+
+func (x *CheckAuthResponse) ClearOauthCodeUrl() {
+	if _, ok := x.Type.(*CheckAuthResponse_OauthCodeUrl); ok {
+		x.Type = nil
+	}
+}
+
+func (x *CheckAuthResponse) ClearToken() {
+	if _, ok := x.Type.(*CheckAuthResponse_Token); ok {
+		x.Type = nil
+	}
+}
+
+const CheckAuthResponse_Type_not_set_case case_CheckAuthResponse_Type = 0
+const CheckAuthResponse_OauthCodeUrl_case case_CheckAuthResponse_Type = 2
+const CheckAuthResponse_Token_case case_CheckAuthResponse_Type = 3
+
+func (x *CheckAuthResponse) WhichType() case_CheckAuthResponse_Type {
+	if x == nil {
+		return CheckAuthResponse_Type_not_set_case
+	}
+	switch x.Type.(type) {
+	case *CheckAuthResponse_OauthCodeUrl:
+		return CheckAuthResponse_OauthCodeUrl_case
+	case *CheckAuthResponse_Token:
+		return CheckAuthResponse_Token_case
+	default:
+		return CheckAuthResponse_Type_not_set_case
+	}
+}
+
+type CheckAuthResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Auth type if auth is required.
+	AuthRequired v1beta1.AuthType
+	// Fields of oneof Type:
+	// Returned when auth type is code.
+	OauthCodeUrl *string
+	// Returned when auth type is token or refresh.
+	Token *v1beta1.OAuthToken
+	// -- end of Type
+}
+
+func (b0 CheckAuthResponse_builder) Build() *CheckAuthResponse {
+	m0 := &CheckAuthResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.AuthRequired = b.AuthRequired
+	if b.OauthCodeUrl != nil {
+		x.Type = &CheckAuthResponse_OauthCodeUrl{*b.OauthCodeUrl}
+	}
+	if b.Token != nil {
+		x.Type = &CheckAuthResponse_Token{b.Token}
+	}
+	return m0
+}
+
+type case_CheckAuthResponse_Type protoreflect.FieldNumber
+
+func (x case_CheckAuthResponse_Type) String() string {
+	md := file_dtkt_base_v1beta1_messages_proto_msgTypes[5].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isCheckAuthResponse_Type interface {
 	isCheckAuthResponse_Type()
 }
@@ -430,7 +786,7 @@ func (*CheckAuthResponse_Token) isCheckAuthResponse_Type() {}
 
 // Request for listing custom types.
 type ListTypesRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -462,11 +818,6 @@ func (x *ListTypesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListTypesRequest.ProtoReflect.Descriptor instead.
-func (*ListTypesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *ListTypesRequest) GetPageSize() int32 {
 	if x != nil {
 		return x.PageSize
@@ -481,9 +832,33 @@ func (x *ListTypesRequest) GetPageToken() string {
 	return ""
 }
 
+func (x *ListTypesRequest) SetPageSize(v int32) {
+	x.PageSize = v
+}
+
+func (x *ListTypesRequest) SetPageToken(v string) {
+	x.PageToken = v
+}
+
+type ListTypesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	PageSize  int32
+	PageToken string
+}
+
+func (b0 ListTypesRequest_builder) Build() *ListTypesRequest {
+	m0 := &ListTypesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.PageSize = b.PageSize
+	x.PageToken = b.PageToken
+	return m0
+}
+
 // Response for listing custom types.
 type ListTypesResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Custom types registered to integration.
 	Types         []*v1beta1.TypeSchema `protobuf:"bytes,1,rep,name=types,proto3" json:"types,omitempty"`
 	NextPageToken string                `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
@@ -516,11 +891,6 @@ func (x *ListTypesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListTypesResponse.ProtoReflect.Descriptor instead.
-func (*ListTypesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *ListTypesResponse) GetTypes() []*v1beta1.TypeSchema {
 	if x != nil {
 		return x.Types
@@ -535,9 +905,34 @@ func (x *ListTypesResponse) GetNextPageToken() string {
 	return ""
 }
 
+func (x *ListTypesResponse) SetTypes(v []*v1beta1.TypeSchema) {
+	x.Types = v
+}
+
+func (x *ListTypesResponse) SetNextPageToken(v string) {
+	x.NextPageToken = v
+}
+
+type ListTypesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Custom types registered to integration.
+	Types         []*v1beta1.TypeSchema
+	NextPageToken string
+}
+
+func (b0 ListTypesResponse_builder) Build() *ListTypesResponse {
+	m0 := &ListTypesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Types = b.Types
+	x.NextPageToken = b.NextPageToken
+	return m0
+}
+
 // Request for getting custom type schema.
 type GetTypeRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -568,11 +963,6 @@ func (x *GetTypeRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetTypeRequest.ProtoReflect.Descriptor instead.
-func (*GetTypeRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *GetTypeRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -580,9 +970,27 @@ func (x *GetTypeRequest) GetName() string {
 	return ""
 }
 
+func (x *GetTypeRequest) SetName(v string) {
+	x.Name = v
+}
+
+type GetTypeRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name string
+}
+
+func (b0 GetTypeRequest_builder) Build() *GetTypeRequest {
+	m0 := &GetTypeRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Name = b.Name
+	return m0
+}
+
 // Response for getting custom type schema.
 type GetTypeResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Type          *v1beta1.TypeSchema    `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -613,16 +1021,40 @@ func (x *GetTypeResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetTypeResponse.ProtoReflect.Descriptor instead.
-func (*GetTypeResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *GetTypeResponse) GetType() *v1beta1.TypeSchema {
 	if x != nil {
 		return x.Type
 	}
 	return nil
+}
+
+func (x *GetTypeResponse) SetType(v *v1beta1.TypeSchema) {
+	x.Type = v
+}
+
+func (x *GetTypeResponse) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return x.Type != nil
+}
+
+func (x *GetTypeResponse) ClearType() {
+	x.Type = nil
+}
+
+type GetTypeResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Type *v1beta1.TypeSchema
+}
+
+func (b0 GetTypeResponse_builder) Build() *GetTypeResponse {
+	m0 := &GetTypeResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Type = b.Type
+	return m0
 }
 
 var File_dtkt_base_v1beta1_messages_proto protoreflect.FileDescriptor
@@ -669,18 +1101,6 @@ const file_dtkt_base_v1beta1_messages_proto_rawDesc = "" +
 	"\x0fGetTypeResponse\x12;\n" +
 	"\x04type\x18\x01 \x01(\v2\x1f.dtkt.shared.v1beta1.TypeSchemaB\x06\xbaH\x03\xc8\x01\x01R\x04typeB\xda\x01\n" +
 	"\x17proto.dtkt.base.v1beta1B\rMessagesProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/base/v1beta1;basev1beta1\xa2\x02\x03DBX\xaa\x02\x11Dtkt.Base.V1beta1\xca\x02\x11Dtkt\\Base\\V1beta1\xe2\x02\x1dDtkt\\Base\\V1beta1\\GPBMetadata\xea\x02\x13Dtkt::Base::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_base_v1beta1_messages_proto_rawDescOnce sync.Once
-	file_dtkt_base_v1beta1_messages_proto_rawDescData []byte
-)
-
-func file_dtkt_base_v1beta1_messages_proto_rawDescGZIP() []byte {
-	file_dtkt_base_v1beta1_messages_proto_rawDescOnce.Do(func() {
-		file_dtkt_base_v1beta1_messages_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_base_v1beta1_messages_proto_rawDesc), len(file_dtkt_base_v1beta1_messages_proto_rawDesc)))
-	})
-	return file_dtkt_base_v1beta1_messages_proto_rawDescData
-}
 
 var file_dtkt_base_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_dtkt_base_v1beta1_messages_proto_goTypes = []any{

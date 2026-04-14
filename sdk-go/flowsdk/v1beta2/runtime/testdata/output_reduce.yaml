@@ -1,0 +1,19 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: output_reduce
+  description: "Output with reduce and event window"
+  inputs:
+    - id: x
+      int64: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value"
+      transforms:
+        - reduce:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+            group_by:
+              window:
+                event:
+                  when: "= inputs.x.closed"

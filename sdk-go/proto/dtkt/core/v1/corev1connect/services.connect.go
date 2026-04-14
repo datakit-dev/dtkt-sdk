@@ -31,6 +31,8 @@ const (
 	DeploymentServiceName = "dtkt.core.v1.DeploymentService"
 	// FlowServiceName is the fully-qualified name of the FlowService service.
 	FlowServiceName = "dtkt.core.v1.FlowService"
+	// FlowRunServiceName is the fully-qualified name of the FlowRunService service.
+	FlowRunServiceName = "dtkt.core.v1.FlowRunService"
 	// IntegrationServiceName is the fully-qualified name of the IntegrationService service.
 	IntegrationServiceName = "dtkt.core.v1.IntegrationService"
 	// ReflectServiceName is the fully-qualified name of the ReflectService service.
@@ -114,6 +116,30 @@ const (
 	FlowServiceUpdateFlowProcedure = "/dtkt.core.v1.FlowService/UpdateFlow"
 	// FlowServiceDeleteFlowProcedure is the fully-qualified name of the FlowService's DeleteFlow RPC.
 	FlowServiceDeleteFlowProcedure = "/dtkt.core.v1.FlowService/DeleteFlow"
+	// FlowRunServiceListFlowRunsProcedure is the fully-qualified name of the FlowRunService's
+	// ListFlowRuns RPC.
+	FlowRunServiceListFlowRunsProcedure = "/dtkt.core.v1.FlowRunService/ListFlowRuns"
+	// FlowRunServiceGetFlowRunProcedure is the fully-qualified name of the FlowRunService's GetFlowRun
+	// RPC.
+	FlowRunServiceGetFlowRunProcedure = "/dtkt.core.v1.FlowRunService/GetFlowRun"
+	// FlowRunServiceCreateFlowRunProcedure is the fully-qualified name of the FlowRunService's
+	// CreateFlowRun RPC.
+	FlowRunServiceCreateFlowRunProcedure = "/dtkt.core.v1.FlowRunService/CreateFlowRun"
+	// FlowRunServiceUpdateFlowRunProcedure is the fully-qualified name of the FlowRunService's
+	// UpdateFlowRun RPC.
+	FlowRunServiceUpdateFlowRunProcedure = "/dtkt.core.v1.FlowRunService/UpdateFlowRun"
+	// FlowRunServiceDeleteFlowRunProcedure is the fully-qualified name of the FlowRunService's
+	// DeleteFlowRun RPC.
+	FlowRunServiceDeleteFlowRunProcedure = "/dtkt.core.v1.FlowRunService/DeleteFlowRun"
+	// FlowRunServiceReceiveFlowRunEventsProcedure is the fully-qualified name of the FlowRunService's
+	// ReceiveFlowRunEvents RPC.
+	FlowRunServiceReceiveFlowRunEventsProcedure = "/dtkt.core.v1.FlowRunService/ReceiveFlowRunEvents"
+	// FlowRunServiceSendFlowRunEventProcedure is the fully-qualified name of the FlowRunService's
+	// SendFlowRunEvent RPC.
+	FlowRunServiceSendFlowRunEventProcedure = "/dtkt.core.v1.FlowRunService/SendFlowRunEvent"
+	// FlowRunServiceStreamFlowRunEventsProcedure is the fully-qualified name of the FlowRunService's
+	// StreamFlowRunEvents RPC.
+	FlowRunServiceStreamFlowRunEventsProcedure = "/dtkt.core.v1.FlowRunService/StreamFlowRunEvents"
 	// IntegrationServiceListIntegrationsProcedure is the fully-qualified name of the
 	// IntegrationService's ListIntegrations RPC.
 	IntegrationServiceListIntegrationsProcedure = "/dtkt.core.v1.IntegrationService/ListIntegrations"
@@ -1025,6 +1051,282 @@ func (UnimplementedFlowServiceHandler) UpdateFlow(context.Context, *connect.Requ
 
 func (UnimplementedFlowServiceHandler) DeleteFlow(context.Context, *connect.Request[v1.DeleteFlowRequest]) (*connect.Response[v1.DeleteFlowResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.FlowService.DeleteFlow is not implemented"))
+}
+
+// FlowRunServiceClient is a client for the dtkt.core.v1.FlowRunService service.
+type FlowRunServiceClient interface {
+	// List flowruns with filtering options.
+	ListFlowRuns(context.Context, *connect.Request[v1.ListFlowRunsRequest]) (*connect.Response[v1.ListFlowRunsResponse], error)
+	// Get a single flowrun by name.
+	GetFlowRun(context.Context, *connect.Request[v1.GetFlowRunRequest]) (*connect.Response[v1.GetFlowRunResponse], error)
+	// Create a new flowrun.
+	CreateFlowRun(context.Context, *connect.Request[v1.CreateFlowRunRequest]) (*connect.Response[longrunningpb.Operation], error)
+	// Update a flowrun.
+	UpdateFlowRun(context.Context, *connect.Request[v1.UpdateFlowRunRequest]) (*connect.Response[longrunningpb.Operation], error)
+	// Delete a flowrun.
+	DeleteFlowRun(context.Context, *connect.Request[v1.DeleteFlowRunRequest]) (*connect.Response[longrunningpb.Operation], error)
+	// Receive a stream of executor events (outputs, input requests, interaction requests, state changes).
+	// For environments with server streaming but not client streaming (e.g. web browsers).
+	ReceiveFlowRunEvents(context.Context, *connect.Request[v1.ReceiveFlowRunEventsRequest]) (*connect.ServerStreamForClient[v1.ReceiveFlowRunEventsResponse], error)
+	// Send an input, interaction response, or flow/node command (stop, terminate, suspend, resume).
+	// For environments without client streaming (e.g. web browsers).
+	SendFlowRunEvent(context.Context, *connect.Request[v1.SendFlowRunEventRequest]) (*connect.Response[emptypb.Empty], error)
+	// Bi-directional event stream: send inputs/commands and receive executor events.
+	StreamFlowRunEvents(context.Context) *connect.BidiStreamForClient[v1.StreamFlowRunEventsRequest, v1.StreamFlowRunEventsResponse]
+}
+
+// NewFlowRunServiceClient constructs a client for the dtkt.core.v1.FlowRunService service. By
+// default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
+// and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
+// connect.WithGRPC() or connect.WithGRPCWeb() options.
+//
+// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
+// http://api.acme.com or https://acme.com/grpc).
+func NewFlowRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) FlowRunServiceClient {
+	baseURL = strings.TrimRight(baseURL, "/")
+	flowRunServiceMethods := v1.File_dtkt_core_v1_services_proto.Services().ByName("FlowRunService").Methods()
+	return &flowRunServiceClient{
+		listFlowRuns: connect.NewClient[v1.ListFlowRunsRequest, v1.ListFlowRunsResponse](
+			httpClient,
+			baseURL+FlowRunServiceListFlowRunsProcedure,
+			connect.WithSchema(flowRunServiceMethods.ByName("ListFlowRuns")),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
+		getFlowRun: connect.NewClient[v1.GetFlowRunRequest, v1.GetFlowRunResponse](
+			httpClient,
+			baseURL+FlowRunServiceGetFlowRunProcedure,
+			connect.WithSchema(flowRunServiceMethods.ByName("GetFlowRun")),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
+		createFlowRun: connect.NewClient[v1.CreateFlowRunRequest, longrunningpb.Operation](
+			httpClient,
+			baseURL+FlowRunServiceCreateFlowRunProcedure,
+			connect.WithSchema(flowRunServiceMethods.ByName("CreateFlowRun")),
+			connect.WithClientOptions(opts...),
+		),
+		updateFlowRun: connect.NewClient[v1.UpdateFlowRunRequest, longrunningpb.Operation](
+			httpClient,
+			baseURL+FlowRunServiceUpdateFlowRunProcedure,
+			connect.WithSchema(flowRunServiceMethods.ByName("UpdateFlowRun")),
+			connect.WithClientOptions(opts...),
+		),
+		deleteFlowRun: connect.NewClient[v1.DeleteFlowRunRequest, longrunningpb.Operation](
+			httpClient,
+			baseURL+FlowRunServiceDeleteFlowRunProcedure,
+			connect.WithSchema(flowRunServiceMethods.ByName("DeleteFlowRun")),
+			connect.WithClientOptions(opts...),
+		),
+		receiveFlowRunEvents: connect.NewClient[v1.ReceiveFlowRunEventsRequest, v1.ReceiveFlowRunEventsResponse](
+			httpClient,
+			baseURL+FlowRunServiceReceiveFlowRunEventsProcedure,
+			connect.WithSchema(flowRunServiceMethods.ByName("ReceiveFlowRunEvents")),
+			connect.WithClientOptions(opts...),
+		),
+		sendFlowRunEvent: connect.NewClient[v1.SendFlowRunEventRequest, emptypb.Empty](
+			httpClient,
+			baseURL+FlowRunServiceSendFlowRunEventProcedure,
+			connect.WithSchema(flowRunServiceMethods.ByName("SendFlowRunEvent")),
+			connect.WithClientOptions(opts...),
+		),
+		streamFlowRunEvents: connect.NewClient[v1.StreamFlowRunEventsRequest, v1.StreamFlowRunEventsResponse](
+			httpClient,
+			baseURL+FlowRunServiceStreamFlowRunEventsProcedure,
+			connect.WithSchema(flowRunServiceMethods.ByName("StreamFlowRunEvents")),
+			connect.WithClientOptions(opts...),
+		),
+	}
+}
+
+// flowRunServiceClient implements FlowRunServiceClient.
+type flowRunServiceClient struct {
+	listFlowRuns         *connect.Client[v1.ListFlowRunsRequest, v1.ListFlowRunsResponse]
+	getFlowRun           *connect.Client[v1.GetFlowRunRequest, v1.GetFlowRunResponse]
+	createFlowRun        *connect.Client[v1.CreateFlowRunRequest, longrunningpb.Operation]
+	updateFlowRun        *connect.Client[v1.UpdateFlowRunRequest, longrunningpb.Operation]
+	deleteFlowRun        *connect.Client[v1.DeleteFlowRunRequest, longrunningpb.Operation]
+	receiveFlowRunEvents *connect.Client[v1.ReceiveFlowRunEventsRequest, v1.ReceiveFlowRunEventsResponse]
+	sendFlowRunEvent     *connect.Client[v1.SendFlowRunEventRequest, emptypb.Empty]
+	streamFlowRunEvents  *connect.Client[v1.StreamFlowRunEventsRequest, v1.StreamFlowRunEventsResponse]
+}
+
+// ListFlowRuns calls dtkt.core.v1.FlowRunService.ListFlowRuns.
+func (c *flowRunServiceClient) ListFlowRuns(ctx context.Context, req *connect.Request[v1.ListFlowRunsRequest]) (*connect.Response[v1.ListFlowRunsResponse], error) {
+	return c.listFlowRuns.CallUnary(ctx, req)
+}
+
+// GetFlowRun calls dtkt.core.v1.FlowRunService.GetFlowRun.
+func (c *flowRunServiceClient) GetFlowRun(ctx context.Context, req *connect.Request[v1.GetFlowRunRequest]) (*connect.Response[v1.GetFlowRunResponse], error) {
+	return c.getFlowRun.CallUnary(ctx, req)
+}
+
+// CreateFlowRun calls dtkt.core.v1.FlowRunService.CreateFlowRun.
+func (c *flowRunServiceClient) CreateFlowRun(ctx context.Context, req *connect.Request[v1.CreateFlowRunRequest]) (*connect.Response[longrunningpb.Operation], error) {
+	return c.createFlowRun.CallUnary(ctx, req)
+}
+
+// UpdateFlowRun calls dtkt.core.v1.FlowRunService.UpdateFlowRun.
+func (c *flowRunServiceClient) UpdateFlowRun(ctx context.Context, req *connect.Request[v1.UpdateFlowRunRequest]) (*connect.Response[longrunningpb.Operation], error) {
+	return c.updateFlowRun.CallUnary(ctx, req)
+}
+
+// DeleteFlowRun calls dtkt.core.v1.FlowRunService.DeleteFlowRun.
+func (c *flowRunServiceClient) DeleteFlowRun(ctx context.Context, req *connect.Request[v1.DeleteFlowRunRequest]) (*connect.Response[longrunningpb.Operation], error) {
+	return c.deleteFlowRun.CallUnary(ctx, req)
+}
+
+// ReceiveFlowRunEvents calls dtkt.core.v1.FlowRunService.ReceiveFlowRunEvents.
+func (c *flowRunServiceClient) ReceiveFlowRunEvents(ctx context.Context, req *connect.Request[v1.ReceiveFlowRunEventsRequest]) (*connect.ServerStreamForClient[v1.ReceiveFlowRunEventsResponse], error) {
+	return c.receiveFlowRunEvents.CallServerStream(ctx, req)
+}
+
+// SendFlowRunEvent calls dtkt.core.v1.FlowRunService.SendFlowRunEvent.
+func (c *flowRunServiceClient) SendFlowRunEvent(ctx context.Context, req *connect.Request[v1.SendFlowRunEventRequest]) (*connect.Response[emptypb.Empty], error) {
+	return c.sendFlowRunEvent.CallUnary(ctx, req)
+}
+
+// StreamFlowRunEvents calls dtkt.core.v1.FlowRunService.StreamFlowRunEvents.
+func (c *flowRunServiceClient) StreamFlowRunEvents(ctx context.Context) *connect.BidiStreamForClient[v1.StreamFlowRunEventsRequest, v1.StreamFlowRunEventsResponse] {
+	return c.streamFlowRunEvents.CallBidiStream(ctx)
+}
+
+// FlowRunServiceHandler is an implementation of the dtkt.core.v1.FlowRunService service.
+type FlowRunServiceHandler interface {
+	// List flowruns with filtering options.
+	ListFlowRuns(context.Context, *connect.Request[v1.ListFlowRunsRequest]) (*connect.Response[v1.ListFlowRunsResponse], error)
+	// Get a single flowrun by name.
+	GetFlowRun(context.Context, *connect.Request[v1.GetFlowRunRequest]) (*connect.Response[v1.GetFlowRunResponse], error)
+	// Create a new flowrun.
+	CreateFlowRun(context.Context, *connect.Request[v1.CreateFlowRunRequest]) (*connect.Response[longrunningpb.Operation], error)
+	// Update a flowrun.
+	UpdateFlowRun(context.Context, *connect.Request[v1.UpdateFlowRunRequest]) (*connect.Response[longrunningpb.Operation], error)
+	// Delete a flowrun.
+	DeleteFlowRun(context.Context, *connect.Request[v1.DeleteFlowRunRequest]) (*connect.Response[longrunningpb.Operation], error)
+	// Receive a stream of executor events (outputs, input requests, interaction requests, state changes).
+	// For environments with server streaming but not client streaming (e.g. web browsers).
+	ReceiveFlowRunEvents(context.Context, *connect.Request[v1.ReceiveFlowRunEventsRequest], *connect.ServerStream[v1.ReceiveFlowRunEventsResponse]) error
+	// Send an input, interaction response, or flow/node command (stop, terminate, suspend, resume).
+	// For environments without client streaming (e.g. web browsers).
+	SendFlowRunEvent(context.Context, *connect.Request[v1.SendFlowRunEventRequest]) (*connect.Response[emptypb.Empty], error)
+	// Bi-directional event stream: send inputs/commands and receive executor events.
+	StreamFlowRunEvents(context.Context, *connect.BidiStream[v1.StreamFlowRunEventsRequest, v1.StreamFlowRunEventsResponse]) error
+}
+
+// NewFlowRunServiceHandler builds an HTTP handler from the service implementation. It returns the
+// path on which to mount the handler and the handler itself.
+//
+// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
+// and JSON codecs. They also support gzip compression.
+func NewFlowRunServiceHandler(svc FlowRunServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	flowRunServiceMethods := v1.File_dtkt_core_v1_services_proto.Services().ByName("FlowRunService").Methods()
+	flowRunServiceListFlowRunsHandler := connect.NewUnaryHandler(
+		FlowRunServiceListFlowRunsProcedure,
+		svc.ListFlowRuns,
+		connect.WithSchema(flowRunServiceMethods.ByName("ListFlowRuns")),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
+	flowRunServiceGetFlowRunHandler := connect.NewUnaryHandler(
+		FlowRunServiceGetFlowRunProcedure,
+		svc.GetFlowRun,
+		connect.WithSchema(flowRunServiceMethods.ByName("GetFlowRun")),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
+	flowRunServiceCreateFlowRunHandler := connect.NewUnaryHandler(
+		FlowRunServiceCreateFlowRunProcedure,
+		svc.CreateFlowRun,
+		connect.WithSchema(flowRunServiceMethods.ByName("CreateFlowRun")),
+		connect.WithHandlerOptions(opts...),
+	)
+	flowRunServiceUpdateFlowRunHandler := connect.NewUnaryHandler(
+		FlowRunServiceUpdateFlowRunProcedure,
+		svc.UpdateFlowRun,
+		connect.WithSchema(flowRunServiceMethods.ByName("UpdateFlowRun")),
+		connect.WithHandlerOptions(opts...),
+	)
+	flowRunServiceDeleteFlowRunHandler := connect.NewUnaryHandler(
+		FlowRunServiceDeleteFlowRunProcedure,
+		svc.DeleteFlowRun,
+		connect.WithSchema(flowRunServiceMethods.ByName("DeleteFlowRun")),
+		connect.WithHandlerOptions(opts...),
+	)
+	flowRunServiceReceiveFlowRunEventsHandler := connect.NewServerStreamHandler(
+		FlowRunServiceReceiveFlowRunEventsProcedure,
+		svc.ReceiveFlowRunEvents,
+		connect.WithSchema(flowRunServiceMethods.ByName("ReceiveFlowRunEvents")),
+		connect.WithHandlerOptions(opts...),
+	)
+	flowRunServiceSendFlowRunEventHandler := connect.NewUnaryHandler(
+		FlowRunServiceSendFlowRunEventProcedure,
+		svc.SendFlowRunEvent,
+		connect.WithSchema(flowRunServiceMethods.ByName("SendFlowRunEvent")),
+		connect.WithHandlerOptions(opts...),
+	)
+	flowRunServiceStreamFlowRunEventsHandler := connect.NewBidiStreamHandler(
+		FlowRunServiceStreamFlowRunEventsProcedure,
+		svc.StreamFlowRunEvents,
+		connect.WithSchema(flowRunServiceMethods.ByName("StreamFlowRunEvents")),
+		connect.WithHandlerOptions(opts...),
+	)
+	return "/dtkt.core.v1.FlowRunService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case FlowRunServiceListFlowRunsProcedure:
+			flowRunServiceListFlowRunsHandler.ServeHTTP(w, r)
+		case FlowRunServiceGetFlowRunProcedure:
+			flowRunServiceGetFlowRunHandler.ServeHTTP(w, r)
+		case FlowRunServiceCreateFlowRunProcedure:
+			flowRunServiceCreateFlowRunHandler.ServeHTTP(w, r)
+		case FlowRunServiceUpdateFlowRunProcedure:
+			flowRunServiceUpdateFlowRunHandler.ServeHTTP(w, r)
+		case FlowRunServiceDeleteFlowRunProcedure:
+			flowRunServiceDeleteFlowRunHandler.ServeHTTP(w, r)
+		case FlowRunServiceReceiveFlowRunEventsProcedure:
+			flowRunServiceReceiveFlowRunEventsHandler.ServeHTTP(w, r)
+		case FlowRunServiceSendFlowRunEventProcedure:
+			flowRunServiceSendFlowRunEventHandler.ServeHTTP(w, r)
+		case FlowRunServiceStreamFlowRunEventsProcedure:
+			flowRunServiceStreamFlowRunEventsHandler.ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
+}
+
+// UnimplementedFlowRunServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedFlowRunServiceHandler struct{}
+
+func (UnimplementedFlowRunServiceHandler) ListFlowRuns(context.Context, *connect.Request[v1.ListFlowRunsRequest]) (*connect.Response[v1.ListFlowRunsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.FlowRunService.ListFlowRuns is not implemented"))
+}
+
+func (UnimplementedFlowRunServiceHandler) GetFlowRun(context.Context, *connect.Request[v1.GetFlowRunRequest]) (*connect.Response[v1.GetFlowRunResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.FlowRunService.GetFlowRun is not implemented"))
+}
+
+func (UnimplementedFlowRunServiceHandler) CreateFlowRun(context.Context, *connect.Request[v1.CreateFlowRunRequest]) (*connect.Response[longrunningpb.Operation], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.FlowRunService.CreateFlowRun is not implemented"))
+}
+
+func (UnimplementedFlowRunServiceHandler) UpdateFlowRun(context.Context, *connect.Request[v1.UpdateFlowRunRequest]) (*connect.Response[longrunningpb.Operation], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.FlowRunService.UpdateFlowRun is not implemented"))
+}
+
+func (UnimplementedFlowRunServiceHandler) DeleteFlowRun(context.Context, *connect.Request[v1.DeleteFlowRunRequest]) (*connect.Response[longrunningpb.Operation], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.FlowRunService.DeleteFlowRun is not implemented"))
+}
+
+func (UnimplementedFlowRunServiceHandler) ReceiveFlowRunEvents(context.Context, *connect.Request[v1.ReceiveFlowRunEventsRequest], *connect.ServerStream[v1.ReceiveFlowRunEventsResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.FlowRunService.ReceiveFlowRunEvents is not implemented"))
+}
+
+func (UnimplementedFlowRunServiceHandler) SendFlowRunEvent(context.Context, *connect.Request[v1.SendFlowRunEventRequest]) (*connect.Response[emptypb.Empty], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.FlowRunService.SendFlowRunEvent is not implemented"))
+}
+
+func (UnimplementedFlowRunServiceHandler) StreamFlowRunEvents(context.Context, *connect.BidiStream[v1.StreamFlowRunEventsRequest, v1.StreamFlowRunEventsResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.FlowRunService.StreamFlowRunEvents is not implemented"))
 }
 
 // IntegrationServiceClient is a client for the dtkt.core.v1.IntegrationService service.

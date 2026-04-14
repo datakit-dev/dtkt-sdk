@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: dtkt/replication/v1beta1/services.proto
 
+//go:build !protoopaque
+
 package replicationv1beta1
 
 import (
