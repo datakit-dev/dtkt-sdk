@@ -9,7 +9,7 @@ import (
 )
 
 type (
-	Eval interface {
+	Program interface {
 		Eval(Runtime) ref.Val
 	}
 	EvalFunc func(Runtime) ref.Val
@@ -50,11 +50,11 @@ func ExprValueToNative(env Env, exprVal *expr.Value) (any, error) {
 		listVal := exprVal.GetListValue()
 		slice := make([]any, len(listVal.Values))
 		for i, e := range listVal.Values {
-			rv, err := ExprValueToNative(env, e)
+			val, err := ExprValueToNative(env, e)
 			if err != nil {
 				return nil, err
 			}
-			slice[i] = rv
+			slice[i] = val
 		}
 		return slice, nil
 	}

@@ -291,8 +291,8 @@ func (w ProtoOptions) Wrap(value any) (proto.Message, error) {
 		return nil, err
 	}
 
-	var a any
-	if err = encoding.FromJSONV2(b, &a,
+	var val any
+	if err = encoding.FromJSONV2(b, &val,
 		encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
 			Resolver: w.Resolver,
 		}),
@@ -300,7 +300,7 @@ func (w ProtoOptions) Wrap(value any) (proto.Message, error) {
 		return nil, err
 	}
 
-	return w.Wrap(a)
+	return w.Wrap(val)
 }
 
 func (w ProtoOptions) UnwrapAny(from *anypb.Any) (any, error) {

@@ -1,10 +1,8 @@
 package flowsdk
 
 import (
-	"context"
 	"fmt"
 	"io"
-	"slices"
 	"strings"
 
 	"buf.build/go/protovalidate"
@@ -16,9 +14,9 @@ import (
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta1/spec"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk/v1beta1"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
+	sharedv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	"github.com/invopop/jsonschema"
-	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 const (
@@ -148,7 +146,7 @@ func (Spec) Filename() string {
 	return SpecSchemaFilename
 }
 
-func (o SpecOptions) ExtendSchemaWithContext(ctx context.Context, schema *jsonschema.Schema) error {
+func (o SpecOptions) ExtendSchema(schema *jsonschema.Schema) error {
 	var (
 		nodeSchemas = map[string]*jsonschema.Schema{}
 		typeNodes   = map[string]shared.SpecNode{
@@ -179,45 +177,45 @@ func (o SpecOptions) ExtendSchemaWithContext(ctx context.Context, schema *jsonsc
 				return err
 			}
 
-			switch node := node.(type) {
+			var callTypeSchema *sharedv1beta1.TypeSchema
+			switch node.(type) {
 			case *flowv1beta1.Connection:
 				if services, ok := nodeSchema.Properties.Load("services"); ok && services.Items != nil {
-					var names []string
-					o.Resolver.RangeServices(func(sd protoreflect.ServiceDescriptor) bool {
-						name := string(sd.FullName())
-						if !slices.Contains(names, name) {
-							names = append(names, name)
-						}
-						return true
-					})
-					services.Items.Enum = util.AnySlice(names)
+					services.Items.Enum = util.AnySlice(spec.ValidConnectionServices(o.Resolver))
 				}
-			case *flowv1beta1.Action, *flowv1beta1.Stream:
-				typeSchema, err := o.Syncer.GetType("dtkt.flow.v1beta1.MethodCall")
+			case *flowv1beta1.Action:
+				callTypeSchema, err = o.Syncer.GetType("dtkt.flow.v1beta1.Action.MethodCall")
 				if err != nil {
 					return fmt.Errorf("failed to load service call schema: %s", err)
 				}
+			case *flowv1beta1.Stream:
+				callTypeSchema, err = o.Syncer.GetType("dtkt.flow.v1beta1.Stream.MethodCall")
+				if err != nil {
+					return fmt.Errorf("failed to load service call schema: %s", err)
+				}
+			}
 
-				b, err := encoding.ToJSONV2(typeSchema.JsonSchema)
+			if callTypeSchema != nil {
+				b, err := encoding.ToJSONV2(callTypeSchema.JsonSchema)
 				if err != nil {
 					return err
 				}
 
-				var callSchema jsonschema.Schema
-				err = encoding.FromJSONV2(b, &callSchema)
+				var callJsonSchema jsonschema.Schema
+				err = encoding.FromJSONV2(b, &callJsonSchema)
 				if err != nil {
 					return err
 				}
 
 				if callProp, ok := nodeSchema.Properties.Load("call"); ok {
-					if methodProp, ok := callSchema.Properties.Load("method"); ok {
+					if methodProp, ok := callJsonSchema.Properties.Load("method"); ok {
 						methodProp.Enum = util.AnySlice(spec.ValidCallNodeMethods(o.Resolver, node))
 					}
-					schema.Definitions[prefix+".call"] = &callSchema
+					schema.Definitions[prefix+".call"] = &callJsonSchema
 					callProp.Ref = "#/$defs/" + prefix + ".call"
 				}
-				callSchema.ID = ""
-				callSchema.Version = ""
+				callJsonSchema.ID = ""
+				callJsonSchema.Version = ""
 			}
 
 			nodeSchemas[prefix] = &nodeSchema
@@ -263,8 +261,4 @@ func (o SpecOptions) ExtendSchemaWithContext(ctx context.Context, schema *jsonsc
 	schema.Definitions["Spec"] = &specSchema
 
 	return nil
-}
-
-func (o SpecOptions) ExtendSchema(schema *jsonschema.Schema) error {
-	return o.ExtendSchemaWithContext(context.Background(), schema)
 }

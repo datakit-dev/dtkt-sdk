@@ -1,9 +1,7 @@
 package funcs
 
 import (
-	"errors"
 	"fmt"
-	"io"
 
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 	"github.com/google/cel-go/cel"
@@ -17,13 +15,9 @@ func MakeIsEOFFunc() cel.EnvOption {
 	return cel.Function(IsEOFFunc,
 		cel.SingletonFunctionBinding(
 			func(args ...ref.Val) ref.Val {
-				switch val := args[0].Value().(type) {
+				switch args[0].Value().(type) {
 				case *flowv1beta1.Runtime_EOF:
 					return types.True
-				case error:
-					if errors.Is(val, io.EOF) {
-						return types.True
-					}
 				}
 				return types.False
 			},

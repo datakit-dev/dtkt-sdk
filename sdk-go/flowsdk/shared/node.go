@@ -5,6 +5,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/google/cel-go/common/types/ref"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -56,6 +57,10 @@ type (
 		Recv() (RecvFunc, bool)
 		Send() (SendFunc, bool)
 		Eval() (EvalFunc, bool)
+		// HasCached returns the cached value and true if this node has caching
+		// enabled and a value has already been captured. The executor re-uses this
+		// value each cycle instead of waiting for a new external event.
+		HasCached() (ref.Val, bool)
 	}
 )
 
@@ -63,6 +68,10 @@ func IsNodeID(id string) bool {
 	return slices.ContainsFunc(validNodePrefixes, func(prefix string) bool {
 		return strings.HasPrefix(id, prefix+".")
 	}) && len(strings.Split(id, ".")) == 2
+}
+
+func IsNodePrefix(prefix string) bool {
+	return slices.Contains(validNodePrefixes, prefix)
 }
 
 func ParseNodePrefix(ident string) (string, bool) {

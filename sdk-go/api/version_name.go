@@ -2,6 +2,7 @@ package api
 
 import (
 	"path"
+	"sync"
 
 	"buf.build/go/protovalidate"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
@@ -19,6 +20,9 @@ import (
 	_ "google.golang.org/protobuf/types/known/timestamppb"
 	_ "google.golang.org/protobuf/types/known/typepb"
 	_ "google.golang.org/protobuf/types/known/wrapperspb"
+
+	// CoreV1
+	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1"
 
 	// V1Beta1
 	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/action/v1beta1"
@@ -38,13 +42,39 @@ import (
 	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta2"
 )
 
-var _ Version = versionName("")
-
 const (
+	CoreV1  = versionName("core.v1")
 	V1Beta1 = versionName("v1beta1")
+	V1Beta2 = versionName("v1beta2")
 )
 
+var _ Version = versionName("")
+var versionValidators = map[versionName]protovalidate.Validator{}
+var versionMutex sync.Mutex
+
 type versionName string
+
+func (v versionName) GetName() string {
+	return string(v)
+}
+
+func (v versionName) GetValidator() (validator protovalidate.Validator, err error) {
+	versionMutex.Lock()
+	defer versionMutex.Unlock()
+
+	validator, ok := versionValidators[v]
+	if ok {
+		return
+	}
+
+	validator, err = protovalidate.New(protovalidate.WithExtensionTypeResolver(v))
+	if err != nil {
+		return nil, err
+	}
+	versionValidators[v] = validator
+
+	return
+}
 
 func (v versionName) NumFiles() (num int) {
 	v.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
@@ -152,8 +182,33 @@ func (v versionName) RangeMethods(f func(protoreflect.MethodDescriptor) bool) {
 	})
 }
 
-func (v versionName) GetValidator() (protovalidate.Validator, error) {
-	return GlobalValidator()
+func (v versionName) FindEnumByName(name protoreflect.FullName) (protoreflect.EnumType, error) {
+	if IsWellKnownName(name) || VersionContainsName(v, name) {
+		return getGlobalResolver().FindEnumByName(name)
+	}
+	return nil, protoregistry.NotFound
+}
+
+func (v versionName) FindServiceByName(name protoreflect.FullName) (protoreflect.ServiceDescriptor, error) {
+	if IsWellKnownName(name) || VersionContainsName(v, name) {
+		return getGlobalResolver().FindServiceByName(name)
+	}
+	return nil, protoregistry.NotFound
+}
+
+func (v versionName) RangeEnums(f func(protoreflect.EnumType) bool) {
+	getGlobalResolver().RangeEnums(func(et protoreflect.EnumType) bool {
+		if IsWellKnownName(et.Descriptor().FullName()) || VersionContainsName(v, et.Descriptor().FullName()) {
+			return f(et)
+		}
+		return true
+	})
+}
+
+func (v versionName) RangeExtensionsByMessage(name protoreflect.FullName, f func(protoreflect.ExtensionType) bool) {
+	if IsWellKnownName(name) || VersionContainsName(v, name) {
+		getGlobalResolver().RangeExtensionsByMessage(name, f)
+	}
 }
 
 func (versionName) JSONSchema() *jsonschema.Schema {

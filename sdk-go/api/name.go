@@ -32,10 +32,18 @@ func VersionContainsName[T ~string](version Version, name T) bool {
 	if len(matches) < 3 {
 		return false
 	}
+
+	switch version {
+	case CoreV1:
+		if matches[1] == "core" && matches[2] == "v1" {
+			return true
+		}
+	}
+
 	return version.String() == matches[2]
 }
 
-func VersionContainsType(version Version, desc protoreflect.Descriptor) bool {
+func VersionContainsDescriptor(version Version, desc protoreflect.Descriptor) bool {
 	return VersionContainsName(version, desc.FullName())
 }
 

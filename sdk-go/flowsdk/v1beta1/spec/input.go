@@ -3,6 +3,7 @@ package spec
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
@@ -16,7 +17,9 @@ type Input struct {
 	typ  InputType
 
 	defaultVal any
-	cachedVal  ref.Val
+
+	cachedMu  sync.Mutex
+	cachedVal ref.Val
 
 	valueCh chan ref.Val
 }
@@ -67,12 +70,18 @@ func (i *Input) Recv() (shared.RecvFunc, bool) {
 				}
 
 				var refVal ref.Val
-				if i.node.GetCache() && i.cachedVal != nil && i.cachedVal.Value() != nil {
-					refVal = i.cachedVal
-				} else if value == nil && i.node.GetCache() && i.typ.HasDefault() {
-					refVal = env.TypeAdapter().NativeToValue(i.defaultVal)
-				} else if value == nil && i.typ.IsRequired() {
-					continue loop
+				if value == nil {
+					i.cachedMu.Lock()
+					cv := i.cachedVal
+					i.cachedMu.Unlock()
+
+					if i.node.GetCache() && cv != nil {
+						refVal = cv
+					} else if i.typ.HasDefault() {
+						refVal = env.TypeAdapter().NativeToValue(i.defaultVal)
+					} else if i.typ.IsRequired() {
+						continue loop
+					}
 				} else {
 					value, err := i.typ.Validate(value)
 					if err != nil {
@@ -80,6 +89,14 @@ func (i *Input) Recv() (shared.RecvFunc, bool) {
 					}
 
 					refVal = env.TypeAdapter().NativeToValue(value)
+
+					if i.node.GetCache() {
+						i.cachedMu.Lock()
+						if i.cachedVal == nil {
+							i.cachedVal = refVal
+						}
+						i.cachedMu.Unlock()
+					}
 				}
 
 				select {
@@ -90,10 +107,6 @@ func (i *Input) Recv() (shared.RecvFunc, bool) {
 			}
 		}
 	}, true
-}
-
-func (i *Input) Eval() (shared.EvalFunc, bool) {
-	return nil, false
 }
 
 // Send reads the validated value produced by Recv and emits it as an event.
@@ -118,5 +131,20 @@ func (i *Input) Send() (shared.SendFunc, bool) {
 // IsRequired returns true when the input has no default and is not nullable,
 // meaning it must receive an external value before it can emit.
 func (i *Input) IsRequired() bool {
-	return i.typ != nil && i.typ.IsRequired()
+	return i.typ.IsRequired()
 }
+
+// HasCached returns the cached value if caching is enabled and a value has
+// already been captured from an external event. The executor uses this to
+// re-emit the same value each cycle without waiting on a new sendCh event.
+func (i *Input) HasCached() (ref.Val, bool) {
+	i.cachedMu.Lock()
+	cv := i.cachedVal
+	i.cachedMu.Unlock()
+	if i.node.GetCache() && cv != nil {
+		return cv, true
+	}
+	return nil, false
+}
+
+func (i *Input) Eval() (shared.EvalFunc, bool) { return nil, false }

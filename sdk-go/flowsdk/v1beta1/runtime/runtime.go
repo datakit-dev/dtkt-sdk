@@ -36,19 +36,21 @@ func NewFromSpec(ctx context.Context, cancel context.CancelCauseFunc, spec *flow
 }
 
 func NewFromProto(ctx context.Context, cancel context.CancelCauseFunc, proto *flowv1beta1.Runtime, opts ...Option) *Runtime {
+	nodes := RuntimeNodeMap(
+		proto.Actions,
+		proto.Connections,
+		proto.Inputs,
+		proto.Outputs,
+		proto.Streams,
+		proto.Vars,
+	)
+
 	run := &Runtime{
 		proto: proto,
 
-		nodes: RuntimeNodeMap(
-			proto.Actions,
-			proto.Connections,
-			proto.Inputs,
-			proto.Outputs,
-			proto.Streams,
-			proto.Vars,
-		),
+		nodes: nodes,
 		env: sync.OnceValues(func() (*Env, error) {
-			return NewEnv(proto, opts...)
+			return NewEnv(proto, append(opts, WithNodes(nodes))...)
 		}),
 
 		recvChs: map[string]chan any{},
@@ -161,25 +163,7 @@ func (r *Runtime) IsCompleted(id string) bool {
 	return false
 }
 
-func (r *Runtime) GetSendCh(id string) (chan<- ref.Val, error) {
-	return r.getSendCh(id)
-}
-
-func (r *Runtime) GetRecvCh(id string) (<-chan any, error) {
-	return r.getRecvCh(id)
-}
-
-func (r *Runtime) Reset() {
-	r.mut.Lock()
-	defer r.mut.Unlock()
-
-	r.nodes.Range(func(_ string, node *Node) bool {
-		node.Reset()
-		return true
-	})
-}
-
-func (r *Runtime) getSendCh(id string) (chan ref.Val, error) {
+func (r *Runtime) GetSendCh(id string) (chan ref.Val, error) {
 	_, ok := r.nodes.Load(id)
 	if !ok {
 		return nil, fmt.Errorf("method getSendCh: node not found: %q", id)
@@ -197,7 +181,7 @@ func (r *Runtime) getSendCh(id string) (chan ref.Val, error) {
 	return sendCh, nil
 }
 
-func (r *Runtime) getRecvCh(id string) (chan any, error) {
+func (r *Runtime) GetRecvCh(id string) (chan any, error) {
 	_, ok := r.nodes.Load(id)
 	if !ok {
 		return nil, fmt.Errorf("method getRecvCh: node not found: %q", id)

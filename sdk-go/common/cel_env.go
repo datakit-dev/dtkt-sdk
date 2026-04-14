@@ -17,7 +17,9 @@ var defaultCELOpts = sync.OnceValue(func() []cel.EnvOption {
 		ext.Strings(
 			ext.StringsVersion(4),
 		),
-		CELEnumExt(),
+		CELEnumLib(),
+		CELJSONLib(),
+		CELUUIDLib(),
 	}
 })
 

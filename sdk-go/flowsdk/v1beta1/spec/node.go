@@ -5,28 +5,29 @@ import (
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
-	"github.com/google/cel-go/cel"
 )
 
-func ParseNode(env shared.Env, node shared.SpecNode, visitor shared.NodeVisitFunc) (shared.ExecNode, error) {
-	exprVisitor := func(ast *cel.Ast) {
-		visitor(GetID(node), ast)
-	}
+type ExecNodeCloser interface {
+	shared.ExecNode
+	Close() error
+}
 
+func ParseNode(env shared.Env, node shared.SpecNode, visitor shared.NodeVisitFunc) (shared.ExecNode, error) {
 	switch node := node.(type) {
+	case *flowv1beta1.Action:
+		return NewAction(env, node, visitor)
 	case *flowv1beta1.Connection:
 		return NewConnection(env, node), nil
 	case *flowv1beta1.Input:
 		return NewInput(env, node), nil
-	case *flowv1beta1.Var:
-		return NewVar(env, node, exprVisitor)
-	case *flowv1beta1.Action:
-		return NewAction(env, node, exprVisitor)
 	case *flowv1beta1.Stream:
-		return NewStream(env, node, exprVisitor)
+		return NewStream(env, node, visitor)
 	case *flowv1beta1.Output:
-		return NewOutput(env, node, exprVisitor)
+		return NewOutput(env, node, visitor)
+	case *flowv1beta1.Var:
+		return NewVar(env, node, visitor)
 	}
+
 	return nil, nil
 }
 

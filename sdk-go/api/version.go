@@ -14,7 +14,9 @@ import (
 )
 
 var validVersions = versions{
+	CoreV1,
 	V1Beta1,
+	V1Beta2,
 }
 
 type (
@@ -23,15 +25,22 @@ type (
 		protoregistry.ExtensionTypeResolver
 		protoregistry.MessageTypeResolver
 		FindMethodByName(protoreflect.FullName) (protoreflect.MethodDescriptor, error)
+		GetName() string
 		GetValidator() (protovalidate.Validator, error)
 		NumFiles() int
 		NumFilesByPackage(name protoreflect.FullName) int
-		RangeFiles(f func(protoreflect.FileDescriptor) bool)
+		RangeFiles(func(protoreflect.FileDescriptor) bool)
 		RangeFilesByPackage(name protoreflect.FullName, f func(protoreflect.FileDescriptor) bool)
 		RangeMessages(func(protoreflect.MessageType) bool)
 		RangeMethods(func(protoreflect.MethodDescriptor) bool)
 		RangeServices(func(protoreflect.ServiceDescriptor) bool)
 		String() string
+		FindDescriptorByName(name protoreflect.FullName) (protoreflect.Descriptor, error)
+		FindEnumByName(enum protoreflect.FullName) (protoreflect.EnumType, error)
+		FindFileByPath(path string) (desc protoreflect.FileDescriptor, err error)
+		FindServiceByName(name protoreflect.FullName) (protoreflect.ServiceDescriptor, error)
+		RangeEnums(f func(protoreflect.EnumType) bool)
+		RangeExtensionsByMessage(name protoreflect.FullName, f func(protoreflect.ExtensionType) bool)
 	}
 	versions []Version
 )

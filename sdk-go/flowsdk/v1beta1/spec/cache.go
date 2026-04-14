@@ -6,31 +6,48 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 )
 
-type CacheNode interface {
-	shared.SpecNode
-	GetCache() bool
+type (
+	EvalCache struct {
+		node   CacheNode
+		prog   shared.Program
+		cached ref.Val
+	}
+	CacheNode interface {
+		shared.SpecNode
+		GetCache() bool
+	}
+)
+
+func NewEvalCache(node CacheNode, prog shared.Program) *EvalCache {
+	return &EvalCache{
+		node: node,
+		prog: prog,
+	}
 }
 
-func CacheableEval(node CacheNode, eval shared.Eval) shared.Eval {
-	if !node.GetCache() {
-		return eval
+func (m *EvalCache) HasCached() (ref.Val, bool) {
+	return m.cached, m.node.GetCache() && m.cached != nil
+}
+
+func (m *EvalCache) Eval() (shared.EvalFunc, bool) {
+	if !m.node.GetCache() {
+		return m.prog.Eval, true
 	}
 
-	var cached ref.Val
 	return shared.EvalFunc(func(run shared.Runtime) ref.Val {
-		if cached != nil {
-			return cached
+		if m.cached != nil {
+			return m.cached
 		}
 
-		refVal := eval.Eval(run)
+		refVal := m.prog.Eval(run)
 		if refVal == types.NullValue {
 			return refVal
 		} else if _, ok := refVal.Value().(error); ok {
 			return refVal
 		}
 
-		cached = refVal
+		m.cached = refVal
 
 		return refVal
-	})
+	}), true
 }

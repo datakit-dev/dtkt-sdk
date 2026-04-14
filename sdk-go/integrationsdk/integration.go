@@ -227,23 +227,18 @@ func (i *Integration[C, I]) GetInstance(ctx context.Context) (inst I, err error)
 	return wrap.inst, nil
 }
 
-func (i *Integration[C, I]) GetDataRoot(ctx context.Context) (string, error) {
-	req, err := middleware.RequestFromContext(ctx)
+func (i *Integration[C, I]) GetDataRoot() (string, error) {
+	root := os.Getenv(env.DataRoot)
+	if root != "" {
+		return root, nil
+	}
+
+	root, err := os.UserCacheDir()
 	if err != nil {
 		return "", err
 	}
 
-	root := os.Getenv(env.DataRoot)
-	if root == "" {
-		cacheDir, err := os.UserCacheDir()
-		if err != nil {
-			return "", err
-		}
-
-		root = cacheDir
-	}
-
-	return filepath.Abs(filepath.Join(root, strings.ToLower(i.String()), req.ConfigHash()))
+	return filepath.Join(root, strings.ToLower(i.String())), nil
 }
 
 func (i *Integration[C, I]) Serve() error {

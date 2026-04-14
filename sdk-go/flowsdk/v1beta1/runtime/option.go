@@ -1,6 +1,8 @@
 package runtime
 
-import "github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
+import (
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
+)
 
 type (
 	Option         func(OptionReceiver)
@@ -21,6 +23,14 @@ func WithResolver(resolver shared.Resolver) Option {
 	return func(r OptionReceiver) {
 		if env, ok := r.(*Env); ok {
 			env.resolver = resolver
+		}
+	}
+}
+
+func WithNodes(nodes NodeMap) Option {
+	return func(r OptionReceiver) {
+		if env, ok := r.(*Env); ok {
+			env.nodes = nodes
 		}
 	}
 }

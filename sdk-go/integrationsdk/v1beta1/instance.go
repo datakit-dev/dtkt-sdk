@@ -16,7 +16,7 @@ type (
 		Package() *sharedv1beta1.Package
 		ConfigSchema() *sharedv1beta1.TypeSchema
 		GetInstance(context.Context) (I, error)
-		GetDataRoot(context.Context) (string, error)
+		GetDataRoot() (string, error)
 		Types() *TypeRegistry
 		Actions() *ActionRegistry
 		Events() *EventRegistry

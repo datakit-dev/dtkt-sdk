@@ -18,6 +18,7 @@ const (
 	LogLevel       = "DTKT_LOG_LEVEL"
 	LogSource      = "DTKT_LOG_SOURCE"
 	Network        = "DTKT_NETWORK"
+	PIDFile        = "DTKT_PID_FILE"
 )
 
 // getVars
@@ -34,6 +35,7 @@ var getVars = sync.OnceValue(func() Vars {
 		LogLevel:       os.Getenv(LogLevel),
 		LogSource:      os.Getenv(LogSource),
 		Network:        os.Getenv(Network),
+		PIDFile:        os.Getenv(PIDFile),
 	}
 })
 

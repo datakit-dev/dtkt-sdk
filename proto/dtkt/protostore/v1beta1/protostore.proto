@@ -32,10 +32,3 @@ message Edge {
   optional bool required = 3;
   optional string field = 4;
 }
-
-// message Index {
-//   oneof type {
-//     string semantic_expression = 1;
-//     string lexical_expression = 2;
-//   }
-// }

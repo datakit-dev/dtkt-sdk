@@ -9,6 +9,7 @@ package flowv1beta1
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	expr "cel.dev/expr"
+	status "google.golang.org/genproto/googleapis/rpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -77,7 +78,7 @@ func (x Node_State) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Node_State.Descriptor instead.
 func (Node_State) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{4, 0}
+	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{3, 0}
 }
 
 type Runtime struct {
@@ -216,50 +217,6 @@ func (x *Graph) GetEdges() []*Edge {
 	return nil
 }
 
-type Groups struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Groups        []*Groups_Group        `protobuf:"bytes,1,rep,name=groups,proto3" json:"groups,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Groups) Reset() {
-	*x = Groups{}
-	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Groups) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Groups) ProtoMessage() {}
-
-func (x *Groups) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Groups.ProtoReflect.Descriptor instead.
-func (*Groups) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *Groups) GetGroups() []*Groups_Group {
-	if x != nil {
-		return x.Groups
-	}
-	return nil
-}
-
 type Edge struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Source        string                 `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
@@ -270,7 +227,7 @@ type Edge struct {
 
 func (x *Edge) Reset() {
 	*x = Edge{}
-	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[3]
+	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -282,7 +239,7 @@ func (x *Edge) String() string {
 func (*Edge) ProtoMessage() {}
 
 func (x *Edge) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[3]
+	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -295,7 +252,7 @@ func (x *Edge) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Edge.ProtoReflect.Descriptor instead.
 func (*Edge) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{3}
+	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Edge) GetSource() string {
@@ -313,12 +270,16 @@ func (x *Edge) GetTarget() string {
 }
 
 type Node struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
-	Id         string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	State      Node_State             `protobuf:"varint,2,opt,name=state,proto3,enum=dtkt.flow.v1beta1.Node_State" json:"state,omitempty"`
-	CallCount  uint64                 `protobuf:"varint,4,opt,name=call_count,json=callCount,proto3" json:"call_count,omitempty"`
-	PrevValue  *expr.Value            `protobuf:"bytes,5,opt,name=prev_value,json=prevValue,proto3" json:"prev_value,omitempty"`
-	CurrValue  *expr.Value            `protobuf:"bytes,6,opt,name=curr_value,json=currValue,proto3" json:"curr_value,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Id        string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	State     Node_State             `protobuf:"varint,2,opt,name=state,proto3,enum=dtkt.flow.v1beta1.Node_State" json:"state,omitempty"`
+	Count     uint64                 `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`
+	PrevValue *expr.Value            `protobuf:"bytes,4,opt,name=prev_value,json=prevValue,proto3" json:"prev_value,omitempty"`
+	// Types that are valid to be assigned to Result:
+	//
+	//	*Node_Value
+	//	*Node_Error
+	Result     isNode_Result          `protobuf_oneof:"result"`
 	StartTime  *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	FinishTime *timestamppb.Timestamp `protobuf:"bytes,21,opt,name=finish_time,json=finishTime,proto3" json:"finish_time,omitempty"`
 	// Types that are valid to be assigned to Type:
@@ -336,7 +297,7 @@ type Node struct {
 
 func (x *Node) Reset() {
 	*x = Node{}
-	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[4]
+	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -348,7 +309,7 @@ func (x *Node) String() string {
 func (*Node) ProtoMessage() {}
 
 func (x *Node) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[4]
+	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -361,7 +322,7 @@ func (x *Node) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Node.ProtoReflect.Descriptor instead.
 func (*Node) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{4}
+	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Node) GetId() string {
@@ -378,9 +339,9 @@ func (x *Node) GetState() Node_State {
 	return Node_STATE_UNSPECIFIED
 }
 
-func (x *Node) GetCallCount() uint64 {
+func (x *Node) GetCount() uint64 {
 	if x != nil {
-		return x.CallCount
+		return x.Count
 	}
 	return 0
 }
@@ -392,9 +353,27 @@ func (x *Node) GetPrevValue() *expr.Value {
 	return nil
 }
 
-func (x *Node) GetCurrValue() *expr.Value {
+func (x *Node) GetResult() isNode_Result {
 	if x != nil {
-		return x.CurrValue
+		return x.Result
+	}
+	return nil
+}
+
+func (x *Node) GetValue() *expr.Value {
+	if x != nil {
+		if x, ok := x.Result.(*Node_Value); ok {
+			return x.Value
+		}
+	}
+	return nil
+}
+
+func (x *Node) GetError() *status.Status {
+	if x != nil {
+		if x, ok := x.Result.(*Node_Error); ok {
+			return x.Error
+		}
 	}
 	return nil
 }
@@ -474,6 +453,22 @@ func (x *Node) GetStream() *Stream {
 	return nil
 }
 
+type isNode_Result interface {
+	isNode_Result()
+}
+
+type Node_Value struct {
+	Value *expr.Value `protobuf:"bytes,5,opt,name=value,proto3,oneof"`
+}
+
+type Node_Error struct {
+	Error *status.Status `protobuf:"bytes,6,opt,name=error,proto3,oneof"`
+}
+
+func (*Node_Value) isNode_Result() {}
+
+func (*Node_Error) isNode_Result() {}
+
 type isNode_Type interface {
 	isNode_Type()
 }
@@ -525,7 +520,7 @@ type Runtime_Done struct {
 
 func (x *Runtime_Done) Reset() {
 	*x = Runtime_Done{}
-	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[5]
+	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -537,7 +532,7 @@ func (x *Runtime_Done) String() string {
 func (*Runtime_Done) ProtoMessage() {}
 
 func (x *Runtime_Done) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[5]
+	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -582,7 +577,7 @@ type Runtime_EOF struct {
 
 func (x *Runtime_EOF) Reset() {
 	*x = Runtime_EOF{}
-	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[6]
+	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -594,7 +589,7 @@ func (x *Runtime_EOF) String() string {
 func (*Runtime_EOF) ProtoMessage() {}
 
 func (x *Runtime_EOF) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[6]
+	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -610,55 +605,11 @@ func (*Runtime_EOF) Descriptor() ([]byte, []int) {
 	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{0, 1}
 }
 
-type Groups_Group struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ids           []string               `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Groups_Group) Reset() {
-	*x = Groups_Group{}
-	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Groups_Group) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Groups_Group) ProtoMessage() {}
-
-func (x *Groups_Group) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Groups_Group.ProtoReflect.Descriptor instead.
-func (*Groups_Group) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{2, 0}
-}
-
-func (x *Groups_Group) GetIds() []string {
-	if x != nil {
-		return x.Ids
-	}
-	return nil
-}
-
 var File_dtkt_flow_v1beta1_eval_proto protoreflect.FileDescriptor
 
 const file_dtkt_flow_v1beta1_eval_proto_rawDesc = "" +
 	"\n" +
-	"\x1cdtkt/flow/v1beta1/eval.proto\x12\x11dtkt.flow.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x14cel/expr/value.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xeb\a\n" +
+	"\x1cdtkt/flow/v1beta1/eval.proto\x12\x11dtkt.flow.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x14cel/expr/value.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\"\xeb\a\n" +
 	"\aRuntime\x12M\n" +
 	"\vconnections\x18\x01 \x03(\v2+.dtkt.flow.v1beta1.Runtime.ConnectionsEntryR\vconnections\x12>\n" +
 	"\x06inputs\x18\x02 \x03(\v2&.dtkt.flow.v1beta1.Runtime.InputsEntryR\x06inputs\x128\n" +
@@ -691,40 +642,36 @@ const file_dtkt_flow_v1beta1_eval_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\v2\x17.dtkt.flow.v1beta1.NodeR\x05value:\x028\x01\"e\n" +
 	"\x05Graph\x12-\n" +
 	"\x05nodes\x18\x01 \x03(\v2\x17.dtkt.flow.v1beta1.NodeR\x05nodes\x12-\n" +
-	"\x05edges\x18\x02 \x03(\v2\x17.dtkt.flow.v1beta1.EdgeR\x05edges\"p\n" +
-	"\x06Groups\x12A\n" +
-	"\x06groups\x18\x01 \x03(\v2\x1f.dtkt.flow.v1beta1.Groups.GroupB\b\xbaH\x05\x92\x01\x02\b\x01R\x06groups\x1a#\n" +
-	"\x05Group\x12\x1a\n" +
-	"\x03ids\x18\x01 \x03(\tB\b\xbaH\x05\x92\x01\x02\b\x01R\x03ids\"\xe2\x01\n" +
+	"\x05edges\x18\x02 \x03(\v2\x17.dtkt.flow.v1beta1.EdgeR\x05edges\"\xe2\x01\n" +
 	"\x04Edge\x12l\n" +
 	"\x06source\x18\x01 \x01(\tBT\xbaHQ\xc8\x01\x01rL2J^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x06source\x12l\n" +
-	"\x06target\x18\x02 \x01(\tBT\xbaHQ\xc8\x01\x01rL2J^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x06target\"\xbc\x06\n" +
+	"\x06target\x18\x02 \x01(\tBT\xbaHQ\xc8\x01\x01rL2J^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x06target\"\xe9\x06\n" +
 	"\x04Node\x12d\n" +
 	"\x02id\x18\x01 \x01(\tBT\xbaHQ\xc8\x01\x01rL2J^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x02id\x123\n" +
-	"\x05state\x18\x02 \x01(\x0e2\x1d.dtkt.flow.v1beta1.Node.StateR\x05state\x12\x1d\n" +
+	"\x05state\x18\x02 \x01(\x0e2\x1d.dtkt.flow.v1beta1.Node.StateR\x05state\x12\x14\n" +
+	"\x05count\x18\x03 \x01(\x04R\x05count\x12.\n" +
 	"\n" +
-	"call_count\x18\x04 \x01(\x04R\tcallCount\x12.\n" +
-	"\n" +
-	"prev_value\x18\x05 \x01(\v2\x0f.cel.expr.ValueR\tprevValue\x12.\n" +
-	"\n" +
-	"curr_value\x18\x06 \x01(\v2\x0f.cel.expr.ValueR\tcurrValue\x129\n" +
+	"prev_value\x18\x04 \x01(\v2\x0f.cel.expr.ValueR\tprevValue\x12'\n" +
+	"\x05value\x18\x05 \x01(\v2\x0f.cel.expr.ValueH\x00R\x05value\x12*\n" +
+	"\x05error\x18\x06 \x01(\v2\x12.google.rpc.StatusH\x00R\x05error\x129\n" +
 	"\n" +
 	"start_time\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x12;\n" +
 	"\vfinish_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"finishTime\x12?\n" +
 	"\n" +
-	"connection\x18\a \x01(\v2\x1d.dtkt.flow.v1beta1.ConnectionH\x00R\n" +
+	"connection\x18\a \x01(\v2\x1d.dtkt.flow.v1beta1.ConnectionH\x01R\n" +
 	"connection\x120\n" +
-	"\x05input\x18\b \x01(\v2\x18.dtkt.flow.v1beta1.InputH\x00R\x05input\x12*\n" +
-	"\x03var\x18\t \x01(\v2\x16.dtkt.flow.v1beta1.VarH\x00R\x03var\x123\n" +
-	"\x06action\x18\v \x01(\v2\x19.dtkt.flow.v1beta1.ActionH\x00R\x06action\x123\n" +
-	"\x06output\x18\r \x01(\v2\x19.dtkt.flow.v1beta1.OutputH\x00R\x06output\x123\n" +
-	"\x06stream\x18\x0e \x01(\v2\x19.dtkt.flow.v1beta1.StreamH\x00R\x06stream\"U\n" +
+	"\x05input\x18\b \x01(\v2\x18.dtkt.flow.v1beta1.InputH\x01R\x05input\x12*\n" +
+	"\x03var\x18\t \x01(\v2\x16.dtkt.flow.v1beta1.VarH\x01R\x03var\x123\n" +
+	"\x06action\x18\v \x01(\v2\x19.dtkt.flow.v1beta1.ActionH\x01R\x06action\x123\n" +
+	"\x06output\x18\r \x01(\v2\x19.dtkt.flow.v1beta1.OutputH\x01R\x06output\x123\n" +
+	"\x06stream\x18\x0e \x01(\v2\x19.dtkt.flow.v1beta1.StreamH\x01R\x06stream\"U\n" +
 	"\x05State\x12\x15\n" +
 	"\x11STATE_UNSPECIFIED\x10\x00\x12\x11\n" +
 	"\rSTATE_PENDING\x10\x01\x12\x11\n" +
 	"\rSTATE_SUCCESS\x10\x02\x12\x0f\n" +
-	"\vSTATE_ERROR\x10\x03B\r\n" +
+	"\vSTATE_ERROR\x10\x03B\x0f\n" +
+	"\x06result\x12\x05\xbaH\x02\b\x01B\r\n" +
 	"\x04type\x12\x05\xbaH\x02\b\x01B\xd6\x01\n" +
 	"\x17proto.dtkt.flow.v1beta1B\tEvalProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1;flowv1beta1\xa2\x02\x03DFX\xaa\x02\x11Dtkt.Flow.V1beta1\xca\x02\x11Dtkt\\Flow\\V1beta1\xe2\x02\x1dDtkt\\Flow\\V1beta1\\GPBMetadata\xea\x02\x13Dtkt::Flow::V1beta1b\x06proto3"
 
@@ -741,59 +688,58 @@ func file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP() []byte {
 }
 
 var file_dtkt_flow_v1beta1_eval_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_dtkt_flow_v1beta1_eval_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_dtkt_flow_v1beta1_eval_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_dtkt_flow_v1beta1_eval_proto_goTypes = []any{
 	(Node_State)(0),               // 0: dtkt.flow.v1beta1.Node.State
 	(*Runtime)(nil),               // 1: dtkt.flow.v1beta1.Runtime
 	(*Graph)(nil),                 // 2: dtkt.flow.v1beta1.Graph
-	(*Groups)(nil),                // 3: dtkt.flow.v1beta1.Groups
-	(*Edge)(nil),                  // 4: dtkt.flow.v1beta1.Edge
-	(*Node)(nil),                  // 5: dtkt.flow.v1beta1.Node
-	(*Runtime_Done)(nil),          // 6: dtkt.flow.v1beta1.Runtime.Done
-	(*Runtime_EOF)(nil),           // 7: dtkt.flow.v1beta1.Runtime.EOF
-	nil,                           // 8: dtkt.flow.v1beta1.Runtime.ConnectionsEntry
-	nil,                           // 9: dtkt.flow.v1beta1.Runtime.InputsEntry
-	nil,                           // 10: dtkt.flow.v1beta1.Runtime.VarsEntry
-	nil,                           // 11: dtkt.flow.v1beta1.Runtime.ActionsEntry
-	nil,                           // 12: dtkt.flow.v1beta1.Runtime.StreamsEntry
-	nil,                           // 13: dtkt.flow.v1beta1.Runtime.OutputsEntry
-	(*Groups_Group)(nil),          // 14: dtkt.flow.v1beta1.Groups.Group
-	(*expr.Value)(nil),            // 15: cel.expr.Value
-	(*timestamppb.Timestamp)(nil), // 16: google.protobuf.Timestamp
-	(*Connection)(nil),            // 17: dtkt.flow.v1beta1.Connection
-	(*Input)(nil),                 // 18: dtkt.flow.v1beta1.Input
-	(*Var)(nil),                   // 19: dtkt.flow.v1beta1.Var
-	(*Action)(nil),                // 20: dtkt.flow.v1beta1.Action
-	(*Output)(nil),                // 21: dtkt.flow.v1beta1.Output
-	(*Stream)(nil),                // 22: dtkt.flow.v1beta1.Stream
+	(*Edge)(nil),                  // 3: dtkt.flow.v1beta1.Edge
+	(*Node)(nil),                  // 4: dtkt.flow.v1beta1.Node
+	(*Runtime_Done)(nil),          // 5: dtkt.flow.v1beta1.Runtime.Done
+	(*Runtime_EOF)(nil),           // 6: dtkt.flow.v1beta1.Runtime.EOF
+	nil,                           // 7: dtkt.flow.v1beta1.Runtime.ConnectionsEntry
+	nil,                           // 8: dtkt.flow.v1beta1.Runtime.InputsEntry
+	nil,                           // 9: dtkt.flow.v1beta1.Runtime.VarsEntry
+	nil,                           // 10: dtkt.flow.v1beta1.Runtime.ActionsEntry
+	nil,                           // 11: dtkt.flow.v1beta1.Runtime.StreamsEntry
+	nil,                           // 12: dtkt.flow.v1beta1.Runtime.OutputsEntry
+	(*expr.Value)(nil),            // 13: cel.expr.Value
+	(*status.Status)(nil),         // 14: google.rpc.Status
+	(*timestamppb.Timestamp)(nil), // 15: google.protobuf.Timestamp
+	(*Connection)(nil),            // 16: dtkt.flow.v1beta1.Connection
+	(*Input)(nil),                 // 17: dtkt.flow.v1beta1.Input
+	(*Var)(nil),                   // 18: dtkt.flow.v1beta1.Var
+	(*Action)(nil),                // 19: dtkt.flow.v1beta1.Action
+	(*Output)(nil),                // 20: dtkt.flow.v1beta1.Output
+	(*Stream)(nil),                // 21: dtkt.flow.v1beta1.Stream
 }
 var file_dtkt_flow_v1beta1_eval_proto_depIdxs = []int32{
-	8,  // 0: dtkt.flow.v1beta1.Runtime.connections:type_name -> dtkt.flow.v1beta1.Runtime.ConnectionsEntry
-	9,  // 1: dtkt.flow.v1beta1.Runtime.inputs:type_name -> dtkt.flow.v1beta1.Runtime.InputsEntry
-	10, // 2: dtkt.flow.v1beta1.Runtime.vars:type_name -> dtkt.flow.v1beta1.Runtime.VarsEntry
-	11, // 3: dtkt.flow.v1beta1.Runtime.actions:type_name -> dtkt.flow.v1beta1.Runtime.ActionsEntry
-	12, // 4: dtkt.flow.v1beta1.Runtime.streams:type_name -> dtkt.flow.v1beta1.Runtime.StreamsEntry
-	13, // 5: dtkt.flow.v1beta1.Runtime.outputs:type_name -> dtkt.flow.v1beta1.Runtime.OutputsEntry
-	5,  // 6: dtkt.flow.v1beta1.Graph.nodes:type_name -> dtkt.flow.v1beta1.Node
-	4,  // 7: dtkt.flow.v1beta1.Graph.edges:type_name -> dtkt.flow.v1beta1.Edge
-	14, // 8: dtkt.flow.v1beta1.Groups.groups:type_name -> dtkt.flow.v1beta1.Groups.Group
-	0,  // 9: dtkt.flow.v1beta1.Node.state:type_name -> dtkt.flow.v1beta1.Node.State
-	15, // 10: dtkt.flow.v1beta1.Node.prev_value:type_name -> cel.expr.Value
-	15, // 11: dtkt.flow.v1beta1.Node.curr_value:type_name -> cel.expr.Value
-	16, // 12: dtkt.flow.v1beta1.Node.start_time:type_name -> google.protobuf.Timestamp
-	16, // 13: dtkt.flow.v1beta1.Node.finish_time:type_name -> google.protobuf.Timestamp
-	17, // 14: dtkt.flow.v1beta1.Node.connection:type_name -> dtkt.flow.v1beta1.Connection
-	18, // 15: dtkt.flow.v1beta1.Node.input:type_name -> dtkt.flow.v1beta1.Input
-	19, // 16: dtkt.flow.v1beta1.Node.var:type_name -> dtkt.flow.v1beta1.Var
-	20, // 17: dtkt.flow.v1beta1.Node.action:type_name -> dtkt.flow.v1beta1.Action
-	21, // 18: dtkt.flow.v1beta1.Node.output:type_name -> dtkt.flow.v1beta1.Output
-	22, // 19: dtkt.flow.v1beta1.Node.stream:type_name -> dtkt.flow.v1beta1.Stream
-	5,  // 20: dtkt.flow.v1beta1.Runtime.ConnectionsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	5,  // 21: dtkt.flow.v1beta1.Runtime.InputsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	5,  // 22: dtkt.flow.v1beta1.Runtime.VarsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	5,  // 23: dtkt.flow.v1beta1.Runtime.ActionsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	5,  // 24: dtkt.flow.v1beta1.Runtime.StreamsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	5,  // 25: dtkt.flow.v1beta1.Runtime.OutputsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	7,  // 0: dtkt.flow.v1beta1.Runtime.connections:type_name -> dtkt.flow.v1beta1.Runtime.ConnectionsEntry
+	8,  // 1: dtkt.flow.v1beta1.Runtime.inputs:type_name -> dtkt.flow.v1beta1.Runtime.InputsEntry
+	9,  // 2: dtkt.flow.v1beta1.Runtime.vars:type_name -> dtkt.flow.v1beta1.Runtime.VarsEntry
+	10, // 3: dtkt.flow.v1beta1.Runtime.actions:type_name -> dtkt.flow.v1beta1.Runtime.ActionsEntry
+	11, // 4: dtkt.flow.v1beta1.Runtime.streams:type_name -> dtkt.flow.v1beta1.Runtime.StreamsEntry
+	12, // 5: dtkt.flow.v1beta1.Runtime.outputs:type_name -> dtkt.flow.v1beta1.Runtime.OutputsEntry
+	4,  // 6: dtkt.flow.v1beta1.Graph.nodes:type_name -> dtkt.flow.v1beta1.Node
+	3,  // 7: dtkt.flow.v1beta1.Graph.edges:type_name -> dtkt.flow.v1beta1.Edge
+	0,  // 8: dtkt.flow.v1beta1.Node.state:type_name -> dtkt.flow.v1beta1.Node.State
+	13, // 9: dtkt.flow.v1beta1.Node.prev_value:type_name -> cel.expr.Value
+	13, // 10: dtkt.flow.v1beta1.Node.value:type_name -> cel.expr.Value
+	14, // 11: dtkt.flow.v1beta1.Node.error:type_name -> google.rpc.Status
+	15, // 12: dtkt.flow.v1beta1.Node.start_time:type_name -> google.protobuf.Timestamp
+	15, // 13: dtkt.flow.v1beta1.Node.finish_time:type_name -> google.protobuf.Timestamp
+	16, // 14: dtkt.flow.v1beta1.Node.connection:type_name -> dtkt.flow.v1beta1.Connection
+	17, // 15: dtkt.flow.v1beta1.Node.input:type_name -> dtkt.flow.v1beta1.Input
+	18, // 16: dtkt.flow.v1beta1.Node.var:type_name -> dtkt.flow.v1beta1.Var
+	19, // 17: dtkt.flow.v1beta1.Node.action:type_name -> dtkt.flow.v1beta1.Action
+	20, // 18: dtkt.flow.v1beta1.Node.output:type_name -> dtkt.flow.v1beta1.Output
+	21, // 19: dtkt.flow.v1beta1.Node.stream:type_name -> dtkt.flow.v1beta1.Stream
+	4,  // 20: dtkt.flow.v1beta1.Runtime.ConnectionsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	4,  // 21: dtkt.flow.v1beta1.Runtime.InputsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	4,  // 22: dtkt.flow.v1beta1.Runtime.VarsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	4,  // 23: dtkt.flow.v1beta1.Runtime.ActionsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	4,  // 24: dtkt.flow.v1beta1.Runtime.StreamsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	4,  // 25: dtkt.flow.v1beta1.Runtime.OutputsEntry.value:type_name -> dtkt.flow.v1beta1.Node
 	26, // [26:26] is the sub-list for method output_type
 	26, // [26:26] is the sub-list for method input_type
 	26, // [26:26] is the sub-list for extension type_name
@@ -807,7 +753,9 @@ func file_dtkt_flow_v1beta1_eval_proto_init() {
 		return
 	}
 	file_dtkt_flow_v1beta1_spec_proto_init()
-	file_dtkt_flow_v1beta1_eval_proto_msgTypes[4].OneofWrappers = []any{
+	file_dtkt_flow_v1beta1_eval_proto_msgTypes[3].OneofWrappers = []any{
+		(*Node_Value)(nil),
+		(*Node_Error)(nil),
 		(*Node_Connection)(nil),
 		(*Node_Input)(nil),
 		(*Node_Var)(nil),
@@ -821,7 +769,7 @@ func file_dtkt_flow_v1beta1_eval_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_flow_v1beta1_eval_proto_rawDesc), len(file_dtkt_flow_v1beta1_eval_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   14,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

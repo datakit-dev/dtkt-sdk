@@ -16,7 +16,7 @@ import (
 )
 
 type Graph struct {
-	dag   graphlib.Graph[string, *flowv1beta1.Node]
+	graphlib.Graph[string, *flowv1beta1.Node]
 	proto *flowv1beta1.Graph
 
 	groups  [][]string
@@ -26,28 +26,28 @@ type Graph struct {
 	errors []error
 }
 
-func NewGraph(env *Env, nodes NodeMap) (*Graph, error) {
+func NewGraph(env *Env) (*Graph, error) {
 	graph := &Graph{
 		proto: &flowv1beta1.Graph{
-			Nodes: nodes.Protos(),
+			Nodes: env.nodes.Protos(),
 		},
 		forward: make(map[string][]string),
 		reverse: make(map[string][]string),
 	}
-	graph.dag = graphlib.NewWithStore(
+	graph.Graph = graphlib.NewWithStore(
 		GetNodeID,
 		graph,
 		graphlib.Directed(),
 		graphlib.PreventCycles(),
 	)
 
-	err := nodes.Parse(env, GraphVisitor(graph))
+	err := env.nodes.Parse(env, graph.Visit)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, node := range nodes {
-		err := graph.dag.AddVertex(node.proto)
+	for _, node := range env.nodes {
+		err := graph.Graph.AddVertex(node.proto)
 		if err != nil {
 			return nil, fmt.Errorf("add graph vertex: %w", err)
 		}
@@ -57,7 +57,7 @@ func NewGraph(env *Env, nodes NodeMap) (*Graph, error) {
 		return nil, fmt.Errorf("build graph error: %w", graph.Error())
 	}
 
-	err = graph.Build(env)
+	err = graph.Build()
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func GraphFromRuntime(run *Runtime) (*Graph, error) {
 		return nil, err
 	}
 
-	return NewGraph(env, run.nodes)
+	return NewGraph(env)
 }
 
 func GraphFromSpec(spec *flowv1beta1.Flow, opts ...Option) (*Graph, error) {
@@ -81,57 +81,48 @@ func GraphFromSpec(spec *flowv1beta1.Flow, opts ...Option) (*Graph, error) {
 		return nil, err
 	}
 
-	return NewGraph(env,
-		RuntimeNodeMap(
-			run.Actions,
-			run.Connections,
-			run.Inputs,
-			run.Outputs,
-			run.Streams,
-			run.Vars,
-		),
-	)
+	return NewGraph(env)
 }
 
-func GraphVisitor(graph *Graph) shared.NodeVisitFunc {
-	return func(target string, expr *cel.Ast) {
-		ast.PreOrderVisit(ast.NavigateAST(expr.NativeRep()), ast.NewExprVisitor(func(expr ast.Expr) {
-			switch expr.Kind() {
-			case ast.SelectKind:
-				// SelectKind represents a field selection expression.
-				if expr.AsSelect().Operand().Kind() == ast.IdentKind {
-					source := fmt.Sprintf("%s.%s", expr.AsSelect().Operand().AsIdent(), expr.AsSelect().FieldName())
-					if shared.IsNodeID(source) {
-						if err := shared.IsValidEdge(source, target); err != nil {
-							graph.AddError(err)
-						} else if err = graph.dag.AddEdge(source, target); err != nil {
-							if !errors.Is(err, graphlib.ErrEdgeAlreadyExists) {
-								graph.AddError(err)
-							}
+func (g *Graph) Visit(target string, expr *cel.Ast) {
+	ast.PreOrderVisit(ast.NavigateAST(expr.NativeRep()), ast.NewExprVisitor(func(expr ast.Expr) {
+		switch expr.Kind() {
+		case ast.SelectKind:
+			// SelectKind represents a field selection expression.
+			if expr.AsSelect().Operand().Kind() == ast.IdentKind {
+				source := fmt.Sprintf("%s.%s", expr.AsSelect().Operand().AsIdent(), expr.AsSelect().FieldName())
+				if shared.IsNodeID(source) {
+					if err := shared.IsValidEdge(source, target); err != nil {
+						g.AddError(err)
+					} else if err = g.Graph.AddEdge(source, target); err != nil {
+						if !errors.Is(err, graphlib.ErrEdgeAlreadyExists) {
+							g.AddError(err)
 						}
 					}
 				}
 			}
-		}))
-	}
+		}
+	}))
 }
 
-func (g *Graph) Build(env *Env) (err error) {
-	g.dag, err = graphlib.TransitiveReduction(g.dag)
-	if err != nil {
-		return err
-	}
-
+func (g *Graph) Build() (err error) {
 	err = g.computePreds()
 	if err != nil {
 		return err
 	}
 
-	return g.computeGroups()
+	err = g.computeGroups()
+	if err != nil {
+		return err
+	}
+
+	g.Graph, err = graphlib.TransitiveReduction(g.Graph)
+
+	return
 }
 
 func (g *Graph) computePreds() error {
-	preds, err := g.dag.PredecessorMap()
+	preds, err := g.Graph.PredecessorMap()
 	if err != nil {
 		return err
 	}
@@ -149,7 +140,7 @@ func (g *Graph) computePreds() error {
 func (g *Graph) computeGroups() error {
 	// Use topological ordering to group independent nodes
 	// Get all nodes in topological order
-	order, err := graphlib.TopologicalSort(g.dag)
+	order, err := graphlib.TopologicalSort(g.Graph)
 	if err != nil {
 		return fmt.Errorf("topological sort error: %w", err)
 	}

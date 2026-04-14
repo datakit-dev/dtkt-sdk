@@ -19,10 +19,6 @@ type (
 	GraphOption func(*graphlib.Traits)
 )
 
-func NewGraph[T any](hash graphlib.Hash[string, T], opts ...GraphOption) *Graph[T] {
-	return NewGraphWithStore(hash, nil, opts...)
-}
-
 func NewGraphWithStore[T any](hash graphlib.Hash[string, T], store graphlib.Store[string, T], opts ...GraphOption) *Graph[T] {
 	opts = append([]GraphOption{
 		graphlib.Directed(),

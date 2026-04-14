@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "cel/expr/value.proto";
 import "dtkt/flow/v1beta1/spec.proto";
 import "google/protobuf/timestamp.proto";
+import "google/rpc/status.proto";
 
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1";
 
@@ -60,10 +61,15 @@ message Node {
 
   State state = 2;
 
-  uint64 call_count = 4;
+  uint64 count = 3;
 
-  cel.expr.Value prev_value = 5;
-  cel.expr.Value curr_value = 6;
+  cel.expr.Value prev_value = 4;
+
+  oneof result {
+    option (buf.validate.oneof).required = true;
+    cel.expr.Value value = 5;
+    google.rpc.Status error = 6;
+  }
 
   google.protobuf.Timestamp start_time = 20;
   google.protobuf.Timestamp finish_time = 21;

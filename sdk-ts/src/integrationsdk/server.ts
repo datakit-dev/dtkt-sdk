@@ -66,9 +66,7 @@ export class Server {
       routes: (router: ConnectRouter) => {
         router.service(BaseService, {
           checkConfig(_: CheckConfigRequest, __: HandlerContext) {
-            return {
-              valid: true,
-            };
+            return {};
           },
         }, {
           jsonOptions: {

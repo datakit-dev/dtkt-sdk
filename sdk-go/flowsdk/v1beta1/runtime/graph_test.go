@@ -19,7 +19,7 @@ func buildGraph(t *testing.T, ids []string, edges [][2]string) *Graph {
 		forward: make(map[string][]string),
 		reverse: make(map[string][]string),
 	}
-	g.dag = graphlib.NewWithStore(
+	g.Graph = graphlib.NewWithStore(
 		GetNodeID,
 		g,
 		graphlib.Directed(),
@@ -33,14 +33,14 @@ func buildGraph(t *testing.T, ids []string, edges [][2]string) *Graph {
 				Var: &flowv1beta1.Var{Id: id, Value: `= "x"`},
 			},
 		}
-		require.NoError(t, g.dag.AddVertex(node))
+		require.NoError(t, g.Graph.AddVertex(node))
 	}
 
 	for _, e := range edges {
-		require.NoError(t, g.dag.AddEdge(e[0], e[1]))
+		require.NoError(t, g.Graph.AddEdge(e[0], e[1]))
 	}
 
-	require.NoError(t, g.Build(&Env{}))
+	require.NoError(t, g.Build())
 	return g
 }
 

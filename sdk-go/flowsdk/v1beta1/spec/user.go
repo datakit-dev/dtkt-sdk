@@ -113,7 +113,7 @@ func ParseUserAction(env shared.Env, action *flowv1beta1.UserAction, visitor sha
 	return nil
 }
 
-func CompileUserAction(run shared.Runtime, action *flowv1beta1.Action) (_ shared.Eval, err error) {
+func CompileUserAction(run shared.Runtime, action *flowv1beta1.Action) (_ shared.Program, err error) {
 	env, err := run.Env()
 	if err != nil {
 		return nil, err
