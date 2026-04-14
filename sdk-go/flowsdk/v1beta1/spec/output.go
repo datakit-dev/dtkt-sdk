@@ -1,12 +1,8 @@
 package spec
 
 import (
-	"log/slog"
-
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/lib/log"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
@@ -20,8 +16,8 @@ type Output struct {
 	eval shared.EvalFunc
 }
 
-func NewOutput(env shared.Env, node *flowv1beta1.Output, visitor shared.ExprVisitFunc) (*Output, error) {
-	expr, err := shared.ParseExpr(env, node.GetValue(), visitor)
+func NewOutput(env shared.Env, node *flowv1beta1.Output, visitor shared.NodeVisitFunc) (*Output, error) {
+	expr, err := shared.ParseExpr(env, node.GetValue(), visitor.ExprVisitor(GetID(node)))
 	if err != nil {
 		return nil, err
 	}
@@ -48,9 +44,6 @@ func (o *Output) Compile(run shared.Runtime) error {
 		if err != nil {
 			return types.WrapErr(err)
 		}
-
-		log.FromCtx(run.Context()).Info(GetID(o.node), slog.Any("value", util.StringFormatAny(value.Value())))
-
 		return value
 	}
 
@@ -68,3 +61,5 @@ func (o *Output) Recv() (shared.RecvFunc, bool) {
 func (o *Output) Send() (shared.SendFunc, bool) {
 	return nil, false
 }
+
+func (o *Output) HasCached() (ref.Val, bool) { return nil, false }

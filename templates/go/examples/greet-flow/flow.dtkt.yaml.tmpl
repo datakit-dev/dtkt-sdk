@@ -27,8 +27,8 @@ spec:
       request:
         name: actions/echo
         input:
-          message: = inputs.message.getValue()
+          message: = inputs.message.value
 
   outputs:
   - id: echo
-    value: = actions.echo.getValue().message
+    value: = actions.echo.value.message

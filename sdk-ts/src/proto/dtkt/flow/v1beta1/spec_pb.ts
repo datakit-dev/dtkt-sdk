@@ -23,7 +23,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dtkt/flow/v1beta1/spec.proto.
  */
 export const file_dtkt_flow_v1beta1_spec: GenFile = /*@__PURE__*/
-  fileDesc("ChxkdGt0L2Zsb3cvdjFiZXRhMS9zcGVjLnByb3RvEhFkdGt0LmZsb3cudjFiZXRhMSLDAgoERmxvdxIUCgRuYW1lGAEgASgJQga6SAPIAQESHQoLZGVzY3JpcHRpb24YAiABKAlCCIK1GAQqAggBEjIKC2Nvbm5lY3Rpb25zGAMgAygLMh0uZHRrdC5mbG93LnYxYmV0YTEuQ29ubmVjdGlvbhIoCgZpbnB1dHMYBCADKAsyGC5kdGt0LmZsb3cudjFiZXRhMS5JbnB1dBIkCgR2YXJzGAUgAygLMhYuZHRrdC5mbG93LnYxYmV0YTEuVmFyEioKB2FjdGlvbnMYByADKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5BY3Rpb24SKgoHb3V0cHV0cxgJIAMoCzIZLmR0a3QuZmxvdy52MWJldGExLk91dHB1dBIqCgdzdHJlYW1zGAogAygLMhkuZHRrdC5mbG93LnYxYmV0YTEuU3RyZWFtIqEBCgpDb25uZWN0aW9uEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSNgoHcGFja2FnZRgCIAEoCzIlLmR0a3Quc2hhcmVkLnYxYmV0YTEuUGFja2FnZS5JZGVudGl0eRIQCghzZXJ2aWNlcxgDIAMoCToaukgXIhUKB3BhY2thZ2UKCHNlcnZpY2VzEAEi6wQKBUlucHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSEgoFY2FjaGUYAiABKAhIAYgBARInCgRib29sGAMgASgLMhcuZHRrdC5mbG93LnYxYmV0YTEuQm9vbEgAEikKBWJ5dGVzGAQgASgLMhguZHRrdC5mbG93LnYxYmV0YTEuQnl0ZXNIABIrCgZkb3VibGUYBSABKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5Eb3VibGVIABIpCgVmbG9hdBgGIAEoCzIYLmR0a3QuZmxvdy52MWJldGExLkZsb2F0SAASKQoFaW50NjQYByABKAsyGC5kdGt0LmZsb3cudjFiZXRhMS5JbnQ2NEgAEisKBnVpbnQ2NBgIIAEoCzIZLmR0a3QuZmxvdy52MWJldGExLlVpbnQ2NEgAEikKBWludDMyGAkgASgLMhguZHRrdC5m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dC5wcm90b2Zvcm0udjFiZXRhMS5Db25maXJtRWxlbWVudEgAEjUKBWlucHV0GAUgASgLMiQuZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5JbnB1dEVsZW1lbnRIABIzCgRmaWxlGAYgASgLMiMuZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5GaWxlRWxlbWVudEgAEjcKBnNlbGVjdBgHIAEoCzIlLmR0a3QucHJvdG9mb3JtLnYxYmV0YTEuU2VsZWN0RWxlbWVudEgAEkIKDG11bHRpX3NlbGVjdBgIIAEoCzIqLmR0a3QucHJvdG9mb3JtLnYxYmV0YTEuTXVsdGlTZWxlY3RFbGVtZW50SABCEAoHZWxlbWVudBIFukgCCAFCDgoMX2Rlc2NyaXB0aW9uIs0BCgZTd2l0Y2gSIQoFdmFsdWUYASABKAlCErpID8gBAXIKMgheXHM/PVxzPxIsCgRjYXNlGAIgAygLMh4uZHRrdC5mbG93LnYxYmV0YTEuU3dpdGNoLkNhc2USIwoHZGVmYXVsdBgDIAEoCUISukgPyAEBcgoyCF5ccz89XHM/Gk0KBENhc2USIQoFdmFsdWUYASABKAlCErpID8gBAXIKMgheXHM/PVxzPxIiCgZyZXR1cm4YAiABKAlCErpID8gBAXIKMgheXHM/PVxzPyKJAQoGVGlja2VyEjAKBWV2ZXJ5GAEgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uQga6SAPIAQESKgoHaW5pdGlhbBgCIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIhCgV2YWx1ZRgDIAEoCUISukgP2AEBcgoyCF5ccz89XHM/QtYBChdwcm90by5kdGt0LmZsb3cudjFiZXRhMUIJU3BlY1Byb3RvUAFaSmdpdGh1Yi5jb20vZGF0YWtpdC1kZXYvZHRrdC1zZGsvc2RrLWdvL3Byb3RvL2R0a3QvZmxvdy92MWJldGExO2Zsb3d2MWJldGExogIDREZYqgIRRHRrdC5GbG93LlYxYmV0YTHKAhFEdGt0XEZsb3dcVjFiZXRhMeICHUR0a3RcRmxvd1xWMWJldGExXEdQQk1ldGFkYXRh6gITRHRrdDo6Rmxvdzo6VjFiZXRhMWIGcHJvdG8z", [file_buf_validate_validate, file_dtkt_flow_v1beta1_type, file_dtkt_protoform_v1beta1_protoform, file_dtkt_shared_v1beta1_messages, file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_struct]);
+  fileDesc("ChxkdGt0L2Zsb3cvdjFiZXRhMS9zcGVjLnByb3RvEhFkdGt0LmZsb3cudjFiZXRhMSLDAgoERmxvdxIUCgRuYW1lGAEgASgJQga6SAPIAQESHQoLZGVzY3JpcHRpb24YAiABKAlCCIK1GAQqAggBEjIKC2Nvbm5lY3Rpb25zGAMgAygLMh0uZHRrdC5mbG93LnYxYmV0YTEuQ29ubmVjdGlvbhIoCgZpbnB1dHMYBCADKAsyGC5kdGt0LmZsb3cudjFiZXRhMS5JbnB1dBIkCgR2YXJzGAUgAygLMhYuZHRrdC5mbG93LnYxYmV0YTEuVmFyEioKB2FjdGlvbnMYByADKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5BY3Rpb24SKgoHb3V0cHV0cxgJIAMoCzIZLmR0a3QuZmxvdy52MWJldGExLk91dHB1dBIqCgdzdHJlYW1zGAogAygLMhkuZHRrdC5mbG93LnYxYmV0YTEuU3RyZWFtIqEBCgpDb25uZWN0aW9uEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSNgoHcGFja2FnZRgCIAEoCzIlLmR0a3Quc2hhcmVkLnYxYmV0YTEuUGFja2FnZS5JZGVudGl0eRIQCghzZXJ2aWNlcxgDIAMoCToaukgXIhUKB3BhY2thZ2UKCHNlcnZpY2VzEAEi6wQKBUlucHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSEgoFY2FjaGUYAiABKAhIAYgBARInCgRib29sGAMgASgLMhcuZHRrdC5mbG93LnYxYmV0YTEuQm9vbEgAEikKBWJ5dGVzGAQgASgLMhguZHRrdC5mbG93LnYxYmV0YTEuQnl0ZXNIABIrCgZkb3VibGUYBSABKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5Eb3VibGVIABIpCgVmbG9hdBgGIAEoCzIYLmR0a3QuZmxvdy52MWJldGExLkZsb2F0SAASKQoFaW50NjQYByABKAsyGC5kdGt0LmZsb3cudjFiZXRhMS5JbnQ2NEgAEisKBnVpbnQ2NBgIIAEoCzIZLmR0a3QuZmxvdy52MWJldGExLlVpbnQ2NEgAEikKBWludDMyGAkgASgLMhguZHRrdC5mbG93LnYxYmV0YTEuSW50MzJIABIrCgZ1aW50MzIYCiABKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5VaW50MzJIABIrCgZzdHJpbmcYCyABKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5TdHJpbmdIABInCgRsaXN0GAwgASgLMhcuZHRrdC5mbG93LnYxYmV0YTEuTGlzdEgAEiUKA21hcBgNIAEoCzIWLmR0a3QuZmxvdy52MWJldGExLk1hcEgAEi0KB21lc3NhZ2UYDiABKAsyGi5kdGt0LmZsb3cudjFiZXRhMS5NZXNzYWdlSABCDQoEdHlwZRIFukgCCAFCCAoGX2NhY2hlItIDCgZBY3Rpb24SLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10rJBISCgVjYWNoZRgCIAEoCEgAiAEBEjIKBGNhbGwYBSABKAsyJC5kdGt0LmZsb3cudjFiZXRhMS5BY3Rpb24uTWV0aG9kQ2FsbBIrCgR1c2VyGAYgASgLMh0uZHRrdC5mbG93LnYxYmV0YTEuVXNlckFjdGlvbhqEAgoKTWV0aG9kQ2FsbBI1Cgpjb25uZWN0aW9uGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSJgoGbWV0aG9kGAIgASgJQha6SBPIAQFyDjIMW2EtekEtWi5fL10rEicKB3JlcXVlc3QYAyABKAsyFi5nb29nbGUucHJvdG9idWYuVmFsdWUSKQoLaW52b2tlX3doZW4YBCABKAlCD7pIDHIKMgheXHM/PVxzP0gAiAEBEiYKCG9uX2Vycm9yGAUgASgJQg+6SAxyCjIIXlxzPz1ccz9IAYgBAUIOCgxfaW52b2tlX3doZW5CCwoJX29uX2Vycm9yOhO6SBAiDgoEY2FsbAoEdXNlchABQggKBl9jYWNoZSK/BQoGU3RyZWFtEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSKAoKc3RhcnRfd2hlbhgCIAEoCUIPukgMcgoyCF5ccz89XHM/SACIAQESJwoJc3RvcF93aGVuGAMgASgJQg+6SAxyCjIIXlxzPz1ccz9IAYgBARIyCgRjYWxsGAQgASgLMiQuZHRrdC5mbG93LnYxYmV0YTEuU3RyZWFtLk1ldGhvZENhbGwSNQoIZ2VuZXJhdGUYBSABKAsyIy5kdGt0LmZsb3cudjFiZXRhMS5TdHJlYW0uR2VuZXJhdG9yGoICCgpNZXRob2RDYWxsEjUKCmNvbm5lY3Rpb24YASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10rJBImCgZtZXRob2QYAiABKAlCFrpIE8gBAXIOMgxbYS16QS1aLl8vXSsSJwoHcmVxdWVzdBgDIAEoCzIWLmdvb2dsZS5wcm90b2J1Zi5WYWx1ZRInCglzZW5kX3doZW4YBCABKAlCD7pIDHIKMgheXHM/PVxzP0gAiAEBEicKCXJlY3Zfd2hlbhgFIAEoCUIPukgMcgoyCF5ccz89XHM/SAGIAQFCDAoKX3NlbmRfd2hlbkIMCgpfcmVjdl93aGVuGowBCglHZW5lcmF0b3ISMAoFZXZlcnkYASABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CBrpIA8gBARIqCgdpbml0aWFsGAIgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEiEKBXZhbHVlGAMgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz86F7pIFCISCgRjYWxsCghnZW5lcmF0ZRABQg0KC19zdGFydF93aGVuQgwKCl9zdG9wX3doZW4ipwYKClVzZXJBY3Rpb24SMwoGaW5wdXRzGAEgAygLMiMuZHRrdC5mbG93LnYxYmV0YTEuVXNlckFjdGlvbi5JbnB1dBo5Cg5Db25maXJtQmluZGluZxInCgV2YWx1ZRgBIAEoCEIYgrUYFCISCgdBcHByb3ZlEgdEZWNsaW5lGiUKDElucHV0QmluZGluZxIVCgV2YWx1ZRgBIAEoCUIGgrUYAioAGiQKC0ZpbGVCaW5kaW5nEhUKBXZhbHVlGAEgASgMQgaCtRgCMgAaPAoNU2VsZWN0QmluZGluZxIrCgV2YWx1ZRgBIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnlCBoK1GAI6ABpBChJNdWx0aVNlbGVjdEJpbmRpbmcSKwoFdmFsdWUYASADKAsyFC5nb29nbGUucHJvdG9idWYuQW55QgaCtRgCQgAa2gMKBUlucHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSKQoFdGl0bGUYAiABKAlCGrpIF8gBAXISMhBeXHM/KD0pP1xzPyguKikkEjEKC2Rlc2NyaXB0aW9uGAMgASgJQhe6SBRyEjIQXlxzPyg9KT9ccz8oLiopJEgBiAEBEjkKB2NvbmZpcm0YBCABKAsyJi5kdGt0LnByb3RvZm9ybS52MWJldGExLkNvbmZpcm1FbGVtZW50SAASNQoFaW5wdXQYBSABKAsyJC5kdGt0LnByb3RvZm9ybS52MWJldGExLklucHV0RWxlbWVudEgAEjMKBGZpbGUYBiABKAsyIy5kdGt0LnByb3RvZm9ybS52MWJldGExLkZpbGVFbGVtZW50SAASNwoGc2VsZWN0GAcgASgLMiUuZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5TZWxlY3RFbGVtZW50SAASQgoMbXVsdGlfc2VsZWN0GAggASgLMiouZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5NdWx0aVNlbGVjdEVsZW1lbnRIAEIQCgdlbGVtZW50EgW6SAIIAUIOCgxfZGVzY3JpcHRpb24iqAMKA1ZhchItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSskEhIKBWNhY2hlGAIgASgISACIAQESOQoFdmFsdWUYAyABKAlCKrpIJ3IlMgheXHM/PVxzP5ICGCA9IGlucHV0cy5mb28uZ2V0VmFsdWUoKRItCgZzd2l0Y2gYBCABKAsyHS5kdGt0LmZsb3cudjFiZXRhMS5WYXIuU3dpdGNoGtEBCgZTd2l0Y2gSIQoFdmFsdWUYASABKAlCErpID8gBAXIKMgheXHM/PVxzPxIwCgRjYXNlGAIgAygLMiIuZHRrdC5mbG93LnYxYmV0YTEuVmFyLlN3aXRjaC5DYXNlEiMKB2RlZmF1bHQYAyABKAlCErpID8gBAXIKMgheXHM/PVxzPxpNCgRDYXNlEiEKBXZhbHVlGAEgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8SIgoGcmV0dXJuGAIgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz86FrpIEyIRCgV2YWx1ZQoGc3dpdGNoEAFCCAoGX2NhY2hlIloKBk91dHB1dBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSskEiEKBXZhbHVlGAIgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz9C1gEKF3Byb3RvLmR0a3QuZmxvdy52MWJldGExQglTcGVjUHJvdG9QAVpKZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9mbG93L3YxYmV0YTE7Zmxvd3YxYmV0YTGiAgNERliqAhFEdGt0LkZsb3cuVjFiZXRhMcoCEUR0a3RcRmxvd1xWMWJldGEx4gIdRHRrdFxGbG93XFYxYmV0YTFcR1BCTWV0YWRhdGHqAhNEdGt0OjpGbG93OjpWMWJldGExYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_flow_v1beta1_type, file_dtkt_protoform_v1beta1_protoform, file_dtkt_shared_v1beta1_messages, file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_struct]);
 
 /**
  * @generated from message dtkt.flow.v1beta1.Flow
@@ -373,79 +373,6 @@ export const InputSchema: GenMessage<Input, {validType: InputValid}> = /*@__PURE
   messageDesc(file_dtkt_flow_v1beta1_spec, 2);
 
 /**
- * Var is an intermediate value in a Flow used to transform and/or memoize the result of a computation for reuse.
- *
- * @generated from message dtkt.flow.v1beta1.Var
- */
-export type Var = Message<"dtkt.flow.v1beta1.Var"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
-
-  /**
-   * When true var always returns its first non-null memoized value.
-   *
-   * @generated from field: optional bool cache = 2;
-   */
-  cache?: boolean;
-
-  /**
-   * Given expression evaluates to var's memoized value, example: "= inputs.foo.getValue()"
-   *
-   * @generated from field: string value = 3;
-   */
-  value: string;
-
-  /**
-   * Given switch statement's first matching case (otherwise default) evaluates to var's memoized value.
-   *
-   * @generated from field: dtkt.flow.v1beta1.Switch switch = 4;
-   */
-  switch?: Switch;
-};
-
-/**
- * Var is an intermediate value in a Flow used to transform and/or memoize the result of a computation for reuse.
- *
- * @generated from message dtkt.flow.v1beta1.Var
- */
-export type VarValid = Message<"dtkt.flow.v1beta1.Var"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
-
-  /**
-   * When true var always returns its first non-null memoized value.
-   *
-   * @generated from field: optional bool cache = 2;
-   */
-  cache?: boolean;
-
-  /**
-   * Given expression evaluates to var's memoized value, example: "= inputs.foo.getValue()"
-   *
-   * @generated from field: string value = 3;
-   */
-  value: string;
-
-  /**
-   * Given switch statement's first matching case (otherwise default) evaluates to var's memoized value.
-   *
-   * @generated from field: dtkt.flow.v1beta1.Switch switch = 4;
-   */
-  switch?: SwitchValid;
-};
-
-/**
- * Describes the message dtkt.flow.v1beta1.Var.
- * Use `create(VarSchema)` to create a new message.
- */
-export const VarSchema: GenMessage<Var, {validType: VarValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 3);
-
-/**
  * @generated from message dtkt.flow.v1beta1.Action
  */
 export type Action = Message<"dtkt.flow.v1beta1.Action"> & {
@@ -462,24 +389,9 @@ export type Action = Message<"dtkt.flow.v1beta1.Action"> & {
   cache?: boolean;
 
   /**
-   * Execute action when given expression evaluates to true; optional.
-   *
-   * @generated from field: optional string run_if = 3;
+   * @generated from field: dtkt.flow.v1beta1.Action.MethodCall call = 5;
    */
-  runIf?: string;
-
-  /**
-   * Return evaluation of given expression when an error is encountered in call
-   * or user; optional.
-   *
-   * @generated from field: optional string on_error = 4;
-   */
-  onError?: string;
-
-  /**
-   * @generated from field: dtkt.flow.v1beta1.MethodCall call = 5;
-   */
-  call?: MethodCall;
+  call?: Action_MethodCall;
 
   /**
    * @generated from field: dtkt.flow.v1beta1.UserAction user = 6;
@@ -504,24 +416,9 @@ export type ActionValid = Message<"dtkt.flow.v1beta1.Action"> & {
   cache?: boolean;
 
   /**
-   * Execute action when given expression evaluates to true; optional.
-   *
-   * @generated from field: optional string run_if = 3;
+   * @generated from field: dtkt.flow.v1beta1.Action.MethodCall call = 5;
    */
-  runIf?: string;
-
-  /**
-   * Return evaluation of given expression when an error is encountered in call
-   * or user; optional.
-   *
-   * @generated from field: optional string on_error = 4;
-   */
-  onError?: string;
-
-  /**
-   * @generated from field: dtkt.flow.v1beta1.MethodCall call = 5;
-   */
-  call?: MethodCallValid;
+  call?: Action_MethodCallValid;
 
   /**
    * @generated from field: dtkt.flow.v1beta1.UserAction user = 6;
@@ -534,44 +431,84 @@ export type ActionValid = Message<"dtkt.flow.v1beta1.Action"> & {
  * Use `create(ActionSchema)` to create a new message.
  */
 export const ActionSchema: GenMessage<Action, {validType: ActionValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 4);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 3);
 
 /**
- * @generated from message dtkt.flow.v1beta1.Output
+ * @generated from message dtkt.flow.v1beta1.Action.MethodCall
  */
-export type Output = Message<"dtkt.flow.v1beta1.Output"> & {
+export type Action_MethodCall = Message<"dtkt.flow.v1beta1.Action.MethodCall"> & {
   /**
-   * @generated from field: string id = 1;
+   * @generated from field: string connection = 1;
    */
-  id: string;
+  connection: string;
 
   /**
-   * @generated from field: string value = 2;
+   * @generated from field: string method = 2;
    */
-  value: string;
+  method: string;
+
+  /**
+   * @generated from field: google.protobuf.Value request = 3;
+   */
+  request?: Value;
+
+  /**
+   * Invoke method when given expression evaluates to true; optional.
+   *
+   * @generated from field: optional string invoke_when = 4;
+   */
+  invokeWhen?: string;
+
+  /**
+   * If method invocation results in an error return the evaluated result of
+   * given expression; optional.
+   *
+   * @generated from field: optional string on_error = 5;
+   */
+  onError?: string;
 };
 
 /**
- * @generated from message dtkt.flow.v1beta1.Output
+ * @generated from message dtkt.flow.v1beta1.Action.MethodCall
  */
-export type OutputValid = Message<"dtkt.flow.v1beta1.Output"> & {
+export type Action_MethodCallValid = Message<"dtkt.flow.v1beta1.Action.MethodCall"> & {
   /**
-   * @generated from field: string id = 1;
+   * @generated from field: string connection = 1;
    */
-  id: string;
+  connection: string;
 
   /**
-   * @generated from field: string value = 2;
+   * @generated from field: string method = 2;
    */
-  value: string;
+  method: string;
+
+  /**
+   * @generated from field: google.protobuf.Value request = 3;
+   */
+  request?: Value;
+
+  /**
+   * Invoke method when given expression evaluates to true; optional.
+   *
+   * @generated from field: optional string invoke_when = 4;
+   */
+  invokeWhen?: string;
+
+  /**
+   * If method invocation results in an error return the evaluated result of
+   * given expression; optional.
+   *
+   * @generated from field: optional string on_error = 5;
+   */
+  onError?: string;
 };
 
 /**
- * Describes the message dtkt.flow.v1beta1.Output.
- * Use `create(OutputSchema)` to create a new message.
+ * Describes the message dtkt.flow.v1beta1.Action.MethodCall.
+ * Use `create(Action_MethodCallSchema)` to create a new message.
  */
-export const OutputSchema: GenMessage<Output, {validType: OutputValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 5);
+export const Action_MethodCallSchema: GenMessage<Action_MethodCall, {validType: Action_MethodCallValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta1_spec, 3, 0);
 
 /**
  * @generated from message dtkt.flow.v1beta1.Stream
@@ -583,28 +520,28 @@ export type Stream = Message<"dtkt.flow.v1beta1.Stream"> & {
   id: string;
 
   /**
-   * Start stream when expression evaluates to true; optional.
+   * Stream starts when expression evaluates to true; optional.
    *
-   * @generated from field: optional string start_if = 2;
+   * @generated from field: optional string start_when = 2;
    */
-  startIf?: string;
+  startWhen?: string;
 
   /**
-   * Stop stream when expression evaluates to true; optional.
+   * Stream stops when expression evaluates to true; optional.
    *
-   * @generated from field: optional string stop_if = 3;
+   * @generated from field: optional string stop_when = 3;
    */
-  stopIf?: string;
+  stopWhen?: string;
 
   /**
-   * @generated from field: dtkt.flow.v1beta1.MethodCall call = 4;
+   * @generated from field: dtkt.flow.v1beta1.Stream.MethodCall call = 4;
    */
-  call?: MethodCall;
+  call?: Stream_MethodCall;
 
   /**
-   * @generated from field: dtkt.flow.v1beta1.Ticker generate = 5;
+   * @generated from field: dtkt.flow.v1beta1.Stream.Generator generate = 5;
    */
-  generate?: Ticker;
+  generate?: Stream_Generator;
 };
 
 /**
@@ -617,28 +554,28 @@ export type StreamValid = Message<"dtkt.flow.v1beta1.Stream"> & {
   id: string;
 
   /**
-   * Start stream when expression evaluates to true; optional.
+   * Stream starts when expression evaluates to true; optional.
    *
-   * @generated from field: optional string start_if = 2;
+   * @generated from field: optional string start_when = 2;
    */
-  startIf?: string;
+  startWhen?: string;
 
   /**
-   * Stop stream when expression evaluates to true; optional.
+   * Stream stops when expression evaluates to true; optional.
    *
-   * @generated from field: optional string stop_if = 3;
+   * @generated from field: optional string stop_when = 3;
    */
-  stopIf?: string;
+  stopWhen?: string;
 
   /**
-   * @generated from field: dtkt.flow.v1beta1.MethodCall call = 4;
+   * @generated from field: dtkt.flow.v1beta1.Stream.MethodCall call = 4;
    */
-  call?: MethodCallValid;
+  call?: Stream_MethodCallValid;
 
   /**
-   * @generated from field: dtkt.flow.v1beta1.Ticker generate = 5;
+   * @generated from field: dtkt.flow.v1beta1.Stream.Generator generate = 5;
    */
-  generate?: TickerValid;
+  generate?: Stream_GeneratorValid;
 };
 
 /**
@@ -646,12 +583,12 @@ export type StreamValid = Message<"dtkt.flow.v1beta1.Stream"> & {
  * Use `create(StreamSchema)` to create a new message.
  */
 export const StreamSchema: GenMessage<Stream, {validType: StreamValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 6);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 4);
 
 /**
- * @generated from message dtkt.flow.v1beta1.MethodCall
+ * @generated from message dtkt.flow.v1beta1.Stream.MethodCall
  */
-export type MethodCall = Message<"dtkt.flow.v1beta1.MethodCall"> & {
+export type Stream_MethodCall = Message<"dtkt.flow.v1beta1.Stream.MethodCall"> & {
   /**
    * @generated from field: string connection = 1;
    */
@@ -666,12 +603,26 @@ export type MethodCall = Message<"dtkt.flow.v1beta1.MethodCall"> & {
    * @generated from field: google.protobuf.Value request = 3;
    */
   request?: Value;
+
+  /**
+   * Stream sends request when given expression evaluates to true; optional.
+   *
+   * @generated from field: optional string send_when = 4;
+   */
+  sendWhen?: string;
+
+  /**
+   * Stream receives response when given expression evaluates to true; optional.
+   *
+   * @generated from field: optional string recv_when = 5;
+   */
+  recvWhen?: string;
 };
 
 /**
- * @generated from message dtkt.flow.v1beta1.MethodCall
+ * @generated from message dtkt.flow.v1beta1.Stream.MethodCall
  */
-export type MethodCallValid = Message<"dtkt.flow.v1beta1.MethodCall"> & {
+export type Stream_MethodCallValid = Message<"dtkt.flow.v1beta1.Stream.MethodCall"> & {
   /**
    * @generated from field: string connection = 1;
    */
@@ -686,14 +637,75 @@ export type MethodCallValid = Message<"dtkt.flow.v1beta1.MethodCall"> & {
    * @generated from field: google.protobuf.Value request = 3;
    */
   request?: Value;
+
+  /**
+   * Stream sends request when given expression evaluates to true; optional.
+   *
+   * @generated from field: optional string send_when = 4;
+   */
+  sendWhen?: string;
+
+  /**
+   * Stream receives response when given expression evaluates to true; optional.
+   *
+   * @generated from field: optional string recv_when = 5;
+   */
+  recvWhen?: string;
 };
 
 /**
- * Describes the message dtkt.flow.v1beta1.MethodCall.
- * Use `create(MethodCallSchema)` to create a new message.
+ * Describes the message dtkt.flow.v1beta1.Stream.MethodCall.
+ * Use `create(Stream_MethodCallSchema)` to create a new message.
  */
-export const MethodCallSchema: GenMessage<MethodCall, {validType: MethodCallValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 7);
+export const Stream_MethodCallSchema: GenMessage<Stream_MethodCall, {validType: Stream_MethodCallValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta1_spec, 4, 0);
+
+/**
+ * @generated from message dtkt.flow.v1beta1.Stream.Generator
+ */
+export type Stream_Generator = Message<"dtkt.flow.v1beta1.Stream.Generator"> & {
+  /**
+   * @generated from field: google.protobuf.Duration every = 1;
+   */
+  every?: Duration;
+
+  /**
+   * @generated from field: google.protobuf.Duration initial = 2;
+   */
+  initial?: Duration;
+
+  /**
+   * @generated from field: string value = 3;
+   */
+  value: string;
+};
+
+/**
+ * @generated from message dtkt.flow.v1beta1.Stream.Generator
+ */
+export type Stream_GeneratorValid = Message<"dtkt.flow.v1beta1.Stream.Generator"> & {
+  /**
+   * @generated from field: google.protobuf.Duration every = 1;
+   */
+  every: Duration;
+
+  /**
+   * @generated from field: google.protobuf.Duration initial = 2;
+   */
+  initial?: Duration;
+
+  /**
+   * @generated from field: string value = 3;
+   */
+  value: string;
+};
+
+/**
+ * Describes the message dtkt.flow.v1beta1.Stream.Generator.
+ * Use `create(Stream_GeneratorSchema)` to create a new message.
+ */
+export const Stream_GeneratorSchema: GenMessage<Stream_Generator, {validType: Stream_GeneratorValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta1_spec, 4, 1);
 
 /**
  * @generated from message dtkt.flow.v1beta1.UserAction
@@ -720,7 +732,7 @@ export type UserActionValid = Message<"dtkt.flow.v1beta1.UserAction"> & {
  * Use `create(UserActionSchema)` to create a new message.
  */
 export const UserActionSchema: GenMessage<UserAction, {validType: UserActionValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 8);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 5);
 
 /**
  * @generated from message dtkt.flow.v1beta1.UserAction.ConfirmBinding
@@ -739,7 +751,7 @@ export type UserAction_ConfirmBindingValid = UserAction_ConfirmBinding;
  * Use `create(UserAction_ConfirmBindingSchema)` to create a new message.
  */
 export const UserAction_ConfirmBindingSchema: GenMessage<UserAction_ConfirmBinding, {validType: UserAction_ConfirmBindingValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 8, 0);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 0);
 
 /**
  * @generated from message dtkt.flow.v1beta1.UserAction.InputBinding
@@ -758,7 +770,7 @@ export type UserAction_InputBindingValid = UserAction_InputBinding;
  * Use `create(UserAction_InputBindingSchema)` to create a new message.
  */
 export const UserAction_InputBindingSchema: GenMessage<UserAction_InputBinding, {validType: UserAction_InputBindingValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 8, 1);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 1);
 
 /**
  * @generated from message dtkt.flow.v1beta1.UserAction.FileBinding
@@ -777,7 +789,7 @@ export type UserAction_FileBindingValid = UserAction_FileBinding;
  * Use `create(UserAction_FileBindingSchema)` to create a new message.
  */
 export const UserAction_FileBindingSchema: GenMessage<UserAction_FileBinding, {validType: UserAction_FileBindingValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 8, 2);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 2);
 
 /**
  * @generated from message dtkt.flow.v1beta1.UserAction.SelectBinding
@@ -796,7 +808,7 @@ export type UserAction_SelectBindingValid = UserAction_SelectBinding;
  * Use `create(UserAction_SelectBindingSchema)` to create a new message.
  */
 export const UserAction_SelectBindingSchema: GenMessage<UserAction_SelectBinding, {validType: UserAction_SelectBindingValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 8, 3);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 3);
 
 /**
  * @generated from message dtkt.flow.v1beta1.UserAction.MultiSelectBinding
@@ -815,7 +827,7 @@ export type UserAction_MultiSelectBindingValid = UserAction_MultiSelectBinding;
  * Use `create(UserAction_MultiSelectBindingSchema)` to create a new message.
  */
 export const UserAction_MultiSelectBindingSchema: GenMessage<UserAction_MultiSelectBinding, {validType: UserAction_MultiSelectBindingValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 8, 4);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 4);
 
 /**
  * @generated from message dtkt.flow.v1beta1.UserAction.Input
@@ -932,21 +944,94 @@ export type UserAction_InputValid = Message<"dtkt.flow.v1beta1.UserAction.Input"
  * Use `create(UserAction_InputSchema)` to create a new message.
  */
 export const UserAction_InputSchema: GenMessage<UserAction_Input, {validType: UserAction_InputValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 8, 5);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 5);
 
 /**
- * @generated from message dtkt.flow.v1beta1.Switch
+ * Var is an intermediate value in a Flow used to transform and/or memoize the result of a computation for reuse.
+ *
+ * @generated from message dtkt.flow.v1beta1.Var
  */
-export type Switch = Message<"dtkt.flow.v1beta1.Switch"> & {
+export type Var = Message<"dtkt.flow.v1beta1.Var"> & {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * When true var always returns its first non-null memoized value.
+   *
+   * @generated from field: optional bool cache = 2;
+   */
+  cache?: boolean;
+
+  /**
+   * Var evaluates to given expression value.
+   *
+   * @generated from field: string value = 3;
+   */
+  value: string;
+
+  /**
+   * Var evaluates to switch statements first matching case (otherwise default).
+   *
+   * @generated from field: dtkt.flow.v1beta1.Var.Switch switch = 4;
+   */
+  switch?: Var_Switch;
+};
+
+/**
+ * Var is an intermediate value in a Flow used to transform and/or memoize the result of a computation for reuse.
+ *
+ * @generated from message dtkt.flow.v1beta1.Var
+ */
+export type VarValid = Message<"dtkt.flow.v1beta1.Var"> & {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * When true var always returns its first non-null memoized value.
+   *
+   * @generated from field: optional bool cache = 2;
+   */
+  cache?: boolean;
+
+  /**
+   * Var evaluates to given expression value.
+   *
+   * @generated from field: string value = 3;
+   */
+  value: string;
+
+  /**
+   * Var evaluates to switch statements first matching case (otherwise default).
+   *
+   * @generated from field: dtkt.flow.v1beta1.Var.Switch switch = 4;
+   */
+  switch?: Var_SwitchValid;
+};
+
+/**
+ * Describes the message dtkt.flow.v1beta1.Var.
+ * Use `create(VarSchema)` to create a new message.
+ */
+export const VarSchema: GenMessage<Var, {validType: VarValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta1_spec, 6);
+
+/**
+ * @generated from message dtkt.flow.v1beta1.Var.Switch
+ */
+export type Var_Switch = Message<"dtkt.flow.v1beta1.Var.Switch"> & {
   /**
    * @generated from field: string value = 1;
    */
   value: string;
 
   /**
-   * @generated from field: repeated dtkt.flow.v1beta1.Switch.Case case = 2;
+   * @generated from field: repeated dtkt.flow.v1beta1.Var.Switch.Case case = 2;
    */
-  case: Switch_Case[];
+  case: Var_Switch_Case[];
 
   /**
    * @generated from field: string default = 3;
@@ -955,18 +1040,18 @@ export type Switch = Message<"dtkt.flow.v1beta1.Switch"> & {
 };
 
 /**
- * @generated from message dtkt.flow.v1beta1.Switch
+ * @generated from message dtkt.flow.v1beta1.Var.Switch
  */
-export type SwitchValid = Message<"dtkt.flow.v1beta1.Switch"> & {
+export type Var_SwitchValid = Message<"dtkt.flow.v1beta1.Var.Switch"> & {
   /**
    * @generated from field: string value = 1;
    */
   value: string;
 
   /**
-   * @generated from field: repeated dtkt.flow.v1beta1.Switch.Case case = 2;
+   * @generated from field: repeated dtkt.flow.v1beta1.Var.Switch.Case case = 2;
    */
-  case: Switch_CaseValid[];
+  case: Var_Switch_CaseValid[];
 
   /**
    * @generated from field: string default = 3;
@@ -975,16 +1060,16 @@ export type SwitchValid = Message<"dtkt.flow.v1beta1.Switch"> & {
 };
 
 /**
- * Describes the message dtkt.flow.v1beta1.Switch.
- * Use `create(SwitchSchema)` to create a new message.
+ * Describes the message dtkt.flow.v1beta1.Var.Switch.
+ * Use `create(Var_SwitchSchema)` to create a new message.
  */
-export const SwitchSchema: GenMessage<Switch, {validType: SwitchValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 9);
+export const Var_SwitchSchema: GenMessage<Var_Switch, {validType: Var_SwitchValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta1_spec, 6, 0);
 
 /**
- * @generated from message dtkt.flow.v1beta1.Switch.Case
+ * @generated from message dtkt.flow.v1beta1.Var.Switch.Case
  */
-export type Switch_Case = Message<"dtkt.flow.v1beta1.Switch.Case"> & {
+export type Var_Switch_Case = Message<"dtkt.flow.v1beta1.Var.Switch.Case"> & {
   /**
    * @generated from field: string value = 1;
    */
@@ -997,9 +1082,9 @@ export type Switch_Case = Message<"dtkt.flow.v1beta1.Switch.Case"> & {
 };
 
 /**
- * @generated from message dtkt.flow.v1beta1.Switch.Case
+ * @generated from message dtkt.flow.v1beta1.Var.Switch.Case
  */
-export type Switch_CaseValid = Message<"dtkt.flow.v1beta1.Switch.Case"> & {
+export type Var_Switch_CaseValid = Message<"dtkt.flow.v1beta1.Var.Switch.Case"> & {
   /**
    * @generated from field: string value = 1;
    */
@@ -1012,56 +1097,46 @@ export type Switch_CaseValid = Message<"dtkt.flow.v1beta1.Switch.Case"> & {
 };
 
 /**
- * Describes the message dtkt.flow.v1beta1.Switch.Case.
- * Use `create(Switch_CaseSchema)` to create a new message.
+ * Describes the message dtkt.flow.v1beta1.Var.Switch.Case.
+ * Use `create(Var_Switch_CaseSchema)` to create a new message.
  */
-export const Switch_CaseSchema: GenMessage<Switch_Case, {validType: Switch_CaseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 9, 0);
+export const Var_Switch_CaseSchema: GenMessage<Var_Switch_Case, {validType: Var_Switch_CaseValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta1_spec, 6, 0, 0);
 
 /**
- * @generated from message dtkt.flow.v1beta1.Ticker
+ * @generated from message dtkt.flow.v1beta1.Output
  */
-export type Ticker = Message<"dtkt.flow.v1beta1.Ticker"> & {
+export type Output = Message<"dtkt.flow.v1beta1.Output"> & {
   /**
-   * @generated from field: google.protobuf.Duration every = 1;
+   * @generated from field: string id = 1;
    */
-  every?: Duration;
+  id: string;
 
   /**
-   * @generated from field: google.protobuf.Duration initial = 2;
-   */
-  initial?: Duration;
-
-  /**
-   * @generated from field: string value = 3;
+   * @generated from field: string value = 2;
    */
   value: string;
 };
 
 /**
- * @generated from message dtkt.flow.v1beta1.Ticker
+ * @generated from message dtkt.flow.v1beta1.Output
  */
-export type TickerValid = Message<"dtkt.flow.v1beta1.Ticker"> & {
+export type OutputValid = Message<"dtkt.flow.v1beta1.Output"> & {
   /**
-   * @generated from field: google.protobuf.Duration every = 1;
+   * @generated from field: string id = 1;
    */
-  every: Duration;
+  id: string;
 
   /**
-   * @generated from field: google.protobuf.Duration initial = 2;
-   */
-  initial?: Duration;
-
-  /**
-   * @generated from field: string value = 3;
+   * @generated from field: string value = 2;
    */
   value: string;
 };
 
 /**
- * Describes the message dtkt.flow.v1beta1.Ticker.
- * Use `create(TickerSchema)` to create a new message.
+ * Describes the message dtkt.flow.v1beta1.Output.
+ * Use `create(OutputSchema)` to create a new message.
  */
-export const TickerSchema: GenMessage<Ticker, {validType: TickerValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 10);
+export const OutputSchema: GenMessage<Output, {validType: OutputValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta1_spec, 7);
 

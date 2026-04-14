@@ -15,15 +15,7 @@ const (
 	switchDefaultId = "switch.default"
 )
 
-func switchCaseId(idx int) string {
-	return fmt.Sprintf("switch.case[%d].value", idx)
-}
-
-func switchReturnId(idx int) string {
-	return fmt.Sprintf("switch.case[%d].return", idx)
-}
-
-func ParseSwitch(env shared.Env, swtch *flowv1beta1.Switch, visitor shared.ExprVisitFunc) error {
+func ParseSwitch(env shared.Env, swtch *flowv1beta1.Var_Switch, visitor shared.ExprVisitFunc) error {
 	if _, err := shared.ParseExpr(env, swtch.GetValue(), visitor); err != nil {
 		return fmt.Errorf("%s parse error: %w", switchExprId, err)
 	}
@@ -43,7 +35,7 @@ func ParseSwitch(env shared.Env, swtch *flowv1beta1.Switch, visitor shared.ExprV
 	return nil
 }
 
-func CompileSwitch(run shared.Runtime, swtch *flowv1beta1.Switch) (shared.Eval, error) {
+func CompileSwitch(run shared.Runtime, swtch *flowv1beta1.Var_Switch) (shared.Program, error) {
 	progMap := map[string]cel.Program{}
 	prg, err := shared.CompileExpr(run, swtch.GetValue())
 	if err != nil {
@@ -76,7 +68,7 @@ func CompileSwitch(run shared.Runtime, swtch *flowv1beta1.Switch) (shared.Eval, 
 	return EvalSwitch(run, swtch, progMap)
 }
 
-func EvalSwitch(run shared.Runtime, swtch *flowv1beta1.Switch, progMap map[string]cel.Program) (shared.Eval, error) {
+func EvalSwitch(run shared.Runtime, swtch *flowv1beta1.Var_Switch, progMap map[string]cel.Program) (shared.Program, error) {
 	env, err := run.Env()
 	if err != nil {
 		return nil, err
@@ -117,4 +109,12 @@ func EvalSwitch(run shared.Runtime, swtch *flowv1beta1.Switch, progMap map[strin
 
 		return nil
 	}), nil
+}
+
+func switchCaseId(idx int) string {
+	return fmt.Sprintf("switch.case[%d].value", idx)
+}
+
+func switchReturnId(idx int) string {
+	return fmt.Sprintf("switch.case[%d].return", idx)
 }

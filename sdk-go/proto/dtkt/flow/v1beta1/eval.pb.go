@@ -11,6 +11,7 @@ package flowv1beta1
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	expr "cel.dev/expr"
+	status "google.golang.org/genproto/googleapis/rpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -74,6 +75,11 @@ func (Node_State) Type() protoreflect.EnumType {
 
 func (x Node_State) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Node_State.Descriptor instead.
+func (Node_State) EnumDescriptor() ([]byte, []int) {
+	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{3, 0}
 }
 
 type Runtime struct {
@@ -250,30 +256,6 @@ func (x *Graph) GetEdges() []*Edge {
 	return nil
 }
 
-func (x *Graph) SetNodes(v []*Node) {
-	x.Nodes = v
-}
-
-func (x *Graph) SetEdges(v []*Edge) {
-	x.Edges = v
-}
-
-type Graph_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	Nodes []*Node
-	Edges []*Edge
-}
-
-func (b0 Graph_builder) Build() *Graph {
-	m0 := &Graph{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.Nodes = b.Nodes
-	x.Edges = b.Edges
-	return m0
-}
-
 type Edge struct {
 	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Source        string                 `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
@@ -305,6 +287,11 @@ func (x *Edge) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Edge.ProtoReflect.Descriptor instead.
+func (*Edge) Descriptor() ([]byte, []int) {
+	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Edge) GetSource() string {
@@ -346,12 +333,16 @@ func (b0 Edge_builder) Build() *Edge {
 }
 
 type Node struct {
-	state      protoimpl.MessageState `protogen:"hybrid.v1"`
-	Id         string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	State      Node_State             `protobuf:"varint,2,opt,name=state,proto3,enum=dtkt.flow.v1beta1.Node_State" json:"state,omitempty"`
-	CallCount  uint64                 `protobuf:"varint,4,opt,name=call_count,json=callCount,proto3" json:"call_count,omitempty"`
-	PrevValue  *expr.Value            `protobuf:"bytes,5,opt,name=prev_value,json=prevValue,proto3" json:"prev_value,omitempty"`
-	CurrValue  *expr.Value            `protobuf:"bytes,6,opt,name=curr_value,json=currValue,proto3" json:"curr_value,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Id        string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	State     Node_State             `protobuf:"varint,2,opt,name=state,proto3,enum=dtkt.flow.v1beta1.Node_State" json:"state,omitempty"`
+	Count     uint64                 `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`
+	PrevValue *expr.Value            `protobuf:"bytes,4,opt,name=prev_value,json=prevValue,proto3" json:"prev_value,omitempty"`
+	// Types that are valid to be assigned to Result:
+	//
+	//	*Node_Value
+	//	*Node_Error
+	Result     isNode_Result          `protobuf_oneof:"result"`
 	StartTime  *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	FinishTime *timestamppb.Timestamp `protobuf:"bytes,21,opt,name=finish_time,json=finishTime,proto3" json:"finish_time,omitempty"`
 	// Types that are valid to be assigned to Type:
@@ -392,6 +383,11 @@ func (x *Node) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
+// Deprecated: Use Node.ProtoReflect.Descriptor instead.
+func (*Node) Descriptor() ([]byte, []int) {
+	return file_dtkt_flow_v1beta1_eval_proto_rawDescGZIP(), []int{3}
+}
+
 func (x *Node) GetId() string {
 	if x != nil {
 		return x.Id
@@ -406,9 +402,9 @@ func (x *Node) GetState() Node_State {
 	return Node_STATE_UNSPECIFIED
 }
 
-func (x *Node) GetCallCount() uint64 {
+func (x *Node) GetCount() uint64 {
 	if x != nil {
-		return x.CallCount
+		return x.Count
 	}
 	return 0
 }
@@ -420,9 +416,27 @@ func (x *Node) GetPrevValue() *expr.Value {
 	return nil
 }
 
-func (x *Node) GetCurrValue() *expr.Value {
+func (x *Node) GetResult() isNode_Result {
 	if x != nil {
-		return x.CurrValue
+		return x.Result
+	}
+	return nil
+}
+
+func (x *Node) GetValue() *expr.Value {
+	if x != nil {
+		if x, ok := x.Result.(*Node_Value); ok {
+			return x.Value
+		}
+	}
+	return nil
+}
+
+func (x *Node) GetError() *status.Status {
+	if x != nil {
+		if x, ok := x.Result.(*Node_Error); ok {
+			return x.Error
+		}
 	}
 	return nil
 }
@@ -502,312 +516,21 @@ func (x *Node) GetStream() *Stream {
 	return nil
 }
 
-func (x *Node) SetId(v string) {
-	x.Id = v
+type isNode_Result interface {
+	isNode_Result()
 }
 
-func (x *Node) SetState(v Node_State) {
-	x.State = v
+type Node_Value struct {
+	Value *expr.Value `protobuf:"bytes,5,opt,name=value,proto3,oneof"`
 }
 
-func (x *Node) SetCallCount(v uint64) {
-	x.CallCount = v
+type Node_Error struct {
+	Error *status.Status `protobuf:"bytes,6,opt,name=error,proto3,oneof"`
 }
 
-func (x *Node) SetPrevValue(v *expr.Value) {
-	x.PrevValue = v
-}
+func (*Node_Value) isNode_Result() {}
 
-func (x *Node) SetCurrValue(v *expr.Value) {
-	x.CurrValue = v
-}
-
-func (x *Node) SetStartTime(v *timestamppb.Timestamp) {
-	x.StartTime = v
-}
-
-func (x *Node) SetFinishTime(v *timestamppb.Timestamp) {
-	x.FinishTime = v
-}
-
-func (x *Node) SetConnection(v *Connection) {
-	if v == nil {
-		x.Type = nil
-		return
-	}
-	x.Type = &Node_Connection{v}
-}
-
-func (x *Node) SetInput(v *Input) {
-	if v == nil {
-		x.Type = nil
-		return
-	}
-	x.Type = &Node_Input{v}
-}
-
-func (x *Node) SetVar(v *Var) {
-	if v == nil {
-		x.Type = nil
-		return
-	}
-	x.Type = &Node_Var{v}
-}
-
-func (x *Node) SetAction(v *Action) {
-	if v == nil {
-		x.Type = nil
-		return
-	}
-	x.Type = &Node_Action{v}
-}
-
-func (x *Node) SetOutput(v *Output) {
-	if v == nil {
-		x.Type = nil
-		return
-	}
-	x.Type = &Node_Output{v}
-}
-
-func (x *Node) SetStream(v *Stream) {
-	if v == nil {
-		x.Type = nil
-		return
-	}
-	x.Type = &Node_Stream{v}
-}
-
-func (x *Node) HasPrevValue() bool {
-	if x == nil {
-		return false
-	}
-	return x.PrevValue != nil
-}
-
-func (x *Node) HasCurrValue() bool {
-	if x == nil {
-		return false
-	}
-	return x.CurrValue != nil
-}
-
-func (x *Node) HasStartTime() bool {
-	if x == nil {
-		return false
-	}
-	return x.StartTime != nil
-}
-
-func (x *Node) HasFinishTime() bool {
-	if x == nil {
-		return false
-	}
-	return x.FinishTime != nil
-}
-
-func (x *Node) HasType() bool {
-	if x == nil {
-		return false
-	}
-	return x.Type != nil
-}
-
-func (x *Node) HasConnection() bool {
-	if x == nil {
-		return false
-	}
-	_, ok := x.Type.(*Node_Connection)
-	return ok
-}
-
-func (x *Node) HasInput() bool {
-	if x == nil {
-		return false
-	}
-	_, ok := x.Type.(*Node_Input)
-	return ok
-}
-
-func (x *Node) HasVar() bool {
-	if x == nil {
-		return false
-	}
-	_, ok := x.Type.(*Node_Var)
-	return ok
-}
-
-func (x *Node) HasAction() bool {
-	if x == nil {
-		return false
-	}
-	_, ok := x.Type.(*Node_Action)
-	return ok
-}
-
-func (x *Node) HasOutput() bool {
-	if x == nil {
-		return false
-	}
-	_, ok := x.Type.(*Node_Output)
-	return ok
-}
-
-func (x *Node) HasStream() bool {
-	if x == nil {
-		return false
-	}
-	_, ok := x.Type.(*Node_Stream)
-	return ok
-}
-
-func (x *Node) ClearPrevValue() {
-	x.PrevValue = nil
-}
-
-func (x *Node) ClearCurrValue() {
-	x.CurrValue = nil
-}
-
-func (x *Node) ClearStartTime() {
-	x.StartTime = nil
-}
-
-func (x *Node) ClearFinishTime() {
-	x.FinishTime = nil
-}
-
-func (x *Node) ClearType() {
-	x.Type = nil
-}
-
-func (x *Node) ClearConnection() {
-	if _, ok := x.Type.(*Node_Connection); ok {
-		x.Type = nil
-	}
-}
-
-func (x *Node) ClearInput() {
-	if _, ok := x.Type.(*Node_Input); ok {
-		x.Type = nil
-	}
-}
-
-func (x *Node) ClearVar() {
-	if _, ok := x.Type.(*Node_Var); ok {
-		x.Type = nil
-	}
-}
-
-func (x *Node) ClearAction() {
-	if _, ok := x.Type.(*Node_Action); ok {
-		x.Type = nil
-	}
-}
-
-func (x *Node) ClearOutput() {
-	if _, ok := x.Type.(*Node_Output); ok {
-		x.Type = nil
-	}
-}
-
-func (x *Node) ClearStream() {
-	if _, ok := x.Type.(*Node_Stream); ok {
-		x.Type = nil
-	}
-}
-
-const Node_Type_not_set_case case_Node_Type = 0
-const Node_Connection_case case_Node_Type = 7
-const Node_Input_case case_Node_Type = 8
-const Node_Var_case case_Node_Type = 9
-const Node_Action_case case_Node_Type = 11
-const Node_Output_case case_Node_Type = 13
-const Node_Stream_case case_Node_Type = 14
-
-func (x *Node) WhichType() case_Node_Type {
-	if x == nil {
-		return Node_Type_not_set_case
-	}
-	switch x.Type.(type) {
-	case *Node_Connection:
-		return Node_Connection_case
-	case *Node_Input:
-		return Node_Input_case
-	case *Node_Var:
-		return Node_Var_case
-	case *Node_Action:
-		return Node_Action_case
-	case *Node_Output:
-		return Node_Output_case
-	case *Node_Stream:
-		return Node_Stream_case
-	default:
-		return Node_Type_not_set_case
-	}
-}
-
-type Node_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	Id         string
-	State      Node_State
-	CallCount  uint64
-	PrevValue  *expr.Value
-	CurrValue  *expr.Value
-	StartTime  *timestamppb.Timestamp
-	FinishTime *timestamppb.Timestamp
-	// Fields of oneof Type:
-	Connection *Connection
-	Input      *Input
-	Var        *Var
-	Action     *Action
-	Output     *Output
-	Stream     *Stream
-	// -- end of Type
-}
-
-func (b0 Node_builder) Build() *Node {
-	m0 := &Node{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.Id = b.Id
-	x.State = b.State
-	x.CallCount = b.CallCount
-	x.PrevValue = b.PrevValue
-	x.CurrValue = b.CurrValue
-	x.StartTime = b.StartTime
-	x.FinishTime = b.FinishTime
-	if b.Connection != nil {
-		x.Type = &Node_Connection{b.Connection}
-	}
-	if b.Input != nil {
-		x.Type = &Node_Input{b.Input}
-	}
-	if b.Var != nil {
-		x.Type = &Node_Var{b.Var}
-	}
-	if b.Action != nil {
-		x.Type = &Node_Action{b.Action}
-	}
-	if b.Output != nil {
-		x.Type = &Node_Output{b.Output}
-	}
-	if b.Stream != nil {
-		x.Type = &Node_Stream{b.Stream}
-	}
-	return m0
-}
-
-type case_Node_Type protoreflect.FieldNumber
-
-func (x case_Node_Type) String() string {
-	md := file_dtkt_flow_v1beta1_eval_proto_msgTypes[3].Descriptor()
-	if x == 0 {
-		return "not set"
-	}
-	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
-}
+func (*Node_Error) isNode_Result() {}
 
 type isNode_Type interface {
 	isNode_Type()
@@ -908,8 +631,11 @@ func (x *Runtime_Done) SetId(v string) {
 	x.Id = v
 }
 
-func (x *Runtime_Done) SetReason(v string) {
-	x.Reason = v
+func (x *Runtime_EOF) Reset() {
+	*x = Runtime_EOF{}
+	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
 }
 
 func (x *Runtime_Done) SetIsError(v bool) {
@@ -918,40 +644,6 @@ func (x *Runtime_Done) SetIsError(v bool) {
 
 type Runtime_Done_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	Id      string
-	Reason  string
-	IsError bool
-}
-
-func (b0 Runtime_Done_builder) Build() *Runtime_Done {
-	m0 := &Runtime_Done{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.Id = b.Id
-	x.Reason = b.Reason
-	x.IsError = b.IsError
-	return m0
-}
-
-type Runtime_EOF struct {
-	state         protoimpl.MessageState `protogen:"hybrid.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Runtime_EOF) Reset() {
-	*x = Runtime_EOF{}
-	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Runtime_EOF) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Runtime_EOF) ProtoMessage() {}
 
 func (x *Runtime_EOF) ProtoReflect() protoreflect.Message {
 	mi := &file_dtkt_flow_v1beta1_eval_proto_msgTypes[5]
@@ -965,15 +657,13 @@ func (x *Runtime_EOF) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-type Runtime_EOF_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-}
-
-func (b0 Runtime_EOF_builder) Build() *Runtime_EOF {
-	m0 := &Runtime_EOF{}
+func (b0 Runtime_Done_builder) Build() *Runtime_Done {
+	m0 := &Runtime_Done{}
 	b, x := &b0, m0
 	_, _ = b, x
+	x.Id = b.Id
+	x.Reason = b.Reason
+	x.IsError = b.IsError
 	return m0
 }
 
@@ -981,7 +671,7 @@ var File_dtkt_flow_v1beta1_eval_proto protoreflect.FileDescriptor
 
 const file_dtkt_flow_v1beta1_eval_proto_rawDesc = "" +
 	"\n" +
-	"\x1cdtkt/flow/v1beta1/eval.proto\x12\x11dtkt.flow.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x14cel/expr/value.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xeb\a\n" +
+	"\x1cdtkt/flow/v1beta1/eval.proto\x12\x11dtkt.flow.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x14cel/expr/value.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\"\xeb\a\n" +
 	"\aRuntime\x12M\n" +
 	"\vconnections\x18\x01 \x03(\v2+.dtkt.flow.v1beta1.Runtime.ConnectionsEntryR\vconnections\x12>\n" +
 	"\x06inputs\x18\x02 \x03(\v2&.dtkt.flow.v1beta1.Runtime.InputsEntryR\x06inputs\x128\n" +
@@ -1017,33 +707,33 @@ const file_dtkt_flow_v1beta1_eval_proto_rawDesc = "" +
 	"\x05edges\x18\x02 \x03(\v2\x17.dtkt.flow.v1beta1.EdgeR\x05edges\"\xe2\x01\n" +
 	"\x04Edge\x12l\n" +
 	"\x06source\x18\x01 \x01(\tBT\xbaHQ\xc8\x01\x01rL2J^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x06source\x12l\n" +
-	"\x06target\x18\x02 \x01(\tBT\xbaHQ\xc8\x01\x01rL2J^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x06target\"\xbc\x06\n" +
+	"\x06target\x18\x02 \x01(\tBT\xbaHQ\xc8\x01\x01rL2J^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x06target\"\xe9\x06\n" +
 	"\x04Node\x12d\n" +
 	"\x02id\x18\x01 \x01(\tBT\xbaHQ\xc8\x01\x01rL2J^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x02id\x123\n" +
-	"\x05state\x18\x02 \x01(\x0e2\x1d.dtkt.flow.v1beta1.Node.StateR\x05state\x12\x1d\n" +
+	"\x05state\x18\x02 \x01(\x0e2\x1d.dtkt.flow.v1beta1.Node.StateR\x05state\x12\x14\n" +
+	"\x05count\x18\x03 \x01(\x04R\x05count\x12.\n" +
 	"\n" +
-	"call_count\x18\x04 \x01(\x04R\tcallCount\x12.\n" +
-	"\n" +
-	"prev_value\x18\x05 \x01(\v2\x0f.cel.expr.ValueR\tprevValue\x12.\n" +
-	"\n" +
-	"curr_value\x18\x06 \x01(\v2\x0f.cel.expr.ValueR\tcurrValue\x129\n" +
+	"prev_value\x18\x04 \x01(\v2\x0f.cel.expr.ValueR\tprevValue\x12'\n" +
+	"\x05value\x18\x05 \x01(\v2\x0f.cel.expr.ValueH\x00R\x05value\x12*\n" +
+	"\x05error\x18\x06 \x01(\v2\x12.google.rpc.StatusH\x00R\x05error\x129\n" +
 	"\n" +
 	"start_time\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x12;\n" +
 	"\vfinish_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"finishTime\x12?\n" +
 	"\n" +
-	"connection\x18\a \x01(\v2\x1d.dtkt.flow.v1beta1.ConnectionH\x00R\n" +
+	"connection\x18\a \x01(\v2\x1d.dtkt.flow.v1beta1.ConnectionH\x01R\n" +
 	"connection\x120\n" +
-	"\x05input\x18\b \x01(\v2\x18.dtkt.flow.v1beta1.InputH\x00R\x05input\x12*\n" +
-	"\x03var\x18\t \x01(\v2\x16.dtkt.flow.v1beta1.VarH\x00R\x03var\x123\n" +
-	"\x06action\x18\v \x01(\v2\x19.dtkt.flow.v1beta1.ActionH\x00R\x06action\x123\n" +
-	"\x06output\x18\r \x01(\v2\x19.dtkt.flow.v1beta1.OutputH\x00R\x06output\x123\n" +
-	"\x06stream\x18\x0e \x01(\v2\x19.dtkt.flow.v1beta1.StreamH\x00R\x06stream\"U\n" +
+	"\x05input\x18\b \x01(\v2\x18.dtkt.flow.v1beta1.InputH\x01R\x05input\x12*\n" +
+	"\x03var\x18\t \x01(\v2\x16.dtkt.flow.v1beta1.VarH\x01R\x03var\x123\n" +
+	"\x06action\x18\v \x01(\v2\x19.dtkt.flow.v1beta1.ActionH\x01R\x06action\x123\n" +
+	"\x06output\x18\r \x01(\v2\x19.dtkt.flow.v1beta1.OutputH\x01R\x06output\x123\n" +
+	"\x06stream\x18\x0e \x01(\v2\x19.dtkt.flow.v1beta1.StreamH\x01R\x06stream\"U\n" +
 	"\x05State\x12\x15\n" +
 	"\x11STATE_UNSPECIFIED\x10\x00\x12\x11\n" +
 	"\rSTATE_PENDING\x10\x01\x12\x11\n" +
 	"\rSTATE_SUCCESS\x10\x02\x12\x0f\n" +
-	"\vSTATE_ERROR\x10\x03B\r\n" +
+	"\vSTATE_ERROR\x10\x03B\x0f\n" +
+	"\x06result\x12\x05\xbaH\x02\b\x01B\r\n" +
 	"\x04type\x12\x05\xbaH\x02\b\x01B\xd6\x01\n" +
 	"\x17proto.dtkt.flow.v1beta1B\tEvalProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1;flowv1beta1\xa2\x02\x03DFX\xaa\x02\x11Dtkt.Flow.V1beta1\xca\x02\x11Dtkt\\Flow\\V1beta1\xe2\x02\x1dDtkt\\Flow\\V1beta1\\GPBMetadata\xea\x02\x13Dtkt::Flow::V1beta1b\x06proto3"
 
@@ -1064,13 +754,14 @@ var file_dtkt_flow_v1beta1_eval_proto_goTypes = []any{
 	nil,                           // 11: dtkt.flow.v1beta1.Runtime.StreamsEntry
 	nil,                           // 12: dtkt.flow.v1beta1.Runtime.OutputsEntry
 	(*expr.Value)(nil),            // 13: cel.expr.Value
-	(*timestamppb.Timestamp)(nil), // 14: google.protobuf.Timestamp
-	(*Connection)(nil),            // 15: dtkt.flow.v1beta1.Connection
-	(*Input)(nil),                 // 16: dtkt.flow.v1beta1.Input
-	(*Var)(nil),                   // 17: dtkt.flow.v1beta1.Var
-	(*Action)(nil),                // 18: dtkt.flow.v1beta1.Action
-	(*Output)(nil),                // 19: dtkt.flow.v1beta1.Output
-	(*Stream)(nil),                // 20: dtkt.flow.v1beta1.Stream
+	(*status.Status)(nil),         // 14: google.rpc.Status
+	(*timestamppb.Timestamp)(nil), // 15: google.protobuf.Timestamp
+	(*Connection)(nil),            // 16: dtkt.flow.v1beta1.Connection
+	(*Input)(nil),                 // 17: dtkt.flow.v1beta1.Input
+	(*Var)(nil),                   // 18: dtkt.flow.v1beta1.Var
+	(*Action)(nil),                // 19: dtkt.flow.v1beta1.Action
+	(*Output)(nil),                // 20: dtkt.flow.v1beta1.Output
+	(*Stream)(nil),                // 21: dtkt.flow.v1beta1.Stream
 }
 var file_dtkt_flow_v1beta1_eval_proto_depIdxs = []int32{
 	7,  // 0: dtkt.flow.v1beta1.Runtime.connections:type_name -> dtkt.flow.v1beta1.Runtime.ConnectionsEntry
@@ -1083,26 +774,27 @@ var file_dtkt_flow_v1beta1_eval_proto_depIdxs = []int32{
 	3,  // 7: dtkt.flow.v1beta1.Graph.edges:type_name -> dtkt.flow.v1beta1.Edge
 	0,  // 8: dtkt.flow.v1beta1.Node.state:type_name -> dtkt.flow.v1beta1.Node.State
 	13, // 9: dtkt.flow.v1beta1.Node.prev_value:type_name -> cel.expr.Value
-	13, // 10: dtkt.flow.v1beta1.Node.curr_value:type_name -> cel.expr.Value
-	14, // 11: dtkt.flow.v1beta1.Node.start_time:type_name -> google.protobuf.Timestamp
-	14, // 12: dtkt.flow.v1beta1.Node.finish_time:type_name -> google.protobuf.Timestamp
-	15, // 13: dtkt.flow.v1beta1.Node.connection:type_name -> dtkt.flow.v1beta1.Connection
-	16, // 14: dtkt.flow.v1beta1.Node.input:type_name -> dtkt.flow.v1beta1.Input
-	17, // 15: dtkt.flow.v1beta1.Node.var:type_name -> dtkt.flow.v1beta1.Var
-	18, // 16: dtkt.flow.v1beta1.Node.action:type_name -> dtkt.flow.v1beta1.Action
-	19, // 17: dtkt.flow.v1beta1.Node.output:type_name -> dtkt.flow.v1beta1.Output
-	20, // 18: dtkt.flow.v1beta1.Node.stream:type_name -> dtkt.flow.v1beta1.Stream
-	4,  // 19: dtkt.flow.v1beta1.Runtime.ConnectionsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	4,  // 20: dtkt.flow.v1beta1.Runtime.InputsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	4,  // 21: dtkt.flow.v1beta1.Runtime.VarsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	4,  // 22: dtkt.flow.v1beta1.Runtime.ActionsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	4,  // 23: dtkt.flow.v1beta1.Runtime.StreamsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	4,  // 24: dtkt.flow.v1beta1.Runtime.OutputsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	25, // [25:25] is the sub-list for method output_type
-	25, // [25:25] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	13, // 10: dtkt.flow.v1beta1.Node.value:type_name -> cel.expr.Value
+	14, // 11: dtkt.flow.v1beta1.Node.error:type_name -> google.rpc.Status
+	15, // 12: dtkt.flow.v1beta1.Node.start_time:type_name -> google.protobuf.Timestamp
+	15, // 13: dtkt.flow.v1beta1.Node.finish_time:type_name -> google.protobuf.Timestamp
+	16, // 14: dtkt.flow.v1beta1.Node.connection:type_name -> dtkt.flow.v1beta1.Connection
+	17, // 15: dtkt.flow.v1beta1.Node.input:type_name -> dtkt.flow.v1beta1.Input
+	18, // 16: dtkt.flow.v1beta1.Node.var:type_name -> dtkt.flow.v1beta1.Var
+	19, // 17: dtkt.flow.v1beta1.Node.action:type_name -> dtkt.flow.v1beta1.Action
+	20, // 18: dtkt.flow.v1beta1.Node.output:type_name -> dtkt.flow.v1beta1.Output
+	21, // 19: dtkt.flow.v1beta1.Node.stream:type_name -> dtkt.flow.v1beta1.Stream
+	4,  // 20: dtkt.flow.v1beta1.Runtime.ConnectionsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	4,  // 21: dtkt.flow.v1beta1.Runtime.InputsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	4,  // 22: dtkt.flow.v1beta1.Runtime.VarsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	4,  // 23: dtkt.flow.v1beta1.Runtime.ActionsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	4,  // 24: dtkt.flow.v1beta1.Runtime.StreamsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	4,  // 25: dtkt.flow.v1beta1.Runtime.OutputsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	26, // [26:26] is the sub-list for method output_type
+	26, // [26:26] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_flow_v1beta1_eval_proto_init() }
@@ -1112,6 +804,8 @@ func file_dtkt_flow_v1beta1_eval_proto_init() {
 	}
 	file_dtkt_flow_v1beta1_spec_proto_init()
 	file_dtkt_flow_v1beta1_eval_proto_msgTypes[3].OneofWrappers = []any{
+		(*Node_Value)(nil),
+		(*Node_Error)(nil),
 		(*Node_Connection)(nil),
 		(*Node_Input)(nil),
 		(*Node_Var)(nil),

@@ -30,13 +30,14 @@ func NewInstance[C any, I v1beta1.InstanceType](ctx context.Context, intgr *Inte
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("config validation failed: %w", err))
 	}
 
-	inst, err := intgr.newInstance(ctx, value)
+	mreq := middleware.NewRequest(req.Connection, req.ConfigHash, req.ConfigGen)
+	inst, err := intgr.newInstance(middleware.AddRequestToContext(ctx, mreq), value)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
 	return &Instance[I]{
-		Request: middleware.NewRequest(req.Connection, req.ConfigHash, req.ConfigGen),
+		Request: mreq,
 		inst:    inst,
 	}, nil
 }

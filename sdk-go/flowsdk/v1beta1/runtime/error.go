@@ -35,7 +35,7 @@ func IsDoneError(err error) (*DoneError, bool) {
 
 func IsRuntimeDone(run *Runtime) (doneErr *DoneError, ok bool) {
 	run.nodes.Range(func(_ string, node *Node) bool {
-		switch value := node.value.(type) {
+		switch value := node.curr.(type) {
 		case *flowv1beta1.Runtime_Done:
 			// Prefer error Dones: keep searching if we already have a non-error.
 			if !ok || value.GetIsError() {

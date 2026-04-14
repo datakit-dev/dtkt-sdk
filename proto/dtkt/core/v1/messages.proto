@@ -850,8 +850,8 @@ message Deployment {
 
   message RuntimeMetadata {
     message Native {
-      // PID of native process.
-      int64 process_id = 1 [(buf.validate.field).required = true];
+      // PID file path of native process.
+      string pid_file_path = 1 [(buf.validate.field).required = true];
     }
 
     message Docker {

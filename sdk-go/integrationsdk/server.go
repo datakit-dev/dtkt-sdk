@@ -23,7 +23,9 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk/v1beta1"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/lib/env"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/network"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	"github.com/datakit-dev/grpc-proxy/proxy"
 	"github.com/jhump/protoreflect/v2/sourceinfo"
 )
@@ -153,9 +155,19 @@ func (s *Server[C, I]) Serve() error {
 	if err != nil {
 		return err
 	}
-
 	//nolint:errcheck
 	defer lis.Close()
+
+	pidFile := env.GetVar(env.PIDFile)
+	if pidFile != "" {
+		pid, err := util.WritePID(pidFile)
+		if err != nil {
+			return err
+		}
+
+		//nolint:errcheck
+		defer pid.Unlock()
+	}
 
 	go s.stopWatch(ctx)
 

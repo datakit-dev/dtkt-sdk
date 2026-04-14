@@ -16,6 +16,7 @@ import (
 )
 
 const (
+	AutoAssign           = "<auto>"
 	DefaultCloudHost     = "api.datakit.cloud"
 	DefaultSocketHost    = "localhost"
 	DefaultSocketPattern = "dtkt-*.sock"
@@ -229,7 +230,6 @@ func (a Address) IsValid() error {
 		if !filepath.IsAbs(addrStr) {
 			return fmt.Errorf("unix socket path must be absolute: %s", addrStr)
 		}
-
 	case TCP:
 		// Must be valid host:port format with port present
 		if _, port, err := net.SplitHostPort(addrStr); err != nil {
@@ -237,7 +237,6 @@ func (a Address) IsValid() error {
 		} else if port == "" {
 			return fmt.Errorf("TCP address requires port")
 		}
-
 	case Cloud:
 		// Must have at least a hostname
 		host := addrStr

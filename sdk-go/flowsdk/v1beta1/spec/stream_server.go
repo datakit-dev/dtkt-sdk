@@ -5,82 +5,82 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/lib/log"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 	"github.com/google/cel-go/common/types/ref"
-	"golang.org/x/sync/errgroup"
-	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var _ shared.ExecNode = (*ServerStream)(nil)
-var _ CallCloser = (*ServerStream)(nil)
+var _ ExecNodeCloser = (*ServerStream)(nil)
 
 // ServerStream implements a server-streaming RPC: one request, N responses.
 // It is self-starting (no Recv trigger needed) — it opens the stream on first
 // Send invocation and emits each response as an independent event.
 type ServerStream struct {
-	id         string
-	conn       shared.Connector
-	methodName protoreflect.FullName
-	evalReq    EvalMessageFunc
+	id     string
+	stream *Stream
+	method *Method
 
+	client common.DynamicClient
 	ctx    context.Context
 	cancel context.CancelFunc
-	group  errgroup.Group
 }
 
-func newServerStream(
-	run shared.Runtime,
-	conn shared.Connector,
-	node CallNode,
-	method protoreflect.MethodDescriptor,
-	evalReq EvalMessageFunc,
-) (*ServerStream, error) {
-	if _, ok := node.(*flowv1beta1.Stream); !ok {
-		return nil, fmt.Errorf("unexpected node type: %T, expected *flowv1beta1.Stream", node)
+// NewServerStream is called by NewCaller for server-streaming RPCs.
+func NewServerStream(node *flowv1beta1.Stream, stream *Stream, method *Method) *ServerStream {
+	return &ServerStream{
+		id:     GetID(node),
+		stream: stream,
+		method: method,
+	}
+}
+
+func (s *ServerStream) Compile(run shared.Runtime) error {
+	conn, err := s.method.GetConnector(run)
+	if err != nil {
+		return err
 	}
 
-	ctx, cancel := context.WithCancel(run.Context())
-	return &ServerStream{
-		id:         GetID(node.(*flowv1beta1.Stream)),
-		conn:       conn,
-		methodName: method.FullName(),
-		evalReq:    evalReq,
-		ctx:        ctx,
-		cancel:     cancel,
-	}, nil
-}
+	ctx, client, err := conn.GetClient(run.Context())
+	if err != nil {
+		return err
+	}
 
-func (s *ServerStream) Compile(shared.Runtime) error  { return nil }
-func (s *ServerStream) Recv() (shared.RecvFunc, bool) { return nil, false }
-func (s *ServerStream) Eval() (shared.EvalFunc, bool) { return nil, false }
+	s.client = client
+	s.ctx, s.cancel = context.WithCancel(ctx)
+
+	return nil
+}
 
 func (s *ServerStream) Send() (shared.SendFunc, bool) {
 	return func(run shared.Runtime, sendCh chan<- ref.Val) error {
-		log.FromCtx(s.ctx).Info("ServerStream send running...")
-		defer log.FromCtx(s.ctx).Info("ServerStream send done.")
-
 		env, err := run.Env()
 		if err != nil {
 			return err
 		}
 
-		ctx, client, err := s.conn.GetClient(s.ctx)
+		method, err := s.method.GetDescriptor(run)
 		if err != nil {
-			return fmt.Errorf("%s: get client: %w", s.id, err)
+			return err
 		}
 
-		req, err := s.evalReq(run)
+		req, err := s.method.EvalRequest(run)
 		if err != nil {
 			return fmt.Errorf("%s: eval request: %w", s.id, err)
 		}
 
-		stream, err := client.CallServerStream(ctx, s.methodName, req)
+		stream, err := s.client.CallServerStream(s.ctx, method.FullName(), req)
 		if err != nil {
-			return fmt.Errorf("%s: call server stream: %w", s.id, err)
+			s.cancel()
+			return err
 		}
+
+		log.FromCtx(s.ctx).Info("ServerStream send running...", slog.String("id", s.id))
+		defer log.FromCtx(s.ctx).Info("ServerStream send done.", slog.String("id", s.id))
 
 		for {
 			msg, err := stream.RecvMsg()
@@ -107,16 +107,9 @@ func (s *ServerStream) Send() (shared.SendFunc, bool) {
 
 func (s *ServerStream) Close() error {
 	s.cancel()
-	return s.group.Wait()
+	return context.Cause(s.ctx)
 }
 
-// NewServerStream is called by NewCaller for server-streaming RPCs.
-func NewServerStream(
-	run shared.Runtime,
-	conn shared.Connector,
-	node CallNode,
-	method protoreflect.MethodDescriptor,
-	evalReq EvalMessageFunc,
-) (*ServerStream, error) {
-	return newServerStream(run, conn, node, method, evalReq)
-}
+func (s *ServerStream) Eval() (shared.EvalFunc, bool) { return nil, false }
+func (s *ServerStream) HasCached() (ref.Val, bool)    { return nil, false }
+func (s *ServerStream) Recv() (shared.RecvFunc, bool) { return nil, false }

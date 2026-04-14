@@ -23,6 +23,12 @@ type (
 	NodeVisitFunc func(id string, expr *cel.Ast)
 )
 
+func (f NodeVisitFunc) ExprVisitor(id string) ExprVisitFunc {
+	return func(expr *cel.Ast) {
+		f(id, expr)
+	}
+}
+
 func ParseExpr(env Env, expr string, visitor ExprVisitFunc) (*cel.Ast, error) {
 	expr, valid := IsValidExpr(expr)
 	if !valid {

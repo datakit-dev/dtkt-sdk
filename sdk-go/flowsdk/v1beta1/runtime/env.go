@@ -11,23 +11,35 @@ import (
 )
 
 var _ shared.Env = (*Env)(nil)
+var nodeMapType = cel.MapType(cel.StringType, cel.DynType)
 
 type (
 	Env struct {
 		*cel.Env
-		vars     cel.Activation
+		nodes    NodeMap
 		types    *common.CELTypes
 		resolver shared.Resolver
 	}
 	EnvOption func(*Env)
 )
 
-func NewEnv(proto *flowv1beta1.Runtime, opts ...Option) (*Env, error) {
+func NewEnv(runtime *flowv1beta1.Runtime, opts ...Option) (*Env, error) {
 	env := &Env{}
 	env.applyOptions(opts...)
 
 	if env.resolver == nil {
 		env.resolver = api.GlobalResolver()
+	}
+
+	if env.nodes == nil {
+		env.nodes = RuntimeNodeMap(
+			runtime.Actions,
+			runtime.Connections,
+			runtime.Inputs,
+			runtime.Outputs,
+			runtime.Streams,
+			runtime.Vars,
+		)
 	}
 
 	types, err := common.NewCELTypes(env.resolver)
@@ -37,22 +49,19 @@ func NewEnv(proto *flowv1beta1.Runtime, opts ...Option) (*Env, error) {
 
 	env.types = types
 
-	vars, err := cel.ContextProtoVars(proto)
-	if err != nil {
-		return nil, err
-	}
-
-	env.vars = vars
-
 	celOpts := append([]cel.EnvOption{
 		cel.CustomTypeProvider(env.types),
 		cel.CustomTypeAdapter(env.types),
-		cel.Container("dtkt"),
 		cel.Abbrevs(
 			string(new(flowv1beta1.Runtime_Done).ProtoReflect().Descriptor().FullName()),
 			string(new(flowv1beta1.Runtime_EOF).ProtoReflect().Descriptor().FullName()),
 		),
-		cel.DeclareContextProto(proto.ProtoReflect().Descriptor()),
+		cel.Variable("actions", nodeMapType),
+		cel.Variable("connections", nodeMapType),
+		cel.Variable("inputs", nodeMapType),
+		cel.Variable("outputs", nodeMapType),
+		cel.Variable("streams", nodeMapType),
+		cel.Variable("vars", nodeMapType),
 	}, funcs.EnvOptions(env)...)
 
 	env.Env, err = common.NewCELEnv(celOpts...)
@@ -72,7 +81,8 @@ func (e *Env) applyOptions(opts ...Option) {
 }
 
 func (e *Env) Vars() cel.Activation {
-	return e.vars
+	vars, _ := cel.NewActivation(e.nodes.asMap())
+	return vars
 }
 
 func (e *Env) TypeAdapter() types.Adapter {

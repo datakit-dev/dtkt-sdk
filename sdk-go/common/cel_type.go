@@ -183,7 +183,12 @@ func (t *CELTypes) wrapRefVal(val ref.Val) ref.Val {
 		return val
 	}
 
-	if msg, ok := val.Value().(proto.Message); ok {
+	msg, ok := val.Value().(proto.Message)
+	if ok {
+		if IsWellKnownName(msg.ProtoReflect().Descriptor().FullName()) {
+			return val
+		}
+
 		return t.wrapProtoMessage(val, msg)
 	}
 
@@ -264,10 +269,12 @@ func (t *CELTypes) wrapIterator(iter traits.Iterator) traits.Iterator {
 	if _, ok := iter.(*celIterator); ok {
 		return iter
 	}
+
 	refVal, ok := iter.(ref.Val)
 	if !ok {
 		return iter
 	}
+
 	return &celIterator{
 		refVal:   refVal,
 		iterator: iter,

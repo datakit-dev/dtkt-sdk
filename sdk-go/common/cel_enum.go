@@ -9,11 +9,11 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-var _ cel.Library = (*celEnumExt)(nil)
+var _ cel.Library = (*celEnumLib)(nil)
 var _ CELEnumType = (*celEnum)(nil)
 
 type (
-	celEnumExt struct{}
+	celEnumLib struct{}
 	celEnum    struct {
 		desc   protoreflect.EnumDescriptor
 		refVal ref.Val
@@ -26,18 +26,18 @@ type (
 	}
 )
 
-func CELEnumExt() cel.EnvOption {
-	return cel.Lib(&celEnumExt{})
+func CELEnumLib() cel.EnvOption {
+	return cel.Lib(&celEnumLib{})
 }
 
-func (*celEnumExt) LibraryName() string {
+func (*celEnumLib) LibraryName() string {
 	return "dtkt.ext.enum"
 }
 
-func (*celEnumExt) CompileOptions() []cel.EnvOption {
+func (*celEnumLib) CompileOptions() []cel.EnvOption {
 	return []cel.EnvOption{
 		cel.Function("enumName",
-			cel.Overload("enum_to_name",
+			cel.Overload("enum_name_string",
 				[]*cel.Type{cel.IntType},
 				cel.StringType,
 				cel.FunctionBinding(func(args ...ref.Val) ref.Val {
@@ -49,7 +49,7 @@ func (*celEnumExt) CompileOptions() []cel.EnvOption {
 					return types.NoSuchOverloadErr()
 				}),
 			),
-			cel.Overload("enum_to_name_trimmed",
+			cel.Overload("enum_name_trimmed_string",
 				[]*cel.Type{cel.IntType, cel.BoolType},
 				cel.StringType,
 				cel.FunctionBinding(func(args ...ref.Val) ref.Val {
@@ -69,7 +69,7 @@ func (*celEnumExt) CompileOptions() []cel.EnvOption {
 	}
 }
 
-func (*celEnumExt) ProgramOptions() []cel.ProgramOption {
+func (*celEnumLib) ProgramOptions() []cel.ProgramOption {
 	return []cel.ProgramOption{}
 }
 

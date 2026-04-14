@@ -81,7 +81,6 @@ func (p *celMessage) Get(index ref.Val) ref.Val {
 						return refVal
 					}
 
-					// Wrap each element in the list as an enum.
 					length := list.Size().Value().(int64)
 					msgList := make([]ref.Val, 0, length)
 					for i := range length {
