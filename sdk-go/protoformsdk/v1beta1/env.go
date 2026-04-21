@@ -4,8 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"buf.build/go/protovalidate"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/api"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
@@ -18,11 +17,8 @@ type (
 		Resolver() Resolver
 	}
 	Resolver interface {
-		common.CELResolver
-		FindMethodByName(protoreflect.FullName) (protoreflect.MethodDescriptor, error)
-		RangeMessages(func(protoreflect.MessageType) bool)
+		api.Resolver
 		InvokeMethod(context.Context, protoreflect.FullName, proto.Message) (proto.Message, error)
-		GetValidator() (protovalidate.Validator, error)
 	}
 	GroupCallbackFunc func(*FieldGroup) error
 )

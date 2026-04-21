@@ -14,7 +14,7 @@ import (
 type (
 	Instance[I v1beta1.InstanceType] struct {
 		*middleware.Request
-		inst I
+		v1beta1.InstanceType
 	}
 	NewInstanceFunc[C any, I v1beta1.InstanceType] func(context.Context, C) (I, error)
 )
@@ -37,15 +37,7 @@ func NewInstance[C any, I v1beta1.InstanceType](ctx context.Context, intgr *Inte
 	}
 
 	return &Instance[I]{
-		Request: mreq,
-		inst:    inst,
+		Request:      mreq,
+		InstanceType: inst,
 	}, nil
-}
-
-func (i *Instance[I]) Instance() I {
-	return i.inst
-}
-
-func (i *Instance[I]) Close() error {
-	return i.inst.Close()
 }

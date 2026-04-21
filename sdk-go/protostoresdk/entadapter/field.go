@@ -117,19 +117,15 @@ func NewField(field *v1beta1.Field, opts ...FieldOption) *Field {
 	return f
 }
 
-func (f *Field) applyOptions(opts ...FieldOption) {
-	applyFieldOptions(f, opts...)
-}
-
-func (f *fieldType[V]) applyOptions(opts ...FieldOption) {
-	applyFieldOptions(f, opts...)
-}
-
-func (f *fieldType[V]) Field() *v1beta1.Field {
+func (f *Field) Field() *v1beta1.Field {
 	return f.field
 }
 
-func (f *Field) Field() *v1beta1.Field {
+func (f *Field) Descriptor() *ent.Descriptor {
+	return f.desc
+}
+
+func (f *fieldType[V]) Field() *v1beta1.Field {
 	return f.field
 }
 
@@ -137,6 +133,10 @@ func (f *fieldType[V]) Descriptor() *ent.Descriptor {
 	return f.desc
 }
 
-func (f *Field) Descriptor() *ent.Descriptor {
-	return f.desc
+func (f *Field) applyOptions(opts ...FieldOption) {
+	applyFieldOptions(f, opts...)
+}
+
+func (f *fieldType[V]) applyOptions(opts ...FieldOption) {
+	applyFieldOptions(f, opts...)
 }

@@ -224,7 +224,7 @@ func (i *Integration[C, I]) GetInstance(ctx context.Context) (inst I, err error)
 		return
 	}
 
-	return wrap.inst, nil
+	return wrap.InstanceType.(I), nil
 }
 
 func (i *Integration[C, I]) GetDataRoot() (string, error) {
@@ -347,7 +347,7 @@ func (i *Integration[C, I]) CheckConfig(ctx context.Context, req *basev1beta1.Ch
 	}
 
 	var authRequired *sharedv1beta1.AuthType
-	resp, err := inst.inst.CheckAuth(ctx, &basev1beta1.CheckAuthRequest{})
+	resp, _ := inst.CheckAuth(ctx, &basev1beta1.CheckAuthRequest{})
 	if resp.GetAuthRequired() > 0 {
 		authRequired = new(resp.GetAuthRequired())
 	}
@@ -434,10 +434,10 @@ func (i *Integration[C, I]) unaryInterceptor() grpc.UnaryServerInterceptor {
 		switch info.FullMethod {
 		case grpc_health_v1.Health_Check_FullMethodName,
 			grpc_health_v1.Health_List_FullMethodName,
-			basev1beta1.BaseService_GetType_FullMethodName,
-			basev1beta1.BaseService_ListTypes_FullMethodName,
+			basev1beta1.BaseService_CheckConfig_FullMethodName,
 			basev1beta1.BaseService_GetPackage_FullMethodName,
-			basev1beta1.BaseService_CheckConfig_FullMethodName:
+			basev1beta1.BaseService_GetType_FullMethodName,
+			basev1beta1.BaseService_ListTypes_FullMethodName:
 			return handler(ctx, req)
 		}
 
@@ -493,7 +493,9 @@ func (i *Integration[C, I]) streamInterceptor() grpc.StreamServerInterceptor {
 }
 
 func (i *Integration[C, I]) newContext(ctx context.Context, req *middleware.Request) context.Context {
-	ctx = log.NewCtx(ctx, i.log.With(slog.String("connection", req.AddrName())))
+	if resource.Connection.IsName(req.AddrName()) {
+		ctx = log.NewCtx(ctx, i.log.With(slog.String("connection", req.AddrName())))
+	}
 	return middleware.AddRequestToContext(ctx, req)
 }
 

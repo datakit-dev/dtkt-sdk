@@ -6,7 +6,7 @@
 // Hello from Protostore SDK!
 
 import (
-  "github.com/datakit-dev/dtkt-sdk/sdk-go/protostoresdk/entprotostore"
+  "github.com/datakit-dev/dtkt-sdk/sdk-go/protostoresdk/entadapter"
 	{{- range $n := $.Nodes }}
     {{- if $n.Annotations.Protostore }}
 		{{ $n.PackageAlias }} "{{ $.Config.Package }}/{{ $n.PackageDir }}"
@@ -25,13 +25,13 @@ func init() {
       {{- if $a := $f.Annotations.Protostore }}
       {{- $valuescan := print $pkg ".ProtostoreScanner." $f.StructField -}}
       {{- if $a.IsList }}
-        {{ $valuescan }} = entprotostore.ListValueScanner[{{ $f.Type }}]("{{$a.ID}}")
+        {{ $valuescan }} = entadapter.ListScanner[{{ $f.Type }}]("{{$a.ID}}")
       {{- else if $a.IsMap }}
-        {{ $valuescan }} = entprotostore.MapValueScanner[{{ $f.Type }}]("{{$a.ID}}")
+        {{ $valuescan }} = entadapter.MapScanner[{{ $f.Type }}]("{{$a.ID}}")
       {{- else if $a.IsEnum }}
-        {{ $valuescan }} = entprotostore.EnumValueScanner[{{ $f.Type }}]("{{$a.ID}}")
+        {{ $valuescan }} = entadapter.EnumScanner[{{ $f.Type }}]("{{$a.ID}}")
       {{- else if $a.IsMessage }}
-        {{ $valuescan }} = entprotostore.MessageValueScanner[{{ $f.Type }}]("{{$a.ID}}")
+        {{ $valuescan }} = entadapter.MessageScanner[{{ $f.Type }}]("{{$a.ID}}")
       {{- end }}
     {{- end }}
     {{- end }}

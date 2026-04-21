@@ -17,10 +17,10 @@ type ResolverType interface {
 	GetValidator() (protovalidate.Validator, error)
 }
 
-func SetResolver(r ResolverType) {
+func SetResolver(res ResolverType) {
 	resolverMut.Lock()
 	defer resolverMut.Unlock()
-	resolver = r
+	resolver = res
 }
 
 func GetResolver() ResolverType {
