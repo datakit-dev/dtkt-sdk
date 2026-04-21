@@ -13,7 +13,7 @@ var _ SpecLoaderType = (*SpecLoader[SpecType])(nil)
 
 type (
 	SpecLoader[S SpecType] struct {
-		apiVersion versionName
+		apiVersion version
 		kind       string
 		spec       S
 		encoder    encoding.Encoder
@@ -21,9 +21,9 @@ type (
 		schemaOpts []common.JSONSchemaOpt
 	}
 	SpecInstance[S SpecType] struct {
-		APIVersion versionName `json:"apiVersion" yaml:"apiVersion"`
-		Kind       string      `json:"kind" yaml:"kind"`
-		Spec       S           `json:"spec" yaml:"spec"`
+		APIVersion version `json:"apiVersion" yaml:"apiVersion"`
+		Kind       string  `json:"kind" yaml:"kind"`
+		Spec       S       `json:"spec" yaml:"spec"`
 	}
 	SpecLoaderType interface {
 		APIVersion() Version
@@ -46,7 +46,7 @@ type (
 func NewLoader[T SpecType](spec T, opts ...SpecLoaderOpt[T]) *SpecLoader[T] {
 	var r = &SpecLoader[T]{
 		kind:       spec.SpecKind(),
-		apiVersion: spec.APIVersion().(versionName),
+		apiVersion: spec.APIVersion().(version),
 		spec:       spec,
 	}
 	r.SetOptions(opts...)

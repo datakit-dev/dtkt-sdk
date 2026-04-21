@@ -40,7 +40,7 @@ func VersionContainsName[T ~string](version Version, name T) bool {
 		}
 	}
 
-	return version.String() == matches[2]
+	return version.GetName() == matches[2]
 }
 
 func VersionContainsDescriptor(version Version, desc protoreflect.Descriptor) bool {

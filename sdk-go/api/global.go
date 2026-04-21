@@ -17,10 +17,6 @@ var getGlobalResolver = sync.OnceValue(func() *globalResolver {
 	}
 })
 
-var getGlobalValidator = sync.OnceValues(func() (protovalidate.Validator, error) {
-	return protovalidate.New(protovalidate.WithExtensionTypeResolver(getGlobalResolver()))
-})
-
 type globalResolver struct {
 	protoresolve.DescriptorPool
 	protoresolve.TypePool
@@ -28,10 +24,6 @@ type globalResolver struct {
 
 func GlobalResolver() *globalResolver {
 	return getGlobalResolver()
-}
-
-func GlobalValidator() (protovalidate.Validator, error) {
-	return getGlobalValidator()
 }
 
 func (r *globalResolver) GetValidator() (protovalidate.Validator, error) {

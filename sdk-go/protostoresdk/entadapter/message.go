@@ -17,56 +17,56 @@ import (
 )
 
 func MessageField[T any, M protostore.MessageType[T]](opts ...FieldOption) *fieldType[M] {
-	f := &fieldType[M]{
+	field := &fieldType[M]{
 		field: v1beta1.NewField(nil),
 	}
 
 	var msg M
-	f.desc = entfield.
+	field.desc = entfield.
 		Bytes(util.ToSnakeCase(msg.ProtoReflect().Descriptor().Name())).
 		GoType(msg).
-		ValueScanner(MessageValueScanner(f)).
+		ValueScanner(MessageScanner(field)).
 		Descriptor()
 
-	f.applyOptions(opts...)
+	field.applyOptions(opts...)
 
-	return f
+	return field
 }
 
 func EncryptedMessageField[T any, M protostore.MessageType[T]](cipher Cipher, opts ...FieldOption) *fieldType[M] {
-	f := &fieldType[M]{
+	field := &fieldType[M]{
 		field: v1beta1.NewField(nil),
 	}
 
 	var msg M
-	f.desc = entfield.
+	field.desc = entfield.
 		Bytes(util.ToSnakeCase(msg.ProtoReflect().Descriptor().Name())).
 		GoType(msg).
-		ValueScanner(EncryptedMessageScanner(f, cipher)).
+		ValueScanner(EncryptedMessageScanner(field, cipher)).
 		Descriptor()
 
-	f.applyOptions(opts...)
+	field.applyOptions(opts...)
 
-	return f
+	return field
 }
 
 func EncryptedAnyField(cipher Cipher, opts ...FieldOption) *fieldType[*anypb.Any] {
-	f := &fieldType[*anypb.Any]{
+	field := &fieldType[*anypb.Any]{
 		field: v1beta1.NewField(nil),
 	}
 
-	f.desc = entfield.
+	field.desc = entfield.
 		Bytes("encrypted_any").
 		GoType((*anypb.Any)(nil)).
-		ValueScanner(EncryptedAnyScanner(f, cipher)).
+		ValueScanner(EncryptedAnyScanner(field, cipher)).
 		Descriptor()
 
-	f.applyOptions(opts...)
+	field.applyOptions(opts...)
 
-	return f
+	return field
 }
 
-func MessageValueScanner[M protostore.MessageType[T], T any](field *fieldType[M]) entfield.TypeValueScanner[M] {
+func MessageScanner[M protostore.MessageType[T], T any](field *fieldType[M]) entfield.TypeValueScanner[M] {
 	return entfield.ValueScannerFunc[M, *sql.Null[[]byte]]{
 		V: func(msg M) (driver.Value, error) {
 			b, err := encoding.ToJSONV2(msg, encoding.WithEncodeProtoJSONOptions(protojson.MarshalOptions{

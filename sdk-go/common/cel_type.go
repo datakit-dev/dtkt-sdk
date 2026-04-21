@@ -6,26 +6,24 @@ import (
 	"unicode"
 
 	"buf.build/go/protovalidate"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/common/types/traits"
+	"github.com/jhump/protoreflect/v2/protoresolve"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protopath"
 	"google.golang.org/protobuf/reflect/protorange"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/reflect/protoregistry"
 )
 
 type (
 	CELTypes struct {
-		resolver   CELResolver
-		registry   *types.Registry
-		fieldAlias util.SyncMap[string, map[string]string]
+		resolver     CELResolver
+		registry     *types.Registry
+		fieldAliases map[string]map[string]string
 	}
 	CELResolver interface {
-		protoregistry.ExtensionTypeResolver
-		protoregistry.MessageTypeResolver
+		protoresolve.SerializationResolver
 		RangeServices(func(protoreflect.ServiceDescriptor) bool)
 		RangeMethods(func(protoreflect.MethodDescriptor) bool)
 		FindMethodByName(protoreflect.FullName) (protoreflect.MethodDescriptor, error)
@@ -56,8 +54,9 @@ func NewCELTypes(resolver CELResolver) (*CELTypes, error) {
 	}
 
 	return &CELTypes{
-		resolver: resolver,
-		registry: registry,
+		resolver:     resolver,
+		registry:     registry,
+		fieldAliases: map[string]map[string]string{},
 	}, nil
 }
 
@@ -210,7 +209,7 @@ func (t *CELTypes) wrapProtoMessage(val ref.Val, msg proto.Message) ref.Val {
 
 func (t *CELTypes) aliasMap(desc protoreflect.MessageDescriptor) map[string]string {
 	fullName := string(desc.FullName())
-	if cached, ok := t.fieldAlias.Load(fullName); ok {
+	if cached, ok := t.fieldAliases[fullName]; ok {
 		return cached
 	}
 
@@ -224,7 +223,7 @@ func (t *CELTypes) aliasMap(desc protoreflect.MessageDescriptor) map[string]stri
 		aliases[jsonName] = protoName
 	}
 
-	t.fieldAlias.Store(fullName, aliases)
+	t.fieldAliases[fullName] = aliases
 	return aliases
 }
 

@@ -15,9 +15,9 @@ import (
 type (
 	Schema struct {
 		mixin.Schema
-		schemaType  SchemaType
-		fieldIntcpt FieldInterceptor
-		skipFields  []string
+		schemaType SchemaType
+		intercept  FieldInterceptor
+		skipFields []string
 	}
 	SchemaType interface {
 		messageType() proto.Message
@@ -47,8 +47,8 @@ func (s Schema) Fields() []ent.Field {
 		desc := s.schemaType.messageType().ProtoReflect().Descriptor().Fields().Get(idx)
 		f := NewField(v1beta1.NewField(desc))
 
-		if s.fieldIntcpt != nil {
-			s.fieldIntcpt(f.desc)
+		if s.intercept != nil {
+			s.intercept(f.desc)
 		}
 
 		if !f.field.Proto().GetSkip() && !slices.Contains(s.skipFields, f.field.Proto().GetName()) {
@@ -67,9 +67,9 @@ func (s Schema) Annotations() []schema.Annotation {
 	}
 }
 
-func WithFieldInterceptor(fieldFunc FieldInterceptor) SchemaOption {
+func WithInterceptFields(intercept FieldInterceptor) SchemaOption {
 	return func(schema *Schema) {
-		schema.fieldIntcpt = fieldFunc
+		schema.intercept = intercept
 	}
 }
 
