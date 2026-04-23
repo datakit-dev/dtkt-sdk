@@ -7,6 +7,7 @@ import (
 	"unicode"
 
 	"buf.build/go/protovalidate"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/common/types/traits"
@@ -15,8 +16,7 @@ import (
 	"google.golang.org/protobuf/reflect/protopath"
 	"google.golang.org/protobuf/reflect/protorange"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/reflect/
-  "
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 type (
