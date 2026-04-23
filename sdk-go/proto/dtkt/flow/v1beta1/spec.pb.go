@@ -962,7 +962,7 @@ func (*Input_Map) isInput_Type() {}
 func (*Input_Message) isInput_Type() {}
 
 type Action struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// When true action always returns its first non-null memoized value.
 	Cache         *bool              `protobuf:"varint,2,opt,name=cache,proto3,oneof" json:"cache,omitempty"`
@@ -997,11 +997,6 @@ func (x *Action) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Action.ProtoReflect.Descriptor instead.
-func (*Action) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *Action) GetId() string {
 	if x != nil {
 		return x.Id
@@ -1030,8 +1025,78 @@ func (x *Action) GetUser() *UserAction {
 	return nil
 }
 
+func (x *Action) SetId(v string) {
+	x.Id = v
+}
+
+func (x *Action) SetCache(v bool) {
+	x.Cache = &v
+}
+
+func (x *Action) SetCall(v *Action_MethodCall) {
+	x.Call = v
+}
+
+func (x *Action) SetUser(v *UserAction) {
+	x.User = v
+}
+
+func (x *Action) HasCache() bool {
+	if x == nil {
+		return false
+	}
+	return x.Cache != nil
+}
+
+func (x *Action) HasCall() bool {
+	if x == nil {
+		return false
+	}
+	return x.Call != nil
+}
+
+func (x *Action) HasUser() bool {
+	if x == nil {
+		return false
+	}
+	return x.User != nil
+}
+
+func (x *Action) ClearCache() {
+	x.Cache = nil
+}
+
+func (x *Action) ClearCall() {
+	x.Call = nil
+}
+
+func (x *Action) ClearUser() {
+	x.User = nil
+}
+
+type Action_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id string
+	// When true action always returns its first non-null memoized value.
+	Cache *bool
+	Call  *Action_MethodCall
+	User  *UserAction
+}
+
+func (b0 Action_builder) Build() *Action {
+	m0 := &Action{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Cache = b.Cache
+	x.Call = b.Call
+	x.User = b.User
+	return m0
+}
+
 type Stream struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Stream starts when expression evaluates to true; optional.
 	StartWhen *string `protobuf:"bytes,2,opt,name=start_when,json=startWhen,proto3,oneof" json:"start_when,omitempty"`
@@ -1066,11 +1131,6 @@ func (x *Stream) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Stream.ProtoReflect.Descriptor instead.
-func (*Stream) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Stream) GetId() string {
@@ -1108,8 +1168,96 @@ func (x *Stream) GetGenerate() *Stream_Generator {
 	return nil
 }
 
+func (x *Stream) SetId(v string) {
+	x.Id = v
+}
+
+func (x *Stream) SetStartWhen(v string) {
+	x.StartWhen = &v
+}
+
+func (x *Stream) SetStopWhen(v string) {
+	x.StopWhen = &v
+}
+
+func (x *Stream) SetCall(v *Stream_MethodCall) {
+	x.Call = v
+}
+
+func (x *Stream) SetGenerate(v *Stream_Generator) {
+	x.Generate = v
+}
+
+func (x *Stream) HasStartWhen() bool {
+	if x == nil {
+		return false
+	}
+	return x.StartWhen != nil
+}
+
+func (x *Stream) HasStopWhen() bool {
+	if x == nil {
+		return false
+	}
+	return x.StopWhen != nil
+}
+
+func (x *Stream) HasCall() bool {
+	if x == nil {
+		return false
+	}
+	return x.Call != nil
+}
+
+func (x *Stream) HasGenerate() bool {
+	if x == nil {
+		return false
+	}
+	return x.Generate != nil
+}
+
+func (x *Stream) ClearStartWhen() {
+	x.StartWhen = nil
+}
+
+func (x *Stream) ClearStopWhen() {
+	x.StopWhen = nil
+}
+
+func (x *Stream) ClearCall() {
+	x.Call = nil
+}
+
+func (x *Stream) ClearGenerate() {
+	x.Generate = nil
+}
+
+type Stream_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id string
+	// Stream starts when expression evaluates to true; optional.
+	StartWhen *string
+	// Stream stops when expression evaluates to true; optional.
+	StopWhen *string
+	Call     *Stream_MethodCall
+	Generate *Stream_Generator
+}
+
+func (b0 Stream_builder) Build() *Stream {
+	m0 := &Stream{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.StartWhen = b.StartWhen
+	x.StopWhen = b.StopWhen
+	x.Call = b.Call
+	x.Generate = b.Generate
+	return m0
+}
+
 type UserAction struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Inputs        []*UserAction_Input    `protobuf:"bytes,1,rep,name=inputs,proto3" json:"inputs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1140,11 +1288,6 @@ func (x *UserAction) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserAction.ProtoReflect.Descriptor instead.
-func (*UserAction) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *UserAction) GetInputs() []*UserAction_Input {
 	if x != nil {
 		return x.Inputs
@@ -1152,9 +1295,27 @@ func (x *UserAction) GetInputs() []*UserAction_Input {
 	return nil
 }
 
+func (x *UserAction) SetInputs(v []*UserAction_Input) {
+	x.Inputs = v
+}
+
+type UserAction_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Inputs []*UserAction_Input
+}
+
+func (b0 UserAction_builder) Build() *UserAction {
+	m0 := &UserAction{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Inputs = b.Inputs
+	return m0
+}
+
 // Var is an intermediate value in a Flow used to transform and/or memoize the result of a computation for reuse.
 type Var struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// When true var always returns its first non-null memoized value.
 	Cache *bool `protobuf:"varint,2,opt,name=cache,proto3,oneof" json:"cache,omitempty"`
@@ -1191,11 +1352,6 @@ func (x *Var) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Var.ProtoReflect.Descriptor instead.
-func (*Var) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *Var) GetId() string {
 	if x != nil {
 		return x.Id
@@ -1224,8 +1380,69 @@ func (x *Var) GetSwitch() *Var_Switch {
 	return nil
 }
 
+func (x *Var) SetId(v string) {
+	x.Id = v
+}
+
+func (x *Var) SetCache(v bool) {
+	x.Cache = &v
+}
+
+func (x *Var) SetValue(v string) {
+	x.Value = v
+}
+
+func (x *Var) SetSwitch(v *Var_Switch) {
+	x.Switch = v
+}
+
+func (x *Var) HasCache() bool {
+	if x == nil {
+		return false
+	}
+	return x.Cache != nil
+}
+
+func (x *Var) HasSwitch() bool {
+	if x == nil {
+		return false
+	}
+	return x.Switch != nil
+}
+
+func (x *Var) ClearCache() {
+	x.Cache = nil
+}
+
+func (x *Var) ClearSwitch() {
+	x.Switch = nil
+}
+
+type Var_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id string
+	// When true var always returns its first non-null memoized value.
+	Cache *bool
+	// Var evaluates to given expression value.
+	Value string
+	// Var evaluates to switch statements first matching case (otherwise default).
+	Switch *Var_Switch
+}
+
+func (b0 Var_builder) Build() *Var {
+	m0 := &Var{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Cache = b.Cache
+	x.Value = b.Value
+	x.Switch = b.Switch
+	return m0
+}
+
 type Output struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Value         string                 `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1257,11 +1474,6 @@ func (x *Output) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Output.ProtoReflect.Descriptor instead.
-func (*Output) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *Output) GetId() string {
 	if x != nil {
 		return x.Id
@@ -1276,8 +1488,32 @@ func (x *Output) GetValue() string {
 	return ""
 }
 
+func (x *Output) SetId(v string) {
+	x.Id = v
+}
+
+func (x *Output) SetValue(v string) {
+	x.Value = v
+}
+
+type Output_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id    string
+	Value string
+}
+
+func (b0 Output_builder) Build() *Output {
+	m0 := &Output{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	x.Value = b.Value
+	return m0
+}
+
 type Action_MethodCall struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
+	state      protoimpl.MessageState `protogen:"hybrid.v1"`
 	Connection string                 `protobuf:"bytes,1,opt,name=connection,proto3" json:"connection,omitempty"`
 	Method     string                 `protobuf:"bytes,2,opt,name=method,proto3" json:"method,omitempty"`
 	Request    *structpb.Value        `protobuf:"bytes,3,opt,name=request,proto3" json:"request,omitempty"`
@@ -1315,11 +1551,6 @@ func (x *Action_MethodCall) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Action_MethodCall.ProtoReflect.Descriptor instead.
-func (*Action_MethodCall) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{3, 0}
-}
-
 func (x *Action_MethodCall) GetConnection() string {
 	if x != nil {
 		return x.Connection
@@ -1355,8 +1586,86 @@ func (x *Action_MethodCall) GetOnError() string {
 	return ""
 }
 
+func (x *Action_MethodCall) SetConnection(v string) {
+	x.Connection = v
+}
+
+func (x *Action_MethodCall) SetMethod(v string) {
+	x.Method = v
+}
+
+func (x *Action_MethodCall) SetRequest(v *structpb.Value) {
+	x.Request = v
+}
+
+func (x *Action_MethodCall) SetInvokeWhen(v string) {
+	x.InvokeWhen = &v
+}
+
+func (x *Action_MethodCall) SetOnError(v string) {
+	x.OnError = &v
+}
+
+func (x *Action_MethodCall) HasRequest() bool {
+	if x == nil {
+		return false
+	}
+	return x.Request != nil
+}
+
+func (x *Action_MethodCall) HasInvokeWhen() bool {
+	if x == nil {
+		return false
+	}
+	return x.InvokeWhen != nil
+}
+
+func (x *Action_MethodCall) HasOnError() bool {
+	if x == nil {
+		return false
+	}
+	return x.OnError != nil
+}
+
+func (x *Action_MethodCall) ClearRequest() {
+	x.Request = nil
+}
+
+func (x *Action_MethodCall) ClearInvokeWhen() {
+	x.InvokeWhen = nil
+}
+
+func (x *Action_MethodCall) ClearOnError() {
+	x.OnError = nil
+}
+
+type Action_MethodCall_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Connection string
+	Method     string
+	Request    *structpb.Value
+	// Invoke method when given expression evaluates to true; optional.
+	InvokeWhen *string
+	// If method invocation results in an error return the evaluated result of
+	// given expression; optional.
+	OnError *string
+}
+
+func (b0 Action_MethodCall_builder) Build() *Action_MethodCall {
+	m0 := &Action_MethodCall{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Connection = b.Connection
+	x.Method = b.Method
+	x.Request = b.Request
+	x.InvokeWhen = b.InvokeWhen
+	x.OnError = b.OnError
+	return m0
+}
+
 type Stream_MethodCall struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
+	state      protoimpl.MessageState `protogen:"hybrid.v1"`
 	Connection string                 `protobuf:"bytes,1,opt,name=connection,proto3" json:"connection,omitempty"`
 	Method     string                 `protobuf:"bytes,2,opt,name=method,proto3" json:"method,omitempty"`
 	Request    *structpb.Value        `protobuf:"bytes,3,opt,name=request,proto3" json:"request,omitempty"`
@@ -1391,11 +1700,6 @@ func (x *Stream_MethodCall) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Stream_MethodCall.ProtoReflect.Descriptor instead.
-func (*Stream_MethodCall) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{4, 0}
 }
 
 func (x *Stream_MethodCall) GetConnection() string {
@@ -1433,8 +1737,85 @@ func (x *Stream_MethodCall) GetRecvWhen() string {
 	return ""
 }
 
+func (x *Stream_MethodCall) SetConnection(v string) {
+	x.Connection = v
+}
+
+func (x *Stream_MethodCall) SetMethod(v string) {
+	x.Method = v
+}
+
+func (x *Stream_MethodCall) SetRequest(v *structpb.Value) {
+	x.Request = v
+}
+
+func (x *Stream_MethodCall) SetSendWhen(v string) {
+	x.SendWhen = &v
+}
+
+func (x *Stream_MethodCall) SetRecvWhen(v string) {
+	x.RecvWhen = &v
+}
+
+func (x *Stream_MethodCall) HasRequest() bool {
+	if x == nil {
+		return false
+	}
+	return x.Request != nil
+}
+
+func (x *Stream_MethodCall) HasSendWhen() bool {
+	if x == nil {
+		return false
+	}
+	return x.SendWhen != nil
+}
+
+func (x *Stream_MethodCall) HasRecvWhen() bool {
+	if x == nil {
+		return false
+	}
+	return x.RecvWhen != nil
+}
+
+func (x *Stream_MethodCall) ClearRequest() {
+	x.Request = nil
+}
+
+func (x *Stream_MethodCall) ClearSendWhen() {
+	x.SendWhen = nil
+}
+
+func (x *Stream_MethodCall) ClearRecvWhen() {
+	x.RecvWhen = nil
+}
+
+type Stream_MethodCall_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Connection string
+	Method     string
+	Request    *structpb.Value
+	// Stream sends request when given expression evaluates to true; optional.
+	SendWhen *string
+	// Stream receives response when given expression evaluates to true; optional.
+	RecvWhen *string
+}
+
+func (b0 Stream_MethodCall_builder) Build() *Stream_MethodCall {
+	m0 := &Stream_MethodCall{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Connection = b.Connection
+	x.Method = b.Method
+	x.Request = b.Request
+	x.SendWhen = b.SendWhen
+	x.RecvWhen = b.RecvWhen
+	return m0
+}
+
 type Stream_Generator struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Every         *durationpb.Duration   `protobuf:"bytes,1,opt,name=every,proto3" json:"every,omitempty"`
 	Initial       *durationpb.Duration   `protobuf:"bytes,2,opt,name=initial,proto3" json:"initial,omitempty"`
 	Value         string                 `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
@@ -1467,11 +1848,6 @@ func (x *Stream_Generator) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Stream_Generator.ProtoReflect.Descriptor instead.
-func (*Stream_Generator) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{4, 1}
-}
-
 func (x *Stream_Generator) GetEvery() *durationpb.Duration {
 	if x != nil {
 		return x.Every
@@ -1493,41 +1869,41 @@ func (x *Stream_Generator) GetValue() string {
 	return ""
 }
 
-func (x *Ticker) SetEvery(v *durationpb.Duration) {
+func (x *Stream_Generator) SetEvery(v *durationpb.Duration) {
 	x.Every = v
 }
 
-func (x *Ticker) SetInitial(v *durationpb.Duration) {
+func (x *Stream_Generator) SetInitial(v *durationpb.Duration) {
 	x.Initial = v
 }
 
-func (x *Ticker) SetValue(v string) {
+func (x *Stream_Generator) SetValue(v string) {
 	x.Value = v
 }
 
-func (x *Ticker) HasEvery() bool {
+func (x *Stream_Generator) HasEvery() bool {
 	if x == nil {
 		return false
 	}
 	return x.Every != nil
 }
 
-func (x *Ticker) HasInitial() bool {
+func (x *Stream_Generator) HasInitial() bool {
 	if x == nil {
 		return false
 	}
 	return x.Initial != nil
 }
 
-func (x *Ticker) ClearEvery() {
+func (x *Stream_Generator) ClearEvery() {
 	x.Every = nil
 }
 
-func (x *Ticker) ClearInitial() {
+func (x *Stream_Generator) ClearInitial() {
 	x.Initial = nil
 }
 
-type Ticker_builder struct {
+type Stream_Generator_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	Every   *durationpb.Duration
@@ -1535,8 +1911,8 @@ type Ticker_builder struct {
 	Value   string
 }
 
-func (b0 Ticker_builder) Build() *Ticker {
-	m0 := &Ticker{}
+func (b0 Stream_Generator_builder) Build() *Stream_Generator {
+	m0 := &Stream_Generator{}
 	b, x := &b0, m0
 	_, _ = b, x
 	x.Every = b.Every
@@ -1575,11 +1951,6 @@ func (x *UserAction_ConfirmBinding) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UserAction_ConfirmBinding.ProtoReflect.Descriptor instead.
-func (*UserAction_ConfirmBinding) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{5, 0}
 }
 
 func (x *UserAction_ConfirmBinding) GetValue() bool {
@@ -1639,11 +2010,6 @@ func (x *UserAction_InputBinding) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserAction_InputBinding.ProtoReflect.Descriptor instead.
-func (*UserAction_InputBinding) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{5, 1}
-}
-
 func (x *UserAction_InputBinding) GetValue() string {
 	if x != nil {
 		return x.Value
@@ -1699,11 +2065,6 @@ func (x *UserAction_FileBinding) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UserAction_FileBinding.ProtoReflect.Descriptor instead.
-func (*UserAction_FileBinding) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{5, 2}
 }
 
 func (x *UserAction_FileBinding) GetValue() []byte {
@@ -1764,11 +2125,6 @@ func (x *UserAction_SelectBinding) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UserAction_SelectBinding.ProtoReflect.Descriptor instead.
-func (*UserAction_SelectBinding) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{5, 3}
 }
 
 func (x *UserAction_SelectBinding) GetValue() *anypb.Any {
@@ -1839,11 +2195,6 @@ func (x *UserAction_MultiSelectBinding) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserAction_MultiSelectBinding.ProtoReflect.Descriptor instead.
-func (*UserAction_MultiSelectBinding) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{5, 4}
-}
-
 func (x *UserAction_MultiSelectBinding) GetValue() []*anypb.Any {
 	if x != nil {
 		return x.Value
@@ -1909,11 +2260,6 @@ func (x *UserAction_Input) ProtoReflect() protoreflect.Message {
 		return ms
 	}
 	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UserAction_Input.ProtoReflect.Descriptor instead.
-func (*UserAction_Input) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{5, 5}
 }
 
 func (x *UserAction_Input) GetId() string {
@@ -2245,7 +2591,7 @@ func (*UserAction_Input_Select) isUserAction_Input_Element() {}
 func (*UserAction_Input_MultiSelect) isUserAction_Input_Element() {}
 
 type Var_Switch struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Value         string                 `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 	Case          []*Var_Switch_Case     `protobuf:"bytes,2,rep,name=case,proto3" json:"case,omitempty"`
 	Default       string                 `protobuf:"bytes,3,opt,name=default,proto3" json:"default,omitempty"`
@@ -2278,11 +2624,6 @@ func (x *Var_Switch) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Var_Switch.ProtoReflect.Descriptor instead.
-func (*Var_Switch) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6, 0}
-}
-
 func (x *Var_Switch) GetValue() string {
 	if x != nil {
 		return x.Value
@@ -2304,8 +2645,38 @@ func (x *Var_Switch) GetDefault() string {
 	return ""
 }
 
+func (x *Var_Switch) SetValue(v string) {
+	x.Value = v
+}
+
+func (x *Var_Switch) SetCase(v []*Var_Switch_Case) {
+	x.Case = v
+}
+
+func (x *Var_Switch) SetDefault(v string) {
+	x.Default = v
+}
+
+type Var_Switch_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Value   string
+	Case    []*Var_Switch_Case
+	Default string
+}
+
+func (b0 Var_Switch_builder) Build() *Var_Switch {
+	m0 := &Var_Switch{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Value = b.Value
+	x.Case = b.Case
+	x.Default = b.Default
+	return m0
+}
+
 type Var_Switch_Case struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	Value         string                 `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 	Return        string                 `protobuf:"bytes,2,opt,name=return,proto3" json:"return,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -2337,11 +2708,6 @@ func (x *Var_Switch_Case) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Var_Switch_Case.ProtoReflect.Descriptor instead.
-func (*Var_Switch_Case) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6, 0, 0}
-}
-
 func (x *Var_Switch_Case) GetValue() string {
 	if x != nil {
 		return x.Value
@@ -2356,23 +2722,23 @@ func (x *Var_Switch_Case) GetReturn() string {
 	return ""
 }
 
-func (x *Switch_Case) SetValue(v string) {
+func (x *Var_Switch_Case) SetValue(v string) {
 	x.Value = v
 }
 
-func (x *Switch_Case) SetReturn(v string) {
+func (x *Var_Switch_Case) SetReturn(v string) {
 	x.Return = v
 }
 
-type Switch_Case_builder struct {
+type Var_Switch_Case_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	Value  string
 	Return string
 }
 
-func (b0 Switch_Case_builder) Build() *Switch_Case {
-	m0 := &Switch_Case{}
+func (b0 Var_Switch_Case_builder) Build() *Var_Switch_Case {
+	m0 := &Var_Switch_Case{}
 	b, x := &b0, m0
 	_, _ = b, x
 	x.Value = b.Value
@@ -2525,18 +2891,6 @@ const file_dtkt_flow_v1beta1_spec_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tB\x12\xbaH\x0f\xc8\x01\x01r\n" +
 	"2\b^\\s?=\\s?R\x05valueB\xd6\x01\n" +
 	"\x17proto.dtkt.flow.v1beta1B\tSpecProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1;flowv1beta1\xa2\x02\x03DFX\xaa\x02\x11Dtkt.Flow.V1beta1\xca\x02\x11Dtkt\\Flow\\V1beta1\xe2\x02\x1dDtkt\\Flow\\V1beta1\\GPBMetadata\xea\x02\x13Dtkt::Flow::V1beta1b\x06proto3"
-
-var (
-	file_dtkt_flow_v1beta1_spec_proto_rawDescOnce sync.Once
-	file_dtkt_flow_v1beta1_spec_proto_rawDescData []byte
-)
-
-func file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP() []byte {
-	file_dtkt_flow_v1beta1_spec_proto_rawDescOnce.Do(func() {
-		file_dtkt_flow_v1beta1_spec_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_dtkt_flow_v1beta1_spec_proto_rawDesc), len(file_dtkt_flow_v1beta1_spec_proto_rawDesc)))
-	})
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescData
-}
 
 var file_dtkt_flow_v1beta1_spec_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_dtkt_flow_v1beta1_spec_proto_goTypes = []any{

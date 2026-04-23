@@ -951,13 +951,389 @@ func (*input_Map) isInput_Type() {}
 
 func (*input_Message) isInput_Type() {}
 
+type Action struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id          string                 `protobuf:"bytes,1,opt,name=id,proto3"`
+	xxx_hidden_Cache       bool                   `protobuf:"varint,2,opt,name=cache,proto3,oneof"`
+	xxx_hidden_Call        *Action_MethodCall     `protobuf:"bytes,5,opt,name=call,proto3"`
+	xxx_hidden_User        *UserAction            `protobuf:"bytes,6,opt,name=user,proto3"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *Action) Reset() {
+	*x = Action{}
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Action) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Action) ProtoMessage() {}
+
+func (x *Action) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *Action) GetId() string {
+	if x != nil {
+		return x.xxx_hidden_Id
+	}
+	return ""
+}
+
+func (x *Action) GetCache() bool {
+	if x != nil {
+		return x.xxx_hidden_Cache
+	}
+	return false
+}
+
+func (x *Action) GetCall() *Action_MethodCall {
+	if x != nil {
+		return x.xxx_hidden_Call
+	}
+	return nil
+}
+
+func (x *Action) GetUser() *UserAction {
+	if x != nil {
+		return x.xxx_hidden_User
+	}
+	return nil
+}
+
+func (x *Action) SetId(v string) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *Action) SetCache(v bool) {
+	x.xxx_hidden_Cache = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
+}
+
+func (x *Action) SetCall(v *Action_MethodCall) {
+	x.xxx_hidden_Call = v
+}
+
+func (x *Action) SetUser(v *UserAction) {
+	x.xxx_hidden_User = v
+}
+
+func (x *Action) HasCache() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Action) HasCall() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Call != nil
+}
+
+func (x *Action) HasUser() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_User != nil
+}
+
+func (x *Action) ClearCache() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Cache = false
+}
+
+func (x *Action) ClearCall() {
+	x.xxx_hidden_Call = nil
+}
+
+func (x *Action) ClearUser() {
+	x.xxx_hidden_User = nil
+}
+
+type Action_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id string
+	// When true action always returns its first non-null memoized value.
+	Cache *bool
+	Call  *Action_MethodCall
+	User  *UserAction
+}
+
+func (b0 Action_builder) Build() *Action {
+	m0 := &Action{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	if b.Cache != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 4)
+		x.xxx_hidden_Cache = *b.Cache
+	}
+	x.xxx_hidden_Call = b.Call
+	x.xxx_hidden_User = b.User
+	return m0
+}
+
+type Stream struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id          string                 `protobuf:"bytes,1,opt,name=id,proto3"`
+	xxx_hidden_StartWhen   *string                `protobuf:"bytes,2,opt,name=start_when,json=startWhen,proto3,oneof"`
+	xxx_hidden_StopWhen    *string                `protobuf:"bytes,3,opt,name=stop_when,json=stopWhen,proto3,oneof"`
+	xxx_hidden_Call        *Stream_MethodCall     `protobuf:"bytes,4,opt,name=call,proto3"`
+	xxx_hidden_Generate    *Stream_Generator      `protobuf:"bytes,5,opt,name=generate,proto3"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *Stream) Reset() {
+	*x = Stream{}
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Stream) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Stream) ProtoMessage() {}
+
+func (x *Stream) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *Stream) GetId() string {
+	if x != nil {
+		return x.xxx_hidden_Id
+	}
+	return ""
+}
+
+func (x *Stream) GetStartWhen() string {
+	if x != nil {
+		if x.xxx_hidden_StartWhen != nil {
+			return *x.xxx_hidden_StartWhen
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *Stream) GetStopWhen() string {
+	if x != nil {
+		if x.xxx_hidden_StopWhen != nil {
+			return *x.xxx_hidden_StopWhen
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *Stream) GetCall() *Stream_MethodCall {
+	if x != nil {
+		return x.xxx_hidden_Call
+	}
+	return nil
+}
+
+func (x *Stream) GetGenerate() *Stream_Generator {
+	if x != nil {
+		return x.xxx_hidden_Generate
+	}
+	return nil
+}
+
+func (x *Stream) SetId(v string) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *Stream) SetStartWhen(v string) {
+	x.xxx_hidden_StartWhen = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 5)
+}
+
+func (x *Stream) SetStopWhen(v string) {
+	x.xxx_hidden_StopWhen = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 5)
+}
+
+func (x *Stream) SetCall(v *Stream_MethodCall) {
+	x.xxx_hidden_Call = v
+}
+
+func (x *Stream) SetGenerate(v *Stream_Generator) {
+	x.xxx_hidden_Generate = v
+}
+
+func (x *Stream) HasStartWhen() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Stream) HasStopWhen() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *Stream) HasCall() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Call != nil
+}
+
+func (x *Stream) HasGenerate() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Generate != nil
+}
+
+func (x *Stream) ClearStartWhen() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_StartWhen = nil
+}
+
+func (x *Stream) ClearStopWhen() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_StopWhen = nil
+}
+
+func (x *Stream) ClearCall() {
+	x.xxx_hidden_Call = nil
+}
+
+func (x *Stream) ClearGenerate() {
+	x.xxx_hidden_Generate = nil
+}
+
+type Stream_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id string
+	// Stream starts when expression evaluates to true; optional.
+	StartWhen *string
+	// Stream stops when expression evaluates to true; optional.
+	StopWhen *string
+	Call     *Stream_MethodCall
+	Generate *Stream_Generator
+}
+
+func (b0 Stream_builder) Build() *Stream {
+	m0 := &Stream{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	if b.StartWhen != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 5)
+		x.xxx_hidden_StartWhen = b.StartWhen
+	}
+	if b.StopWhen != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 5)
+		x.xxx_hidden_StopWhen = b.StopWhen
+	}
+	x.xxx_hidden_Call = b.Call
+	x.xxx_hidden_Generate = b.Generate
+	return m0
+}
+
+type UserAction struct {
+	state             protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Inputs *[]*UserAction_Input   `protobuf:"bytes,1,rep,name=inputs,proto3"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *UserAction) Reset() {
+	*x = UserAction{}
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserAction) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserAction) ProtoMessage() {}
+
+func (x *UserAction) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *UserAction) GetInputs() []*UserAction_Input {
+	if x != nil {
+		if x.xxx_hidden_Inputs != nil {
+			return *x.xxx_hidden_Inputs
+		}
+	}
+	return nil
+}
+
+func (x *UserAction) SetInputs(v []*UserAction_Input) {
+	x.xxx_hidden_Inputs = &v
+}
+
+type UserAction_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Inputs []*UserAction_Input
+}
+
+func (b0 UserAction_builder) Build() *UserAction {
+	m0 := &UserAction{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Inputs = &b.Inputs
+	return m0
+}
+
 // Var is an intermediate value in a Flow used to transform and/or memoize the result of a computation for reuse.
 type Var struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Id          string                 `protobuf:"bytes,1,opt,name=id,proto3"`
 	xxx_hidden_Cache       bool                   `protobuf:"varint,2,opt,name=cache,proto3,oneof"`
 	xxx_hidden_Value       string                 `protobuf:"bytes,3,opt,name=value,proto3"`
-	xxx_hidden_Switch      *Switch                `protobuf:"bytes,4,opt,name=switch,proto3"`
+	xxx_hidden_Switch      *Var_Switch            `protobuf:"bytes,4,opt,name=switch,proto3"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -966,7 +1342,7 @@ type Var struct {
 
 func (x *Var) Reset() {
 	*x = Var{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[3]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -978,7 +1354,7 @@ func (x *Var) String() string {
 func (*Var) ProtoMessage() {}
 
 func (x *Var) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[3]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1010,7 +1386,7 @@ func (x *Var) GetValue() string {
 	return ""
 }
 
-func (x *Var) GetSwitch() *Switch {
+func (x *Var) GetSwitch() *Var_Switch {
 	if x != nil {
 		return x.xxx_hidden_Switch
 	}
@@ -1030,7 +1406,7 @@ func (x *Var) SetValue(v string) {
 	x.xxx_hidden_Value = v
 }
 
-func (x *Var) SetSwitch(v *Switch) {
+func (x *Var) SetSwitch(v *Var_Switch) {
 	x.xxx_hidden_Switch = v
 }
 
@@ -1063,10 +1439,10 @@ type Var_builder struct {
 	Id string
 	// When true var always returns its first non-null memoized value.
 	Cache *bool
-	// Given expression evaluates to var's memoized value, example: "= inputs.foo.getValue()"
+	// Var evaluates to given expression value.
 	Value string
-	// Given switch statement's first matching case (otherwise default) evaluates to var's memoized value.
-	Switch *Switch
+	// Var evaluates to switch statements first matching case (otherwise default).
+	Switch *Var_Switch
 }
 
 func (b0 Var_builder) Build() *Var {
@@ -1083,215 +1459,6 @@ func (b0 Var_builder) Build() *Var {
 	return m0
 }
 
-type Action struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Id          string                 `protobuf:"bytes,1,opt,name=id,proto3"`
-	xxx_hidden_Cache       bool                   `protobuf:"varint,2,opt,name=cache,proto3,oneof"`
-	xxx_hidden_RunIf       *string                `protobuf:"bytes,3,opt,name=run_if,json=runIf,proto3,oneof"`
-	xxx_hidden_OnError     *string                `protobuf:"bytes,4,opt,name=on_error,json=onError,proto3,oneof"`
-	xxx_hidden_Call        *MethodCall            `protobuf:"bytes,5,opt,name=call,proto3"`
-	xxx_hidden_User        *UserAction            `protobuf:"bytes,6,opt,name=user,proto3"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
-}
-
-func (x *Action) Reset() {
-	*x = Action{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Action) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Action) ProtoMessage() {}
-
-func (x *Action) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *Action) GetId() string {
-	if x != nil {
-		return x.xxx_hidden_Id
-	}
-	return ""
-}
-
-func (x *Action) GetCache() bool {
-	if x != nil {
-		return x.xxx_hidden_Cache
-	}
-	return false
-}
-
-func (x *Action) GetRunIf() string {
-	if x != nil {
-		if x.xxx_hidden_RunIf != nil {
-			return *x.xxx_hidden_RunIf
-		}
-		return ""
-	}
-	return ""
-}
-
-func (x *Action) GetOnError() string {
-	if x != nil {
-		if x.xxx_hidden_OnError != nil {
-			return *x.xxx_hidden_OnError
-		}
-		return ""
-	}
-	return ""
-}
-
-func (x *Action) GetCall() *MethodCall {
-	if x != nil {
-		return x.xxx_hidden_Call
-	}
-	return nil
-}
-
-func (x *Action) GetUser() *UserAction {
-	if x != nil {
-		return x.xxx_hidden_User
-	}
-	return nil
-}
-
-func (x *Action) SetId(v string) {
-	x.xxx_hidden_Id = v
-}
-
-func (x *Action) SetCache(v bool) {
-	x.xxx_hidden_Cache = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 6)
-}
-
-func (x *Action) SetRunIf(v string) {
-	x.xxx_hidden_RunIf = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 6)
-}
-
-func (x *Action) SetOnError(v string) {
-	x.xxx_hidden_OnError = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 6)
-}
-
-func (x *Action) SetCall(v *MethodCall) {
-	x.xxx_hidden_Call = v
-}
-
-func (x *Action) SetUser(v *UserAction) {
-	x.xxx_hidden_User = v
-}
-
-func (x *Action) HasCache() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
-func (x *Action) HasRunIf() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
-}
-
-func (x *Action) HasOnError() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
-}
-
-func (x *Action) HasCall() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Call != nil
-}
-
-func (x *Action) HasUser() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_User != nil
-}
-
-func (x *Action) ClearCache() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_Cache = false
-}
-
-func (x *Action) ClearRunIf() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
-	x.xxx_hidden_RunIf = nil
-}
-
-func (x *Action) ClearOnError() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
-	x.xxx_hidden_OnError = nil
-}
-
-func (x *Action) ClearCall() {
-	x.xxx_hidden_Call = nil
-}
-
-func (x *Action) ClearUser() {
-	x.xxx_hidden_User = nil
-}
-
-type Action_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	Id string
-	// When true action always returns its first non-null memoized value.
-	Cache *bool
-	// Execute action when given expression evaluates to true; optional.
-	RunIf *string
-	// Return evaluation of given expression when an error is encountered in call
-	// or user; optional.
-	OnError *string
-	Call    *MethodCall
-	User    *UserAction
-}
-
-func (b0 Action_builder) Build() *Action {
-	m0 := &Action{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.xxx_hidden_Id = b.Id
-	if b.Cache != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 6)
-		x.xxx_hidden_Cache = *b.Cache
-	}
-	if b.RunIf != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 6)
-		x.xxx_hidden_RunIf = b.RunIf
-	}
-	if b.OnError != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 6)
-		x.xxx_hidden_OnError = b.OnError
-	}
-	x.xxx_hidden_Call = b.Call
-	x.xxx_hidden_User = b.User
-	return m0
-}
-
 type Output struct {
 	state            protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Id    string                 `protobuf:"bytes,1,opt,name=id,proto3"`
@@ -1302,7 +1469,7 @@ type Output struct {
 
 func (x *Output) Reset() {
 	*x = Output{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[5]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1314,7 +1481,7 @@ func (x *Output) String() string {
 func (*Output) ProtoMessage() {}
 
 func (x *Output) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[5]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1363,34 +1530,34 @@ func (b0 Output_builder) Build() *Output {
 	return m0
 }
 
-type Stream struct {
+type Action_MethodCall struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Id          string                 `protobuf:"bytes,1,opt,name=id,proto3"`
-	xxx_hidden_StartIf     *string                `protobuf:"bytes,2,opt,name=start_if,json=startIf,proto3,oneof"`
-	xxx_hidden_StopIf      *string                `protobuf:"bytes,3,opt,name=stop_if,json=stopIf,proto3,oneof"`
-	xxx_hidden_Call        *MethodCall            `protobuf:"bytes,4,opt,name=call,proto3"`
-	xxx_hidden_Generate    *Ticker                `protobuf:"bytes,5,opt,name=generate,proto3"`
+	xxx_hidden_Connection  string                 `protobuf:"bytes,1,opt,name=connection,proto3"`
+	xxx_hidden_Method      string                 `protobuf:"bytes,2,opt,name=method,proto3"`
+	xxx_hidden_Request     *structpb.Value        `protobuf:"bytes,3,opt,name=request,proto3"`
+	xxx_hidden_InvokeWhen  *string                `protobuf:"bytes,4,opt,name=invoke_when,json=invokeWhen,proto3,oneof"`
+	xxx_hidden_OnError     *string                `protobuf:"bytes,5,opt,name=on_error,json=onError,proto3,oneof"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
 
-func (x *Stream) Reset() {
-	*x = Stream{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[6]
+func (x *Action_MethodCall) Reset() {
+	*x = Action_MethodCall{}
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Stream) String() string {
+func (x *Action_MethodCall) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Stream) ProtoMessage() {}
+func (*Action_MethodCall) ProtoMessage() {}
 
-func (x *Stream) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[6]
+func (x *Action_MethodCall) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1401,323 +1568,162 @@ func (x *Stream) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *Stream) GetId() string {
-	if x != nil {
-		return x.xxx_hidden_Id
-	}
-	return ""
-}
-
-func (x *Stream) GetStartIf() string {
-	if x != nil {
-		if x.xxx_hidden_StartIf != nil {
-			return *x.xxx_hidden_StartIf
-		}
-		return ""
-	}
-	return ""
-}
-
-func (x *Stream) GetStopIf() string {
-	if x != nil {
-		if x.xxx_hidden_StopIf != nil {
-			return *x.xxx_hidden_StopIf
-		}
-		return ""
-	}
-	return ""
-}
-
-func (x *Stream) GetCall() *MethodCall {
-	if x != nil {
-		return x.xxx_hidden_Call
-	}
-	return nil
-}
-
-func (x *Stream) GetGenerate() *Ticker {
-	if x != nil {
-		return x.xxx_hidden_Generate
-	}
-	return nil
-}
-
-func (x *Stream) SetId(v string) {
-	x.xxx_hidden_Id = v
-}
-
-func (x *Stream) SetStartIf(v string) {
-	x.xxx_hidden_StartIf = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 5)
-}
-
-func (x *Stream) SetStopIf(v string) {
-	x.xxx_hidden_StopIf = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 5)
-}
-
-func (x *Stream) SetCall(v *MethodCall) {
-	x.xxx_hidden_Call = v
-}
-
-func (x *Stream) SetGenerate(v *Ticker) {
-	x.xxx_hidden_Generate = v
-}
-
-func (x *Stream) HasStartIf() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
-func (x *Stream) HasStopIf() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
-}
-
-func (x *Stream) HasCall() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Call != nil
-}
-
-func (x *Stream) HasGenerate() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Generate != nil
-}
-
-func (x *Stream) ClearStartIf() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_StartIf = nil
-}
-
-func (x *Stream) ClearStopIf() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
-	x.xxx_hidden_StopIf = nil
-}
-
-func (x *Stream) ClearCall() {
-	x.xxx_hidden_Call = nil
-}
-
-func (x *Stream) ClearGenerate() {
-	x.xxx_hidden_Generate = nil
-}
-
-type Stream_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	Id string
-	// Start stream when expression evaluates to true; optional.
-	StartIf *string
-	// Stop stream when expression evaluates to true; optional.
-	StopIf   *string
-	Call     *MethodCall
-	Generate *Ticker
-}
-
-func (b0 Stream_builder) Build() *Stream {
-	m0 := &Stream{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.xxx_hidden_Id = b.Id
-	if b.StartIf != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 5)
-		x.xxx_hidden_StartIf = b.StartIf
-	}
-	if b.StopIf != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 5)
-		x.xxx_hidden_StopIf = b.StopIf
-	}
-	x.xxx_hidden_Call = b.Call
-	x.xxx_hidden_Generate = b.Generate
-	return m0
-}
-
-type MethodCall struct {
-	state                 protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Connection string                 `protobuf:"bytes,1,opt,name=connection,proto3"`
-	xxx_hidden_Method     string                 `protobuf:"bytes,2,opt,name=method,proto3"`
-	xxx_hidden_Request    *structpb.Value        `protobuf:"bytes,3,opt,name=request,proto3"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
-}
-
-func (x *MethodCall) Reset() {
-	*x = MethodCall{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *MethodCall) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*MethodCall) ProtoMessage() {}
-
-func (x *MethodCall) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *MethodCall) GetConnection() string {
+func (x *Action_MethodCall) GetConnection() string {
 	if x != nil {
 		return x.xxx_hidden_Connection
 	}
 	return ""
 }
 
-func (x *MethodCall) GetMethod() string {
+func (x *Action_MethodCall) GetMethod() string {
 	if x != nil {
 		return x.xxx_hidden_Method
 	}
 	return ""
 }
 
-func (x *MethodCall) GetRequest() *structpb.Value {
+func (x *Action_MethodCall) GetRequest() *structpb.Value {
 	if x != nil {
 		return x.xxx_hidden_Request
 	}
 	return nil
 }
 
-func (x *MethodCall) SetConnection(v string) {
+func (x *Action_MethodCall) GetInvokeWhen() string {
+	if x != nil {
+		if x.xxx_hidden_InvokeWhen != nil {
+			return *x.xxx_hidden_InvokeWhen
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *Action_MethodCall) GetOnError() string {
+	if x != nil {
+		if x.xxx_hidden_OnError != nil {
+			return *x.xxx_hidden_OnError
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *Action_MethodCall) SetConnection(v string) {
 	x.xxx_hidden_Connection = v
 }
 
-func (x *MethodCall) SetMethod(v string) {
+func (x *Action_MethodCall) SetMethod(v string) {
 	x.xxx_hidden_Method = v
 }
 
-func (x *MethodCall) SetRequest(v *structpb.Value) {
+func (x *Action_MethodCall) SetRequest(v *structpb.Value) {
 	x.xxx_hidden_Request = v
 }
 
-func (x *MethodCall) HasRequest() bool {
+func (x *Action_MethodCall) SetInvokeWhen(v string) {
+	x.xxx_hidden_InvokeWhen = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 5)
+}
+
+func (x *Action_MethodCall) SetOnError(v string) {
+	x.xxx_hidden_OnError = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 5)
+}
+
+func (x *Action_MethodCall) HasRequest() bool {
 	if x == nil {
 		return false
 	}
 	return x.xxx_hidden_Request != nil
 }
 
-func (x *MethodCall) ClearRequest() {
+func (x *Action_MethodCall) HasInvokeWhen() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+}
+
+func (x *Action_MethodCall) HasOnError() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
+}
+
+func (x *Action_MethodCall) ClearRequest() {
 	x.xxx_hidden_Request = nil
 }
 
-type MethodCall_builder struct {
+func (x *Action_MethodCall) ClearInvokeWhen() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	x.xxx_hidden_InvokeWhen = nil
+}
+
+func (x *Action_MethodCall) ClearOnError() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
+	x.xxx_hidden_OnError = nil
+}
+
+type Action_MethodCall_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	Connection string
 	Method     string
 	Request    *structpb.Value
+	// Invoke method when given expression evaluates to true; optional.
+	InvokeWhen *string
+	// If method invocation results in an error return the evaluated result of
+	// given expression; optional.
+	OnError *string
 }
 
-func (b0 MethodCall_builder) Build() *MethodCall {
-	m0 := &MethodCall{}
+func (b0 Action_MethodCall_builder) Build() *Action_MethodCall {
+	m0 := &Action_MethodCall{}
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Connection = b.Connection
 	x.xxx_hidden_Method = b.Method
 	x.xxx_hidden_Request = b.Request
+	if b.InvokeWhen != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 5)
+		x.xxx_hidden_InvokeWhen = b.InvokeWhen
+	}
+	if b.OnError != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 5)
+		x.xxx_hidden_OnError = b.OnError
+	}
 	return m0
 }
 
-type UserAction struct {
-	state             protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Inputs *[]*UserAction_Input   `protobuf:"bytes,1,rep,name=inputs,proto3"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+type Stream_MethodCall struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Connection  string                 `protobuf:"bytes,1,opt,name=connection,proto3"`
+	xxx_hidden_Method      string                 `protobuf:"bytes,2,opt,name=method,proto3"`
+	xxx_hidden_Request     *structpb.Value        `protobuf:"bytes,3,opt,name=request,proto3"`
+	xxx_hidden_SendWhen    *string                `protobuf:"bytes,4,opt,name=send_when,json=sendWhen,proto3,oneof"`
+	xxx_hidden_RecvWhen    *string                `protobuf:"bytes,5,opt,name=recv_when,json=recvWhen,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
-func (x *UserAction) Reset() {
-	*x = UserAction{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UserAction) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UserAction) ProtoMessage() {}
-
-func (x *UserAction) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *UserAction) GetInputs() []*UserAction_Input {
-	if x != nil {
-		if x.xxx_hidden_Inputs != nil {
-			return *x.xxx_hidden_Inputs
-		}
-	}
-	return nil
-}
-
-func (x *UserAction) SetInputs(v []*UserAction_Input) {
-	x.xxx_hidden_Inputs = &v
-}
-
-type UserAction_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	Inputs []*UserAction_Input
-}
-
-func (b0 UserAction_builder) Build() *UserAction {
-	m0 := &UserAction{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.xxx_hidden_Inputs = &b.Inputs
-	return m0
-}
-
-type Switch struct {
-	state              protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Value   string                 `protobuf:"bytes,1,opt,name=value,proto3"`
-	xxx_hidden_Case    *[]*Switch_Case        `protobuf:"bytes,2,rep,name=case,proto3"`
-	xxx_hidden_Default string                 `protobuf:"bytes,3,opt,name=default,proto3"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
-}
-
-func (x *Switch) Reset() {
-	*x = Switch{}
+func (x *Stream_MethodCall) Reset() {
+	*x = Stream_MethodCall{}
 	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Switch) String() string {
+func (x *Stream_MethodCall) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Switch) ProtoMessage() {}
+func (*Stream_MethodCall) ProtoMessage() {}
 
-func (x *Switch) ProtoReflect() protoreflect.Message {
+func (x *Stream_MethodCall) ProtoReflect() protoreflect.Message {
 	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1729,60 +1735,135 @@ func (x *Switch) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *Switch) GetValue() string {
+func (x *Stream_MethodCall) GetConnection() string {
 	if x != nil {
-		return x.xxx_hidden_Value
+		return x.xxx_hidden_Connection
 	}
 	return ""
 }
 
-func (x *Switch) GetCase() []*Switch_Case {
+func (x *Stream_MethodCall) GetMethod() string {
 	if x != nil {
-		if x.xxx_hidden_Case != nil {
-			return *x.xxx_hidden_Case
-		}
+		return x.xxx_hidden_Method
+	}
+	return ""
+}
+
+func (x *Stream_MethodCall) GetRequest() *structpb.Value {
+	if x != nil {
+		return x.xxx_hidden_Request
 	}
 	return nil
 }
 
-func (x *Switch) GetDefault() string {
+func (x *Stream_MethodCall) GetSendWhen() string {
 	if x != nil {
-		return x.xxx_hidden_Default
+		if x.xxx_hidden_SendWhen != nil {
+			return *x.xxx_hidden_SendWhen
+		}
+		return ""
 	}
 	return ""
 }
 
-func (x *Switch) SetValue(v string) {
-	x.xxx_hidden_Value = v
+func (x *Stream_MethodCall) GetRecvWhen() string {
+	if x != nil {
+		if x.xxx_hidden_RecvWhen != nil {
+			return *x.xxx_hidden_RecvWhen
+		}
+		return ""
+	}
+	return ""
 }
 
-func (x *Switch) SetCase(v []*Switch_Case) {
-	x.xxx_hidden_Case = &v
+func (x *Stream_MethodCall) SetConnection(v string) {
+	x.xxx_hidden_Connection = v
 }
 
-func (x *Switch) SetDefault(v string) {
-	x.xxx_hidden_Default = v
+func (x *Stream_MethodCall) SetMethod(v string) {
+	x.xxx_hidden_Method = v
 }
 
-type Switch_builder struct {
+func (x *Stream_MethodCall) SetRequest(v *structpb.Value) {
+	x.xxx_hidden_Request = v
+}
+
+func (x *Stream_MethodCall) SetSendWhen(v string) {
+	x.xxx_hidden_SendWhen = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 5)
+}
+
+func (x *Stream_MethodCall) SetRecvWhen(v string) {
+	x.xxx_hidden_RecvWhen = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 5)
+}
+
+func (x *Stream_MethodCall) HasRequest() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Request != nil
+}
+
+func (x *Stream_MethodCall) HasSendWhen() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+}
+
+func (x *Stream_MethodCall) HasRecvWhen() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
+}
+
+func (x *Stream_MethodCall) ClearRequest() {
+	x.xxx_hidden_Request = nil
+}
+
+func (x *Stream_MethodCall) ClearSendWhen() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	x.xxx_hidden_SendWhen = nil
+}
+
+func (x *Stream_MethodCall) ClearRecvWhen() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
+	x.xxx_hidden_RecvWhen = nil
+}
+
+type Stream_MethodCall_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	Value   string
-	Case    []*Switch_Case
-	Default string
+	Connection string
+	Method     string
+	Request    *structpb.Value
+	// Stream sends request when given expression evaluates to true; optional.
+	SendWhen *string
+	// Stream receives response when given expression evaluates to true; optional.
+	RecvWhen *string
 }
 
-func (b0 Switch_builder) Build() *Switch {
-	m0 := &Switch{}
+func (b0 Stream_MethodCall_builder) Build() *Stream_MethodCall {
+	m0 := &Stream_MethodCall{}
 	b, x := &b0, m0
 	_, _ = b, x
-	x.xxx_hidden_Value = b.Value
-	x.xxx_hidden_Case = &b.Case
-	x.xxx_hidden_Default = b.Default
+	x.xxx_hidden_Connection = b.Connection
+	x.xxx_hidden_Method = b.Method
+	x.xxx_hidden_Request = b.Request
+	if b.SendWhen != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 5)
+		x.xxx_hidden_SendWhen = b.SendWhen
+	}
+	if b.RecvWhen != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 5)
+		x.xxx_hidden_RecvWhen = b.RecvWhen
+	}
 	return m0
 }
 
-type Ticker struct {
+type Stream_Generator struct {
 	state              protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Every   *durationpb.Duration   `protobuf:"bytes,1,opt,name=every,proto3"`
 	xxx_hidden_Initial *durationpb.Duration   `protobuf:"bytes,2,opt,name=initial,proto3"`
@@ -1791,20 +1872,20 @@ type Ticker struct {
 	sizeCache          protoimpl.SizeCache
 }
 
-func (x *Ticker) Reset() {
-	*x = Ticker{}
+func (x *Stream_Generator) Reset() {
+	*x = Stream_Generator{}
 	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Ticker) String() string {
+func (x *Stream_Generator) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Ticker) ProtoMessage() {}
+func (*Stream_Generator) ProtoMessage() {}
 
-func (x *Ticker) ProtoReflect() protoreflect.Message {
+func (x *Stream_Generator) ProtoReflect() protoreflect.Message {
 	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1816,62 +1897,62 @@ func (x *Ticker) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *Ticker) GetEvery() *durationpb.Duration {
+func (x *Stream_Generator) GetEvery() *durationpb.Duration {
 	if x != nil {
 		return x.xxx_hidden_Every
 	}
 	return nil
 }
 
-func (x *Ticker) GetInitial() *durationpb.Duration {
+func (x *Stream_Generator) GetInitial() *durationpb.Duration {
 	if x != nil {
 		return x.xxx_hidden_Initial
 	}
 	return nil
 }
 
-func (x *Ticker) GetValue() string {
+func (x *Stream_Generator) GetValue() string {
 	if x != nil {
 		return x.xxx_hidden_Value
 	}
 	return ""
 }
 
-func (x *Ticker) SetEvery(v *durationpb.Duration) {
+func (x *Stream_Generator) SetEvery(v *durationpb.Duration) {
 	x.xxx_hidden_Every = v
 }
 
-func (x *Ticker) SetInitial(v *durationpb.Duration) {
+func (x *Stream_Generator) SetInitial(v *durationpb.Duration) {
 	x.xxx_hidden_Initial = v
 }
 
-func (x *Ticker) SetValue(v string) {
+func (x *Stream_Generator) SetValue(v string) {
 	x.xxx_hidden_Value = v
 }
 
-func (x *Ticker) HasEvery() bool {
+func (x *Stream_Generator) HasEvery() bool {
 	if x == nil {
 		return false
 	}
 	return x.xxx_hidden_Every != nil
 }
 
-func (x *Ticker) HasInitial() bool {
+func (x *Stream_Generator) HasInitial() bool {
 	if x == nil {
 		return false
 	}
 	return x.xxx_hidden_Initial != nil
 }
 
-func (x *Ticker) ClearEvery() {
+func (x *Stream_Generator) ClearEvery() {
 	x.xxx_hidden_Every = nil
 }
 
-func (x *Ticker) ClearInitial() {
+func (x *Stream_Generator) ClearInitial() {
 	x.xxx_hidden_Initial = nil
 }
 
-type Ticker_builder struct {
+type Stream_Generator_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	Every   *durationpb.Duration
@@ -1879,8 +1960,8 @@ type Ticker_builder struct {
 	Value   string
 }
 
-func (b0 Ticker_builder) Build() *Ticker {
-	m0 := &Ticker{}
+func (b0 Stream_Generator_builder) Build() *Stream_Generator {
+	m0 := &Stream_Generator{}
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Every = b.Every
@@ -2556,28 +2637,29 @@ func (*userAction_Input_Select) isUserAction_Input_Element() {}
 
 func (*userAction_Input_MultiSelect) isUserAction_Input_Element() {}
 
-type Switch_Case struct {
-	state             protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Value  string                 `protobuf:"bytes,1,opt,name=value,proto3"`
-	xxx_hidden_Return string                 `protobuf:"bytes,2,opt,name=return,proto3"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+type Var_Switch struct {
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Value   string                 `protobuf:"bytes,1,opt,name=value,proto3"`
+	xxx_hidden_Case    *[]*Var_Switch_Case    `protobuf:"bytes,2,rep,name=case,proto3"`
+	xxx_hidden_Default string                 `protobuf:"bytes,3,opt,name=default,proto3"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
-func (x *Switch_Case) Reset() {
-	*x = Switch_Case{}
+func (x *Var_Switch) Reset() {
+	*x = Var_Switch{}
 	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Switch_Case) String() string {
+func (x *Var_Switch) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Switch_Case) ProtoMessage() {}
+func (*Var_Switch) ProtoMessage() {}
 
-func (x *Switch_Case) ProtoReflect() protoreflect.Message {
+func (x *Var_Switch) ProtoReflect() protoreflect.Message {
 	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2589,37 +2671,123 @@ func (x *Switch_Case) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *Switch_Case) GetValue() string {
+func (x *Var_Switch) GetValue() string {
 	if x != nil {
 		return x.xxx_hidden_Value
 	}
 	return ""
 }
 
-func (x *Switch_Case) GetReturn() string {
+func (x *Var_Switch) GetCase() []*Var_Switch_Case {
+	if x != nil {
+		if x.xxx_hidden_Case != nil {
+			return *x.xxx_hidden_Case
+		}
+	}
+	return nil
+}
+
+func (x *Var_Switch) GetDefault() string {
+	if x != nil {
+		return x.xxx_hidden_Default
+	}
+	return ""
+}
+
+func (x *Var_Switch) SetValue(v string) {
+	x.xxx_hidden_Value = v
+}
+
+func (x *Var_Switch) SetCase(v []*Var_Switch_Case) {
+	x.xxx_hidden_Case = &v
+}
+
+func (x *Var_Switch) SetDefault(v string) {
+	x.xxx_hidden_Default = v
+}
+
+type Var_Switch_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Value   string
+	Case    []*Var_Switch_Case
+	Default string
+}
+
+func (b0 Var_Switch_builder) Build() *Var_Switch {
+	m0 := &Var_Switch{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Value = b.Value
+	x.xxx_hidden_Case = &b.Case
+	x.xxx_hidden_Default = b.Default
+	return m0
+}
+
+type Var_Switch_Case struct {
+	state             protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Value  string                 `protobuf:"bytes,1,opt,name=value,proto3"`
+	xxx_hidden_Return string                 `protobuf:"bytes,2,opt,name=return,proto3"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *Var_Switch_Case) Reset() {
+	*x = Var_Switch_Case{}
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Var_Switch_Case) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Var_Switch_Case) ProtoMessage() {}
+
+func (x *Var_Switch_Case) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *Var_Switch_Case) GetValue() string {
+	if x != nil {
+		return x.xxx_hidden_Value
+	}
+	return ""
+}
+
+func (x *Var_Switch_Case) GetReturn() string {
 	if x != nil {
 		return x.xxx_hidden_Return
 	}
 	return ""
 }
 
-func (x *Switch_Case) SetValue(v string) {
+func (x *Var_Switch_Case) SetValue(v string) {
 	x.xxx_hidden_Value = v
 }
 
-func (x *Switch_Case) SetReturn(v string) {
+func (x *Var_Switch_Case) SetReturn(v string) {
 	x.xxx_hidden_Return = v
 }
 
-type Switch_Case_builder struct {
+type Var_Switch_Case_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	Value  string
 	Return string
 }
 
-func (b0 Switch_Case_builder) Build() *Switch_Case {
-	m0 := &Switch_Case{}
+func (b0 Var_Switch_Case_builder) Build() *Var_Switch_Case {
+	m0 := &Var_Switch_Case{}
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Value = b.Value
@@ -2666,53 +2834,63 @@ const file_dtkt_flow_v1beta1_spec_proto_rawDesc = "" +
 	"\x03map\x18\r \x01(\v2\x16.dtkt.flow.v1beta1.MapH\x00R\x03map\x126\n" +
 	"\amessage\x18\x0e \x01(\v2\x1a.dtkt.flow.v1beta1.MessageH\x00R\amessageB\r\n" +
 	"\x04type\x12\x05\xbaH\x02\b\x01B\b\n" +
-	"\x06_cache\"\xea\x01\n" +
-	"\x03Var\x121\n" +
-	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]+$R\x02id\x12\x19\n" +
-	"\x05cache\x18\x02 \x01(\bH\x00R\x05cache\x88\x01\x01\x12@\n" +
-	"\x05value\x18\x03 \x01(\tB*\xbaH'r%2\b^\\s?=\\s?\x92\x02\x18 = inputs.foo.getValue()R\x05value\x121\n" +
-	"\x06switch\x18\x04 \x01(\v2\x19.dtkt.flow.v1beta1.SwitchR\x06switch:\x16\xbaH\x13\"\x11\n" +
-	"\x05value\n" +
-	"\x06switch\x10\x01B\b\n" +
-	"\x06_cache\"\xd1\x02\n" +
+	"\x06_cache\"\x9b\x04\n" +
 	"\x06Action\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]+$R\x02id\x12\x19\n" +
-	"\x05cache\x18\x02 \x01(\bH\x00R\x05cache\x88\x01\x01\x12+\n" +
-	"\x06run_if\x18\x03 \x01(\tB\x0f\xbaH\fr\n" +
-	"2\b^\\s?=\\s?H\x01R\x05runIf\x88\x01\x01\x12/\n" +
-	"\bon_error\x18\x04 \x01(\tB\x0f\xbaH\fr\n" +
-	"2\b^\\s?=\\s?H\x02R\aonError\x88\x01\x01\x121\n" +
-	"\x04call\x18\x05 \x01(\v2\x1d.dtkt.flow.v1beta1.MethodCallR\x04call\x121\n" +
-	"\x04user\x18\x06 \x01(\v2\x1d.dtkt.flow.v1beta1.UserActionR\x04user:\x13\xbaH\x10\"\x0e\n" +
-	"\x04call\n" +
-	"\x04user\x10\x01B\b\n" +
-	"\x06_cacheB\t\n" +
-	"\a_run_ifB\v\n" +
-	"\t_on_error\"e\n" +
-	"\x06Output\x121\n" +
-	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]+$R\x02id\x12(\n" +
-	"\x05value\x18\x02 \x01(\tB\x12\xbaH\x0f\xc8\x01\x01r\n" +
-	"2\b^\\s?=\\s?R\x05value\"\xb7\x02\n" +
-	"\x06Stream\x121\n" +
-	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]+$R\x02id\x12/\n" +
-	"\bstart_if\x18\x02 \x01(\tB\x0f\xbaH\fr\n" +
-	"2\b^\\s?=\\s?H\x00R\astartIf\x88\x01\x01\x12-\n" +
-	"\astop_if\x18\x03 \x01(\tB\x0f\xbaH\fr\n" +
-	"2\b^\\s?=\\s?H\x01R\x06stopIf\x88\x01\x01\x121\n" +
-	"\x04call\x18\x04 \x01(\v2\x1d.dtkt.flow.v1beta1.MethodCallR\x04call\x125\n" +
-	"\bgenerate\x18\x05 \x01(\v2\x19.dtkt.flow.v1beta1.TickerR\bgenerate:\x17\xbaH\x14\"\x12\n" +
-	"\x04call\n" +
-	"\bgenerate\x10\x01B\v\n" +
-	"\t_start_ifB\n" +
-	"\n" +
-	"\b_stop_if\"\xb1\x01\n" +
+	"\x05cache\x18\x02 \x01(\bH\x00R\x05cache\x88\x01\x01\x128\n" +
+	"\x04call\x18\x05 \x01(\v2$.dtkt.flow.v1beta1.Action.MethodCallR\x04call\x121\n" +
+	"\x04user\x18\x06 \x01(\v2\x1d.dtkt.flow.v1beta1.UserActionR\x04user\x1a\xb6\x02\n" +
 	"\n" +
 	"MethodCall\x12A\n" +
 	"\n" +
 	"connection\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]+$R\n" +
 	"connection\x12.\n" +
 	"\x06method\x18\x02 \x01(\tB\x16\xbaH\x13\xc8\x01\x01r\x0e2\f[a-zA-Z._/]+R\x06method\x120\n" +
-	"\arequest\x18\x03 \x01(\v2\x16.google.protobuf.ValueR\arequest\"\x95\a\n" +
+	"\arequest\x18\x03 \x01(\v2\x16.google.protobuf.ValueR\arequest\x125\n" +
+	"\vinvoke_when\x18\x04 \x01(\tB\x0f\xbaH\fr\n" +
+	"2\b^\\s?=\\s?H\x00R\n" +
+	"invokeWhen\x88\x01\x01\x12/\n" +
+	"\bon_error\x18\x05 \x01(\tB\x0f\xbaH\fr\n" +
+	"2\b^\\s?=\\s?H\x01R\aonError\x88\x01\x01B\x0e\n" +
+	"\f_invoke_whenB\v\n" +
+	"\t_on_error:\x13\xbaH\x10\"\x0e\n" +
+	"\x04call\n" +
+	"\x04user\x10\x01B\b\n" +
+	"\x06_cache\"\xb0\x06\n" +
+	"\x06Stream\x121\n" +
+	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]+$R\x02id\x123\n" +
+	"\n" +
+	"start_when\x18\x02 \x01(\tB\x0f\xbaH\fr\n" +
+	"2\b^\\s?=\\s?H\x00R\tstartWhen\x88\x01\x01\x121\n" +
+	"\tstop_when\x18\x03 \x01(\tB\x0f\xbaH\fr\n" +
+	"2\b^\\s?=\\s?H\x01R\bstopWhen\x88\x01\x01\x128\n" +
+	"\x04call\x18\x04 \x01(\v2$.dtkt.flow.v1beta1.Stream.MethodCallR\x04call\x12?\n" +
+	"\bgenerate\x18\x05 \x01(\v2#.dtkt.flow.v1beta1.Stream.GeneratorR\bgenerate\x1a\xb3\x02\n" +
+	"\n" +
+	"MethodCall\x12A\n" +
+	"\n" +
+	"connection\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]+$R\n" +
+	"connection\x12.\n" +
+	"\x06method\x18\x02 \x01(\tB\x16\xbaH\x13\xc8\x01\x01r\x0e2\f[a-zA-Z._/]+R\x06method\x120\n" +
+	"\arequest\x18\x03 \x01(\v2\x16.google.protobuf.ValueR\arequest\x121\n" +
+	"\tsend_when\x18\x04 \x01(\tB\x0f\xbaH\fr\n" +
+	"2\b^\\s?=\\s?H\x00R\bsendWhen\x88\x01\x01\x121\n" +
+	"\trecv_when\x18\x05 \x01(\tB\x0f\xbaH\fr\n" +
+	"2\b^\\s?=\\s?H\x01R\brecvWhen\x88\x01\x01B\f\n" +
+	"\n" +
+	"_send_whenB\f\n" +
+	"\n" +
+	"_recv_when\x1a\xa3\x01\n" +
+	"\tGenerator\x127\n" +
+	"\x05every\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\x06\xbaH\x03\xc8\x01\x01R\x05every\x123\n" +
+	"\ainitial\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\ainitial\x12(\n" +
+	"\x05value\x18\x03 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
+	"2\b^\\s?=\\s?R\x05value:\x17\xbaH\x14\"\x12\n" +
+	"\x04call\n" +
+	"\bgenerate\x10\x01B\r\n" +
+	"\v_start_whenB\f\n" +
+	"\n" +
+	"_stop_when\"\x95\a\n" +
 	"\n" +
 	"UserAction\x12;\n" +
 	"\x06inputs\x18\x01 \x03(\v2#.dtkt.flow.v1beta1.UserAction.InputR\x06inputs\x1a@\n" +
@@ -2737,109 +2915,118 @@ const file_dtkt_flow_v1beta1_spec_proto_rawDesc = "" +
 	"\x06select\x18\a \x01(\v2%.dtkt.protoform.v1beta1.SelectElementH\x00R\x06select\x12O\n" +
 	"\fmulti_select\x18\b \x01(\v2*.dtkt.protoform.v1beta1.MultiSelectElementH\x00R\vmultiSelectB\x10\n" +
 	"\aelement\x12\x05\xbaH\x02\b\x01B\x0e\n" +
-	"\f_description\"\xf2\x01\n" +
+	"\f_description\"\xe7\x03\n" +
+	"\x03Var\x121\n" +
+	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]+$R\x02id\x12\x19\n" +
+	"\x05cache\x18\x02 \x01(\bH\x00R\x05cache\x88\x01\x01\x12@\n" +
+	"\x05value\x18\x03 \x01(\tB*\xbaH'r%2\b^\\s?=\\s?\x92\x02\x18 = inputs.foo.getValue()R\x05value\x125\n" +
+	"\x06switch\x18\x04 \x01(\v2\x1d.dtkt.flow.v1beta1.Var.SwitchR\x06switch\x1a\xf6\x01\n" +
 	"\x06Switch\x12(\n" +
 	"\x05value\x18\x01 \x01(\tB\x12\xbaH\x0f\xc8\x01\x01r\n" +
-	"2\b^\\s?=\\s?R\x05value\x122\n" +
-	"\x04case\x18\x02 \x03(\v2\x1e.dtkt.flow.v1beta1.Switch.CaseR\x04case\x12,\n" +
+	"2\b^\\s?=\\s?R\x05value\x126\n" +
+	"\x04case\x18\x02 \x03(\v2\".dtkt.flow.v1beta1.Var.Switch.CaseR\x04case\x12,\n" +
 	"\adefault\x18\x03 \x01(\tB\x12\xbaH\x0f\xc8\x01\x01r\n" +
 	"2\b^\\s?=\\s?R\adefault\x1a\\\n" +
 	"\x04Case\x12(\n" +
 	"\x05value\x18\x01 \x01(\tB\x12\xbaH\x0f\xc8\x01\x01r\n" +
 	"2\b^\\s?=\\s?R\x05value\x12*\n" +
 	"\x06return\x18\x02 \x01(\tB\x12\xbaH\x0f\xc8\x01\x01r\n" +
-	"2\b^\\s?=\\s?R\x06return\"\xa0\x01\n" +
-	"\x06Ticker\x127\n" +
-	"\x05every\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\x06\xbaH\x03\xc8\x01\x01R\x05every\x123\n" +
-	"\ainitial\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\ainitial\x12(\n" +
-	"\x05value\x18\x03 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
+	"2\b^\\s?=\\s?R\x06return:\x16\xbaH\x13\"\x11\n" +
+	"\x05value\n" +
+	"\x06switch\x10\x01B\b\n" +
+	"\x06_cache\"e\n" +
+	"\x06Output\x121\n" +
+	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]+$R\x02id\x12(\n" +
+	"\x05value\x18\x02 \x01(\tB\x12\xbaH\x0f\xc8\x01\x01r\n" +
 	"2\b^\\s?=\\s?R\x05valueB\xd6\x01\n" +
 	"\x17proto.dtkt.flow.v1beta1B\tSpecProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1;flowv1beta1\xa2\x02\x03DFX\xaa\x02\x11Dtkt.Flow.V1beta1\xca\x02\x11Dtkt\\Flow\\V1beta1\xe2\x02\x1dDtkt\\Flow\\V1beta1\\GPBMetadata\xea\x02\x13Dtkt::Flow::V1beta1b\x06proto3"
 
-var file_dtkt_flow_v1beta1_spec_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_dtkt_flow_v1beta1_spec_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_dtkt_flow_v1beta1_spec_proto_goTypes = []any{
 	(*Flow)(nil),                          // 0: dtkt.flow.v1beta1.Flow
 	(*Connection)(nil),                    // 1: dtkt.flow.v1beta1.Connection
 	(*Input)(nil),                         // 2: dtkt.flow.v1beta1.Input
-	(*Var)(nil),                           // 3: dtkt.flow.v1beta1.Var
-	(*Action)(nil),                        // 4: dtkt.flow.v1beta1.Action
-	(*Output)(nil),                        // 5: dtkt.flow.v1beta1.Output
-	(*Stream)(nil),                        // 6: dtkt.flow.v1beta1.Stream
-	(*MethodCall)(nil),                    // 7: dtkt.flow.v1beta1.MethodCall
-	(*UserAction)(nil),                    // 8: dtkt.flow.v1beta1.UserAction
-	(*Switch)(nil),                        // 9: dtkt.flow.v1beta1.Switch
-	(*Ticker)(nil),                        // 10: dtkt.flow.v1beta1.Ticker
+	(*Action)(nil),                        // 3: dtkt.flow.v1beta1.Action
+	(*Stream)(nil),                        // 4: dtkt.flow.v1beta1.Stream
+	(*UserAction)(nil),                    // 5: dtkt.flow.v1beta1.UserAction
+	(*Var)(nil),                           // 6: dtkt.flow.v1beta1.Var
+	(*Output)(nil),                        // 7: dtkt.flow.v1beta1.Output
+	(*Action_MethodCall)(nil),             // 8: dtkt.flow.v1beta1.Action.MethodCall
+	(*Stream_MethodCall)(nil),             // 9: dtkt.flow.v1beta1.Stream.MethodCall
+	(*Stream_Generator)(nil),              // 10: dtkt.flow.v1beta1.Stream.Generator
 	(*UserAction_ConfirmBinding)(nil),     // 11: dtkt.flow.v1beta1.UserAction.ConfirmBinding
 	(*UserAction_InputBinding)(nil),       // 12: dtkt.flow.v1beta1.UserAction.InputBinding
 	(*UserAction_FileBinding)(nil),        // 13: dtkt.flow.v1beta1.UserAction.FileBinding
 	(*UserAction_SelectBinding)(nil),      // 14: dtkt.flow.v1beta1.UserAction.SelectBinding
 	(*UserAction_MultiSelectBinding)(nil), // 15: dtkt.flow.v1beta1.UserAction.MultiSelectBinding
 	(*UserAction_Input)(nil),              // 16: dtkt.flow.v1beta1.UserAction.Input
-	(*Switch_Case)(nil),                   // 17: dtkt.flow.v1beta1.Switch.Case
-	(*v1beta1.Package_Identity)(nil),      // 18: dtkt.shared.v1beta1.Package.Identity
-	(*Bool)(nil),                          // 19: dtkt.flow.v1beta1.Bool
-	(*Bytes)(nil),                         // 20: dtkt.flow.v1beta1.Bytes
-	(*Double)(nil),                        // 21: dtkt.flow.v1beta1.Double
-	(*Float)(nil),                         // 22: dtkt.flow.v1beta1.Float
-	(*Int64)(nil),                         // 23: dtkt.flow.v1beta1.Int64
-	(*Uint64)(nil),                        // 24: dtkt.flow.v1beta1.Uint64
-	(*Int32)(nil),                         // 25: dtkt.flow.v1beta1.Int32
-	(*Uint32)(nil),                        // 26: dtkt.flow.v1beta1.Uint32
-	(*String)(nil),                        // 27: dtkt.flow.v1beta1.String
-	(*List)(nil),                          // 28: dtkt.flow.v1beta1.List
-	(*Map)(nil),                           // 29: dtkt.flow.v1beta1.Map
-	(*Message)(nil),                       // 30: dtkt.flow.v1beta1.Message
-	(*structpb.Value)(nil),                // 31: google.protobuf.Value
-	(*durationpb.Duration)(nil),           // 32: google.protobuf.Duration
-	(*anypb.Any)(nil),                     // 33: google.protobuf.Any
-	(*v1beta11.ConfirmElement)(nil),       // 34: dtkt.protoform.v1beta1.ConfirmElement
-	(*v1beta11.InputElement)(nil),         // 35: dtkt.protoform.v1beta1.InputElement
-	(*v1beta11.FileElement)(nil),          // 36: dtkt.protoform.v1beta1.FileElement
-	(*v1beta11.SelectElement)(nil),        // 37: dtkt.protoform.v1beta1.SelectElement
-	(*v1beta11.MultiSelectElement)(nil),   // 38: dtkt.protoform.v1beta1.MultiSelectElement
+	(*Var_Switch)(nil),                    // 17: dtkt.flow.v1beta1.Var.Switch
+	(*Var_Switch_Case)(nil),               // 18: dtkt.flow.v1beta1.Var.Switch.Case
+	(*v1beta1.Package_Identity)(nil),      // 19: dtkt.shared.v1beta1.Package.Identity
+	(*Bool)(nil),                          // 20: dtkt.flow.v1beta1.Bool
+	(*Bytes)(nil),                         // 21: dtkt.flow.v1beta1.Bytes
+	(*Double)(nil),                        // 22: dtkt.flow.v1beta1.Double
+	(*Float)(nil),                         // 23: dtkt.flow.v1beta1.Float
+	(*Int64)(nil),                         // 24: dtkt.flow.v1beta1.Int64
+	(*Uint64)(nil),                        // 25: dtkt.flow.v1beta1.Uint64
+	(*Int32)(nil),                         // 26: dtkt.flow.v1beta1.Int32
+	(*Uint32)(nil),                        // 27: dtkt.flow.v1beta1.Uint32
+	(*String)(nil),                        // 28: dtkt.flow.v1beta1.String
+	(*List)(nil),                          // 29: dtkt.flow.v1beta1.List
+	(*Map)(nil),                           // 30: dtkt.flow.v1beta1.Map
+	(*Message)(nil),                       // 31: dtkt.flow.v1beta1.Message
+	(*structpb.Value)(nil),                // 32: google.protobuf.Value
+	(*durationpb.Duration)(nil),           // 33: google.protobuf.Duration
+	(*anypb.Any)(nil),                     // 34: google.protobuf.Any
+	(*v1beta11.ConfirmElement)(nil),       // 35: dtkt.protoform.v1beta1.ConfirmElement
+	(*v1beta11.InputElement)(nil),         // 36: dtkt.protoform.v1beta1.InputElement
+	(*v1beta11.FileElement)(nil),          // 37: dtkt.protoform.v1beta1.FileElement
+	(*v1beta11.SelectElement)(nil),        // 38: dtkt.protoform.v1beta1.SelectElement
+	(*v1beta11.MultiSelectElement)(nil),   // 39: dtkt.protoform.v1beta1.MultiSelectElement
 }
 var file_dtkt_flow_v1beta1_spec_proto_depIdxs = []int32{
 	1,  // 0: dtkt.flow.v1beta1.Flow.connections:type_name -> dtkt.flow.v1beta1.Connection
 	2,  // 1: dtkt.flow.v1beta1.Flow.inputs:type_name -> dtkt.flow.v1beta1.Input
-	3,  // 2: dtkt.flow.v1beta1.Flow.vars:type_name -> dtkt.flow.v1beta1.Var
-	4,  // 3: dtkt.flow.v1beta1.Flow.actions:type_name -> dtkt.flow.v1beta1.Action
-	5,  // 4: dtkt.flow.v1beta1.Flow.outputs:type_name -> dtkt.flow.v1beta1.Output
-	6,  // 5: dtkt.flow.v1beta1.Flow.streams:type_name -> dtkt.flow.v1beta1.Stream
-	18, // 6: dtkt.flow.v1beta1.Connection.package:type_name -> dtkt.shared.v1beta1.Package.Identity
-	19, // 7: dtkt.flow.v1beta1.Input.bool:type_name -> dtkt.flow.v1beta1.Bool
-	20, // 8: dtkt.flow.v1beta1.Input.bytes:type_name -> dtkt.flow.v1beta1.Bytes
-	21, // 9: dtkt.flow.v1beta1.Input.double:type_name -> dtkt.flow.v1beta1.Double
-	22, // 10: dtkt.flow.v1beta1.Input.float:type_name -> dtkt.flow.v1beta1.Float
-	23, // 11: dtkt.flow.v1beta1.Input.int64:type_name -> dtkt.flow.v1beta1.Int64
-	24, // 12: dtkt.flow.v1beta1.Input.uint64:type_name -> dtkt.flow.v1beta1.Uint64
-	25, // 13: dtkt.flow.v1beta1.Input.int32:type_name -> dtkt.flow.v1beta1.Int32
-	26, // 14: dtkt.flow.v1beta1.Input.uint32:type_name -> dtkt.flow.v1beta1.Uint32
-	27, // 15: dtkt.flow.v1beta1.Input.string:type_name -> dtkt.flow.v1beta1.String
-	28, // 16: dtkt.flow.v1beta1.Input.list:type_name -> dtkt.flow.v1beta1.List
-	29, // 17: dtkt.flow.v1beta1.Input.map:type_name -> dtkt.flow.v1beta1.Map
-	30, // 18: dtkt.flow.v1beta1.Input.message:type_name -> dtkt.flow.v1beta1.Message
-	9,  // 19: dtkt.flow.v1beta1.Var.switch:type_name -> dtkt.flow.v1beta1.Switch
-	7,  // 20: dtkt.flow.v1beta1.Action.call:type_name -> dtkt.flow.v1beta1.MethodCall
-	8,  // 21: dtkt.flow.v1beta1.Action.user:type_name -> dtkt.flow.v1beta1.UserAction
-	7,  // 22: dtkt.flow.v1beta1.Stream.call:type_name -> dtkt.flow.v1beta1.MethodCall
-	10, // 23: dtkt.flow.v1beta1.Stream.generate:type_name -> dtkt.flow.v1beta1.Ticker
-	31, // 24: dtkt.flow.v1beta1.MethodCall.request:type_name -> google.protobuf.Value
-	16, // 25: dtkt.flow.v1beta1.UserAction.inputs:type_name -> dtkt.flow.v1beta1.UserAction.Input
-	17, // 26: dtkt.flow.v1beta1.Switch.case:type_name -> dtkt.flow.v1beta1.Switch.Case
-	32, // 27: dtkt.flow.v1beta1.Ticker.every:type_name -> google.protobuf.Duration
-	32, // 28: dtkt.flow.v1beta1.Ticker.initial:type_name -> google.protobuf.Duration
-	33, // 29: dtkt.flow.v1beta1.UserAction.SelectBinding.value:type_name -> google.protobuf.Any
-	33, // 30: dtkt.flow.v1beta1.UserAction.MultiSelectBinding.value:type_name -> google.protobuf.Any
-	34, // 31: dtkt.flow.v1beta1.UserAction.Input.confirm:type_name -> dtkt.protoform.v1beta1.ConfirmElement
-	35, // 32: dtkt.flow.v1beta1.UserAction.Input.input:type_name -> dtkt.protoform.v1beta1.InputElement
-	36, // 33: dtkt.flow.v1beta1.UserAction.Input.file:type_name -> dtkt.protoform.v1beta1.FileElement
-	37, // 34: dtkt.flow.v1beta1.UserAction.Input.select:type_name -> dtkt.protoform.v1beta1.SelectElement
-	38, // 35: dtkt.flow.v1beta1.UserAction.Input.multi_select:type_name -> dtkt.protoform.v1beta1.MultiSelectElement
-	36, // [36:36] is the sub-list for method output_type
-	36, // [36:36] is the sub-list for method input_type
-	36, // [36:36] is the sub-list for extension type_name
-	36, // [36:36] is the sub-list for extension extendee
-	0,  // [0:36] is the sub-list for field type_name
+	6,  // 2: dtkt.flow.v1beta1.Flow.vars:type_name -> dtkt.flow.v1beta1.Var
+	3,  // 3: dtkt.flow.v1beta1.Flow.actions:type_name -> dtkt.flow.v1beta1.Action
+	7,  // 4: dtkt.flow.v1beta1.Flow.outputs:type_name -> dtkt.flow.v1beta1.Output
+	4,  // 5: dtkt.flow.v1beta1.Flow.streams:type_name -> dtkt.flow.v1beta1.Stream
+	19, // 6: dtkt.flow.v1beta1.Connection.package:type_name -> dtkt.shared.v1beta1.Package.Identity
+	20, // 7: dtkt.flow.v1beta1.Input.bool:type_name -> dtkt.flow.v1beta1.Bool
+	21, // 8: dtkt.flow.v1beta1.Input.bytes:type_name -> dtkt.flow.v1beta1.Bytes
+	22, // 9: dtkt.flow.v1beta1.Input.double:type_name -> dtkt.flow.v1beta1.Double
+	23, // 10: dtkt.flow.v1beta1.Input.float:type_name -> dtkt.flow.v1beta1.Float
+	24, // 11: dtkt.flow.v1beta1.Input.int64:type_name -> dtkt.flow.v1beta1.Int64
+	25, // 12: dtkt.flow.v1beta1.Input.uint64:type_name -> dtkt.flow.v1beta1.Uint64
+	26, // 13: dtkt.flow.v1beta1.Input.int32:type_name -> dtkt.flow.v1beta1.Int32
+	27, // 14: dtkt.flow.v1beta1.Input.uint32:type_name -> dtkt.flow.v1beta1.Uint32
+	28, // 15: dtkt.flow.v1beta1.Input.string:type_name -> dtkt.flow.v1beta1.String
+	29, // 16: dtkt.flow.v1beta1.Input.list:type_name -> dtkt.flow.v1beta1.List
+	30, // 17: dtkt.flow.v1beta1.Input.map:type_name -> dtkt.flow.v1beta1.Map
+	31, // 18: dtkt.flow.v1beta1.Input.message:type_name -> dtkt.flow.v1beta1.Message
+	8,  // 19: dtkt.flow.v1beta1.Action.call:type_name -> dtkt.flow.v1beta1.Action.MethodCall
+	5,  // 20: dtkt.flow.v1beta1.Action.user:type_name -> dtkt.flow.v1beta1.UserAction
+	9,  // 21: dtkt.flow.v1beta1.Stream.call:type_name -> dtkt.flow.v1beta1.Stream.MethodCall
+	10, // 22: dtkt.flow.v1beta1.Stream.generate:type_name -> dtkt.flow.v1beta1.Stream.Generator
+	16, // 23: dtkt.flow.v1beta1.UserAction.inputs:type_name -> dtkt.flow.v1beta1.UserAction.Input
+	17, // 24: dtkt.flow.v1beta1.Var.switch:type_name -> dtkt.flow.v1beta1.Var.Switch
+	32, // 25: dtkt.flow.v1beta1.Action.MethodCall.request:type_name -> google.protobuf.Value
+	32, // 26: dtkt.flow.v1beta1.Stream.MethodCall.request:type_name -> google.protobuf.Value
+	33, // 27: dtkt.flow.v1beta1.Stream.Generator.every:type_name -> google.protobuf.Duration
+	33, // 28: dtkt.flow.v1beta1.Stream.Generator.initial:type_name -> google.protobuf.Duration
+	34, // 29: dtkt.flow.v1beta1.UserAction.SelectBinding.value:type_name -> google.protobuf.Any
+	34, // 30: dtkt.flow.v1beta1.UserAction.MultiSelectBinding.value:type_name -> google.protobuf.Any
+	35, // 31: dtkt.flow.v1beta1.UserAction.Input.confirm:type_name -> dtkt.protoform.v1beta1.ConfirmElement
+	36, // 32: dtkt.flow.v1beta1.UserAction.Input.input:type_name -> dtkt.protoform.v1beta1.InputElement
+	37, // 33: dtkt.flow.v1beta1.UserAction.Input.file:type_name -> dtkt.protoform.v1beta1.FileElement
+	38, // 34: dtkt.flow.v1beta1.UserAction.Input.select:type_name -> dtkt.protoform.v1beta1.SelectElement
+	39, // 35: dtkt.flow.v1beta1.UserAction.Input.multi_select:type_name -> dtkt.protoform.v1beta1.MultiSelectElement
+	18, // 36: dtkt.flow.v1beta1.Var.Switch.case:type_name -> dtkt.flow.v1beta1.Var.Switch.Case
+	37, // [37:37] is the sub-list for method output_type
+	37, // [37:37] is the sub-list for method input_type
+	37, // [37:37] is the sub-list for extension type_name
+	37, // [37:37] is the sub-list for extension extendee
+	0,  // [0:37] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_flow_v1beta1_spec_proto_init() }
@@ -2865,6 +3052,8 @@ func file_dtkt_flow_v1beta1_spec_proto_init() {
 	file_dtkt_flow_v1beta1_spec_proto_msgTypes[3].OneofWrappers = []any{}
 	file_dtkt_flow_v1beta1_spec_proto_msgTypes[4].OneofWrappers = []any{}
 	file_dtkt_flow_v1beta1_spec_proto_msgTypes[6].OneofWrappers = []any{}
+	file_dtkt_flow_v1beta1_spec_proto_msgTypes[8].OneofWrappers = []any{}
+	file_dtkt_flow_v1beta1_spec_proto_msgTypes[9].OneofWrappers = []any{}
 	file_dtkt_flow_v1beta1_spec_proto_msgTypes[16].OneofWrappers = []any{
 		(*userAction_Input_Confirm)(nil),
 		(*userAction_Input_Input)(nil),
@@ -2878,7 +3067,7 @@ func file_dtkt_flow_v1beta1_spec_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_flow_v1beta1_spec_proto_rawDesc), len(file_dtkt_flow_v1beta1_spec_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   18,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

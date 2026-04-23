@@ -11,6 +11,7 @@ package flowv1beta1
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	expr "cel.dev/expr"
+	status "google.golang.org/genproto/googleapis/rpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -353,9 +354,9 @@ type Node struct {
 	state                 protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Id         string                 `protobuf:"bytes,1,opt,name=id,proto3"`
 	xxx_hidden_State      Node_State             `protobuf:"varint,2,opt,name=state,proto3,enum=dtkt.flow.v1beta1.Node_State"`
-	xxx_hidden_CallCount  uint64                 `protobuf:"varint,4,opt,name=call_count,json=callCount,proto3"`
-	xxx_hidden_PrevValue  *expr.Value            `protobuf:"bytes,5,opt,name=prev_value,json=prevValue,proto3"`
-	xxx_hidden_CurrValue  *expr.Value            `protobuf:"bytes,6,opt,name=curr_value,json=currValue,proto3"`
+	xxx_hidden_Count      uint64                 `protobuf:"varint,3,opt,name=count,proto3"`
+	xxx_hidden_PrevValue  *expr.Value            `protobuf:"bytes,4,opt,name=prev_value,json=prevValue,proto3"`
+	xxx_hidden_Result     isNode_Result          `protobuf_oneof:"result"`
 	xxx_hidden_StartTime  *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=start_time,json=startTime,proto3"`
 	xxx_hidden_FinishTime *timestamppb.Timestamp `protobuf:"bytes,21,opt,name=finish_time,json=finishTime,proto3"`
 	xxx_hidden_Type       isNode_Type            `protobuf_oneof:"type"`
@@ -402,9 +403,9 @@ func (x *Node) GetState() Node_State {
 	return Node_STATE_UNSPECIFIED
 }
 
-func (x *Node) GetCallCount() uint64 {
+func (x *Node) GetCount() uint64 {
 	if x != nil {
-		return x.xxx_hidden_CallCount
+		return x.xxx_hidden_Count
 	}
 	return 0
 }
@@ -416,9 +417,20 @@ func (x *Node) GetPrevValue() *expr.Value {
 	return nil
 }
 
-func (x *Node) GetCurrValue() *expr.Value {
+func (x *Node) GetValue() *expr.Value {
 	if x != nil {
-		return x.xxx_hidden_CurrValue
+		if x, ok := x.xxx_hidden_Result.(*node_Value); ok {
+			return x.Value
+		}
+	}
+	return nil
+}
+
+func (x *Node) GetError() *status.Status {
+	if x != nil {
+		if x, ok := x.xxx_hidden_Result.(*node_Error); ok {
+			return x.Error
+		}
 	}
 	return nil
 }
@@ -499,16 +511,28 @@ func (x *Node) SetState(v Node_State) {
 	x.xxx_hidden_State = v
 }
 
-func (x *Node) SetCallCount(v uint64) {
-	x.xxx_hidden_CallCount = v
+func (x *Node) SetCount(v uint64) {
+	x.xxx_hidden_Count = v
 }
 
 func (x *Node) SetPrevValue(v *expr.Value) {
 	x.xxx_hidden_PrevValue = v
 }
 
-func (x *Node) SetCurrValue(v *expr.Value) {
-	x.xxx_hidden_CurrValue = v
+func (x *Node) SetValue(v *expr.Value) {
+	if v == nil {
+		x.xxx_hidden_Result = nil
+		return
+	}
+	x.xxx_hidden_Result = &node_Value{v}
+}
+
+func (x *Node) SetError(v *status.Status) {
+	if v == nil {
+		x.xxx_hidden_Result = nil
+		return
+	}
+	x.xxx_hidden_Result = &node_Error{v}
 }
 
 func (x *Node) SetStartTime(v *timestamppb.Timestamp) {
@@ -574,11 +598,27 @@ func (x *Node) HasPrevValue() bool {
 	return x.xxx_hidden_PrevValue != nil
 }
 
-func (x *Node) HasCurrValue() bool {
+func (x *Node) HasResult() bool {
 	if x == nil {
 		return false
 	}
-	return x.xxx_hidden_CurrValue != nil
+	return x.xxx_hidden_Result != nil
+}
+
+func (x *Node) HasValue() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Result.(*node_Value)
+	return ok
+}
+
+func (x *Node) HasError() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Result.(*node_Error)
+	return ok
 }
 
 func (x *Node) HasStartTime() bool {
@@ -654,8 +694,20 @@ func (x *Node) ClearPrevValue() {
 	x.xxx_hidden_PrevValue = nil
 }
 
-func (x *Node) ClearCurrValue() {
-	x.xxx_hidden_CurrValue = nil
+func (x *Node) ClearResult() {
+	x.xxx_hidden_Result = nil
+}
+
+func (x *Node) ClearValue() {
+	if _, ok := x.xxx_hidden_Result.(*node_Value); ok {
+		x.xxx_hidden_Result = nil
+	}
+}
+
+func (x *Node) ClearError() {
+	if _, ok := x.xxx_hidden_Result.(*node_Error); ok {
+		x.xxx_hidden_Result = nil
+	}
 }
 
 func (x *Node) ClearStartTime() {
@@ -706,6 +758,24 @@ func (x *Node) ClearStream() {
 	}
 }
 
+const Node_Result_not_set_case case_Node_Result = 0
+const Node_Value_case case_Node_Result = 5
+const Node_Error_case case_Node_Result = 6
+
+func (x *Node) WhichResult() case_Node_Result {
+	if x == nil {
+		return Node_Result_not_set_case
+	}
+	switch x.xxx_hidden_Result.(type) {
+	case *node_Value:
+		return Node_Value_case
+	case *node_Error:
+		return Node_Error_case
+	default:
+		return Node_Result_not_set_case
+	}
+}
+
 const Node_Type_not_set_case case_Node_Type = 0
 const Node_Connection_case case_Node_Type = 7
 const Node_Input_case case_Node_Type = 8
@@ -739,11 +809,14 @@ func (x *Node) WhichType() case_Node_Type {
 type Node_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	Id         string
-	State      Node_State
-	CallCount  uint64
-	PrevValue  *expr.Value
-	CurrValue  *expr.Value
+	Id        string
+	State     Node_State
+	Count     uint64
+	PrevValue *expr.Value
+	// Fields of oneof xxx_hidden_Result:
+	Value *expr.Value
+	Error *status.Status
+	// -- end of xxx_hidden_Result
 	StartTime  *timestamppb.Timestamp
 	FinishTime *timestamppb.Timestamp
 	// Fields of oneof xxx_hidden_Type:
@@ -762,9 +835,14 @@ func (b0 Node_builder) Build() *Node {
 	_, _ = b, x
 	x.xxx_hidden_Id = b.Id
 	x.xxx_hidden_State = b.State
-	x.xxx_hidden_CallCount = b.CallCount
+	x.xxx_hidden_Count = b.Count
 	x.xxx_hidden_PrevValue = b.PrevValue
-	x.xxx_hidden_CurrValue = b.CurrValue
+	if b.Value != nil {
+		x.xxx_hidden_Result = &node_Value{b.Value}
+	}
+	if b.Error != nil {
+		x.xxx_hidden_Result = &node_Error{b.Error}
+	}
 	x.xxx_hidden_StartTime = b.StartTime
 	x.xxx_hidden_FinishTime = b.FinishTime
 	if b.Connection != nil {
@@ -788,6 +866,16 @@ func (b0 Node_builder) Build() *Node {
 	return m0
 }
 
+type case_Node_Result protoreflect.FieldNumber
+
+func (x case_Node_Result) String() string {
+	md := file_dtkt_flow_v1beta1_eval_proto_msgTypes[3].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type case_Node_Type protoreflect.FieldNumber
 
 func (x case_Node_Type) String() string {
@@ -797,6 +885,22 @@ func (x case_Node_Type) String() string {
 	}
 	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
 }
+
+type isNode_Result interface {
+	isNode_Result()
+}
+
+type node_Value struct {
+	Value *expr.Value `protobuf:"bytes,5,opt,name=value,proto3,oneof"`
+}
+
+type node_Error struct {
+	Error *status.Status `protobuf:"bytes,6,opt,name=error,proto3,oneof"`
+}
+
+func (*node_Value) isNode_Result() {}
+
+func (*node_Error) isNode_Result() {}
 
 type isNode_Type interface {
 	isNode_Type()
@@ -970,7 +1074,7 @@ var File_dtkt_flow_v1beta1_eval_proto protoreflect.FileDescriptor
 
 const file_dtkt_flow_v1beta1_eval_proto_rawDesc = "" +
 	"\n" +
-	"\x1cdtkt/flow/v1beta1/eval.proto\x12\x11dtkt.flow.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x14cel/expr/value.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xeb\a\n" +
+	"\x1cdtkt/flow/v1beta1/eval.proto\x12\x11dtkt.flow.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x14cel/expr/value.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\"\xeb\a\n" +
 	"\aRuntime\x12M\n" +
 	"\vconnections\x18\x01 \x03(\v2+.dtkt.flow.v1beta1.Runtime.ConnectionsEntryR\vconnections\x12>\n" +
 	"\x06inputs\x18\x02 \x03(\v2&.dtkt.flow.v1beta1.Runtime.InputsEntryR\x06inputs\x128\n" +
@@ -1006,33 +1110,33 @@ const file_dtkt_flow_v1beta1_eval_proto_rawDesc = "" +
 	"\x05edges\x18\x02 \x03(\v2\x17.dtkt.flow.v1beta1.EdgeR\x05edges\"\xe2\x01\n" +
 	"\x04Edge\x12l\n" +
 	"\x06source\x18\x01 \x01(\tBT\xbaHQ\xc8\x01\x01rL2J^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x06source\x12l\n" +
-	"\x06target\x18\x02 \x01(\tBT\xbaHQ\xc8\x01\x01rL2J^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x06target\"\xbc\x06\n" +
+	"\x06target\x18\x02 \x01(\tBT\xbaHQ\xc8\x01\x01rL2J^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x06target\"\xe9\x06\n" +
 	"\x04Node\x12d\n" +
 	"\x02id\x18\x01 \x01(\tBT\xbaHQ\xc8\x01\x01rL2J^(connections|inputs|vars|streams|actions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x02id\x123\n" +
-	"\x05state\x18\x02 \x01(\x0e2\x1d.dtkt.flow.v1beta1.Node.StateR\x05state\x12\x1d\n" +
+	"\x05state\x18\x02 \x01(\x0e2\x1d.dtkt.flow.v1beta1.Node.StateR\x05state\x12\x14\n" +
+	"\x05count\x18\x03 \x01(\x04R\x05count\x12.\n" +
 	"\n" +
-	"call_count\x18\x04 \x01(\x04R\tcallCount\x12.\n" +
-	"\n" +
-	"prev_value\x18\x05 \x01(\v2\x0f.cel.expr.ValueR\tprevValue\x12.\n" +
-	"\n" +
-	"curr_value\x18\x06 \x01(\v2\x0f.cel.expr.ValueR\tcurrValue\x129\n" +
+	"prev_value\x18\x04 \x01(\v2\x0f.cel.expr.ValueR\tprevValue\x12'\n" +
+	"\x05value\x18\x05 \x01(\v2\x0f.cel.expr.ValueH\x00R\x05value\x12*\n" +
+	"\x05error\x18\x06 \x01(\v2\x12.google.rpc.StatusH\x00R\x05error\x129\n" +
 	"\n" +
 	"start_time\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x12;\n" +
 	"\vfinish_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"finishTime\x12?\n" +
 	"\n" +
-	"connection\x18\a \x01(\v2\x1d.dtkt.flow.v1beta1.ConnectionH\x00R\n" +
+	"connection\x18\a \x01(\v2\x1d.dtkt.flow.v1beta1.ConnectionH\x01R\n" +
 	"connection\x120\n" +
-	"\x05input\x18\b \x01(\v2\x18.dtkt.flow.v1beta1.InputH\x00R\x05input\x12*\n" +
-	"\x03var\x18\t \x01(\v2\x16.dtkt.flow.v1beta1.VarH\x00R\x03var\x123\n" +
-	"\x06action\x18\v \x01(\v2\x19.dtkt.flow.v1beta1.ActionH\x00R\x06action\x123\n" +
-	"\x06output\x18\r \x01(\v2\x19.dtkt.flow.v1beta1.OutputH\x00R\x06output\x123\n" +
-	"\x06stream\x18\x0e \x01(\v2\x19.dtkt.flow.v1beta1.StreamH\x00R\x06stream\"U\n" +
+	"\x05input\x18\b \x01(\v2\x18.dtkt.flow.v1beta1.InputH\x01R\x05input\x12*\n" +
+	"\x03var\x18\t \x01(\v2\x16.dtkt.flow.v1beta1.VarH\x01R\x03var\x123\n" +
+	"\x06action\x18\v \x01(\v2\x19.dtkt.flow.v1beta1.ActionH\x01R\x06action\x123\n" +
+	"\x06output\x18\r \x01(\v2\x19.dtkt.flow.v1beta1.OutputH\x01R\x06output\x123\n" +
+	"\x06stream\x18\x0e \x01(\v2\x19.dtkt.flow.v1beta1.StreamH\x01R\x06stream\"U\n" +
 	"\x05State\x12\x15\n" +
 	"\x11STATE_UNSPECIFIED\x10\x00\x12\x11\n" +
 	"\rSTATE_PENDING\x10\x01\x12\x11\n" +
 	"\rSTATE_SUCCESS\x10\x02\x12\x0f\n" +
-	"\vSTATE_ERROR\x10\x03B\r\n" +
+	"\vSTATE_ERROR\x10\x03B\x0f\n" +
+	"\x06result\x12\x05\xbaH\x02\b\x01B\r\n" +
 	"\x04type\x12\x05\xbaH\x02\b\x01B\xd6\x01\n" +
 	"\x17proto.dtkt.flow.v1beta1B\tEvalProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1;flowv1beta1\xa2\x02\x03DFX\xaa\x02\x11Dtkt.Flow.V1beta1\xca\x02\x11Dtkt\\Flow\\V1beta1\xe2\x02\x1dDtkt\\Flow\\V1beta1\\GPBMetadata\xea\x02\x13Dtkt::Flow::V1beta1b\x06proto3"
 
@@ -1053,13 +1157,14 @@ var file_dtkt_flow_v1beta1_eval_proto_goTypes = []any{
 	nil,                           // 11: dtkt.flow.v1beta1.Runtime.StreamsEntry
 	nil,                           // 12: dtkt.flow.v1beta1.Runtime.OutputsEntry
 	(*expr.Value)(nil),            // 13: cel.expr.Value
-	(*timestamppb.Timestamp)(nil), // 14: google.protobuf.Timestamp
-	(*Connection)(nil),            // 15: dtkt.flow.v1beta1.Connection
-	(*Input)(nil),                 // 16: dtkt.flow.v1beta1.Input
-	(*Var)(nil),                   // 17: dtkt.flow.v1beta1.Var
-	(*Action)(nil),                // 18: dtkt.flow.v1beta1.Action
-	(*Output)(nil),                // 19: dtkt.flow.v1beta1.Output
-	(*Stream)(nil),                // 20: dtkt.flow.v1beta1.Stream
+	(*status.Status)(nil),         // 14: google.rpc.Status
+	(*timestamppb.Timestamp)(nil), // 15: google.protobuf.Timestamp
+	(*Connection)(nil),            // 16: dtkt.flow.v1beta1.Connection
+	(*Input)(nil),                 // 17: dtkt.flow.v1beta1.Input
+	(*Var)(nil),                   // 18: dtkt.flow.v1beta1.Var
+	(*Action)(nil),                // 19: dtkt.flow.v1beta1.Action
+	(*Output)(nil),                // 20: dtkt.flow.v1beta1.Output
+	(*Stream)(nil),                // 21: dtkt.flow.v1beta1.Stream
 }
 var file_dtkt_flow_v1beta1_eval_proto_depIdxs = []int32{
 	7,  // 0: dtkt.flow.v1beta1.Runtime.connections:type_name -> dtkt.flow.v1beta1.Runtime.ConnectionsEntry
@@ -1072,26 +1177,27 @@ var file_dtkt_flow_v1beta1_eval_proto_depIdxs = []int32{
 	3,  // 7: dtkt.flow.v1beta1.Graph.edges:type_name -> dtkt.flow.v1beta1.Edge
 	0,  // 8: dtkt.flow.v1beta1.Node.state:type_name -> dtkt.flow.v1beta1.Node.State
 	13, // 9: dtkt.flow.v1beta1.Node.prev_value:type_name -> cel.expr.Value
-	13, // 10: dtkt.flow.v1beta1.Node.curr_value:type_name -> cel.expr.Value
-	14, // 11: dtkt.flow.v1beta1.Node.start_time:type_name -> google.protobuf.Timestamp
-	14, // 12: dtkt.flow.v1beta1.Node.finish_time:type_name -> google.protobuf.Timestamp
-	15, // 13: dtkt.flow.v1beta1.Node.connection:type_name -> dtkt.flow.v1beta1.Connection
-	16, // 14: dtkt.flow.v1beta1.Node.input:type_name -> dtkt.flow.v1beta1.Input
-	17, // 15: dtkt.flow.v1beta1.Node.var:type_name -> dtkt.flow.v1beta1.Var
-	18, // 16: dtkt.flow.v1beta1.Node.action:type_name -> dtkt.flow.v1beta1.Action
-	19, // 17: dtkt.flow.v1beta1.Node.output:type_name -> dtkt.flow.v1beta1.Output
-	20, // 18: dtkt.flow.v1beta1.Node.stream:type_name -> dtkt.flow.v1beta1.Stream
-	4,  // 19: dtkt.flow.v1beta1.Runtime.ConnectionsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	4,  // 20: dtkt.flow.v1beta1.Runtime.InputsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	4,  // 21: dtkt.flow.v1beta1.Runtime.VarsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	4,  // 22: dtkt.flow.v1beta1.Runtime.ActionsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	4,  // 23: dtkt.flow.v1beta1.Runtime.StreamsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	4,  // 24: dtkt.flow.v1beta1.Runtime.OutputsEntry.value:type_name -> dtkt.flow.v1beta1.Node
-	25, // [25:25] is the sub-list for method output_type
-	25, // [25:25] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	13, // 10: dtkt.flow.v1beta1.Node.value:type_name -> cel.expr.Value
+	14, // 11: dtkt.flow.v1beta1.Node.error:type_name -> google.rpc.Status
+	15, // 12: dtkt.flow.v1beta1.Node.start_time:type_name -> google.protobuf.Timestamp
+	15, // 13: dtkt.flow.v1beta1.Node.finish_time:type_name -> google.protobuf.Timestamp
+	16, // 14: dtkt.flow.v1beta1.Node.connection:type_name -> dtkt.flow.v1beta1.Connection
+	17, // 15: dtkt.flow.v1beta1.Node.input:type_name -> dtkt.flow.v1beta1.Input
+	18, // 16: dtkt.flow.v1beta1.Node.var:type_name -> dtkt.flow.v1beta1.Var
+	19, // 17: dtkt.flow.v1beta1.Node.action:type_name -> dtkt.flow.v1beta1.Action
+	20, // 18: dtkt.flow.v1beta1.Node.output:type_name -> dtkt.flow.v1beta1.Output
+	21, // 19: dtkt.flow.v1beta1.Node.stream:type_name -> dtkt.flow.v1beta1.Stream
+	4,  // 20: dtkt.flow.v1beta1.Runtime.ConnectionsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	4,  // 21: dtkt.flow.v1beta1.Runtime.InputsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	4,  // 22: dtkt.flow.v1beta1.Runtime.VarsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	4,  // 23: dtkt.flow.v1beta1.Runtime.ActionsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	4,  // 24: dtkt.flow.v1beta1.Runtime.StreamsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	4,  // 25: dtkt.flow.v1beta1.Runtime.OutputsEntry.value:type_name -> dtkt.flow.v1beta1.Node
+	26, // [26:26] is the sub-list for method output_type
+	26, // [26:26] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_flow_v1beta1_eval_proto_init() }
@@ -1101,6 +1207,8 @@ func file_dtkt_flow_v1beta1_eval_proto_init() {
 	}
 	file_dtkt_flow_v1beta1_spec_proto_init()
 	file_dtkt_flow_v1beta1_eval_proto_msgTypes[3].OneofWrappers = []any{
+		(*node_Value)(nil),
+		(*node_Error)(nil),
 		(*node_Connection)(nil),
 		(*node_Input)(nil),
 		(*node_Var)(nil),

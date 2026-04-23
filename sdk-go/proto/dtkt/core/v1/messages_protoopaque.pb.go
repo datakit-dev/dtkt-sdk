@@ -15125,10 +15125,10 @@ func (*deployment_RuntimeMetadata_Native_) isDeployment_RuntimeMetadata_Type() {
 func (*deployment_RuntimeMetadata_Docker_) isDeployment_RuntimeMetadata_Type() {}
 
 type Deployment_RuntimeMetadata_Native struct {
-	state                protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_ProcessId int64                  `protobuf:"varint,1,opt,name=process_id,json=processId,proto3"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_PidFilePath string                 `protobuf:"bytes,1,opt,name=pid_file_path,json=pidFilePath,proto3"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Deployment_RuntimeMetadata_Native) Reset() {
@@ -15156,29 +15156,29 @@ func (x *Deployment_RuntimeMetadata_Native) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-func (x *Deployment_RuntimeMetadata_Native) GetProcessId() int64 {
+func (x *Deployment_RuntimeMetadata_Native) GetPidFilePath() string {
 	if x != nil {
-		return x.xxx_hidden_ProcessId
+		return x.xxx_hidden_PidFilePath
 	}
-	return 0
+	return ""
 }
 
-func (x *Deployment_RuntimeMetadata_Native) SetProcessId(v int64) {
-	x.xxx_hidden_ProcessId = v
+func (x *Deployment_RuntimeMetadata_Native) SetPidFilePath(v string) {
+	x.xxx_hidden_PidFilePath = v
 }
 
 type Deployment_RuntimeMetadata_Native_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// PID of native process.
-	ProcessId int64
+	// PID file path of native process.
+	PidFilePath string
 }
 
 func (b0 Deployment_RuntimeMetadata_Native_builder) Build() *Deployment_RuntimeMetadata_Native {
 	m0 := &Deployment_RuntimeMetadata_Native{}
 	b, x := &b0, m0
 	_, _ = b, x
-	x.xxx_hidden_ProcessId = b.ProcessId
+	x.xxx_hidden_PidFilePath = b.PidFilePath
 	return m0
 }
 
@@ -16016,7 +16016,7 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"connection\xbaH\x85\x02*](has(this.custom_protos) || has(this.custom_grpc)) ? has(this.address) : has(this.deployment)*Vhas(this.deployment) ? has(this.decrypted_config) || has(this.encrypted_config) : true*Lhas(this.headers) ? has(this.custom_protos) || has(this.custom_grpc) : falseB\r\n" +
 	"\x04type\x12\x05\xbaH\x02\b\x01B\b\n" +
 	"\x06configB\x06\n" +
-	"\x04auth\"\xc7\x0f\n" +
+	"\x04auth\"\xcc\x0f\n" +
 	"\n" +
 	"Deployment\x12#\n" +
 	"\x04name\x18\x01 \x01(\tB\x0f\xe0A\b\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x04name\x12&\n" +
@@ -16050,13 +16050,12 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\acontext\x18\x03 \x01(\v2\x15.dtkt.core.v1.ContextR\acontext:J\xbaHG*Ehas(this.metadata.artifact_etag) && this.metadata.artifact_etag != ''\x1a\xe2\x01\n" +
 	"\x05Cloud\x12@\n" +
 	"\acontext\x18\x01 \x01(\v2\x15.dtkt.core.v1.ContextB\x0f\xe0A\x04\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\acontext\x12@\n" +
-	"\x06config\x18\x03 \x01(\v2\x1a.dtkt.core.v1.EncryptedAnyB\f\xe0A\x03\xbaH\x03\xc8\x01\x01\x80\x01\x01R\x06config:U\xbaHR*Phas(this.config) && this.config.type_url.endsWith('/google.protobuf.BytesValue')\x1a\x9c\x02\n" +
+	"\x06config\x18\x03 \x01(\v2\x1a.dtkt.core.v1.EncryptedAnyB\f\xe0A\x03\xbaH\x03\xc8\x01\x01\x80\x01\x01R\x06config:U\xbaHR*Phas(this.config) && this.config.type_url.endsWith('/google.protobuf.BytesValue')\x1a\xa1\x02\n" +
 	"\x0fRuntimeMetadata\x12I\n" +
 	"\x06native\x18\x01 \x01(\v2/.dtkt.core.v1.Deployment.RuntimeMetadata.NativeH\x00R\x06native\x12I\n" +
-	"\x06docker\x18\x02 \x01(\v2/.dtkt.core.v1.Deployment.RuntimeMetadata.DockerH\x00R\x06docker\x1a/\n" +
-	"\x06Native\x12%\n" +
-	"\n" +
-	"process_id\x18\x01 \x01(\x03B\x06\xbaH\x03\xc8\x01\x01R\tprocessId\x1a3\n" +
+	"\x06docker\x18\x02 \x01(\v2/.dtkt.core.v1.Deployment.RuntimeMetadata.DockerH\x00R\x06docker\x1a4\n" +
+	"\x06Native\x12*\n" +
+	"\rpid_file_path\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vpidFilePath\x1a3\n" +
 	"\x06Docker\x12)\n" +
 	"\fcontainer_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vcontainerIdB\r\n" +
 	"\x04type\x12\x05\xbaH\x02\b\x01\"_\n" +
