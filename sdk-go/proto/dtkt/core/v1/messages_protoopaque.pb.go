@@ -5933,14 +5933,15 @@ func (b0 Method_builder) Build() *Method {
 
 // Type message for documentation and reflection indexing.
 type Type struct {
-	state                 protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Name       string                 `protobuf:"bytes,1,opt,name=name,proto3"`
-	xxx_hidden_Uid        string                 `protobuf:"bytes,5,opt,name=uid,proto3"`
-	xxx_hidden_Schema     *TypeSchema            `protobuf:"bytes,2,opt,name=schema,proto3"`
-	xxx_hidden_CreateTime *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=create_time,json=createTime,proto3"`
-	xxx_hidden_UpdateTime *timestamppb.Timestamp `protobuf:"bytes,21,opt,name=update_time,json=updateTime,proto3"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Name        string                 `protobuf:"bytes,1,opt,name=name,proto3"`
+	xxx_hidden_Uid         string                 `protobuf:"bytes,5,opt,name=uid,proto3"`
+	xxx_hidden_Schema      *TypeSchema            `protobuf:"bytes,2,opt,name=schema,proto3"`
+	xxx_hidden_Description string                 `protobuf:"bytes,3,opt,name=description,proto3"`
+	xxx_hidden_CreateTime  *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=create_time,json=createTime,proto3"`
+	xxx_hidden_UpdateTime  *timestamppb.Timestamp `protobuf:"bytes,21,opt,name=update_time,json=updateTime,proto3"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Type) Reset() {
@@ -5989,6 +5990,13 @@ func (x *Type) GetSchema() *TypeSchema {
 	return nil
 }
 
+func (x *Type) GetDescription() string {
+	if x != nil {
+		return x.xxx_hidden_Description
+	}
+	return ""
+}
+
 func (x *Type) GetCreateTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.xxx_hidden_CreateTime
@@ -6013,6 +6021,10 @@ func (x *Type) SetUid(v string) {
 
 func (x *Type) SetSchema(v *TypeSchema) {
 	x.xxx_hidden_Schema = v
+}
+
+func (x *Type) SetDescription(v string) {
+	x.xxx_hidden_Description = v
 }
 
 func (x *Type) SetCreateTime(v *timestamppb.Timestamp) {
@@ -6065,6 +6077,8 @@ type Type_builder struct {
 	Uid string
 	// Type schema.
 	Schema *TypeSchema
+	// Type description.
+	Description string
 	// Type create time.
 	CreateTime *timestamppb.Timestamp
 	// Type update time.
@@ -6078,6 +6092,7 @@ func (b0 Type_builder) Build() *Type {
 	x.xxx_hidden_Name = b.Name
 	x.xxx_hidden_Uid = b.Uid
 	x.xxx_hidden_Schema = b.Schema
+	x.xxx_hidden_Description = b.Description
 	x.xxx_hidden_CreateTime = b.CreateTime
 	x.xxx_hidden_UpdateTime = b.UpdateTime
 	return m0
@@ -16123,11 +16138,12 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"createTime\x12F\n" +
 	"\vupdate_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\n" +
 	"updateTime:\xaf\x02\xeaA\xab\x02\n" +
-	"\x06Method\x12\x10methods/{method}\x12Forganizations/{organization}/connections/{connection}/methods/{method}\x126users/{user}/connections/{connection}/methods/{method}\x12Forganizations/{organization}/deployments/{deployment}/methods/{method}\x126users/{user}/deployments/{deployment}/methods/{method}*\amethods2\x06method\"\xa3\x04\n" +
+	"\x06Method\x12\x10methods/{method}\x12Forganizations/{organization}/connections/{connection}/methods/{method}\x126users/{user}/connections/{connection}/methods/{method}\x12Forganizations/{organization}/deployments/{deployment}/methods/{method}\x126users/{user}/deployments/{deployment}/methods/{method}*\amethods2\x06method\"\xc5\x04\n" +
 	"\x04Type\x12\x1a\n" +
 	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12\x1d\n" +
 	"\x03uid\x18\x05 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x03uid\x128\n" +
-	"\x06schema\x18\x02 \x01(\v2\x18.dtkt.core.v1.TypeSchemaB\x06\xbaH\x03\xc8\x01\x01R\x06schema\x12F\n" +
+	"\x06schema\x18\x02 \x01(\v2\x18.dtkt.core.v1.TypeSchemaB\x06\xbaH\x03\xc8\x01\x01R\x06schema\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12F\n" +
 	"\vcreate_time\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\n" +
 	"createTime\x12F\n" +
 	"\vupdate_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\n" +

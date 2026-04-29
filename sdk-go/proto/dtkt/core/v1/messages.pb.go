@@ -6211,6 +6211,10 @@ func (x *Type) SetSchema(v *TypeSchema) {
 	x.Schema = v
 }
 
+func (x *Type) SetDescription(v string) {
+	x.Description = v
+}
+
 func (x *Type) SetCreateTime(v *timestamppb.Timestamp) {
 	x.CreateTime = v
 }
@@ -6261,6 +6265,8 @@ type Type_builder struct {
 	Uid string
 	// Type schema.
 	Schema *TypeSchema
+	// Type description.
+	Description string
 	// Type create time.
 	CreateTime *timestamppb.Timestamp
 	// Type update time.
@@ -6274,6 +6280,7 @@ func (b0 Type_builder) Build() *Type {
 	x.Name = b.Name
 	x.Uid = b.Uid
 	x.Schema = b.Schema
+	x.Description = b.Description
 	x.CreateTime = b.CreateTime
 	x.UpdateTime = b.UpdateTime
 	return m0
