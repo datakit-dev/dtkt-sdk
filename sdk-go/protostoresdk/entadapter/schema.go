@@ -45,14 +45,14 @@ func (s Schema) Fields() []ent.Field {
 	var fields []ent.Field
 	for idx := range s.schemaType.messageType().ProtoReflect().Descriptor().Fields().Len() {
 		desc := s.schemaType.messageType().ProtoReflect().Descriptor().Fields().Get(idx)
-		f := NewField(v1beta1.NewField(desc))
+		field := NewField(v1beta1.NewField(desc))
 
 		if s.intercept != nil {
-			s.intercept(f.desc)
+			s.intercept(field.desc)
 		}
 
-		if !f.field.Proto().GetSkip() && !slices.Contains(s.skipFields, f.field.Proto().GetName()) {
-			fields = append(fields, f)
+		if !field.field.Proto().GetSkip() && !slices.Contains(s.skipFields, field.field.Proto().GetName()) {
+			fields = append(fields, field)
 		}
 	}
 	return fields

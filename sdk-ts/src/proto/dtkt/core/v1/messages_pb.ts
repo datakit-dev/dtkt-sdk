@@ -3470,6 +3470,13 @@ export type Type = Message<"dtkt.core.v1.Type"> & {
   schema?: TypeSchema;
 
   /**
+   * Type description.
+   *
+   * @generated from field: string description = 3;
+   */
+  description: string;
+
+  /**
    * Type create time.
    *
    * @generated from field: google.protobuf.Timestamp create_time = 20;
@@ -3510,6 +3517,13 @@ export type TypeValid = Message<"dtkt.core.v1.Type"> & {
    * @generated from field: dtkt.core.v1.TypeSchema schema = 2;
    */
   schema: TypeSchemaValid;
+
+  /**
+   * Type description.
+   *
+   * @generated from field: string description = 3;
+   */
+  description: string;
 
   /**
    * Type create time.

@@ -6122,6 +6122,8 @@ type Type struct {
 	Uid string `protobuf:"bytes,5,opt,name=uid,proto3" json:"uid,omitempty"`
 	// Type schema.
 	Schema *TypeSchema `protobuf:"bytes,2,opt,name=schema,proto3" json:"schema,omitempty"`
+	// Type description.
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	// Type create time.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
 	// Type update time.
@@ -6174,6 +6176,13 @@ func (x *Type) GetSchema() *TypeSchema {
 		return x.Schema
 	}
 	return nil
+}
+
+func (x *Type) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
 }
 
 func (x *Type) GetCreateTime() *timestamppb.Timestamp {
@@ -16467,11 +16476,12 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"createTime\x12F\n" +
 	"\vupdate_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\n" +
 	"updateTime:\xaf\x02\xeaA\xab\x02\n" +
-	"\x06Method\x12\x10methods/{method}\x12Forganizations/{organization}/connections/{connection}/methods/{method}\x126users/{user}/connections/{connection}/methods/{method}\x12Forganizations/{organization}/deployments/{deployment}/methods/{method}\x126users/{user}/deployments/{deployment}/methods/{method}*\amethods2\x06method\"\xa3\x04\n" +
+	"\x06Method\x12\x10methods/{method}\x12Forganizations/{organization}/connections/{connection}/methods/{method}\x126users/{user}/connections/{connection}/methods/{method}\x12Forganizations/{organization}/deployments/{deployment}/methods/{method}\x126users/{user}/deployments/{deployment}/methods/{method}*\amethods2\x06method\"\xc5\x04\n" +
 	"\x04Type\x12\x1a\n" +
 	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12\x1d\n" +
 	"\x03uid\x18\x05 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x03uid\x128\n" +
-	"\x06schema\x18\x02 \x01(\v2\x18.dtkt.core.v1.TypeSchemaB\x06\xbaH\x03\xc8\x01\x01R\x06schema\x12F\n" +
+	"\x06schema\x18\x02 \x01(\v2\x18.dtkt.core.v1.TypeSchemaB\x06\xbaH\x03\xc8\x01\x01R\x06schema\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12F\n" +
 	"\vcreate_time\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\n" +
 	"createTime\x12F\n" +
 	"\vupdate_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\n" +

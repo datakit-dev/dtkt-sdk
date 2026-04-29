@@ -49,6 +49,6 @@ func WithFieldSkip(skip bool) FieldOption {
 
 func WithFieldValidation(opts ...protovalidate.ValidationOption) FieldOption {
 	return func(f *Field) {
-		f.validate = opts
+		f.opts = opts
 	}
 }

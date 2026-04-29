@@ -16,8 +16,6 @@ type (
 		apiVersion version
 		kind       string
 		spec       S
-		encoder    encoding.Encoder
-		decoder    encoding.Decoder
 		schemaOpts []common.JSONSchemaOpt
 	}
 	SpecInstance[S SpecType] struct {
@@ -44,16 +42,16 @@ type (
 )
 
 func NewLoader[T SpecType](spec T, opts ...SpecLoaderOpt[T]) *SpecLoader[T] {
-	var r = &SpecLoader[T]{
+	loader := &SpecLoader[T]{
 		kind:       spec.SpecKind(),
 		apiVersion: spec.APIVersion().(version),
 		spec:       spec,
 	}
-	r.SetOptions(opts...)
-	return r
+	loader.applyOptions(opts...)
+	return loader
 }
 
-func (l *SpecLoader[T]) SetOptions(opts ...SpecLoaderOpt[T]) {
+func (l *SpecLoader[T]) applyOptions(opts ...SpecLoaderOpt[T]) {
 	for _, opt := range opts {
 		if opt != nil {
 			opt(l)
@@ -135,24 +133,24 @@ func (l *SpecLoader[T]) JSONSchema() (*jsonschema.Schema, error) {
 }
 
 func (l *SpecLoader[T]) Decode(format encoding.Format, raw []byte) (_ T, err error) {
-	var inst SpecInstance[T]
-	err = format.Decode(raw, &inst)
+	var spec SpecInstance[T]
+	err = format.Decode(raw, &spec)
 	if err != nil {
 		return
-	} else if inst.Kind != l.kind {
-		err = fmt.Errorf("invalid spec kind: %s, expected: %s", inst.Kind, l.kind)
+	} else if spec.Kind != l.kind {
+		err = fmt.Errorf("invalid spec kind: %s, expected: %s", spec.Kind, l.kind)
 		return
-	} else if inst.APIVersion != l.apiVersion {
-		err = fmt.Errorf("invalid spec version: %s, expected: %s", inst.APIVersion, l.apiVersion)
+	} else if spec.APIVersion != l.apiVersion {
+		err = fmt.Errorf("invalid spec version: %s, expected: %s", spec.APIVersion, l.apiVersion)
 		return
 	}
 
-	err = inst.Spec.Validate()
+	err = spec.Spec.Validate()
 	if err != nil {
 		return
 	}
 
-	return inst.Spec, nil
+	return spec.Spec, nil
 }
 
 func (l *SpecLoader[T]) Encode(format encoding.Format, spec T) (raw []byte, err error) {

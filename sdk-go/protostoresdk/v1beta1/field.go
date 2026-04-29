@@ -14,29 +14,27 @@ import (
 
 type (
 	Field struct {
-		proto    *protostorev1beta1.Field
-		rules    *validate.FieldRules
-		desc     protoreflect.FieldDescriptor
-		rType    reflect.Type
-		validate []protovalidate.ValidationOption
+		proto *protostorev1beta1.Field
+		desc  protoreflect.FieldDescriptor
+		typ   reflect.Type
+		rules *validate.FieldRules
+		opts  []protovalidate.ValidationOption
 	}
 	FieldOption func(*Field)
 )
 
 func NewField(desc protoreflect.FieldDescriptor, opts ...FieldOption) *Field {
-	var (
-		field *protostorev1beta1.Field
-		rules *validate.FieldRules
-		rType reflect.Type
-	)
+	field := &Field{
+		desc: desc,
+	}
 
 	if desc != nil {
-		rType = protostore.ReflectFieldType(desc)
+		field.typ = protostore.ReflectFieldType(desc)
 
 		if opts, ok := desc.Options().(*descriptorpb.FieldOptions); ok && opts != nil {
 			if proto.HasExtension(opts, protostorev1beta1.E_Field) {
 				if f, ok := proto.GetExtension(opts, protostorev1beta1.E_Field).(*protostorev1beta1.Field); ok && f != nil {
-					field = f
+					field.proto = f
 				}
 			}
 		}
@@ -44,30 +42,25 @@ func NewField(desc protoreflect.FieldDescriptor, opts ...FieldOption) *Field {
 		if opts, ok := desc.Options().(*descriptorpb.FieldOptions); ok && opts != nil {
 			if proto.HasExtension(opts, validate.E_Field) {
 				if r, ok := proto.GetExtension(opts, validate.E_Field).(*validate.FieldRules); ok && r != nil {
-					rules = r
+					field.rules = r
 				}
 			}
 		}
 	}
 
-	if field == nil {
-		field = &protostorev1beta1.Field{}
+	if field.proto == nil {
+		field.proto = &protostorev1beta1.Field{}
 	}
 
-	if rules == nil {
-		rules = &validate.FieldRules{}
+	if field.rules == nil {
+		field.rules = &validate.FieldRules{}
 	}
 
-	if field.GetName() == "" && desc != nil {
-		field.Name = new(string(desc.Name()))
+	if field.proto.GetName() == "" && desc != nil {
+		field.proto.Name = new(string(desc.Name()))
 	}
 
-	return (&Field{
-		proto: field,
-		rules: rules,
-		desc:  desc,
-		rType: rType,
-	}).applyOptions(opts...)
+	return field.applyOptions(opts...)
 }
 
 func (f *Field) Proto() *protostorev1beta1.Field {
@@ -78,8 +71,8 @@ func (f *Field) Descriptor() protoreflect.FieldDescriptor {
 	return f.desc
 }
 
-func (f *Field) ReflectType() reflect.Type {
-	return f.rType
+func (f *Field) Type() reflect.Type {
+	return f.typ
 }
 
 func (f *Field) applyOptions(opts ...FieldOption) *Field {
