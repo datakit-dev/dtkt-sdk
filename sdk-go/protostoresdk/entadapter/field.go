@@ -47,7 +47,7 @@ func NewField(field *v1beta1.Field, opts ...FieldOption) *Field {
 		}
 
 		desc = ent.
-			JSON(field.Proto().GetName(), reflect.Zero(field.ReflectType()).Interface()).
+			JSON(field.Proto().GetName(), reflect.Zero(field.Type()).Interface()).
 			Annotations(a).
 			Descriptor()
 	} else if field.Descriptor().IsMap() {
@@ -62,7 +62,7 @@ func NewField(field *v1beta1.Field, opts ...FieldOption) *Field {
 		}
 
 		desc = ent.
-			JSON(field.Proto().GetName(), reflect.Zero(field.ReflectType()).Interface()).
+			JSON(field.Proto().GetName(), reflect.Zero(field.Type()).Interface()).
 			Annotations(a).
 			Descriptor()
 	} else if field.Descriptor().Message() != nil {
@@ -70,13 +70,13 @@ func NewField(field *v1beta1.Field, opts ...FieldOption) *Field {
 		a.IsMessage = true
 
 		desc = ent.
-			JSON(field.Proto().GetName(), reflect.Zero(field.ReflectType()).Interface()).
+			JSON(field.Proto().GetName(), reflect.Zero(field.Type()).Interface()).
 			Annotations(a).
 			Descriptor()
 	} else if field.Descriptor().Enum() != nil {
 		desc = ent.
 			Int32(field.Proto().GetName()).
-			GoType(reflect.Zero(field.ReflectType()).Interface()).
+			GoType(reflect.Zero(field.Type()).Interface()).
 			Annotations(Annotation{
 				ProtoName: string(field.Descriptor().Enum().FullName()),
 				IsEnum:    true,

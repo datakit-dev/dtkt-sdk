@@ -1,6 +1,5 @@
 package resource
 
-// Core resources
 const (
 	Automation   NameType = "automations"
 	Connection   NameType = "connections"

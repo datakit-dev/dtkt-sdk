@@ -43,6 +43,15 @@ func VersionContainsName[T ~string](version Version, name T) bool {
 	return version.GetName() == matches[2]
 }
 
+func VersionFromName[T ~string](name T) (Version, bool) {
+	for _, version := range validVersions {
+		if VersionContainsName(version, name) {
+			return version, true
+		}
+	}
+	return nil, false
+}
+
 func VersionContainsDescriptor(version Version, desc protoreflect.Descriptor) bool {
 	return VersionContainsName(version, desc.FullName())
 }
