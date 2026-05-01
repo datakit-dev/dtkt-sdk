@@ -20,6 +20,7 @@ import (
 // serverStreamHandler sends each incoming message as a request and forwards the stream of responses.
 type serverStreamHandler struct {
 	flowControlMixin
+	suspendableMixin
 	id                   string
 	method               protoreflect.FullName
 	inputs               map[string]<-chan *pubsub.Message
@@ -45,16 +46,29 @@ func (h *serverStreamHandler) Run(ctx context.Context) error {
 
 	var iterCount int
 	for {
+		// Pause point: between iterations only. An in-flight stream call
+		// completes naturally; suspend never aborts the connection.
 		if h.throttle > 0 && iterCount > 0 {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
+			case <-h.SuspendChan():
+				if !h.pauseUntilResume(ctx) {
+					return ctx.Err()
+				}
+				continue
 			case <-time.After(h.throttle):
 			}
 		}
 
-		act := newActivationFromChannels(ctx, h.inputs, h.env.TypeAdapter())
+		act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan())
 		vars, err := act.Resolve()
+		if errors.Is(err, errOperatorSuspended) {
+			if !h.pauseUntilResume(ctx) {
+				return ctx.Err()
+			}
+			continue
+		}
 		if err != nil {
 			return fmt.Errorf("server-stream %s resolve: %w", h.id, err)
 		}

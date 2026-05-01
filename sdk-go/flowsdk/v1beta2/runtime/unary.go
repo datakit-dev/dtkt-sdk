@@ -23,6 +23,7 @@ import (
 // unaryHandler sends each incoming message as a request and forwards the single response.
 type unaryHandler struct {
 	flowControlMixin
+	suspendableMixin
 	id           string
 	method       protoreflect.FullName
 	inputs       map[string]<-chan *pubsub.Message
@@ -41,16 +42,31 @@ type unaryHandler struct {
 func (h *unaryHandler) Run(ctx context.Context) error {
 	var evalCount uint64
 	for {
+		// Pause point: between iterations, BEFORE starting the next call.
+		// An in-flight call from the previous iteration always completes
+		// naturally. Suspend never aborts an RPC mid-flight (we can't
+		// guarantee that's safe / idempotent on the server side).
+		act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan())
 		if h.throttle > 0 && evalCount > 0 {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
+			case <-h.SuspendChan():
+				if !h.pauseUntilResume(ctx) {
+					return ctx.Err()
+				}
+				continue
 			case <-time.After(h.throttle):
 			}
 		}
 
-		act := newActivationFromChannels(ctx, h.inputs, h.env.TypeAdapter())
 		vars, err := act.Resolve()
+		if errors.Is(err, errOperatorSuspended) {
+			if !h.pauseUntilResume(ctx) {
+				return ctx.Err()
+			}
+			continue
+		}
 		if err != nil {
 			return fmt.Errorf("unary %s resolve: %w", h.id, err)
 		}

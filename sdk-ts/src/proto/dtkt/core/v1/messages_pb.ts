@@ -5142,7 +5142,11 @@ export type ListAutomationsRequest = Message<"dtkt.core.v1.ListAutomationsReques
   parent?: string;
 
   /**
-   * Filter expression.
+   * AIP-160 filter expression. Supported subset: `field op value` clauses
+   * joined by AND, where op is `=` (equality) or `:` (substring).
+   * Filterable fields: `name`, `flow`. Examples:
+   *   name:nightly
+   *   flow="users/foo/flows/etl"
    *
    * @generated from field: optional string filter = 4;
    */
@@ -5671,14 +5675,21 @@ export type ListConnectionsRequest = Message<"dtkt.core.v1.ListConnectionsReques
   pageToken: string;
 
   /**
-   * Parent resource name: `organizations/{organization}` or `users/{user}`.
+   * Parent resource name (the connection's URL hierarchy parent: an
+   * organization or user). Blank lists across all parents the caller has
+   * access to. Examples: "organizations/bar", "users/foo".
    *
    * @generated from field: optional string parent = 3;
    */
   parent?: string;
 
   /**
-   * Filter expression.
+   * AIP-160 filter expression. Supported subset: `field op value`
+   * clauses joined by AND, where op is `=` (equality) or `:` (substring).
+   * Filterable fields: `name`, `deployment`, `integration`. Examples:
+   *   name:email
+   *   deployment="users/foo/deployments/email-default"
+   *   integration="users/foo/integrations/email" AND name:prod
    *
    * @generated from field: optional string filter = 4;
    */
@@ -6240,14 +6251,19 @@ export type ListDeploymentsRequest = Message<"dtkt.core.v1.ListDeploymentsReques
   pageToken: string;
 
   /**
-   * Parent resource name.
+   * Parent resource name (the deployment's URL hierarchy parent: an
+   * organization or user). Examples: "organizations/bar", "users/foo".
    *
    * @generated from field: optional string parent = 3;
    */
   parent?: string;
 
   /**
-   * Filter expression.
+   * AIP-160 filter expression. Supported subset: `field op value` clauses
+   * joined by AND, where op is `=` (equality) or `:` (substring).
+   * Filterable fields: `name`, `integration`. Examples:
+   *   name:email
+   *   integration="users/foo/integrations/email"
    *
    * @generated from field: optional string filter = 4;
    */

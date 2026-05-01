@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -18,6 +19,7 @@ import (
 // outputHandler receives messages, evaluates a CEL expression, and publishes the result to the output PubSub topic.
 type outputHandler struct {
 	flowControlMixin
+	suspendableMixin
 	id          string
 	inputs      map[string]<-chan *pubsub.Message
 	program     cel.Program
@@ -34,7 +36,10 @@ func (h *outputHandler) Run(ctx context.Context) error {
 		return h.runWithTransforms(ctx)
 	}
 
-	var iterCount int
+	var (
+		iterCount int
+		eofSeen   bool
+	)
 	for {
 		if h.throttle > 0 && iterCount > 0 {
 			select {
@@ -44,17 +49,29 @@ func (h *outputHandler) Run(ctx context.Context) error {
 			}
 		}
 
-		act := newActivationFromChannels(ctx, h.inputs, h.adapter)
+		act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.adapter, h.SuspendChan())
 		vars, err := act.Resolve()
+		if errors.Is(err, errOperatorSuspended) {
+			if !h.pauseUntilResume(ctx) {
+				return ctx.Err()
+			}
+			continue
+		}
 		if err != nil {
 			if ctx.Err() != nil {
 				break
 			}
 			return fmt.Errorf("output %s resolve: %w", h.id, err)
 		}
-		if act.AnyEOF() || ctx.Err() != nil {
+		if act.AnyEOF() {
+			eofSeen = true
 			break
 		}
+		// Once Resolve has consumed a message, we always finish the
+		// iteration (eval + publish) before the next loop pass. The
+		// suspend signal is only honored at the TOP of the loop, never
+		// mid-iteration. This guarantees no consumed-but-unpublished
+		// message can be dropped on suspend.
 		result, err := evalCEL(h.program, vars)
 		if err != nil {
 			return fmt.Errorf("output %s eval: %w", h.id, err)
@@ -77,12 +94,26 @@ func (h *outputHandler) Run(ctx context.Context) error {
 		h.checkFC(vars)
 	}
 
-	// Publish EOF marker so consumers know the stream ended.
-	return publishNode(h.pubsub, h.outputTopic, flowv1beta2.RunSnapshot_OutputNode_builder{
+	// Publish a Closed:true EOF marker on exit so subscribers know the
+	// stream has ended. Under the unified suspend design this code path
+	// is reached ONLY on real termination — input drained (AnyEOF), or
+	// ctx cancelled by Stop/Terminate. Suspend never reaches here; it's
+	// handled at the top of the loop via pauseUntilResume.
+	phase := flowv1beta2.RunSnapshot_PHASE_SUCCEEDED
+	if !eofSeen && ctx.Err() != nil {
+		phase = flowv1beta2.RunSnapshot_PHASE_CANCELLED
+	}
+	if err := publishNode(h.pubsub, h.outputTopic, flowv1beta2.RunSnapshot_OutputNode_builder{
 		Id:     h.id,
 		Closed: true,
-		Phase:  flowv1beta2.RunSnapshot_PHASE_SUCCEEDED,
-	}.Build())
+		Phase:  phase,
+	}.Build()); err != nil {
+		return err
+	}
+	if !eofSeen {
+		return ctx.Err()
+	}
+	return nil
 }
 
 func (h *outputHandler) runWithTransforms(ctx context.Context) error {
@@ -110,6 +141,7 @@ func (h *outputHandler) runWithTransforms(ctx context.Context) error {
 		return err
 	}
 
+	var eofSeen bool
 	g.Go(func() error {
 		var iterCount int
 		for {
@@ -121,17 +153,26 @@ func (h *outputHandler) runWithTransforms(ctx context.Context) error {
 				}
 			}
 
-			act := newActivationFromChannels(ctx, h.inputs, h.adapter)
+			act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.adapter, h.SuspendChan())
 			vars, err := act.Resolve()
+			if errors.Is(err, errOperatorSuspended) {
+				if !h.pauseUntilResume(ctx) {
+					return ctx.Err()
+				}
+				continue
+			}
 			if err != nil {
 				if ctx.Err() != nil {
 					return ctx.Err()
 				}
 				return fmt.Errorf("output %s resolve: %w", h.id, err)
 			}
-			if act.AnyEOF() || ctx.Err() != nil {
+			if act.AnyEOF() {
+				eofSeen = true
 				break
 			}
+			// See comment in Run(): consumed messages must always be
+			// processed; suspend is honored only at the top of the loop.
 			result, err := evalCEL(h.program, vars)
 			if err != nil {
 				return fmt.Errorf("output %s eval: %w", h.id, err)
@@ -154,10 +195,22 @@ func (h *outputHandler) runWithTransforms(ctx context.Context) error {
 	if lastErr != nil {
 		return lastErr
 	}
-	// Publish EOF marker so consumers know the stream ended.
-	return publishNode(h.pubsub, h.outputTopic, flowv1beta2.RunSnapshot_OutputNode_builder{
+	// See Run() above. Under the unified suspend design, ctx cancellation
+	// only happens on Stop/Terminate (not suspend), so always publish a
+	// Closed:true marker so subscribers know the stream ended.
+	phase := flowv1beta2.RunSnapshot_PHASE_SUCCEEDED
+	if !eofSeen && ctx.Err() != nil {
+		phase = flowv1beta2.RunSnapshot_PHASE_CANCELLED
+	}
+	if err := publishNode(h.pubsub, h.outputTopic, flowv1beta2.RunSnapshot_OutputNode_builder{
 		Id:     h.id,
 		Closed: true,
-		Phase:  flowv1beta2.RunSnapshot_PHASE_SUCCEEDED,
-	}.Build())
+		Phase:  phase,
+	}.Build()); err != nil {
+		return err
+	}
+	if !eofSeen {
+		return ctx.Err()
+	}
+	return nil
 }

@@ -1509,7 +1509,11 @@ message ListAutomationsRequest {
   // Parent resource name: `organizations/{organization}` or `users/{user}`.
   optional string parent = 3;
 
-  // Filter expression.
+  // AIP-160 filter expression. Supported subset: `field op value` clauses
+  // joined by AND, where op is `=` (equality) or `:` (substring).
+  // Filterable fields: `name`, `flow`. Examples:
+  //   name:nightly
+  //   flow="users/foo/flows/etl"
   optional string filter = 4;
 }
 
@@ -1605,10 +1609,17 @@ message ListConnectionsRequest {
   // Token for retrieving the next page.
   string page_token = 2;
 
-  // Parent resource name: `organizations/{organization}` or `users/{user}`.
+  // Parent resource name (the connection's URL hierarchy parent: an
+  // organization or user). Blank lists across all parents the caller has
+  // access to. Examples: "organizations/bar", "users/foo".
   optional string parent = 3;
 
-  // Filter expression.
+  // AIP-160 filter expression. Supported subset: `field op value`
+  // clauses joined by AND, where op is `=` (equality) or `:` (substring).
+  // Filterable fields: `name`, `deployment`, `integration`. Examples:
+  //   name:email
+  //   deployment="users/foo/deployments/email-default"
+  //   integration="users/foo/integrations/email" AND name:prod
   optional string filter = 4;
 }
 
@@ -1719,10 +1730,15 @@ message ListDeploymentsRequest {
   // Token for retrieving the next page.
   string page_token = 2;
 
-  // Parent resource name.
+  // Parent resource name (the deployment's URL hierarchy parent: an
+  // organization or user). Examples: "organizations/bar", "users/foo".
   optional string parent = 3;
 
-  // Filter expression.
+  // AIP-160 filter expression. Supported subset: `field op value` clauses
+  // joined by AND, where op is `=` (equality) or `:` (substring).
+  // Filterable fields: `name`, `integration`. Examples:
+  //   name:email
+  //   integration="users/foo/integrations/email"
   optional string filter = 4;
 }
 

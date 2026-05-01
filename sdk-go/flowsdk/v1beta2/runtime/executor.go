@@ -223,9 +223,14 @@ func (e *Executor) TerminateNode(nodeID string) {
 	}
 }
 
-// Suspend suspends all running handler nodes. Generators pause their
-// timer/iteration in-place. Non-generators have their context cancelled
-// and park until resumed. Input nodes are not affected.
+// Suspend pauses every running handler in place. Every handler implements
+// selfSuspendable, so we never cancel handler contexts on suspend — that
+// reservation belongs to "stop forever". Each handler honors the suspend
+// signal at a safe pause point in its loop (between iterations, never
+// mid-consume), which preserves goroutine lifetimes and eliminates the
+// consumed-but-not-published race that ctx-cancel-on-suspend allowed.
+// In-flight external operations (RPC calls, stream sends, prompt waits)
+// are NEVER aborted; they complete naturally before the handler pauses.
 // Safe to call concurrently. No-op if the flow is not running.
 func (e *Executor) Suspend() {
 	e.mu.Lock()
@@ -238,23 +243,14 @@ func (e *Executor) Suspend() {
 			continue
 		}
 		e.suspendedNodes[id] = true
-		// Generators handle suspend internally (pause timer, stay alive).
-		if h, ok := e.handlers[id]; ok {
-			if sh, ok := h.(selfSuspendable); ok {
-				sh.suspend()
-				continue
-			}
+		if sh, ok := e.handlers[id].(selfSuspendable); ok {
+			sh.suspend()
 		}
-		// Non-generators: cancel context; awaitResume will park them.
-		if cancel, ok := e.nodeCtxs[id]; ok {
-			cancel()
-		}
+		e.publishSuspendedPhase(id)
 	}
 }
 
-// SuspendNode suspends a single handler node. Generators pause internally;
-// non-generators have their context cancelled. Input nodes are not affected.
-// No-op if the flow is not running or the node ID is unknown.
+// SuspendNode suspends a single handler. See Suspend.
 func (e *Executor) SuspendNode(nodeID string) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -268,57 +264,59 @@ func (e *Executor) SuspendNode(nodeID string) {
 		return
 	}
 	e.suspendedNodes[nodeID] = true
-	if h, ok := e.handlers[nodeID]; ok {
-		if sh, ok := h.(selfSuspendable); ok {
-			sh.suspend()
-			return
-		}
+	if sh, ok := e.handlers[nodeID].(selfSuspendable); ok {
+		sh.suspend()
 	}
-	if cancel, ok := e.nodeCtxs[nodeID]; ok {
-		cancel()
-	}
+	e.publishSuspendedPhase(nodeID)
 }
 
-// Resume resumes all suspended nodes. Generators are signalled to restart
-// their timer/iteration. Non-generators receive a resume signal via their
-// parkAndResume channel.
+// publishSuspendedPhase emits a PHASE_SUSPENDED state event on the node's
+// topic so attached clients can observe the operator's suspend intent
+// immediately. The handler may not actually be paused yet (e.g. blocked
+// in an RPC call), but the operator's intent is the source of truth for
+// the visible phase. Must be called with e.mu held.
+func (e *Executor) publishSuspendedPhase(nodeID string) {
+	np, ok := e.nodeProtos[nodeID]
+	if !ok {
+		return
+	}
+	_ = publishPhaseChange(e.handlerPub, e.topics.For(nodeID), np,
+		flowv1beta2.RunSnapshot_PHASE_SUSPENDED, nil)
+}
+
+// Resume signals every suspended handler to continue, and clears the
+// suspendedNodes entry for each. Resume is the single writer that flips
+// nodes back to "running" — handlers no longer participate in the
+// bookkeeping. This eliminates the race where a Suspend/Resume/Suspend
+// triple could silently no-op the second Suspend.
 // Safe to call concurrently. No-op if no nodes are suspended.
 func (e *Executor) Resume() {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	for id := range e.suspendedNodes {
-		if h, ok := e.handlers[id]; ok {
-			if sh, ok := h.(selfSuspendable); ok {
-				sh.resume()
-				delete(e.suspendedNodes, id)
-				continue
-			}
+		if sh, ok := e.handlers[id].(selfSuspendable); ok {
+			sh.resume()
 		}
-		if ch, ok := e.resumeChans[id]; ok {
-			select {
-			case ch <- nil:
-			default:
-			}
-		}
+		delete(e.suspendedNodes, id)
 	}
 }
 
-// ResumeNode resumes a single suspended node. Generators are signalled
-// internally. Non-generators receive a resume signal via parkAndResume.
-// No-op if the node is not suspended.
+// ResumeNode resumes a single suspended node. For non-self-suspendable
+// handlers (legacy retry-driven SuspendError path), still uses the
+// resumeChans signal. For all current handlers, sh.resume() suffices.
 func (e *Executor) ResumeNode(nodeID string, val *expr.Value) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	if !e.suspendedNodes[nodeID] {
 		return
 	}
-	if h, ok := e.handlers[nodeID]; ok {
-		if sh, ok := h.(selfSuspendable); ok {
-			sh.resume()
-			delete(e.suspendedNodes, nodeID)
-			return
-		}
+	if sh, ok := e.handlers[nodeID].(selfSuspendable); ok {
+		sh.resume()
+		delete(e.suspendedNodes, nodeID)
+		return
 	}
+	// Fallback: send via resumeChans (used by retry-strategy SuspendError
+	// path where parkAndResume blocks on this channel).
 	if ch, ok := e.resumeChans[nodeID]; ok {
 		select {
 		case ch <- val:

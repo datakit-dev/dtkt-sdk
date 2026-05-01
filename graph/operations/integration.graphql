@@ -6,13 +6,27 @@ fragment IntegrationFragment on Integration {
   version
   description
   icon
-  serviceNames
-  configSchema
-  serverConfig
-  published {
-    ...IntegrationPackageFragment
-  }
+  visibility
+  organizationSlug
   organizationID
+  revisionID
+  createdAt
+  updatedAt
+  published {
+    ...IntegrationRevisionFragment
+  }
+}
+
+fragment IntegrationRevisionFragment on IntegrationRevision {
+  id
+  slug
+  integrationSlug
+  organizationSlug
+  specEtag
+  sourceURI
+  sourceEtag
+  integrationID
+  authorID
   createdAt
   updatedAt
 }
@@ -34,15 +48,5 @@ query ListIntegrations(
       }
     }
     totalCount
-  }
-}
-
-mutation CreateIntegration($input: CreateIntegrationInput!) {
-  createIntegration(input: $input) {
-    created
-    error
-    integration {
-      ...IntegrationFragment
-    }
   }
 }

@@ -1,0 +1,28 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: suspend_resume_bidi_stream
+  description: |
+    Range generator -> bidi stream (echo) -> output. The mock 'echo.BidiEcho'
+    method echoes each message back, so the output sequence equals the
+    input sequence 1:1. Used by suspend/resume multi-cycle test to verify
+    that the bidi stream connection stays open through suspend cycles
+    (we should not close/recreate streams on suspend) AND that the publish
+    side correctly pauses without losing values.
+  generators:
+    - id: seq
+      range:
+        start: 1
+        end: 1000000
+        rate:
+          count: 100
+          interval: "1s"
+  streams:
+    - id: echo
+      call:
+        connection: echo
+        method: echo.BidiEcho
+        request: "= generators.seq.value"
+  outputs:
+    - id: result
+      value: "= streams.echo.value"

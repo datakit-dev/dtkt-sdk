@@ -25,9 +25,28 @@ var (
 	_ executor.NodeHandler = (*clientStreamHandler)(nil)
 	_ executor.NodeHandler = (*bidiStreamHandler)(nil)
 
+	// Every handler that runs as a long-lived goroutine in launchHandlers
+	// implements selfSuspendable. Suspend pauses the handler's loop at a
+	// safe point (between iterations) without exiting its goroutine, and
+	// without interrupting any in-flight external operation. For streams
+	// this means the connection stays open and the receive side keeps
+	// flowing — only the publish side pauses. For unary actions the
+	// current call completes naturally; only the next iteration pauses.
+	//
+	// This design is intentional: closing a stream or aborting a call
+	// mid-flight cannot be guaranteed idempotent (server-side state,
+	// side effects). Suspend must NOT cause those.
 	_ selfSuspendable = (*tickerHandler)(nil)
 	_ selfSuspendable = (*cronHandler)(nil)
 	_ selfSuspendable = (*rangeHandler)(nil)
+	_ selfSuspendable = (*varHandler)(nil)
+	_ selfSuspendable = (*switchHandler)(nil)
+	_ selfSuspendable = (*outputHandler)(nil)
+	_ selfSuspendable = (*unaryHandler)(nil)
+	_ selfSuspendable = (*serverStreamHandler)(nil)
+	_ selfSuspendable = (*clientStreamHandler)(nil)
+	_ selfSuspendable = (*bidiStreamHandler)(nil)
+	_ selfSuspendable = (*interactionHandler)(nil)
 )
 
 // newHandler creates a NodeHandler from a compiled node and its wired
@@ -38,7 +57,7 @@ var (
 func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Message, ps executor.PubSub, topic string, transformPS executor.PubSub, adapter types.Adapter) (executor.NodeHandler, error) {
 	switch c := compiled.(type) {
 	case *compiledVarSwitch:
-		return &switchHandler{
+		h := &switchHandler{
 			id:          nodeID,
 			inputs:      inputs,
 			pubsub:      ps,
@@ -49,10 +68,12 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 			transforms:  c.transforms,
 			transformPS: transformPS,
 			adapter:     adapter,
-		}, nil
+		}
+		h.initSuspendable()
+		return h, nil
 
 	case *compiledVarValue:
-		return &varHandler{
+		h := &varHandler{
 			id:          nodeID,
 			inputs:      inputs,
 			pubsub:      ps,
@@ -61,7 +82,9 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 			transforms:  c.transforms,
 			transformPS: transformPS,
 			adapter:     adapter,
-		}, nil
+		}
+		h.initSuspendable()
+		return h, nil
 
 	case *compiledTicker:
 		return &tickerHandler{
@@ -102,7 +125,7 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 	case *compiledCall:
 		switch c.kind {
 		case rpc.MethodUnary:
-			return &unaryHandler{
+			h := &unaryHandler{
 				id:           nodeID,
 				method:       c.method,
 				inputs:       inputs,
@@ -116,9 +139,11 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 				request:      c.request,
 				responseProg: c.responseProg,
 				retry:        c.retry,
-			}, nil
+			}
+			h.initSuspendable()
+			return h, nil
 		case rpc.MethodServerStream:
-			return &serverStreamHandler{
+			h := &serverStreamHandler{
 				id:                   nodeID,
 				method:               c.method,
 				inputs:               inputs,
@@ -132,9 +157,11 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 				request:              c.request,
 				responseProg:         c.responseProg,
 				retry:                c.retry,
-			}, nil
+			}
+			h.initSuspendable()
+			return h, nil
 		case rpc.MethodClientStream:
-			return &clientStreamHandler{
+			h := &clientStreamHandler{
 				id:                   nodeID,
 				method:               c.method,
 				inputs:               inputs,
@@ -148,9 +175,11 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 				request:              c.request,
 				responseProg:         c.responseProg,
 				retry:                c.retry,
-			}, nil
+			}
+			h.initSuspendable()
+			return h, nil
 		case rpc.MethodBidiStream:
-			return &bidiStreamHandler{
+			h := &bidiStreamHandler{
 				id:                   nodeID,
 				method:               c.method,
 				inputs:               inputs,
@@ -164,13 +193,15 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 				request:              c.request,
 				responseProg:         c.responseProg,
 				retry:                c.retry,
-			}, nil
+			}
+			h.initSuspendable()
+			return h, nil
 		default:
 			return nil, fmt.Errorf("unsupported method kind for %q on node %s", c.method, nodeID)
 		}
 
 	case *compiledOutput:
-		return &outputHandler{
+		h := &outputHandler{
 			id:          nodeID,
 			inputs:      inputs,
 			program:     c.program,
@@ -180,7 +211,9 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 			outputTopic: topic,
 			throttle:    c.throttle,
 			adapter:     adapter,
-		}, nil
+		}
+		h.initSuspendable()
+		return h, nil
 
 	default:
 		return nil, fmt.Errorf("unsupported compiled node type %T for node %s", compiled, nodeID)

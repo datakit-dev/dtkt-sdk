@@ -39,6 +39,7 @@ func (e *runtimeEnv) Vars() cel.Activation         { return nil }
 type nodeRef struct {
 	ch         <-chan *pubsub.Message
 	ctx        context.Context
+	suspendCh  <-chan struct{} // optional: handler's suspend signal
 	node       executor.StateNode
 	chanClosed bool // channel itself was closed (not EOF value)
 	consumed   bool
@@ -52,9 +53,15 @@ func (nr *nodeRef) recv() error {
 		return nil
 	}
 	for {
+		// Multiplexes ctx cancellation, operator suspend, and the input
+		// channel. errOperatorSuspended is returned WITHOUT consuming a
+		// message, so the next recv (after resume) picks up the same
+		// buffered message — no data loss across suspend cycles.
 		select {
 		case <-nr.ctx.Done():
 			return nr.ctx.Err()
+		case <-nr.suspendCh:
+			return errOperatorSuspended
 		case msg, ok := <-nr.ch:
 			if !ok {
 				nr.chanClosed = true
@@ -90,9 +97,17 @@ func newActivation(adapter types.Adapter) *activation {
 }
 
 func newActivationFromChannels(ctx context.Context, inputs map[string]<-chan *pubsub.Message, adapter types.Adapter) *activation {
+	return newActivationFromChannelsSuspendable(ctx, inputs, adapter, nil)
+}
+
+// newActivationFromChannelsSuspendable is the suspend-aware variant. When
+// suspendCh fires before any input arrives, recv returns errOperatorSuspended
+// without consuming a message; the caller pauses, then re-creates the
+// activation after resume to pick up where it left off.
+func newActivationFromChannelsSuspendable(ctx context.Context, inputs map[string]<-chan *pubsub.Message, adapter types.Adapter, suspendCh <-chan struct{}) *activation {
 	a := newActivation(adapter)
 	for nodeID, ch := range inputs {
-		a.refs[nodeID] = &nodeRef{ch: ch, ctx: ctx}
+		a.refs[nodeID] = &nodeRef{ch: ch, ctx: ctx, suspendCh: suspendCh}
 	}
 	return a
 }

@@ -239,6 +239,7 @@ func reflectJSONSchema(reflector *jsonschema.Reflector, value any) (*jsonschema.
 					itemSchema.ID = ""
 					itemSchema.Version = ""
 
+					hoistDefinitions(jsonSchema, itemSchema)
 					jsonSchema.AdditionalProperties = itemSchema
 				}
 			case reflect.Struct:
@@ -259,6 +260,8 @@ func reflectJSONSchema(reflector *jsonschema.Reflector, value any) (*jsonschema.
 				jsonSchema.Version = itemSchema.Version
 				itemSchema.ID = ""
 				itemSchema.Version = ""
+
+				hoistDefinitions(jsonSchema, itemSchema)
 				jsonSchema.Items = itemSchema
 			}
 		}
@@ -267,6 +270,27 @@ func reflectJSONSchema(reflector *jsonschema.Reflector, value any) (*jsonschema.
 	}
 
 	return nil, fmt.Errorf("%s cannot be represented as a json type", reflectType.Kind())
+}
+
+// hoistDefinitions lifts $defs entries from a nested item schema (e.g. an
+// array's `items` or a map's `additionalProperties`) up to the parent schema.
+// Without this, $ref pointers like "#/$defs/Foo" emitted by the reflector when
+// the top-level Go type is a slice/map of a struct with nested struct fields
+// would resolve against the parent root and fail to find the definition,
+// producing "json-pointer ... not found" compile errors.
+func hoistDefinitions(parent, child *jsonschema.Schema) {
+	if len(child.Definitions) == 0 {
+		return
+	}
+	if parent.Definitions == nil {
+		parent.Definitions = jsonschema.Definitions{}
+	}
+	for name, def := range child.Definitions {
+		if _, exists := parent.Definitions[name]; !exists {
+			parent.Definitions[name] = def
+		}
+	}
+	child.Definitions = nil
 }
 
 func (s *JSONSchema[T]) setCallback(f JSONSchemaCallbackFunc) {

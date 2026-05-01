@@ -10,10 +10,14 @@ use_struct_references: true
 bindings:
   ID:
     type: github.com/google/uuid.UUID
+  UUID:
+    type: github.com/google/uuid.UUID
   Time:
     type: time.Time
   DateTime:
     type: time.Time
+  Duration:
+    type: string
   Map:
     type: map[string]any
   Any:

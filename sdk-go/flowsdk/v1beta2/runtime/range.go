@@ -91,6 +91,7 @@ func (h *rangeHandler) Run(ctx context.Context) error {
 				return nil
 			case <-h.suspendCh:
 				if !parkSuspend() {
+					_ = publishEOF()
 					return nil
 				}
 				i-- // re-emit current value after resume
@@ -104,6 +105,7 @@ func (h *rangeHandler) Run(ctx context.Context) error {
 				return nil
 			case <-h.suspendCh:
 				if !parkSuspend() {
+					_ = publishEOF()
 					return nil
 				}
 				i-- // re-emit current value after resume

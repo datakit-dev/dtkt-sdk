@@ -1,6 +1,7 @@
 package common_test
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
@@ -126,6 +127,75 @@ func Test_SliceSchema(t *testing.T) {
 		t.Errorf("expected config key 'value', got '%s'", config[0])
 	} else {
 		t.Log(config)
+	}
+}
+
+// Regression: when the top-level Go type is a slice (or map) of a struct that
+// has nested struct fields (e.g. `OptString`), the reflector emits the nested
+// struct definitions in $defs and references them via $ref "#/$defs/Foo".
+// Those definitions must live at the schema root — if they end up nested
+// inside `items` or `additionalProperties`, the json-schema compiler fails
+// with `compile: json-pointer ... not found` when resolving the $ref.
+type optString struct {
+	Value string
+	Set   bool
+}
+
+type sendEmailRequest struct {
+	From    optString `json:"From"`
+	To      optString `json:"To"`
+	Subject optString `json:"Subject"`
+}
+
+type sendEmailBatchRequest []sendEmailRequest
+
+type sendEmailRequestMap map[string]sendEmailRequest
+
+func Test_NestedDefsHoistedFromArrayItems(t *testing.T) {
+	schema, err := common.JSONSchemaFor[sendEmailBatchRequest](
+		common.WithSchemaID("ActionInput.SendEmailBatch.jsonschema.json"),
+	)
+	if err != nil {
+		t.Fatalf("expected schema, got error: %v", err)
+	}
+
+	t.Log(schema.String())
+
+	var raw map[string]any
+	if err := json.Unmarshal(schema.Bytes(), &raw); err != nil {
+		t.Fatalf("unmarshal schema: %v", err)
+	}
+	if _, ok := raw["$defs"]; !ok {
+		t.Fatalf("expected $defs at schema root, got: %s", schema.String())
+	}
+	if items, ok := raw["items"].(map[string]any); ok {
+		if _, nested := items["$defs"]; nested {
+			t.Errorf("$defs leaked into items — $ref pointers won't resolve")
+		}
+	}
+}
+
+func Test_NestedDefsHoistedFromMapValues(t *testing.T) {
+	schema, err := common.JSONSchemaFor[sendEmailRequestMap](
+		common.WithSchemaID("ActionInput.SendEmailMap.jsonschema.json"),
+	)
+	if err != nil {
+		t.Fatalf("expected schema, got error: %v", err)
+	}
+
+	t.Log(schema.String())
+
+	var raw map[string]any
+	if err := json.Unmarshal(schema.Bytes(), &raw); err != nil {
+		t.Fatalf("unmarshal schema: %v", err)
+	}
+	if _, ok := raw["$defs"]; !ok {
+		t.Fatalf("expected $defs at schema root, got: %s", schema.String())
+	}
+	if ap, ok := raw["additionalProperties"].(map[string]any); ok {
+		if _, nested := ap["$defs"]; nested {
+			t.Errorf("$defs leaked into additionalProperties — $ref pointers won't resolve")
+		}
 	}
 }
 

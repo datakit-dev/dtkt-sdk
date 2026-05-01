@@ -21,11 +21,11 @@ export type Scalars = {
    * https://relay.dev/graphql/connections.htm#sec-Cursor
    */
   Cursor: { input: string; output: string; }
+  Duration: { input: string; output: string; }
   Int64: { input: number; output: number; }
-  /** The builtin Map type */
   Map: { input: Record<string, unknown>; output: Record<string, unknown>; }
-  /** The builtin Time type */
   Time: { input: string; output: string; }
+  UUID: { input: string; output: string; }
 };
 
 /** ActionType is enum for the type of action that can be performed on a resource. */
@@ -48,13 +48,25 @@ export type AddRoleInput = {
   readonly userIDs?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
 };
 
+export type Address = {
+  readonly __typename?: 'Address';
+  readonly network: Scalars['String']['output'];
+  readonly target: Scalars['String']['output'];
+};
+
+export type AnyProto = {
+  readonly __typename?: 'AnyProto';
+  readonly typeUrl: Scalars['String']['output'];
+  readonly value: Scalars['Any']['output'];
+};
+
 export type AuthCheck = {
   readonly __typename?: 'AuthCheck';
-  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly message?: Maybe<Scalars['String']['output']>;
   readonly oAuthUrl?: Maybe<Scalars['String']['output']>;
   readonly required: Scalars['Boolean']['output'];
   readonly success: Scalars['Boolean']['output'];
-  readonly type: ServiceAuthType;
+  readonly type: AuthType;
 };
 
 
@@ -62,10 +74,10 @@ export type AuthCheckOAuthUrlArgs = {
   redirectURL: Scalars['String']['input'];
 };
 
-export type BaseServiceMetadata = {
-  readonly __typename?: 'BaseServiceMetadata';
-  readonly customActions: ReadonlyArray<CustomActionMetadata>;
-};
+export enum AuthType {
+  None = 'NONE',
+  Oauth = 'OAUTH'
+}
 
 export type Catalog = Node & {
   readonly __typename?: 'Catalog';
@@ -175,13 +187,6 @@ export enum CatalogOrderField {
   SourcesCount = 'SOURCES_COUNT',
   UpdatedAt = 'UPDATED_AT'
 }
-
-export type CatalogServiceMetadata = {
-  readonly __typename?: 'CatalogServiceMetadata';
-  readonly dataTypes: ReadonlyArray<DataTypeMetadata>;
-  readonly defaultCatalog?: Maybe<Scalars['String']['output']>;
-  readonly queryDialect: Scalars['String']['output'];
-};
 
 export type CatalogUpdated = {
   readonly __typename?: 'CatalogUpdated';
@@ -596,23 +601,24 @@ export type ColumnRefWhereInput = {
   readonly updatedAtNotIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
 };
 
-export type ConfigCheck = {
-  readonly __typename?: 'ConfigCheck';
-  readonly error?: Maybe<Scalars['String']['output']>;
-  readonly success: Scalars['Boolean']['output'];
-};
-
 export type Connection = Node & {
   readonly __typename?: 'Connection';
+  readonly address: Address;
   readonly catalogs: CatalogConnection;
+  readonly configURI?: Maybe<Scalars['String']['output']>;
   readonly connectionUsers?: Maybe<ReadonlyArray<ConnectionUser>>;
   readonly createdAt: Scalars['Time']['output'];
+  readonly customGrpc?: Maybe<Scalars['Boolean']['output']>;
+  readonly customProtos?: Maybe<Scalars['String']['output']>;
+  readonly deployment?: Maybe<Deployment>;
+  readonly deploymentID?: Maybe<Scalars['ID']['output']>;
+  readonly deploymentSlug?: Maybe<Scalars['String']['output']>;
+  readonly headers: Scalars['Map']['output'];
   readonly id: Scalars['ID']['output'];
-  readonly integration: Integration;
-  readonly integrationID: Scalars['ID']['output'];
-  readonly metadata: ConnectionMetadata;
+  readonly integrationSlug?: Maybe<Scalars['String']['output']>;
   readonly name: Scalars['String']['output'];
   readonly organizationID: Scalars['ID']['output'];
+  readonly organizationSlug: Scalars['String']['output'];
   readonly organizations?: Maybe<ReadonlyArray<Organization>>;
   readonly owner: Organization;
   readonly slug: Scalars['String']['output'];
@@ -655,7 +661,13 @@ export type ConnectionSourcesArgs = {
 export type ConnectionCheck = {
   readonly __typename?: 'ConnectionCheck';
   readonly authCheck: AuthCheck;
-  readonly configCheck: ConfigCheck;
+  readonly configCheck: ConnectionConfigCheck;
+};
+
+export type ConnectionConfigCheck = {
+  readonly __typename?: 'ConnectionConfigCheck';
+  readonly message?: Maybe<Scalars['String']['output']>;
+  readonly success: Scalars['Boolean']['output'];
 };
 
 /** A connection to a list of items. */
@@ -692,16 +704,6 @@ export type ConnectionEdge = {
   readonly node?: Maybe<Connection>;
 };
 
-export type ConnectionMetadata = {
-  readonly __typename?: 'ConnectionMetadata';
-  readonly baseService: BaseServiceMetadata;
-  readonly catalogService?: Maybe<CatalogServiceMetadata>;
-  readonly destinationService?: Maybe<DestinationServiceMetadata>;
-  readonly embeddingService?: Maybe<EmbeddingServiceMetadata>;
-  readonly eventService?: Maybe<EventServiceMetadata>;
-  readonly sourceService?: Maybe<SourceServiceMetadata>;
-};
-
 /** Ordering options for Connection connections */
 export type ConnectionOrder = {
   /** The ordering direction. */
@@ -719,6 +721,11 @@ export enum ConnectionOrderField {
   SourceTypesCount = 'SOURCE_TYPES_COUNT',
   UpdatedAt = 'UPDATED_AT'
 }
+
+export type ConnectionType =
+  { readonly customGRPC: Scalars['Boolean']['input']; readonly customProtos?: never; readonly deploymentID?: never; }
+  |  { readonly customGRPC?: never; readonly customProtos: Scalars['String']['input']; readonly deploymentID?: never; }
+  |  { readonly customGRPC?: never; readonly customProtos?: never; readonly deploymentID: Scalars['ID']['input']; };
 
 export type ConnectionUpdated = {
   readonly __typename?: 'ConnectionUpdated';
@@ -838,6 +845,22 @@ export type ConnectionUserWhereInput = {
  */
 export type ConnectionWhereInput = {
   readonly and?: InputMaybe<ReadonlyArray<ConnectionWhereInput>>;
+  /** config_uri field predicates */
+  readonly configURI?: InputMaybe<Scalars['String']['input']>;
+  readonly configURIContains?: InputMaybe<Scalars['String']['input']>;
+  readonly configURIContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly configURIEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly configURIGT?: InputMaybe<Scalars['String']['input']>;
+  readonly configURIGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly configURIHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly configURIHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly configURIIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly configURIIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly configURILT?: InputMaybe<Scalars['String']['input']>;
+  readonly configURILTE?: InputMaybe<Scalars['String']['input']>;
+  readonly configURINEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly configURINotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly configURINotNil?: InputMaybe<Scalars['Boolean']['input']>;
   /** created_at field predicates */
   readonly createdAt?: InputMaybe<Scalars['Time']['input']>;
   readonly createdAtGT?: InputMaybe<Scalars['Time']['input']>;
@@ -847,15 +870,59 @@ export type ConnectionWhereInput = {
   readonly createdAtLTE?: InputMaybe<Scalars['Time']['input']>;
   readonly createdAtNEQ?: InputMaybe<Scalars['Time']['input']>;
   readonly createdAtNotIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
+  /** custom_grpc field predicates */
+  readonly customGrpc?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly customGrpcIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly customGrpcNEQ?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly customGrpcNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** custom_protos field predicates */
+  readonly customProtos?: InputMaybe<Scalars['String']['input']>;
+  readonly customProtosContains?: InputMaybe<Scalars['String']['input']>;
+  readonly customProtosContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly customProtosEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly customProtosGT?: InputMaybe<Scalars['String']['input']>;
+  readonly customProtosGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly customProtosHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly customProtosHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly customProtosIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly customProtosIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly customProtosLT?: InputMaybe<Scalars['String']['input']>;
+  readonly customProtosLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly customProtosNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly customProtosNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly customProtosNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** deployment_id field predicates */
+  readonly deploymentID?: InputMaybe<Scalars['ID']['input']>;
+  readonly deploymentIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly deploymentIDIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly deploymentIDNEQ?: InputMaybe<Scalars['ID']['input']>;
+  readonly deploymentIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly deploymentIDNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** deployment_slug field predicates */
+  readonly deploymentSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly deploymentSlugIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly deploymentSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly deploymentSlugNotNil?: InputMaybe<Scalars['Boolean']['input']>;
   /** catalogs edge predicates */
   readonly hasCatalogs?: InputMaybe<Scalars['Boolean']['input']>;
   readonly hasCatalogsWith?: InputMaybe<ReadonlyArray<CatalogWhereInput>>;
   /** connection_users edge predicates */
   readonly hasConnectionUsers?: InputMaybe<Scalars['Boolean']['input']>;
   readonly hasConnectionUsersWith?: InputMaybe<ReadonlyArray<ConnectionUserWhereInput>>;
-  /** integration edge predicates */
-  readonly hasIntegration?: InputMaybe<Scalars['Boolean']['input']>;
-  readonly hasIntegrationWith?: InputMaybe<ReadonlyArray<IntegrationWhereInput>>;
+  /** deployment edge predicates */
+  readonly hasDeployment?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasDeploymentWith?: InputMaybe<ReadonlyArray<DeploymentWhereInput>>;
   /** organizations edge predicates */
   readonly hasOrganizations?: InputMaybe<Scalars['Boolean']['input']>;
   readonly hasOrganizationsWith?: InputMaybe<ReadonlyArray<OrganizationWhereInput>>;
@@ -877,11 +944,22 @@ export type ConnectionWhereInput = {
   readonly idLTE?: InputMaybe<Scalars['ID']['input']>;
   readonly idNEQ?: InputMaybe<Scalars['ID']['input']>;
   readonly idNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
-  /** integration_id field predicates */
-  readonly integrationID?: InputMaybe<Scalars['ID']['input']>;
-  readonly integrationIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
-  readonly integrationIDNEQ?: InputMaybe<Scalars['ID']['input']>;
-  readonly integrationIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  /** integration_slug field predicates */
+  readonly integrationSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly integrationSlugIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly integrationSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly integrationSlugNotNil?: InputMaybe<Scalars['Boolean']['input']>;
   /** name field predicates */
   readonly name?: InputMaybe<Scalars['String']['input']>;
   readonly nameContains?: InputMaybe<Scalars['String']['input']>;
@@ -903,6 +981,20 @@ export type ConnectionWhereInput = {
   readonly organizationIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
   readonly organizationIDNEQ?: InputMaybe<Scalars['ID']['input']>;
   readonly organizationIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  /** organization_slug field predicates */
+  readonly organizationSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly organizationSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
   /** slug field predicates */
   readonly slug?: InputMaybe<Scalars['String']['input']>;
   readonly slugContains?: InputMaybe<Scalars['String']['input']>;
@@ -956,11 +1048,13 @@ export type CreateColumnInput = {
 
 /** CreateConnectionInput is used to create Connection object. */
 export type CreateConnectionInput = {
+  /** Address of gRPC server. Required when type is customProtos or customGRPC. */
+  readonly address?: InputMaybe<Scalars['String']['input']>;
   readonly config: Scalars['Any']['input'];
-  readonly integrationID: Scalars['ID']['input'];
-  /** name is the name of the Connection. Optional: if not provided, integration name will be used. */
+  /** Name of the Connection. Optional: if not provided, integration name will be used. */
   readonly name?: InputMaybe<Scalars['String']['input']>;
   readonly ownerID: Scalars['ID']['input'];
+  readonly type: ConnectionType;
   readonly visibility?: InputMaybe<Visibility>;
 };
 
@@ -981,7 +1075,9 @@ export type CreateDestinationInput = {
 export type CreateEventSourceInput = {
   readonly config: Scalars['String']['input'];
   readonly connectionID: Scalars['ID']['input'];
+  readonly connectionSlug: Scalars['String']['input'];
   readonly name: Scalars['String']['input'];
+  readonly organizationSlug: Scalars['String']['input'];
   /** Pull frequency in string format, e.g.: "1s", "2.3h" or "4h35m" */
   readonly pullFreq?: InputMaybe<Scalars['String']['input']>;
   readonly strategy: EventSourceStrategy;
@@ -1041,23 +1137,6 @@ export type CreateGeoMapInput = {
   readonly organizationID?: InputMaybe<Scalars['ID']['input']>;
   readonly settings?: InputMaybe<GeoMapSettingsInput>;
   readonly visibility?: InputMaybe<Visibility>;
-};
-
-/**
- * CreateIntegrationInput is used for create Integration object.
- * Input was generated by ent.
- */
-export type CreateIntegrationInput = {
-  readonly address: Scalars['String']['input'];
-  readonly apiVersion: Scalars['String']['input'];
-  readonly configSchema?: InputMaybe<Scalars['String']['input']>;
-  readonly description: Scalars['String']['input'];
-  readonly icon: Scalars['String']['input'];
-  readonly name: Scalars['String']['input'];
-  readonly network: Scalars['String']['input'];
-  readonly organizationID: Scalars['ID']['input'];
-  readonly serviceNames?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
-  readonly version: Scalars['String']['input'];
 };
 
 /**
@@ -1135,6 +1214,7 @@ export type CreateSpaceInput = {
   readonly flowRunIDs?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
   readonly geoMapIDs?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
   readonly name: Scalars['String']['input'];
+  readonly organizationSlug: Scalars['String']['input'];
   /** Timezone name (e.g. America/Los_Angeles) */
   readonly tzName?: InputMaybe<Scalars['String']['input']>;
 };
@@ -1145,14 +1225,6 @@ export type CreateTableInput = {
   readonly fields?: InputMaybe<ReadonlyArray<FieldInput>>;
   readonly name: Scalars['String']['input'];
   readonly schemaID: Scalars['ID']['input'];
-};
-
-export type CustomActionMetadata = {
-  readonly __typename?: 'CustomActionMetadata';
-  readonly description: Scalars['String']['output'];
-  readonly inputSchema: Scalars['String']['output'];
-  readonly name: Scalars['String']['output'];
-  readonly outputSchema: Scalars['String']['output'];
 };
 
 export type DataType = {
@@ -1169,6 +1241,234 @@ export type DataTypeMetadata = {
   readonly nativeType: Scalars['String']['output'];
 };
 
+export type Deployment = Node & {
+  readonly __typename?: 'Deployment';
+  readonly address: Address;
+  readonly connections: ConnectionConnection;
+  readonly createdAt: Scalars['Time']['output'];
+  readonly env: Scalars['Map']['output'];
+  readonly etag: Scalars['String']['output'];
+  readonly id: Scalars['ID']['output'];
+  readonly integration: Integration;
+  readonly integrationID: Scalars['ID']['output'];
+  readonly integrationSlug: Scalars['String']['output'];
+  readonly organization: Organization;
+  readonly organizationID: Scalars['ID']['output'];
+  readonly organizationSlug: Scalars['String']['output'];
+  readonly packageConfig?: Maybe<PackageConfigMetadata>;
+  readonly packageSpec?: Maybe<PackageSpecMetadata>;
+  readonly ports: Scalars['Map']['output'];
+  readonly revision: IntegrationRevision;
+  readonly revisionID: Scalars['ID']['output'];
+  readonly slug: Scalars['String']['output'];
+  readonly state: DeploymentState;
+  readonly typeSchemas?: Maybe<ReadonlyArray<TypeSchema>>;
+  readonly updatedAt: Scalars['Time']['output'];
+  readonly visibility: Visibility;
+};
+
+
+export type DeploymentConnectionsArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<ConnectionOrder>;
+  where?: InputMaybe<ConnectionWhereInput>;
+};
+
+/** A connection to a list of items. */
+export type DeploymentConnection = {
+  readonly __typename?: 'DeploymentConnection';
+  /** A list of edges. */
+  readonly edges?: Maybe<ReadonlyArray<Maybe<DeploymentEdge>>>;
+  /** Information to aid in pagination. */
+  readonly pageInfo: PageInfo;
+  /** Identifies the total count of items in the connection. */
+  readonly totalCount: Scalars['Int']['output'];
+};
+
+export type DeploymentCreated = {
+  readonly __typename?: 'DeploymentCreated';
+  readonly created: Scalars['Boolean']['output'];
+  readonly deployment?: Maybe<Deployment>;
+  readonly error?: Maybe<Scalars['String']['output']>;
+};
+
+export type DeploymentDeleted = {
+  readonly __typename?: 'DeploymentDeleted';
+  readonly deleted: Scalars['Boolean']['output'];
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly id?: Maybe<Scalars['ID']['output']>;
+};
+
+/** An edge in a connection. */
+export type DeploymentEdge = {
+  readonly __typename?: 'DeploymentEdge';
+  /** A cursor for use in pagination. */
+  readonly cursor: Scalars['Cursor']['output'];
+  /** The item at the end of the edge. */
+  readonly node?: Maybe<Deployment>;
+};
+
+/** Ordering options for Deployment connections */
+export type DeploymentOrder = {
+  /** The ordering direction. */
+  readonly direction?: OrderDirection;
+  /** The field by which to order Deployments. */
+  readonly field: DeploymentOrderField;
+};
+
+/** Properties by which Deployment connections can be ordered. */
+export enum DeploymentOrderField {
+  ConnectionsCount = 'CONNECTIONS_COUNT',
+  CreatedAt = 'CREATED_AT',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+export enum DeploymentState {
+  Failed = 'FAILED',
+  Pending = 'PENDING',
+  Running = 'RUNNING',
+  Stopped = 'STOPPED',
+  Stopping = 'STOPPING'
+}
+
+export type DeploymentUpdated = {
+  readonly __typename?: 'DeploymentUpdated';
+  readonly deployment?: Maybe<Deployment>;
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly updated: Scalars['Boolean']['output'];
+};
+
+/**
+ * DeploymentWhereInput is used for filtering Deployment objects.
+ * Input was generated by ent.
+ */
+export type DeploymentWhereInput = {
+  readonly and?: InputMaybe<ReadonlyArray<DeploymentWhereInput>>;
+  /** created_at field predicates */
+  readonly createdAt?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtGT?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtGTE?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
+  readonly createdAtLT?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtLTE?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtNEQ?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtNotIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
+  /** etag field predicates */
+  readonly etag?: InputMaybe<Scalars['String']['input']>;
+  readonly etagContains?: InputMaybe<Scalars['String']['input']>;
+  readonly etagContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly etagEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly etagGT?: InputMaybe<Scalars['String']['input']>;
+  readonly etagGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly etagHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly etagHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly etagIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly etagLT?: InputMaybe<Scalars['String']['input']>;
+  readonly etagLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly etagNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly etagNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  /** connections edge predicates */
+  readonly hasConnections?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasConnectionsWith?: InputMaybe<ReadonlyArray<ConnectionWhereInput>>;
+  /** integration edge predicates */
+  readonly hasIntegration?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasIntegrationWith?: InputMaybe<ReadonlyArray<IntegrationWhereInput>>;
+  /** organization edge predicates */
+  readonly hasOrganization?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasOrganizationWith?: InputMaybe<ReadonlyArray<OrganizationWhereInput>>;
+  /** revision edge predicates */
+  readonly hasRevision?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasRevisionWith?: InputMaybe<ReadonlyArray<IntegrationRevisionWhereInput>>;
+  /** type_schemas edge predicates */
+  readonly hasTypeSchemas?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasTypeSchemasWith?: InputMaybe<ReadonlyArray<TypeSchemaWhereInput>>;
+  /** id field predicates */
+  readonly id?: InputMaybe<Scalars['ID']['input']>;
+  readonly idGT?: InputMaybe<Scalars['ID']['input']>;
+  readonly idGTE?: InputMaybe<Scalars['ID']['input']>;
+  readonly idIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly idLT?: InputMaybe<Scalars['ID']['input']>;
+  readonly idLTE?: InputMaybe<Scalars['ID']['input']>;
+  readonly idNEQ?: InputMaybe<Scalars['ID']['input']>;
+  readonly idNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  /** integration_id field predicates */
+  readonly integrationID?: InputMaybe<Scalars['ID']['input']>;
+  readonly integrationIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly integrationIDNEQ?: InputMaybe<Scalars['ID']['input']>;
+  readonly integrationIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  /** integration_slug field predicates */
+  readonly integrationSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly integrationSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly not?: InputMaybe<DeploymentWhereInput>;
+  readonly or?: InputMaybe<ReadonlyArray<DeploymentWhereInput>>;
+  /** organization_id field predicates */
+  readonly organizationID?: InputMaybe<Scalars['ID']['input']>;
+  readonly organizationIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly organizationIDNEQ?: InputMaybe<Scalars['ID']['input']>;
+  readonly organizationIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  /** organization_slug field predicates */
+  readonly organizationSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly organizationSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  /** revision_id field predicates */
+  readonly revisionID?: InputMaybe<Scalars['ID']['input']>;
+  readonly revisionIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly revisionIDNEQ?: InputMaybe<Scalars['ID']['input']>;
+  readonly revisionIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  /** slug field predicates */
+  readonly slug?: InputMaybe<Scalars['String']['input']>;
+  readonly slugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly slugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly slugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly slugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly slugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly slugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly slugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly slugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly slugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly slugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly slugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly slugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  /** updated_at field predicates */
+  readonly updatedAt?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtGT?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtGTE?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
+  readonly updatedAtLT?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtLTE?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtNEQ?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtNotIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
+  /** visibility field predicates */
+  readonly visibility?: InputMaybe<Visibility>;
+  readonly visibilityIn?: InputMaybe<ReadonlyArray<Visibility>>;
+  readonly visibilityNEQ?: InputMaybe<Visibility>;
+  readonly visibilityNotIn?: InputMaybe<ReadonlyArray<Visibility>>;
+};
+
 export type Destination = Node & {
   readonly __typename?: 'Destination';
   readonly connection: Connection;
@@ -1183,12 +1483,6 @@ export type Destination = Node & {
   /** Timezone name (e.g. America/Los_Angeles) */
   readonly tzName: Scalars['String']['output'];
   readonly updatedAt: Scalars['Time']['output'];
-};
-
-export type DestinationConfig = {
-  readonly __typename?: 'DestinationConfig';
-  readonly schema: Scalars['String']['output'];
-  readonly service: Scalars['String']['output'];
 };
 
 /** A connection to a list of items. */
@@ -1238,11 +1532,6 @@ export enum DestinationOrderField {
   CreatedAt = 'CREATED_AT',
   UpdatedAt = 'UPDATED_AT'
 }
-
-export type DestinationServiceMetadata = {
-  readonly __typename?: 'DestinationServiceMetadata';
-  readonly destinationConfigs: ReadonlyArray<DestinationConfig>;
-};
 
 export type DestinationUpdated = {
   readonly __typename?: 'DestinationUpdated';
@@ -1349,41 +1638,17 @@ export type DestinationWhereInput = {
   readonly updatedAtNotIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
 };
 
-export type EmbeddingModelMetadata = {
-  readonly __typename?: 'EmbeddingModelMetadata';
-  readonly id: Scalars['String']['output'];
-  readonly maxDimensions: Scalars['Int']['output'];
-  readonly minDimensions: Scalars['Int']['output'];
-  readonly name: Scalars['String']['output'];
-};
-
-export type EmbeddingServiceMetadata = {
-  readonly __typename?: 'EmbeddingServiceMetadata';
-  readonly models: ReadonlyArray<EmbeddingModelMetadata>;
-};
-
-export type EventMetadata = {
-  readonly __typename?: 'EventMetadata';
-  readonly description: Scalars['String']['output'];
-  readonly payloadSchema: Scalars['String']['output'];
-  readonly type: Scalars['String']['output'];
-};
-
-export type EventServiceMetadata = {
-  readonly __typename?: 'EventServiceMetadata';
-  readonly eventSources: ReadonlyArray<EventSourceMetadata>;
-  readonly events: ReadonlyArray<EventMetadata>;
-};
-
 export type EventSource = Node & {
   readonly __typename?: 'EventSource';
   readonly connection: Connection;
   readonly connectionID: Scalars['ID']['output'];
+  readonly connectionSlug: Scalars['String']['output'];
   readonly createdAt: Scalars['Time']['output'];
   readonly creationAt?: Maybe<Scalars['Time']['output']>;
   readonly error?: Maybe<Scalars['String']['output']>;
   readonly id: Scalars['ID']['output'];
   readonly name: Scalars['String']['output'];
+  readonly organizationSlug: Scalars['String']['output'];
   /** Pull frequency in string format, e.g.: "1s", "2.3h" or "4h35m" */
   readonly pullFreq?: Maybe<Scalars['String']['output']>;
   readonly pushUrl?: Maybe<Scalars['String']['output']>;
@@ -1428,14 +1693,6 @@ export type EventSourceEdge = {
   readonly cursor: Scalars['Cursor']['output'];
   /** The item at the end of the edge. */
   readonly node?: Maybe<EventSource>;
-};
-
-export type EventSourceMetadata = {
-  readonly __typename?: 'EventSourceMetadata';
-  readonly configSchema: Scalars['String']['output'];
-  readonly description: Scalars['String']['output'];
-  readonly name: Scalars['String']['output'];
-  readonly strategy: EventSourceStrategy;
 };
 
 /** Ordering options for EventSource connections */
@@ -1489,6 +1746,20 @@ export type EventSourceWhereInput = {
   readonly connectionIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
   readonly connectionIDNEQ?: InputMaybe<Scalars['ID']['input']>;
   readonly connectionIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  /** connection_slug field predicates */
+  readonly connectionSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly connectionSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
   /** created_at field predicates */
   readonly createdAt?: InputMaybe<Scalars['Time']['input']>;
   readonly createdAtGT?: InputMaybe<Scalars['Time']['input']>;
@@ -1553,6 +1824,20 @@ export type EventSourceWhereInput = {
   readonly nameNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
   readonly not?: InputMaybe<EventSourceWhereInput>;
   readonly or?: InputMaybe<ReadonlyArray<EventSourceWhereInput>>;
+  /** organization_slug field predicates */
+  readonly organizationSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly organizationSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
   /** requires_creation field predicates */
   readonly requiresCreation?: InputMaybe<Scalars['Boolean']['input']>;
   readonly requiresCreationNEQ?: InputMaybe<Scalars['Boolean']['input']>;
@@ -1657,6 +1942,7 @@ export type Flow = Node & {
   readonly name: Scalars['String']['output'];
   readonly organization: Organization;
   readonly organizationID: Scalars['ID']['output'];
+  readonly organizationSlug: Scalars['String']['output'];
   readonly resources: FlowResourceConnection;
   readonly revision?: Maybe<FlowRevision>;
   readonly revisionID?: Maybe<Scalars['ID']['output']>;
@@ -2149,11 +2435,9 @@ export type FlowRun = Node & {
   readonly body: FlowBody;
   readonly config: FlowRunConfig;
   readonly createdAt: Scalars['Time']['output'];
-  readonly env: FlowEnv;
   readonly error?: Maybe<Scalars['String']['output']>;
   readonly flow: Flow;
   readonly flowID: Scalars['ID']['output'];
-  readonly graph: FlowGraph;
   readonly id: Scalars['ID']['output'];
   readonly resources: FlowResourceConnection;
   readonly revision: FlowRevision;
@@ -2529,6 +2813,20 @@ export type FlowWhereInput = {
   readonly organizationIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
   readonly organizationIDNEQ?: InputMaybe<Scalars['ID']['input']>;
   readonly organizationIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  /** organization_slug field predicates */
+  readonly organizationSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly organizationSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
   /** revision_id field predicates */
   readonly revisionID?: InputMaybe<Scalars['ID']['input']>;
   readonly revisionIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
@@ -2564,6 +2862,12 @@ export type FlowWhereInput = {
   readonly visibilityIn?: InputMaybe<ReadonlyArray<FlowVisibility>>;
   readonly visibilityNEQ?: InputMaybe<FlowVisibility>;
   readonly visibilityNotIn?: InputMaybe<ReadonlyArray<FlowVisibility>>;
+};
+
+export type GrpcStatus = {
+  readonly __typename?: 'GRPCStatus';
+  readonly code: Scalars['Int']['output'];
+  readonly message: Scalars['String']['output'];
 };
 
 export type GeoFeature = Node & {
@@ -3537,36 +3841,43 @@ export type IoSchemaWhereInput = {
 
 export type Integration = Node & {
   readonly __typename?: 'Integration';
-  readonly address: Scalars['String']['output'];
   readonly apiVersion: Scalars['String']['output'];
-  readonly configSchema?: Maybe<Scalars['String']['output']>;
-  readonly connections?: Maybe<ReadonlyArray<Connection>>;
   readonly createdAt: Scalars['Time']['output'];
+  readonly deployments: DeploymentConnection;
   readonly description: Scalars['String']['output'];
   readonly icon: Scalars['String']['output'];
   readonly id: Scalars['ID']['output'];
   readonly name: Scalars['String']['output'];
-  readonly network: Scalars['String']['output'];
   readonly organization: Organization;
   readonly organizationID: Scalars['ID']['output'];
-  readonly packages: IntegrationPackageConnection;
-  readonly published?: Maybe<IntegrationPackage>;
-  readonly publishedID?: Maybe<Scalars['ID']['output']>;
-  readonly serverConfig?: Maybe<Scalars['String']['output']>;
-  readonly serviceNames?: Maybe<ReadonlyArray<Scalars['String']['output']>>;
+  readonly organizationSlug: Scalars['String']['output'];
+  readonly published?: Maybe<IntegrationRevision>;
+  readonly revisionID?: Maybe<Scalars['ID']['output']>;
+  readonly revisions: IntegrationRevisionConnection;
   readonly slug: Scalars['String']['output'];
   readonly updatedAt: Scalars['Time']['output'];
   readonly version: Scalars['String']['output'];
+  readonly visibility: Visibility;
 };
 
 
-export type IntegrationPackagesArgs = {
+export type IntegrationDeploymentsArgs = {
   after?: InputMaybe<Scalars['Cursor']['input']>;
   before?: InputMaybe<Scalars['Cursor']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<IntegrationPackageOrder>;
-  where?: InputMaybe<IntegrationPackageWhereInput>;
+  orderBy?: InputMaybe<DeploymentOrder>;
+  where?: InputMaybe<DeploymentWhereInput>;
+};
+
+
+export type IntegrationRevisionsArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<IntegrationRevisionOrder>;
+  where?: InputMaybe<IntegrationRevisionWhereInput>;
 };
 
 /** A connection to a list of items. */
@@ -3615,122 +3926,99 @@ export type IntegrationOrder = {
 export enum IntegrationOrderField {
   ApiVersion = 'API_VERSION',
   CreatedAt = 'CREATED_AT',
+  DeploymentsCount = 'DEPLOYMENTS_COUNT',
   Name = 'NAME',
-  PackagesCount = 'PACKAGES_COUNT',
+  RevisionsCount = 'REVISIONS_COUNT',
   UpdatedAt = 'UPDATED_AT',
   Version = 'VERSION'
 }
 
-export type IntegrationPackage = Node & {
-  readonly __typename?: 'IntegrationPackage';
+export type IntegrationRevision = Node & {
+  readonly __typename?: 'IntegrationRevision';
   readonly author: User;
   readonly authorID: Scalars['ID']['output'];
-  readonly body: Scalars['Map']['output'];
-  readonly checksum: Scalars['String']['output'];
-  readonly configSchema: Scalars['String']['output'];
+  readonly build?: Maybe<PackageBuildMetadata>;
   readonly createdAt: Scalars['Time']['output'];
+  readonly deployments?: Maybe<ReadonlyArray<Deployment>>;
   readonly id: Scalars['ID']['output'];
   readonly integration: Integration;
   readonly integrationID: Scalars['ID']['output'];
-  readonly serviceNames: ReadonlyArray<Scalars['String']['output']>;
-  readonly spec: Scalars['Bytes']['output'];
+  readonly integrationSlug: Scalars['String']['output'];
+  readonly organizationSlug: Scalars['String']['output'];
+  readonly slug: Scalars['String']['output'];
+  readonly sourceEtag?: Maybe<Scalars['String']['output']>;
+  readonly sourceURI?: Maybe<Scalars['String']['output']>;
+  readonly spec: PackageSpecMetadata;
+  readonly specEtag: Scalars['String']['output'];
   readonly updatedAt: Scalars['Time']['output'];
 };
 
 /** A connection to a list of items. */
-export type IntegrationPackageConnection = {
-  readonly __typename?: 'IntegrationPackageConnection';
+export type IntegrationRevisionConnection = {
+  readonly __typename?: 'IntegrationRevisionConnection';
   /** A list of edges. */
-  readonly edges?: Maybe<ReadonlyArray<Maybe<IntegrationPackageEdge>>>;
+  readonly edges?: Maybe<ReadonlyArray<Maybe<IntegrationRevisionEdge>>>;
   /** Information to aid in pagination. */
   readonly pageInfo: PageInfo;
   /** Identifies the total count of items in the connection. */
   readonly totalCount: Scalars['Int']['output'];
 };
 
-export type IntegrationPackageCreated = {
-  readonly __typename?: 'IntegrationPackageCreated';
+export type IntegrationRevisionCreated = {
+  readonly __typename?: 'IntegrationRevisionCreated';
   readonly created: Scalars['Boolean']['output'];
   readonly error?: Maybe<Scalars['String']['output']>;
-  readonly integrationPackage?: Maybe<IntegrationPackage>;
+  readonly integrationRevision?: Maybe<IntegrationRevision>;
 };
 
-export type IntegrationPackageDeleted = {
-  readonly __typename?: 'IntegrationPackageDeleted';
+export type IntegrationRevisionDeleted = {
+  readonly __typename?: 'IntegrationRevisionDeleted';
   readonly deleted: Scalars['Boolean']['output'];
   readonly error?: Maybe<Scalars['String']['output']>;
   readonly id?: Maybe<Scalars['ID']['output']>;
 };
 
 /** An edge in a connection. */
-export type IntegrationPackageEdge = {
-  readonly __typename?: 'IntegrationPackageEdge';
+export type IntegrationRevisionEdge = {
+  readonly __typename?: 'IntegrationRevisionEdge';
   /** A cursor for use in pagination. */
   readonly cursor: Scalars['Cursor']['output'];
   /** The item at the end of the edge. */
-  readonly node?: Maybe<IntegrationPackage>;
+  readonly node?: Maybe<IntegrationRevision>;
 };
 
-/** Ordering options for IntegrationPackage connections */
-export type IntegrationPackageOrder = {
+/** Ordering options for IntegrationRevision connections */
+export type IntegrationRevisionOrder = {
   /** The ordering direction. */
   readonly direction?: OrderDirection;
-  /** The field by which to order IntegrationPackages. */
-  readonly field: IntegrationPackageOrderField;
+  /** The field by which to order IntegrationRevisions. */
+  readonly field: IntegrationRevisionOrderField;
 };
 
-/** Properties by which IntegrationPackage connections can be ordered. */
-export enum IntegrationPackageOrderField {
+/** Properties by which IntegrationRevision connections can be ordered. */
+export enum IntegrationRevisionOrderField {
   CreatedAt = 'CREATED_AT',
   UpdatedAt = 'UPDATED_AT'
 }
 
-export type IntegrationPackageUpdated = {
-  readonly __typename?: 'IntegrationPackageUpdated';
+export type IntegrationRevisionUpdated = {
+  readonly __typename?: 'IntegrationRevisionUpdated';
   readonly error?: Maybe<Scalars['String']['output']>;
-  readonly integrationPackage?: Maybe<IntegrationPackage>;
+  readonly integrationRevision?: Maybe<IntegrationRevision>;
   readonly updated: Scalars['Boolean']['output'];
 };
 
 /**
- * IntegrationPackageWhereInput is used for filtering IntegrationPackage objects.
+ * IntegrationRevisionWhereInput is used for filtering IntegrationRevision objects.
  * Input was generated by ent.
  */
-export type IntegrationPackageWhereInput = {
-  readonly and?: InputMaybe<ReadonlyArray<IntegrationPackageWhereInput>>;
+export type IntegrationRevisionWhereInput = {
+  readonly and?: InputMaybe<ReadonlyArray<IntegrationRevisionWhereInput>>;
   /** author_id field predicates */
   readonly authorID?: InputMaybe<Scalars['ID']['input']>;
   readonly authorIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
   readonly authorIDNEQ?: InputMaybe<Scalars['ID']['input']>;
   readonly authorIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
-  /** checksum field predicates */
-  readonly checksum?: InputMaybe<Scalars['String']['input']>;
-  readonly checksumContains?: InputMaybe<Scalars['String']['input']>;
-  readonly checksumContainsFold?: InputMaybe<Scalars['String']['input']>;
-  readonly checksumEqualFold?: InputMaybe<Scalars['String']['input']>;
-  readonly checksumGT?: InputMaybe<Scalars['String']['input']>;
-  readonly checksumGTE?: InputMaybe<Scalars['String']['input']>;
-  readonly checksumHasPrefix?: InputMaybe<Scalars['String']['input']>;
-  readonly checksumHasSuffix?: InputMaybe<Scalars['String']['input']>;
-  readonly checksumIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
-  readonly checksumLT?: InputMaybe<Scalars['String']['input']>;
-  readonly checksumLTE?: InputMaybe<Scalars['String']['input']>;
-  readonly checksumNEQ?: InputMaybe<Scalars['String']['input']>;
-  readonly checksumNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
-  /** config_schema field predicates */
-  readonly configSchema?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaContains?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaContainsFold?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaEqualFold?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaGT?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaGTE?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaHasPrefix?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaHasSuffix?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
-  readonly configSchemaLT?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaLTE?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaNEQ?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
   /** created_at field predicates */
   readonly createdAt?: InputMaybe<Scalars['Time']['input']>;
   readonly createdAtGT?: InputMaybe<Scalars['Time']['input']>;
@@ -3743,6 +4031,9 @@ export type IntegrationPackageWhereInput = {
   /** author edge predicates */
   readonly hasAuthor?: InputMaybe<Scalars['Boolean']['input']>;
   readonly hasAuthorWith?: InputMaybe<ReadonlyArray<UserWhereInput>>;
+  /** deployments edge predicates */
+  readonly hasDeployments?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasDeploymentsWith?: InputMaybe<ReadonlyArray<DeploymentWhereInput>>;
   /** integration edge predicates */
   readonly hasIntegration?: InputMaybe<Scalars['Boolean']['input']>;
   readonly hasIntegrationWith?: InputMaybe<ReadonlyArray<IntegrationWhereInput>>;
@@ -3760,8 +4051,96 @@ export type IntegrationPackageWhereInput = {
   readonly integrationIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
   readonly integrationIDNEQ?: InputMaybe<Scalars['ID']['input']>;
   readonly integrationIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
-  readonly not?: InputMaybe<IntegrationPackageWhereInput>;
-  readonly or?: InputMaybe<ReadonlyArray<IntegrationPackageWhereInput>>;
+  /** integration_slug field predicates */
+  readonly integrationSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly integrationSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly not?: InputMaybe<IntegrationRevisionWhereInput>;
+  readonly or?: InputMaybe<ReadonlyArray<IntegrationRevisionWhereInput>>;
+  /** organization_slug field predicates */
+  readonly organizationSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly organizationSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  /** slug field predicates */
+  readonly slug?: InputMaybe<Scalars['String']['input']>;
+  readonly slugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly slugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly slugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly slugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly slugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly slugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly slugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly slugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly slugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly slugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly slugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly slugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  /** source_etag field predicates */
+  readonly sourceEtag?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceEtagContains?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceEtagContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceEtagEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceEtagGT?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceEtagGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceEtagHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceEtagHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceEtagIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly sourceEtagIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly sourceEtagLT?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceEtagLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceEtagNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceEtagNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly sourceEtagNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** source_uri field predicates */
+  readonly sourceURI?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceURIContains?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceURIContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceURIEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceURIGT?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceURIGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceURIHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceURIHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceURIIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly sourceURIIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly sourceURILT?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceURILTE?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceURINEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly sourceURINotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly sourceURINotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** spec_etag field predicates */
+  readonly specEtag?: InputMaybe<Scalars['String']['input']>;
+  readonly specEtagContains?: InputMaybe<Scalars['String']['input']>;
+  readonly specEtagContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly specEtagEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly specEtagGT?: InputMaybe<Scalars['String']['input']>;
+  readonly specEtagGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly specEtagHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly specEtagHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly specEtagIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly specEtagLT?: InputMaybe<Scalars['String']['input']>;
+  readonly specEtagLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly specEtagNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly specEtagNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
   /** updated_at field predicates */
   readonly updatedAt?: InputMaybe<Scalars['Time']['input']>;
   readonly updatedAtGT?: InputMaybe<Scalars['Time']['input']>;
@@ -3785,20 +4164,6 @@ export type IntegrationUpdated = {
  * Input was generated by ent.
  */
 export type IntegrationWhereInput = {
-  /** address field predicates */
-  readonly address?: InputMaybe<Scalars['String']['input']>;
-  readonly addressContains?: InputMaybe<Scalars['String']['input']>;
-  readonly addressContainsFold?: InputMaybe<Scalars['String']['input']>;
-  readonly addressEqualFold?: InputMaybe<Scalars['String']['input']>;
-  readonly addressGT?: InputMaybe<Scalars['String']['input']>;
-  readonly addressGTE?: InputMaybe<Scalars['String']['input']>;
-  readonly addressHasPrefix?: InputMaybe<Scalars['String']['input']>;
-  readonly addressHasSuffix?: InputMaybe<Scalars['String']['input']>;
-  readonly addressIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
-  readonly addressLT?: InputMaybe<Scalars['String']['input']>;
-  readonly addressLTE?: InputMaybe<Scalars['String']['input']>;
-  readonly addressNEQ?: InputMaybe<Scalars['String']['input']>;
-  readonly addressNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
   readonly and?: InputMaybe<ReadonlyArray<IntegrationWhereInput>>;
   /** api_version field predicates */
   readonly apiVersion?: InputMaybe<Scalars['String']['input']>;
@@ -3814,22 +4179,6 @@ export type IntegrationWhereInput = {
   readonly apiVersionLTE?: InputMaybe<Scalars['String']['input']>;
   readonly apiVersionNEQ?: InputMaybe<Scalars['String']['input']>;
   readonly apiVersionNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
-  /** config_schema field predicates */
-  readonly configSchema?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaContains?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaContainsFold?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaEqualFold?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaGT?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaGTE?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaHasPrefix?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaHasSuffix?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
-  readonly configSchemaIsNil?: InputMaybe<Scalars['Boolean']['input']>;
-  readonly configSchemaLT?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaLTE?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaNEQ?: InputMaybe<Scalars['String']['input']>;
-  readonly configSchemaNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
-  readonly configSchemaNotNil?: InputMaybe<Scalars['Boolean']['input']>;
   /** created_at field predicates */
   readonly createdAt?: InputMaybe<Scalars['Time']['input']>;
   readonly createdAtGT?: InputMaybe<Scalars['Time']['input']>;
@@ -3853,18 +4202,18 @@ export type IntegrationWhereInput = {
   readonly descriptionLTE?: InputMaybe<Scalars['String']['input']>;
   readonly descriptionNEQ?: InputMaybe<Scalars['String']['input']>;
   readonly descriptionNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
-  /** connections edge predicates */
-  readonly hasConnections?: InputMaybe<Scalars['Boolean']['input']>;
-  readonly hasConnectionsWith?: InputMaybe<ReadonlyArray<ConnectionWhereInput>>;
+  /** deployments edge predicates */
+  readonly hasDeployments?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasDeploymentsWith?: InputMaybe<ReadonlyArray<DeploymentWhereInput>>;
   /** organization edge predicates */
   readonly hasOrganization?: InputMaybe<Scalars['Boolean']['input']>;
   readonly hasOrganizationWith?: InputMaybe<ReadonlyArray<OrganizationWhereInput>>;
-  /** packages edge predicates */
-  readonly hasPackages?: InputMaybe<Scalars['Boolean']['input']>;
-  readonly hasPackagesWith?: InputMaybe<ReadonlyArray<IntegrationPackageWhereInput>>;
   /** published edge predicates */
   readonly hasPublished?: InputMaybe<Scalars['Boolean']['input']>;
-  readonly hasPublishedWith?: InputMaybe<ReadonlyArray<IntegrationPackageWhereInput>>;
+  readonly hasPublishedWith?: InputMaybe<ReadonlyArray<IntegrationRevisionWhereInput>>;
+  /** revisions edge predicates */
+  readonly hasRevisions?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasRevisionsWith?: InputMaybe<ReadonlyArray<IntegrationRevisionWhereInput>>;
   /** icon field predicates */
   readonly icon?: InputMaybe<Scalars['String']['input']>;
   readonly iconContains?: InputMaybe<Scalars['String']['input']>;
@@ -3902,20 +4251,6 @@ export type IntegrationWhereInput = {
   readonly nameLTE?: InputMaybe<Scalars['String']['input']>;
   readonly nameNEQ?: InputMaybe<Scalars['String']['input']>;
   readonly nameNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
-  /** network field predicates */
-  readonly network?: InputMaybe<Scalars['String']['input']>;
-  readonly networkContains?: InputMaybe<Scalars['String']['input']>;
-  readonly networkContainsFold?: InputMaybe<Scalars['String']['input']>;
-  readonly networkEqualFold?: InputMaybe<Scalars['String']['input']>;
-  readonly networkGT?: InputMaybe<Scalars['String']['input']>;
-  readonly networkGTE?: InputMaybe<Scalars['String']['input']>;
-  readonly networkHasPrefix?: InputMaybe<Scalars['String']['input']>;
-  readonly networkHasSuffix?: InputMaybe<Scalars['String']['input']>;
-  readonly networkIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
-  readonly networkLT?: InputMaybe<Scalars['String']['input']>;
-  readonly networkLTE?: InputMaybe<Scalars['String']['input']>;
-  readonly networkNEQ?: InputMaybe<Scalars['String']['input']>;
-  readonly networkNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
   readonly not?: InputMaybe<IntegrationWhereInput>;
   readonly or?: InputMaybe<ReadonlyArray<IntegrationWhereInput>>;
   /** organization_id field predicates */
@@ -3923,13 +4258,27 @@ export type IntegrationWhereInput = {
   readonly organizationIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
   readonly organizationIDNEQ?: InputMaybe<Scalars['ID']['input']>;
   readonly organizationIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
-  /** published_id field predicates */
-  readonly publishedID?: InputMaybe<Scalars['ID']['input']>;
-  readonly publishedIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
-  readonly publishedIDIsNil?: InputMaybe<Scalars['Boolean']['input']>;
-  readonly publishedIDNEQ?: InputMaybe<Scalars['ID']['input']>;
-  readonly publishedIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
-  readonly publishedIDNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** organization_slug field predicates */
+  readonly organizationSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly organizationSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  /** revision_id field predicates */
+  readonly revisionID?: InputMaybe<Scalars['ID']['input']>;
+  readonly revisionIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly revisionIDIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly revisionIDNEQ?: InputMaybe<Scalars['ID']['input']>;
+  readonly revisionIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly revisionIDNotNil?: InputMaybe<Scalars['Boolean']['input']>;
   /** slug field predicates */
   readonly slug?: InputMaybe<Scalars['String']['input']>;
   readonly slugContains?: InputMaybe<Scalars['String']['input']>;
@@ -3967,6 +4316,11 @@ export type IntegrationWhereInput = {
   readonly versionLTE?: InputMaybe<Scalars['String']['input']>;
   readonly versionNEQ?: InputMaybe<Scalars['String']['input']>;
   readonly versionNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  /** visibility field predicates */
+  readonly visibility?: InputMaybe<Visibility>;
+  readonly visibilityIn?: InputMaybe<ReadonlyArray<Visibility>>;
+  readonly visibilityNEQ?: InputMaybe<Visibility>;
+  readonly visibilityNotIn?: InputMaybe<ReadonlyArray<Visibility>>;
 };
 
 export type Model = Node & {
@@ -4061,6 +4415,8 @@ export type ModelType = Node & {
   readonly modeler: ModelerType;
   readonly models?: Maybe<ReadonlyArray<Model>>;
   readonly name: Scalars['String']['output'];
+  readonly organization: Organization;
+  readonly organizationID: Scalars['ID']['output'];
   readonly parents?: Maybe<ReadonlyArray<ModelType>>;
   readonly slug: Scalars['String']['output'];
   readonly sourceTypes: ReadonlyArray<SourceType>;
@@ -4174,6 +4530,9 @@ export type ModelTypeWhereInput = {
   /** models edge predicates */
   readonly hasModels?: InputMaybe<Scalars['Boolean']['input']>;
   readonly hasModelsWith?: InputMaybe<ReadonlyArray<ModelWhereInput>>;
+  /** organization edge predicates */
+  readonly hasOrganization?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasOrganizationWith?: InputMaybe<ReadonlyArray<OrganizationWhereInput>>;
   /** parents edge predicates */
   readonly hasParents?: InputMaybe<Scalars['Boolean']['input']>;
   readonly hasParentsWith?: InputMaybe<ReadonlyArray<ModelTypeWhereInput>>;
@@ -4237,6 +4596,11 @@ export type ModelTypeWhereInput = {
   readonly nameNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
   readonly not?: InputMaybe<ModelTypeWhereInput>;
   readonly or?: InputMaybe<ReadonlyArray<ModelTypeWhereInput>>;
+  /** organization_id field predicates */
+  readonly organizationID?: InputMaybe<Scalars['ID']['input']>;
+  readonly organizationIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly organizationIDNEQ?: InputMaybe<Scalars['ID']['input']>;
+  readonly organizationIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
   /** slug field predicates */
   readonly slug?: InputMaybe<Scalars['String']['input']>;
   readonly slugContains?: InputMaybe<Scalars['String']['input']>;
@@ -4426,7 +4790,6 @@ export type Mutation = {
   readonly createFlowRun?: Maybe<FlowRunCreated>;
   readonly createGeoLayer?: Maybe<GeoLayerCreated>;
   readonly createGeoMap?: Maybe<GeoMapCreated>;
-  readonly createIntegration?: Maybe<IntegrationCreated>;
   readonly createModel?: Maybe<ModelCreated>;
   readonly createOrganization?: Maybe<OrganizationCreated>;
   readonly createPersonalAccessToken?: Maybe<PersonalAccessTokenCreated>;
@@ -4462,7 +4825,6 @@ export type Mutation = {
   readonly stopFlowRun?: Maybe<FlowRunUpdated>;
   readonly syncCatalog: CatalogUpdated;
   readonly syncModel?: Maybe<ModelUpdated>;
-  readonly syncPackage?: Maybe<IntegrationPackageUpdated>;
   readonly syncSchema?: Maybe<SchemaRefUpdated>;
   readonly syncSource: SourceUpdated;
   readonly syncTable: TableRefUpdated;
@@ -4539,11 +4901,6 @@ export type MutationCreateGeoLayerArgs = {
 
 export type MutationCreateGeoMapArgs = {
   input: CreateGeoMapInput;
-};
-
-
-export type MutationCreateIntegrationArgs = {
-  input: CreateIntegrationInput;
 };
 
 
@@ -4726,11 +5083,6 @@ export type MutationSyncModelArgs = {
 };
 
 
-export type MutationSyncPackageArgs = {
-  input: SyncPackageInput;
-};
-
-
 export type MutationSyncSchemaArgs = {
   autoSync?: InputMaybe<Scalars['Boolean']['input']>;
   id: Scalars['ID']['input'];
@@ -4856,7 +5208,7 @@ export type Node = {
   readonly id: Scalars['ID']['output'];
 };
 
-export type NodeAction = CatalogCreated | CatalogDeleted | CatalogUpdated | ColumnRefCreated | ColumnRefDeleted | ColumnRefUpdated | ConnectionCreated | ConnectionDeleted | ConnectionUpdated | ConnectionUserCreated | ConnectionUserDeleted | ConnectionUserUpdated | DestinationCreated | DestinationDeleted | DestinationUpdated | EventSourceCreated | EventSourceDeleted | EventSourceUpdated | FlowCreated | FlowDeleted | FlowResourceCreated | FlowResourceDeleted | FlowResourceUpdated | FlowRevisionCreated | FlowRevisionDeleted | FlowRevisionUpdated | FlowRunCreated | FlowRunDeleted | FlowRunUpdated | FlowUpdated | GeoFeatureCreated | GeoFeatureDeleted | GeoFeatureUpdated | GeoLayerCreated | GeoLayerDeleted | GeoLayerUpdated | GeoMapCreated | GeoMapDeleted | GeoMapUpdated | GeoSourceCreated | GeoSourceDeleted | GeoSourceUpdated | IoSchemaCreated | IoSchemaDeleted | IoSchemaUpdated | IntegrationCreated | IntegrationDeleted | IntegrationPackageCreated | IntegrationPackageDeleted | IntegrationPackageUpdated | IntegrationUpdated | ModelCreated | ModelDeleted | ModelTypeCreated | ModelTypeDeleted | ModelTypeUpdated | ModelUpdated | OrganizationCreated | OrganizationDeleted | OrganizationUpdated | PersonalAccessTokenCreated | PersonalAccessTokenDeleted | PersonalAccessTokenUpdated | SqlQueryCreated | SqlQueryDeleted | SqlQueryUpdated | SchemaRefCreated | SchemaRefDeleted | SchemaRefUpdated | SearchLexemeCreated | SearchLexemeDeleted | SearchLexemeUpdated | SearchSemanticCreated | SearchSemanticDeleted | SearchSemanticUpdated | SourceCreated | SourceDeleted | SourceTypeCreated | SourceTypeDeleted | SourceTypeUpdated | SourceUpdated | SpaceCreated | SpaceDeleted | SpaceUpdated | TableRefCreated | TableRefDeleted | TableRefUpdated | UserCreated | UserDeleted | UserUpdated;
+export type NodeAction = CatalogCreated | CatalogDeleted | CatalogUpdated | ColumnRefCreated | ColumnRefDeleted | ColumnRefUpdated | ConnectionCreated | ConnectionDeleted | ConnectionUpdated | ConnectionUserCreated | ConnectionUserDeleted | ConnectionUserUpdated | DeploymentCreated | DeploymentDeleted | DeploymentUpdated | DestinationCreated | DestinationDeleted | DestinationUpdated | EventSourceCreated | EventSourceDeleted | EventSourceUpdated | FlowCreated | FlowDeleted | FlowResourceCreated | FlowResourceDeleted | FlowResourceUpdated | FlowRevisionCreated | FlowRevisionDeleted | FlowRevisionUpdated | FlowRunCreated | FlowRunDeleted | FlowRunUpdated | FlowUpdated | GeoFeatureCreated | GeoFeatureDeleted | GeoFeatureUpdated | GeoLayerCreated | GeoLayerDeleted | GeoLayerUpdated | GeoMapCreated | GeoMapDeleted | GeoMapUpdated | GeoSourceCreated | GeoSourceDeleted | GeoSourceUpdated | IoSchemaCreated | IoSchemaDeleted | IoSchemaUpdated | IntegrationCreated | IntegrationDeleted | IntegrationRevisionCreated | IntegrationRevisionDeleted | IntegrationRevisionUpdated | IntegrationUpdated | ModelCreated | ModelDeleted | ModelTypeCreated | ModelTypeDeleted | ModelTypeUpdated | ModelUpdated | OperationCreated | OperationDeleted | OperationUpdated | OrganizationCreated | OrganizationDeleted | OrganizationUpdated | PersonalAccessTokenCreated | PersonalAccessTokenDeleted | PersonalAccessTokenUpdated | SqlQueryCreated | SqlQueryDeleted | SqlQueryUpdated | SchemaRefCreated | SchemaRefDeleted | SchemaRefUpdated | SearchLexemeCreated | SearchLexemeDeleted | SearchLexemeUpdated | SearchSemanticCreated | SearchSemanticDeleted | SearchSemanticUpdated | SourceCreated | SourceDeleted | SourceTypeCreated | SourceTypeDeleted | SourceTypeUpdated | SourceUpdated | SpaceCreated | SpaceDeleted | SpaceUpdated | TableRefCreated | TableRefDeleted | TableRefUpdated | TypeFileCreated | TypeFileDeleted | TypeFileUpdated | TypeMethodCreated | TypeMethodDeleted | TypeMethodUpdated | TypeSchemaCreated | TypeSchemaDeleted | TypeSchemaUpdated | TypeServiceCreated | TypeServiceDeleted | TypeServiceUpdated | UserCreated | UserDeleted | UserUpdated;
 
 export type NodeEvent = {
   readonly __typename?: 'NodeEvent';
@@ -4876,6 +5228,198 @@ export type NodeSubscribeInput = {
   readonly nodeType: Scalars['String']['input'];
 };
 
+export type Operation = Node & {
+  readonly __typename?: 'Operation';
+  readonly canceled: Scalars['Boolean']['output'];
+  readonly createdAt: Scalars['Time']['output'];
+  readonly done?: Maybe<Scalars['Boolean']['output']>;
+  readonly error?: Maybe<GrpcStatus>;
+  readonly id: Scalars['ID']['output'];
+  readonly metadata: AnyProto;
+  readonly organization: Organization;
+  readonly organizationID: Scalars['ID']['output'];
+  readonly organizationSlug: Scalars['String']['output'];
+  readonly resourceID: Scalars['UUID']['output'];
+  readonly resourceName: Scalars['String']['output'];
+  readonly resourceType: Scalars['String']['output'];
+  readonly response?: Maybe<AnyProto>;
+  readonly slug: Scalars['String']['output'];
+  readonly updatedAt: Scalars['Time']['output'];
+};
+
+/** A connection to a list of items. */
+export type OperationConnection = {
+  readonly __typename?: 'OperationConnection';
+  /** A list of edges. */
+  readonly edges?: Maybe<ReadonlyArray<Maybe<OperationEdge>>>;
+  /** Information to aid in pagination. */
+  readonly pageInfo: PageInfo;
+  /** Identifies the total count of items in the connection. */
+  readonly totalCount: Scalars['Int']['output'];
+};
+
+export type OperationCreated = {
+  readonly __typename?: 'OperationCreated';
+  readonly created: Scalars['Boolean']['output'];
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly operation?: Maybe<Operation>;
+};
+
+export type OperationDeleted = {
+  readonly __typename?: 'OperationDeleted';
+  readonly deleted: Scalars['Boolean']['output'];
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly id?: Maybe<Scalars['ID']['output']>;
+};
+
+/** An edge in a connection. */
+export type OperationEdge = {
+  readonly __typename?: 'OperationEdge';
+  /** A cursor for use in pagination. */
+  readonly cursor: Scalars['Cursor']['output'];
+  /** The item at the end of the edge. */
+  readonly node?: Maybe<Operation>;
+};
+
+/** Ordering options for Operation connections */
+export type OperationOrder = {
+  /** The ordering direction. */
+  readonly direction?: OrderDirection;
+  /** The field by which to order Operations. */
+  readonly field: OperationOrderField;
+};
+
+/** Properties by which Operation connections can be ordered. */
+export enum OperationOrderField {
+  CreatedAt = 'CREATED_AT',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+export type OperationUpdated = {
+  readonly __typename?: 'OperationUpdated';
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly operation?: Maybe<Operation>;
+  readonly updated: Scalars['Boolean']['output'];
+};
+
+/**
+ * OperationWhereInput is used for filtering Operation objects.
+ * Input was generated by ent.
+ */
+export type OperationWhereInput = {
+  readonly and?: InputMaybe<ReadonlyArray<OperationWhereInput>>;
+  /** canceled field predicates */
+  readonly canceled?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly canceledNEQ?: InputMaybe<Scalars['Boolean']['input']>;
+  /** created_at field predicates */
+  readonly createdAt?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtGT?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtGTE?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
+  readonly createdAtLT?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtLTE?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtNEQ?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtNotIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
+  /** done field predicates */
+  readonly done?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly doneIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly doneNEQ?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly doneNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** organization edge predicates */
+  readonly hasOrganization?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasOrganizationWith?: InputMaybe<ReadonlyArray<OrganizationWhereInput>>;
+  /** id field predicates */
+  readonly id?: InputMaybe<Scalars['ID']['input']>;
+  readonly idGT?: InputMaybe<Scalars['ID']['input']>;
+  readonly idGTE?: InputMaybe<Scalars['ID']['input']>;
+  readonly idIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly idLT?: InputMaybe<Scalars['ID']['input']>;
+  readonly idLTE?: InputMaybe<Scalars['ID']['input']>;
+  readonly idNEQ?: InputMaybe<Scalars['ID']['input']>;
+  readonly idNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly not?: InputMaybe<OperationWhereInput>;
+  readonly or?: InputMaybe<ReadonlyArray<OperationWhereInput>>;
+  /** organization_id field predicates */
+  readonly organizationID?: InputMaybe<Scalars['ID']['input']>;
+  readonly organizationIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly organizationIDNEQ?: InputMaybe<Scalars['ID']['input']>;
+  readonly organizationIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  /** organization_slug field predicates */
+  readonly organizationSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly organizationSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  /** resource_id field predicates */
+  readonly resourceID?: InputMaybe<Scalars['UUID']['input']>;
+  readonly resourceIDGT?: InputMaybe<Scalars['UUID']['input']>;
+  readonly resourceIDGTE?: InputMaybe<Scalars['UUID']['input']>;
+  readonly resourceIDIn?: InputMaybe<ReadonlyArray<Scalars['UUID']['input']>>;
+  readonly resourceIDLT?: InputMaybe<Scalars['UUID']['input']>;
+  readonly resourceIDLTE?: InputMaybe<Scalars['UUID']['input']>;
+  readonly resourceIDNEQ?: InputMaybe<Scalars['UUID']['input']>;
+  readonly resourceIDNotIn?: InputMaybe<ReadonlyArray<Scalars['UUID']['input']>>;
+  /** resource_name field predicates */
+  readonly resourceName?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceNameContains?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceNameContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceNameEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceNameGT?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceNameGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceNameHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceNameHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceNameIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly resourceNameLT?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceNameLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceNameNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceNameNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  /** resource_type field predicates */
+  readonly resourceType?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceTypeContains?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceTypeContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceTypeEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceTypeGT?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceTypeGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceTypeHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceTypeHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceTypeIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly resourceTypeLT?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceTypeLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceTypeNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly resourceTypeNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  /** slug field predicates */
+  readonly slug?: InputMaybe<Scalars['String']['input']>;
+  readonly slugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly slugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly slugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly slugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly slugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly slugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly slugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly slugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly slugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly slugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly slugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly slugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  /** updated_at field predicates */
+  readonly updatedAt?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtGT?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtGTE?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
+  readonly updatedAtLT?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtLTE?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtNEQ?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtNotIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
+};
+
 /** Possible directions in which to order a list of items when provided an `orderBy` argument. */
 export enum OrderDirection {
   /** Specifies an ascending order for a given `orderBy` argument. */
@@ -4892,13 +5436,16 @@ export type Organization = Node & {
   readonly connectionsOwned: ConnectionConnection;
   readonly createdAt: Scalars['Time']['output'];
   readonly customerID: Scalars['String']['output'];
+  readonly deployments: DeploymentConnection;
   readonly destinations: DestinationConnection;
   readonly flows: FlowConnection;
   readonly geoLayers: GeoLayerConnection;
   readonly geoMaps: GeoMapConnection;
   readonly id: Scalars['ID']['output'];
   readonly integrations: IntegrationConnection;
+  readonly modelTypes: ModelTypeConnection;
   readonly name: Scalars['String']['output'];
+  readonly operations: OperationConnection;
   readonly slug: Scalars['String']['output'];
   readonly spaces: SpaceConnection;
   /** Timezone name (e.g. America/Los_Angeles) */
@@ -4944,6 +5491,16 @@ export type OrganizationConnectionsOwnedArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<ConnectionOrder>;
   where?: InputMaybe<ConnectionWhereInput>;
+};
+
+
+export type OrganizationDeploymentsArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<DeploymentOrder>;
+  where?: InputMaybe<DeploymentWhereInput>;
 };
 
 
@@ -4994,6 +5551,26 @@ export type OrganizationIntegrationsArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<IntegrationOrder>;
   where?: InputMaybe<IntegrationWhereInput>;
+};
+
+
+export type OrganizationModelTypesArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<ModelTypeOrder>;
+  where?: InputMaybe<ModelTypeWhereInput>;
+};
+
+
+export type OrganizationOperationsArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<OperationOrder>;
+  where?: InputMaybe<OperationWhereInput>;
 };
 
 
@@ -5052,10 +5629,12 @@ export type OrganizationOrder = {
 export enum OrganizationOrderField {
   CatalogsCount = 'CATALOGS_COUNT',
   CreatedAt = 'CREATED_AT',
+  DeploymentsCount = 'DEPLOYMENTS_COUNT',
   DestinationsCount = 'DESTINATIONS_COUNT',
   FlowsCount = 'FLOWS_COUNT',
   IntegrationsCount = 'INTEGRATIONS_COUNT',
   Name = 'NAME',
+  OperationsCount = 'OPERATIONS_COUNT',
   SpacesCount = 'SPACES_COUNT',
   UpdatedAt = 'UPDATED_AT'
 }
@@ -5108,6 +5687,9 @@ export type OrganizationWhereInput = {
   readonly hasConnectionsOwned?: InputMaybe<Scalars['Boolean']['input']>;
   readonly hasConnectionsOwnedWith?: InputMaybe<ReadonlyArray<ConnectionWhereInput>>;
   readonly hasConnectionsWith?: InputMaybe<ReadonlyArray<ConnectionWhereInput>>;
+  /** deployments edge predicates */
+  readonly hasDeployments?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasDeploymentsWith?: InputMaybe<ReadonlyArray<DeploymentWhereInput>>;
   /** destinations edge predicates */
   readonly hasDestinations?: InputMaybe<Scalars['Boolean']['input']>;
   readonly hasDestinationsWith?: InputMaybe<ReadonlyArray<DestinationWhereInput>>;
@@ -5123,6 +5705,12 @@ export type OrganizationWhereInput = {
   /** integrations edge predicates */
   readonly hasIntegrations?: InputMaybe<Scalars['Boolean']['input']>;
   readonly hasIntegrationsWith?: InputMaybe<ReadonlyArray<IntegrationWhereInput>>;
+  /** model_types edge predicates */
+  readonly hasModelTypes?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasModelTypesWith?: InputMaybe<ReadonlyArray<ModelTypeWhereInput>>;
+  /** operations edge predicates */
+  readonly hasOperations?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasOperationsWith?: InputMaybe<ReadonlyArray<OperationWhereInput>>;
   /** spaces edge predicates */
   readonly hasSpaces?: InputMaybe<Scalars['Boolean']['input']>;
   readonly hasSpacesWith?: InputMaybe<ReadonlyArray<SpaceWhereInput>>;
@@ -5188,6 +5776,55 @@ export type OrganizationWhereInput = {
   readonly updatedAtLTE?: InputMaybe<Scalars['Time']['input']>;
   readonly updatedAtNEQ?: InputMaybe<Scalars['Time']['input']>;
   readonly updatedAtNotIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
+};
+
+export type Package = {
+  readonly __typename?: 'Package';
+  readonly description: Scalars['String']['output'];
+  readonly icon?: Maybe<Scalars['String']['output']>;
+  readonly identity: PackageIdentity;
+  readonly platforms: ReadonlyArray<Scalars['String']['output']>;
+  readonly runtimes: ReadonlyArray<Scalars['String']['output']>;
+  readonly type: Scalars['String']['output'];
+};
+
+export type PackageBuildMetadata = {
+  readonly __typename?: 'PackageBuildMetadata';
+  readonly artifactEtag?: Maybe<Scalars['String']['output']>;
+  readonly artifactUri: Scalars['String']['output'];
+  readonly env?: Maybe<Scalars['Map']['output']>;
+  readonly platform: Scalars['String']['output'];
+  readonly runtime: Scalars['String']['output'];
+};
+
+export type PackageConfigMetadata = {
+  readonly __typename?: 'PackageConfigMetadata';
+  readonly version: PackageConfigVersion;
+};
+
+export type PackageConfigV1Beta1 = {
+  readonly __typename?: 'PackageConfigV1Beta1';
+  readonly v1beta1: TypeSchemaV1Beta1;
+};
+
+export type PackageConfigVersion = PackageConfigV1Beta1;
+
+export type PackageIdentity = {
+  readonly __typename?: 'PackageIdentity';
+  readonly name: Scalars['String']['output'];
+  readonly version: Scalars['String']['output'];
+};
+
+export type PackageSpecMetadata = {
+  readonly __typename?: 'PackageSpecMetadata';
+  readonly version: PackageSpecVersion;
+};
+
+export type PackageSpecVersion = PackageV1Beta1;
+
+export type PackageV1Beta1 = {
+  readonly __typename?: 'PackageV1Beta1';
+  readonly v1beta1?: Maybe<Package>;
 };
 
 /**
@@ -5372,6 +6009,7 @@ export type Query = {
   readonly columnsDeleted: ReadonlyArray<Maybe<ColumnRef>>;
   readonly connection?: Maybe<Connection>;
   readonly connections: ConnectionConnection;
+  readonly deployments: DeploymentConnection;
   readonly destination?: Maybe<Destination>;
   readonly destinations: DestinationConnection;
   readonly eventSource?: Maybe<EventSource>;
@@ -5390,6 +6028,7 @@ export type Query = {
   readonly geoMaps: GeoMapConnection;
   readonly geoSources: GeoSourceConnection;
   readonly integration?: Maybe<Integration>;
+  readonly integrationRevisions: IntegrationRevisionConnection;
   readonly integrations: IntegrationConnection;
   readonly ioSchema?: Maybe<IoSchema>;
   readonly ioSchemas: IoSchemaConnection;
@@ -5401,9 +6040,9 @@ export type Query = {
   readonly node?: Maybe<Node>;
   /** Lookup nodes by a list of IDs. */
   readonly nodes: ReadonlyArray<Maybe<Node>>;
+  readonly operations: OperationConnection;
   readonly organization?: Maybe<Organization>;
   readonly organizations: OrganizationConnection;
-  readonly packages: IntegrationPackageConnection;
   /** Permissions for the current or given user */
   readonly permissions: ReadonlyArray<Maybe<Permission>>;
   readonly personalAccessToken?: Maybe<PersonalAccessToken>;
@@ -5484,6 +6123,16 @@ export type QueryConnectionsArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<ConnectionOrder>;
   where?: InputMaybe<ConnectionWhereInput>;
+};
+
+
+export type QueryDeploymentsArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<DeploymentOrder>;
+  where?: InputMaybe<DeploymentWhereInput>;
 };
 
 
@@ -5631,6 +6280,16 @@ export type QueryIntegrationArgs = {
 };
 
 
+export type QueryIntegrationRevisionsArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<IntegrationRevisionOrder>;
+  where?: InputMaybe<IntegrationRevisionWhereInput>;
+};
+
+
 export type QueryIntegrationsArgs = {
   after?: InputMaybe<Scalars['Cursor']['input']>;
   before?: InputMaybe<Scalars['Cursor']['input']>;
@@ -5698,6 +6357,16 @@ export type QueryNodesArgs = {
 };
 
 
+export type QueryOperationsArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<OperationOrder>;
+  where?: InputMaybe<OperationWhereInput>;
+};
+
+
 export type QueryOrganizationArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
@@ -5711,16 +6380,6 @@ export type QueryOrganizationsArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<OrganizationOrder>;
   where?: InputMaybe<OrganizationWhereInput>;
-};
-
-
-export type QueryPackagesArgs = {
-  after?: InputMaybe<Scalars['Cursor']['input']>;
-  before?: InputMaybe<Scalars['Cursor']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<IntegrationPackageOrder>;
-  where?: InputMaybe<IntegrationPackageWhereInput>;
 };
 
 
@@ -6837,11 +7496,6 @@ export type SearchWhereInput = {
   readonly spaceIDNotNil?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
-export enum ServiceAuthType {
-  None = 'NONE',
-  Oauth = 'OAUTH'
-}
-
 export type Source = Node & {
   readonly __typename?: 'Source';
   readonly autoSync: Scalars['Boolean']['output'];
@@ -6870,17 +7524,6 @@ export type Source = Node & {
   readonly type: SourceType;
   readonly typeID: Scalars['ID']['output'];
   readonly updatedAt: Scalars['Time']['output'];
-};
-
-export type SourceConfig = {
-  readonly __typename?: 'SourceConfig';
-  readonly category: Scalars['String']['output'];
-  readonly description: Scalars['String']['output'];
-  readonly iconUrl: Scalars['String']['output'];
-  readonly id: Scalars['String']['output'];
-  readonly name: Scalars['String']['output'];
-  readonly schema: Scalars['String']['output'];
-  readonly service: Scalars['String']['output'];
 };
 
 /** A connection to a list of items. */
@@ -6931,11 +7574,6 @@ export enum SourceOrderField {
   UpdatedAt = 'UPDATED_AT'
 }
 
-export type SourceServiceMetadata = {
-  readonly __typename?: 'SourceServiceMetadata';
-  readonly sourceConfigs: ReadonlyArray<SourceConfig>;
-};
-
 export type SourceType = Node & {
   readonly __typename?: 'SourceType';
   readonly category: Scalars['String']['output'];
@@ -6943,12 +7581,14 @@ export type SourceType = Node & {
   readonly configSchema: Scalars['String']['output'];
   readonly connection: Connection;
   readonly connectionID: Scalars['ID']['output'];
+  readonly connectionSlug: Scalars['String']['output'];
   readonly createdAt: Scalars['Time']['output'];
   readonly description: Scalars['String']['output'];
   readonly iconURL: Scalars['String']['output'];
   readonly id: Scalars['ID']['output'];
   readonly modelTypes?: Maybe<ReadonlyArray<ModelType>>;
   readonly name: Scalars['String']['output'];
+  readonly organizationSlug: Scalars['String']['output'];
   readonly providerID: Scalars['String']['output'];
   readonly slug: Scalars['String']['output'];
   readonly sources?: Maybe<ReadonlyArray<Source>>;
@@ -7055,6 +7695,20 @@ export type SourceTypeWhereInput = {
   readonly connectionIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
   readonly connectionIDNEQ?: InputMaybe<Scalars['ID']['input']>;
   readonly connectionIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  /** connection_slug field predicates */
+  readonly connectionSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly connectionSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
   /** created_at field predicates */
   readonly createdAt?: InputMaybe<Scalars['Time']['input']>;
   readonly createdAtGT?: InputMaybe<Scalars['Time']['input']>;
@@ -7126,6 +7780,20 @@ export type SourceTypeWhereInput = {
   readonly nameNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
   readonly not?: InputMaybe<SourceTypeWhereInput>;
   readonly or?: InputMaybe<ReadonlyArray<SourceTypeWhereInput>>;
+  /** organization_slug field predicates */
+  readonly organizationSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly organizationSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
   /** provider_id field predicates */
   readonly providerID?: InputMaybe<Scalars['String']['input']>;
   readonly providerIDContains?: InputMaybe<Scalars['String']['input']>;
@@ -7355,6 +8023,7 @@ export type Space = Node & {
   readonly name: Scalars['String']['output'];
   readonly organization: Organization;
   readonly organizationID: Scalars['ID']['output'];
+  readonly organizationSlug: Scalars['String']['output'];
   readonly slug: Scalars['String']['output'];
   readonly sqlQueries: SqlQueryConnection;
   /** Timezone name (e.g. America/Los_Angeles) */
@@ -7536,6 +8205,20 @@ export type SpaceWhereInput = {
   readonly organizationIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
   readonly organizationIDNEQ?: InputMaybe<Scalars['ID']['input']>;
   readonly organizationIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  /** organization_slug field predicates */
+  readonly organizationSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly organizationSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
   /** slug field predicates */
   readonly slug?: InputMaybe<Scalars['String']['input']>;
   readonly slugContains?: InputMaybe<Scalars['String']['input']>;
@@ -7594,16 +8277,6 @@ export type SubscriptionFlowRunSubscribeArgs = {
 
 export type SubscriptionNodeSubscribeArgs = {
   input: NodeSubscribeInput;
-};
-
-/**
- * SyncPackageInput is used to signal that an integration has changed and should be
- * updated by calling the GetPackage RPC method.
- */
-export type SyncPackageInput = {
-  readonly checksum: Scalars['String']['input'];
-  readonly integrationID: Scalars['ID']['input'];
-  readonly publish?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 /** SyncStatus is enum for the field sync_status */
@@ -7888,6 +8561,363 @@ export type TableRefWhereInput = {
   readonly updatedAtNotIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
 };
 
+export type TypeFile = Node & {
+  readonly __typename?: 'TypeFile';
+  readonly connection?: Maybe<Connection>;
+  readonly connectionID?: Maybe<Scalars['ID']['output']>;
+  readonly createdAt: Scalars['Time']['output'];
+  readonly deployment?: Maybe<Deployment>;
+  readonly deploymentID?: Maybe<Scalars['ID']['output']>;
+  readonly id: Scalars['ID']['output'];
+  readonly organization: Organization;
+  readonly organizationID: Scalars['ID']['output'];
+  readonly organizationSlug: Scalars['String']['output'];
+  readonly updatedAt: Scalars['Time']['output'];
+};
+
+export type TypeFileCreated = {
+  readonly __typename?: 'TypeFileCreated';
+  readonly created: Scalars['Boolean']['output'];
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly typeFile?: Maybe<TypeFile>;
+};
+
+export type TypeFileDeleted = {
+  readonly __typename?: 'TypeFileDeleted';
+  readonly deleted: Scalars['Boolean']['output'];
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type TypeFileUpdated = {
+  readonly __typename?: 'TypeFileUpdated';
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly typeFile?: Maybe<TypeFile>;
+  readonly updated: Scalars['Boolean']['output'];
+};
+
+export type TypeMethod = Node & {
+  readonly __typename?: 'TypeMethod';
+  readonly connection?: Maybe<Connection>;
+  readonly connectionID?: Maybe<Scalars['ID']['output']>;
+  readonly connectionSlug?: Maybe<Scalars['String']['output']>;
+  readonly createdAt: Scalars['Time']['output'];
+  readonly deployment?: Maybe<Deployment>;
+  readonly deploymentID?: Maybe<Scalars['ID']['output']>;
+  readonly deploymentSlug?: Maybe<Scalars['String']['output']>;
+  readonly description?: Maybe<Scalars['String']['output']>;
+  readonly id: Scalars['ID']['output'];
+  readonly integrationSlug?: Maybe<Scalars['String']['output']>;
+  readonly name: Scalars['String']['output'];
+  readonly organization: Organization;
+  readonly organizationID: Scalars['ID']['output'];
+  readonly organizationSlug: Scalars['String']['output'];
+  readonly request: Scalars['String']['output'];
+  readonly requestStreaming: Scalars['Boolean']['output'];
+  readonly response: Scalars['String']['output'];
+  readonly responseStreaming: Scalars['Boolean']['output'];
+  readonly service: TypeService;
+  readonly serviceID: Scalars['ID']['output'];
+  readonly systemType: Scalars['Boolean']['output'];
+  readonly updatedAt: Scalars['Time']['output'];
+};
+
+export type TypeMethodCreated = {
+  readonly __typename?: 'TypeMethodCreated';
+  readonly created: Scalars['Boolean']['output'];
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly typeMethod?: Maybe<TypeMethod>;
+};
+
+export type TypeMethodDeleted = {
+  readonly __typename?: 'TypeMethodDeleted';
+  readonly deleted: Scalars['Boolean']['output'];
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type TypeMethodUpdated = {
+  readonly __typename?: 'TypeMethodUpdated';
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly typeMethod?: Maybe<TypeMethod>;
+  readonly updated: Scalars['Boolean']['output'];
+};
+
+export type TypeSchema = Node & {
+  readonly __typename?: 'TypeSchema';
+  readonly connection?: Maybe<Connection>;
+  readonly connectionID?: Maybe<Scalars['ID']['output']>;
+  readonly connectionSlug?: Maybe<Scalars['String']['output']>;
+  readonly createdAt: Scalars['Time']['output'];
+  readonly deployment?: Maybe<Deployment>;
+  readonly deploymentID?: Maybe<Scalars['ID']['output']>;
+  readonly deploymentSlug?: Maybe<Scalars['String']['output']>;
+  readonly id: Scalars['ID']['output'];
+  readonly integrationSlug?: Maybe<Scalars['String']['output']>;
+  readonly jsonSchema: Scalars['Map']['output'];
+  readonly modTime: Scalars['Time']['output'];
+  readonly name: Scalars['String']['output'];
+  readonly organization: Organization;
+  readonly organizationID: Scalars['ID']['output'];
+  readonly organizationSlug: Scalars['String']['output'];
+  readonly protoName: Scalars['String']['output'];
+  readonly systemType: Scalars['Boolean']['output'];
+  readonly updatedAt: Scalars['Time']['output'];
+};
+
+export type TypeSchemaCreated = {
+  readonly __typename?: 'TypeSchemaCreated';
+  readonly created: Scalars['Boolean']['output'];
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly typeSchema?: Maybe<TypeSchema>;
+};
+
+export type TypeSchemaDeleted = {
+  readonly __typename?: 'TypeSchemaDeleted';
+  readonly deleted: Scalars['Boolean']['output'];
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly id?: Maybe<Scalars['ID']['output']>;
+};
+
+/** Ordering options for TypeSchema connections */
+export type TypeSchemaOrder = {
+  /** The ordering direction. */
+  readonly direction?: OrderDirection;
+  /** The field by which to order TypeSchemas. */
+  readonly field: TypeSchemaOrderField;
+};
+
+/** Properties by which TypeSchema connections can be ordered. */
+export enum TypeSchemaOrderField {
+  CreatedAt = 'CREATED_AT',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+export type TypeSchemaUpdated = {
+  readonly __typename?: 'TypeSchemaUpdated';
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly typeSchema?: Maybe<TypeSchema>;
+  readonly updated: Scalars['Boolean']['output'];
+};
+
+export type TypeSchemaV1Beta1 = {
+  readonly __typename?: 'TypeSchemaV1Beta1';
+  readonly jsonSchema: Scalars['Map']['output'];
+  readonly modTime: Scalars['Time']['output'];
+  readonly protoName: Scalars['String']['output'];
+  readonly uri: Scalars['String']['output'];
+};
+
+/**
+ * TypeSchemaWhereInput is used for filtering TypeSchema objects.
+ * Input was generated by ent.
+ */
+export type TypeSchemaWhereInput = {
+  readonly and?: InputMaybe<ReadonlyArray<TypeSchemaWhereInput>>;
+  /** connection_id field predicates */
+  readonly connectionID?: InputMaybe<Scalars['ID']['input']>;
+  readonly connectionIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly connectionIDIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly connectionIDNEQ?: InputMaybe<Scalars['ID']['input']>;
+  readonly connectionIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly connectionIDNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** connection_slug field predicates */
+  readonly connectionSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly connectionSlugIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly connectionSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly connectionSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly connectionSlugNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** created_at field predicates */
+  readonly createdAt?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtGT?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtGTE?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
+  readonly createdAtLT?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtLTE?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtNEQ?: InputMaybe<Scalars['Time']['input']>;
+  readonly createdAtNotIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
+  /** deployment_id field predicates */
+  readonly deploymentID?: InputMaybe<Scalars['ID']['input']>;
+  readonly deploymentIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly deploymentIDIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly deploymentIDNEQ?: InputMaybe<Scalars['ID']['input']>;
+  readonly deploymentIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly deploymentIDNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** deployment_slug field predicates */
+  readonly deploymentSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly deploymentSlugIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly deploymentSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly deploymentSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly deploymentSlugNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** connection edge predicates */
+  readonly hasConnection?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasConnectionWith?: InputMaybe<ReadonlyArray<ConnectionWhereInput>>;
+  /** deployment edge predicates */
+  readonly hasDeployment?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasDeploymentWith?: InputMaybe<ReadonlyArray<DeploymentWhereInput>>;
+  /** organization edge predicates */
+  readonly hasOrganization?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasOrganizationWith?: InputMaybe<ReadonlyArray<OrganizationWhereInput>>;
+  /** id field predicates */
+  readonly id?: InputMaybe<Scalars['ID']['input']>;
+  readonly idGT?: InputMaybe<Scalars['ID']['input']>;
+  readonly idGTE?: InputMaybe<Scalars['ID']['input']>;
+  readonly idIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly idLT?: InputMaybe<Scalars['ID']['input']>;
+  readonly idLTE?: InputMaybe<Scalars['ID']['input']>;
+  readonly idNEQ?: InputMaybe<Scalars['ID']['input']>;
+  readonly idNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  /** integration_slug field predicates */
+  readonly integrationSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly integrationSlugIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly integrationSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly integrationSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly integrationSlugNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** mod_time field predicates */
+  readonly modTime?: InputMaybe<Scalars['Time']['input']>;
+  readonly modTimeGT?: InputMaybe<Scalars['Time']['input']>;
+  readonly modTimeGTE?: InputMaybe<Scalars['Time']['input']>;
+  readonly modTimeIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
+  readonly modTimeLT?: InputMaybe<Scalars['Time']['input']>;
+  readonly modTimeLTE?: InputMaybe<Scalars['Time']['input']>;
+  readonly modTimeNEQ?: InputMaybe<Scalars['Time']['input']>;
+  readonly modTimeNotIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
+  /** name field predicates */
+  readonly name?: InputMaybe<Scalars['String']['input']>;
+  readonly nameContains?: InputMaybe<Scalars['String']['input']>;
+  readonly nameContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly nameEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly nameGT?: InputMaybe<Scalars['String']['input']>;
+  readonly nameGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly nameHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly nameHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly nameIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly nameLT?: InputMaybe<Scalars['String']['input']>;
+  readonly nameLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly nameNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly nameNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly not?: InputMaybe<TypeSchemaWhereInput>;
+  readonly or?: InputMaybe<ReadonlyArray<TypeSchemaWhereInput>>;
+  /** organization_id field predicates */
+  readonly organizationID?: InputMaybe<Scalars['ID']['input']>;
+  readonly organizationIDIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  readonly organizationIDNEQ?: InputMaybe<Scalars['ID']['input']>;
+  readonly organizationIDNotIn?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
+  /** organization_slug field predicates */
+  readonly organizationSlug?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContains?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly organizationSlugLT?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly organizationSlugNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  /** proto_name field predicates */
+  readonly protoName?: InputMaybe<Scalars['String']['input']>;
+  readonly protoNameContains?: InputMaybe<Scalars['String']['input']>;
+  readonly protoNameContainsFold?: InputMaybe<Scalars['String']['input']>;
+  readonly protoNameEqualFold?: InputMaybe<Scalars['String']['input']>;
+  readonly protoNameGT?: InputMaybe<Scalars['String']['input']>;
+  readonly protoNameGTE?: InputMaybe<Scalars['String']['input']>;
+  readonly protoNameHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  readonly protoNameHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  readonly protoNameIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  readonly protoNameLT?: InputMaybe<Scalars['String']['input']>;
+  readonly protoNameLTE?: InputMaybe<Scalars['String']['input']>;
+  readonly protoNameNEQ?: InputMaybe<Scalars['String']['input']>;
+  readonly protoNameNotIn?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
+  /** system_type field predicates */
+  readonly systemType?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly systemTypeNEQ?: InputMaybe<Scalars['Boolean']['input']>;
+  /** updated_at field predicates */
+  readonly updatedAt?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtGT?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtGTE?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
+  readonly updatedAtLT?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtLTE?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtNEQ?: InputMaybe<Scalars['Time']['input']>;
+  readonly updatedAtNotIn?: InputMaybe<ReadonlyArray<Scalars['Time']['input']>>;
+};
+
+export type TypeService = Node & {
+  readonly __typename?: 'TypeService';
+  readonly connection?: Maybe<Connection>;
+  readonly connectionID?: Maybe<Scalars['ID']['output']>;
+  readonly connectionSlug?: Maybe<Scalars['String']['output']>;
+  readonly createdAt: Scalars['Time']['output'];
+  readonly deployment?: Maybe<Deployment>;
+  readonly deploymentID?: Maybe<Scalars['ID']['output']>;
+  readonly deploymentSlug?: Maybe<Scalars['String']['output']>;
+  readonly description?: Maybe<Scalars['String']['output']>;
+  readonly id: Scalars['ID']['output'];
+  readonly integrationSlug?: Maybe<Scalars['String']['output']>;
+  readonly name: Scalars['String']['output'];
+  readonly organization: Organization;
+  readonly organizationID: Scalars['ID']['output'];
+  readonly organizationSlug: Scalars['String']['output'];
+  readonly systemType: Scalars['Boolean']['output'];
+  readonly typeMethods?: Maybe<ReadonlyArray<TypeMethod>>;
+  readonly updatedAt: Scalars['Time']['output'];
+  readonly version?: Maybe<Scalars['String']['output']>;
+};
+
+export type TypeServiceCreated = {
+  readonly __typename?: 'TypeServiceCreated';
+  readonly created: Scalars['Boolean']['output'];
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly typeService?: Maybe<TypeService>;
+};
+
+export type TypeServiceDeleted = {
+  readonly __typename?: 'TypeServiceDeleted';
+  readonly deleted: Scalars['Boolean']['output'];
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type TypeServiceUpdated = {
+  readonly __typename?: 'TypeServiceUpdated';
+  readonly error?: Maybe<Scalars['String']['output']>;
+  readonly typeService?: Maybe<TypeService>;
+  readonly updated: Scalars['Boolean']['output'];
+};
+
 /**
  * UpdateCatalogInput is used for update Catalog object.
  * Input was generated by ent.
@@ -7961,24 +8991,6 @@ export type UpdateGeoMapInput = {
   readonly removeLayerIDs?: InputMaybe<ReadonlyArray<Scalars['ID']['input']>>;
   readonly settings?: InputMaybe<GeoMapSettingsInput>;
   readonly visibility?: InputMaybe<Visibility>;
-};
-
-/**
- * UpdateIntegrationInput is used for update Integration object.
- * Input was generated by ent.
- */
-export type UpdateIntegrationInput = {
-  readonly address?: InputMaybe<Scalars['String']['input']>;
-  readonly appendServiceNames?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
-  readonly clearConfigSchema?: InputMaybe<Scalars['Boolean']['input']>;
-  readonly clearServiceNames?: InputMaybe<Scalars['Boolean']['input']>;
-  readonly configSchema?: InputMaybe<Scalars['String']['input']>;
-  readonly description?: InputMaybe<Scalars['String']['input']>;
-  readonly icon?: InputMaybe<Scalars['String']['input']>;
-  readonly network?: InputMaybe<Scalars['String']['input']>;
-  readonly organizationID?: InputMaybe<Scalars['ID']['input']>;
-  readonly serviceNames?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>;
-  readonly version?: InputMaybe<Scalars['String']['input']>;
 };
 
 /**
@@ -8094,8 +9106,8 @@ export type User = Node & {
   readonly emailVerified?: Maybe<Scalars['Boolean']['output']>;
   readonly id: Scalars['ID']['output'];
   readonly image?: Maybe<Scalars['String']['output']>;
+  readonly integrationRevisions?: Maybe<ReadonlyArray<IntegrationRevision>>;
   readonly name?: Maybe<Scalars['String']['output']>;
-  readonly packages?: Maybe<ReadonlyArray<IntegrationPackage>>;
   readonly personalAccessTokens?: Maybe<ReadonlyArray<PersonalAccessToken>>;
   readonly role?: Maybe<Scalars['String']['output']>;
   readonly sqlQueries: SqlQueryConnection;
@@ -8241,9 +9253,9 @@ export type UserWhereInput = {
   /** connection_user edge predicates */
   readonly hasConnectionUser?: InputMaybe<Scalars['Boolean']['input']>;
   readonly hasConnectionUserWith?: InputMaybe<ReadonlyArray<ConnectionUserWhereInput>>;
-  /** packages edge predicates */
-  readonly hasPackages?: InputMaybe<Scalars['Boolean']['input']>;
-  readonly hasPackagesWith?: InputMaybe<ReadonlyArray<IntegrationPackageWhereInput>>;
+  /** integration_revisions edge predicates */
+  readonly hasIntegrationRevisions?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly hasIntegrationRevisionsWith?: InputMaybe<ReadonlyArray<IntegrationRevisionWhereInput>>;
   /** personal_access_tokens edge predicates */
   readonly hasPersonalAccessTokens?: InputMaybe<Scalars['Boolean']['input']>;
   readonly hasPersonalAccessTokensWith?: InputMaybe<ReadonlyArray<PersonalAccessTokenWhereInput>>;
@@ -8444,7 +9456,9 @@ export type DeleteColumnMutationVariables = Exact<{
 
 export type DeleteColumnMutation = { readonly __typename?: 'Mutation', readonly deleteColumn?: { readonly __typename?: 'ColumnRefDeleted', readonly deleted: boolean, readonly error?: string | null, readonly id?: string | null } | null };
 
-export type ConnectionFragmentFragment = { readonly __typename?: 'Connection', readonly id: string, readonly slug: string, readonly name: string, readonly visibility: Visibility, readonly createdAt: string, readonly updatedAt: string, readonly integrationID: string, readonly organizationID: string };
+export type AddressFragmentFragment = { readonly __typename?: 'Address', readonly network: string, readonly target: string };
+
+export type ConnectionFragmentFragment = { readonly __typename?: 'Connection', readonly id: string, readonly slug: string, readonly name: string, readonly visibility: Visibility, readonly organizationSlug: string, readonly organizationID: string, readonly integrationSlug?: string | null, readonly deploymentSlug?: string | null, readonly deploymentID?: string | null, readonly configURI?: string | null, readonly customProtos?: string | null, readonly customGrpc?: boolean | null, readonly headers: Record<string, unknown>, readonly createdAt: string, readonly updatedAt: string, readonly address: { readonly __typename?: 'Address', readonly network: string, readonly target: string } };
 
 export type GetConnectionQueryVariables = Exact<{
   connectionId?: InputMaybe<Scalars['ID']['input']>;
@@ -8452,7 +9466,7 @@ export type GetConnectionQueryVariables = Exact<{
 }>;
 
 
-export type GetConnectionQuery = { readonly __typename?: 'Query', readonly connection?: { readonly __typename?: 'Connection', readonly id: string, readonly slug: string, readonly name: string, readonly visibility: Visibility, readonly createdAt: string, readonly updatedAt: string, readonly integrationID: string, readonly organizationID: string } | null };
+export type GetConnectionQuery = { readonly __typename?: 'Query', readonly connection?: { readonly __typename?: 'Connection', readonly id: string, readonly slug: string, readonly name: string, readonly visibility: Visibility, readonly organizationSlug: string, readonly organizationID: string, readonly integrationSlug?: string | null, readonly deploymentSlug?: string | null, readonly deploymentID?: string | null, readonly configURI?: string | null, readonly customProtos?: string | null, readonly customGrpc?: boolean | null, readonly headers: Record<string, unknown>, readonly createdAt: string, readonly updatedAt: string, readonly address: { readonly __typename?: 'Address', readonly network: string, readonly target: string } } | null };
 
 export type ListConnectionsQueryVariables = Exact<{
   orderBy?: InputMaybe<ConnectionOrder>;
@@ -8460,7 +9474,7 @@ export type ListConnectionsQueryVariables = Exact<{
 }>;
 
 
-export type ListConnectionsQuery = { readonly __typename?: 'Query', readonly connections: { readonly __typename?: 'ConnectionConnection', readonly totalCount: number, readonly edges?: ReadonlyArray<{ readonly __typename?: 'ConnectionEdge', readonly node?: { readonly __typename?: 'Connection', readonly id: string, readonly slug: string, readonly name: string, readonly visibility: Visibility, readonly createdAt: string, readonly updatedAt: string, readonly integrationID: string, readonly organizationID: string } | null } | null> | null } };
+export type ListConnectionsQuery = { readonly __typename?: 'Query', readonly connections: { readonly __typename?: 'ConnectionConnection', readonly totalCount: number, readonly edges?: ReadonlyArray<{ readonly __typename?: 'ConnectionEdge', readonly node?: { readonly __typename?: 'Connection', readonly id: string, readonly slug: string, readonly name: string, readonly visibility: Visibility, readonly organizationSlug: string, readonly organizationID: string, readonly integrationSlug?: string | null, readonly deploymentSlug?: string | null, readonly deploymentID?: string | null, readonly configURI?: string | null, readonly customProtos?: string | null, readonly customGrpc?: boolean | null, readonly headers: Record<string, unknown>, readonly createdAt: string, readonly updatedAt: string, readonly address: { readonly __typename?: 'Address', readonly network: string, readonly target: string } } | null } | null> | null } };
 
 export type CheckConnectionQueryVariables = Exact<{
   id?: InputMaybe<Scalars['ID']['input']>;
@@ -8468,14 +9482,14 @@ export type CheckConnectionQueryVariables = Exact<{
 }>;
 
 
-export type CheckConnectionQuery = { readonly __typename?: 'Query', readonly checkConnection?: { readonly __typename?: 'ConnectionCheck', readonly authCheck: { readonly __typename?: 'AuthCheck', readonly type: ServiceAuthType, readonly required: boolean, readonly success: boolean, readonly error?: string | null }, readonly configCheck: { readonly __typename?: 'ConfigCheck', readonly success: boolean, readonly error?: string | null } } | null };
+export type CheckConnectionQuery = { readonly __typename?: 'Query', readonly checkConnection?: { readonly __typename?: 'ConnectionCheck', readonly authCheck: { readonly __typename?: 'AuthCheck', readonly type: AuthType, readonly required: boolean, readonly success: boolean, readonly message?: string | null }, readonly configCheck: { readonly __typename?: 'ConnectionConfigCheck', readonly success: boolean, readonly message?: string | null } } | null };
 
 export type CreateConnectionMutationVariables = Exact<{
   input: CreateConnectionInput;
 }>;
 
 
-export type CreateConnectionMutation = { readonly __typename?: 'Mutation', readonly createConnection?: { readonly __typename?: 'ConnectionCreated', readonly created: boolean, readonly error?: string | null, readonly connection?: { readonly __typename?: 'Connection', readonly id: string, readonly slug: string, readonly name: string, readonly visibility: Visibility, readonly createdAt: string, readonly updatedAt: string, readonly integrationID: string, readonly organizationID: string } | null } | null };
+export type CreateConnectionMutation = { readonly __typename?: 'Mutation', readonly createConnection?: { readonly __typename?: 'ConnectionCreated', readonly created: boolean, readonly error?: string | null, readonly connection?: { readonly __typename?: 'Connection', readonly id: string, readonly slug: string, readonly name: string, readonly visibility: Visibility, readonly organizationSlug: string, readonly organizationID: string, readonly integrationSlug?: string | null, readonly deploymentSlug?: string | null, readonly deploymentID?: string | null, readonly configURI?: string | null, readonly customProtos?: string | null, readonly customGrpc?: boolean | null, readonly headers: Record<string, unknown>, readonly createdAt: string, readonly updatedAt: string, readonly address: { readonly __typename?: 'Address', readonly network: string, readonly target: string } } | null } | null };
 
 export type UpdateConnectionMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -8483,7 +9497,7 @@ export type UpdateConnectionMutationVariables = Exact<{
 }>;
 
 
-export type UpdateConnectionMutation = { readonly __typename?: 'Mutation', readonly updateConnection?: { readonly __typename?: 'ConnectionUpdated', readonly updated: boolean, readonly error?: string | null, readonly connection?: { readonly __typename?: 'Connection', readonly id: string, readonly slug: string, readonly name: string, readonly visibility: Visibility, readonly createdAt: string, readonly updatedAt: string, readonly integrationID: string, readonly organizationID: string } | null } | null };
+export type UpdateConnectionMutation = { readonly __typename?: 'Mutation', readonly updateConnection?: { readonly __typename?: 'ConnectionUpdated', readonly updated: boolean, readonly error?: string | null, readonly connection?: { readonly __typename?: 'Connection', readonly id: string, readonly slug: string, readonly name: string, readonly visibility: Visibility, readonly organizationSlug: string, readonly organizationID: string, readonly integrationSlug?: string | null, readonly deploymentSlug?: string | null, readonly deploymentID?: string | null, readonly configURI?: string | null, readonly customProtos?: string | null, readonly customGrpc?: boolean | null, readonly headers: Record<string, unknown>, readonly createdAt: string, readonly updatedAt: string, readonly address: { readonly __typename?: 'Address', readonly network: string, readonly target: string } } | null } | null };
 
 export type DeleteConnectionMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -8491,6 +9505,16 @@ export type DeleteConnectionMutationVariables = Exact<{
 
 
 export type DeleteConnectionMutation = { readonly __typename?: 'Mutation', readonly deleteConnection?: { readonly __typename?: 'ConnectionDeleted', readonly deleted: boolean, readonly error?: string | null, readonly id?: string | null } | null };
+
+export type DeploymentFragmentFragment = { readonly __typename?: 'Deployment', readonly id: string, readonly slug: string, readonly state: DeploymentState, readonly visibility: Visibility, readonly organizationSlug: string, readonly organizationID: string, readonly integrationSlug: string, readonly integrationID: string, readonly revisionID: string, readonly etag: string, readonly env: Record<string, unknown>, readonly ports: Record<string, unknown>, readonly createdAt: string, readonly updatedAt: string, readonly address: { readonly __typename?: 'Address', readonly network: string, readonly target: string } };
+
+export type ListDeploymentsQueryVariables = Exact<{
+  orderBy?: InputMaybe<DeploymentOrder>;
+  where?: InputMaybe<DeploymentWhereInput>;
+}>;
+
+
+export type ListDeploymentsQuery = { readonly __typename?: 'Query', readonly deployments: { readonly __typename?: 'DeploymentConnection', readonly totalCount: number, readonly edges?: ReadonlyArray<{ readonly __typename?: 'DeploymentEdge', readonly node?: { readonly __typename?: 'Deployment', readonly id: string, readonly slug: string, readonly state: DeploymentState, readonly visibility: Visibility, readonly organizationSlug: string, readonly organizationID: string, readonly integrationSlug: string, readonly integrationID: string, readonly revisionID: string, readonly etag: string, readonly env: Record<string, unknown>, readonly ports: Record<string, unknown>, readonly createdAt: string, readonly updatedAt: string, readonly address: { readonly __typename?: 'Address', readonly network: string, readonly target: string } } | null } | null> | null } };
 
 export type DestinationFragmentFragment = { readonly __typename?: 'Destination', readonly id: string, readonly name: string, readonly tzName: string, readonly createdAt: string, readonly updatedAt: string, readonly providerID: string, readonly connectionID: string, readonly organizationID: string };
 
@@ -8651,7 +9675,9 @@ export type CreateFlowMutationVariables = Exact<{
 
 export type CreateFlowMutation = { readonly __typename?: 'Mutation', readonly createFlow?: { readonly __typename?: 'FlowCreated', readonly created: boolean, readonly error?: string | null, readonly flow?: { readonly __typename?: 'Flow', readonly id: string, readonly name: string, readonly description?: string | null, readonly createdAt: string, readonly updatedAt: string } | null } | null };
 
-export type IntegrationFragmentFragment = { readonly __typename?: 'Integration', readonly id: string, readonly slug: string, readonly name: string, readonly apiVersion: string, readonly version: string, readonly description: string, readonly icon: string, readonly serviceNames?: ReadonlyArray<string> | null, readonly configSchema?: string | null, readonly serverConfig?: string | null, readonly organizationID: string, readonly createdAt: string, readonly updatedAt: string, readonly published?: { readonly __typename?: 'IntegrationPackage', readonly id: string, readonly checksum: string, readonly spec: string, readonly configSchema: string, readonly serviceNames: ReadonlyArray<string>, readonly integrationID: string, readonly authorID: string, readonly createdAt: string, readonly updatedAt: string } | null };
+export type IntegrationFragmentFragment = { readonly __typename?: 'Integration', readonly id: string, readonly slug: string, readonly name: string, readonly apiVersion: string, readonly version: string, readonly description: string, readonly icon: string, readonly visibility: Visibility, readonly organizationSlug: string, readonly organizationID: string, readonly revisionID?: string | null, readonly createdAt: string, readonly updatedAt: string, readonly published?: { readonly __typename?: 'IntegrationRevision', readonly id: string, readonly slug: string, readonly integrationSlug: string, readonly organizationSlug: string, readonly specEtag: string, readonly sourceURI?: string | null, readonly sourceEtag?: string | null, readonly integrationID: string, readonly authorID: string, readonly createdAt: string, readonly updatedAt: string } | null };
+
+export type IntegrationRevisionFragmentFragment = { readonly __typename?: 'IntegrationRevision', readonly id: string, readonly slug: string, readonly integrationSlug: string, readonly organizationSlug: string, readonly specEtag: string, readonly sourceURI?: string | null, readonly sourceEtag?: string | null, readonly integrationID: string, readonly authorID: string, readonly createdAt: string, readonly updatedAt: string };
 
 export type GetIntegrationQueryVariables = Exact<{
   id?: InputMaybe<Scalars['ID']['input']>;
@@ -8659,7 +9685,7 @@ export type GetIntegrationQueryVariables = Exact<{
 }>;
 
 
-export type GetIntegrationQuery = { readonly __typename?: 'Query', readonly integration?: { readonly __typename?: 'Integration', readonly id: string, readonly slug: string, readonly name: string, readonly apiVersion: string, readonly version: string, readonly description: string, readonly icon: string, readonly serviceNames?: ReadonlyArray<string> | null, readonly configSchema?: string | null, readonly serverConfig?: string | null, readonly organizationID: string, readonly createdAt: string, readonly updatedAt: string, readonly published?: { readonly __typename?: 'IntegrationPackage', readonly id: string, readonly checksum: string, readonly spec: string, readonly configSchema: string, readonly serviceNames: ReadonlyArray<string>, readonly integrationID: string, readonly authorID: string, readonly createdAt: string, readonly updatedAt: string } | null } | null };
+export type GetIntegrationQuery = { readonly __typename?: 'Query', readonly integration?: { readonly __typename?: 'Integration', readonly id: string, readonly slug: string, readonly name: string, readonly apiVersion: string, readonly version: string, readonly description: string, readonly icon: string, readonly visibility: Visibility, readonly organizationSlug: string, readonly organizationID: string, readonly revisionID?: string | null, readonly createdAt: string, readonly updatedAt: string, readonly published?: { readonly __typename?: 'IntegrationRevision', readonly id: string, readonly slug: string, readonly integrationSlug: string, readonly organizationSlug: string, readonly specEtag: string, readonly sourceURI?: string | null, readonly sourceEtag?: string | null, readonly integrationID: string, readonly authorID: string, readonly createdAt: string, readonly updatedAt: string } | null } | null };
 
 export type ListIntegrationsQueryVariables = Exact<{
   orderBy?: InputMaybe<IntegrationOrder>;
@@ -8667,14 +9693,7 @@ export type ListIntegrationsQueryVariables = Exact<{
 }>;
 
 
-export type ListIntegrationsQuery = { readonly __typename?: 'Query', readonly integrations: { readonly __typename?: 'IntegrationConnection', readonly totalCount: number, readonly edges?: ReadonlyArray<{ readonly __typename?: 'IntegrationEdge', readonly node?: { readonly __typename?: 'Integration', readonly id: string, readonly slug: string, readonly name: string, readonly apiVersion: string, readonly version: string, readonly description: string, readonly icon: string, readonly serviceNames?: ReadonlyArray<string> | null, readonly configSchema?: string | null, readonly serverConfig?: string | null, readonly organizationID: string, readonly createdAt: string, readonly updatedAt: string, readonly published?: { readonly __typename?: 'IntegrationPackage', readonly id: string, readonly checksum: string, readonly spec: string, readonly configSchema: string, readonly serviceNames: ReadonlyArray<string>, readonly integrationID: string, readonly authorID: string, readonly createdAt: string, readonly updatedAt: string } | null } | null } | null> | null } };
-
-export type CreateIntegrationMutationVariables = Exact<{
-  input: CreateIntegrationInput;
-}>;
-
-
-export type CreateIntegrationMutation = { readonly __typename?: 'Mutation', readonly createIntegration?: { readonly __typename?: 'IntegrationCreated', readonly created: boolean, readonly error?: string | null, readonly integration?: { readonly __typename?: 'Integration', readonly id: string, readonly slug: string, readonly name: string, readonly apiVersion: string, readonly version: string, readonly description: string, readonly icon: string, readonly serviceNames?: ReadonlyArray<string> | null, readonly configSchema?: string | null, readonly serverConfig?: string | null, readonly organizationID: string, readonly createdAt: string, readonly updatedAt: string, readonly published?: { readonly __typename?: 'IntegrationPackage', readonly id: string, readonly checksum: string, readonly spec: string, readonly configSchema: string, readonly serviceNames: ReadonlyArray<string>, readonly integrationID: string, readonly authorID: string, readonly createdAt: string, readonly updatedAt: string } | null } | null } | null };
+export type ListIntegrationsQuery = { readonly __typename?: 'Query', readonly integrations: { readonly __typename?: 'IntegrationConnection', readonly totalCount: number, readonly edges?: ReadonlyArray<{ readonly __typename?: 'IntegrationEdge', readonly node?: { readonly __typename?: 'Integration', readonly id: string, readonly slug: string, readonly name: string, readonly apiVersion: string, readonly version: string, readonly description: string, readonly icon: string, readonly visibility: Visibility, readonly organizationSlug: string, readonly organizationID: string, readonly revisionID?: string | null, readonly createdAt: string, readonly updatedAt: string, readonly published?: { readonly __typename?: 'IntegrationRevision', readonly id: string, readonly slug: string, readonly integrationSlug: string, readonly organizationSlug: string, readonly specEtag: string, readonly sourceURI?: string | null, readonly sourceEtag?: string | null, readonly integrationID: string, readonly authorID: string, readonly createdAt: string, readonly updatedAt: string } | null } | null } | null> | null } };
 
 export type IoSchemaFragmentFragment = { readonly __typename?: 'IOSchema', readonly id: string, readonly nodeType: string, readonly nodeID: string, readonly inputSchema?: string | null, readonly outputSchema?: string | null, readonly createdAt: string, readonly updatedAt: string, readonly organizationID?: string | null };
 
@@ -8798,23 +9817,6 @@ export type DeleteOrganizationMutationVariables = Exact<{
 
 export type DeleteOrganizationMutation = { readonly __typename?: 'Mutation', readonly deleteOrganization?: { readonly __typename?: 'OrganizationDeleted', readonly deleted: boolean, readonly error?: string | null, readonly id?: string | null } | null };
 
-export type IntegrationPackageFragmentFragment = { readonly __typename?: 'IntegrationPackage', readonly id: string, readonly checksum: string, readonly spec: string, readonly configSchema: string, readonly serviceNames: ReadonlyArray<string>, readonly integrationID: string, readonly authorID: string, readonly createdAt: string, readonly updatedAt: string };
-
-export type ListPackagesQueryVariables = Exact<{
-  orderBy?: InputMaybe<IntegrationPackageOrder>;
-  where?: InputMaybe<IntegrationPackageWhereInput>;
-}>;
-
-
-export type ListPackagesQuery = { readonly __typename?: 'Query', readonly packages: { readonly __typename?: 'IntegrationPackageConnection', readonly totalCount: number, readonly edges?: ReadonlyArray<{ readonly __typename?: 'IntegrationPackageEdge', readonly node?: { readonly __typename?: 'IntegrationPackage', readonly id: string, readonly checksum: string, readonly spec: string, readonly configSchema: string, readonly serviceNames: ReadonlyArray<string>, readonly integrationID: string, readonly authorID: string, readonly createdAt: string, readonly updatedAt: string } | null } | null> | null } };
-
-export type SyncPackageMutationVariables = Exact<{
-  input: SyncPackageInput;
-}>;
-
-
-export type SyncPackageMutation = { readonly __typename?: 'Mutation', readonly syncPackage?: { readonly __typename?: 'IntegrationPackageUpdated', readonly integrationPackage?: { readonly __typename?: 'IntegrationPackage', readonly id: string, readonly checksum: string, readonly spec: string, readonly configSchema: string, readonly serviceNames: ReadonlyArray<string>, readonly integrationID: string, readonly authorID: string, readonly createdAt: string, readonly updatedAt: string, readonly integration: { readonly __typename?: 'Integration', readonly id: string, readonly slug: string, readonly name: string, readonly apiVersion: string, readonly version: string, readonly description: string, readonly icon: string, readonly serviceNames?: ReadonlyArray<string> | null, readonly configSchema?: string | null, readonly serverConfig?: string | null, readonly organizationID: string, readonly createdAt: string, readonly updatedAt: string, readonly published?: { readonly __typename?: 'IntegrationPackage', readonly id: string, readonly checksum: string, readonly spec: string, readonly configSchema: string, readonly serviceNames: ReadonlyArray<string>, readonly integrationID: string, readonly authorID: string, readonly createdAt: string, readonly updatedAt: string } | null } } | null } | null };
-
 export type PersonalAccessTokenFragmentFragment = { readonly __typename?: 'PersonalAccessToken', readonly id: string, readonly name: string, readonly token: string, readonly userID: string, readonly expiresAt: string, readonly createdAt: string, readonly updatedAt: string };
 
 export type GetPersonalAccessTokenQueryVariables = Exact<{
@@ -8932,6 +9934,7 @@ export type SearchQuery = { readonly __typename?: 'Query', readonly search: { re
         | { readonly __typename?: 'ColumnRef', readonly id: string, readonly type: 'ColumnRef' }
         | { readonly __typename?: 'Connection', readonly id: string, readonly type: 'Connection' }
         | { readonly __typename?: 'ConnectionUser', readonly id: string, readonly type: 'ConnectionUser' }
+        | { readonly __typename?: 'Deployment', readonly id: string, readonly type: 'Deployment' }
         | { readonly __typename?: 'Destination', readonly id: string, readonly type: 'Destination' }
         | { readonly __typename?: 'EventSource', readonly id: string, readonly type: 'EventSource' }
         | { readonly __typename?: 'Flow', readonly id: string, readonly type: 'Flow' }
@@ -8944,9 +9947,10 @@ export type SearchQuery = { readonly __typename?: 'Query', readonly search: { re
         | { readonly __typename?: 'GeoSource', readonly id: string, readonly type: 'GeoSource' }
         | { readonly __typename?: 'IOSchema', readonly id: string, readonly type: 'IOSchema' }
         | { readonly __typename?: 'Integration', readonly id: string, readonly type: 'Integration' }
-        | { readonly __typename?: 'IntegrationPackage', readonly id: string, readonly type: 'IntegrationPackage' }
+        | { readonly __typename?: 'IntegrationRevision', readonly id: string, readonly type: 'IntegrationRevision' }
         | { readonly __typename?: 'Model', readonly id: string, readonly type: 'Model' }
         | { readonly __typename?: 'ModelType', readonly id: string, readonly type: 'ModelType' }
+        | { readonly __typename?: 'Operation', readonly id: string, readonly type: 'Operation' }
         | { readonly __typename?: 'Organization', readonly id: string, readonly type: 'Organization' }
         | { readonly __typename?: 'PersonalAccessToken', readonly id: string, readonly type: 'PersonalAccessToken' }
         | { readonly __typename?: 'SQLQuery', readonly id: string, readonly type: 'SQLQuery' }
@@ -8957,6 +9961,10 @@ export type SearchQuery = { readonly __typename?: 'Query', readonly search: { re
         | { readonly __typename?: 'SourceType', readonly id: string, readonly type: 'SourceType' }
         | { readonly __typename?: 'Space', readonly id: string, readonly type: 'Space' }
         | { readonly __typename?: 'TableRef', readonly id: string, readonly type: 'TableRef' }
+        | { readonly __typename?: 'TypeFile', readonly id: string, readonly type: 'TypeFile' }
+        | { readonly __typename?: 'TypeMethod', readonly id: string, readonly type: 'TypeMethod' }
+        | { readonly __typename?: 'TypeSchema', readonly id: string, readonly type: 'TypeSchema' }
+        | { readonly __typename?: 'TypeService', readonly id: string, readonly type: 'TypeService' }
         | { readonly __typename?: 'User', readonly id: string, readonly type: 'User' }
        } | null> } };
 
@@ -9157,16 +10165,54 @@ export const ColumnRefFragmentFragmentDoc = gql`
   tableID
 }
     `;
+export const AddressFragmentFragmentDoc = gql`
+    fragment AddressFragment on Address {
+  network
+  target
+}
+    `;
 export const ConnectionFragmentFragmentDoc = gql`
     fragment ConnectionFragment on Connection {
   id
   slug
   name
   visibility
+  organizationSlug
+  organizationID
+  integrationSlug
+  deploymentSlug
+  deploymentID
+  configURI
+  customProtos
+  customGrpc
+  headers
+  address {
+    ...AddressFragment
+  }
   createdAt
   updatedAt
-  integrationID
+}
+    ${AddressFragmentFragmentDoc}`;
+export const DeploymentFragmentFragmentDoc = gql`
+    fragment DeploymentFragment on Deployment {
+  id
+  slug
+  state
+  visibility
+  organizationSlug
   organizationID
+  integrationSlug
+  integrationID
+  revisionID
+  etag
+  env
+  ports
+  address {
+    network
+    target
+  }
+  createdAt
+  updatedAt
 }
     `;
 export const DestinationFragmentFragmentDoc = gql`
@@ -9238,13 +10284,15 @@ export const FlowFragmentFragmentDoc = gql`
   updatedAt
 }
     `;
-export const IntegrationPackageFragmentFragmentDoc = gql`
-    fragment IntegrationPackageFragment on IntegrationPackage {
+export const IntegrationRevisionFragmentFragmentDoc = gql`
+    fragment IntegrationRevisionFragment on IntegrationRevision {
   id
-  checksum
-  spec
-  configSchema
-  serviceNames
+  slug
+  integrationSlug
+  organizationSlug
+  specEtag
+  sourceURI
+  sourceEtag
   integrationID
   authorID
   createdAt
@@ -9260,17 +10308,17 @@ export const IntegrationFragmentFragmentDoc = gql`
   version
   description
   icon
-  serviceNames
-  configSchema
-  serverConfig
-  published {
-    ...IntegrationPackageFragment
-  }
+  visibility
+  organizationSlug
   organizationID
+  revisionID
   createdAt
   updatedAt
+  published {
+    ...IntegrationRevisionFragment
+  }
 }
-    ${IntegrationPackageFragmentFragmentDoc}`;
+    ${IntegrationRevisionFragmentFragmentDoc}`;
 export const IoSchemaFragmentFragmentDoc = gql`
     fragment IoSchemaFragment on IOSchema {
   id
@@ -9562,11 +10610,11 @@ export const CheckConnectionDocument = gql`
       type
       required
       success
-      error
+      message
     }
     configCheck {
       success
-      error
+      message
     }
   }
 }
@@ -9602,6 +10650,18 @@ export const DeleteConnectionDocument = gql`
   }
 }
     `;
+export const ListDeploymentsDocument = gql`
+    query ListDeployments($orderBy: DeploymentOrder, $where: DeploymentWhereInput) {
+  deployments(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...DeploymentFragment
+      }
+    }
+    totalCount
+  }
+}
+    ${DeploymentFragmentFragmentDoc}`;
 export const GetDestinationDocument = gql`
     query GetDestination($id: ID!) {
   destination(id: $id) {
@@ -9820,17 +10880,6 @@ export const ListIntegrationsDocument = gql`
   }
 }
     ${IntegrationFragmentFragmentDoc}`;
-export const CreateIntegrationDocument = gql`
-    mutation CreateIntegration($input: CreateIntegrationInput!) {
-  createIntegration(input: $input) {
-    created
-    error
-    integration {
-      ...IntegrationFragment
-    }
-  }
-}
-    ${IntegrationFragmentFragmentDoc}`;
 export const GetIoSchemaDocument = gql`
     query GetIoSchema($nodeType: String!, $nodeId: ID!) {
   ioSchema(type: $nodeType, id: $nodeId) {
@@ -9977,31 +11026,6 @@ export const DeleteOrganizationDocument = gql`
   }
 }
     `;
-export const ListPackagesDocument = gql`
-    query ListPackages($orderBy: IntegrationPackageOrder, $where: IntegrationPackageWhereInput) {
-  packages(orderBy: $orderBy, where: $where) {
-    totalCount
-    edges {
-      node {
-        ...IntegrationPackageFragment
-      }
-    }
-  }
-}
-    ${IntegrationPackageFragmentFragmentDoc}`;
-export const SyncPackageDocument = gql`
-    mutation SyncPackage($input: SyncPackageInput!) {
-  syncPackage(input: $input) {
-    integrationPackage {
-      ...IntegrationPackageFragment
-      integration {
-        ...IntegrationFragment
-      }
-    }
-  }
-}
-    ${IntegrationPackageFragmentFragmentDoc}
-${IntegrationFragmentFragmentDoc}`;
 export const GetPersonalAccessTokenDocument = gql`
     query GetPersonalAccessToken($id: ID, $token: String) {
   personalAccessToken(id: $id, token: $token) {
@@ -10392,6 +11416,9 @@ export function getSdk<C>(requester: Requester<C>) {
     DeleteConnection(variables: DeleteConnectionMutationVariables, options?: C): Promise<DeleteConnectionMutation> {
       return requester<DeleteConnectionMutation, DeleteConnectionMutationVariables>(DeleteConnectionDocument, variables, options) as Promise<DeleteConnectionMutation>;
     },
+    ListDeployments(variables?: ListDeploymentsQueryVariables, options?: C): Promise<ListDeploymentsQuery> {
+      return requester<ListDeploymentsQuery, ListDeploymentsQueryVariables>(ListDeploymentsDocument, variables, options) as Promise<ListDeploymentsQuery>;
+    },
     GetDestination(variables: GetDestinationQueryVariables, options?: C): Promise<GetDestinationQuery> {
       return requester<GetDestinationQuery, GetDestinationQueryVariables>(GetDestinationDocument, variables, options) as Promise<GetDestinationQuery>;
     },
@@ -10458,9 +11485,6 @@ export function getSdk<C>(requester: Requester<C>) {
     ListIntegrations(variables?: ListIntegrationsQueryVariables, options?: C): Promise<ListIntegrationsQuery> {
       return requester<ListIntegrationsQuery, ListIntegrationsQueryVariables>(ListIntegrationsDocument, variables, options) as Promise<ListIntegrationsQuery>;
     },
-    CreateIntegration(variables: CreateIntegrationMutationVariables, options?: C): Promise<CreateIntegrationMutation> {
-      return requester<CreateIntegrationMutation, CreateIntegrationMutationVariables>(CreateIntegrationDocument, variables, options) as Promise<CreateIntegrationMutation>;
-    },
     GetIoSchema(variables: GetIoSchemaQueryVariables, options?: C): Promise<GetIoSchemaQuery> {
       return requester<GetIoSchemaQuery, GetIoSchemaQueryVariables>(GetIoSchemaDocument, variables, options) as Promise<GetIoSchemaQuery>;
     },
@@ -10505,12 +11529,6 @@ export function getSdk<C>(requester: Requester<C>) {
     },
     DeleteOrganization(variables: DeleteOrganizationMutationVariables, options?: C): Promise<DeleteOrganizationMutation> {
       return requester<DeleteOrganizationMutation, DeleteOrganizationMutationVariables>(DeleteOrganizationDocument, variables, options) as Promise<DeleteOrganizationMutation>;
-    },
-    ListPackages(variables?: ListPackagesQueryVariables, options?: C): Promise<ListPackagesQuery> {
-      return requester<ListPackagesQuery, ListPackagesQueryVariables>(ListPackagesDocument, variables, options) as Promise<ListPackagesQuery>;
-    },
-    SyncPackage(variables: SyncPackageMutationVariables, options?: C): Promise<SyncPackageMutation> {
-      return requester<SyncPackageMutation, SyncPackageMutationVariables>(SyncPackageDocument, variables, options) as Promise<SyncPackageMutation>;
     },
     GetPersonalAccessToken(variables?: GetPersonalAccessTokenQueryVariables, options?: C): Promise<GetPersonalAccessTokenQuery> {
       return requester<GetPersonalAccessTokenQuery, GetPersonalAccessTokenQueryVariables>(GetPersonalAccessTokenDocument, variables, options) as Promise<GetPersonalAccessTokenQuery>;

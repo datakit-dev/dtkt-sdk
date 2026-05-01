@@ -1,0 +1,34 @@
+fragment DeploymentFragment on Deployment {
+  id
+  slug
+  state
+  visibility
+  organizationSlug
+  organizationID
+  integrationSlug
+  integrationID
+  revisionID
+  etag
+  env
+  ports
+  address {
+    network
+    target
+  }
+  createdAt
+  updatedAt
+}
+
+query ListDeployments(
+  $orderBy: DeploymentOrder
+  $where: DeploymentWhereInput
+) {
+  deployments(orderBy: $orderBy, where: $where) {
+    edges {
+      node {
+        ...DeploymentFragment
+      }
+    }
+    totalCount
+  }
+}

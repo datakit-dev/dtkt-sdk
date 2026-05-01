@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	expr "cel.dev/expr"
@@ -16,6 +17,7 @@ import (
 
 type varHandler struct {
 	flowControlMixin
+	suspendableMixin
 	id          string
 	inputs      map[string]<-chan *pubsub.Message
 	pubsub      executor.PubSub
@@ -33,8 +35,14 @@ func (h *varHandler) Run(ctx context.Context) error {
 
 	var evalCount uint64
 	for {
-		act := newActivationFromChannels(ctx, h.inputs, h.adapter)
+		act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.adapter, h.SuspendChan())
 		vars, err := act.Resolve()
+		if errors.Is(err, errOperatorSuspended) {
+			if !h.pauseUntilResume(ctx) {
+				return ctx.Err()
+			}
+			continue
+		}
 		if err != nil {
 			return fmt.Errorf("var %s resolve: %w", h.id, err)
 		}
@@ -104,8 +112,14 @@ func (h *varHandler) runWithTransforms(ctx context.Context) error {
 
 	g.Go(func() error {
 		for {
-			act := newActivationFromChannels(ctx, h.inputs, h.adapter)
+			act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.adapter, h.SuspendChan())
 			vars, err := act.Resolve()
+			if errors.Is(err, errOperatorSuspended) {
+				if !h.pauseUntilResume(ctx) {
+					return ctx.Err()
+				}
+				continue
+			}
 			if err != nil {
 				return fmt.Errorf("var %s resolve: %w", h.id, err)
 			}

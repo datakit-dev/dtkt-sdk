@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -21,6 +22,7 @@ import (
 // prompt channel; the response arrives via TryDeliver from the demux goroutine.
 type interactionHandler struct {
 	flowControlMixin
+	suspendableMixin
 	id          string
 	inputs      map[string]<-chan *pubsub.Message
 	pubsub      executor.PubSub
@@ -60,9 +62,17 @@ func (h *interactionHandler) Run(ctx context.Context) error {
 	}
 
 	for {
-		// Wait for upstream dependencies.
-		act := newActivationFromChannels(ctx, h.inputs, h.adapter)
+		// Pause point: between iterations only. An in-flight prompt
+		// completes naturally — we don't cancel a prompt the operator
+		// is already responding to.
+		act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.adapter, h.SuspendChan())
 		vars, err := act.Resolve()
+		if errors.Is(err, errOperatorSuspended) {
+			if !h.pauseUntilResume(ctx) {
+				return ctx.Err()
+			}
+			continue
+		}
 		if err != nil {
 			return fmt.Errorf("interaction %s resolve: %w", h.id, err)
 		}
@@ -139,8 +149,14 @@ func (h *interactionHandler) runWithTransforms(ctx context.Context) error {
 
 	g.Go(func() error {
 		for {
-			act := newActivationFromChannels(ctx, h.inputs, h.adapter)
+			act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.adapter, h.SuspendChan())
 			vars, err := act.Resolve()
+			if errors.Is(err, errOperatorSuspended) {
+				if !h.pauseUntilResume(ctx) {
+					return ctx.Err()
+				}
+				continue
+			}
 			if err != nil {
 				return fmt.Errorf("interaction %s resolve: %w", h.id, err)
 			}

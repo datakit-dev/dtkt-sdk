@@ -21,6 +21,7 @@ import (
 // bidiStreamHandler streams messages in both directions concurrently.
 type bidiStreamHandler struct {
 	flowControlMixin
+	suspendableMixin
 	id                   string
 	method               protoreflect.FullName
 	inputs               map[string]<-chan *pubsub.Message
@@ -75,16 +76,31 @@ func (h *bidiStreamHandler) Run(ctx context.Context) error {
 		defer stream.CloseSend() //nolint:errcheck
 		var iterCount int
 		for {
+			// Pause the SEND side only. Recv (the other goroutine, below)
+			// keeps reading from the stream — we cannot guarantee that
+			// closing/restarting a bidi stream is idempotent on the
+			// server side, so the connection stays open through suspend.
 			if h.throttle > 0 && iterCount > 0 {
 				select {
 				case <-ctx.Done():
 					return
+				case <-h.SuspendChan():
+					if !h.pauseUntilResume(ctx) {
+						return
+					}
+					continue
 				case <-time.After(h.throttle):
 				}
 			}
 
-			act := newActivationFromChannels(ctx, h.inputs, h.env.TypeAdapter())
+			act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan())
 			vars, err := act.Resolve()
+			if errors.Is(err, errOperatorSuspended) {
+				if !h.pauseUntilResume(ctx) {
+					return
+				}
+				continue
+			}
 			if err != nil || act.AnyEOF() {
 				return
 			}

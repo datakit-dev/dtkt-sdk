@@ -1,0 +1,26 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: suspend_resume_client_stream
+  description: |
+    Range generator -> client stream -> output. The client stream
+    'log.Collect' aggregates inputs and returns a count when the stream
+    closes. For per-node isolation tests we verify the stream connection
+    survives suspend cycles (no premature close, no recreation).
+  generators:
+    - id: seq
+      range:
+        start: 1
+        end: 1000000
+        rate:
+          count: 100
+          interval: "1s"
+  streams:
+    - id: collect
+      call:
+        connection: log
+        method: log.Collect
+        request: "= generators.seq.value"
+  outputs:
+    - id: result
+      value: "= streams.collect.value"

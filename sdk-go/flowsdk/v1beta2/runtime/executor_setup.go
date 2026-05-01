@@ -95,6 +95,18 @@ func (e *Executor) setupRunState(
 			}
 			genCancel()
 			parkCancel()
+			// Wake any handlers currently paused via the suspendable mixin
+			// so they can observe the input EOFs and exit cleanly. Without
+			// this a flow that was suspended at the moment Stop was called
+			// would never drain.
+			e.mu.Lock()
+			for id := range e.suspendedNodes {
+				if sh, ok := e.handlers[id].(selfSuspendable); ok {
+					sh.resume()
+				}
+				delete(e.suspendedNodes, id)
+			}
+			e.mu.Unlock()
 		})
 	}
 
@@ -264,6 +276,7 @@ func (e *Executor) buildInteractionHandlers(
 			transformPS: e.pubsub,
 			adapter:     celEnv.TypeAdapter(),
 		}
+		h.initSuspendable()
 		interactionHandlers[nodeID] = h
 	}
 	return interactionHandlers, nil

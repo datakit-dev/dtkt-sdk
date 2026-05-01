@@ -125,6 +125,7 @@ task test
 ```
 
 - If you add new features or fix bugs, please include or update relevant tests.
+- Test conventions are in [docs/testing.md](docs/testing.md) (project) and [../dtkt-dev/docs/go/testing.md](../dtkt-dev/docs/go/testing.md) (Go-wide).
 
 ## Pull Requests
 

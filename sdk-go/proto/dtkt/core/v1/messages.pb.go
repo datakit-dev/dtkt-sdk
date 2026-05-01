@@ -9379,7 +9379,12 @@ type ListAutomationsRequest struct {
 	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// Parent resource name: `organizations/{organization}` or `users/{user}`.
 	Parent *string `protobuf:"bytes,3,opt,name=parent,proto3,oneof" json:"parent,omitempty"`
-	// Filter expression.
+	// AIP-160 filter expression. Supported subset: `field op value` clauses
+	// joined by AND, where op is `=` (equality) or `:` (substring).
+	// Filterable fields: `name`, `flow`. Examples:
+	//
+	//	name:nightly
+	//	flow="users/foo/flows/etl"
 	Filter        *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -9485,7 +9490,12 @@ type ListAutomationsRequest_builder struct {
 	PageToken string
 	// Parent resource name: `organizations/{organization}` or `users/{user}`.
 	Parent *string
-	// Filter expression.
+	// AIP-160 filter expression. Supported subset: `field op value` clauses
+	// joined by AND, where op is `=` (equality) or `:` (substring).
+	// Filterable fields: `name`, `flow`. Examples:
+	//
+	//	name:nightly
+	//	flow="users/foo/flows/etl"
 	Filter *string
 }
 
@@ -10318,9 +10328,17 @@ type ListConnectionsRequest struct {
 	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Token for retrieving the next page.
 	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	// Parent resource name: `organizations/{organization}` or `users/{user}`.
+	// Parent resource name (the connection's URL hierarchy parent: an
+	// organization or user). Blank lists across all parents the caller has
+	// access to. Examples: "organizations/bar", "users/foo".
 	Parent *string `protobuf:"bytes,3,opt,name=parent,proto3,oneof" json:"parent,omitempty"`
-	// Filter expression.
+	// AIP-160 filter expression. Supported subset: `field op value`
+	// clauses joined by AND, where op is `=` (equality) or `:` (substring).
+	// Filterable fields: `name`, `deployment`, `integration`. Examples:
+	//
+	//	name:email
+	//	deployment="users/foo/deployments/email-default"
+	//	integration="users/foo/integrations/email" AND name:prod
 	Filter        *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -10424,9 +10442,17 @@ type ListConnectionsRequest_builder struct {
 	PageSize int32
 	// Token for retrieving the next page.
 	PageToken string
-	// Parent resource name: `organizations/{organization}` or `users/{user}`.
+	// Parent resource name (the connection's URL hierarchy parent: an
+	// organization or user). Blank lists across all parents the caller has
+	// access to. Examples: "organizations/bar", "users/foo".
 	Parent *string
-	// Filter expression.
+	// AIP-160 filter expression. Supported subset: `field op value`
+	// clauses joined by AND, where op is `=` (equality) or `:` (substring).
+	// Filterable fields: `name`, `deployment`, `integration`. Examples:
+	//
+	//	name:email
+	//	deployment="users/foo/deployments/email-default"
+	//	integration="users/foo/integrations/email" AND name:prod
 	Filter *string
 }
 
@@ -11618,9 +11644,15 @@ type ListDeploymentsRequest struct {
 	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Token for retrieving the next page.
 	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	// Parent resource name.
+	// Parent resource name (the deployment's URL hierarchy parent: an
+	// organization or user). Examples: "organizations/bar", "users/foo".
 	Parent *string `protobuf:"bytes,3,opt,name=parent,proto3,oneof" json:"parent,omitempty"`
-	// Filter expression.
+	// AIP-160 filter expression. Supported subset: `field op value` clauses
+	// joined by AND, where op is `=` (equality) or `:` (substring).
+	// Filterable fields: `name`, `integration`. Examples:
+	//
+	//	name:email
+	//	integration="users/foo/integrations/email"
 	Filter        *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -11724,9 +11756,15 @@ type ListDeploymentsRequest_builder struct {
 	PageSize int32
 	// Token for retrieving the next page.
 	PageToken string
-	// Parent resource name.
+	// Parent resource name (the deployment's URL hierarchy parent: an
+	// organization or user). Examples: "organizations/bar", "users/foo".
 	Parent *string
-	// Filter expression.
+	// AIP-160 filter expression. Supported subset: `field op value` clauses
+	// joined by AND, where op is `=` (equality) or `:` (substring).
+	// Filterable fields: `name`, `integration`. Examples:
+	//
+	//	name:email
+	//	integration="users/foo/integrations/email"
 	Filter *string
 }
 

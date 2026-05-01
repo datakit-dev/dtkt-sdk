@@ -1,12 +1,27 @@
+fragment AddressFragment on Address {
+  network
+  target
+}
+
 fragment ConnectionFragment on Connection {
   id
   slug
   name
   visibility
+  organizationSlug
+  organizationID
+  integrationSlug
+  deploymentSlug
+  deploymentID
+  configURI
+  customProtos
+  customGrpc
+  headers
+  address {
+    ...AddressFragment
+  }
   createdAt
   updatedAt
-  integrationID
-  organizationID
 }
 
 query GetConnection($connectionId: ID, $slug: String) {
@@ -32,11 +47,11 @@ query CheckConnection($id: ID, $slug: String) {
       type
       required
       success
-      error
+      message
     }
     configCheck {
       success
-      error
+      message
     }
   }
 }

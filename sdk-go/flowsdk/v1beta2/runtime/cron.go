@@ -60,6 +60,15 @@ func (h *cronHandler) Run(ctx context.Context) error {
 			}.Build())
 			select {
 			case <-ctx.Done():
+				// Publish EOF so downstream consumers don't hang waiting
+				// for a marker that would otherwise never come.
+				_ = publishNode(h.pubsub, h.topic, flowv1beta2.RunSnapshot_GeneratorNode_builder{
+					Id:        h.id,
+					Value:     newEOFValue(),
+					Done:      true,
+					EvalCount: uint64(h.count),
+					Phase:     flowv1beta2.RunSnapshot_PHASE_SUCCEEDED,
+				}.Build())
 				return nil
 			case <-h.resumeCh:
 				_ = publishStateEvent(h.pubsub, h.topic, flowv1beta2.RunSnapshot_GeneratorNode_builder{

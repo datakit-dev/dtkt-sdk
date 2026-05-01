@@ -13,6 +13,30 @@ import (
 	"github.com/google/uuid"
 )
 
+// AddressFragment includes the GraphQL fields of Address requested by the fragment AddressFragment.
+type AddressFragment struct {
+	Network string `json:"network"`
+	Target  string `json:"target"`
+}
+
+// GetNetwork returns AddressFragment.Network, and is useful for accessing the field via an interface.
+func (v *AddressFragment) GetNetwork() string { return v.Network }
+
+// GetTarget returns AddressFragment.Target, and is useful for accessing the field via an interface.
+func (v *AddressFragment) GetTarget() string { return v.Target }
+
+type AuthType string
+
+const (
+	AuthTypeNone  AuthType = "NONE"
+	AuthTypeOauth AuthType = "OAUTH"
+)
+
+var AllAuthType = []AuthType{
+	AuthTypeNone,
+	AuthTypeOauth,
+}
+
 // CatalogFragment includes the GraphQL fields of Catalog requested by the fragment CatalogFragment.
 type CatalogFragment struct {
 	Id             uuid.UUID  `json:"id"`
@@ -95,9 +119,9 @@ func (v *CatalogOrder) GetField() CatalogOrderField { return v.Field }
 type CatalogOrderField string
 
 const (
+	CatalogOrderFieldLabel        CatalogOrderField = "LABEL"
 	CatalogOrderFieldCreatedAt    CatalogOrderField = "CREATED_AT"
 	CatalogOrderFieldUpdatedAt    CatalogOrderField = "UPDATED_AT"
-	CatalogOrderFieldLabel        CatalogOrderField = "LABEL"
 	CatalogOrderFieldName         CatalogOrderField = "NAME"
 	CatalogOrderFieldAlias        CatalogOrderField = "ALIAS"
 	CatalogOrderFieldSourcesCount CatalogOrderField = "SOURCES_COUNT"
@@ -106,9 +130,9 @@ const (
 )
 
 var AllCatalogOrderField = []CatalogOrderField{
+	CatalogOrderFieldLabel,
 	CatalogOrderFieldCreatedAt,
 	CatalogOrderFieldUpdatedAt,
-	CatalogOrderFieldLabel,
 	CatalogOrderFieldName,
 	CatalogOrderFieldAlias,
 	CatalogOrderFieldSourcesCount,
@@ -131,24 +155,6 @@ type CatalogWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
-	// created_at field predicates
-	CreatedAt      *time.Time  `json:"createdAt"`
-	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
-	CreatedAtIn    []time.Time `json:"createdAtIn"`
-	CreatedAtNotIn []time.Time `json:"createdAtNotIn"`
-	CreatedAtGT    *time.Time  `json:"createdAtGT"`
-	CreatedAtGTE   *time.Time  `json:"createdAtGTE"`
-	CreatedAtLT    *time.Time  `json:"createdAtLT"`
-	CreatedAtLTE   *time.Time  `json:"createdAtLTE"`
-	// updated_at field predicates
-	UpdatedAt      *time.Time  `json:"updatedAt"`
-	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ"`
-	UpdatedAtIn    []time.Time `json:"updatedAtIn"`
-	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn"`
-	UpdatedAtGT    *time.Time  `json:"updatedAtGT"`
-	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
-	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
-	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
 	// label field predicates
 	Label             *string  `json:"label"`
 	LabelNEQ          *string  `json:"labelNEQ"`
@@ -198,6 +204,24 @@ type CatalogWhereInput struct {
 	SyncedAtLTE    *time.Time  `json:"syncedAtLTE"`
 	SyncedAtIsNil  *bool       `json:"syncedAtIsNil"`
 	SyncedAtNotNil *bool       `json:"syncedAtNotNil"`
+	// created_at field predicates
+	CreatedAt      *time.Time  `json:"createdAt"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
+	CreatedAtIn    []time.Time `json:"createdAtIn"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE"`
+	// updated_at field predicates
+	UpdatedAt      *time.Time  `json:"updatedAt"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
 	// deleted_at field predicates
 	DeletedAt       *time.Time  `json:"deletedAt"`
 	DeletedAtNEQ    *time.Time  `json:"deletedAtNEQ"`
@@ -330,54 +354,6 @@ func (v *CatalogWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 // GetIdLTE returns CatalogWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *CatalogWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
 
-// GetCreatedAt returns CatalogWhereInput.CreatedAt, and is useful for accessing the field via an interface.
-func (v *CatalogWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
-
-// GetCreatedAtNEQ returns CatalogWhereInput.CreatedAtNEQ, and is useful for accessing the field via an interface.
-func (v *CatalogWhereInput) GetCreatedAtNEQ() *time.Time { return v.CreatedAtNEQ }
-
-// GetCreatedAtIn returns CatalogWhereInput.CreatedAtIn, and is useful for accessing the field via an interface.
-func (v *CatalogWhereInput) GetCreatedAtIn() []time.Time { return v.CreatedAtIn }
-
-// GetCreatedAtNotIn returns CatalogWhereInput.CreatedAtNotIn, and is useful for accessing the field via an interface.
-func (v *CatalogWhereInput) GetCreatedAtNotIn() []time.Time { return v.CreatedAtNotIn }
-
-// GetCreatedAtGT returns CatalogWhereInput.CreatedAtGT, and is useful for accessing the field via an interface.
-func (v *CatalogWhereInput) GetCreatedAtGT() *time.Time { return v.CreatedAtGT }
-
-// GetCreatedAtGTE returns CatalogWhereInput.CreatedAtGTE, and is useful for accessing the field via an interface.
-func (v *CatalogWhereInput) GetCreatedAtGTE() *time.Time { return v.CreatedAtGTE }
-
-// GetCreatedAtLT returns CatalogWhereInput.CreatedAtLT, and is useful for accessing the field via an interface.
-func (v *CatalogWhereInput) GetCreatedAtLT() *time.Time { return v.CreatedAtLT }
-
-// GetCreatedAtLTE returns CatalogWhereInput.CreatedAtLTE, and is useful for accessing the field via an interface.
-func (v *CatalogWhereInput) GetCreatedAtLTE() *time.Time { return v.CreatedAtLTE }
-
-// GetUpdatedAt returns CatalogWhereInput.UpdatedAt, and is useful for accessing the field via an interface.
-func (v *CatalogWhereInput) GetUpdatedAt() *time.Time { return v.UpdatedAt }
-
-// GetUpdatedAtNEQ returns CatalogWhereInput.UpdatedAtNEQ, and is useful for accessing the field via an interface.
-func (v *CatalogWhereInput) GetUpdatedAtNEQ() *time.Time { return v.UpdatedAtNEQ }
-
-// GetUpdatedAtIn returns CatalogWhereInput.UpdatedAtIn, and is useful for accessing the field via an interface.
-func (v *CatalogWhereInput) GetUpdatedAtIn() []time.Time { return v.UpdatedAtIn }
-
-// GetUpdatedAtNotIn returns CatalogWhereInput.UpdatedAtNotIn, and is useful for accessing the field via an interface.
-func (v *CatalogWhereInput) GetUpdatedAtNotIn() []time.Time { return v.UpdatedAtNotIn }
-
-// GetUpdatedAtGT returns CatalogWhereInput.UpdatedAtGT, and is useful for accessing the field via an interface.
-func (v *CatalogWhereInput) GetUpdatedAtGT() *time.Time { return v.UpdatedAtGT }
-
-// GetUpdatedAtGTE returns CatalogWhereInput.UpdatedAtGTE, and is useful for accessing the field via an interface.
-func (v *CatalogWhereInput) GetUpdatedAtGTE() *time.Time { return v.UpdatedAtGTE }
-
-// GetUpdatedAtLT returns CatalogWhereInput.UpdatedAtLT, and is useful for accessing the field via an interface.
-func (v *CatalogWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
-
-// GetUpdatedAtLTE returns CatalogWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
-func (v *CatalogWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
-
 // GetLabel returns CatalogWhereInput.Label, and is useful for accessing the field via an interface.
 func (v *CatalogWhereInput) GetLabel() *string { return v.Label }
 
@@ -509,6 +485,54 @@ func (v *CatalogWhereInput) GetSyncedAtIsNil() *bool { return v.SyncedAtIsNil }
 
 // GetSyncedAtNotNil returns CatalogWhereInput.SyncedAtNotNil, and is useful for accessing the field via an interface.
 func (v *CatalogWhereInput) GetSyncedAtNotNil() *bool { return v.SyncedAtNotNil }
+
+// GetCreatedAt returns CatalogWhereInput.CreatedAt, and is useful for accessing the field via an interface.
+func (v *CatalogWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
+
+// GetCreatedAtNEQ returns CatalogWhereInput.CreatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *CatalogWhereInput) GetCreatedAtNEQ() *time.Time { return v.CreatedAtNEQ }
+
+// GetCreatedAtIn returns CatalogWhereInput.CreatedAtIn, and is useful for accessing the field via an interface.
+func (v *CatalogWhereInput) GetCreatedAtIn() []time.Time { return v.CreatedAtIn }
+
+// GetCreatedAtNotIn returns CatalogWhereInput.CreatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *CatalogWhereInput) GetCreatedAtNotIn() []time.Time { return v.CreatedAtNotIn }
+
+// GetCreatedAtGT returns CatalogWhereInput.CreatedAtGT, and is useful for accessing the field via an interface.
+func (v *CatalogWhereInput) GetCreatedAtGT() *time.Time { return v.CreatedAtGT }
+
+// GetCreatedAtGTE returns CatalogWhereInput.CreatedAtGTE, and is useful for accessing the field via an interface.
+func (v *CatalogWhereInput) GetCreatedAtGTE() *time.Time { return v.CreatedAtGTE }
+
+// GetCreatedAtLT returns CatalogWhereInput.CreatedAtLT, and is useful for accessing the field via an interface.
+func (v *CatalogWhereInput) GetCreatedAtLT() *time.Time { return v.CreatedAtLT }
+
+// GetCreatedAtLTE returns CatalogWhereInput.CreatedAtLTE, and is useful for accessing the field via an interface.
+func (v *CatalogWhereInput) GetCreatedAtLTE() *time.Time { return v.CreatedAtLTE }
+
+// GetUpdatedAt returns CatalogWhereInput.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *CatalogWhereInput) GetUpdatedAt() *time.Time { return v.UpdatedAt }
+
+// GetUpdatedAtNEQ returns CatalogWhereInput.UpdatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *CatalogWhereInput) GetUpdatedAtNEQ() *time.Time { return v.UpdatedAtNEQ }
+
+// GetUpdatedAtIn returns CatalogWhereInput.UpdatedAtIn, and is useful for accessing the field via an interface.
+func (v *CatalogWhereInput) GetUpdatedAtIn() []time.Time { return v.UpdatedAtIn }
+
+// GetUpdatedAtNotIn returns CatalogWhereInput.UpdatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *CatalogWhereInput) GetUpdatedAtNotIn() []time.Time { return v.UpdatedAtNotIn }
+
+// GetUpdatedAtGT returns CatalogWhereInput.UpdatedAtGT, and is useful for accessing the field via an interface.
+func (v *CatalogWhereInput) GetUpdatedAtGT() *time.Time { return v.UpdatedAtGT }
+
+// GetUpdatedAtGTE returns CatalogWhereInput.UpdatedAtGTE, and is useful for accessing the field via an interface.
+func (v *CatalogWhereInput) GetUpdatedAtGTE() *time.Time { return v.UpdatedAtGTE }
+
+// GetUpdatedAtLT returns CatalogWhereInput.UpdatedAtLT, and is useful for accessing the field via an interface.
+func (v *CatalogWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
+
+// GetUpdatedAtLTE returns CatalogWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
+func (v *CatalogWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
 
 // GetDeletedAt returns CatalogWhereInput.DeletedAt, and is useful for accessing the field via an interface.
 func (v *CatalogWhereInput) GetDeletedAt() *time.Time { return v.DeletedAt }
@@ -768,8 +792,8 @@ func (v *CatalogWhereInput) GetHasSchemasWith() []*SchemaRefWhereInput { return 
 
 // CheckConnectionCheckConnectionConnectionCheck includes the requested fields of the GraphQL type ConnectionCheck.
 type CheckConnectionCheckConnectionConnectionCheck struct {
-	AuthCheck   *CheckConnectionCheckConnectionConnectionCheckAuthCheck   `json:"authCheck"`
-	ConfigCheck *CheckConnectionCheckConnectionConnectionCheckConfigCheck `json:"configCheck"`
+	AuthCheck   *CheckConnectionCheckConnectionConnectionCheckAuthCheck                        `json:"authCheck"`
+	ConfigCheck *CheckConnectionCheckConnectionConnectionCheckConfigCheckConnectionConfigCheck `json:"configCheck"`
 }
 
 // GetAuthCheck returns CheckConnectionCheckConnectionConnectionCheck.AuthCheck, and is useful for accessing the field via an interface.
@@ -778,22 +802,20 @@ func (v *CheckConnectionCheckConnectionConnectionCheck) GetAuthCheck() *CheckCon
 }
 
 // GetConfigCheck returns CheckConnectionCheckConnectionConnectionCheck.ConfigCheck, and is useful for accessing the field via an interface.
-func (v *CheckConnectionCheckConnectionConnectionCheck) GetConfigCheck() *CheckConnectionCheckConnectionConnectionCheckConfigCheck {
+func (v *CheckConnectionCheckConnectionConnectionCheck) GetConfigCheck() *CheckConnectionCheckConnectionConnectionCheckConfigCheckConnectionConfigCheck {
 	return v.ConfigCheck
 }
 
 // CheckConnectionCheckConnectionConnectionCheckAuthCheck includes the requested fields of the GraphQL type AuthCheck.
 type CheckConnectionCheckConnectionConnectionCheckAuthCheck struct {
-	Type     ServiceAuthType `json:"type"`
-	Required bool            `json:"required"`
-	Success  bool            `json:"success"`
-	Error    *string         `json:"error"`
+	Type     AuthType `json:"type"`
+	Required bool     `json:"required"`
+	Success  bool     `json:"success"`
+	Message  *string  `json:"message"`
 }
 
 // GetType returns CheckConnectionCheckConnectionConnectionCheckAuthCheck.Type, and is useful for accessing the field via an interface.
-func (v *CheckConnectionCheckConnectionConnectionCheckAuthCheck) GetType() ServiceAuthType {
-	return v.Type
-}
+func (v *CheckConnectionCheckConnectionConnectionCheckAuthCheck) GetType() AuthType { return v.Type }
 
 // GetRequired returns CheckConnectionCheckConnectionConnectionCheckAuthCheck.Required, and is useful for accessing the field via an interface.
 func (v *CheckConnectionCheckConnectionConnectionCheckAuthCheck) GetRequired() bool {
@@ -803,22 +825,26 @@ func (v *CheckConnectionCheckConnectionConnectionCheckAuthCheck) GetRequired() b
 // GetSuccess returns CheckConnectionCheckConnectionConnectionCheckAuthCheck.Success, and is useful for accessing the field via an interface.
 func (v *CheckConnectionCheckConnectionConnectionCheckAuthCheck) GetSuccess() bool { return v.Success }
 
-// GetError returns CheckConnectionCheckConnectionConnectionCheckAuthCheck.Error, and is useful for accessing the field via an interface.
-func (v *CheckConnectionCheckConnectionConnectionCheckAuthCheck) GetError() *string { return v.Error }
-
-// CheckConnectionCheckConnectionConnectionCheckConfigCheck includes the requested fields of the GraphQL type ConfigCheck.
-type CheckConnectionCheckConnectionConnectionCheckConfigCheck struct {
-	Success bool    `json:"success"`
-	Error   *string `json:"error"`
+// GetMessage returns CheckConnectionCheckConnectionConnectionCheckAuthCheck.Message, and is useful for accessing the field via an interface.
+func (v *CheckConnectionCheckConnectionConnectionCheckAuthCheck) GetMessage() *string {
+	return v.Message
 }
 
-// GetSuccess returns CheckConnectionCheckConnectionConnectionCheckConfigCheck.Success, and is useful for accessing the field via an interface.
-func (v *CheckConnectionCheckConnectionConnectionCheckConfigCheck) GetSuccess() bool {
+// CheckConnectionCheckConnectionConnectionCheckConfigCheckConnectionConfigCheck includes the requested fields of the GraphQL type ConnectionConfigCheck.
+type CheckConnectionCheckConnectionConnectionCheckConfigCheckConnectionConfigCheck struct {
+	Success bool    `json:"success"`
+	Message *string `json:"message"`
+}
+
+// GetSuccess returns CheckConnectionCheckConnectionConnectionCheckConfigCheckConnectionConfigCheck.Success, and is useful for accessing the field via an interface.
+func (v *CheckConnectionCheckConnectionConnectionCheckConfigCheckConnectionConfigCheck) GetSuccess() bool {
 	return v.Success
 }
 
-// GetError returns CheckConnectionCheckConnectionConnectionCheckConfigCheck.Error, and is useful for accessing the field via an interface.
-func (v *CheckConnectionCheckConnectionConnectionCheckConfigCheck) GetError() *string { return v.Error }
+// GetMessage returns CheckConnectionCheckConnectionConnectionCheckConfigCheckConnectionConfigCheck.Message, and is useful for accessing the field via an interface.
+func (v *CheckConnectionCheckConnectionConnectionCheckConfigCheckConnectionConfigCheck) GetMessage() *string {
+	return v.Message
+}
 
 // CheckConnectionResponse is returned by CheckConnection on success.
 type CheckConnectionResponse struct {
@@ -954,18 +980,18 @@ func (v *ColumnRefOrder) GetField() ColumnRefOrderField { return v.Field }
 type ColumnRefOrderField string
 
 const (
-	ColumnRefOrderFieldName      ColumnRefOrderField = "NAME"
+	ColumnRefOrderFieldAlias     ColumnRefOrderField = "ALIAS"
 	ColumnRefOrderFieldCreatedAt ColumnRefOrderField = "CREATED_AT"
 	ColumnRefOrderFieldUpdatedAt ColumnRefOrderField = "UPDATED_AT"
-	ColumnRefOrderFieldAlias     ColumnRefOrderField = "ALIAS"
+	ColumnRefOrderFieldName      ColumnRefOrderField = "NAME"
 	ColumnRefOrderFieldOrdinal   ColumnRefOrderField = "ORDINAL"
 )
 
 var AllColumnRefOrderField = []ColumnRefOrderField{
-	ColumnRefOrderFieldName,
+	ColumnRefOrderFieldAlias,
 	ColumnRefOrderFieldCreatedAt,
 	ColumnRefOrderFieldUpdatedAt,
-	ColumnRefOrderFieldAlias,
+	ColumnRefOrderFieldName,
 	ColumnRefOrderFieldOrdinal,
 }
 
@@ -984,20 +1010,20 @@ type ColumnRefWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
-	// name field predicates
-	Name             *string  `json:"name"`
-	NameNEQ          *string  `json:"nameNEQ"`
-	NameIn           []string `json:"nameIn"`
-	NameNotIn        []string `json:"nameNotIn"`
-	NameGT           *string  `json:"nameGT"`
-	NameGTE          *string  `json:"nameGTE"`
-	NameLT           *string  `json:"nameLT"`
-	NameLTE          *string  `json:"nameLTE"`
-	NameContains     *string  `json:"nameContains"`
-	NameHasPrefix    *string  `json:"nameHasPrefix"`
-	NameHasSuffix    *string  `json:"nameHasSuffix"`
-	NameEqualFold    *string  `json:"nameEqualFold"`
-	NameContainsFold *string  `json:"nameContainsFold"`
+	// alias field predicates
+	Alias             *string  `json:"alias"`
+	AliasNEQ          *string  `json:"aliasNEQ"`
+	AliasIn           []string `json:"aliasIn"`
+	AliasNotIn        []string `json:"aliasNotIn"`
+	AliasGT           *string  `json:"aliasGT"`
+	AliasGTE          *string  `json:"aliasGTE"`
+	AliasLT           *string  `json:"aliasLT"`
+	AliasLTE          *string  `json:"aliasLTE"`
+	AliasContains     *string  `json:"aliasContains"`
+	AliasHasPrefix    *string  `json:"aliasHasPrefix"`
+	AliasHasSuffix    *string  `json:"aliasHasSuffix"`
+	AliasEqualFold    *string  `json:"aliasEqualFold"`
+	AliasContainsFold *string  `json:"aliasContainsFold"`
 	// created_at field predicates
 	CreatedAt      *time.Time  `json:"createdAt"`
 	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
@@ -1016,20 +1042,6 @@ type ColumnRefWhereInput struct {
 	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
 	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
-	// alias field predicates
-	Alias             *string  `json:"alias"`
-	AliasNEQ          *string  `json:"aliasNEQ"`
-	AliasIn           []string `json:"aliasIn"`
-	AliasNotIn        []string `json:"aliasNotIn"`
-	AliasGT           *string  `json:"aliasGT"`
-	AliasGTE          *string  `json:"aliasGTE"`
-	AliasLT           *string  `json:"aliasLT"`
-	AliasLTE          *string  `json:"aliasLTE"`
-	AliasContains     *string  `json:"aliasContains"`
-	AliasHasPrefix    *string  `json:"aliasHasPrefix"`
-	AliasHasSuffix    *string  `json:"aliasHasSuffix"`
-	AliasEqualFold    *string  `json:"aliasEqualFold"`
-	AliasContainsFold *string  `json:"aliasContainsFold"`
 	// deleted_at field predicates
 	DeletedAt       *time.Time  `json:"deletedAt"`
 	DeletedAtNEQ    *time.Time  `json:"deletedAtNEQ"`
@@ -1041,6 +1053,20 @@ type ColumnRefWhereInput struct {
 	DeletedAtLTE    *time.Time  `json:"deletedAtLTE"`
 	DeletedAtIsNil  *bool       `json:"deletedAtIsNil"`
 	DeletedAtNotNil *bool       `json:"deletedAtNotNil"`
+	// name field predicates
+	Name             *string  `json:"name"`
+	NameNEQ          *string  `json:"nameNEQ"`
+	NameIn           []string `json:"nameIn"`
+	NameNotIn        []string `json:"nameNotIn"`
+	NameGT           *string  `json:"nameGT"`
+	NameGTE          *string  `json:"nameGTE"`
+	NameLT           *string  `json:"nameLT"`
+	NameLTE          *string  `json:"nameLTE"`
+	NameContains     *string  `json:"nameContains"`
+	NameHasPrefix    *string  `json:"nameHasPrefix"`
+	NameHasSuffix    *string  `json:"nameHasSuffix"`
+	NameEqualFold    *string  `json:"nameEqualFold"`
+	NameContainsFold *string  `json:"nameContainsFold"`
 	// dtype field predicates
 	Dtype             *string  `json:"dtype"`
 	DtypeNEQ          *string  `json:"dtypeNEQ"`
@@ -1135,44 +1161,44 @@ func (v *ColumnRefWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 // GetIdLTE returns ColumnRefWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *ColumnRefWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
 
-// GetName returns ColumnRefWhereInput.Name, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetName() *string { return v.Name }
+// GetAlias returns ColumnRefWhereInput.Alias, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetAlias() *string { return v.Alias }
 
-// GetNameNEQ returns ColumnRefWhereInput.NameNEQ, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetNameNEQ() *string { return v.NameNEQ }
+// GetAliasNEQ returns ColumnRefWhereInput.AliasNEQ, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetAliasNEQ() *string { return v.AliasNEQ }
 
-// GetNameIn returns ColumnRefWhereInput.NameIn, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetNameIn() []string { return v.NameIn }
+// GetAliasIn returns ColumnRefWhereInput.AliasIn, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetAliasIn() []string { return v.AliasIn }
 
-// GetNameNotIn returns ColumnRefWhereInput.NameNotIn, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetNameNotIn() []string { return v.NameNotIn }
+// GetAliasNotIn returns ColumnRefWhereInput.AliasNotIn, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetAliasNotIn() []string { return v.AliasNotIn }
 
-// GetNameGT returns ColumnRefWhereInput.NameGT, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetNameGT() *string { return v.NameGT }
+// GetAliasGT returns ColumnRefWhereInput.AliasGT, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetAliasGT() *string { return v.AliasGT }
 
-// GetNameGTE returns ColumnRefWhereInput.NameGTE, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetNameGTE() *string { return v.NameGTE }
+// GetAliasGTE returns ColumnRefWhereInput.AliasGTE, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetAliasGTE() *string { return v.AliasGTE }
 
-// GetNameLT returns ColumnRefWhereInput.NameLT, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetNameLT() *string { return v.NameLT }
+// GetAliasLT returns ColumnRefWhereInput.AliasLT, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetAliasLT() *string { return v.AliasLT }
 
-// GetNameLTE returns ColumnRefWhereInput.NameLTE, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetNameLTE() *string { return v.NameLTE }
+// GetAliasLTE returns ColumnRefWhereInput.AliasLTE, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetAliasLTE() *string { return v.AliasLTE }
 
-// GetNameContains returns ColumnRefWhereInput.NameContains, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetNameContains() *string { return v.NameContains }
+// GetAliasContains returns ColumnRefWhereInput.AliasContains, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetAliasContains() *string { return v.AliasContains }
 
-// GetNameHasPrefix returns ColumnRefWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
+// GetAliasHasPrefix returns ColumnRefWhereInput.AliasHasPrefix, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetAliasHasPrefix() *string { return v.AliasHasPrefix }
 
-// GetNameHasSuffix returns ColumnRefWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
+// GetAliasHasSuffix returns ColumnRefWhereInput.AliasHasSuffix, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetAliasHasSuffix() *string { return v.AliasHasSuffix }
 
-// GetNameEqualFold returns ColumnRefWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
+// GetAliasEqualFold returns ColumnRefWhereInput.AliasEqualFold, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetAliasEqualFold() *string { return v.AliasEqualFold }
 
-// GetNameContainsFold returns ColumnRefWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
+// GetAliasContainsFold returns ColumnRefWhereInput.AliasContainsFold, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetAliasContainsFold() *string { return v.AliasContainsFold }
 
 // GetCreatedAt returns ColumnRefWhereInput.CreatedAt, and is useful for accessing the field via an interface.
 func (v *ColumnRefWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
@@ -1222,45 +1248,6 @@ func (v *ColumnRefWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT
 // GetUpdatedAtLTE returns ColumnRefWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
 func (v *ColumnRefWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
 
-// GetAlias returns ColumnRefWhereInput.Alias, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetAlias() *string { return v.Alias }
-
-// GetAliasNEQ returns ColumnRefWhereInput.AliasNEQ, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetAliasNEQ() *string { return v.AliasNEQ }
-
-// GetAliasIn returns ColumnRefWhereInput.AliasIn, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetAliasIn() []string { return v.AliasIn }
-
-// GetAliasNotIn returns ColumnRefWhereInput.AliasNotIn, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetAliasNotIn() []string { return v.AliasNotIn }
-
-// GetAliasGT returns ColumnRefWhereInput.AliasGT, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetAliasGT() *string { return v.AliasGT }
-
-// GetAliasGTE returns ColumnRefWhereInput.AliasGTE, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetAliasGTE() *string { return v.AliasGTE }
-
-// GetAliasLT returns ColumnRefWhereInput.AliasLT, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetAliasLT() *string { return v.AliasLT }
-
-// GetAliasLTE returns ColumnRefWhereInput.AliasLTE, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetAliasLTE() *string { return v.AliasLTE }
-
-// GetAliasContains returns ColumnRefWhereInput.AliasContains, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetAliasContains() *string { return v.AliasContains }
-
-// GetAliasHasPrefix returns ColumnRefWhereInput.AliasHasPrefix, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetAliasHasPrefix() *string { return v.AliasHasPrefix }
-
-// GetAliasHasSuffix returns ColumnRefWhereInput.AliasHasSuffix, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetAliasHasSuffix() *string { return v.AliasHasSuffix }
-
-// GetAliasEqualFold returns ColumnRefWhereInput.AliasEqualFold, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetAliasEqualFold() *string { return v.AliasEqualFold }
-
-// GetAliasContainsFold returns ColumnRefWhereInput.AliasContainsFold, and is useful for accessing the field via an interface.
-func (v *ColumnRefWhereInput) GetAliasContainsFold() *string { return v.AliasContainsFold }
-
 // GetDeletedAt returns ColumnRefWhereInput.DeletedAt, and is useful for accessing the field via an interface.
 func (v *ColumnRefWhereInput) GetDeletedAt() *time.Time { return v.DeletedAt }
 
@@ -1290,6 +1277,45 @@ func (v *ColumnRefWhereInput) GetDeletedAtIsNil() *bool { return v.DeletedAtIsNi
 
 // GetDeletedAtNotNil returns ColumnRefWhereInput.DeletedAtNotNil, and is useful for accessing the field via an interface.
 func (v *ColumnRefWhereInput) GetDeletedAtNotNil() *bool { return v.DeletedAtNotNil }
+
+// GetName returns ColumnRefWhereInput.Name, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetName() *string { return v.Name }
+
+// GetNameNEQ returns ColumnRefWhereInput.NameNEQ, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetNameNEQ() *string { return v.NameNEQ }
+
+// GetNameIn returns ColumnRefWhereInput.NameIn, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetNameIn() []string { return v.NameIn }
+
+// GetNameNotIn returns ColumnRefWhereInput.NameNotIn, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetNameNotIn() []string { return v.NameNotIn }
+
+// GetNameGT returns ColumnRefWhereInput.NameGT, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetNameGT() *string { return v.NameGT }
+
+// GetNameGTE returns ColumnRefWhereInput.NameGTE, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetNameGTE() *string { return v.NameGTE }
+
+// GetNameLT returns ColumnRefWhereInput.NameLT, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetNameLT() *string { return v.NameLT }
+
+// GetNameLTE returns ColumnRefWhereInput.NameLTE, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetNameLTE() *string { return v.NameLTE }
+
+// GetNameContains returns ColumnRefWhereInput.NameContains, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetNameContains() *string { return v.NameContains }
+
+// GetNameHasPrefix returns ColumnRefWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
+
+// GetNameHasSuffix returns ColumnRefWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
+
+// GetNameEqualFold returns ColumnRefWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
+
+// GetNameContainsFold returns ColumnRefWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
+func (v *ColumnRefWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
 
 // GetDtype returns ColumnRefWhereInput.Dtype, and is useful for accessing the field via an interface.
 func (v *ColumnRefWhereInput) GetDtype() *string { return v.Dtype }
@@ -1445,14 +1471,22 @@ func (v *ColumnRefWhereInput) GetHasSQLQueriesWith() []*SQLQueryWhereInput {
 
 // ConnectionFragment includes the GraphQL fields of Connection requested by the fragment ConnectionFragment.
 type ConnectionFragment struct {
-	Id             uuid.UUID  `json:"id"`
-	Slug           string     `json:"slug"`
-	Name           string     `json:"name"`
-	Visibility     Visibility `json:"visibility"`
-	CreatedAt      time.Time  `json:"createdAt"`
-	UpdatedAt      time.Time  `json:"updatedAt"`
-	IntegrationID  uuid.UUID  `json:"integrationID"`
-	OrganizationID uuid.UUID  `json:"organizationID"`
+	Id               uuid.UUID                  `json:"id"`
+	Slug             string                     `json:"slug"`
+	Name             string                     `json:"name"`
+	Visibility       Visibility                 `json:"visibility"`
+	OrganizationSlug string                     `json:"organizationSlug"`
+	OrganizationID   uuid.UUID                  `json:"organizationID"`
+	IntegrationSlug  *string                    `json:"integrationSlug"`
+	DeploymentSlug   *string                    `json:"deploymentSlug"`
+	DeploymentID     *uuid.UUID                 `json:"deploymentID"`
+	ConfigURI        *string                    `json:"configURI"`
+	CustomProtos     *string                    `json:"customProtos"`
+	CustomGrpc       *bool                      `json:"customGrpc"`
+	Headers          map[string]any             `json:"headers"`
+	Address          *ConnectionFragmentAddress `json:"address"`
+	CreatedAt        time.Time                  `json:"createdAt"`
+	UpdatedAt        time.Time                  `json:"updatedAt"`
 }
 
 // GetId returns ConnectionFragment.Id, and is useful for accessing the field via an interface.
@@ -1467,17 +1501,99 @@ func (v *ConnectionFragment) GetName() string { return v.Name }
 // GetVisibility returns ConnectionFragment.Visibility, and is useful for accessing the field via an interface.
 func (v *ConnectionFragment) GetVisibility() Visibility { return v.Visibility }
 
+// GetOrganizationSlug returns ConnectionFragment.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *ConnectionFragment) GetOrganizationSlug() string { return v.OrganizationSlug }
+
+// GetOrganizationID returns ConnectionFragment.OrganizationID, and is useful for accessing the field via an interface.
+func (v *ConnectionFragment) GetOrganizationID() uuid.UUID { return v.OrganizationID }
+
+// GetIntegrationSlug returns ConnectionFragment.IntegrationSlug, and is useful for accessing the field via an interface.
+func (v *ConnectionFragment) GetIntegrationSlug() *string { return v.IntegrationSlug }
+
+// GetDeploymentSlug returns ConnectionFragment.DeploymentSlug, and is useful for accessing the field via an interface.
+func (v *ConnectionFragment) GetDeploymentSlug() *string { return v.DeploymentSlug }
+
+// GetDeploymentID returns ConnectionFragment.DeploymentID, and is useful for accessing the field via an interface.
+func (v *ConnectionFragment) GetDeploymentID() *uuid.UUID { return v.DeploymentID }
+
+// GetConfigURI returns ConnectionFragment.ConfigURI, and is useful for accessing the field via an interface.
+func (v *ConnectionFragment) GetConfigURI() *string { return v.ConfigURI }
+
+// GetCustomProtos returns ConnectionFragment.CustomProtos, and is useful for accessing the field via an interface.
+func (v *ConnectionFragment) GetCustomProtos() *string { return v.CustomProtos }
+
+// GetCustomGrpc returns ConnectionFragment.CustomGrpc, and is useful for accessing the field via an interface.
+func (v *ConnectionFragment) GetCustomGrpc() *bool { return v.CustomGrpc }
+
+// GetHeaders returns ConnectionFragment.Headers, and is useful for accessing the field via an interface.
+func (v *ConnectionFragment) GetHeaders() map[string]any { return v.Headers }
+
+// GetAddress returns ConnectionFragment.Address, and is useful for accessing the field via an interface.
+func (v *ConnectionFragment) GetAddress() *ConnectionFragmentAddress { return v.Address }
+
 // GetCreatedAt returns ConnectionFragment.CreatedAt, and is useful for accessing the field via an interface.
 func (v *ConnectionFragment) GetCreatedAt() time.Time { return v.CreatedAt }
 
 // GetUpdatedAt returns ConnectionFragment.UpdatedAt, and is useful for accessing the field via an interface.
 func (v *ConnectionFragment) GetUpdatedAt() time.Time { return v.UpdatedAt }
 
-// GetIntegrationID returns ConnectionFragment.IntegrationID, and is useful for accessing the field via an interface.
-func (v *ConnectionFragment) GetIntegrationID() uuid.UUID { return v.IntegrationID }
+// ConnectionFragmentAddress includes the requested fields of the GraphQL type Address.
+type ConnectionFragmentAddress struct {
+	AddressFragment `json:"-"`
+}
 
-// GetOrganizationID returns ConnectionFragment.OrganizationID, and is useful for accessing the field via an interface.
-func (v *ConnectionFragment) GetOrganizationID() uuid.UUID { return v.OrganizationID }
+// GetNetwork returns ConnectionFragmentAddress.Network, and is useful for accessing the field via an interface.
+func (v *ConnectionFragmentAddress) GetNetwork() string { return v.AddressFragment.Network }
+
+// GetTarget returns ConnectionFragmentAddress.Target, and is useful for accessing the field via an interface.
+func (v *ConnectionFragmentAddress) GetTarget() string { return v.AddressFragment.Target }
+
+func (v *ConnectionFragmentAddress) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*ConnectionFragmentAddress
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.ConnectionFragmentAddress = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(
+		b, &v.AddressFragment)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type __premarshalConnectionFragmentAddress struct {
+	Network string `json:"network"`
+
+	Target string `json:"target"`
+}
+
+func (v *ConnectionFragmentAddress) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *ConnectionFragmentAddress) __premarshalJSON() (*__premarshalConnectionFragmentAddress, error) {
+	var retval __premarshalConnectionFragmentAddress
+
+	retval.Network = v.AddressFragment.Network
+	retval.Target = v.AddressFragment.Target
+	return &retval, nil
+}
 
 // Ordering options for Connection connections
 type ConnectionOrder struct {
@@ -1497,22 +1613,37 @@ func (v *ConnectionOrder) GetField() ConnectionOrderField { return v.Field }
 type ConnectionOrderField string
 
 const (
-	ConnectionOrderFieldName             ConnectionOrderField = "NAME"
 	ConnectionOrderFieldCreatedAt        ConnectionOrderField = "CREATED_AT"
 	ConnectionOrderFieldUpdatedAt        ConnectionOrderField = "UPDATED_AT"
+	ConnectionOrderFieldName             ConnectionOrderField = "NAME"
 	ConnectionOrderFieldCatalogsCount    ConnectionOrderField = "CATALOGS_COUNT"
 	ConnectionOrderFieldSourceTypesCount ConnectionOrderField = "SOURCE_TYPES_COUNT"
 	ConnectionOrderFieldSourcesCount     ConnectionOrderField = "SOURCES_COUNT"
 )
 
 var AllConnectionOrderField = []ConnectionOrderField{
-	ConnectionOrderFieldName,
 	ConnectionOrderFieldCreatedAt,
 	ConnectionOrderFieldUpdatedAt,
+	ConnectionOrderFieldName,
 	ConnectionOrderFieldCatalogsCount,
 	ConnectionOrderFieldSourceTypesCount,
 	ConnectionOrderFieldSourcesCount,
 }
+
+type ConnectionType struct {
+	DeploymentID *uuid.UUID `json:"deploymentID"`
+	CustomProtos *string    `json:"customProtos"`
+	CustomGRPC   *bool      `json:"customGRPC"`
+}
+
+// GetDeploymentID returns ConnectionType.DeploymentID, and is useful for accessing the field via an interface.
+func (v *ConnectionType) GetDeploymentID() *uuid.UUID { return v.DeploymentID }
+
+// GetCustomProtos returns ConnectionType.CustomProtos, and is useful for accessing the field via an interface.
+func (v *ConnectionType) GetCustomProtos() *string { return v.CustomProtos }
+
+// GetCustomGRPC returns ConnectionType.CustomGRPC, and is useful for accessing the field via an interface.
+func (v *ConnectionType) GetCustomGRPC() *bool { return v.CustomGRPC }
 
 // ConnectionUserWhereInput is used for filtering ConnectionUser objects.
 // Input was generated by ent.
@@ -1645,20 +1776,34 @@ type ConnectionWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
-	// name field predicates
-	Name             *string  `json:"name"`
-	NameNEQ          *string  `json:"nameNEQ"`
-	NameIn           []string `json:"nameIn"`
-	NameNotIn        []string `json:"nameNotIn"`
-	NameGT           *string  `json:"nameGT"`
-	NameGTE          *string  `json:"nameGTE"`
-	NameLT           *string  `json:"nameLT"`
-	NameLTE          *string  `json:"nameLTE"`
-	NameContains     *string  `json:"nameContains"`
-	NameHasPrefix    *string  `json:"nameHasPrefix"`
-	NameHasSuffix    *string  `json:"nameHasSuffix"`
-	NameEqualFold    *string  `json:"nameEqualFold"`
-	NameContainsFold *string  `json:"nameContainsFold"`
+	// organization_slug field predicates
+	OrganizationSlug             *string  `json:"organizationSlug"`
+	OrganizationSlugNEQ          *string  `json:"organizationSlugNEQ"`
+	OrganizationSlugIn           []string `json:"organizationSlugIn"`
+	OrganizationSlugNotIn        []string `json:"organizationSlugNotIn"`
+	OrganizationSlugGT           *string  `json:"organizationSlugGT"`
+	OrganizationSlugGTE          *string  `json:"organizationSlugGTE"`
+	OrganizationSlugLT           *string  `json:"organizationSlugLT"`
+	OrganizationSlugLTE          *string  `json:"organizationSlugLTE"`
+	OrganizationSlugContains     *string  `json:"organizationSlugContains"`
+	OrganizationSlugHasPrefix    *string  `json:"organizationSlugHasPrefix"`
+	OrganizationSlugHasSuffix    *string  `json:"organizationSlugHasSuffix"`
+	OrganizationSlugEqualFold    *string  `json:"organizationSlugEqualFold"`
+	OrganizationSlugContainsFold *string  `json:"organizationSlugContainsFold"`
+	// slug field predicates
+	Slug             *string  `json:"slug"`
+	SlugNEQ          *string  `json:"slugNEQ"`
+	SlugIn           []string `json:"slugIn"`
+	SlugNotIn        []string `json:"slugNotIn"`
+	SlugGT           *string  `json:"slugGT"`
+	SlugGTE          *string  `json:"slugGTE"`
+	SlugLT           *string  `json:"slugLT"`
+	SlugLTE          *string  `json:"slugLTE"`
+	SlugContains     *string  `json:"slugContains"`
+	SlugHasPrefix    *string  `json:"slugHasPrefix"`
+	SlugHasSuffix    *string  `json:"slugHasSuffix"`
+	SlugEqualFold    *string  `json:"slugEqualFold"`
+	SlugContainsFold *string  `json:"slugContainsFold"`
 	// created_at field predicates
 	CreatedAt      *time.Time  `json:"createdAt"`
 	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
@@ -1677,41 +1822,112 @@ type ConnectionWhereInput struct {
 	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
 	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
-	// slug field predicates
-	Slug             *string  `json:"slug"`
-	SlugNEQ          *string  `json:"slugNEQ"`
-	SlugIn           []string `json:"slugIn"`
-	SlugNotIn        []string `json:"slugNotIn"`
-	SlugGT           *string  `json:"slugGT"`
-	SlugGTE          *string  `json:"slugGTE"`
-	SlugLT           *string  `json:"slugLT"`
-	SlugLTE          *string  `json:"slugLTE"`
-	SlugContains     *string  `json:"slugContains"`
-	SlugHasPrefix    *string  `json:"slugHasPrefix"`
-	SlugHasSuffix    *string  `json:"slugHasSuffix"`
-	SlugEqualFold    *string  `json:"slugEqualFold"`
-	SlugContainsFold *string  `json:"slugContainsFold"`
+	// name field predicates
+	Name             *string  `json:"name"`
+	NameNEQ          *string  `json:"nameNEQ"`
+	NameIn           []string `json:"nameIn"`
+	NameNotIn        []string `json:"nameNotIn"`
+	NameGT           *string  `json:"nameGT"`
+	NameGTE          *string  `json:"nameGTE"`
+	NameLT           *string  `json:"nameLT"`
+	NameLTE          *string  `json:"nameLTE"`
+	NameContains     *string  `json:"nameContains"`
+	NameHasPrefix    *string  `json:"nameHasPrefix"`
+	NameHasSuffix    *string  `json:"nameHasSuffix"`
+	NameEqualFold    *string  `json:"nameEqualFold"`
+	NameContainsFold *string  `json:"nameContainsFold"`
+	// config_uri field predicates
+	ConfigURI             *string  `json:"configURI"`
+	ConfigURINEQ          *string  `json:"configURINEQ"`
+	ConfigURIIn           []string `json:"configURIIn"`
+	ConfigURINotIn        []string `json:"configURINotIn"`
+	ConfigURIGT           *string  `json:"configURIGT"`
+	ConfigURIGTE          *string  `json:"configURIGTE"`
+	ConfigURILT           *string  `json:"configURILT"`
+	ConfigURILTE          *string  `json:"configURILTE"`
+	ConfigURIContains     *string  `json:"configURIContains"`
+	ConfigURIHasPrefix    *string  `json:"configURIHasPrefix"`
+	ConfigURIHasSuffix    *string  `json:"configURIHasSuffix"`
+	ConfigURIIsNil        *bool    `json:"configURIIsNil"`
+	ConfigURINotNil       *bool    `json:"configURINotNil"`
+	ConfigURIEqualFold    *string  `json:"configURIEqualFold"`
+	ConfigURIContainsFold *string  `json:"configURIContainsFold"`
+	// custom_protos field predicates
+	CustomProtos             *string  `json:"customProtos"`
+	CustomProtosNEQ          *string  `json:"customProtosNEQ"`
+	CustomProtosIn           []string `json:"customProtosIn"`
+	CustomProtosNotIn        []string `json:"customProtosNotIn"`
+	CustomProtosGT           *string  `json:"customProtosGT"`
+	CustomProtosGTE          *string  `json:"customProtosGTE"`
+	CustomProtosLT           *string  `json:"customProtosLT"`
+	CustomProtosLTE          *string  `json:"customProtosLTE"`
+	CustomProtosContains     *string  `json:"customProtosContains"`
+	CustomProtosHasPrefix    *string  `json:"customProtosHasPrefix"`
+	CustomProtosHasSuffix    *string  `json:"customProtosHasSuffix"`
+	CustomProtosIsNil        *bool    `json:"customProtosIsNil"`
+	CustomProtosNotNil       *bool    `json:"customProtosNotNil"`
+	CustomProtosEqualFold    *string  `json:"customProtosEqualFold"`
+	CustomProtosContainsFold *string  `json:"customProtosContainsFold"`
+	// custom_grpc field predicates
+	CustomGrpc       *bool `json:"customGrpc"`
+	CustomGrpcNEQ    *bool `json:"customGrpcNEQ"`
+	CustomGrpcIsNil  *bool `json:"customGrpcIsNil"`
+	CustomGrpcNotNil *bool `json:"customGrpcNotNil"`
 	// visibility field predicates
 	Visibility      *Visibility  `json:"visibility"`
 	VisibilityNEQ   *Visibility  `json:"visibilityNEQ"`
 	VisibilityIn    []Visibility `json:"visibilityIn"`
 	VisibilityNotIn []Visibility `json:"visibilityNotIn"`
-	// integration_id field predicates
-	IntegrationID      *uuid.UUID  `json:"integrationID"`
-	IntegrationIDNEQ   *uuid.UUID  `json:"integrationIDNEQ"`
-	IntegrationIDIn    []uuid.UUID `json:"integrationIDIn"`
-	IntegrationIDNotIn []uuid.UUID `json:"integrationIDNotIn"`
+	// deployment_slug field predicates
+	DeploymentSlug             *string  `json:"deploymentSlug"`
+	DeploymentSlugNEQ          *string  `json:"deploymentSlugNEQ"`
+	DeploymentSlugIn           []string `json:"deploymentSlugIn"`
+	DeploymentSlugNotIn        []string `json:"deploymentSlugNotIn"`
+	DeploymentSlugGT           *string  `json:"deploymentSlugGT"`
+	DeploymentSlugGTE          *string  `json:"deploymentSlugGTE"`
+	DeploymentSlugLT           *string  `json:"deploymentSlugLT"`
+	DeploymentSlugLTE          *string  `json:"deploymentSlugLTE"`
+	DeploymentSlugContains     *string  `json:"deploymentSlugContains"`
+	DeploymentSlugHasPrefix    *string  `json:"deploymentSlugHasPrefix"`
+	DeploymentSlugHasSuffix    *string  `json:"deploymentSlugHasSuffix"`
+	DeploymentSlugIsNil        *bool    `json:"deploymentSlugIsNil"`
+	DeploymentSlugNotNil       *bool    `json:"deploymentSlugNotNil"`
+	DeploymentSlugEqualFold    *string  `json:"deploymentSlugEqualFold"`
+	DeploymentSlugContainsFold *string  `json:"deploymentSlugContainsFold"`
+	// integration_slug field predicates
+	IntegrationSlug             *string  `json:"integrationSlug"`
+	IntegrationSlugNEQ          *string  `json:"integrationSlugNEQ"`
+	IntegrationSlugIn           []string `json:"integrationSlugIn"`
+	IntegrationSlugNotIn        []string `json:"integrationSlugNotIn"`
+	IntegrationSlugGT           *string  `json:"integrationSlugGT"`
+	IntegrationSlugGTE          *string  `json:"integrationSlugGTE"`
+	IntegrationSlugLT           *string  `json:"integrationSlugLT"`
+	IntegrationSlugLTE          *string  `json:"integrationSlugLTE"`
+	IntegrationSlugContains     *string  `json:"integrationSlugContains"`
+	IntegrationSlugHasPrefix    *string  `json:"integrationSlugHasPrefix"`
+	IntegrationSlugHasSuffix    *string  `json:"integrationSlugHasSuffix"`
+	IntegrationSlugIsNil        *bool    `json:"integrationSlugIsNil"`
+	IntegrationSlugNotNil       *bool    `json:"integrationSlugNotNil"`
+	IntegrationSlugEqualFold    *string  `json:"integrationSlugEqualFold"`
+	IntegrationSlugContainsFold *string  `json:"integrationSlugContainsFold"`
+	// deployment_id field predicates
+	DeploymentID       *uuid.UUID  `json:"deploymentID"`
+	DeploymentIDNEQ    *uuid.UUID  `json:"deploymentIDNEQ"`
+	DeploymentIDIn     []uuid.UUID `json:"deploymentIDIn"`
+	DeploymentIDNotIn  []uuid.UUID `json:"deploymentIDNotIn"`
+	DeploymentIDIsNil  *bool       `json:"deploymentIDIsNil"`
+	DeploymentIDNotNil *bool       `json:"deploymentIDNotNil"`
 	// organization_id field predicates
 	OrganizationID      *uuid.UUID  `json:"organizationID"`
 	OrganizationIDNEQ   *uuid.UUID  `json:"organizationIDNEQ"`
 	OrganizationIDIn    []uuid.UUID `json:"organizationIDIn"`
 	OrganizationIDNotIn []uuid.UUID `json:"organizationIDNotIn"`
-	// integration edge predicates
-	HasIntegration     *bool                    `json:"hasIntegration"`
-	HasIntegrationWith []*IntegrationWhereInput `json:"hasIntegrationWith,omitempty"`
 	// owner edge predicates
 	HasOwner     *bool                     `json:"hasOwner"`
 	HasOwnerWith []*OrganizationWhereInput `json:"hasOwnerWith,omitempty"`
+	// deployment edge predicates
+	HasDeployment     *bool                   `json:"hasDeployment"`
+	HasDeploymentWith []*DeploymentWhereInput `json:"hasDeploymentWith,omitempty"`
 	// organizations edge predicates
 	HasOrganizations     *bool                     `json:"hasOrganizations"`
 	HasOrganizationsWith []*OrganizationWhereInput `json:"hasOrganizationsWith,omitempty"`
@@ -1762,44 +1978,93 @@ func (v *ConnectionWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 // GetIdLTE returns ConnectionWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *ConnectionWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
 
-// GetName returns ConnectionWhereInput.Name, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetName() *string { return v.Name }
+// GetOrganizationSlug returns ConnectionWhereInput.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetOrganizationSlug() *string { return v.OrganizationSlug }
 
-// GetNameNEQ returns ConnectionWhereInput.NameNEQ, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetNameNEQ() *string { return v.NameNEQ }
+// GetOrganizationSlugNEQ returns ConnectionWhereInput.OrganizationSlugNEQ, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetOrganizationSlugNEQ() *string { return v.OrganizationSlugNEQ }
 
-// GetNameIn returns ConnectionWhereInput.NameIn, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetNameIn() []string { return v.NameIn }
+// GetOrganizationSlugIn returns ConnectionWhereInput.OrganizationSlugIn, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetOrganizationSlugIn() []string { return v.OrganizationSlugIn }
 
-// GetNameNotIn returns ConnectionWhereInput.NameNotIn, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetNameNotIn() []string { return v.NameNotIn }
+// GetOrganizationSlugNotIn returns ConnectionWhereInput.OrganizationSlugNotIn, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetOrganizationSlugNotIn() []string { return v.OrganizationSlugNotIn }
 
-// GetNameGT returns ConnectionWhereInput.NameGT, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetNameGT() *string { return v.NameGT }
+// GetOrganizationSlugGT returns ConnectionWhereInput.OrganizationSlugGT, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetOrganizationSlugGT() *string { return v.OrganizationSlugGT }
 
-// GetNameGTE returns ConnectionWhereInput.NameGTE, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetNameGTE() *string { return v.NameGTE }
+// GetOrganizationSlugGTE returns ConnectionWhereInput.OrganizationSlugGTE, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetOrganizationSlugGTE() *string { return v.OrganizationSlugGTE }
 
-// GetNameLT returns ConnectionWhereInput.NameLT, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetNameLT() *string { return v.NameLT }
+// GetOrganizationSlugLT returns ConnectionWhereInput.OrganizationSlugLT, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetOrganizationSlugLT() *string { return v.OrganizationSlugLT }
 
-// GetNameLTE returns ConnectionWhereInput.NameLTE, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetNameLTE() *string { return v.NameLTE }
+// GetOrganizationSlugLTE returns ConnectionWhereInput.OrganizationSlugLTE, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetOrganizationSlugLTE() *string { return v.OrganizationSlugLTE }
 
-// GetNameContains returns ConnectionWhereInput.NameContains, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetNameContains() *string { return v.NameContains }
+// GetOrganizationSlugContains returns ConnectionWhereInput.OrganizationSlugContains, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetOrganizationSlugContains() *string {
+	return v.OrganizationSlugContains
+}
 
-// GetNameHasPrefix returns ConnectionWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
+// GetOrganizationSlugHasPrefix returns ConnectionWhereInput.OrganizationSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetOrganizationSlugHasPrefix() *string {
+	return v.OrganizationSlugHasPrefix
+}
 
-// GetNameHasSuffix returns ConnectionWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
+// GetOrganizationSlugHasSuffix returns ConnectionWhereInput.OrganizationSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetOrganizationSlugHasSuffix() *string {
+	return v.OrganizationSlugHasSuffix
+}
 
-// GetNameEqualFold returns ConnectionWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
+// GetOrganizationSlugEqualFold returns ConnectionWhereInput.OrganizationSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetOrganizationSlugEqualFold() *string {
+	return v.OrganizationSlugEqualFold
+}
 
-// GetNameContainsFold returns ConnectionWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
+// GetOrganizationSlugContainsFold returns ConnectionWhereInput.OrganizationSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetOrganizationSlugContainsFold() *string {
+	return v.OrganizationSlugContainsFold
+}
+
+// GetSlug returns ConnectionWhereInput.Slug, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetSlug() *string { return v.Slug }
+
+// GetSlugNEQ returns ConnectionWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
+
+// GetSlugIn returns ConnectionWhereInput.SlugIn, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetSlugIn() []string { return v.SlugIn }
+
+// GetSlugNotIn returns ConnectionWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
+
+// GetSlugGT returns ConnectionWhereInput.SlugGT, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetSlugGT() *string { return v.SlugGT }
+
+// GetSlugGTE returns ConnectionWhereInput.SlugGTE, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetSlugGTE() *string { return v.SlugGTE }
+
+// GetSlugLT returns ConnectionWhereInput.SlugLT, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetSlugLT() *string { return v.SlugLT }
+
+// GetSlugLTE returns ConnectionWhereInput.SlugLTE, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetSlugLTE() *string { return v.SlugLTE }
+
+// GetSlugContains returns ConnectionWhereInput.SlugContains, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetSlugContains() *string { return v.SlugContains }
+
+// GetSlugHasPrefix returns ConnectionWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
+
+// GetSlugHasSuffix returns ConnectionWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
+
+// GetSlugEqualFold returns ConnectionWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
+
+// GetSlugContainsFold returns ConnectionWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
 
 // GetCreatedAt returns ConnectionWhereInput.CreatedAt, and is useful for accessing the field via an interface.
 func (v *ConnectionWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
@@ -1849,44 +2114,148 @@ func (v *ConnectionWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtL
 // GetUpdatedAtLTE returns ConnectionWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
 func (v *ConnectionWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
 
-// GetSlug returns ConnectionWhereInput.Slug, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetSlug() *string { return v.Slug }
+// GetName returns ConnectionWhereInput.Name, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetName() *string { return v.Name }
 
-// GetSlugNEQ returns ConnectionWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
+// GetNameNEQ returns ConnectionWhereInput.NameNEQ, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetNameNEQ() *string { return v.NameNEQ }
 
-// GetSlugIn returns ConnectionWhereInput.SlugIn, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetSlugIn() []string { return v.SlugIn }
+// GetNameIn returns ConnectionWhereInput.NameIn, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetNameIn() []string { return v.NameIn }
 
-// GetSlugNotIn returns ConnectionWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
+// GetNameNotIn returns ConnectionWhereInput.NameNotIn, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetNameNotIn() []string { return v.NameNotIn }
 
-// GetSlugGT returns ConnectionWhereInput.SlugGT, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetSlugGT() *string { return v.SlugGT }
+// GetNameGT returns ConnectionWhereInput.NameGT, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetNameGT() *string { return v.NameGT }
 
-// GetSlugGTE returns ConnectionWhereInput.SlugGTE, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetSlugGTE() *string { return v.SlugGTE }
+// GetNameGTE returns ConnectionWhereInput.NameGTE, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetNameGTE() *string { return v.NameGTE }
 
-// GetSlugLT returns ConnectionWhereInput.SlugLT, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetSlugLT() *string { return v.SlugLT }
+// GetNameLT returns ConnectionWhereInput.NameLT, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetNameLT() *string { return v.NameLT }
 
-// GetSlugLTE returns ConnectionWhereInput.SlugLTE, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetSlugLTE() *string { return v.SlugLTE }
+// GetNameLTE returns ConnectionWhereInput.NameLTE, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetNameLTE() *string { return v.NameLTE }
 
-// GetSlugContains returns ConnectionWhereInput.SlugContains, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetSlugContains() *string { return v.SlugContains }
+// GetNameContains returns ConnectionWhereInput.NameContains, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetNameContains() *string { return v.NameContains }
 
-// GetSlugHasPrefix returns ConnectionWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
+// GetNameHasPrefix returns ConnectionWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
 
-// GetSlugHasSuffix returns ConnectionWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
+// GetNameHasSuffix returns ConnectionWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
 
-// GetSlugEqualFold returns ConnectionWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
+// GetNameEqualFold returns ConnectionWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
 
-// GetSlugContainsFold returns ConnectionWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
+// GetNameContainsFold returns ConnectionWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
+
+// GetConfigURI returns ConnectionWhereInput.ConfigURI, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetConfigURI() *string { return v.ConfigURI }
+
+// GetConfigURINEQ returns ConnectionWhereInput.ConfigURINEQ, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetConfigURINEQ() *string { return v.ConfigURINEQ }
+
+// GetConfigURIIn returns ConnectionWhereInput.ConfigURIIn, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetConfigURIIn() []string { return v.ConfigURIIn }
+
+// GetConfigURINotIn returns ConnectionWhereInput.ConfigURINotIn, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetConfigURINotIn() []string { return v.ConfigURINotIn }
+
+// GetConfigURIGT returns ConnectionWhereInput.ConfigURIGT, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetConfigURIGT() *string { return v.ConfigURIGT }
+
+// GetConfigURIGTE returns ConnectionWhereInput.ConfigURIGTE, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetConfigURIGTE() *string { return v.ConfigURIGTE }
+
+// GetConfigURILT returns ConnectionWhereInput.ConfigURILT, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetConfigURILT() *string { return v.ConfigURILT }
+
+// GetConfigURILTE returns ConnectionWhereInput.ConfigURILTE, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetConfigURILTE() *string { return v.ConfigURILTE }
+
+// GetConfigURIContains returns ConnectionWhereInput.ConfigURIContains, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetConfigURIContains() *string { return v.ConfigURIContains }
+
+// GetConfigURIHasPrefix returns ConnectionWhereInput.ConfigURIHasPrefix, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetConfigURIHasPrefix() *string { return v.ConfigURIHasPrefix }
+
+// GetConfigURIHasSuffix returns ConnectionWhereInput.ConfigURIHasSuffix, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetConfigURIHasSuffix() *string { return v.ConfigURIHasSuffix }
+
+// GetConfigURIIsNil returns ConnectionWhereInput.ConfigURIIsNil, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetConfigURIIsNil() *bool { return v.ConfigURIIsNil }
+
+// GetConfigURINotNil returns ConnectionWhereInput.ConfigURINotNil, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetConfigURINotNil() *bool { return v.ConfigURINotNil }
+
+// GetConfigURIEqualFold returns ConnectionWhereInput.ConfigURIEqualFold, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetConfigURIEqualFold() *string { return v.ConfigURIEqualFold }
+
+// GetConfigURIContainsFold returns ConnectionWhereInput.ConfigURIContainsFold, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetConfigURIContainsFold() *string { return v.ConfigURIContainsFold }
+
+// GetCustomProtos returns ConnectionWhereInput.CustomProtos, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomProtos() *string { return v.CustomProtos }
+
+// GetCustomProtosNEQ returns ConnectionWhereInput.CustomProtosNEQ, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomProtosNEQ() *string { return v.CustomProtosNEQ }
+
+// GetCustomProtosIn returns ConnectionWhereInput.CustomProtosIn, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomProtosIn() []string { return v.CustomProtosIn }
+
+// GetCustomProtosNotIn returns ConnectionWhereInput.CustomProtosNotIn, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomProtosNotIn() []string { return v.CustomProtosNotIn }
+
+// GetCustomProtosGT returns ConnectionWhereInput.CustomProtosGT, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomProtosGT() *string { return v.CustomProtosGT }
+
+// GetCustomProtosGTE returns ConnectionWhereInput.CustomProtosGTE, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomProtosGTE() *string { return v.CustomProtosGTE }
+
+// GetCustomProtosLT returns ConnectionWhereInput.CustomProtosLT, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomProtosLT() *string { return v.CustomProtosLT }
+
+// GetCustomProtosLTE returns ConnectionWhereInput.CustomProtosLTE, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomProtosLTE() *string { return v.CustomProtosLTE }
+
+// GetCustomProtosContains returns ConnectionWhereInput.CustomProtosContains, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomProtosContains() *string { return v.CustomProtosContains }
+
+// GetCustomProtosHasPrefix returns ConnectionWhereInput.CustomProtosHasPrefix, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomProtosHasPrefix() *string { return v.CustomProtosHasPrefix }
+
+// GetCustomProtosHasSuffix returns ConnectionWhereInput.CustomProtosHasSuffix, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomProtosHasSuffix() *string { return v.CustomProtosHasSuffix }
+
+// GetCustomProtosIsNil returns ConnectionWhereInput.CustomProtosIsNil, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomProtosIsNil() *bool { return v.CustomProtosIsNil }
+
+// GetCustomProtosNotNil returns ConnectionWhereInput.CustomProtosNotNil, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomProtosNotNil() *bool { return v.CustomProtosNotNil }
+
+// GetCustomProtosEqualFold returns ConnectionWhereInput.CustomProtosEqualFold, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomProtosEqualFold() *string { return v.CustomProtosEqualFold }
+
+// GetCustomProtosContainsFold returns ConnectionWhereInput.CustomProtosContainsFold, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomProtosContainsFold() *string {
+	return v.CustomProtosContainsFold
+}
+
+// GetCustomGrpc returns ConnectionWhereInput.CustomGrpc, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomGrpc() *bool { return v.CustomGrpc }
+
+// GetCustomGrpcNEQ returns ConnectionWhereInput.CustomGrpcNEQ, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomGrpcNEQ() *bool { return v.CustomGrpcNEQ }
+
+// GetCustomGrpcIsNil returns ConnectionWhereInput.CustomGrpcIsNil, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomGrpcIsNil() *bool { return v.CustomGrpcIsNil }
+
+// GetCustomGrpcNotNil returns ConnectionWhereInput.CustomGrpcNotNil, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetCustomGrpcNotNil() *bool { return v.CustomGrpcNotNil }
 
 // GetVisibility returns ConnectionWhereInput.Visibility, and is useful for accessing the field via an interface.
 func (v *ConnectionWhereInput) GetVisibility() *Visibility { return v.Visibility }
@@ -1900,17 +2269,123 @@ func (v *ConnectionWhereInput) GetVisibilityIn() []Visibility { return v.Visibil
 // GetVisibilityNotIn returns ConnectionWhereInput.VisibilityNotIn, and is useful for accessing the field via an interface.
 func (v *ConnectionWhereInput) GetVisibilityNotIn() []Visibility { return v.VisibilityNotIn }
 
-// GetIntegrationID returns ConnectionWhereInput.IntegrationID, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetIntegrationID() *uuid.UUID { return v.IntegrationID }
+// GetDeploymentSlug returns ConnectionWhereInput.DeploymentSlug, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentSlug() *string { return v.DeploymentSlug }
 
-// GetIntegrationIDNEQ returns ConnectionWhereInput.IntegrationIDNEQ, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetIntegrationIDNEQ() *uuid.UUID { return v.IntegrationIDNEQ }
+// GetDeploymentSlugNEQ returns ConnectionWhereInput.DeploymentSlugNEQ, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentSlugNEQ() *string { return v.DeploymentSlugNEQ }
 
-// GetIntegrationIDIn returns ConnectionWhereInput.IntegrationIDIn, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetIntegrationIDIn() []uuid.UUID { return v.IntegrationIDIn }
+// GetDeploymentSlugIn returns ConnectionWhereInput.DeploymentSlugIn, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentSlugIn() []string { return v.DeploymentSlugIn }
 
-// GetIntegrationIDNotIn returns ConnectionWhereInput.IntegrationIDNotIn, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetIntegrationIDNotIn() []uuid.UUID { return v.IntegrationIDNotIn }
+// GetDeploymentSlugNotIn returns ConnectionWhereInput.DeploymentSlugNotIn, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentSlugNotIn() []string { return v.DeploymentSlugNotIn }
+
+// GetDeploymentSlugGT returns ConnectionWhereInput.DeploymentSlugGT, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentSlugGT() *string { return v.DeploymentSlugGT }
+
+// GetDeploymentSlugGTE returns ConnectionWhereInput.DeploymentSlugGTE, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentSlugGTE() *string { return v.DeploymentSlugGTE }
+
+// GetDeploymentSlugLT returns ConnectionWhereInput.DeploymentSlugLT, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentSlugLT() *string { return v.DeploymentSlugLT }
+
+// GetDeploymentSlugLTE returns ConnectionWhereInput.DeploymentSlugLTE, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentSlugLTE() *string { return v.DeploymentSlugLTE }
+
+// GetDeploymentSlugContains returns ConnectionWhereInput.DeploymentSlugContains, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentSlugContains() *string { return v.DeploymentSlugContains }
+
+// GetDeploymentSlugHasPrefix returns ConnectionWhereInput.DeploymentSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentSlugHasPrefix() *string { return v.DeploymentSlugHasPrefix }
+
+// GetDeploymentSlugHasSuffix returns ConnectionWhereInput.DeploymentSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentSlugHasSuffix() *string { return v.DeploymentSlugHasSuffix }
+
+// GetDeploymentSlugIsNil returns ConnectionWhereInput.DeploymentSlugIsNil, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentSlugIsNil() *bool { return v.DeploymentSlugIsNil }
+
+// GetDeploymentSlugNotNil returns ConnectionWhereInput.DeploymentSlugNotNil, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentSlugNotNil() *bool { return v.DeploymentSlugNotNil }
+
+// GetDeploymentSlugEqualFold returns ConnectionWhereInput.DeploymentSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentSlugEqualFold() *string { return v.DeploymentSlugEqualFold }
+
+// GetDeploymentSlugContainsFold returns ConnectionWhereInput.DeploymentSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentSlugContainsFold() *string {
+	return v.DeploymentSlugContainsFold
+}
+
+// GetIntegrationSlug returns ConnectionWhereInput.IntegrationSlug, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetIntegrationSlug() *string { return v.IntegrationSlug }
+
+// GetIntegrationSlugNEQ returns ConnectionWhereInput.IntegrationSlugNEQ, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetIntegrationSlugNEQ() *string { return v.IntegrationSlugNEQ }
+
+// GetIntegrationSlugIn returns ConnectionWhereInput.IntegrationSlugIn, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetIntegrationSlugIn() []string { return v.IntegrationSlugIn }
+
+// GetIntegrationSlugNotIn returns ConnectionWhereInput.IntegrationSlugNotIn, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetIntegrationSlugNotIn() []string { return v.IntegrationSlugNotIn }
+
+// GetIntegrationSlugGT returns ConnectionWhereInput.IntegrationSlugGT, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetIntegrationSlugGT() *string { return v.IntegrationSlugGT }
+
+// GetIntegrationSlugGTE returns ConnectionWhereInput.IntegrationSlugGTE, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetIntegrationSlugGTE() *string { return v.IntegrationSlugGTE }
+
+// GetIntegrationSlugLT returns ConnectionWhereInput.IntegrationSlugLT, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetIntegrationSlugLT() *string { return v.IntegrationSlugLT }
+
+// GetIntegrationSlugLTE returns ConnectionWhereInput.IntegrationSlugLTE, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetIntegrationSlugLTE() *string { return v.IntegrationSlugLTE }
+
+// GetIntegrationSlugContains returns ConnectionWhereInput.IntegrationSlugContains, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetIntegrationSlugContains() *string { return v.IntegrationSlugContains }
+
+// GetIntegrationSlugHasPrefix returns ConnectionWhereInput.IntegrationSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetIntegrationSlugHasPrefix() *string {
+	return v.IntegrationSlugHasPrefix
+}
+
+// GetIntegrationSlugHasSuffix returns ConnectionWhereInput.IntegrationSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetIntegrationSlugHasSuffix() *string {
+	return v.IntegrationSlugHasSuffix
+}
+
+// GetIntegrationSlugIsNil returns ConnectionWhereInput.IntegrationSlugIsNil, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetIntegrationSlugIsNil() *bool { return v.IntegrationSlugIsNil }
+
+// GetIntegrationSlugNotNil returns ConnectionWhereInput.IntegrationSlugNotNil, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetIntegrationSlugNotNil() *bool { return v.IntegrationSlugNotNil }
+
+// GetIntegrationSlugEqualFold returns ConnectionWhereInput.IntegrationSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetIntegrationSlugEqualFold() *string {
+	return v.IntegrationSlugEqualFold
+}
+
+// GetIntegrationSlugContainsFold returns ConnectionWhereInput.IntegrationSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetIntegrationSlugContainsFold() *string {
+	return v.IntegrationSlugContainsFold
+}
+
+// GetDeploymentID returns ConnectionWhereInput.DeploymentID, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentID() *uuid.UUID { return v.DeploymentID }
+
+// GetDeploymentIDNEQ returns ConnectionWhereInput.DeploymentIDNEQ, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentIDNEQ() *uuid.UUID { return v.DeploymentIDNEQ }
+
+// GetDeploymentIDIn returns ConnectionWhereInput.DeploymentIDIn, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentIDIn() []uuid.UUID { return v.DeploymentIDIn }
+
+// GetDeploymentIDNotIn returns ConnectionWhereInput.DeploymentIDNotIn, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentIDNotIn() []uuid.UUID { return v.DeploymentIDNotIn }
+
+// GetDeploymentIDIsNil returns ConnectionWhereInput.DeploymentIDIsNil, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentIDIsNil() *bool { return v.DeploymentIDIsNil }
+
+// GetDeploymentIDNotNil returns ConnectionWhereInput.DeploymentIDNotNil, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetDeploymentIDNotNil() *bool { return v.DeploymentIDNotNil }
 
 // GetOrganizationID returns ConnectionWhereInput.OrganizationID, and is useful for accessing the field via an interface.
 func (v *ConnectionWhereInput) GetOrganizationID() *uuid.UUID { return v.OrganizationID }
@@ -1924,19 +2399,19 @@ func (v *ConnectionWhereInput) GetOrganizationIDIn() []uuid.UUID { return v.Orga
 // GetOrganizationIDNotIn returns ConnectionWhereInput.OrganizationIDNotIn, and is useful for accessing the field via an interface.
 func (v *ConnectionWhereInput) GetOrganizationIDNotIn() []uuid.UUID { return v.OrganizationIDNotIn }
 
-// GetHasIntegration returns ConnectionWhereInput.HasIntegration, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetHasIntegration() *bool { return v.HasIntegration }
-
-// GetHasIntegrationWith returns ConnectionWhereInput.HasIntegrationWith, and is useful for accessing the field via an interface.
-func (v *ConnectionWhereInput) GetHasIntegrationWith() []*IntegrationWhereInput {
-	return v.HasIntegrationWith
-}
-
 // GetHasOwner returns ConnectionWhereInput.HasOwner, and is useful for accessing the field via an interface.
 func (v *ConnectionWhereInput) GetHasOwner() *bool { return v.HasOwner }
 
 // GetHasOwnerWith returns ConnectionWhereInput.HasOwnerWith, and is useful for accessing the field via an interface.
 func (v *ConnectionWhereInput) GetHasOwnerWith() []*OrganizationWhereInput { return v.HasOwnerWith }
+
+// GetHasDeployment returns ConnectionWhereInput.HasDeployment, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetHasDeployment() *bool { return v.HasDeployment }
+
+// GetHasDeploymentWith returns ConnectionWhereInput.HasDeploymentWith, and is useful for accessing the field via an interface.
+func (v *ConnectionWhereInput) GetHasDeploymentWith() []*DeploymentWhereInput {
+	return v.HasDeploymentWith
+}
 
 // GetHasOrganizations returns ConnectionWhereInput.HasOrganizations, and is useful for accessing the field via an interface.
 func (v *ConnectionWhereInput) GetHasOrganizations() *bool { return v.HasOrganizations }
@@ -2460,6 +2935,56 @@ func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) GetVisibil
 	return v.ConnectionFragment.Visibility
 }
 
+// GetOrganizationSlug returns CreateConnectionCreateConnectionConnectionCreatedConnection.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) GetOrganizationSlug() string {
+	return v.ConnectionFragment.OrganizationSlug
+}
+
+// GetOrganizationID returns CreateConnectionCreateConnectionConnectionCreatedConnection.OrganizationID, and is useful for accessing the field via an interface.
+func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) GetOrganizationID() uuid.UUID {
+	return v.ConnectionFragment.OrganizationID
+}
+
+// GetIntegrationSlug returns CreateConnectionCreateConnectionConnectionCreatedConnection.IntegrationSlug, and is useful for accessing the field via an interface.
+func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) GetIntegrationSlug() *string {
+	return v.ConnectionFragment.IntegrationSlug
+}
+
+// GetDeploymentSlug returns CreateConnectionCreateConnectionConnectionCreatedConnection.DeploymentSlug, and is useful for accessing the field via an interface.
+func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) GetDeploymentSlug() *string {
+	return v.ConnectionFragment.DeploymentSlug
+}
+
+// GetDeploymentID returns CreateConnectionCreateConnectionConnectionCreatedConnection.DeploymentID, and is useful for accessing the field via an interface.
+func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) GetDeploymentID() *uuid.UUID {
+	return v.ConnectionFragment.DeploymentID
+}
+
+// GetConfigURI returns CreateConnectionCreateConnectionConnectionCreatedConnection.ConfigURI, and is useful for accessing the field via an interface.
+func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) GetConfigURI() *string {
+	return v.ConnectionFragment.ConfigURI
+}
+
+// GetCustomProtos returns CreateConnectionCreateConnectionConnectionCreatedConnection.CustomProtos, and is useful for accessing the field via an interface.
+func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) GetCustomProtos() *string {
+	return v.ConnectionFragment.CustomProtos
+}
+
+// GetCustomGrpc returns CreateConnectionCreateConnectionConnectionCreatedConnection.CustomGrpc, and is useful for accessing the field via an interface.
+func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) GetCustomGrpc() *bool {
+	return v.ConnectionFragment.CustomGrpc
+}
+
+// GetHeaders returns CreateConnectionCreateConnectionConnectionCreatedConnection.Headers, and is useful for accessing the field via an interface.
+func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) GetHeaders() map[string]any {
+	return v.ConnectionFragment.Headers
+}
+
+// GetAddress returns CreateConnectionCreateConnectionConnectionCreatedConnection.Address, and is useful for accessing the field via an interface.
+func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) GetAddress() *ConnectionFragmentAddress {
+	return v.ConnectionFragment.Address
+}
+
 // GetCreatedAt returns CreateConnectionCreateConnectionConnectionCreatedConnection.CreatedAt, and is useful for accessing the field via an interface.
 func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) GetCreatedAt() time.Time {
 	return v.ConnectionFragment.CreatedAt
@@ -2468,16 +2993,6 @@ func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) GetCreated
 // GetUpdatedAt returns CreateConnectionCreateConnectionConnectionCreatedConnection.UpdatedAt, and is useful for accessing the field via an interface.
 func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) GetUpdatedAt() time.Time {
 	return v.ConnectionFragment.UpdatedAt
-}
-
-// GetIntegrationID returns CreateConnectionCreateConnectionConnectionCreatedConnection.IntegrationID, and is useful for accessing the field via an interface.
-func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) GetIntegrationID() uuid.UUID {
-	return v.ConnectionFragment.IntegrationID
-}
-
-// GetOrganizationID returns CreateConnectionCreateConnectionConnectionCreatedConnection.OrganizationID, and is useful for accessing the field via an interface.
-func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) GetOrganizationID() uuid.UUID {
-	return v.ConnectionFragment.OrganizationID
 }
 
 func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) UnmarshalJSON(b []byte) error {
@@ -2514,13 +3029,29 @@ type __premarshalCreateConnectionCreateConnectionConnectionCreatedConnection str
 
 	Visibility Visibility `json:"visibility"`
 
+	OrganizationSlug string `json:"organizationSlug"`
+
+	OrganizationID uuid.UUID `json:"organizationID"`
+
+	IntegrationSlug *string `json:"integrationSlug"`
+
+	DeploymentSlug *string `json:"deploymentSlug"`
+
+	DeploymentID *uuid.UUID `json:"deploymentID"`
+
+	ConfigURI *string `json:"configURI"`
+
+	CustomProtos *string `json:"customProtos"`
+
+	CustomGrpc *bool `json:"customGrpc"`
+
+	Headers map[string]any `json:"headers"`
+
+	Address *ConnectionFragmentAddress `json:"address"`
+
 	CreatedAt time.Time `json:"createdAt"`
 
 	UpdatedAt time.Time `json:"updatedAt"`
-
-	IntegrationID uuid.UUID `json:"integrationID"`
-
-	OrganizationID uuid.UUID `json:"organizationID"`
 }
 
 func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) MarshalJSON() ([]byte, error) {
@@ -2538,34 +3069,47 @@ func (v *CreateConnectionCreateConnectionConnectionCreatedConnection) __premarsh
 	retval.Slug = v.ConnectionFragment.Slug
 	retval.Name = v.ConnectionFragment.Name
 	retval.Visibility = v.ConnectionFragment.Visibility
+	retval.OrganizationSlug = v.ConnectionFragment.OrganizationSlug
+	retval.OrganizationID = v.ConnectionFragment.OrganizationID
+	retval.IntegrationSlug = v.ConnectionFragment.IntegrationSlug
+	retval.DeploymentSlug = v.ConnectionFragment.DeploymentSlug
+	retval.DeploymentID = v.ConnectionFragment.DeploymentID
+	retval.ConfigURI = v.ConnectionFragment.ConfigURI
+	retval.CustomProtos = v.ConnectionFragment.CustomProtos
+	retval.CustomGrpc = v.ConnectionFragment.CustomGrpc
+	retval.Headers = v.ConnectionFragment.Headers
+	retval.Address = v.ConnectionFragment.Address
 	retval.CreatedAt = v.ConnectionFragment.CreatedAt
 	retval.UpdatedAt = v.ConnectionFragment.UpdatedAt
-	retval.IntegrationID = v.ConnectionFragment.IntegrationID
-	retval.OrganizationID = v.ConnectionFragment.OrganizationID
 	return &retval, nil
 }
 
 // CreateConnectionInput is used to create Connection object.
 type CreateConnectionInput struct {
-	// name is the name of the Connection. Optional: if not provided, integration name will be used.
-	Name          *string     `json:"name"`
-	Config        any         `json:"config"`
-	Visibility    *Visibility `json:"visibility"`
-	IntegrationID uuid.UUID   `json:"integrationID"`
-	OwnerID       uuid.UUID   `json:"ownerID"`
+	// Name of the Connection. Optional: if not provided, integration name will be used.
+	Name *string `json:"name"`
+	// Address of gRPC server. Required when type is customProtos or customGRPC.
+	Address    *string         `json:"address"`
+	Type       *ConnectionType `json:"type,omitempty"`
+	Config     any             `json:"config"`
+	Visibility *Visibility     `json:"visibility"`
+	OwnerID    uuid.UUID       `json:"ownerID"`
 }
 
 // GetName returns CreateConnectionInput.Name, and is useful for accessing the field via an interface.
 func (v *CreateConnectionInput) GetName() *string { return v.Name }
+
+// GetAddress returns CreateConnectionInput.Address, and is useful for accessing the field via an interface.
+func (v *CreateConnectionInput) GetAddress() *string { return v.Address }
+
+// GetType returns CreateConnectionInput.Type, and is useful for accessing the field via an interface.
+func (v *CreateConnectionInput) GetType() *ConnectionType { return v.Type }
 
 // GetConfig returns CreateConnectionInput.Config, and is useful for accessing the field via an interface.
 func (v *CreateConnectionInput) GetConfig() any { return v.Config }
 
 // GetVisibility returns CreateConnectionInput.Visibility, and is useful for accessing the field via an interface.
 func (v *CreateConnectionInput) GetVisibility() *Visibility { return v.Visibility }
-
-// GetIntegrationID returns CreateConnectionInput.IntegrationID, and is useful for accessing the field via an interface.
-func (v *CreateConnectionInput) GetIntegrationID() uuid.UUID { return v.IntegrationID }
 
 // GetOwnerID returns CreateConnectionInput.OwnerID, and is useful for accessing the field via an interface.
 func (v *CreateConnectionInput) GetOwnerID() uuid.UUID { return v.OwnerID }
@@ -2887,13 +3431,21 @@ func (v *CreateEventSourceCreateEventSourceEventSourceCreatedEventSource) __prem
 // CreateEventSourceInput is used for create EventSource object.
 // Input was generated by ent.
 type CreateEventSourceInput struct {
-	Name     string              `json:"name"`
-	Strategy EventSourceStrategy `json:"strategy"`
-	Config   string              `json:"config"`
+	OrganizationSlug string              `json:"organizationSlug"`
+	ConnectionSlug   string              `json:"connectionSlug"`
+	Name             string              `json:"name"`
+	Strategy         EventSourceStrategy `json:"strategy"`
+	Config           string              `json:"config"`
 	// Pull frequency in string format, e.g.: "1s", "2.3h" or "4h35m"
 	PullFreq     *string   `json:"pullFreq"`
 	ConnectionID uuid.UUID `json:"connectionID"`
 }
+
+// GetOrganizationSlug returns CreateEventSourceInput.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *CreateEventSourceInput) GetOrganizationSlug() string { return v.OrganizationSlug }
+
+// GetConnectionSlug returns CreateEventSourceInput.ConnectionSlug, and is useful for accessing the field via an interface.
+func (v *CreateEventSourceInput) GetConnectionSlug() string { return v.ConnectionSlug }
 
 // GetName returns CreateEventSourceInput.Name, and is useful for accessing the field via an interface.
 func (v *CreateEventSourceInput) GetName() string { return v.Name }
@@ -3370,237 +3922,6 @@ type CreateFlowRunResponse struct {
 // GetCreateFlowRun returns CreateFlowRunResponse.CreateFlowRun, and is useful for accessing the field via an interface.
 func (v *CreateFlowRunResponse) GetCreateFlowRun() *CreateFlowRunCreateFlowRunFlowRunCreated {
 	return v.CreateFlowRun
-}
-
-// CreateIntegrationCreateIntegrationIntegrationCreated includes the requested fields of the GraphQL type IntegrationCreated.
-type CreateIntegrationCreateIntegrationIntegrationCreated struct {
-	Created     bool                                                             `json:"created"`
-	Error       *string                                                          `json:"error"`
-	Integration *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration `json:"integration"`
-}
-
-// GetCreated returns CreateIntegrationCreateIntegrationIntegrationCreated.Created, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreated) GetCreated() bool { return v.Created }
-
-// GetError returns CreateIntegrationCreateIntegrationIntegrationCreated.Error, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreated) GetError() *string { return v.Error }
-
-// GetIntegration returns CreateIntegrationCreateIntegrationIntegrationCreated.Integration, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreated) GetIntegration() *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration {
-	return v.Integration
-}
-
-// CreateIntegrationCreateIntegrationIntegrationCreatedIntegration includes the requested fields of the GraphQL type Integration.
-type CreateIntegrationCreateIntegrationIntegrationCreatedIntegration struct {
-	IntegrationFragment `json:"-"`
-}
-
-// GetId returns CreateIntegrationCreateIntegrationIntegrationCreatedIntegration.Id, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) GetId() uuid.UUID {
-	return v.IntegrationFragment.Id
-}
-
-// GetSlug returns CreateIntegrationCreateIntegrationIntegrationCreatedIntegration.Slug, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) GetSlug() string {
-	return v.IntegrationFragment.Slug
-}
-
-// GetName returns CreateIntegrationCreateIntegrationIntegrationCreatedIntegration.Name, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) GetName() string {
-	return v.IntegrationFragment.Name
-}
-
-// GetApiVersion returns CreateIntegrationCreateIntegrationIntegrationCreatedIntegration.ApiVersion, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) GetApiVersion() string {
-	return v.IntegrationFragment.ApiVersion
-}
-
-// GetVersion returns CreateIntegrationCreateIntegrationIntegrationCreatedIntegration.Version, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) GetVersion() string {
-	return v.IntegrationFragment.Version
-}
-
-// GetDescription returns CreateIntegrationCreateIntegrationIntegrationCreatedIntegration.Description, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) GetDescription() string {
-	return v.IntegrationFragment.Description
-}
-
-// GetIcon returns CreateIntegrationCreateIntegrationIntegrationCreatedIntegration.Icon, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) GetIcon() string {
-	return v.IntegrationFragment.Icon
-}
-
-// GetServiceNames returns CreateIntegrationCreateIntegrationIntegrationCreatedIntegration.ServiceNames, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) GetServiceNames() []string {
-	return v.IntegrationFragment.ServiceNames
-}
-
-// GetConfigSchema returns CreateIntegrationCreateIntegrationIntegrationCreatedIntegration.ConfigSchema, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) GetConfigSchema() *string {
-	return v.IntegrationFragment.ConfigSchema
-}
-
-// GetServerConfig returns CreateIntegrationCreateIntegrationIntegrationCreatedIntegration.ServerConfig, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) GetServerConfig() *string {
-	return v.IntegrationFragment.ServerConfig
-}
-
-// GetPublished returns CreateIntegrationCreateIntegrationIntegrationCreatedIntegration.Published, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) GetPublished() *IntegrationFragmentPublishedIntegrationPackage {
-	return v.IntegrationFragment.Published
-}
-
-// GetOrganizationID returns CreateIntegrationCreateIntegrationIntegrationCreatedIntegration.OrganizationID, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) GetOrganizationID() uuid.UUID {
-	return v.IntegrationFragment.OrganizationID
-}
-
-// GetCreatedAt returns CreateIntegrationCreateIntegrationIntegrationCreatedIntegration.CreatedAt, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) GetCreatedAt() time.Time {
-	return v.IntegrationFragment.CreatedAt
-}
-
-// GetUpdatedAt returns CreateIntegrationCreateIntegrationIntegrationCreatedIntegration.UpdatedAt, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) GetUpdatedAt() time.Time {
-	return v.IntegrationFragment.UpdatedAt
-}
-
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) UnmarshalJSON(b []byte) error {
-
-	if string(b) == "null" {
-		return nil
-	}
-
-	var firstPass struct {
-		*CreateIntegrationCreateIntegrationIntegrationCreatedIntegration
-		graphql.NoUnmarshalJSON
-	}
-	firstPass.CreateIntegrationCreateIntegrationIntegrationCreatedIntegration = v
-
-	err := json.Unmarshal(b, &firstPass)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(
-		b, &v.IntegrationFragment)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-type __premarshalCreateIntegrationCreateIntegrationIntegrationCreatedIntegration struct {
-	Id uuid.UUID `json:"id"`
-
-	Slug string `json:"slug"`
-
-	Name string `json:"name"`
-
-	ApiVersion string `json:"apiVersion"`
-
-	Version string `json:"version"`
-
-	Description string `json:"description"`
-
-	Icon string `json:"icon"`
-
-	ServiceNames []string `json:"serviceNames"`
-
-	ConfigSchema *string `json:"configSchema"`
-
-	ServerConfig *string `json:"serverConfig"`
-
-	Published *IntegrationFragmentPublishedIntegrationPackage `json:"published"`
-
-	OrganizationID uuid.UUID `json:"organizationID"`
-
-	CreatedAt time.Time `json:"createdAt"`
-
-	UpdatedAt time.Time `json:"updatedAt"`
-}
-
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) MarshalJSON() ([]byte, error) {
-	premarshaled, err := v.__premarshalJSON()
-	if err != nil {
-		return nil, err
-	}
-	return json.Marshal(premarshaled)
-}
-
-func (v *CreateIntegrationCreateIntegrationIntegrationCreatedIntegration) __premarshalJSON() (*__premarshalCreateIntegrationCreateIntegrationIntegrationCreatedIntegration, error) {
-	var retval __premarshalCreateIntegrationCreateIntegrationIntegrationCreatedIntegration
-
-	retval.Id = v.IntegrationFragment.Id
-	retval.Slug = v.IntegrationFragment.Slug
-	retval.Name = v.IntegrationFragment.Name
-	retval.ApiVersion = v.IntegrationFragment.ApiVersion
-	retval.Version = v.IntegrationFragment.Version
-	retval.Description = v.IntegrationFragment.Description
-	retval.Icon = v.IntegrationFragment.Icon
-	retval.ServiceNames = v.IntegrationFragment.ServiceNames
-	retval.ConfigSchema = v.IntegrationFragment.ConfigSchema
-	retval.ServerConfig = v.IntegrationFragment.ServerConfig
-	retval.Published = v.IntegrationFragment.Published
-	retval.OrganizationID = v.IntegrationFragment.OrganizationID
-	retval.CreatedAt = v.IntegrationFragment.CreatedAt
-	retval.UpdatedAt = v.IntegrationFragment.UpdatedAt
-	return &retval, nil
-}
-
-// CreateIntegrationInput is used for create Integration object.
-// Input was generated by ent.
-type CreateIntegrationInput struct {
-	ApiVersion     string    `json:"apiVersion"`
-	Name           string    `json:"name"`
-	Version        string    `json:"version"`
-	Icon           string    `json:"icon"`
-	Description    string    `json:"description"`
-	Network        string    `json:"network"`
-	Address        string    `json:"address"`
-	ServiceNames   []string  `json:"serviceNames"`
-	ConfigSchema   *string   `json:"configSchema"`
-	OrganizationID uuid.UUID `json:"organizationID"`
-}
-
-// GetApiVersion returns CreateIntegrationInput.ApiVersion, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationInput) GetApiVersion() string { return v.ApiVersion }
-
-// GetName returns CreateIntegrationInput.Name, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationInput) GetName() string { return v.Name }
-
-// GetVersion returns CreateIntegrationInput.Version, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationInput) GetVersion() string { return v.Version }
-
-// GetIcon returns CreateIntegrationInput.Icon, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationInput) GetIcon() string { return v.Icon }
-
-// GetDescription returns CreateIntegrationInput.Description, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationInput) GetDescription() string { return v.Description }
-
-// GetNetwork returns CreateIntegrationInput.Network, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationInput) GetNetwork() string { return v.Network }
-
-// GetAddress returns CreateIntegrationInput.Address, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationInput) GetAddress() string { return v.Address }
-
-// GetServiceNames returns CreateIntegrationInput.ServiceNames, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationInput) GetServiceNames() []string { return v.ServiceNames }
-
-// GetConfigSchema returns CreateIntegrationInput.ConfigSchema, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationInput) GetConfigSchema() *string { return v.ConfigSchema }
-
-// GetOrganizationID returns CreateIntegrationInput.OrganizationID, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationInput) GetOrganizationID() uuid.UUID { return v.OrganizationID }
-
-// CreateIntegrationResponse is returned by CreateIntegration on success.
-type CreateIntegrationResponse struct {
-	CreateIntegration *CreateIntegrationCreateIntegrationIntegrationCreated `json:"createIntegration"`
-}
-
-// GetCreateIntegration returns CreateIntegrationResponse.CreateIntegration, and is useful for accessing the field via an interface.
-func (v *CreateIntegrationResponse) GetCreateIntegration() *CreateIntegrationCreateIntegrationIntegrationCreated {
-	return v.CreateIntegration
 }
 
 // CreateModelCreateModelModelCreated includes the requested fields of the GraphQL type ModelCreated.
@@ -4235,17 +4556,17 @@ func (v *CreateSchemaCreateSchemaSchemaRefCreatedSchemaRef) __premarshalJSON() (
 // CreateSchemaRefInput is used for create SchemaRef object.
 // Input was generated by ent.
 type CreateSchemaRefInput struct {
-	Name        string    `json:"name"`
 	AutoSync    *bool     `json:"autoSync"`
+	Name        string    `json:"name"`
 	Description *string   `json:"description"`
 	CatalogID   uuid.UUID `json:"catalogID"`
 }
 
-// GetName returns CreateSchemaRefInput.Name, and is useful for accessing the field via an interface.
-func (v *CreateSchemaRefInput) GetName() string { return v.Name }
-
 // GetAutoSync returns CreateSchemaRefInput.AutoSync, and is useful for accessing the field via an interface.
 func (v *CreateSchemaRefInput) GetAutoSync() *bool { return v.AutoSync }
+
+// GetName returns CreateSchemaRefInput.Name, and is useful for accessing the field via an interface.
+func (v *CreateSchemaRefInput) GetName() string { return v.Name }
 
 // GetDescription returns CreateSchemaRefInput.Description, and is useful for accessing the field via an interface.
 func (v *CreateSchemaRefInput) GetDescription() *string { return v.Description }
@@ -4620,20 +4941,24 @@ func (v *CreateSpaceCreateSpaceSpaceCreatedSpace) __premarshalJSON() (*__premars
 // CreateSpaceInput is used for create Space object.
 // Input was generated by ent.
 type CreateSpaceInput struct {
-	Name string `json:"name"`
+	OrganizationSlug string `json:"organizationSlug"`
 	// Timezone name (e.g. America/Los_Angeles)
 	TzName     *string     `json:"tzName"`
+	Name       string      `json:"name"`
 	CatalogIDs []uuid.UUID `json:"catalogIDs"`
 	GeoMapIDs  []uuid.UUID `json:"geoMapIDs"`
 	FlowIDs    []uuid.UUID `json:"flowIDs"`
 	FlowRunIDs []uuid.UUID `json:"flowRunIDs"`
 }
 
-// GetName returns CreateSpaceInput.Name, and is useful for accessing the field via an interface.
-func (v *CreateSpaceInput) GetName() string { return v.Name }
+// GetOrganizationSlug returns CreateSpaceInput.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *CreateSpaceInput) GetOrganizationSlug() string { return v.OrganizationSlug }
 
 // GetTzName returns CreateSpaceInput.TzName, and is useful for accessing the field via an interface.
 func (v *CreateSpaceInput) GetTzName() *string { return v.TzName }
+
+// GetName returns CreateSpaceInput.Name, and is useful for accessing the field via an interface.
+func (v *CreateSpaceInput) GetName() string { return v.Name }
 
 // GetCatalogIDs returns CreateSpaceInput.CatalogIDs, and is useful for accessing the field via an interface.
 func (v *CreateSpaceInput) GetCatalogIDs() []uuid.UUID { return v.CatalogIDs }
@@ -5200,6 +5525,598 @@ func (v *DeleteTableResponse) GetDeleteTable() *DeleteTableDeleteTableTableRefDe
 	return v.DeleteTable
 }
 
+// DeploymentFragment includes the GraphQL fields of Deployment requested by the fragment DeploymentFragment.
+type DeploymentFragment struct {
+	Id               uuid.UUID                  `json:"id"`
+	Slug             string                     `json:"slug"`
+	State            DeploymentState            `json:"state"`
+	Visibility       Visibility                 `json:"visibility"`
+	OrganizationSlug string                     `json:"organizationSlug"`
+	OrganizationID   uuid.UUID                  `json:"organizationID"`
+	IntegrationSlug  string                     `json:"integrationSlug"`
+	IntegrationID    uuid.UUID                  `json:"integrationID"`
+	RevisionID       uuid.UUID                  `json:"revisionID"`
+	Etag             string                     `json:"etag"`
+	Env              map[string]any             `json:"env"`
+	Ports            map[string]any             `json:"ports"`
+	Address          *DeploymentFragmentAddress `json:"address"`
+	CreatedAt        time.Time                  `json:"createdAt"`
+	UpdatedAt        time.Time                  `json:"updatedAt"`
+}
+
+// GetId returns DeploymentFragment.Id, and is useful for accessing the field via an interface.
+func (v *DeploymentFragment) GetId() uuid.UUID { return v.Id }
+
+// GetSlug returns DeploymentFragment.Slug, and is useful for accessing the field via an interface.
+func (v *DeploymentFragment) GetSlug() string { return v.Slug }
+
+// GetState returns DeploymentFragment.State, and is useful for accessing the field via an interface.
+func (v *DeploymentFragment) GetState() DeploymentState { return v.State }
+
+// GetVisibility returns DeploymentFragment.Visibility, and is useful for accessing the field via an interface.
+func (v *DeploymentFragment) GetVisibility() Visibility { return v.Visibility }
+
+// GetOrganizationSlug returns DeploymentFragment.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *DeploymentFragment) GetOrganizationSlug() string { return v.OrganizationSlug }
+
+// GetOrganizationID returns DeploymentFragment.OrganizationID, and is useful for accessing the field via an interface.
+func (v *DeploymentFragment) GetOrganizationID() uuid.UUID { return v.OrganizationID }
+
+// GetIntegrationSlug returns DeploymentFragment.IntegrationSlug, and is useful for accessing the field via an interface.
+func (v *DeploymentFragment) GetIntegrationSlug() string { return v.IntegrationSlug }
+
+// GetIntegrationID returns DeploymentFragment.IntegrationID, and is useful for accessing the field via an interface.
+func (v *DeploymentFragment) GetIntegrationID() uuid.UUID { return v.IntegrationID }
+
+// GetRevisionID returns DeploymentFragment.RevisionID, and is useful for accessing the field via an interface.
+func (v *DeploymentFragment) GetRevisionID() uuid.UUID { return v.RevisionID }
+
+// GetEtag returns DeploymentFragment.Etag, and is useful for accessing the field via an interface.
+func (v *DeploymentFragment) GetEtag() string { return v.Etag }
+
+// GetEnv returns DeploymentFragment.Env, and is useful for accessing the field via an interface.
+func (v *DeploymentFragment) GetEnv() map[string]any { return v.Env }
+
+// GetPorts returns DeploymentFragment.Ports, and is useful for accessing the field via an interface.
+func (v *DeploymentFragment) GetPorts() map[string]any { return v.Ports }
+
+// GetAddress returns DeploymentFragment.Address, and is useful for accessing the field via an interface.
+func (v *DeploymentFragment) GetAddress() *DeploymentFragmentAddress { return v.Address }
+
+// GetCreatedAt returns DeploymentFragment.CreatedAt, and is useful for accessing the field via an interface.
+func (v *DeploymentFragment) GetCreatedAt() time.Time { return v.CreatedAt }
+
+// GetUpdatedAt returns DeploymentFragment.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *DeploymentFragment) GetUpdatedAt() time.Time { return v.UpdatedAt }
+
+// DeploymentFragmentAddress includes the requested fields of the GraphQL type Address.
+type DeploymentFragmentAddress struct {
+	Network string `json:"network"`
+	Target  string `json:"target"`
+}
+
+// GetNetwork returns DeploymentFragmentAddress.Network, and is useful for accessing the field via an interface.
+func (v *DeploymentFragmentAddress) GetNetwork() string { return v.Network }
+
+// GetTarget returns DeploymentFragmentAddress.Target, and is useful for accessing the field via an interface.
+func (v *DeploymentFragmentAddress) GetTarget() string { return v.Target }
+
+// Ordering options for Deployment connections
+type DeploymentOrder struct {
+	// The ordering direction.
+	Direction OrderDirection `json:"direction"`
+	// The field by which to order Deployments.
+	Field DeploymentOrderField `json:"field"`
+}
+
+// GetDirection returns DeploymentOrder.Direction, and is useful for accessing the field via an interface.
+func (v *DeploymentOrder) GetDirection() OrderDirection { return v.Direction }
+
+// GetField returns DeploymentOrder.Field, and is useful for accessing the field via an interface.
+func (v *DeploymentOrder) GetField() DeploymentOrderField { return v.Field }
+
+// Properties by which Deployment connections can be ordered.
+type DeploymentOrderField string
+
+const (
+	DeploymentOrderFieldCreatedAt        DeploymentOrderField = "CREATED_AT"
+	DeploymentOrderFieldUpdatedAt        DeploymentOrderField = "UPDATED_AT"
+	DeploymentOrderFieldConnectionsCount DeploymentOrderField = "CONNECTIONS_COUNT"
+)
+
+var AllDeploymentOrderField = []DeploymentOrderField{
+	DeploymentOrderFieldCreatedAt,
+	DeploymentOrderFieldUpdatedAt,
+	DeploymentOrderFieldConnectionsCount,
+}
+
+type DeploymentState string
+
+const (
+	DeploymentStatePending  DeploymentState = "PENDING"
+	DeploymentStateRunning  DeploymentState = "RUNNING"
+	DeploymentStateStopping DeploymentState = "STOPPING"
+	DeploymentStateStopped  DeploymentState = "STOPPED"
+	DeploymentStateFailed   DeploymentState = "FAILED"
+)
+
+var AllDeploymentState = []DeploymentState{
+	DeploymentStatePending,
+	DeploymentStateRunning,
+	DeploymentStateStopping,
+	DeploymentStateStopped,
+	DeploymentStateFailed,
+}
+
+// DeploymentWhereInput is used for filtering Deployment objects.
+// Input was generated by ent.
+type DeploymentWhereInput struct {
+	Not *DeploymentWhereInput   `json:"not,omitempty"`
+	And []*DeploymentWhereInput `json:"and,omitempty"`
+	Or  []*DeploymentWhereInput `json:"or,omitempty"`
+	// id field predicates
+	Id      *uuid.UUID  `json:"id"`
+	IdNEQ   *uuid.UUID  `json:"idNEQ"`
+	IdIn    []uuid.UUID `json:"idIn"`
+	IdNotIn []uuid.UUID `json:"idNotIn"`
+	IdGT    *uuid.UUID  `json:"idGT"`
+	IdGTE   *uuid.UUID  `json:"idGTE"`
+	IdLT    *uuid.UUID  `json:"idLT"`
+	IdLTE   *uuid.UUID  `json:"idLTE"`
+	// organization_slug field predicates
+	OrganizationSlug             *string  `json:"organizationSlug"`
+	OrganizationSlugNEQ          *string  `json:"organizationSlugNEQ"`
+	OrganizationSlugIn           []string `json:"organizationSlugIn"`
+	OrganizationSlugNotIn        []string `json:"organizationSlugNotIn"`
+	OrganizationSlugGT           *string  `json:"organizationSlugGT"`
+	OrganizationSlugGTE          *string  `json:"organizationSlugGTE"`
+	OrganizationSlugLT           *string  `json:"organizationSlugLT"`
+	OrganizationSlugLTE          *string  `json:"organizationSlugLTE"`
+	OrganizationSlugContains     *string  `json:"organizationSlugContains"`
+	OrganizationSlugHasPrefix    *string  `json:"organizationSlugHasPrefix"`
+	OrganizationSlugHasSuffix    *string  `json:"organizationSlugHasSuffix"`
+	OrganizationSlugEqualFold    *string  `json:"organizationSlugEqualFold"`
+	OrganizationSlugContainsFold *string  `json:"organizationSlugContainsFold"`
+	// slug field predicates
+	Slug             *string  `json:"slug"`
+	SlugNEQ          *string  `json:"slugNEQ"`
+	SlugIn           []string `json:"slugIn"`
+	SlugNotIn        []string `json:"slugNotIn"`
+	SlugGT           *string  `json:"slugGT"`
+	SlugGTE          *string  `json:"slugGTE"`
+	SlugLT           *string  `json:"slugLT"`
+	SlugLTE          *string  `json:"slugLTE"`
+	SlugContains     *string  `json:"slugContains"`
+	SlugHasPrefix    *string  `json:"slugHasPrefix"`
+	SlugHasSuffix    *string  `json:"slugHasSuffix"`
+	SlugEqualFold    *string  `json:"slugEqualFold"`
+	SlugContainsFold *string  `json:"slugContainsFold"`
+	// created_at field predicates
+	CreatedAt      *time.Time  `json:"createdAt"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
+	CreatedAtIn    []time.Time `json:"createdAtIn"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE"`
+	// updated_at field predicates
+	UpdatedAt      *time.Time  `json:"updatedAt"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
+	// etag field predicates
+	Etag             *string  `json:"etag"`
+	EtagNEQ          *string  `json:"etagNEQ"`
+	EtagIn           []string `json:"etagIn"`
+	EtagNotIn        []string `json:"etagNotIn"`
+	EtagGT           *string  `json:"etagGT"`
+	EtagGTE          *string  `json:"etagGTE"`
+	EtagLT           *string  `json:"etagLT"`
+	EtagLTE          *string  `json:"etagLTE"`
+	EtagContains     *string  `json:"etagContains"`
+	EtagHasPrefix    *string  `json:"etagHasPrefix"`
+	EtagHasSuffix    *string  `json:"etagHasSuffix"`
+	EtagEqualFold    *string  `json:"etagEqualFold"`
+	EtagContainsFold *string  `json:"etagContainsFold"`
+	// integration_slug field predicates
+	IntegrationSlug             *string  `json:"integrationSlug"`
+	IntegrationSlugNEQ          *string  `json:"integrationSlugNEQ"`
+	IntegrationSlugIn           []string `json:"integrationSlugIn"`
+	IntegrationSlugNotIn        []string `json:"integrationSlugNotIn"`
+	IntegrationSlugGT           *string  `json:"integrationSlugGT"`
+	IntegrationSlugGTE          *string  `json:"integrationSlugGTE"`
+	IntegrationSlugLT           *string  `json:"integrationSlugLT"`
+	IntegrationSlugLTE          *string  `json:"integrationSlugLTE"`
+	IntegrationSlugContains     *string  `json:"integrationSlugContains"`
+	IntegrationSlugHasPrefix    *string  `json:"integrationSlugHasPrefix"`
+	IntegrationSlugHasSuffix    *string  `json:"integrationSlugHasSuffix"`
+	IntegrationSlugEqualFold    *string  `json:"integrationSlugEqualFold"`
+	IntegrationSlugContainsFold *string  `json:"integrationSlugContainsFold"`
+	// visibility field predicates
+	Visibility      *Visibility  `json:"visibility"`
+	VisibilityNEQ   *Visibility  `json:"visibilityNEQ"`
+	VisibilityIn    []Visibility `json:"visibilityIn"`
+	VisibilityNotIn []Visibility `json:"visibilityNotIn"`
+	// revision_id field predicates
+	RevisionID      *uuid.UUID  `json:"revisionID"`
+	RevisionIDNEQ   *uuid.UUID  `json:"revisionIDNEQ"`
+	RevisionIDIn    []uuid.UUID `json:"revisionIDIn"`
+	RevisionIDNotIn []uuid.UUID `json:"revisionIDNotIn"`
+	// integration_id field predicates
+	IntegrationID      *uuid.UUID  `json:"integrationID"`
+	IntegrationIDNEQ   *uuid.UUID  `json:"integrationIDNEQ"`
+	IntegrationIDIn    []uuid.UUID `json:"integrationIDIn"`
+	IntegrationIDNotIn []uuid.UUID `json:"integrationIDNotIn"`
+	// organization_id field predicates
+	OrganizationID      *uuid.UUID  `json:"organizationID"`
+	OrganizationIDNEQ   *uuid.UUID  `json:"organizationIDNEQ"`
+	OrganizationIDIn    []uuid.UUID `json:"organizationIDIn"`
+	OrganizationIDNotIn []uuid.UUID `json:"organizationIDNotIn"`
+	// organization edge predicates
+	HasOrganization     *bool                     `json:"hasOrganization"`
+	HasOrganizationWith []*OrganizationWhereInput `json:"hasOrganizationWith,omitempty"`
+	// integration edge predicates
+	HasIntegration     *bool                    `json:"hasIntegration"`
+	HasIntegrationWith []*IntegrationWhereInput `json:"hasIntegrationWith,omitempty"`
+	// revision edge predicates
+	HasRevision     *bool                            `json:"hasRevision"`
+	HasRevisionWith []*IntegrationRevisionWhereInput `json:"hasRevisionWith,omitempty"`
+	// connections edge predicates
+	HasConnections     *bool                   `json:"hasConnections"`
+	HasConnectionsWith []*ConnectionWhereInput `json:"hasConnectionsWith,omitempty"`
+	// type_schemas edge predicates
+	HasTypeSchemas     *bool                   `json:"hasTypeSchemas"`
+	HasTypeSchemasWith []*TypeSchemaWhereInput `json:"hasTypeSchemasWith,omitempty"`
+}
+
+// GetNot returns DeploymentWhereInput.Not, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetNot() *DeploymentWhereInput { return v.Not }
+
+// GetAnd returns DeploymentWhereInput.And, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetAnd() []*DeploymentWhereInput { return v.And }
+
+// GetOr returns DeploymentWhereInput.Or, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOr() []*DeploymentWhereInput { return v.Or }
+
+// GetId returns DeploymentWhereInput.Id, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetId() *uuid.UUID { return v.Id }
+
+// GetIdNEQ returns DeploymentWhereInput.IdNEQ, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIdNEQ() *uuid.UUID { return v.IdNEQ }
+
+// GetIdIn returns DeploymentWhereInput.IdIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIdIn() []uuid.UUID { return v.IdIn }
+
+// GetIdNotIn returns DeploymentWhereInput.IdNotIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIdNotIn() []uuid.UUID { return v.IdNotIn }
+
+// GetIdGT returns DeploymentWhereInput.IdGT, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIdGT() *uuid.UUID { return v.IdGT }
+
+// GetIdGTE returns DeploymentWhereInput.IdGTE, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIdGTE() *uuid.UUID { return v.IdGTE }
+
+// GetIdLT returns DeploymentWhereInput.IdLT, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
+
+// GetIdLTE returns DeploymentWhereInput.IdLTE, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
+
+// GetOrganizationSlug returns DeploymentWhereInput.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationSlug() *string { return v.OrganizationSlug }
+
+// GetOrganizationSlugNEQ returns DeploymentWhereInput.OrganizationSlugNEQ, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationSlugNEQ() *string { return v.OrganizationSlugNEQ }
+
+// GetOrganizationSlugIn returns DeploymentWhereInput.OrganizationSlugIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationSlugIn() []string { return v.OrganizationSlugIn }
+
+// GetOrganizationSlugNotIn returns DeploymentWhereInput.OrganizationSlugNotIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationSlugNotIn() []string { return v.OrganizationSlugNotIn }
+
+// GetOrganizationSlugGT returns DeploymentWhereInput.OrganizationSlugGT, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationSlugGT() *string { return v.OrganizationSlugGT }
+
+// GetOrganizationSlugGTE returns DeploymentWhereInput.OrganizationSlugGTE, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationSlugGTE() *string { return v.OrganizationSlugGTE }
+
+// GetOrganizationSlugLT returns DeploymentWhereInput.OrganizationSlugLT, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationSlugLT() *string { return v.OrganizationSlugLT }
+
+// GetOrganizationSlugLTE returns DeploymentWhereInput.OrganizationSlugLTE, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationSlugLTE() *string { return v.OrganizationSlugLTE }
+
+// GetOrganizationSlugContains returns DeploymentWhereInput.OrganizationSlugContains, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationSlugContains() *string {
+	return v.OrganizationSlugContains
+}
+
+// GetOrganizationSlugHasPrefix returns DeploymentWhereInput.OrganizationSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationSlugHasPrefix() *string {
+	return v.OrganizationSlugHasPrefix
+}
+
+// GetOrganizationSlugHasSuffix returns DeploymentWhereInput.OrganizationSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationSlugHasSuffix() *string {
+	return v.OrganizationSlugHasSuffix
+}
+
+// GetOrganizationSlugEqualFold returns DeploymentWhereInput.OrganizationSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationSlugEqualFold() *string {
+	return v.OrganizationSlugEqualFold
+}
+
+// GetOrganizationSlugContainsFold returns DeploymentWhereInput.OrganizationSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationSlugContainsFold() *string {
+	return v.OrganizationSlugContainsFold
+}
+
+// GetSlug returns DeploymentWhereInput.Slug, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetSlug() *string { return v.Slug }
+
+// GetSlugNEQ returns DeploymentWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
+
+// GetSlugIn returns DeploymentWhereInput.SlugIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetSlugIn() []string { return v.SlugIn }
+
+// GetSlugNotIn returns DeploymentWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
+
+// GetSlugGT returns DeploymentWhereInput.SlugGT, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetSlugGT() *string { return v.SlugGT }
+
+// GetSlugGTE returns DeploymentWhereInput.SlugGTE, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetSlugGTE() *string { return v.SlugGTE }
+
+// GetSlugLT returns DeploymentWhereInput.SlugLT, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetSlugLT() *string { return v.SlugLT }
+
+// GetSlugLTE returns DeploymentWhereInput.SlugLTE, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetSlugLTE() *string { return v.SlugLTE }
+
+// GetSlugContains returns DeploymentWhereInput.SlugContains, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetSlugContains() *string { return v.SlugContains }
+
+// GetSlugHasPrefix returns DeploymentWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
+
+// GetSlugHasSuffix returns DeploymentWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
+
+// GetSlugEqualFold returns DeploymentWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
+
+// GetSlugContainsFold returns DeploymentWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
+
+// GetCreatedAt returns DeploymentWhereInput.CreatedAt, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
+
+// GetCreatedAtNEQ returns DeploymentWhereInput.CreatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetCreatedAtNEQ() *time.Time { return v.CreatedAtNEQ }
+
+// GetCreatedAtIn returns DeploymentWhereInput.CreatedAtIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetCreatedAtIn() []time.Time { return v.CreatedAtIn }
+
+// GetCreatedAtNotIn returns DeploymentWhereInput.CreatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetCreatedAtNotIn() []time.Time { return v.CreatedAtNotIn }
+
+// GetCreatedAtGT returns DeploymentWhereInput.CreatedAtGT, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetCreatedAtGT() *time.Time { return v.CreatedAtGT }
+
+// GetCreatedAtGTE returns DeploymentWhereInput.CreatedAtGTE, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetCreatedAtGTE() *time.Time { return v.CreatedAtGTE }
+
+// GetCreatedAtLT returns DeploymentWhereInput.CreatedAtLT, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetCreatedAtLT() *time.Time { return v.CreatedAtLT }
+
+// GetCreatedAtLTE returns DeploymentWhereInput.CreatedAtLTE, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetCreatedAtLTE() *time.Time { return v.CreatedAtLTE }
+
+// GetUpdatedAt returns DeploymentWhereInput.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetUpdatedAt() *time.Time { return v.UpdatedAt }
+
+// GetUpdatedAtNEQ returns DeploymentWhereInput.UpdatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetUpdatedAtNEQ() *time.Time { return v.UpdatedAtNEQ }
+
+// GetUpdatedAtIn returns DeploymentWhereInput.UpdatedAtIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetUpdatedAtIn() []time.Time { return v.UpdatedAtIn }
+
+// GetUpdatedAtNotIn returns DeploymentWhereInput.UpdatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetUpdatedAtNotIn() []time.Time { return v.UpdatedAtNotIn }
+
+// GetUpdatedAtGT returns DeploymentWhereInput.UpdatedAtGT, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetUpdatedAtGT() *time.Time { return v.UpdatedAtGT }
+
+// GetUpdatedAtGTE returns DeploymentWhereInput.UpdatedAtGTE, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetUpdatedAtGTE() *time.Time { return v.UpdatedAtGTE }
+
+// GetUpdatedAtLT returns DeploymentWhereInput.UpdatedAtLT, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
+
+// GetUpdatedAtLTE returns DeploymentWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
+
+// GetEtag returns DeploymentWhereInput.Etag, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetEtag() *string { return v.Etag }
+
+// GetEtagNEQ returns DeploymentWhereInput.EtagNEQ, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetEtagNEQ() *string { return v.EtagNEQ }
+
+// GetEtagIn returns DeploymentWhereInput.EtagIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetEtagIn() []string { return v.EtagIn }
+
+// GetEtagNotIn returns DeploymentWhereInput.EtagNotIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetEtagNotIn() []string { return v.EtagNotIn }
+
+// GetEtagGT returns DeploymentWhereInput.EtagGT, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetEtagGT() *string { return v.EtagGT }
+
+// GetEtagGTE returns DeploymentWhereInput.EtagGTE, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetEtagGTE() *string { return v.EtagGTE }
+
+// GetEtagLT returns DeploymentWhereInput.EtagLT, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetEtagLT() *string { return v.EtagLT }
+
+// GetEtagLTE returns DeploymentWhereInput.EtagLTE, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetEtagLTE() *string { return v.EtagLTE }
+
+// GetEtagContains returns DeploymentWhereInput.EtagContains, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetEtagContains() *string { return v.EtagContains }
+
+// GetEtagHasPrefix returns DeploymentWhereInput.EtagHasPrefix, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetEtagHasPrefix() *string { return v.EtagHasPrefix }
+
+// GetEtagHasSuffix returns DeploymentWhereInput.EtagHasSuffix, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetEtagHasSuffix() *string { return v.EtagHasSuffix }
+
+// GetEtagEqualFold returns DeploymentWhereInput.EtagEqualFold, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetEtagEqualFold() *string { return v.EtagEqualFold }
+
+// GetEtagContainsFold returns DeploymentWhereInput.EtagContainsFold, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetEtagContainsFold() *string { return v.EtagContainsFold }
+
+// GetIntegrationSlug returns DeploymentWhereInput.IntegrationSlug, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationSlug() *string { return v.IntegrationSlug }
+
+// GetIntegrationSlugNEQ returns DeploymentWhereInput.IntegrationSlugNEQ, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationSlugNEQ() *string { return v.IntegrationSlugNEQ }
+
+// GetIntegrationSlugIn returns DeploymentWhereInput.IntegrationSlugIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationSlugIn() []string { return v.IntegrationSlugIn }
+
+// GetIntegrationSlugNotIn returns DeploymentWhereInput.IntegrationSlugNotIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationSlugNotIn() []string { return v.IntegrationSlugNotIn }
+
+// GetIntegrationSlugGT returns DeploymentWhereInput.IntegrationSlugGT, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationSlugGT() *string { return v.IntegrationSlugGT }
+
+// GetIntegrationSlugGTE returns DeploymentWhereInput.IntegrationSlugGTE, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationSlugGTE() *string { return v.IntegrationSlugGTE }
+
+// GetIntegrationSlugLT returns DeploymentWhereInput.IntegrationSlugLT, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationSlugLT() *string { return v.IntegrationSlugLT }
+
+// GetIntegrationSlugLTE returns DeploymentWhereInput.IntegrationSlugLTE, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationSlugLTE() *string { return v.IntegrationSlugLTE }
+
+// GetIntegrationSlugContains returns DeploymentWhereInput.IntegrationSlugContains, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationSlugContains() *string { return v.IntegrationSlugContains }
+
+// GetIntegrationSlugHasPrefix returns DeploymentWhereInput.IntegrationSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationSlugHasPrefix() *string {
+	return v.IntegrationSlugHasPrefix
+}
+
+// GetIntegrationSlugHasSuffix returns DeploymentWhereInput.IntegrationSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationSlugHasSuffix() *string {
+	return v.IntegrationSlugHasSuffix
+}
+
+// GetIntegrationSlugEqualFold returns DeploymentWhereInput.IntegrationSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationSlugEqualFold() *string {
+	return v.IntegrationSlugEqualFold
+}
+
+// GetIntegrationSlugContainsFold returns DeploymentWhereInput.IntegrationSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationSlugContainsFold() *string {
+	return v.IntegrationSlugContainsFold
+}
+
+// GetVisibility returns DeploymentWhereInput.Visibility, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetVisibility() *Visibility { return v.Visibility }
+
+// GetVisibilityNEQ returns DeploymentWhereInput.VisibilityNEQ, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetVisibilityNEQ() *Visibility { return v.VisibilityNEQ }
+
+// GetVisibilityIn returns DeploymentWhereInput.VisibilityIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetVisibilityIn() []Visibility { return v.VisibilityIn }
+
+// GetVisibilityNotIn returns DeploymentWhereInput.VisibilityNotIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetVisibilityNotIn() []Visibility { return v.VisibilityNotIn }
+
+// GetRevisionID returns DeploymentWhereInput.RevisionID, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetRevisionID() *uuid.UUID { return v.RevisionID }
+
+// GetRevisionIDNEQ returns DeploymentWhereInput.RevisionIDNEQ, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetRevisionIDNEQ() *uuid.UUID { return v.RevisionIDNEQ }
+
+// GetRevisionIDIn returns DeploymentWhereInput.RevisionIDIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetRevisionIDIn() []uuid.UUID { return v.RevisionIDIn }
+
+// GetRevisionIDNotIn returns DeploymentWhereInput.RevisionIDNotIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetRevisionIDNotIn() []uuid.UUID { return v.RevisionIDNotIn }
+
+// GetIntegrationID returns DeploymentWhereInput.IntegrationID, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationID() *uuid.UUID { return v.IntegrationID }
+
+// GetIntegrationIDNEQ returns DeploymentWhereInput.IntegrationIDNEQ, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationIDNEQ() *uuid.UUID { return v.IntegrationIDNEQ }
+
+// GetIntegrationIDIn returns DeploymentWhereInput.IntegrationIDIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationIDIn() []uuid.UUID { return v.IntegrationIDIn }
+
+// GetIntegrationIDNotIn returns DeploymentWhereInput.IntegrationIDNotIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetIntegrationIDNotIn() []uuid.UUID { return v.IntegrationIDNotIn }
+
+// GetOrganizationID returns DeploymentWhereInput.OrganizationID, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationID() *uuid.UUID { return v.OrganizationID }
+
+// GetOrganizationIDNEQ returns DeploymentWhereInput.OrganizationIDNEQ, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationIDNEQ() *uuid.UUID { return v.OrganizationIDNEQ }
+
+// GetOrganizationIDIn returns DeploymentWhereInput.OrganizationIDIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationIDIn() []uuid.UUID { return v.OrganizationIDIn }
+
+// GetOrganizationIDNotIn returns DeploymentWhereInput.OrganizationIDNotIn, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetOrganizationIDNotIn() []uuid.UUID { return v.OrganizationIDNotIn }
+
+// GetHasOrganization returns DeploymentWhereInput.HasOrganization, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetHasOrganization() *bool { return v.HasOrganization }
+
+// GetHasOrganizationWith returns DeploymentWhereInput.HasOrganizationWith, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetHasOrganizationWith() []*OrganizationWhereInput {
+	return v.HasOrganizationWith
+}
+
+// GetHasIntegration returns DeploymentWhereInput.HasIntegration, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetHasIntegration() *bool { return v.HasIntegration }
+
+// GetHasIntegrationWith returns DeploymentWhereInput.HasIntegrationWith, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetHasIntegrationWith() []*IntegrationWhereInput {
+	return v.HasIntegrationWith
+}
+
+// GetHasRevision returns DeploymentWhereInput.HasRevision, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetHasRevision() *bool { return v.HasRevision }
+
+// GetHasRevisionWith returns DeploymentWhereInput.HasRevisionWith, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetHasRevisionWith() []*IntegrationRevisionWhereInput {
+	return v.HasRevisionWith
+}
+
+// GetHasConnections returns DeploymentWhereInput.HasConnections, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetHasConnections() *bool { return v.HasConnections }
+
+// GetHasConnectionsWith returns DeploymentWhereInput.HasConnectionsWith, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetHasConnectionsWith() []*ConnectionWhereInput {
+	return v.HasConnectionsWith
+}
+
+// GetHasTypeSchemas returns DeploymentWhereInput.HasTypeSchemas, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetHasTypeSchemas() *bool { return v.HasTypeSchemas }
+
+// GetHasTypeSchemasWith returns DeploymentWhereInput.HasTypeSchemasWith, and is useful for accessing the field via an interface.
+func (v *DeploymentWhereInput) GetHasTypeSchemasWith() []*TypeSchemaWhereInput {
+	return v.HasTypeSchemasWith
+}
+
 // DestinationFragment includes the GraphQL fields of Destination requested by the fragment DestinationFragment.
 type DestinationFragment struct {
 	Id   uuid.UUID `json:"id"`
@@ -5671,18 +6588,18 @@ func (v *EventSourceOrder) GetField() EventSourceOrderField { return v.Field }
 type EventSourceOrderField string
 
 const (
-	EventSourceOrderFieldCreatedAt EventSourceOrderField = "CREATED_AT"
-	EventSourceOrderFieldUpdatedAt EventSourceOrderField = "UPDATED_AT"
 	EventSourceOrderFieldStartedAt EventSourceOrderField = "STARTED_AT"
 	EventSourceOrderFieldStoppedAt EventSourceOrderField = "STOPPED_AT"
+	EventSourceOrderFieldCreatedAt EventSourceOrderField = "CREATED_AT"
+	EventSourceOrderFieldUpdatedAt EventSourceOrderField = "UPDATED_AT"
 	EventSourceOrderFieldName      EventSourceOrderField = "NAME"
 )
 
 var AllEventSourceOrderField = []EventSourceOrderField{
-	EventSourceOrderFieldCreatedAt,
-	EventSourceOrderFieldUpdatedAt,
 	EventSourceOrderFieldStartedAt,
 	EventSourceOrderFieldStoppedAt,
+	EventSourceOrderFieldCreatedAt,
+	EventSourceOrderFieldUpdatedAt,
 	EventSourceOrderFieldName,
 }
 
@@ -5735,24 +6652,48 @@ type EventSourceWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
-	// created_at field predicates
-	CreatedAt      *time.Time  `json:"createdAt"`
-	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
-	CreatedAtIn    []time.Time `json:"createdAtIn"`
-	CreatedAtNotIn []time.Time `json:"createdAtNotIn"`
-	CreatedAtGT    *time.Time  `json:"createdAtGT"`
-	CreatedAtGTE   *time.Time  `json:"createdAtGTE"`
-	CreatedAtLT    *time.Time  `json:"createdAtLT"`
-	CreatedAtLTE   *time.Time  `json:"createdAtLTE"`
-	// updated_at field predicates
-	UpdatedAt      *time.Time  `json:"updatedAt"`
-	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ"`
-	UpdatedAtIn    []time.Time `json:"updatedAtIn"`
-	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn"`
-	UpdatedAtGT    *time.Time  `json:"updatedAtGT"`
-	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
-	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
-	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
+	// organization_slug field predicates
+	OrganizationSlug             *string  `json:"organizationSlug"`
+	OrganizationSlugNEQ          *string  `json:"organizationSlugNEQ"`
+	OrganizationSlugIn           []string `json:"organizationSlugIn"`
+	OrganizationSlugNotIn        []string `json:"organizationSlugNotIn"`
+	OrganizationSlugGT           *string  `json:"organizationSlugGT"`
+	OrganizationSlugGTE          *string  `json:"organizationSlugGTE"`
+	OrganizationSlugLT           *string  `json:"organizationSlugLT"`
+	OrganizationSlugLTE          *string  `json:"organizationSlugLTE"`
+	OrganizationSlugContains     *string  `json:"organizationSlugContains"`
+	OrganizationSlugHasPrefix    *string  `json:"organizationSlugHasPrefix"`
+	OrganizationSlugHasSuffix    *string  `json:"organizationSlugHasSuffix"`
+	OrganizationSlugEqualFold    *string  `json:"organizationSlugEqualFold"`
+	OrganizationSlugContainsFold *string  `json:"organizationSlugContainsFold"`
+	// connection_slug field predicates
+	ConnectionSlug             *string  `json:"connectionSlug"`
+	ConnectionSlugNEQ          *string  `json:"connectionSlugNEQ"`
+	ConnectionSlugIn           []string `json:"connectionSlugIn"`
+	ConnectionSlugNotIn        []string `json:"connectionSlugNotIn"`
+	ConnectionSlugGT           *string  `json:"connectionSlugGT"`
+	ConnectionSlugGTE          *string  `json:"connectionSlugGTE"`
+	ConnectionSlugLT           *string  `json:"connectionSlugLT"`
+	ConnectionSlugLTE          *string  `json:"connectionSlugLTE"`
+	ConnectionSlugContains     *string  `json:"connectionSlugContains"`
+	ConnectionSlugHasPrefix    *string  `json:"connectionSlugHasPrefix"`
+	ConnectionSlugHasSuffix    *string  `json:"connectionSlugHasSuffix"`
+	ConnectionSlugEqualFold    *string  `json:"connectionSlugEqualFold"`
+	ConnectionSlugContainsFold *string  `json:"connectionSlugContainsFold"`
+	// slug field predicates
+	Slug             *string  `json:"slug"`
+	SlugNEQ          *string  `json:"slugNEQ"`
+	SlugIn           []string `json:"slugIn"`
+	SlugNotIn        []string `json:"slugNotIn"`
+	SlugGT           *string  `json:"slugGT"`
+	SlugGTE          *string  `json:"slugGTE"`
+	SlugLT           *string  `json:"slugLT"`
+	SlugLTE          *string  `json:"slugLTE"`
+	SlugContains     *string  `json:"slugContains"`
+	SlugHasPrefix    *string  `json:"slugHasPrefix"`
+	SlugHasSuffix    *string  `json:"slugHasSuffix"`
+	SlugEqualFold    *string  `json:"slugEqualFold"`
+	SlugContainsFold *string  `json:"slugContainsFold"`
 	// started_at field predicates
 	StartedAt       *time.Time  `json:"startedAt"`
 	StartedAtNEQ    *time.Time  `json:"startedAtNEQ"`
@@ -5775,20 +6716,24 @@ type EventSourceWhereInput struct {
 	StoppedAtLTE    *time.Time  `json:"stoppedAtLTE"`
 	StoppedAtIsNil  *bool       `json:"stoppedAtIsNil"`
 	StoppedAtNotNil *bool       `json:"stoppedAtNotNil"`
-	// slug field predicates
-	Slug             *string  `json:"slug"`
-	SlugNEQ          *string  `json:"slugNEQ"`
-	SlugIn           []string `json:"slugIn"`
-	SlugNotIn        []string `json:"slugNotIn"`
-	SlugGT           *string  `json:"slugGT"`
-	SlugGTE          *string  `json:"slugGTE"`
-	SlugLT           *string  `json:"slugLT"`
-	SlugLTE          *string  `json:"slugLTE"`
-	SlugContains     *string  `json:"slugContains"`
-	SlugHasPrefix    *string  `json:"slugHasPrefix"`
-	SlugHasSuffix    *string  `json:"slugHasSuffix"`
-	SlugEqualFold    *string  `json:"slugEqualFold"`
-	SlugContainsFold *string  `json:"slugContainsFold"`
+	// created_at field predicates
+	CreatedAt      *time.Time  `json:"createdAt"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
+	CreatedAtIn    []time.Time `json:"createdAtIn"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE"`
+	// updated_at field predicates
+	UpdatedAt      *time.Time  `json:"updatedAt"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
 	// name field predicates
 	Name             *string  `json:"name"`
 	NameNEQ          *string  `json:"nameNEQ"`
@@ -5886,53 +6831,140 @@ func (v *EventSourceWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 // GetIdLTE returns EventSourceWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *EventSourceWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
 
-// GetCreatedAt returns EventSourceWhereInput.CreatedAt, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
+// GetOrganizationSlug returns EventSourceWhereInput.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetOrganizationSlug() *string { return v.OrganizationSlug }
 
-// GetCreatedAtNEQ returns EventSourceWhereInput.CreatedAtNEQ, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetCreatedAtNEQ() *time.Time { return v.CreatedAtNEQ }
+// GetOrganizationSlugNEQ returns EventSourceWhereInput.OrganizationSlugNEQ, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetOrganizationSlugNEQ() *string { return v.OrganizationSlugNEQ }
 
-// GetCreatedAtIn returns EventSourceWhereInput.CreatedAtIn, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetCreatedAtIn() []time.Time { return v.CreatedAtIn }
+// GetOrganizationSlugIn returns EventSourceWhereInput.OrganizationSlugIn, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetOrganizationSlugIn() []string { return v.OrganizationSlugIn }
 
-// GetCreatedAtNotIn returns EventSourceWhereInput.CreatedAtNotIn, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetCreatedAtNotIn() []time.Time { return v.CreatedAtNotIn }
+// GetOrganizationSlugNotIn returns EventSourceWhereInput.OrganizationSlugNotIn, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetOrganizationSlugNotIn() []string { return v.OrganizationSlugNotIn }
 
-// GetCreatedAtGT returns EventSourceWhereInput.CreatedAtGT, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetCreatedAtGT() *time.Time { return v.CreatedAtGT }
+// GetOrganizationSlugGT returns EventSourceWhereInput.OrganizationSlugGT, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetOrganizationSlugGT() *string { return v.OrganizationSlugGT }
 
-// GetCreatedAtGTE returns EventSourceWhereInput.CreatedAtGTE, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetCreatedAtGTE() *time.Time { return v.CreatedAtGTE }
+// GetOrganizationSlugGTE returns EventSourceWhereInput.OrganizationSlugGTE, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetOrganizationSlugGTE() *string { return v.OrganizationSlugGTE }
 
-// GetCreatedAtLT returns EventSourceWhereInput.CreatedAtLT, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetCreatedAtLT() *time.Time { return v.CreatedAtLT }
+// GetOrganizationSlugLT returns EventSourceWhereInput.OrganizationSlugLT, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetOrganizationSlugLT() *string { return v.OrganizationSlugLT }
 
-// GetCreatedAtLTE returns EventSourceWhereInput.CreatedAtLTE, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetCreatedAtLTE() *time.Time { return v.CreatedAtLTE }
+// GetOrganizationSlugLTE returns EventSourceWhereInput.OrganizationSlugLTE, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetOrganizationSlugLTE() *string { return v.OrganizationSlugLTE }
 
-// GetUpdatedAt returns EventSourceWhereInput.UpdatedAt, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetUpdatedAt() *time.Time { return v.UpdatedAt }
+// GetOrganizationSlugContains returns EventSourceWhereInput.OrganizationSlugContains, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetOrganizationSlugContains() *string {
+	return v.OrganizationSlugContains
+}
 
-// GetUpdatedAtNEQ returns EventSourceWhereInput.UpdatedAtNEQ, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetUpdatedAtNEQ() *time.Time { return v.UpdatedAtNEQ }
+// GetOrganizationSlugHasPrefix returns EventSourceWhereInput.OrganizationSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetOrganizationSlugHasPrefix() *string {
+	return v.OrganizationSlugHasPrefix
+}
 
-// GetUpdatedAtIn returns EventSourceWhereInput.UpdatedAtIn, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetUpdatedAtIn() []time.Time { return v.UpdatedAtIn }
+// GetOrganizationSlugHasSuffix returns EventSourceWhereInput.OrganizationSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetOrganizationSlugHasSuffix() *string {
+	return v.OrganizationSlugHasSuffix
+}
 
-// GetUpdatedAtNotIn returns EventSourceWhereInput.UpdatedAtNotIn, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetUpdatedAtNotIn() []time.Time { return v.UpdatedAtNotIn }
+// GetOrganizationSlugEqualFold returns EventSourceWhereInput.OrganizationSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetOrganizationSlugEqualFold() *string {
+	return v.OrganizationSlugEqualFold
+}
 
-// GetUpdatedAtGT returns EventSourceWhereInput.UpdatedAtGT, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetUpdatedAtGT() *time.Time { return v.UpdatedAtGT }
+// GetOrganizationSlugContainsFold returns EventSourceWhereInput.OrganizationSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetOrganizationSlugContainsFold() *string {
+	return v.OrganizationSlugContainsFold
+}
 
-// GetUpdatedAtGTE returns EventSourceWhereInput.UpdatedAtGTE, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetUpdatedAtGTE() *time.Time { return v.UpdatedAtGTE }
+// GetConnectionSlug returns EventSourceWhereInput.ConnectionSlug, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetConnectionSlug() *string { return v.ConnectionSlug }
 
-// GetUpdatedAtLT returns EventSourceWhereInput.UpdatedAtLT, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
+// GetConnectionSlugNEQ returns EventSourceWhereInput.ConnectionSlugNEQ, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetConnectionSlugNEQ() *string { return v.ConnectionSlugNEQ }
 
-// GetUpdatedAtLTE returns EventSourceWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
+// GetConnectionSlugIn returns EventSourceWhereInput.ConnectionSlugIn, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetConnectionSlugIn() []string { return v.ConnectionSlugIn }
+
+// GetConnectionSlugNotIn returns EventSourceWhereInput.ConnectionSlugNotIn, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetConnectionSlugNotIn() []string { return v.ConnectionSlugNotIn }
+
+// GetConnectionSlugGT returns EventSourceWhereInput.ConnectionSlugGT, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetConnectionSlugGT() *string { return v.ConnectionSlugGT }
+
+// GetConnectionSlugGTE returns EventSourceWhereInput.ConnectionSlugGTE, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetConnectionSlugGTE() *string { return v.ConnectionSlugGTE }
+
+// GetConnectionSlugLT returns EventSourceWhereInput.ConnectionSlugLT, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetConnectionSlugLT() *string { return v.ConnectionSlugLT }
+
+// GetConnectionSlugLTE returns EventSourceWhereInput.ConnectionSlugLTE, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetConnectionSlugLTE() *string { return v.ConnectionSlugLTE }
+
+// GetConnectionSlugContains returns EventSourceWhereInput.ConnectionSlugContains, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetConnectionSlugContains() *string { return v.ConnectionSlugContains }
+
+// GetConnectionSlugHasPrefix returns EventSourceWhereInput.ConnectionSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetConnectionSlugHasPrefix() *string {
+	return v.ConnectionSlugHasPrefix
+}
+
+// GetConnectionSlugHasSuffix returns EventSourceWhereInput.ConnectionSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetConnectionSlugHasSuffix() *string {
+	return v.ConnectionSlugHasSuffix
+}
+
+// GetConnectionSlugEqualFold returns EventSourceWhereInput.ConnectionSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetConnectionSlugEqualFold() *string {
+	return v.ConnectionSlugEqualFold
+}
+
+// GetConnectionSlugContainsFold returns EventSourceWhereInput.ConnectionSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetConnectionSlugContainsFold() *string {
+	return v.ConnectionSlugContainsFold
+}
+
+// GetSlug returns EventSourceWhereInput.Slug, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetSlug() *string { return v.Slug }
+
+// GetSlugNEQ returns EventSourceWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
+
+// GetSlugIn returns EventSourceWhereInput.SlugIn, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetSlugIn() []string { return v.SlugIn }
+
+// GetSlugNotIn returns EventSourceWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
+
+// GetSlugGT returns EventSourceWhereInput.SlugGT, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetSlugGT() *string { return v.SlugGT }
+
+// GetSlugGTE returns EventSourceWhereInput.SlugGTE, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetSlugGTE() *string { return v.SlugGTE }
+
+// GetSlugLT returns EventSourceWhereInput.SlugLT, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetSlugLT() *string { return v.SlugLT }
+
+// GetSlugLTE returns EventSourceWhereInput.SlugLTE, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetSlugLTE() *string { return v.SlugLTE }
+
+// GetSlugContains returns EventSourceWhereInput.SlugContains, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetSlugContains() *string { return v.SlugContains }
+
+// GetSlugHasPrefix returns EventSourceWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
+
+// GetSlugHasSuffix returns EventSourceWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
+
+// GetSlugEqualFold returns EventSourceWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
+
+// GetSlugContainsFold returns EventSourceWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
 
 // GetStartedAt returns EventSourceWhereInput.StartedAt, and is useful for accessing the field via an interface.
 func (v *EventSourceWhereInput) GetStartedAt() *time.Time { return v.StartedAt }
@@ -5994,44 +7026,53 @@ func (v *EventSourceWhereInput) GetStoppedAtIsNil() *bool { return v.StoppedAtIs
 // GetStoppedAtNotNil returns EventSourceWhereInput.StoppedAtNotNil, and is useful for accessing the field via an interface.
 func (v *EventSourceWhereInput) GetStoppedAtNotNil() *bool { return v.StoppedAtNotNil }
 
-// GetSlug returns EventSourceWhereInput.Slug, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetSlug() *string { return v.Slug }
+// GetCreatedAt returns EventSourceWhereInput.CreatedAt, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
 
-// GetSlugNEQ returns EventSourceWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
+// GetCreatedAtNEQ returns EventSourceWhereInput.CreatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetCreatedAtNEQ() *time.Time { return v.CreatedAtNEQ }
 
-// GetSlugIn returns EventSourceWhereInput.SlugIn, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetSlugIn() []string { return v.SlugIn }
+// GetCreatedAtIn returns EventSourceWhereInput.CreatedAtIn, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetCreatedAtIn() []time.Time { return v.CreatedAtIn }
 
-// GetSlugNotIn returns EventSourceWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
+// GetCreatedAtNotIn returns EventSourceWhereInput.CreatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetCreatedAtNotIn() []time.Time { return v.CreatedAtNotIn }
 
-// GetSlugGT returns EventSourceWhereInput.SlugGT, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetSlugGT() *string { return v.SlugGT }
+// GetCreatedAtGT returns EventSourceWhereInput.CreatedAtGT, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetCreatedAtGT() *time.Time { return v.CreatedAtGT }
 
-// GetSlugGTE returns EventSourceWhereInput.SlugGTE, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetSlugGTE() *string { return v.SlugGTE }
+// GetCreatedAtGTE returns EventSourceWhereInput.CreatedAtGTE, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetCreatedAtGTE() *time.Time { return v.CreatedAtGTE }
 
-// GetSlugLT returns EventSourceWhereInput.SlugLT, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetSlugLT() *string { return v.SlugLT }
+// GetCreatedAtLT returns EventSourceWhereInput.CreatedAtLT, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetCreatedAtLT() *time.Time { return v.CreatedAtLT }
 
-// GetSlugLTE returns EventSourceWhereInput.SlugLTE, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetSlugLTE() *string { return v.SlugLTE }
+// GetCreatedAtLTE returns EventSourceWhereInput.CreatedAtLTE, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetCreatedAtLTE() *time.Time { return v.CreatedAtLTE }
 
-// GetSlugContains returns EventSourceWhereInput.SlugContains, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetSlugContains() *string { return v.SlugContains }
+// GetUpdatedAt returns EventSourceWhereInput.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetUpdatedAt() *time.Time { return v.UpdatedAt }
 
-// GetSlugHasPrefix returns EventSourceWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
+// GetUpdatedAtNEQ returns EventSourceWhereInput.UpdatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetUpdatedAtNEQ() *time.Time { return v.UpdatedAtNEQ }
 
-// GetSlugHasSuffix returns EventSourceWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
+// GetUpdatedAtIn returns EventSourceWhereInput.UpdatedAtIn, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetUpdatedAtIn() []time.Time { return v.UpdatedAtIn }
 
-// GetSlugEqualFold returns EventSourceWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
+// GetUpdatedAtNotIn returns EventSourceWhereInput.UpdatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetUpdatedAtNotIn() []time.Time { return v.UpdatedAtNotIn }
 
-// GetSlugContainsFold returns EventSourceWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
-func (v *EventSourceWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
+// GetUpdatedAtGT returns EventSourceWhereInput.UpdatedAtGT, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetUpdatedAtGT() *time.Time { return v.UpdatedAtGT }
+
+// GetUpdatedAtGTE returns EventSourceWhereInput.UpdatedAtGTE, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetUpdatedAtGTE() *time.Time { return v.UpdatedAtGTE }
+
+// GetUpdatedAtLT returns EventSourceWhereInput.UpdatedAtLT, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
+
+// GetUpdatedAtLTE returns EventSourceWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
+func (v *EventSourceWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
 
 // GetName returns EventSourceWhereInput.Name, and is useful for accessing the field via an interface.
 func (v *EventSourceWhereInput) GetName() *string { return v.Name }
@@ -7061,17 +8102,17 @@ func (v *FlowRunOrder) GetField() FlowRunOrderField { return v.Field }
 type FlowRunOrderField string
 
 const (
-	FlowRunOrderFieldCreatedAt FlowRunOrderField = "CREATED_AT"
-	FlowRunOrderFieldUpdatedAt FlowRunOrderField = "UPDATED_AT"
 	FlowRunOrderFieldStartedAt FlowRunOrderField = "STARTED_AT"
 	FlowRunOrderFieldStoppedAt FlowRunOrderField = "STOPPED_AT"
+	FlowRunOrderFieldCreatedAt FlowRunOrderField = "CREATED_AT"
+	FlowRunOrderFieldUpdatedAt FlowRunOrderField = "UPDATED_AT"
 )
 
 var AllFlowRunOrderField = []FlowRunOrderField{
-	FlowRunOrderFieldCreatedAt,
-	FlowRunOrderFieldUpdatedAt,
 	FlowRunOrderFieldStartedAt,
 	FlowRunOrderFieldStoppedAt,
+	FlowRunOrderFieldCreatedAt,
+	FlowRunOrderFieldUpdatedAt,
 }
 
 type FlowRunResourceInput struct {
@@ -7127,24 +8168,6 @@ type FlowRunWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
-	// created_at field predicates
-	CreatedAt      *time.Time  `json:"createdAt"`
-	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
-	CreatedAtIn    []time.Time `json:"createdAtIn"`
-	CreatedAtNotIn []time.Time `json:"createdAtNotIn"`
-	CreatedAtGT    *time.Time  `json:"createdAtGT"`
-	CreatedAtGTE   *time.Time  `json:"createdAtGTE"`
-	CreatedAtLT    *time.Time  `json:"createdAtLT"`
-	CreatedAtLTE   *time.Time  `json:"createdAtLTE"`
-	// updated_at field predicates
-	UpdatedAt      *time.Time  `json:"updatedAt"`
-	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ"`
-	UpdatedAtIn    []time.Time `json:"updatedAtIn"`
-	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn"`
-	UpdatedAtGT    *time.Time  `json:"updatedAtGT"`
-	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
-	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
-	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
 	// started_at field predicates
 	StartedAt       *time.Time  `json:"startedAt"`
 	StartedAtNEQ    *time.Time  `json:"startedAtNEQ"`
@@ -7167,6 +8190,24 @@ type FlowRunWhereInput struct {
 	StoppedAtLTE    *time.Time  `json:"stoppedAtLTE"`
 	StoppedAtIsNil  *bool       `json:"stoppedAtIsNil"`
 	StoppedAtNotNil *bool       `json:"stoppedAtNotNil"`
+	// created_at field predicates
+	CreatedAt      *time.Time  `json:"createdAt"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
+	CreatedAtIn    []time.Time `json:"createdAtIn"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE"`
+	// updated_at field predicates
+	UpdatedAt      *time.Time  `json:"updatedAt"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
 	// status field predicates
 	Status      *FlowRunStatus  `json:"status"`
 	StatusNEQ   *FlowRunStatus  `json:"statusNEQ"`
@@ -7250,54 +8291,6 @@ func (v *FlowRunWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 // GetIdLTE returns FlowRunWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *FlowRunWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
 
-// GetCreatedAt returns FlowRunWhereInput.CreatedAt, and is useful for accessing the field via an interface.
-func (v *FlowRunWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
-
-// GetCreatedAtNEQ returns FlowRunWhereInput.CreatedAtNEQ, and is useful for accessing the field via an interface.
-func (v *FlowRunWhereInput) GetCreatedAtNEQ() *time.Time { return v.CreatedAtNEQ }
-
-// GetCreatedAtIn returns FlowRunWhereInput.CreatedAtIn, and is useful for accessing the field via an interface.
-func (v *FlowRunWhereInput) GetCreatedAtIn() []time.Time { return v.CreatedAtIn }
-
-// GetCreatedAtNotIn returns FlowRunWhereInput.CreatedAtNotIn, and is useful for accessing the field via an interface.
-func (v *FlowRunWhereInput) GetCreatedAtNotIn() []time.Time { return v.CreatedAtNotIn }
-
-// GetCreatedAtGT returns FlowRunWhereInput.CreatedAtGT, and is useful for accessing the field via an interface.
-func (v *FlowRunWhereInput) GetCreatedAtGT() *time.Time { return v.CreatedAtGT }
-
-// GetCreatedAtGTE returns FlowRunWhereInput.CreatedAtGTE, and is useful for accessing the field via an interface.
-func (v *FlowRunWhereInput) GetCreatedAtGTE() *time.Time { return v.CreatedAtGTE }
-
-// GetCreatedAtLT returns FlowRunWhereInput.CreatedAtLT, and is useful for accessing the field via an interface.
-func (v *FlowRunWhereInput) GetCreatedAtLT() *time.Time { return v.CreatedAtLT }
-
-// GetCreatedAtLTE returns FlowRunWhereInput.CreatedAtLTE, and is useful for accessing the field via an interface.
-func (v *FlowRunWhereInput) GetCreatedAtLTE() *time.Time { return v.CreatedAtLTE }
-
-// GetUpdatedAt returns FlowRunWhereInput.UpdatedAt, and is useful for accessing the field via an interface.
-func (v *FlowRunWhereInput) GetUpdatedAt() *time.Time { return v.UpdatedAt }
-
-// GetUpdatedAtNEQ returns FlowRunWhereInput.UpdatedAtNEQ, and is useful for accessing the field via an interface.
-func (v *FlowRunWhereInput) GetUpdatedAtNEQ() *time.Time { return v.UpdatedAtNEQ }
-
-// GetUpdatedAtIn returns FlowRunWhereInput.UpdatedAtIn, and is useful for accessing the field via an interface.
-func (v *FlowRunWhereInput) GetUpdatedAtIn() []time.Time { return v.UpdatedAtIn }
-
-// GetUpdatedAtNotIn returns FlowRunWhereInput.UpdatedAtNotIn, and is useful for accessing the field via an interface.
-func (v *FlowRunWhereInput) GetUpdatedAtNotIn() []time.Time { return v.UpdatedAtNotIn }
-
-// GetUpdatedAtGT returns FlowRunWhereInput.UpdatedAtGT, and is useful for accessing the field via an interface.
-func (v *FlowRunWhereInput) GetUpdatedAtGT() *time.Time { return v.UpdatedAtGT }
-
-// GetUpdatedAtGTE returns FlowRunWhereInput.UpdatedAtGTE, and is useful for accessing the field via an interface.
-func (v *FlowRunWhereInput) GetUpdatedAtGTE() *time.Time { return v.UpdatedAtGTE }
-
-// GetUpdatedAtLT returns FlowRunWhereInput.UpdatedAtLT, and is useful for accessing the field via an interface.
-func (v *FlowRunWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
-
-// GetUpdatedAtLTE returns FlowRunWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
-func (v *FlowRunWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
-
 // GetStartedAt returns FlowRunWhereInput.StartedAt, and is useful for accessing the field via an interface.
 func (v *FlowRunWhereInput) GetStartedAt() *time.Time { return v.StartedAt }
 
@@ -7357,6 +8350,54 @@ func (v *FlowRunWhereInput) GetStoppedAtIsNil() *bool { return v.StoppedAtIsNil 
 
 // GetStoppedAtNotNil returns FlowRunWhereInput.StoppedAtNotNil, and is useful for accessing the field via an interface.
 func (v *FlowRunWhereInput) GetStoppedAtNotNil() *bool { return v.StoppedAtNotNil }
+
+// GetCreatedAt returns FlowRunWhereInput.CreatedAt, and is useful for accessing the field via an interface.
+func (v *FlowRunWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
+
+// GetCreatedAtNEQ returns FlowRunWhereInput.CreatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *FlowRunWhereInput) GetCreatedAtNEQ() *time.Time { return v.CreatedAtNEQ }
+
+// GetCreatedAtIn returns FlowRunWhereInput.CreatedAtIn, and is useful for accessing the field via an interface.
+func (v *FlowRunWhereInput) GetCreatedAtIn() []time.Time { return v.CreatedAtIn }
+
+// GetCreatedAtNotIn returns FlowRunWhereInput.CreatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *FlowRunWhereInput) GetCreatedAtNotIn() []time.Time { return v.CreatedAtNotIn }
+
+// GetCreatedAtGT returns FlowRunWhereInput.CreatedAtGT, and is useful for accessing the field via an interface.
+func (v *FlowRunWhereInput) GetCreatedAtGT() *time.Time { return v.CreatedAtGT }
+
+// GetCreatedAtGTE returns FlowRunWhereInput.CreatedAtGTE, and is useful for accessing the field via an interface.
+func (v *FlowRunWhereInput) GetCreatedAtGTE() *time.Time { return v.CreatedAtGTE }
+
+// GetCreatedAtLT returns FlowRunWhereInput.CreatedAtLT, and is useful for accessing the field via an interface.
+func (v *FlowRunWhereInput) GetCreatedAtLT() *time.Time { return v.CreatedAtLT }
+
+// GetCreatedAtLTE returns FlowRunWhereInput.CreatedAtLTE, and is useful for accessing the field via an interface.
+func (v *FlowRunWhereInput) GetCreatedAtLTE() *time.Time { return v.CreatedAtLTE }
+
+// GetUpdatedAt returns FlowRunWhereInput.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *FlowRunWhereInput) GetUpdatedAt() *time.Time { return v.UpdatedAt }
+
+// GetUpdatedAtNEQ returns FlowRunWhereInput.UpdatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *FlowRunWhereInput) GetUpdatedAtNEQ() *time.Time { return v.UpdatedAtNEQ }
+
+// GetUpdatedAtIn returns FlowRunWhereInput.UpdatedAtIn, and is useful for accessing the field via an interface.
+func (v *FlowRunWhereInput) GetUpdatedAtIn() []time.Time { return v.UpdatedAtIn }
+
+// GetUpdatedAtNotIn returns FlowRunWhereInput.UpdatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *FlowRunWhereInput) GetUpdatedAtNotIn() []time.Time { return v.UpdatedAtNotIn }
+
+// GetUpdatedAtGT returns FlowRunWhereInput.UpdatedAtGT, and is useful for accessing the field via an interface.
+func (v *FlowRunWhereInput) GetUpdatedAtGT() *time.Time { return v.UpdatedAtGT }
+
+// GetUpdatedAtGTE returns FlowRunWhereInput.UpdatedAtGTE, and is useful for accessing the field via an interface.
+func (v *FlowRunWhereInput) GetUpdatedAtGTE() *time.Time { return v.UpdatedAtGTE }
+
+// GetUpdatedAtLT returns FlowRunWhereInput.UpdatedAtLT, and is useful for accessing the field via an interface.
+func (v *FlowRunWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
+
+// GetUpdatedAtLTE returns FlowRunWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
+func (v *FlowRunWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
 
 // GetStatus returns FlowRunWhereInput.Status, and is useful for accessing the field via an interface.
 func (v *FlowRunWhereInput) GetStatus() *FlowRunStatus { return v.Status }
@@ -7505,6 +8546,34 @@ type FlowWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
+	// organization_slug field predicates
+	OrganizationSlug             *string  `json:"organizationSlug"`
+	OrganizationSlugNEQ          *string  `json:"organizationSlugNEQ"`
+	OrganizationSlugIn           []string `json:"organizationSlugIn"`
+	OrganizationSlugNotIn        []string `json:"organizationSlugNotIn"`
+	OrganizationSlugGT           *string  `json:"organizationSlugGT"`
+	OrganizationSlugGTE          *string  `json:"organizationSlugGTE"`
+	OrganizationSlugLT           *string  `json:"organizationSlugLT"`
+	OrganizationSlugLTE          *string  `json:"organizationSlugLTE"`
+	OrganizationSlugContains     *string  `json:"organizationSlugContains"`
+	OrganizationSlugHasPrefix    *string  `json:"organizationSlugHasPrefix"`
+	OrganizationSlugHasSuffix    *string  `json:"organizationSlugHasSuffix"`
+	OrganizationSlugEqualFold    *string  `json:"organizationSlugEqualFold"`
+	OrganizationSlugContainsFold *string  `json:"organizationSlugContainsFold"`
+	// slug field predicates
+	Slug             *string  `json:"slug"`
+	SlugNEQ          *string  `json:"slugNEQ"`
+	SlugIn           []string `json:"slugIn"`
+	SlugNotIn        []string `json:"slugNotIn"`
+	SlugGT           *string  `json:"slugGT"`
+	SlugGTE          *string  `json:"slugGTE"`
+	SlugLT           *string  `json:"slugLT"`
+	SlugLTE          *string  `json:"slugLTE"`
+	SlugContains     *string  `json:"slugContains"`
+	SlugHasPrefix    *string  `json:"slugHasPrefix"`
+	SlugHasSuffix    *string  `json:"slugHasSuffix"`
+	SlugEqualFold    *string  `json:"slugEqualFold"`
+	SlugContainsFold *string  `json:"slugContainsFold"`
 	// created_at field predicates
 	CreatedAt      *time.Time  `json:"createdAt"`
 	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
@@ -7523,20 +8592,6 @@ type FlowWhereInput struct {
 	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
 	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
-	// slug field predicates
-	Slug             *string  `json:"slug"`
-	SlugNEQ          *string  `json:"slugNEQ"`
-	SlugIn           []string `json:"slugIn"`
-	SlugNotIn        []string `json:"slugNotIn"`
-	SlugGT           *string  `json:"slugGT"`
-	SlugGTE          *string  `json:"slugGTE"`
-	SlugLT           *string  `json:"slugLT"`
-	SlugLTE          *string  `json:"slugLTE"`
-	SlugContains     *string  `json:"slugContains"`
-	SlugHasPrefix    *string  `json:"slugHasPrefix"`
-	SlugHasSuffix    *string  `json:"slugHasSuffix"`
-	SlugEqualFold    *string  `json:"slugEqualFold"`
-	SlugContainsFold *string  `json:"slugContainsFold"`
 	// name field predicates
 	Name             *string  `json:"name"`
 	NameNEQ          *string  `json:"nameNEQ"`
@@ -7637,6 +8692,86 @@ func (v *FlowWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 // GetIdLTE returns FlowWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *FlowWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
 
+// GetOrganizationSlug returns FlowWhereInput.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetOrganizationSlug() *string { return v.OrganizationSlug }
+
+// GetOrganizationSlugNEQ returns FlowWhereInput.OrganizationSlugNEQ, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetOrganizationSlugNEQ() *string { return v.OrganizationSlugNEQ }
+
+// GetOrganizationSlugIn returns FlowWhereInput.OrganizationSlugIn, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetOrganizationSlugIn() []string { return v.OrganizationSlugIn }
+
+// GetOrganizationSlugNotIn returns FlowWhereInput.OrganizationSlugNotIn, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetOrganizationSlugNotIn() []string { return v.OrganizationSlugNotIn }
+
+// GetOrganizationSlugGT returns FlowWhereInput.OrganizationSlugGT, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetOrganizationSlugGT() *string { return v.OrganizationSlugGT }
+
+// GetOrganizationSlugGTE returns FlowWhereInput.OrganizationSlugGTE, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetOrganizationSlugGTE() *string { return v.OrganizationSlugGTE }
+
+// GetOrganizationSlugLT returns FlowWhereInput.OrganizationSlugLT, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetOrganizationSlugLT() *string { return v.OrganizationSlugLT }
+
+// GetOrganizationSlugLTE returns FlowWhereInput.OrganizationSlugLTE, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetOrganizationSlugLTE() *string { return v.OrganizationSlugLTE }
+
+// GetOrganizationSlugContains returns FlowWhereInput.OrganizationSlugContains, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetOrganizationSlugContains() *string { return v.OrganizationSlugContains }
+
+// GetOrganizationSlugHasPrefix returns FlowWhereInput.OrganizationSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetOrganizationSlugHasPrefix() *string { return v.OrganizationSlugHasPrefix }
+
+// GetOrganizationSlugHasSuffix returns FlowWhereInput.OrganizationSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetOrganizationSlugHasSuffix() *string { return v.OrganizationSlugHasSuffix }
+
+// GetOrganizationSlugEqualFold returns FlowWhereInput.OrganizationSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetOrganizationSlugEqualFold() *string { return v.OrganizationSlugEqualFold }
+
+// GetOrganizationSlugContainsFold returns FlowWhereInput.OrganizationSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetOrganizationSlugContainsFold() *string {
+	return v.OrganizationSlugContainsFold
+}
+
+// GetSlug returns FlowWhereInput.Slug, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetSlug() *string { return v.Slug }
+
+// GetSlugNEQ returns FlowWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
+
+// GetSlugIn returns FlowWhereInput.SlugIn, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetSlugIn() []string { return v.SlugIn }
+
+// GetSlugNotIn returns FlowWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
+
+// GetSlugGT returns FlowWhereInput.SlugGT, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetSlugGT() *string { return v.SlugGT }
+
+// GetSlugGTE returns FlowWhereInput.SlugGTE, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetSlugGTE() *string { return v.SlugGTE }
+
+// GetSlugLT returns FlowWhereInput.SlugLT, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetSlugLT() *string { return v.SlugLT }
+
+// GetSlugLTE returns FlowWhereInput.SlugLTE, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetSlugLTE() *string { return v.SlugLTE }
+
+// GetSlugContains returns FlowWhereInput.SlugContains, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetSlugContains() *string { return v.SlugContains }
+
+// GetSlugHasPrefix returns FlowWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
+
+// GetSlugHasSuffix returns FlowWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
+
+// GetSlugEqualFold returns FlowWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
+
+// GetSlugContainsFold returns FlowWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
+func (v *FlowWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
+
 // GetCreatedAt returns FlowWhereInput.CreatedAt, and is useful for accessing the field via an interface.
 func (v *FlowWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
 
@@ -7684,45 +8819,6 @@ func (v *FlowWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
 
 // GetUpdatedAtLTE returns FlowWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
 func (v *FlowWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
-
-// GetSlug returns FlowWhereInput.Slug, and is useful for accessing the field via an interface.
-func (v *FlowWhereInput) GetSlug() *string { return v.Slug }
-
-// GetSlugNEQ returns FlowWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
-func (v *FlowWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
-
-// GetSlugIn returns FlowWhereInput.SlugIn, and is useful for accessing the field via an interface.
-func (v *FlowWhereInput) GetSlugIn() []string { return v.SlugIn }
-
-// GetSlugNotIn returns FlowWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
-func (v *FlowWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
-
-// GetSlugGT returns FlowWhereInput.SlugGT, and is useful for accessing the field via an interface.
-func (v *FlowWhereInput) GetSlugGT() *string { return v.SlugGT }
-
-// GetSlugGTE returns FlowWhereInput.SlugGTE, and is useful for accessing the field via an interface.
-func (v *FlowWhereInput) GetSlugGTE() *string { return v.SlugGTE }
-
-// GetSlugLT returns FlowWhereInput.SlugLT, and is useful for accessing the field via an interface.
-func (v *FlowWhereInput) GetSlugLT() *string { return v.SlugLT }
-
-// GetSlugLTE returns FlowWhereInput.SlugLTE, and is useful for accessing the field via an interface.
-func (v *FlowWhereInput) GetSlugLTE() *string { return v.SlugLTE }
-
-// GetSlugContains returns FlowWhereInput.SlugContains, and is useful for accessing the field via an interface.
-func (v *FlowWhereInput) GetSlugContains() *string { return v.SlugContains }
-
-// GetSlugHasPrefix returns FlowWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
-func (v *FlowWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
-
-// GetSlugHasSuffix returns FlowWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
-func (v *FlowWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
-
-// GetSlugEqualFold returns FlowWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
-func (v *FlowWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
-
-// GetSlugContainsFold returns FlowWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
-func (v *FlowWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
 
 // GetName returns FlowWhereInput.Name, and is useful for accessing the field via an interface.
 func (v *FlowWhereInput) GetName() *string { return v.Name }
@@ -8131,20 +9227,20 @@ type GeoLayerWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
-	// name field predicates
-	Name             *string  `json:"name"`
-	NameNEQ          *string  `json:"nameNEQ"`
-	NameIn           []string `json:"nameIn"`
-	NameNotIn        []string `json:"nameNotIn"`
-	NameGT           *string  `json:"nameGT"`
-	NameGTE          *string  `json:"nameGTE"`
-	NameLT           *string  `json:"nameLT"`
-	NameLTE          *string  `json:"nameLTE"`
-	NameContains     *string  `json:"nameContains"`
-	NameHasPrefix    *string  `json:"nameHasPrefix"`
-	NameHasSuffix    *string  `json:"nameHasSuffix"`
-	NameEqualFold    *string  `json:"nameEqualFold"`
-	NameContainsFold *string  `json:"nameContainsFold"`
+	// slug field predicates
+	Slug             *string  `json:"slug"`
+	SlugNEQ          *string  `json:"slugNEQ"`
+	SlugIn           []string `json:"slugIn"`
+	SlugNotIn        []string `json:"slugNotIn"`
+	SlugGT           *string  `json:"slugGT"`
+	SlugGTE          *string  `json:"slugGTE"`
+	SlugLT           *string  `json:"slugLT"`
+	SlugLTE          *string  `json:"slugLTE"`
+	SlugContains     *string  `json:"slugContains"`
+	SlugHasPrefix    *string  `json:"slugHasPrefix"`
+	SlugHasSuffix    *string  `json:"slugHasSuffix"`
+	SlugEqualFold    *string  `json:"slugEqualFold"`
+	SlugContainsFold *string  `json:"slugContainsFold"`
 	// created_at field predicates
 	CreatedAt      *time.Time  `json:"createdAt"`
 	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
@@ -8198,20 +9294,20 @@ type GeoLayerWhereInput struct {
 	SyncedAtLTE    *time.Time  `json:"syncedAtLTE"`
 	SyncedAtIsNil  *bool       `json:"syncedAtIsNil"`
 	SyncedAtNotNil *bool       `json:"syncedAtNotNil"`
-	// slug field predicates
-	Slug             *string  `json:"slug"`
-	SlugNEQ          *string  `json:"slugNEQ"`
-	SlugIn           []string `json:"slugIn"`
-	SlugNotIn        []string `json:"slugNotIn"`
-	SlugGT           *string  `json:"slugGT"`
-	SlugGTE          *string  `json:"slugGTE"`
-	SlugLT           *string  `json:"slugLT"`
-	SlugLTE          *string  `json:"slugLTE"`
-	SlugContains     *string  `json:"slugContains"`
-	SlugHasPrefix    *string  `json:"slugHasPrefix"`
-	SlugHasSuffix    *string  `json:"slugHasSuffix"`
-	SlugEqualFold    *string  `json:"slugEqualFold"`
-	SlugContainsFold *string  `json:"slugContainsFold"`
+	// name field predicates
+	Name             *string  `json:"name"`
+	NameNEQ          *string  `json:"nameNEQ"`
+	NameIn           []string `json:"nameIn"`
+	NameNotIn        []string `json:"nameNotIn"`
+	NameGT           *string  `json:"nameGT"`
+	NameGTE          *string  `json:"nameGTE"`
+	NameLT           *string  `json:"nameLT"`
+	NameLTE          *string  `json:"nameLTE"`
+	NameContains     *string  `json:"nameContains"`
+	NameHasPrefix    *string  `json:"nameHasPrefix"`
+	NameHasSuffix    *string  `json:"nameHasSuffix"`
+	NameEqualFold    *string  `json:"nameEqualFold"`
+	NameContainsFold *string  `json:"nameContainsFold"`
 	// description field predicates
 	Description             *string  `json:"description"`
 	DescriptionNEQ          *string  `json:"descriptionNEQ"`
@@ -8329,44 +9425,44 @@ func (v *GeoLayerWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 // GetIdLTE returns GeoLayerWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *GeoLayerWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
 
-// GetName returns GeoLayerWhereInput.Name, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetName() *string { return v.Name }
+// GetSlug returns GeoLayerWhereInput.Slug, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetSlug() *string { return v.Slug }
 
-// GetNameNEQ returns GeoLayerWhereInput.NameNEQ, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetNameNEQ() *string { return v.NameNEQ }
+// GetSlugNEQ returns GeoLayerWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
 
-// GetNameIn returns GeoLayerWhereInput.NameIn, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetNameIn() []string { return v.NameIn }
+// GetSlugIn returns GeoLayerWhereInput.SlugIn, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetSlugIn() []string { return v.SlugIn }
 
-// GetNameNotIn returns GeoLayerWhereInput.NameNotIn, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetNameNotIn() []string { return v.NameNotIn }
+// GetSlugNotIn returns GeoLayerWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
 
-// GetNameGT returns GeoLayerWhereInput.NameGT, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetNameGT() *string { return v.NameGT }
+// GetSlugGT returns GeoLayerWhereInput.SlugGT, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetSlugGT() *string { return v.SlugGT }
 
-// GetNameGTE returns GeoLayerWhereInput.NameGTE, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetNameGTE() *string { return v.NameGTE }
+// GetSlugGTE returns GeoLayerWhereInput.SlugGTE, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetSlugGTE() *string { return v.SlugGTE }
 
-// GetNameLT returns GeoLayerWhereInput.NameLT, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetNameLT() *string { return v.NameLT }
+// GetSlugLT returns GeoLayerWhereInput.SlugLT, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetSlugLT() *string { return v.SlugLT }
 
-// GetNameLTE returns GeoLayerWhereInput.NameLTE, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetNameLTE() *string { return v.NameLTE }
+// GetSlugLTE returns GeoLayerWhereInput.SlugLTE, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetSlugLTE() *string { return v.SlugLTE }
 
-// GetNameContains returns GeoLayerWhereInput.NameContains, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetNameContains() *string { return v.NameContains }
+// GetSlugContains returns GeoLayerWhereInput.SlugContains, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetSlugContains() *string { return v.SlugContains }
 
-// GetNameHasPrefix returns GeoLayerWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
+// GetSlugHasPrefix returns GeoLayerWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
 
-// GetNameHasSuffix returns GeoLayerWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
+// GetSlugHasSuffix returns GeoLayerWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
 
-// GetNameEqualFold returns GeoLayerWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
+// GetSlugEqualFold returns GeoLayerWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
 
-// GetNameContainsFold returns GeoLayerWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
+// GetSlugContainsFold returns GeoLayerWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
 
 // GetCreatedAt returns GeoLayerWhereInput.CreatedAt, and is useful for accessing the field via an interface.
 func (v *GeoLayerWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
@@ -8509,44 +9605,44 @@ func (v *GeoLayerWhereInput) GetSyncedAtIsNil() *bool { return v.SyncedAtIsNil }
 // GetSyncedAtNotNil returns GeoLayerWhereInput.SyncedAtNotNil, and is useful for accessing the field via an interface.
 func (v *GeoLayerWhereInput) GetSyncedAtNotNil() *bool { return v.SyncedAtNotNil }
 
-// GetSlug returns GeoLayerWhereInput.Slug, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetSlug() *string { return v.Slug }
+// GetName returns GeoLayerWhereInput.Name, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetName() *string { return v.Name }
 
-// GetSlugNEQ returns GeoLayerWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
+// GetNameNEQ returns GeoLayerWhereInput.NameNEQ, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetNameNEQ() *string { return v.NameNEQ }
 
-// GetSlugIn returns GeoLayerWhereInput.SlugIn, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetSlugIn() []string { return v.SlugIn }
+// GetNameIn returns GeoLayerWhereInput.NameIn, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetNameIn() []string { return v.NameIn }
 
-// GetSlugNotIn returns GeoLayerWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
+// GetNameNotIn returns GeoLayerWhereInput.NameNotIn, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetNameNotIn() []string { return v.NameNotIn }
 
-// GetSlugGT returns GeoLayerWhereInput.SlugGT, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetSlugGT() *string { return v.SlugGT }
+// GetNameGT returns GeoLayerWhereInput.NameGT, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetNameGT() *string { return v.NameGT }
 
-// GetSlugGTE returns GeoLayerWhereInput.SlugGTE, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetSlugGTE() *string { return v.SlugGTE }
+// GetNameGTE returns GeoLayerWhereInput.NameGTE, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetNameGTE() *string { return v.NameGTE }
 
-// GetSlugLT returns GeoLayerWhereInput.SlugLT, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetSlugLT() *string { return v.SlugLT }
+// GetNameLT returns GeoLayerWhereInput.NameLT, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetNameLT() *string { return v.NameLT }
 
-// GetSlugLTE returns GeoLayerWhereInput.SlugLTE, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetSlugLTE() *string { return v.SlugLTE }
+// GetNameLTE returns GeoLayerWhereInput.NameLTE, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetNameLTE() *string { return v.NameLTE }
 
-// GetSlugContains returns GeoLayerWhereInput.SlugContains, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetSlugContains() *string { return v.SlugContains }
+// GetNameContains returns GeoLayerWhereInput.NameContains, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetNameContains() *string { return v.NameContains }
 
-// GetSlugHasPrefix returns GeoLayerWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
+// GetNameHasPrefix returns GeoLayerWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
 
-// GetSlugHasSuffix returns GeoLayerWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
+// GetNameHasSuffix returns GeoLayerWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
 
-// GetSlugEqualFold returns GeoLayerWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
+// GetNameEqualFold returns GeoLayerWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
 
-// GetSlugContainsFold returns GeoLayerWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
-func (v *GeoLayerWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
+// GetNameContainsFold returns GeoLayerWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
+func (v *GeoLayerWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
 
 // GetDescription returns GeoLayerWhereInput.Description, and is useful for accessing the field via an interface.
 func (v *GeoLayerWhereInput) GetDescription() *string { return v.Description }
@@ -8775,20 +9871,20 @@ type GeoMapWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
-	// name field predicates
-	Name             *string  `json:"name"`
-	NameNEQ          *string  `json:"nameNEQ"`
-	NameIn           []string `json:"nameIn"`
-	NameNotIn        []string `json:"nameNotIn"`
-	NameGT           *string  `json:"nameGT"`
-	NameGTE          *string  `json:"nameGTE"`
-	NameLT           *string  `json:"nameLT"`
-	NameLTE          *string  `json:"nameLTE"`
-	NameContains     *string  `json:"nameContains"`
-	NameHasPrefix    *string  `json:"nameHasPrefix"`
-	NameHasSuffix    *string  `json:"nameHasSuffix"`
-	NameEqualFold    *string  `json:"nameEqualFold"`
-	NameContainsFold *string  `json:"nameContainsFold"`
+	// slug field predicates
+	Slug             *string  `json:"slug"`
+	SlugNEQ          *string  `json:"slugNEQ"`
+	SlugIn           []string `json:"slugIn"`
+	SlugNotIn        []string `json:"slugNotIn"`
+	SlugGT           *string  `json:"slugGT"`
+	SlugGTE          *string  `json:"slugGTE"`
+	SlugLT           *string  `json:"slugLT"`
+	SlugLTE          *string  `json:"slugLTE"`
+	SlugContains     *string  `json:"slugContains"`
+	SlugHasPrefix    *string  `json:"slugHasPrefix"`
+	SlugHasSuffix    *string  `json:"slugHasSuffix"`
+	SlugEqualFold    *string  `json:"slugEqualFold"`
+	SlugContainsFold *string  `json:"slugContainsFold"`
 	// created_at field predicates
 	CreatedAt      *time.Time  `json:"createdAt"`
 	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
@@ -8807,20 +9903,20 @@ type GeoMapWhereInput struct {
 	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
 	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
-	// slug field predicates
-	Slug             *string  `json:"slug"`
-	SlugNEQ          *string  `json:"slugNEQ"`
-	SlugIn           []string `json:"slugIn"`
-	SlugNotIn        []string `json:"slugNotIn"`
-	SlugGT           *string  `json:"slugGT"`
-	SlugGTE          *string  `json:"slugGTE"`
-	SlugLT           *string  `json:"slugLT"`
-	SlugLTE          *string  `json:"slugLTE"`
-	SlugContains     *string  `json:"slugContains"`
-	SlugHasPrefix    *string  `json:"slugHasPrefix"`
-	SlugHasSuffix    *string  `json:"slugHasSuffix"`
-	SlugEqualFold    *string  `json:"slugEqualFold"`
-	SlugContainsFold *string  `json:"slugContainsFold"`
+	// name field predicates
+	Name             *string  `json:"name"`
+	NameNEQ          *string  `json:"nameNEQ"`
+	NameIn           []string `json:"nameIn"`
+	NameNotIn        []string `json:"nameNotIn"`
+	NameGT           *string  `json:"nameGT"`
+	NameGTE          *string  `json:"nameGTE"`
+	NameLT           *string  `json:"nameLT"`
+	NameLTE          *string  `json:"nameLTE"`
+	NameContains     *string  `json:"nameContains"`
+	NameHasPrefix    *string  `json:"nameHasPrefix"`
+	NameHasSuffix    *string  `json:"nameHasSuffix"`
+	NameEqualFold    *string  `json:"nameEqualFold"`
+	NameContainsFold *string  `json:"nameContainsFold"`
 	// description field predicates
 	Description             *string  `json:"description"`
 	DescriptionNEQ          *string  `json:"descriptionNEQ"`
@@ -8891,44 +9987,44 @@ func (v *GeoMapWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 // GetIdLTE returns GeoMapWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *GeoMapWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
 
-// GetName returns GeoMapWhereInput.Name, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetName() *string { return v.Name }
+// GetSlug returns GeoMapWhereInput.Slug, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetSlug() *string { return v.Slug }
 
-// GetNameNEQ returns GeoMapWhereInput.NameNEQ, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetNameNEQ() *string { return v.NameNEQ }
+// GetSlugNEQ returns GeoMapWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
 
-// GetNameIn returns GeoMapWhereInput.NameIn, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetNameIn() []string { return v.NameIn }
+// GetSlugIn returns GeoMapWhereInput.SlugIn, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetSlugIn() []string { return v.SlugIn }
 
-// GetNameNotIn returns GeoMapWhereInput.NameNotIn, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetNameNotIn() []string { return v.NameNotIn }
+// GetSlugNotIn returns GeoMapWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
 
-// GetNameGT returns GeoMapWhereInput.NameGT, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetNameGT() *string { return v.NameGT }
+// GetSlugGT returns GeoMapWhereInput.SlugGT, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetSlugGT() *string { return v.SlugGT }
 
-// GetNameGTE returns GeoMapWhereInput.NameGTE, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetNameGTE() *string { return v.NameGTE }
+// GetSlugGTE returns GeoMapWhereInput.SlugGTE, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetSlugGTE() *string { return v.SlugGTE }
 
-// GetNameLT returns GeoMapWhereInput.NameLT, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetNameLT() *string { return v.NameLT }
+// GetSlugLT returns GeoMapWhereInput.SlugLT, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetSlugLT() *string { return v.SlugLT }
 
-// GetNameLTE returns GeoMapWhereInput.NameLTE, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetNameLTE() *string { return v.NameLTE }
+// GetSlugLTE returns GeoMapWhereInput.SlugLTE, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetSlugLTE() *string { return v.SlugLTE }
 
-// GetNameContains returns GeoMapWhereInput.NameContains, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetNameContains() *string { return v.NameContains }
+// GetSlugContains returns GeoMapWhereInput.SlugContains, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetSlugContains() *string { return v.SlugContains }
 
-// GetNameHasPrefix returns GeoMapWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
+// GetSlugHasPrefix returns GeoMapWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
 
-// GetNameHasSuffix returns GeoMapWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
+// GetSlugHasSuffix returns GeoMapWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
 
-// GetNameEqualFold returns GeoMapWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
+// GetSlugEqualFold returns GeoMapWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
 
-// GetNameContainsFold returns GeoMapWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
+// GetSlugContainsFold returns GeoMapWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
 
 // GetCreatedAt returns GeoMapWhereInput.CreatedAt, and is useful for accessing the field via an interface.
 func (v *GeoMapWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
@@ -8978,44 +10074,44 @@ func (v *GeoMapWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
 // GetUpdatedAtLTE returns GeoMapWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
 func (v *GeoMapWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
 
-// GetSlug returns GeoMapWhereInput.Slug, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetSlug() *string { return v.Slug }
+// GetName returns GeoMapWhereInput.Name, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetName() *string { return v.Name }
 
-// GetSlugNEQ returns GeoMapWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
+// GetNameNEQ returns GeoMapWhereInput.NameNEQ, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetNameNEQ() *string { return v.NameNEQ }
 
-// GetSlugIn returns GeoMapWhereInput.SlugIn, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetSlugIn() []string { return v.SlugIn }
+// GetNameIn returns GeoMapWhereInput.NameIn, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetNameIn() []string { return v.NameIn }
 
-// GetSlugNotIn returns GeoMapWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
+// GetNameNotIn returns GeoMapWhereInput.NameNotIn, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetNameNotIn() []string { return v.NameNotIn }
 
-// GetSlugGT returns GeoMapWhereInput.SlugGT, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetSlugGT() *string { return v.SlugGT }
+// GetNameGT returns GeoMapWhereInput.NameGT, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetNameGT() *string { return v.NameGT }
 
-// GetSlugGTE returns GeoMapWhereInput.SlugGTE, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetSlugGTE() *string { return v.SlugGTE }
+// GetNameGTE returns GeoMapWhereInput.NameGTE, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetNameGTE() *string { return v.NameGTE }
 
-// GetSlugLT returns GeoMapWhereInput.SlugLT, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetSlugLT() *string { return v.SlugLT }
+// GetNameLT returns GeoMapWhereInput.NameLT, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetNameLT() *string { return v.NameLT }
 
-// GetSlugLTE returns GeoMapWhereInput.SlugLTE, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetSlugLTE() *string { return v.SlugLTE }
+// GetNameLTE returns GeoMapWhereInput.NameLTE, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetNameLTE() *string { return v.NameLTE }
 
-// GetSlugContains returns GeoMapWhereInput.SlugContains, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetSlugContains() *string { return v.SlugContains }
+// GetNameContains returns GeoMapWhereInput.NameContains, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetNameContains() *string { return v.NameContains }
 
-// GetSlugHasPrefix returns GeoMapWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
+// GetNameHasPrefix returns GeoMapWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
 
-// GetSlugHasSuffix returns GeoMapWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
+// GetNameHasSuffix returns GeoMapWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
 
-// GetSlugEqualFold returns GeoMapWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
+// GetNameEqualFold returns GeoMapWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
 
-// GetSlugContainsFold returns GeoMapWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
-func (v *GeoMapWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
+// GetNameContainsFold returns GeoMapWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
+func (v *GeoMapWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
 
 // GetDescription returns GeoMapWhereInput.Description, and is useful for accessing the field via an interface.
 func (v *GeoMapWhereInput) GetDescription() *string { return v.Description }
@@ -9134,20 +10230,6 @@ type GeoSourceWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
-	// name field predicates
-	Name             *string  `json:"name"`
-	NameNEQ          *string  `json:"nameNEQ"`
-	NameIn           []string `json:"nameIn"`
-	NameNotIn        []string `json:"nameNotIn"`
-	NameGT           *string  `json:"nameGT"`
-	NameGTE          *string  `json:"nameGTE"`
-	NameLT           *string  `json:"nameLT"`
-	NameLTE          *string  `json:"nameLTE"`
-	NameContains     *string  `json:"nameContains"`
-	NameHasPrefix    *string  `json:"nameHasPrefix"`
-	NameHasSuffix    *string  `json:"nameHasSuffix"`
-	NameEqualFold    *string  `json:"nameEqualFold"`
-	NameContainsFold *string  `json:"nameContainsFold"`
 	// created_at field predicates
 	CreatedAt      *time.Time  `json:"createdAt"`
 	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
@@ -9166,6 +10248,20 @@ type GeoSourceWhereInput struct {
 	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
 	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
+	// name field predicates
+	Name             *string  `json:"name"`
+	NameNEQ          *string  `json:"nameNEQ"`
+	NameIn           []string `json:"nameIn"`
+	NameNotIn        []string `json:"nameNotIn"`
+	NameGT           *string  `json:"nameGT"`
+	NameGTE          *string  `json:"nameGTE"`
+	NameLT           *string  `json:"nameLT"`
+	NameLTE          *string  `json:"nameLTE"`
+	NameContains     *string  `json:"nameContains"`
+	NameHasPrefix    *string  `json:"nameHasPrefix"`
+	NameHasSuffix    *string  `json:"nameHasSuffix"`
+	NameEqualFold    *string  `json:"nameEqualFold"`
+	NameContainsFold *string  `json:"nameContainsFold"`
 	// provider_id field predicates
 	ProviderID             *string  `json:"providerID"`
 	ProviderIDNEQ          *string  `json:"providerIDNEQ"`
@@ -9240,45 +10336,6 @@ func (v *GeoSourceWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 // GetIdLTE returns GeoSourceWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *GeoSourceWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
 
-// GetName returns GeoSourceWhereInput.Name, and is useful for accessing the field via an interface.
-func (v *GeoSourceWhereInput) GetName() *string { return v.Name }
-
-// GetNameNEQ returns GeoSourceWhereInput.NameNEQ, and is useful for accessing the field via an interface.
-func (v *GeoSourceWhereInput) GetNameNEQ() *string { return v.NameNEQ }
-
-// GetNameIn returns GeoSourceWhereInput.NameIn, and is useful for accessing the field via an interface.
-func (v *GeoSourceWhereInput) GetNameIn() []string { return v.NameIn }
-
-// GetNameNotIn returns GeoSourceWhereInput.NameNotIn, and is useful for accessing the field via an interface.
-func (v *GeoSourceWhereInput) GetNameNotIn() []string { return v.NameNotIn }
-
-// GetNameGT returns GeoSourceWhereInput.NameGT, and is useful for accessing the field via an interface.
-func (v *GeoSourceWhereInput) GetNameGT() *string { return v.NameGT }
-
-// GetNameGTE returns GeoSourceWhereInput.NameGTE, and is useful for accessing the field via an interface.
-func (v *GeoSourceWhereInput) GetNameGTE() *string { return v.NameGTE }
-
-// GetNameLT returns GeoSourceWhereInput.NameLT, and is useful for accessing the field via an interface.
-func (v *GeoSourceWhereInput) GetNameLT() *string { return v.NameLT }
-
-// GetNameLTE returns GeoSourceWhereInput.NameLTE, and is useful for accessing the field via an interface.
-func (v *GeoSourceWhereInput) GetNameLTE() *string { return v.NameLTE }
-
-// GetNameContains returns GeoSourceWhereInput.NameContains, and is useful for accessing the field via an interface.
-func (v *GeoSourceWhereInput) GetNameContains() *string { return v.NameContains }
-
-// GetNameHasPrefix returns GeoSourceWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
-func (v *GeoSourceWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
-
-// GetNameHasSuffix returns GeoSourceWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
-func (v *GeoSourceWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
-
-// GetNameEqualFold returns GeoSourceWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
-func (v *GeoSourceWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
-
-// GetNameContainsFold returns GeoSourceWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
-func (v *GeoSourceWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
-
 // GetCreatedAt returns GeoSourceWhereInput.CreatedAt, and is useful for accessing the field via an interface.
 func (v *GeoSourceWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
 
@@ -9326,6 +10383,45 @@ func (v *GeoSourceWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT
 
 // GetUpdatedAtLTE returns GeoSourceWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
 func (v *GeoSourceWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
+
+// GetName returns GeoSourceWhereInput.Name, and is useful for accessing the field via an interface.
+func (v *GeoSourceWhereInput) GetName() *string { return v.Name }
+
+// GetNameNEQ returns GeoSourceWhereInput.NameNEQ, and is useful for accessing the field via an interface.
+func (v *GeoSourceWhereInput) GetNameNEQ() *string { return v.NameNEQ }
+
+// GetNameIn returns GeoSourceWhereInput.NameIn, and is useful for accessing the field via an interface.
+func (v *GeoSourceWhereInput) GetNameIn() []string { return v.NameIn }
+
+// GetNameNotIn returns GeoSourceWhereInput.NameNotIn, and is useful for accessing the field via an interface.
+func (v *GeoSourceWhereInput) GetNameNotIn() []string { return v.NameNotIn }
+
+// GetNameGT returns GeoSourceWhereInput.NameGT, and is useful for accessing the field via an interface.
+func (v *GeoSourceWhereInput) GetNameGT() *string { return v.NameGT }
+
+// GetNameGTE returns GeoSourceWhereInput.NameGTE, and is useful for accessing the field via an interface.
+func (v *GeoSourceWhereInput) GetNameGTE() *string { return v.NameGTE }
+
+// GetNameLT returns GeoSourceWhereInput.NameLT, and is useful for accessing the field via an interface.
+func (v *GeoSourceWhereInput) GetNameLT() *string { return v.NameLT }
+
+// GetNameLTE returns GeoSourceWhereInput.NameLTE, and is useful for accessing the field via an interface.
+func (v *GeoSourceWhereInput) GetNameLTE() *string { return v.NameLTE }
+
+// GetNameContains returns GeoSourceWhereInput.NameContains, and is useful for accessing the field via an interface.
+func (v *GeoSourceWhereInput) GetNameContains() *string { return v.NameContains }
+
+// GetNameHasPrefix returns GeoSourceWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
+func (v *GeoSourceWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
+
+// GetNameHasSuffix returns GeoSourceWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
+func (v *GeoSourceWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
+
+// GetNameEqualFold returns GeoSourceWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
+func (v *GeoSourceWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
+
+// GetNameContainsFold returns GeoSourceWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
+func (v *GeoSourceWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
 
 // GetProviderID returns GeoSourceWhereInput.ProviderID, and is useful for accessing the field via an interface.
 func (v *GeoSourceWhereInput) GetProviderID() *string { return v.ProviderID }
@@ -9729,21 +10825,53 @@ func (v *GetConnectionConnection) GetName() string { return v.ConnectionFragment
 // GetVisibility returns GetConnectionConnection.Visibility, and is useful for accessing the field via an interface.
 func (v *GetConnectionConnection) GetVisibility() Visibility { return v.ConnectionFragment.Visibility }
 
-// GetCreatedAt returns GetConnectionConnection.CreatedAt, and is useful for accessing the field via an interface.
-func (v *GetConnectionConnection) GetCreatedAt() time.Time { return v.ConnectionFragment.CreatedAt }
-
-// GetUpdatedAt returns GetConnectionConnection.UpdatedAt, and is useful for accessing the field via an interface.
-func (v *GetConnectionConnection) GetUpdatedAt() time.Time { return v.ConnectionFragment.UpdatedAt }
-
-// GetIntegrationID returns GetConnectionConnection.IntegrationID, and is useful for accessing the field via an interface.
-func (v *GetConnectionConnection) GetIntegrationID() uuid.UUID {
-	return v.ConnectionFragment.IntegrationID
+// GetOrganizationSlug returns GetConnectionConnection.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *GetConnectionConnection) GetOrganizationSlug() string {
+	return v.ConnectionFragment.OrganizationSlug
 }
 
 // GetOrganizationID returns GetConnectionConnection.OrganizationID, and is useful for accessing the field via an interface.
 func (v *GetConnectionConnection) GetOrganizationID() uuid.UUID {
 	return v.ConnectionFragment.OrganizationID
 }
+
+// GetIntegrationSlug returns GetConnectionConnection.IntegrationSlug, and is useful for accessing the field via an interface.
+func (v *GetConnectionConnection) GetIntegrationSlug() *string {
+	return v.ConnectionFragment.IntegrationSlug
+}
+
+// GetDeploymentSlug returns GetConnectionConnection.DeploymentSlug, and is useful for accessing the field via an interface.
+func (v *GetConnectionConnection) GetDeploymentSlug() *string {
+	return v.ConnectionFragment.DeploymentSlug
+}
+
+// GetDeploymentID returns GetConnectionConnection.DeploymentID, and is useful for accessing the field via an interface.
+func (v *GetConnectionConnection) GetDeploymentID() *uuid.UUID {
+	return v.ConnectionFragment.DeploymentID
+}
+
+// GetConfigURI returns GetConnectionConnection.ConfigURI, and is useful for accessing the field via an interface.
+func (v *GetConnectionConnection) GetConfigURI() *string { return v.ConnectionFragment.ConfigURI }
+
+// GetCustomProtos returns GetConnectionConnection.CustomProtos, and is useful for accessing the field via an interface.
+func (v *GetConnectionConnection) GetCustomProtos() *string { return v.ConnectionFragment.CustomProtos }
+
+// GetCustomGrpc returns GetConnectionConnection.CustomGrpc, and is useful for accessing the field via an interface.
+func (v *GetConnectionConnection) GetCustomGrpc() *bool { return v.ConnectionFragment.CustomGrpc }
+
+// GetHeaders returns GetConnectionConnection.Headers, and is useful for accessing the field via an interface.
+func (v *GetConnectionConnection) GetHeaders() map[string]any { return v.ConnectionFragment.Headers }
+
+// GetAddress returns GetConnectionConnection.Address, and is useful for accessing the field via an interface.
+func (v *GetConnectionConnection) GetAddress() *ConnectionFragmentAddress {
+	return v.ConnectionFragment.Address
+}
+
+// GetCreatedAt returns GetConnectionConnection.CreatedAt, and is useful for accessing the field via an interface.
+func (v *GetConnectionConnection) GetCreatedAt() time.Time { return v.ConnectionFragment.CreatedAt }
+
+// GetUpdatedAt returns GetConnectionConnection.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *GetConnectionConnection) GetUpdatedAt() time.Time { return v.ConnectionFragment.UpdatedAt }
 
 func (v *GetConnectionConnection) UnmarshalJSON(b []byte) error {
 
@@ -9779,13 +10907,29 @@ type __premarshalGetConnectionConnection struct {
 
 	Visibility Visibility `json:"visibility"`
 
+	OrganizationSlug string `json:"organizationSlug"`
+
+	OrganizationID uuid.UUID `json:"organizationID"`
+
+	IntegrationSlug *string `json:"integrationSlug"`
+
+	DeploymentSlug *string `json:"deploymentSlug"`
+
+	DeploymentID *uuid.UUID `json:"deploymentID"`
+
+	ConfigURI *string `json:"configURI"`
+
+	CustomProtos *string `json:"customProtos"`
+
+	CustomGrpc *bool `json:"customGrpc"`
+
+	Headers map[string]any `json:"headers"`
+
+	Address *ConnectionFragmentAddress `json:"address"`
+
 	CreatedAt time.Time `json:"createdAt"`
 
 	UpdatedAt time.Time `json:"updatedAt"`
-
-	IntegrationID uuid.UUID `json:"integrationID"`
-
-	OrganizationID uuid.UUID `json:"organizationID"`
 }
 
 func (v *GetConnectionConnection) MarshalJSON() ([]byte, error) {
@@ -9803,10 +10947,18 @@ func (v *GetConnectionConnection) __premarshalJSON() (*__premarshalGetConnection
 	retval.Slug = v.ConnectionFragment.Slug
 	retval.Name = v.ConnectionFragment.Name
 	retval.Visibility = v.ConnectionFragment.Visibility
+	retval.OrganizationSlug = v.ConnectionFragment.OrganizationSlug
+	retval.OrganizationID = v.ConnectionFragment.OrganizationID
+	retval.IntegrationSlug = v.ConnectionFragment.IntegrationSlug
+	retval.DeploymentSlug = v.ConnectionFragment.DeploymentSlug
+	retval.DeploymentID = v.ConnectionFragment.DeploymentID
+	retval.ConfigURI = v.ConnectionFragment.ConfigURI
+	retval.CustomProtos = v.ConnectionFragment.CustomProtos
+	retval.CustomGrpc = v.ConnectionFragment.CustomGrpc
+	retval.Headers = v.ConnectionFragment.Headers
+	retval.Address = v.ConnectionFragment.Address
 	retval.CreatedAt = v.ConnectionFragment.CreatedAt
 	retval.UpdatedAt = v.ConnectionFragment.UpdatedAt
-	retval.IntegrationID = v.ConnectionFragment.IntegrationID
-	retval.OrganizationID = v.ConnectionFragment.OrganizationID
 	return &retval, nil
 }
 
@@ -10276,24 +11428,14 @@ func (v *GetIntegrationIntegration) GetDescription() string { return v.Integrati
 // GetIcon returns GetIntegrationIntegration.Icon, and is useful for accessing the field via an interface.
 func (v *GetIntegrationIntegration) GetIcon() string { return v.IntegrationFragment.Icon }
 
-// GetServiceNames returns GetIntegrationIntegration.ServiceNames, and is useful for accessing the field via an interface.
-func (v *GetIntegrationIntegration) GetServiceNames() []string {
-	return v.IntegrationFragment.ServiceNames
+// GetVisibility returns GetIntegrationIntegration.Visibility, and is useful for accessing the field via an interface.
+func (v *GetIntegrationIntegration) GetVisibility() Visibility {
+	return v.IntegrationFragment.Visibility
 }
 
-// GetConfigSchema returns GetIntegrationIntegration.ConfigSchema, and is useful for accessing the field via an interface.
-func (v *GetIntegrationIntegration) GetConfigSchema() *string {
-	return v.IntegrationFragment.ConfigSchema
-}
-
-// GetServerConfig returns GetIntegrationIntegration.ServerConfig, and is useful for accessing the field via an interface.
-func (v *GetIntegrationIntegration) GetServerConfig() *string {
-	return v.IntegrationFragment.ServerConfig
-}
-
-// GetPublished returns GetIntegrationIntegration.Published, and is useful for accessing the field via an interface.
-func (v *GetIntegrationIntegration) GetPublished() *IntegrationFragmentPublishedIntegrationPackage {
-	return v.IntegrationFragment.Published
+// GetOrganizationSlug returns GetIntegrationIntegration.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *GetIntegrationIntegration) GetOrganizationSlug() string {
+	return v.IntegrationFragment.OrganizationSlug
 }
 
 // GetOrganizationID returns GetIntegrationIntegration.OrganizationID, and is useful for accessing the field via an interface.
@@ -10301,11 +11443,21 @@ func (v *GetIntegrationIntegration) GetOrganizationID() uuid.UUID {
 	return v.IntegrationFragment.OrganizationID
 }
 
+// GetRevisionID returns GetIntegrationIntegration.RevisionID, and is useful for accessing the field via an interface.
+func (v *GetIntegrationIntegration) GetRevisionID() *uuid.UUID {
+	return v.IntegrationFragment.RevisionID
+}
+
 // GetCreatedAt returns GetIntegrationIntegration.CreatedAt, and is useful for accessing the field via an interface.
 func (v *GetIntegrationIntegration) GetCreatedAt() time.Time { return v.IntegrationFragment.CreatedAt }
 
 // GetUpdatedAt returns GetIntegrationIntegration.UpdatedAt, and is useful for accessing the field via an interface.
 func (v *GetIntegrationIntegration) GetUpdatedAt() time.Time { return v.IntegrationFragment.UpdatedAt }
+
+// GetPublished returns GetIntegrationIntegration.Published, and is useful for accessing the field via an interface.
+func (v *GetIntegrationIntegration) GetPublished() *IntegrationFragmentPublishedIntegrationRevision {
+	return v.IntegrationFragment.Published
+}
 
 func (v *GetIntegrationIntegration) UnmarshalJSON(b []byte) error {
 
@@ -10347,19 +11499,19 @@ type __premarshalGetIntegrationIntegration struct {
 
 	Icon string `json:"icon"`
 
-	ServiceNames []string `json:"serviceNames"`
+	Visibility Visibility `json:"visibility"`
 
-	ConfigSchema *string `json:"configSchema"`
-
-	ServerConfig *string `json:"serverConfig"`
-
-	Published *IntegrationFragmentPublishedIntegrationPackage `json:"published"`
+	OrganizationSlug string `json:"organizationSlug"`
 
 	OrganizationID uuid.UUID `json:"organizationID"`
+
+	RevisionID *uuid.UUID `json:"revisionID"`
 
 	CreatedAt time.Time `json:"createdAt"`
 
 	UpdatedAt time.Time `json:"updatedAt"`
+
+	Published *IntegrationFragmentPublishedIntegrationRevision `json:"published"`
 }
 
 func (v *GetIntegrationIntegration) MarshalJSON() ([]byte, error) {
@@ -10380,13 +11532,13 @@ func (v *GetIntegrationIntegration) __premarshalJSON() (*__premarshalGetIntegrat
 	retval.Version = v.IntegrationFragment.Version
 	retval.Description = v.IntegrationFragment.Description
 	retval.Icon = v.IntegrationFragment.Icon
-	retval.ServiceNames = v.IntegrationFragment.ServiceNames
-	retval.ConfigSchema = v.IntegrationFragment.ConfigSchema
-	retval.ServerConfig = v.IntegrationFragment.ServerConfig
-	retval.Published = v.IntegrationFragment.Published
+	retval.Visibility = v.IntegrationFragment.Visibility
+	retval.OrganizationSlug = v.IntegrationFragment.OrganizationSlug
 	retval.OrganizationID = v.IntegrationFragment.OrganizationID
+	retval.RevisionID = v.IntegrationFragment.RevisionID
 	retval.CreatedAt = v.IntegrationFragment.CreatedAt
 	retval.UpdatedAt = v.IntegrationFragment.UpdatedAt
+	retval.Published = v.IntegrationFragment.Published
 	return &retval, nil
 }
 
@@ -12001,20 +13153,20 @@ func (v *IOSchemaWhereInput) GetHasOrganizationWith() []*OrganizationWhereInput 
 
 // IntegrationFragment includes the GraphQL fields of Integration requested by the fragment IntegrationFragment.
 type IntegrationFragment struct {
-	Id             uuid.UUID                                       `json:"id"`
-	Slug           string                                          `json:"slug"`
-	Name           string                                          `json:"name"`
-	ApiVersion     string                                          `json:"apiVersion"`
-	Version        string                                          `json:"version"`
-	Description    string                                          `json:"description"`
-	Icon           string                                          `json:"icon"`
-	ServiceNames   []string                                        `json:"serviceNames"`
-	ConfigSchema   *string                                         `json:"configSchema"`
-	ServerConfig   *string                                         `json:"serverConfig"`
-	Published      *IntegrationFragmentPublishedIntegrationPackage `json:"published"`
-	OrganizationID uuid.UUID                                       `json:"organizationID"`
-	CreatedAt      time.Time                                       `json:"createdAt"`
-	UpdatedAt      time.Time                                       `json:"updatedAt"`
+	Id               uuid.UUID                                        `json:"id"`
+	Slug             string                                           `json:"slug"`
+	Name             string                                           `json:"name"`
+	ApiVersion       string                                           `json:"apiVersion"`
+	Version          string                                           `json:"version"`
+	Description      string                                           `json:"description"`
+	Icon             string                                           `json:"icon"`
+	Visibility       Visibility                                       `json:"visibility"`
+	OrganizationSlug string                                           `json:"organizationSlug"`
+	OrganizationID   uuid.UUID                                        `json:"organizationID"`
+	RevisionID       *uuid.UUID                                       `json:"revisionID"`
+	CreatedAt        time.Time                                        `json:"createdAt"`
+	UpdatedAt        time.Time                                        `json:"updatedAt"`
+	Published        *IntegrationFragmentPublishedIntegrationRevision `json:"published"`
 }
 
 // GetId returns IntegrationFragment.Id, and is useful for accessing the field via an interface.
@@ -12038,22 +13190,17 @@ func (v *IntegrationFragment) GetDescription() string { return v.Description }
 // GetIcon returns IntegrationFragment.Icon, and is useful for accessing the field via an interface.
 func (v *IntegrationFragment) GetIcon() string { return v.Icon }
 
-// GetServiceNames returns IntegrationFragment.ServiceNames, and is useful for accessing the field via an interface.
-func (v *IntegrationFragment) GetServiceNames() []string { return v.ServiceNames }
+// GetVisibility returns IntegrationFragment.Visibility, and is useful for accessing the field via an interface.
+func (v *IntegrationFragment) GetVisibility() Visibility { return v.Visibility }
 
-// GetConfigSchema returns IntegrationFragment.ConfigSchema, and is useful for accessing the field via an interface.
-func (v *IntegrationFragment) GetConfigSchema() *string { return v.ConfigSchema }
-
-// GetServerConfig returns IntegrationFragment.ServerConfig, and is useful for accessing the field via an interface.
-func (v *IntegrationFragment) GetServerConfig() *string { return v.ServerConfig }
-
-// GetPublished returns IntegrationFragment.Published, and is useful for accessing the field via an interface.
-func (v *IntegrationFragment) GetPublished() *IntegrationFragmentPublishedIntegrationPackage {
-	return v.Published
-}
+// GetOrganizationSlug returns IntegrationFragment.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *IntegrationFragment) GetOrganizationSlug() string { return v.OrganizationSlug }
 
 // GetOrganizationID returns IntegrationFragment.OrganizationID, and is useful for accessing the field via an interface.
 func (v *IntegrationFragment) GetOrganizationID() uuid.UUID { return v.OrganizationID }
+
+// GetRevisionID returns IntegrationFragment.RevisionID, and is useful for accessing the field via an interface.
+func (v *IntegrationFragment) GetRevisionID() *uuid.UUID { return v.RevisionID }
 
 // GetCreatedAt returns IntegrationFragment.CreatedAt, and is useful for accessing the field via an interface.
 func (v *IntegrationFragment) GetCreatedAt() time.Time { return v.CreatedAt }
@@ -12061,67 +13208,82 @@ func (v *IntegrationFragment) GetCreatedAt() time.Time { return v.CreatedAt }
 // GetUpdatedAt returns IntegrationFragment.UpdatedAt, and is useful for accessing the field via an interface.
 func (v *IntegrationFragment) GetUpdatedAt() time.Time { return v.UpdatedAt }
 
-// IntegrationFragmentPublishedIntegrationPackage includes the requested fields of the GraphQL type IntegrationPackage.
-type IntegrationFragmentPublishedIntegrationPackage struct {
-	IntegrationPackageFragment `json:"-"`
+// GetPublished returns IntegrationFragment.Published, and is useful for accessing the field via an interface.
+func (v *IntegrationFragment) GetPublished() *IntegrationFragmentPublishedIntegrationRevision {
+	return v.Published
 }
 
-// GetId returns IntegrationFragmentPublishedIntegrationPackage.Id, and is useful for accessing the field via an interface.
-func (v *IntegrationFragmentPublishedIntegrationPackage) GetId() uuid.UUID {
-	return v.IntegrationPackageFragment.Id
+// IntegrationFragmentPublishedIntegrationRevision includes the requested fields of the GraphQL type IntegrationRevision.
+type IntegrationFragmentPublishedIntegrationRevision struct {
+	IntegrationRevisionFragment `json:"-"`
 }
 
-// GetChecksum returns IntegrationFragmentPublishedIntegrationPackage.Checksum, and is useful for accessing the field via an interface.
-func (v *IntegrationFragmentPublishedIntegrationPackage) GetChecksum() string {
-	return v.IntegrationPackageFragment.Checksum
+// GetId returns IntegrationFragmentPublishedIntegrationRevision.Id, and is useful for accessing the field via an interface.
+func (v *IntegrationFragmentPublishedIntegrationRevision) GetId() uuid.UUID {
+	return v.IntegrationRevisionFragment.Id
 }
 
-// GetSpec returns IntegrationFragmentPublishedIntegrationPackage.Spec, and is useful for accessing the field via an interface.
-func (v *IntegrationFragmentPublishedIntegrationPackage) GetSpec() []byte {
-	return v.IntegrationPackageFragment.Spec
+// GetSlug returns IntegrationFragmentPublishedIntegrationRevision.Slug, and is useful for accessing the field via an interface.
+func (v *IntegrationFragmentPublishedIntegrationRevision) GetSlug() string {
+	return v.IntegrationRevisionFragment.Slug
 }
 
-// GetConfigSchema returns IntegrationFragmentPublishedIntegrationPackage.ConfigSchema, and is useful for accessing the field via an interface.
-func (v *IntegrationFragmentPublishedIntegrationPackage) GetConfigSchema() string {
-	return v.IntegrationPackageFragment.ConfigSchema
+// GetIntegrationSlug returns IntegrationFragmentPublishedIntegrationRevision.IntegrationSlug, and is useful for accessing the field via an interface.
+func (v *IntegrationFragmentPublishedIntegrationRevision) GetIntegrationSlug() string {
+	return v.IntegrationRevisionFragment.IntegrationSlug
 }
 
-// GetServiceNames returns IntegrationFragmentPublishedIntegrationPackage.ServiceNames, and is useful for accessing the field via an interface.
-func (v *IntegrationFragmentPublishedIntegrationPackage) GetServiceNames() []string {
-	return v.IntegrationPackageFragment.ServiceNames
+// GetOrganizationSlug returns IntegrationFragmentPublishedIntegrationRevision.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *IntegrationFragmentPublishedIntegrationRevision) GetOrganizationSlug() string {
+	return v.IntegrationRevisionFragment.OrganizationSlug
 }
 
-// GetIntegrationID returns IntegrationFragmentPublishedIntegrationPackage.IntegrationID, and is useful for accessing the field via an interface.
-func (v *IntegrationFragmentPublishedIntegrationPackage) GetIntegrationID() uuid.UUID {
-	return v.IntegrationPackageFragment.IntegrationID
+// GetSpecEtag returns IntegrationFragmentPublishedIntegrationRevision.SpecEtag, and is useful for accessing the field via an interface.
+func (v *IntegrationFragmentPublishedIntegrationRevision) GetSpecEtag() string {
+	return v.IntegrationRevisionFragment.SpecEtag
 }
 
-// GetAuthorID returns IntegrationFragmentPublishedIntegrationPackage.AuthorID, and is useful for accessing the field via an interface.
-func (v *IntegrationFragmentPublishedIntegrationPackage) GetAuthorID() uuid.UUID {
-	return v.IntegrationPackageFragment.AuthorID
+// GetSourceURI returns IntegrationFragmentPublishedIntegrationRevision.SourceURI, and is useful for accessing the field via an interface.
+func (v *IntegrationFragmentPublishedIntegrationRevision) GetSourceURI() *string {
+	return v.IntegrationRevisionFragment.SourceURI
 }
 
-// GetCreatedAt returns IntegrationFragmentPublishedIntegrationPackage.CreatedAt, and is useful for accessing the field via an interface.
-func (v *IntegrationFragmentPublishedIntegrationPackage) GetCreatedAt() time.Time {
-	return v.IntegrationPackageFragment.CreatedAt
+// GetSourceEtag returns IntegrationFragmentPublishedIntegrationRevision.SourceEtag, and is useful for accessing the field via an interface.
+func (v *IntegrationFragmentPublishedIntegrationRevision) GetSourceEtag() *string {
+	return v.IntegrationRevisionFragment.SourceEtag
 }
 
-// GetUpdatedAt returns IntegrationFragmentPublishedIntegrationPackage.UpdatedAt, and is useful for accessing the field via an interface.
-func (v *IntegrationFragmentPublishedIntegrationPackage) GetUpdatedAt() time.Time {
-	return v.IntegrationPackageFragment.UpdatedAt
+// GetIntegrationID returns IntegrationFragmentPublishedIntegrationRevision.IntegrationID, and is useful for accessing the field via an interface.
+func (v *IntegrationFragmentPublishedIntegrationRevision) GetIntegrationID() uuid.UUID {
+	return v.IntegrationRevisionFragment.IntegrationID
 }
 
-func (v *IntegrationFragmentPublishedIntegrationPackage) UnmarshalJSON(b []byte) error {
+// GetAuthorID returns IntegrationFragmentPublishedIntegrationRevision.AuthorID, and is useful for accessing the field via an interface.
+func (v *IntegrationFragmentPublishedIntegrationRevision) GetAuthorID() uuid.UUID {
+	return v.IntegrationRevisionFragment.AuthorID
+}
+
+// GetCreatedAt returns IntegrationFragmentPublishedIntegrationRevision.CreatedAt, and is useful for accessing the field via an interface.
+func (v *IntegrationFragmentPublishedIntegrationRevision) GetCreatedAt() time.Time {
+	return v.IntegrationRevisionFragment.CreatedAt
+}
+
+// GetUpdatedAt returns IntegrationFragmentPublishedIntegrationRevision.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *IntegrationFragmentPublishedIntegrationRevision) GetUpdatedAt() time.Time {
+	return v.IntegrationRevisionFragment.UpdatedAt
+}
+
+func (v *IntegrationFragmentPublishedIntegrationRevision) UnmarshalJSON(b []byte) error {
 
 	if string(b) == "null" {
 		return nil
 	}
 
 	var firstPass struct {
-		*IntegrationFragmentPublishedIntegrationPackage
+		*IntegrationFragmentPublishedIntegrationRevision
 		graphql.NoUnmarshalJSON
 	}
-	firstPass.IntegrationFragmentPublishedIntegrationPackage = v
+	firstPass.IntegrationFragmentPublishedIntegrationRevision = v
 
 	err := json.Unmarshal(b, &firstPass)
 	if err != nil {
@@ -12129,23 +13291,27 @@ func (v *IntegrationFragmentPublishedIntegrationPackage) UnmarshalJSON(b []byte)
 	}
 
 	err = json.Unmarshal(
-		b, &v.IntegrationPackageFragment)
+		b, &v.IntegrationRevisionFragment)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-type __premarshalIntegrationFragmentPublishedIntegrationPackage struct {
+type __premarshalIntegrationFragmentPublishedIntegrationRevision struct {
 	Id uuid.UUID `json:"id"`
 
-	Checksum string `json:"checksum"`
+	Slug string `json:"slug"`
 
-	Spec []byte `json:"spec"`
+	IntegrationSlug string `json:"integrationSlug"`
 
-	ConfigSchema string `json:"configSchema"`
+	OrganizationSlug string `json:"organizationSlug"`
 
-	ServiceNames []string `json:"serviceNames"`
+	SpecEtag string `json:"specEtag"`
+
+	SourceURI *string `json:"sourceURI"`
+
+	SourceEtag *string `json:"sourceEtag"`
 
 	IntegrationID uuid.UUID `json:"integrationID"`
 
@@ -12156,7 +13322,7 @@ type __premarshalIntegrationFragmentPublishedIntegrationPackage struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-func (v *IntegrationFragmentPublishedIntegrationPackage) MarshalJSON() ([]byte, error) {
+func (v *IntegrationFragmentPublishedIntegrationRevision) MarshalJSON() ([]byte, error) {
 	premarshaled, err := v.__premarshalJSON()
 	if err != nil {
 		return nil, err
@@ -12164,18 +13330,20 @@ func (v *IntegrationFragmentPublishedIntegrationPackage) MarshalJSON() ([]byte, 
 	return json.Marshal(premarshaled)
 }
 
-func (v *IntegrationFragmentPublishedIntegrationPackage) __premarshalJSON() (*__premarshalIntegrationFragmentPublishedIntegrationPackage, error) {
-	var retval __premarshalIntegrationFragmentPublishedIntegrationPackage
+func (v *IntegrationFragmentPublishedIntegrationRevision) __premarshalJSON() (*__premarshalIntegrationFragmentPublishedIntegrationRevision, error) {
+	var retval __premarshalIntegrationFragmentPublishedIntegrationRevision
 
-	retval.Id = v.IntegrationPackageFragment.Id
-	retval.Checksum = v.IntegrationPackageFragment.Checksum
-	retval.Spec = v.IntegrationPackageFragment.Spec
-	retval.ConfigSchema = v.IntegrationPackageFragment.ConfigSchema
-	retval.ServiceNames = v.IntegrationPackageFragment.ServiceNames
-	retval.IntegrationID = v.IntegrationPackageFragment.IntegrationID
-	retval.AuthorID = v.IntegrationPackageFragment.AuthorID
-	retval.CreatedAt = v.IntegrationPackageFragment.CreatedAt
-	retval.UpdatedAt = v.IntegrationPackageFragment.UpdatedAt
+	retval.Id = v.IntegrationRevisionFragment.Id
+	retval.Slug = v.IntegrationRevisionFragment.Slug
+	retval.IntegrationSlug = v.IntegrationRevisionFragment.IntegrationSlug
+	retval.OrganizationSlug = v.IntegrationRevisionFragment.OrganizationSlug
+	retval.SpecEtag = v.IntegrationRevisionFragment.SpecEtag
+	retval.SourceURI = v.IntegrationRevisionFragment.SourceURI
+	retval.SourceEtag = v.IntegrationRevisionFragment.SourceEtag
+	retval.IntegrationID = v.IntegrationRevisionFragment.IntegrationID
+	retval.AuthorID = v.IntegrationRevisionFragment.AuthorID
+	retval.CreatedAt = v.IntegrationRevisionFragment.CreatedAt
+	retval.UpdatedAt = v.IntegrationRevisionFragment.UpdatedAt
 	return &retval, nil
 }
 
@@ -12197,96 +13365,79 @@ func (v *IntegrationOrder) GetField() IntegrationOrderField { return v.Field }
 type IntegrationOrderField string
 
 const (
-	IntegrationOrderFieldCreatedAt     IntegrationOrderField = "CREATED_AT"
-	IntegrationOrderFieldUpdatedAt     IntegrationOrderField = "UPDATED_AT"
-	IntegrationOrderFieldApiVersion    IntegrationOrderField = "API_VERSION"
-	IntegrationOrderFieldName          IntegrationOrderField = "NAME"
-	IntegrationOrderFieldVersion       IntegrationOrderField = "VERSION"
-	IntegrationOrderFieldPackagesCount IntegrationOrderField = "PACKAGES_COUNT"
+	IntegrationOrderFieldCreatedAt        IntegrationOrderField = "CREATED_AT"
+	IntegrationOrderFieldUpdatedAt        IntegrationOrderField = "UPDATED_AT"
+	IntegrationOrderFieldName             IntegrationOrderField = "NAME"
+	IntegrationOrderFieldVersion          IntegrationOrderField = "VERSION"
+	IntegrationOrderFieldApiVersion       IntegrationOrderField = "API_VERSION"
+	IntegrationOrderFieldDeploymentsCount IntegrationOrderField = "DEPLOYMENTS_COUNT"
+	IntegrationOrderFieldRevisionsCount   IntegrationOrderField = "REVISIONS_COUNT"
 )
 
 var AllIntegrationOrderField = []IntegrationOrderField{
 	IntegrationOrderFieldCreatedAt,
 	IntegrationOrderFieldUpdatedAt,
-	IntegrationOrderFieldApiVersion,
 	IntegrationOrderFieldName,
 	IntegrationOrderFieldVersion,
-	IntegrationOrderFieldPackagesCount,
+	IntegrationOrderFieldApiVersion,
+	IntegrationOrderFieldDeploymentsCount,
+	IntegrationOrderFieldRevisionsCount,
 }
 
-// IntegrationPackageFragment includes the GraphQL fields of IntegrationPackage requested by the fragment IntegrationPackageFragment.
-type IntegrationPackageFragment struct {
-	Id            uuid.UUID `json:"id"`
-	Checksum      string    `json:"checksum"`
-	Spec          []byte    `json:"spec"`
-	ConfigSchema  string    `json:"configSchema"`
-	ServiceNames  []string  `json:"serviceNames"`
-	IntegrationID uuid.UUID `json:"integrationID"`
-	AuthorID      uuid.UUID `json:"authorID"`
-	CreatedAt     time.Time `json:"createdAt"`
-	UpdatedAt     time.Time `json:"updatedAt"`
+// IntegrationRevisionFragment includes the GraphQL fields of IntegrationRevision requested by the fragment IntegrationRevisionFragment.
+type IntegrationRevisionFragment struct {
+	Id               uuid.UUID `json:"id"`
+	Slug             string    `json:"slug"`
+	IntegrationSlug  string    `json:"integrationSlug"`
+	OrganizationSlug string    `json:"organizationSlug"`
+	SpecEtag         string    `json:"specEtag"`
+	SourceURI        *string   `json:"sourceURI"`
+	SourceEtag       *string   `json:"sourceEtag"`
+	IntegrationID    uuid.UUID `json:"integrationID"`
+	AuthorID         uuid.UUID `json:"authorID"`
+	CreatedAt        time.Time `json:"createdAt"`
+	UpdatedAt        time.Time `json:"updatedAt"`
 }
 
-// GetId returns IntegrationPackageFragment.Id, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageFragment) GetId() uuid.UUID { return v.Id }
+// GetId returns IntegrationRevisionFragment.Id, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionFragment) GetId() uuid.UUID { return v.Id }
 
-// GetChecksum returns IntegrationPackageFragment.Checksum, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageFragment) GetChecksum() string { return v.Checksum }
+// GetSlug returns IntegrationRevisionFragment.Slug, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionFragment) GetSlug() string { return v.Slug }
 
-// GetSpec returns IntegrationPackageFragment.Spec, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageFragment) GetSpec() []byte { return v.Spec }
+// GetIntegrationSlug returns IntegrationRevisionFragment.IntegrationSlug, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionFragment) GetIntegrationSlug() string { return v.IntegrationSlug }
 
-// GetConfigSchema returns IntegrationPackageFragment.ConfigSchema, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageFragment) GetConfigSchema() string { return v.ConfigSchema }
+// GetOrganizationSlug returns IntegrationRevisionFragment.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionFragment) GetOrganizationSlug() string { return v.OrganizationSlug }
 
-// GetServiceNames returns IntegrationPackageFragment.ServiceNames, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageFragment) GetServiceNames() []string { return v.ServiceNames }
+// GetSpecEtag returns IntegrationRevisionFragment.SpecEtag, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionFragment) GetSpecEtag() string { return v.SpecEtag }
 
-// GetIntegrationID returns IntegrationPackageFragment.IntegrationID, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageFragment) GetIntegrationID() uuid.UUID { return v.IntegrationID }
+// GetSourceURI returns IntegrationRevisionFragment.SourceURI, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionFragment) GetSourceURI() *string { return v.SourceURI }
 
-// GetAuthorID returns IntegrationPackageFragment.AuthorID, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageFragment) GetAuthorID() uuid.UUID { return v.AuthorID }
+// GetSourceEtag returns IntegrationRevisionFragment.SourceEtag, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionFragment) GetSourceEtag() *string { return v.SourceEtag }
 
-// GetCreatedAt returns IntegrationPackageFragment.CreatedAt, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageFragment) GetCreatedAt() time.Time { return v.CreatedAt }
+// GetIntegrationID returns IntegrationRevisionFragment.IntegrationID, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionFragment) GetIntegrationID() uuid.UUID { return v.IntegrationID }
 
-// GetUpdatedAt returns IntegrationPackageFragment.UpdatedAt, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageFragment) GetUpdatedAt() time.Time { return v.UpdatedAt }
+// GetAuthorID returns IntegrationRevisionFragment.AuthorID, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionFragment) GetAuthorID() uuid.UUID { return v.AuthorID }
 
-// Ordering options for IntegrationPackage connections
-type IntegrationPackageOrder struct {
-	// The ordering direction.
-	Direction OrderDirection `json:"direction"`
-	// The field by which to order IntegrationPackages.
-	Field IntegrationPackageOrderField `json:"field"`
-}
+// GetCreatedAt returns IntegrationRevisionFragment.CreatedAt, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionFragment) GetCreatedAt() time.Time { return v.CreatedAt }
 
-// GetDirection returns IntegrationPackageOrder.Direction, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageOrder) GetDirection() OrderDirection { return v.Direction }
+// GetUpdatedAt returns IntegrationRevisionFragment.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionFragment) GetUpdatedAt() time.Time { return v.UpdatedAt }
 
-// GetField returns IntegrationPackageOrder.Field, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageOrder) GetField() IntegrationPackageOrderField { return v.Field }
-
-// Properties by which IntegrationPackage connections can be ordered.
-type IntegrationPackageOrderField string
-
-const (
-	IntegrationPackageOrderFieldCreatedAt IntegrationPackageOrderField = "CREATED_AT"
-	IntegrationPackageOrderFieldUpdatedAt IntegrationPackageOrderField = "UPDATED_AT"
-)
-
-var AllIntegrationPackageOrderField = []IntegrationPackageOrderField{
-	IntegrationPackageOrderFieldCreatedAt,
-	IntegrationPackageOrderFieldUpdatedAt,
-}
-
-// IntegrationPackageWhereInput is used for filtering IntegrationPackage objects.
+// IntegrationRevisionWhereInput is used for filtering IntegrationRevision objects.
 // Input was generated by ent.
-type IntegrationPackageWhereInput struct {
-	Not *IntegrationPackageWhereInput   `json:"not,omitempty"`
-	And []*IntegrationPackageWhereInput `json:"and,omitempty"`
-	Or  []*IntegrationPackageWhereInput `json:"or,omitempty"`
+type IntegrationRevisionWhereInput struct {
+	Not *IntegrationRevisionWhereInput   `json:"not,omitempty"`
+	And []*IntegrationRevisionWhereInput `json:"and,omitempty"`
+	Or  []*IntegrationRevisionWhereInput `json:"or,omitempty"`
 	// id field predicates
 	Id      *uuid.UUID  `json:"id"`
 	IdNEQ   *uuid.UUID  `json:"idNEQ"`
@@ -12296,6 +13447,48 @@ type IntegrationPackageWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
+	// organization_slug field predicates
+	OrganizationSlug             *string  `json:"organizationSlug"`
+	OrganizationSlugNEQ          *string  `json:"organizationSlugNEQ"`
+	OrganizationSlugIn           []string `json:"organizationSlugIn"`
+	OrganizationSlugNotIn        []string `json:"organizationSlugNotIn"`
+	OrganizationSlugGT           *string  `json:"organizationSlugGT"`
+	OrganizationSlugGTE          *string  `json:"organizationSlugGTE"`
+	OrganizationSlugLT           *string  `json:"organizationSlugLT"`
+	OrganizationSlugLTE          *string  `json:"organizationSlugLTE"`
+	OrganizationSlugContains     *string  `json:"organizationSlugContains"`
+	OrganizationSlugHasPrefix    *string  `json:"organizationSlugHasPrefix"`
+	OrganizationSlugHasSuffix    *string  `json:"organizationSlugHasSuffix"`
+	OrganizationSlugEqualFold    *string  `json:"organizationSlugEqualFold"`
+	OrganizationSlugContainsFold *string  `json:"organizationSlugContainsFold"`
+	// integration_slug field predicates
+	IntegrationSlug             *string  `json:"integrationSlug"`
+	IntegrationSlugNEQ          *string  `json:"integrationSlugNEQ"`
+	IntegrationSlugIn           []string `json:"integrationSlugIn"`
+	IntegrationSlugNotIn        []string `json:"integrationSlugNotIn"`
+	IntegrationSlugGT           *string  `json:"integrationSlugGT"`
+	IntegrationSlugGTE          *string  `json:"integrationSlugGTE"`
+	IntegrationSlugLT           *string  `json:"integrationSlugLT"`
+	IntegrationSlugLTE          *string  `json:"integrationSlugLTE"`
+	IntegrationSlugContains     *string  `json:"integrationSlugContains"`
+	IntegrationSlugHasPrefix    *string  `json:"integrationSlugHasPrefix"`
+	IntegrationSlugHasSuffix    *string  `json:"integrationSlugHasSuffix"`
+	IntegrationSlugEqualFold    *string  `json:"integrationSlugEqualFold"`
+	IntegrationSlugContainsFold *string  `json:"integrationSlugContainsFold"`
+	// slug field predicates
+	Slug             *string  `json:"slug"`
+	SlugNEQ          *string  `json:"slugNEQ"`
+	SlugIn           []string `json:"slugIn"`
+	SlugNotIn        []string `json:"slugNotIn"`
+	SlugGT           *string  `json:"slugGT"`
+	SlugGTE          *string  `json:"slugGTE"`
+	SlugLT           *string  `json:"slugLT"`
+	SlugLTE          *string  `json:"slugLTE"`
+	SlugContains     *string  `json:"slugContains"`
+	SlugHasPrefix    *string  `json:"slugHasPrefix"`
+	SlugHasSuffix    *string  `json:"slugHasSuffix"`
+	SlugEqualFold    *string  `json:"slugEqualFold"`
+	SlugContainsFold *string  `json:"slugContainsFold"`
 	// created_at field predicates
 	CreatedAt      *time.Time  `json:"createdAt"`
 	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
@@ -12314,34 +13507,52 @@ type IntegrationPackageWhereInput struct {
 	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
 	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
-	// checksum field predicates
-	Checksum             *string  `json:"checksum"`
-	ChecksumNEQ          *string  `json:"checksumNEQ"`
-	ChecksumIn           []string `json:"checksumIn"`
-	ChecksumNotIn        []string `json:"checksumNotIn"`
-	ChecksumGT           *string  `json:"checksumGT"`
-	ChecksumGTE          *string  `json:"checksumGTE"`
-	ChecksumLT           *string  `json:"checksumLT"`
-	ChecksumLTE          *string  `json:"checksumLTE"`
-	ChecksumContains     *string  `json:"checksumContains"`
-	ChecksumHasPrefix    *string  `json:"checksumHasPrefix"`
-	ChecksumHasSuffix    *string  `json:"checksumHasSuffix"`
-	ChecksumEqualFold    *string  `json:"checksumEqualFold"`
-	ChecksumContainsFold *string  `json:"checksumContainsFold"`
-	// config_schema field predicates
-	ConfigSchema             *string  `json:"configSchema"`
-	ConfigSchemaNEQ          *string  `json:"configSchemaNEQ"`
-	ConfigSchemaIn           []string `json:"configSchemaIn"`
-	ConfigSchemaNotIn        []string `json:"configSchemaNotIn"`
-	ConfigSchemaGT           *string  `json:"configSchemaGT"`
-	ConfigSchemaGTE          *string  `json:"configSchemaGTE"`
-	ConfigSchemaLT           *string  `json:"configSchemaLT"`
-	ConfigSchemaLTE          *string  `json:"configSchemaLTE"`
-	ConfigSchemaContains     *string  `json:"configSchemaContains"`
-	ConfigSchemaHasPrefix    *string  `json:"configSchemaHasPrefix"`
-	ConfigSchemaHasSuffix    *string  `json:"configSchemaHasSuffix"`
-	ConfigSchemaEqualFold    *string  `json:"configSchemaEqualFold"`
-	ConfigSchemaContainsFold *string  `json:"configSchemaContainsFold"`
+	// spec_etag field predicates
+	SpecEtag             *string  `json:"specEtag"`
+	SpecEtagNEQ          *string  `json:"specEtagNEQ"`
+	SpecEtagIn           []string `json:"specEtagIn"`
+	SpecEtagNotIn        []string `json:"specEtagNotIn"`
+	SpecEtagGT           *string  `json:"specEtagGT"`
+	SpecEtagGTE          *string  `json:"specEtagGTE"`
+	SpecEtagLT           *string  `json:"specEtagLT"`
+	SpecEtagLTE          *string  `json:"specEtagLTE"`
+	SpecEtagContains     *string  `json:"specEtagContains"`
+	SpecEtagHasPrefix    *string  `json:"specEtagHasPrefix"`
+	SpecEtagHasSuffix    *string  `json:"specEtagHasSuffix"`
+	SpecEtagEqualFold    *string  `json:"specEtagEqualFold"`
+	SpecEtagContainsFold *string  `json:"specEtagContainsFold"`
+	// source_uri field predicates
+	SourceURI             *string  `json:"sourceURI"`
+	SourceURINEQ          *string  `json:"sourceURINEQ"`
+	SourceURIIn           []string `json:"sourceURIIn"`
+	SourceURINotIn        []string `json:"sourceURINotIn"`
+	SourceURIGT           *string  `json:"sourceURIGT"`
+	SourceURIGTE          *string  `json:"sourceURIGTE"`
+	SourceURILT           *string  `json:"sourceURILT"`
+	SourceURILTE          *string  `json:"sourceURILTE"`
+	SourceURIContains     *string  `json:"sourceURIContains"`
+	SourceURIHasPrefix    *string  `json:"sourceURIHasPrefix"`
+	SourceURIHasSuffix    *string  `json:"sourceURIHasSuffix"`
+	SourceURIIsNil        *bool    `json:"sourceURIIsNil"`
+	SourceURINotNil       *bool    `json:"sourceURINotNil"`
+	SourceURIEqualFold    *string  `json:"sourceURIEqualFold"`
+	SourceURIContainsFold *string  `json:"sourceURIContainsFold"`
+	// source_etag field predicates
+	SourceEtag             *string  `json:"sourceEtag"`
+	SourceEtagNEQ          *string  `json:"sourceEtagNEQ"`
+	SourceEtagIn           []string `json:"sourceEtagIn"`
+	SourceEtagNotIn        []string `json:"sourceEtagNotIn"`
+	SourceEtagGT           *string  `json:"sourceEtagGT"`
+	SourceEtagGTE          *string  `json:"sourceEtagGTE"`
+	SourceEtagLT           *string  `json:"sourceEtagLT"`
+	SourceEtagLTE          *string  `json:"sourceEtagLTE"`
+	SourceEtagContains     *string  `json:"sourceEtagContains"`
+	SourceEtagHasPrefix    *string  `json:"sourceEtagHasPrefix"`
+	SourceEtagHasSuffix    *string  `json:"sourceEtagHasSuffix"`
+	SourceEtagIsNil        *bool    `json:"sourceEtagIsNil"`
+	SourceEtagNotNil       *bool    `json:"sourceEtagNotNil"`
+	SourceEtagEqualFold    *string  `json:"sourceEtagEqualFold"`
+	SourceEtagContainsFold *string  `json:"sourceEtagContainsFold"`
 	// integration_id field predicates
 	IntegrationID      *uuid.UUID  `json:"integrationID"`
 	IntegrationIDNEQ   *uuid.UUID  `json:"integrationIDNEQ"`
@@ -12358,218 +13569,427 @@ type IntegrationPackageWhereInput struct {
 	// author edge predicates
 	HasAuthor     *bool             `json:"hasAuthor"`
 	HasAuthorWith []*UserWhereInput `json:"hasAuthorWith,omitempty"`
+	// deployments edge predicates
+	HasDeployments     *bool                   `json:"hasDeployments"`
+	HasDeploymentsWith []*DeploymentWhereInput `json:"hasDeploymentsWith,omitempty"`
 }
 
-// GetNot returns IntegrationPackageWhereInput.Not, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetNot() *IntegrationPackageWhereInput { return v.Not }
+// GetNot returns IntegrationRevisionWhereInput.Not, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetNot() *IntegrationRevisionWhereInput { return v.Not }
 
-// GetAnd returns IntegrationPackageWhereInput.And, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetAnd() []*IntegrationPackageWhereInput { return v.And }
+// GetAnd returns IntegrationRevisionWhereInput.And, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetAnd() []*IntegrationRevisionWhereInput { return v.And }
 
-// GetOr returns IntegrationPackageWhereInput.Or, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetOr() []*IntegrationPackageWhereInput { return v.Or }
+// GetOr returns IntegrationRevisionWhereInput.Or, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetOr() []*IntegrationRevisionWhereInput { return v.Or }
 
-// GetId returns IntegrationPackageWhereInput.Id, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetId() *uuid.UUID { return v.Id }
+// GetId returns IntegrationRevisionWhereInput.Id, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetId() *uuid.UUID { return v.Id }
 
-// GetIdNEQ returns IntegrationPackageWhereInput.IdNEQ, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetIdNEQ() *uuid.UUID { return v.IdNEQ }
+// GetIdNEQ returns IntegrationRevisionWhereInput.IdNEQ, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIdNEQ() *uuid.UUID { return v.IdNEQ }
 
-// GetIdIn returns IntegrationPackageWhereInput.IdIn, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetIdIn() []uuid.UUID { return v.IdIn }
+// GetIdIn returns IntegrationRevisionWhereInput.IdIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIdIn() []uuid.UUID { return v.IdIn }
 
-// GetIdNotIn returns IntegrationPackageWhereInput.IdNotIn, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetIdNotIn() []uuid.UUID { return v.IdNotIn }
+// GetIdNotIn returns IntegrationRevisionWhereInput.IdNotIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIdNotIn() []uuid.UUID { return v.IdNotIn }
 
-// GetIdGT returns IntegrationPackageWhereInput.IdGT, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetIdGT() *uuid.UUID { return v.IdGT }
+// GetIdGT returns IntegrationRevisionWhereInput.IdGT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIdGT() *uuid.UUID { return v.IdGT }
 
-// GetIdGTE returns IntegrationPackageWhereInput.IdGTE, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetIdGTE() *uuid.UUID { return v.IdGTE }
+// GetIdGTE returns IntegrationRevisionWhereInput.IdGTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIdGTE() *uuid.UUID { return v.IdGTE }
 
-// GetIdLT returns IntegrationPackageWhereInput.IdLT, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
+// GetIdLT returns IntegrationRevisionWhereInput.IdLT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 
-// GetIdLTE returns IntegrationPackageWhereInput.IdLTE, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
+// GetIdLTE returns IntegrationRevisionWhereInput.IdLTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
 
-// GetCreatedAt returns IntegrationPackageWhereInput.CreatedAt, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
+// GetOrganizationSlug returns IntegrationRevisionWhereInput.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetOrganizationSlug() *string { return v.OrganizationSlug }
 
-// GetCreatedAtNEQ returns IntegrationPackageWhereInput.CreatedAtNEQ, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetCreatedAtNEQ() *time.Time { return v.CreatedAtNEQ }
-
-// GetCreatedAtIn returns IntegrationPackageWhereInput.CreatedAtIn, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetCreatedAtIn() []time.Time { return v.CreatedAtIn }
-
-// GetCreatedAtNotIn returns IntegrationPackageWhereInput.CreatedAtNotIn, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetCreatedAtNotIn() []time.Time { return v.CreatedAtNotIn }
-
-// GetCreatedAtGT returns IntegrationPackageWhereInput.CreatedAtGT, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetCreatedAtGT() *time.Time { return v.CreatedAtGT }
-
-// GetCreatedAtGTE returns IntegrationPackageWhereInput.CreatedAtGTE, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetCreatedAtGTE() *time.Time { return v.CreatedAtGTE }
-
-// GetCreatedAtLT returns IntegrationPackageWhereInput.CreatedAtLT, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetCreatedAtLT() *time.Time { return v.CreatedAtLT }
-
-// GetCreatedAtLTE returns IntegrationPackageWhereInput.CreatedAtLTE, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetCreatedAtLTE() *time.Time { return v.CreatedAtLTE }
-
-// GetUpdatedAt returns IntegrationPackageWhereInput.UpdatedAt, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetUpdatedAt() *time.Time { return v.UpdatedAt }
-
-// GetUpdatedAtNEQ returns IntegrationPackageWhereInput.UpdatedAtNEQ, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetUpdatedAtNEQ() *time.Time { return v.UpdatedAtNEQ }
-
-// GetUpdatedAtIn returns IntegrationPackageWhereInput.UpdatedAtIn, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetUpdatedAtIn() []time.Time { return v.UpdatedAtIn }
-
-// GetUpdatedAtNotIn returns IntegrationPackageWhereInput.UpdatedAtNotIn, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetUpdatedAtNotIn() []time.Time { return v.UpdatedAtNotIn }
-
-// GetUpdatedAtGT returns IntegrationPackageWhereInput.UpdatedAtGT, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetUpdatedAtGT() *time.Time { return v.UpdatedAtGT }
-
-// GetUpdatedAtGTE returns IntegrationPackageWhereInput.UpdatedAtGTE, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetUpdatedAtGTE() *time.Time { return v.UpdatedAtGTE }
-
-// GetUpdatedAtLT returns IntegrationPackageWhereInput.UpdatedAtLT, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
-
-// GetUpdatedAtLTE returns IntegrationPackageWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
-
-// GetChecksum returns IntegrationPackageWhereInput.Checksum, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetChecksum() *string { return v.Checksum }
-
-// GetChecksumNEQ returns IntegrationPackageWhereInput.ChecksumNEQ, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetChecksumNEQ() *string { return v.ChecksumNEQ }
-
-// GetChecksumIn returns IntegrationPackageWhereInput.ChecksumIn, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetChecksumIn() []string { return v.ChecksumIn }
-
-// GetChecksumNotIn returns IntegrationPackageWhereInput.ChecksumNotIn, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetChecksumNotIn() []string { return v.ChecksumNotIn }
-
-// GetChecksumGT returns IntegrationPackageWhereInput.ChecksumGT, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetChecksumGT() *string { return v.ChecksumGT }
-
-// GetChecksumGTE returns IntegrationPackageWhereInput.ChecksumGTE, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetChecksumGTE() *string { return v.ChecksumGTE }
-
-// GetChecksumLT returns IntegrationPackageWhereInput.ChecksumLT, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetChecksumLT() *string { return v.ChecksumLT }
-
-// GetChecksumLTE returns IntegrationPackageWhereInput.ChecksumLTE, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetChecksumLTE() *string { return v.ChecksumLTE }
-
-// GetChecksumContains returns IntegrationPackageWhereInput.ChecksumContains, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetChecksumContains() *string { return v.ChecksumContains }
-
-// GetChecksumHasPrefix returns IntegrationPackageWhereInput.ChecksumHasPrefix, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetChecksumHasPrefix() *string { return v.ChecksumHasPrefix }
-
-// GetChecksumHasSuffix returns IntegrationPackageWhereInput.ChecksumHasSuffix, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetChecksumHasSuffix() *string { return v.ChecksumHasSuffix }
-
-// GetChecksumEqualFold returns IntegrationPackageWhereInput.ChecksumEqualFold, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetChecksumEqualFold() *string { return v.ChecksumEqualFold }
-
-// GetChecksumContainsFold returns IntegrationPackageWhereInput.ChecksumContainsFold, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetChecksumContainsFold() *string {
-	return v.ChecksumContainsFold
+// GetOrganizationSlugNEQ returns IntegrationRevisionWhereInput.OrganizationSlugNEQ, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetOrganizationSlugNEQ() *string {
+	return v.OrganizationSlugNEQ
 }
 
-// GetConfigSchema returns IntegrationPackageWhereInput.ConfigSchema, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetConfigSchema() *string { return v.ConfigSchema }
+// GetOrganizationSlugIn returns IntegrationRevisionWhereInput.OrganizationSlugIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetOrganizationSlugIn() []string { return v.OrganizationSlugIn }
 
-// GetConfigSchemaNEQ returns IntegrationPackageWhereInput.ConfigSchemaNEQ, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetConfigSchemaNEQ() *string { return v.ConfigSchemaNEQ }
-
-// GetConfigSchemaIn returns IntegrationPackageWhereInput.ConfigSchemaIn, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetConfigSchemaIn() []string { return v.ConfigSchemaIn }
-
-// GetConfigSchemaNotIn returns IntegrationPackageWhereInput.ConfigSchemaNotIn, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetConfigSchemaNotIn() []string { return v.ConfigSchemaNotIn }
-
-// GetConfigSchemaGT returns IntegrationPackageWhereInput.ConfigSchemaGT, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetConfigSchemaGT() *string { return v.ConfigSchemaGT }
-
-// GetConfigSchemaGTE returns IntegrationPackageWhereInput.ConfigSchemaGTE, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetConfigSchemaGTE() *string { return v.ConfigSchemaGTE }
-
-// GetConfigSchemaLT returns IntegrationPackageWhereInput.ConfigSchemaLT, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetConfigSchemaLT() *string { return v.ConfigSchemaLT }
-
-// GetConfigSchemaLTE returns IntegrationPackageWhereInput.ConfigSchemaLTE, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetConfigSchemaLTE() *string { return v.ConfigSchemaLTE }
-
-// GetConfigSchemaContains returns IntegrationPackageWhereInput.ConfigSchemaContains, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetConfigSchemaContains() *string {
-	return v.ConfigSchemaContains
+// GetOrganizationSlugNotIn returns IntegrationRevisionWhereInput.OrganizationSlugNotIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetOrganizationSlugNotIn() []string {
+	return v.OrganizationSlugNotIn
 }
 
-// GetConfigSchemaHasPrefix returns IntegrationPackageWhereInput.ConfigSchemaHasPrefix, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetConfigSchemaHasPrefix() *string {
-	return v.ConfigSchemaHasPrefix
+// GetOrganizationSlugGT returns IntegrationRevisionWhereInput.OrganizationSlugGT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetOrganizationSlugGT() *string { return v.OrganizationSlugGT }
+
+// GetOrganizationSlugGTE returns IntegrationRevisionWhereInput.OrganizationSlugGTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetOrganizationSlugGTE() *string {
+	return v.OrganizationSlugGTE
 }
 
-// GetConfigSchemaHasSuffix returns IntegrationPackageWhereInput.ConfigSchemaHasSuffix, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetConfigSchemaHasSuffix() *string {
-	return v.ConfigSchemaHasSuffix
+// GetOrganizationSlugLT returns IntegrationRevisionWhereInput.OrganizationSlugLT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetOrganizationSlugLT() *string { return v.OrganizationSlugLT }
+
+// GetOrganizationSlugLTE returns IntegrationRevisionWhereInput.OrganizationSlugLTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetOrganizationSlugLTE() *string {
+	return v.OrganizationSlugLTE
 }
 
-// GetConfigSchemaEqualFold returns IntegrationPackageWhereInput.ConfigSchemaEqualFold, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetConfigSchemaEqualFold() *string {
-	return v.ConfigSchemaEqualFold
+// GetOrganizationSlugContains returns IntegrationRevisionWhereInput.OrganizationSlugContains, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetOrganizationSlugContains() *string {
+	return v.OrganizationSlugContains
 }
 
-// GetConfigSchemaContainsFold returns IntegrationPackageWhereInput.ConfigSchemaContainsFold, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetConfigSchemaContainsFold() *string {
-	return v.ConfigSchemaContainsFold
+// GetOrganizationSlugHasPrefix returns IntegrationRevisionWhereInput.OrganizationSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetOrganizationSlugHasPrefix() *string {
+	return v.OrganizationSlugHasPrefix
 }
 
-// GetIntegrationID returns IntegrationPackageWhereInput.IntegrationID, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetIntegrationID() *uuid.UUID { return v.IntegrationID }
+// GetOrganizationSlugHasSuffix returns IntegrationRevisionWhereInput.OrganizationSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetOrganizationSlugHasSuffix() *string {
+	return v.OrganizationSlugHasSuffix
+}
 
-// GetIntegrationIDNEQ returns IntegrationPackageWhereInput.IntegrationIDNEQ, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetIntegrationIDNEQ() *uuid.UUID { return v.IntegrationIDNEQ }
+// GetOrganizationSlugEqualFold returns IntegrationRevisionWhereInput.OrganizationSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetOrganizationSlugEqualFold() *string {
+	return v.OrganizationSlugEqualFold
+}
 
-// GetIntegrationIDIn returns IntegrationPackageWhereInput.IntegrationIDIn, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetIntegrationIDIn() []uuid.UUID { return v.IntegrationIDIn }
+// GetOrganizationSlugContainsFold returns IntegrationRevisionWhereInput.OrganizationSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetOrganizationSlugContainsFold() *string {
+	return v.OrganizationSlugContainsFold
+}
 
-// GetIntegrationIDNotIn returns IntegrationPackageWhereInput.IntegrationIDNotIn, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetIntegrationIDNotIn() []uuid.UUID {
+// GetIntegrationSlug returns IntegrationRevisionWhereInput.IntegrationSlug, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationSlug() *string { return v.IntegrationSlug }
+
+// GetIntegrationSlugNEQ returns IntegrationRevisionWhereInput.IntegrationSlugNEQ, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationSlugNEQ() *string { return v.IntegrationSlugNEQ }
+
+// GetIntegrationSlugIn returns IntegrationRevisionWhereInput.IntegrationSlugIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationSlugIn() []string { return v.IntegrationSlugIn }
+
+// GetIntegrationSlugNotIn returns IntegrationRevisionWhereInput.IntegrationSlugNotIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationSlugNotIn() []string {
+	return v.IntegrationSlugNotIn
+}
+
+// GetIntegrationSlugGT returns IntegrationRevisionWhereInput.IntegrationSlugGT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationSlugGT() *string { return v.IntegrationSlugGT }
+
+// GetIntegrationSlugGTE returns IntegrationRevisionWhereInput.IntegrationSlugGTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationSlugGTE() *string { return v.IntegrationSlugGTE }
+
+// GetIntegrationSlugLT returns IntegrationRevisionWhereInput.IntegrationSlugLT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationSlugLT() *string { return v.IntegrationSlugLT }
+
+// GetIntegrationSlugLTE returns IntegrationRevisionWhereInput.IntegrationSlugLTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationSlugLTE() *string { return v.IntegrationSlugLTE }
+
+// GetIntegrationSlugContains returns IntegrationRevisionWhereInput.IntegrationSlugContains, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationSlugContains() *string {
+	return v.IntegrationSlugContains
+}
+
+// GetIntegrationSlugHasPrefix returns IntegrationRevisionWhereInput.IntegrationSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationSlugHasPrefix() *string {
+	return v.IntegrationSlugHasPrefix
+}
+
+// GetIntegrationSlugHasSuffix returns IntegrationRevisionWhereInput.IntegrationSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationSlugHasSuffix() *string {
+	return v.IntegrationSlugHasSuffix
+}
+
+// GetIntegrationSlugEqualFold returns IntegrationRevisionWhereInput.IntegrationSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationSlugEqualFold() *string {
+	return v.IntegrationSlugEqualFold
+}
+
+// GetIntegrationSlugContainsFold returns IntegrationRevisionWhereInput.IntegrationSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationSlugContainsFold() *string {
+	return v.IntegrationSlugContainsFold
+}
+
+// GetSlug returns IntegrationRevisionWhereInput.Slug, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSlug() *string { return v.Slug }
+
+// GetSlugNEQ returns IntegrationRevisionWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
+
+// GetSlugIn returns IntegrationRevisionWhereInput.SlugIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSlugIn() []string { return v.SlugIn }
+
+// GetSlugNotIn returns IntegrationRevisionWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
+
+// GetSlugGT returns IntegrationRevisionWhereInput.SlugGT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSlugGT() *string { return v.SlugGT }
+
+// GetSlugGTE returns IntegrationRevisionWhereInput.SlugGTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSlugGTE() *string { return v.SlugGTE }
+
+// GetSlugLT returns IntegrationRevisionWhereInput.SlugLT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSlugLT() *string { return v.SlugLT }
+
+// GetSlugLTE returns IntegrationRevisionWhereInput.SlugLTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSlugLTE() *string { return v.SlugLTE }
+
+// GetSlugContains returns IntegrationRevisionWhereInput.SlugContains, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSlugContains() *string { return v.SlugContains }
+
+// GetSlugHasPrefix returns IntegrationRevisionWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
+
+// GetSlugHasSuffix returns IntegrationRevisionWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
+
+// GetSlugEqualFold returns IntegrationRevisionWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
+
+// GetSlugContainsFold returns IntegrationRevisionWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
+
+// GetCreatedAt returns IntegrationRevisionWhereInput.CreatedAt, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
+
+// GetCreatedAtNEQ returns IntegrationRevisionWhereInput.CreatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetCreatedAtNEQ() *time.Time { return v.CreatedAtNEQ }
+
+// GetCreatedAtIn returns IntegrationRevisionWhereInput.CreatedAtIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetCreatedAtIn() []time.Time { return v.CreatedAtIn }
+
+// GetCreatedAtNotIn returns IntegrationRevisionWhereInput.CreatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetCreatedAtNotIn() []time.Time { return v.CreatedAtNotIn }
+
+// GetCreatedAtGT returns IntegrationRevisionWhereInput.CreatedAtGT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetCreatedAtGT() *time.Time { return v.CreatedAtGT }
+
+// GetCreatedAtGTE returns IntegrationRevisionWhereInput.CreatedAtGTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetCreatedAtGTE() *time.Time { return v.CreatedAtGTE }
+
+// GetCreatedAtLT returns IntegrationRevisionWhereInput.CreatedAtLT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetCreatedAtLT() *time.Time { return v.CreatedAtLT }
+
+// GetCreatedAtLTE returns IntegrationRevisionWhereInput.CreatedAtLTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetCreatedAtLTE() *time.Time { return v.CreatedAtLTE }
+
+// GetUpdatedAt returns IntegrationRevisionWhereInput.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetUpdatedAt() *time.Time { return v.UpdatedAt }
+
+// GetUpdatedAtNEQ returns IntegrationRevisionWhereInput.UpdatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetUpdatedAtNEQ() *time.Time { return v.UpdatedAtNEQ }
+
+// GetUpdatedAtIn returns IntegrationRevisionWhereInput.UpdatedAtIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetUpdatedAtIn() []time.Time { return v.UpdatedAtIn }
+
+// GetUpdatedAtNotIn returns IntegrationRevisionWhereInput.UpdatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetUpdatedAtNotIn() []time.Time { return v.UpdatedAtNotIn }
+
+// GetUpdatedAtGT returns IntegrationRevisionWhereInput.UpdatedAtGT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetUpdatedAtGT() *time.Time { return v.UpdatedAtGT }
+
+// GetUpdatedAtGTE returns IntegrationRevisionWhereInput.UpdatedAtGTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetUpdatedAtGTE() *time.Time { return v.UpdatedAtGTE }
+
+// GetUpdatedAtLT returns IntegrationRevisionWhereInput.UpdatedAtLT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
+
+// GetUpdatedAtLTE returns IntegrationRevisionWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
+
+// GetSpecEtag returns IntegrationRevisionWhereInput.SpecEtag, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSpecEtag() *string { return v.SpecEtag }
+
+// GetSpecEtagNEQ returns IntegrationRevisionWhereInput.SpecEtagNEQ, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSpecEtagNEQ() *string { return v.SpecEtagNEQ }
+
+// GetSpecEtagIn returns IntegrationRevisionWhereInput.SpecEtagIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSpecEtagIn() []string { return v.SpecEtagIn }
+
+// GetSpecEtagNotIn returns IntegrationRevisionWhereInput.SpecEtagNotIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSpecEtagNotIn() []string { return v.SpecEtagNotIn }
+
+// GetSpecEtagGT returns IntegrationRevisionWhereInput.SpecEtagGT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSpecEtagGT() *string { return v.SpecEtagGT }
+
+// GetSpecEtagGTE returns IntegrationRevisionWhereInput.SpecEtagGTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSpecEtagGTE() *string { return v.SpecEtagGTE }
+
+// GetSpecEtagLT returns IntegrationRevisionWhereInput.SpecEtagLT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSpecEtagLT() *string { return v.SpecEtagLT }
+
+// GetSpecEtagLTE returns IntegrationRevisionWhereInput.SpecEtagLTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSpecEtagLTE() *string { return v.SpecEtagLTE }
+
+// GetSpecEtagContains returns IntegrationRevisionWhereInput.SpecEtagContains, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSpecEtagContains() *string { return v.SpecEtagContains }
+
+// GetSpecEtagHasPrefix returns IntegrationRevisionWhereInput.SpecEtagHasPrefix, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSpecEtagHasPrefix() *string { return v.SpecEtagHasPrefix }
+
+// GetSpecEtagHasSuffix returns IntegrationRevisionWhereInput.SpecEtagHasSuffix, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSpecEtagHasSuffix() *string { return v.SpecEtagHasSuffix }
+
+// GetSpecEtagEqualFold returns IntegrationRevisionWhereInput.SpecEtagEqualFold, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSpecEtagEqualFold() *string { return v.SpecEtagEqualFold }
+
+// GetSpecEtagContainsFold returns IntegrationRevisionWhereInput.SpecEtagContainsFold, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSpecEtagContainsFold() *string {
+	return v.SpecEtagContainsFold
+}
+
+// GetSourceURI returns IntegrationRevisionWhereInput.SourceURI, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceURI() *string { return v.SourceURI }
+
+// GetSourceURINEQ returns IntegrationRevisionWhereInput.SourceURINEQ, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceURINEQ() *string { return v.SourceURINEQ }
+
+// GetSourceURIIn returns IntegrationRevisionWhereInput.SourceURIIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceURIIn() []string { return v.SourceURIIn }
+
+// GetSourceURINotIn returns IntegrationRevisionWhereInput.SourceURINotIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceURINotIn() []string { return v.SourceURINotIn }
+
+// GetSourceURIGT returns IntegrationRevisionWhereInput.SourceURIGT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceURIGT() *string { return v.SourceURIGT }
+
+// GetSourceURIGTE returns IntegrationRevisionWhereInput.SourceURIGTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceURIGTE() *string { return v.SourceURIGTE }
+
+// GetSourceURILT returns IntegrationRevisionWhereInput.SourceURILT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceURILT() *string { return v.SourceURILT }
+
+// GetSourceURILTE returns IntegrationRevisionWhereInput.SourceURILTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceURILTE() *string { return v.SourceURILTE }
+
+// GetSourceURIContains returns IntegrationRevisionWhereInput.SourceURIContains, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceURIContains() *string { return v.SourceURIContains }
+
+// GetSourceURIHasPrefix returns IntegrationRevisionWhereInput.SourceURIHasPrefix, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceURIHasPrefix() *string { return v.SourceURIHasPrefix }
+
+// GetSourceURIHasSuffix returns IntegrationRevisionWhereInput.SourceURIHasSuffix, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceURIHasSuffix() *string { return v.SourceURIHasSuffix }
+
+// GetSourceURIIsNil returns IntegrationRevisionWhereInput.SourceURIIsNil, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceURIIsNil() *bool { return v.SourceURIIsNil }
+
+// GetSourceURINotNil returns IntegrationRevisionWhereInput.SourceURINotNil, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceURINotNil() *bool { return v.SourceURINotNil }
+
+// GetSourceURIEqualFold returns IntegrationRevisionWhereInput.SourceURIEqualFold, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceURIEqualFold() *string { return v.SourceURIEqualFold }
+
+// GetSourceURIContainsFold returns IntegrationRevisionWhereInput.SourceURIContainsFold, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceURIContainsFold() *string {
+	return v.SourceURIContainsFold
+}
+
+// GetSourceEtag returns IntegrationRevisionWhereInput.SourceEtag, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceEtag() *string { return v.SourceEtag }
+
+// GetSourceEtagNEQ returns IntegrationRevisionWhereInput.SourceEtagNEQ, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceEtagNEQ() *string { return v.SourceEtagNEQ }
+
+// GetSourceEtagIn returns IntegrationRevisionWhereInput.SourceEtagIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceEtagIn() []string { return v.SourceEtagIn }
+
+// GetSourceEtagNotIn returns IntegrationRevisionWhereInput.SourceEtagNotIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceEtagNotIn() []string { return v.SourceEtagNotIn }
+
+// GetSourceEtagGT returns IntegrationRevisionWhereInput.SourceEtagGT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceEtagGT() *string { return v.SourceEtagGT }
+
+// GetSourceEtagGTE returns IntegrationRevisionWhereInput.SourceEtagGTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceEtagGTE() *string { return v.SourceEtagGTE }
+
+// GetSourceEtagLT returns IntegrationRevisionWhereInput.SourceEtagLT, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceEtagLT() *string { return v.SourceEtagLT }
+
+// GetSourceEtagLTE returns IntegrationRevisionWhereInput.SourceEtagLTE, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceEtagLTE() *string { return v.SourceEtagLTE }
+
+// GetSourceEtagContains returns IntegrationRevisionWhereInput.SourceEtagContains, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceEtagContains() *string { return v.SourceEtagContains }
+
+// GetSourceEtagHasPrefix returns IntegrationRevisionWhereInput.SourceEtagHasPrefix, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceEtagHasPrefix() *string {
+	return v.SourceEtagHasPrefix
+}
+
+// GetSourceEtagHasSuffix returns IntegrationRevisionWhereInput.SourceEtagHasSuffix, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceEtagHasSuffix() *string {
+	return v.SourceEtagHasSuffix
+}
+
+// GetSourceEtagIsNil returns IntegrationRevisionWhereInput.SourceEtagIsNil, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceEtagIsNil() *bool { return v.SourceEtagIsNil }
+
+// GetSourceEtagNotNil returns IntegrationRevisionWhereInput.SourceEtagNotNil, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceEtagNotNil() *bool { return v.SourceEtagNotNil }
+
+// GetSourceEtagEqualFold returns IntegrationRevisionWhereInput.SourceEtagEqualFold, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceEtagEqualFold() *string {
+	return v.SourceEtagEqualFold
+}
+
+// GetSourceEtagContainsFold returns IntegrationRevisionWhereInput.SourceEtagContainsFold, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetSourceEtagContainsFold() *string {
+	return v.SourceEtagContainsFold
+}
+
+// GetIntegrationID returns IntegrationRevisionWhereInput.IntegrationID, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationID() *uuid.UUID { return v.IntegrationID }
+
+// GetIntegrationIDNEQ returns IntegrationRevisionWhereInput.IntegrationIDNEQ, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationIDNEQ() *uuid.UUID { return v.IntegrationIDNEQ }
+
+// GetIntegrationIDIn returns IntegrationRevisionWhereInput.IntegrationIDIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationIDIn() []uuid.UUID { return v.IntegrationIDIn }
+
+// GetIntegrationIDNotIn returns IntegrationRevisionWhereInput.IntegrationIDNotIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetIntegrationIDNotIn() []uuid.UUID {
 	return v.IntegrationIDNotIn
 }
 
-// GetAuthorID returns IntegrationPackageWhereInput.AuthorID, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetAuthorID() *uuid.UUID { return v.AuthorID }
+// GetAuthorID returns IntegrationRevisionWhereInput.AuthorID, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetAuthorID() *uuid.UUID { return v.AuthorID }
 
-// GetAuthorIDNEQ returns IntegrationPackageWhereInput.AuthorIDNEQ, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetAuthorIDNEQ() *uuid.UUID { return v.AuthorIDNEQ }
+// GetAuthorIDNEQ returns IntegrationRevisionWhereInput.AuthorIDNEQ, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetAuthorIDNEQ() *uuid.UUID { return v.AuthorIDNEQ }
 
-// GetAuthorIDIn returns IntegrationPackageWhereInput.AuthorIDIn, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetAuthorIDIn() []uuid.UUID { return v.AuthorIDIn }
+// GetAuthorIDIn returns IntegrationRevisionWhereInput.AuthorIDIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetAuthorIDIn() []uuid.UUID { return v.AuthorIDIn }
 
-// GetAuthorIDNotIn returns IntegrationPackageWhereInput.AuthorIDNotIn, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetAuthorIDNotIn() []uuid.UUID { return v.AuthorIDNotIn }
+// GetAuthorIDNotIn returns IntegrationRevisionWhereInput.AuthorIDNotIn, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetAuthorIDNotIn() []uuid.UUID { return v.AuthorIDNotIn }
 
-// GetHasIntegration returns IntegrationPackageWhereInput.HasIntegration, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetHasIntegration() *bool { return v.HasIntegration }
+// GetHasIntegration returns IntegrationRevisionWhereInput.HasIntegration, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetHasIntegration() *bool { return v.HasIntegration }
 
-// GetHasIntegrationWith returns IntegrationPackageWhereInput.HasIntegrationWith, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetHasIntegrationWith() []*IntegrationWhereInput {
+// GetHasIntegrationWith returns IntegrationRevisionWhereInput.HasIntegrationWith, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetHasIntegrationWith() []*IntegrationWhereInput {
 	return v.HasIntegrationWith
 }
 
-// GetHasAuthor returns IntegrationPackageWhereInput.HasAuthor, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetHasAuthor() *bool { return v.HasAuthor }
+// GetHasAuthor returns IntegrationRevisionWhereInput.HasAuthor, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetHasAuthor() *bool { return v.HasAuthor }
 
-// GetHasAuthorWith returns IntegrationPackageWhereInput.HasAuthorWith, and is useful for accessing the field via an interface.
-func (v *IntegrationPackageWhereInput) GetHasAuthorWith() []*UserWhereInput { return v.HasAuthorWith }
+// GetHasAuthorWith returns IntegrationRevisionWhereInput.HasAuthorWith, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetHasAuthorWith() []*UserWhereInput { return v.HasAuthorWith }
+
+// GetHasDeployments returns IntegrationRevisionWhereInput.HasDeployments, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetHasDeployments() *bool { return v.HasDeployments }
+
+// GetHasDeploymentsWith returns IntegrationRevisionWhereInput.HasDeploymentsWith, and is useful for accessing the field via an interface.
+func (v *IntegrationRevisionWhereInput) GetHasDeploymentsWith() []*DeploymentWhereInput {
+	return v.HasDeploymentsWith
+}
 
 // IntegrationWhereInput is used for filtering Integration objects.
 // Input was generated by ent.
@@ -12586,6 +14006,34 @@ type IntegrationWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
+	// organization_slug field predicates
+	OrganizationSlug             *string  `json:"organizationSlug"`
+	OrganizationSlugNEQ          *string  `json:"organizationSlugNEQ"`
+	OrganizationSlugIn           []string `json:"organizationSlugIn"`
+	OrganizationSlugNotIn        []string `json:"organizationSlugNotIn"`
+	OrganizationSlugGT           *string  `json:"organizationSlugGT"`
+	OrganizationSlugGTE          *string  `json:"organizationSlugGTE"`
+	OrganizationSlugLT           *string  `json:"organizationSlugLT"`
+	OrganizationSlugLTE          *string  `json:"organizationSlugLTE"`
+	OrganizationSlugContains     *string  `json:"organizationSlugContains"`
+	OrganizationSlugHasPrefix    *string  `json:"organizationSlugHasPrefix"`
+	OrganizationSlugHasSuffix    *string  `json:"organizationSlugHasSuffix"`
+	OrganizationSlugEqualFold    *string  `json:"organizationSlugEqualFold"`
+	OrganizationSlugContainsFold *string  `json:"organizationSlugContainsFold"`
+	// slug field predicates
+	Slug             *string  `json:"slug"`
+	SlugNEQ          *string  `json:"slugNEQ"`
+	SlugIn           []string `json:"slugIn"`
+	SlugNotIn        []string `json:"slugNotIn"`
+	SlugGT           *string  `json:"slugGT"`
+	SlugGTE          *string  `json:"slugGTE"`
+	SlugLT           *string  `json:"slugLT"`
+	SlugLTE          *string  `json:"slugLTE"`
+	SlugContains     *string  `json:"slugContains"`
+	SlugHasPrefix    *string  `json:"slugHasPrefix"`
+	SlugHasSuffix    *string  `json:"slugHasSuffix"`
+	SlugEqualFold    *string  `json:"slugEqualFold"`
+	SlugContainsFold *string  `json:"slugContainsFold"`
 	// created_at field predicates
 	CreatedAt      *time.Time  `json:"createdAt"`
 	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
@@ -12604,34 +14052,6 @@ type IntegrationWhereInput struct {
 	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
 	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
-	// slug field predicates
-	Slug             *string  `json:"slug"`
-	SlugNEQ          *string  `json:"slugNEQ"`
-	SlugIn           []string `json:"slugIn"`
-	SlugNotIn        []string `json:"slugNotIn"`
-	SlugGT           *string  `json:"slugGT"`
-	SlugGTE          *string  `json:"slugGTE"`
-	SlugLT           *string  `json:"slugLT"`
-	SlugLTE          *string  `json:"slugLTE"`
-	SlugContains     *string  `json:"slugContains"`
-	SlugHasPrefix    *string  `json:"slugHasPrefix"`
-	SlugHasSuffix    *string  `json:"slugHasSuffix"`
-	SlugEqualFold    *string  `json:"slugEqualFold"`
-	SlugContainsFold *string  `json:"slugContainsFold"`
-	// api_version field predicates
-	ApiVersion             *string  `json:"apiVersion"`
-	ApiVersionNEQ          *string  `json:"apiVersionNEQ"`
-	ApiVersionIn           []string `json:"apiVersionIn"`
-	ApiVersionNotIn        []string `json:"apiVersionNotIn"`
-	ApiVersionGT           *string  `json:"apiVersionGT"`
-	ApiVersionGTE          *string  `json:"apiVersionGTE"`
-	ApiVersionLT           *string  `json:"apiVersionLT"`
-	ApiVersionLTE          *string  `json:"apiVersionLTE"`
-	ApiVersionContains     *string  `json:"apiVersionContains"`
-	ApiVersionHasPrefix    *string  `json:"apiVersionHasPrefix"`
-	ApiVersionHasSuffix    *string  `json:"apiVersionHasSuffix"`
-	ApiVersionEqualFold    *string  `json:"apiVersionEqualFold"`
-	ApiVersionContainsFold *string  `json:"apiVersionContainsFold"`
 	// name field predicates
 	Name             *string  `json:"name"`
 	NameNEQ          *string  `json:"nameNEQ"`
@@ -12688,57 +14108,32 @@ type IntegrationWhereInput struct {
 	DescriptionHasSuffix    *string  `json:"descriptionHasSuffix"`
 	DescriptionEqualFold    *string  `json:"descriptionEqualFold"`
 	DescriptionContainsFold *string  `json:"descriptionContainsFold"`
-	// network field predicates
-	Network             *string  `json:"network"`
-	NetworkNEQ          *string  `json:"networkNEQ"`
-	NetworkIn           []string `json:"networkIn"`
-	NetworkNotIn        []string `json:"networkNotIn"`
-	NetworkGT           *string  `json:"networkGT"`
-	NetworkGTE          *string  `json:"networkGTE"`
-	NetworkLT           *string  `json:"networkLT"`
-	NetworkLTE          *string  `json:"networkLTE"`
-	NetworkContains     *string  `json:"networkContains"`
-	NetworkHasPrefix    *string  `json:"networkHasPrefix"`
-	NetworkHasSuffix    *string  `json:"networkHasSuffix"`
-	NetworkEqualFold    *string  `json:"networkEqualFold"`
-	NetworkContainsFold *string  `json:"networkContainsFold"`
-	// address field predicates
-	Address             *string  `json:"address"`
-	AddressNEQ          *string  `json:"addressNEQ"`
-	AddressIn           []string `json:"addressIn"`
-	AddressNotIn        []string `json:"addressNotIn"`
-	AddressGT           *string  `json:"addressGT"`
-	AddressGTE          *string  `json:"addressGTE"`
-	AddressLT           *string  `json:"addressLT"`
-	AddressLTE          *string  `json:"addressLTE"`
-	AddressContains     *string  `json:"addressContains"`
-	AddressHasPrefix    *string  `json:"addressHasPrefix"`
-	AddressHasSuffix    *string  `json:"addressHasSuffix"`
-	AddressEqualFold    *string  `json:"addressEqualFold"`
-	AddressContainsFold *string  `json:"addressContainsFold"`
-	// config_schema field predicates
-	ConfigSchema             *string  `json:"configSchema"`
-	ConfigSchemaNEQ          *string  `json:"configSchemaNEQ"`
-	ConfigSchemaIn           []string `json:"configSchemaIn"`
-	ConfigSchemaNotIn        []string `json:"configSchemaNotIn"`
-	ConfigSchemaGT           *string  `json:"configSchemaGT"`
-	ConfigSchemaGTE          *string  `json:"configSchemaGTE"`
-	ConfigSchemaLT           *string  `json:"configSchemaLT"`
-	ConfigSchemaLTE          *string  `json:"configSchemaLTE"`
-	ConfigSchemaContains     *string  `json:"configSchemaContains"`
-	ConfigSchemaHasPrefix    *string  `json:"configSchemaHasPrefix"`
-	ConfigSchemaHasSuffix    *string  `json:"configSchemaHasSuffix"`
-	ConfigSchemaIsNil        *bool    `json:"configSchemaIsNil"`
-	ConfigSchemaNotNil       *bool    `json:"configSchemaNotNil"`
-	ConfigSchemaEqualFold    *string  `json:"configSchemaEqualFold"`
-	ConfigSchemaContainsFold *string  `json:"configSchemaContainsFold"`
-	// published_id field predicates
-	PublishedID       *uuid.UUID  `json:"publishedID"`
-	PublishedIDNEQ    *uuid.UUID  `json:"publishedIDNEQ"`
-	PublishedIDIn     []uuid.UUID `json:"publishedIDIn"`
-	PublishedIDNotIn  []uuid.UUID `json:"publishedIDNotIn"`
-	PublishedIDIsNil  *bool       `json:"publishedIDIsNil"`
-	PublishedIDNotNil *bool       `json:"publishedIDNotNil"`
+	// api_version field predicates
+	ApiVersion             *string  `json:"apiVersion"`
+	ApiVersionNEQ          *string  `json:"apiVersionNEQ"`
+	ApiVersionIn           []string `json:"apiVersionIn"`
+	ApiVersionNotIn        []string `json:"apiVersionNotIn"`
+	ApiVersionGT           *string  `json:"apiVersionGT"`
+	ApiVersionGTE          *string  `json:"apiVersionGTE"`
+	ApiVersionLT           *string  `json:"apiVersionLT"`
+	ApiVersionLTE          *string  `json:"apiVersionLTE"`
+	ApiVersionContains     *string  `json:"apiVersionContains"`
+	ApiVersionHasPrefix    *string  `json:"apiVersionHasPrefix"`
+	ApiVersionHasSuffix    *string  `json:"apiVersionHasSuffix"`
+	ApiVersionEqualFold    *string  `json:"apiVersionEqualFold"`
+	ApiVersionContainsFold *string  `json:"apiVersionContainsFold"`
+	// visibility field predicates
+	Visibility      *Visibility  `json:"visibility"`
+	VisibilityNEQ   *Visibility  `json:"visibilityNEQ"`
+	VisibilityIn    []Visibility `json:"visibilityIn"`
+	VisibilityNotIn []Visibility `json:"visibilityNotIn"`
+	// revision_id field predicates
+	RevisionID       *uuid.UUID  `json:"revisionID"`
+	RevisionIDNEQ    *uuid.UUID  `json:"revisionIDNEQ"`
+	RevisionIDIn     []uuid.UUID `json:"revisionIDIn"`
+	RevisionIDNotIn  []uuid.UUID `json:"revisionIDNotIn"`
+	RevisionIDIsNil  *bool       `json:"revisionIDIsNil"`
+	RevisionIDNotNil *bool       `json:"revisionIDNotNil"`
 	// organization_id field predicates
 	OrganizationID      *uuid.UUID  `json:"organizationID"`
 	OrganizationIDNEQ   *uuid.UUID  `json:"organizationIDNEQ"`
@@ -12747,15 +14142,15 @@ type IntegrationWhereInput struct {
 	// organization edge predicates
 	HasOrganization     *bool                     `json:"hasOrganization"`
 	HasOrganizationWith []*OrganizationWhereInput `json:"hasOrganizationWith,omitempty"`
-	// connections edge predicates
-	HasConnections     *bool                   `json:"hasConnections"`
-	HasConnectionsWith []*ConnectionWhereInput `json:"hasConnectionsWith,omitempty"`
-	// packages edge predicates
-	HasPackages     *bool                           `json:"hasPackages"`
-	HasPackagesWith []*IntegrationPackageWhereInput `json:"hasPackagesWith,omitempty"`
+	// deployments edge predicates
+	HasDeployments     *bool                   `json:"hasDeployments"`
+	HasDeploymentsWith []*DeploymentWhereInput `json:"hasDeploymentsWith,omitempty"`
+	// revisions edge predicates
+	HasRevisions     *bool                            `json:"hasRevisions"`
+	HasRevisionsWith []*IntegrationRevisionWhereInput `json:"hasRevisionsWith,omitempty"`
 	// published edge predicates
-	HasPublished     *bool                           `json:"hasPublished"`
-	HasPublishedWith []*IntegrationPackageWhereInput `json:"hasPublishedWith,omitempty"`
+	HasPublished     *bool                            `json:"hasPublished"`
+	HasPublishedWith []*IntegrationRevisionWhereInput `json:"hasPublishedWith,omitempty"`
 }
 
 // GetNot returns IntegrationWhereInput.Not, and is useful for accessing the field via an interface.
@@ -12790,6 +14185,94 @@ func (v *IntegrationWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 
 // GetIdLTE returns IntegrationWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *IntegrationWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
+
+// GetOrganizationSlug returns IntegrationWhereInput.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetOrganizationSlug() *string { return v.OrganizationSlug }
+
+// GetOrganizationSlugNEQ returns IntegrationWhereInput.OrganizationSlugNEQ, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetOrganizationSlugNEQ() *string { return v.OrganizationSlugNEQ }
+
+// GetOrganizationSlugIn returns IntegrationWhereInput.OrganizationSlugIn, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetOrganizationSlugIn() []string { return v.OrganizationSlugIn }
+
+// GetOrganizationSlugNotIn returns IntegrationWhereInput.OrganizationSlugNotIn, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetOrganizationSlugNotIn() []string { return v.OrganizationSlugNotIn }
+
+// GetOrganizationSlugGT returns IntegrationWhereInput.OrganizationSlugGT, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetOrganizationSlugGT() *string { return v.OrganizationSlugGT }
+
+// GetOrganizationSlugGTE returns IntegrationWhereInput.OrganizationSlugGTE, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetOrganizationSlugGTE() *string { return v.OrganizationSlugGTE }
+
+// GetOrganizationSlugLT returns IntegrationWhereInput.OrganizationSlugLT, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetOrganizationSlugLT() *string { return v.OrganizationSlugLT }
+
+// GetOrganizationSlugLTE returns IntegrationWhereInput.OrganizationSlugLTE, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetOrganizationSlugLTE() *string { return v.OrganizationSlugLTE }
+
+// GetOrganizationSlugContains returns IntegrationWhereInput.OrganizationSlugContains, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetOrganizationSlugContains() *string {
+	return v.OrganizationSlugContains
+}
+
+// GetOrganizationSlugHasPrefix returns IntegrationWhereInput.OrganizationSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetOrganizationSlugHasPrefix() *string {
+	return v.OrganizationSlugHasPrefix
+}
+
+// GetOrganizationSlugHasSuffix returns IntegrationWhereInput.OrganizationSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetOrganizationSlugHasSuffix() *string {
+	return v.OrganizationSlugHasSuffix
+}
+
+// GetOrganizationSlugEqualFold returns IntegrationWhereInput.OrganizationSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetOrganizationSlugEqualFold() *string {
+	return v.OrganizationSlugEqualFold
+}
+
+// GetOrganizationSlugContainsFold returns IntegrationWhereInput.OrganizationSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetOrganizationSlugContainsFold() *string {
+	return v.OrganizationSlugContainsFold
+}
+
+// GetSlug returns IntegrationWhereInput.Slug, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetSlug() *string { return v.Slug }
+
+// GetSlugNEQ returns IntegrationWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
+
+// GetSlugIn returns IntegrationWhereInput.SlugIn, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetSlugIn() []string { return v.SlugIn }
+
+// GetSlugNotIn returns IntegrationWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
+
+// GetSlugGT returns IntegrationWhereInput.SlugGT, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetSlugGT() *string { return v.SlugGT }
+
+// GetSlugGTE returns IntegrationWhereInput.SlugGTE, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetSlugGTE() *string { return v.SlugGTE }
+
+// GetSlugLT returns IntegrationWhereInput.SlugLT, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetSlugLT() *string { return v.SlugLT }
+
+// GetSlugLTE returns IntegrationWhereInput.SlugLTE, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetSlugLTE() *string { return v.SlugLTE }
+
+// GetSlugContains returns IntegrationWhereInput.SlugContains, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetSlugContains() *string { return v.SlugContains }
+
+// GetSlugHasPrefix returns IntegrationWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
+
+// GetSlugHasSuffix returns IntegrationWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
+
+// GetSlugEqualFold returns IntegrationWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
+
+// GetSlugContainsFold returns IntegrationWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
 
 // GetCreatedAt returns IntegrationWhereInput.CreatedAt, and is useful for accessing the field via an interface.
 func (v *IntegrationWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
@@ -12838,84 +14321,6 @@ func (v *IntegrationWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAt
 
 // GetUpdatedAtLTE returns IntegrationWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
 func (v *IntegrationWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
-
-// GetSlug returns IntegrationWhereInput.Slug, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetSlug() *string { return v.Slug }
-
-// GetSlugNEQ returns IntegrationWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
-
-// GetSlugIn returns IntegrationWhereInput.SlugIn, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetSlugIn() []string { return v.SlugIn }
-
-// GetSlugNotIn returns IntegrationWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
-
-// GetSlugGT returns IntegrationWhereInput.SlugGT, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetSlugGT() *string { return v.SlugGT }
-
-// GetSlugGTE returns IntegrationWhereInput.SlugGTE, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetSlugGTE() *string { return v.SlugGTE }
-
-// GetSlugLT returns IntegrationWhereInput.SlugLT, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetSlugLT() *string { return v.SlugLT }
-
-// GetSlugLTE returns IntegrationWhereInput.SlugLTE, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetSlugLTE() *string { return v.SlugLTE }
-
-// GetSlugContains returns IntegrationWhereInput.SlugContains, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetSlugContains() *string { return v.SlugContains }
-
-// GetSlugHasPrefix returns IntegrationWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
-
-// GetSlugHasSuffix returns IntegrationWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
-
-// GetSlugEqualFold returns IntegrationWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
-
-// GetSlugContainsFold returns IntegrationWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
-
-// GetApiVersion returns IntegrationWhereInput.ApiVersion, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetApiVersion() *string { return v.ApiVersion }
-
-// GetApiVersionNEQ returns IntegrationWhereInput.ApiVersionNEQ, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetApiVersionNEQ() *string { return v.ApiVersionNEQ }
-
-// GetApiVersionIn returns IntegrationWhereInput.ApiVersionIn, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetApiVersionIn() []string { return v.ApiVersionIn }
-
-// GetApiVersionNotIn returns IntegrationWhereInput.ApiVersionNotIn, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetApiVersionNotIn() []string { return v.ApiVersionNotIn }
-
-// GetApiVersionGT returns IntegrationWhereInput.ApiVersionGT, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetApiVersionGT() *string { return v.ApiVersionGT }
-
-// GetApiVersionGTE returns IntegrationWhereInput.ApiVersionGTE, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetApiVersionGTE() *string { return v.ApiVersionGTE }
-
-// GetApiVersionLT returns IntegrationWhereInput.ApiVersionLT, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetApiVersionLT() *string { return v.ApiVersionLT }
-
-// GetApiVersionLTE returns IntegrationWhereInput.ApiVersionLTE, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetApiVersionLTE() *string { return v.ApiVersionLTE }
-
-// GetApiVersionContains returns IntegrationWhereInput.ApiVersionContains, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetApiVersionContains() *string { return v.ApiVersionContains }
-
-// GetApiVersionHasPrefix returns IntegrationWhereInput.ApiVersionHasPrefix, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetApiVersionHasPrefix() *string { return v.ApiVersionHasPrefix }
-
-// GetApiVersionHasSuffix returns IntegrationWhereInput.ApiVersionHasSuffix, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetApiVersionHasSuffix() *string { return v.ApiVersionHasSuffix }
-
-// GetApiVersionEqualFold returns IntegrationWhereInput.ApiVersionEqualFold, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetApiVersionEqualFold() *string { return v.ApiVersionEqualFold }
-
-// GetApiVersionContainsFold returns IntegrationWhereInput.ApiVersionContainsFold, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetApiVersionContainsFold() *string { return v.ApiVersionContainsFold }
 
 // GetName returns IntegrationWhereInput.Name, and is useful for accessing the field via an interface.
 func (v *IntegrationWhereInput) GetName() *string { return v.Name }
@@ -13075,148 +14480,74 @@ func (v *IntegrationWhereInput) GetDescriptionContainsFold() *string {
 	return v.DescriptionContainsFold
 }
 
-// GetNetwork returns IntegrationWhereInput.Network, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetNetwork() *string { return v.Network }
+// GetApiVersion returns IntegrationWhereInput.ApiVersion, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetApiVersion() *string { return v.ApiVersion }
 
-// GetNetworkNEQ returns IntegrationWhereInput.NetworkNEQ, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetNetworkNEQ() *string { return v.NetworkNEQ }
+// GetApiVersionNEQ returns IntegrationWhereInput.ApiVersionNEQ, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetApiVersionNEQ() *string { return v.ApiVersionNEQ }
 
-// GetNetworkIn returns IntegrationWhereInput.NetworkIn, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetNetworkIn() []string { return v.NetworkIn }
+// GetApiVersionIn returns IntegrationWhereInput.ApiVersionIn, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetApiVersionIn() []string { return v.ApiVersionIn }
 
-// GetNetworkNotIn returns IntegrationWhereInput.NetworkNotIn, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetNetworkNotIn() []string { return v.NetworkNotIn }
+// GetApiVersionNotIn returns IntegrationWhereInput.ApiVersionNotIn, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetApiVersionNotIn() []string { return v.ApiVersionNotIn }
 
-// GetNetworkGT returns IntegrationWhereInput.NetworkGT, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetNetworkGT() *string { return v.NetworkGT }
+// GetApiVersionGT returns IntegrationWhereInput.ApiVersionGT, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetApiVersionGT() *string { return v.ApiVersionGT }
 
-// GetNetworkGTE returns IntegrationWhereInput.NetworkGTE, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetNetworkGTE() *string { return v.NetworkGTE }
+// GetApiVersionGTE returns IntegrationWhereInput.ApiVersionGTE, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetApiVersionGTE() *string { return v.ApiVersionGTE }
 
-// GetNetworkLT returns IntegrationWhereInput.NetworkLT, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetNetworkLT() *string { return v.NetworkLT }
+// GetApiVersionLT returns IntegrationWhereInput.ApiVersionLT, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetApiVersionLT() *string { return v.ApiVersionLT }
 
-// GetNetworkLTE returns IntegrationWhereInput.NetworkLTE, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetNetworkLTE() *string { return v.NetworkLTE }
+// GetApiVersionLTE returns IntegrationWhereInput.ApiVersionLTE, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetApiVersionLTE() *string { return v.ApiVersionLTE }
 
-// GetNetworkContains returns IntegrationWhereInput.NetworkContains, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetNetworkContains() *string { return v.NetworkContains }
+// GetApiVersionContains returns IntegrationWhereInput.ApiVersionContains, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetApiVersionContains() *string { return v.ApiVersionContains }
 
-// GetNetworkHasPrefix returns IntegrationWhereInput.NetworkHasPrefix, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetNetworkHasPrefix() *string { return v.NetworkHasPrefix }
+// GetApiVersionHasPrefix returns IntegrationWhereInput.ApiVersionHasPrefix, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetApiVersionHasPrefix() *string { return v.ApiVersionHasPrefix }
 
-// GetNetworkHasSuffix returns IntegrationWhereInput.NetworkHasSuffix, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetNetworkHasSuffix() *string { return v.NetworkHasSuffix }
+// GetApiVersionHasSuffix returns IntegrationWhereInput.ApiVersionHasSuffix, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetApiVersionHasSuffix() *string { return v.ApiVersionHasSuffix }
 
-// GetNetworkEqualFold returns IntegrationWhereInput.NetworkEqualFold, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetNetworkEqualFold() *string { return v.NetworkEqualFold }
+// GetApiVersionEqualFold returns IntegrationWhereInput.ApiVersionEqualFold, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetApiVersionEqualFold() *string { return v.ApiVersionEqualFold }
 
-// GetNetworkContainsFold returns IntegrationWhereInput.NetworkContainsFold, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetNetworkContainsFold() *string { return v.NetworkContainsFold }
+// GetApiVersionContainsFold returns IntegrationWhereInput.ApiVersionContainsFold, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetApiVersionContainsFold() *string { return v.ApiVersionContainsFold }
 
-// GetAddress returns IntegrationWhereInput.Address, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetAddress() *string { return v.Address }
+// GetVisibility returns IntegrationWhereInput.Visibility, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetVisibility() *Visibility { return v.Visibility }
 
-// GetAddressNEQ returns IntegrationWhereInput.AddressNEQ, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetAddressNEQ() *string { return v.AddressNEQ }
+// GetVisibilityNEQ returns IntegrationWhereInput.VisibilityNEQ, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetVisibilityNEQ() *Visibility { return v.VisibilityNEQ }
 
-// GetAddressIn returns IntegrationWhereInput.AddressIn, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetAddressIn() []string { return v.AddressIn }
+// GetVisibilityIn returns IntegrationWhereInput.VisibilityIn, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetVisibilityIn() []Visibility { return v.VisibilityIn }
 
-// GetAddressNotIn returns IntegrationWhereInput.AddressNotIn, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetAddressNotIn() []string { return v.AddressNotIn }
+// GetVisibilityNotIn returns IntegrationWhereInput.VisibilityNotIn, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetVisibilityNotIn() []Visibility { return v.VisibilityNotIn }
 
-// GetAddressGT returns IntegrationWhereInput.AddressGT, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetAddressGT() *string { return v.AddressGT }
+// GetRevisionID returns IntegrationWhereInput.RevisionID, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetRevisionID() *uuid.UUID { return v.RevisionID }
 
-// GetAddressGTE returns IntegrationWhereInput.AddressGTE, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetAddressGTE() *string { return v.AddressGTE }
+// GetRevisionIDNEQ returns IntegrationWhereInput.RevisionIDNEQ, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetRevisionIDNEQ() *uuid.UUID { return v.RevisionIDNEQ }
 
-// GetAddressLT returns IntegrationWhereInput.AddressLT, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetAddressLT() *string { return v.AddressLT }
+// GetRevisionIDIn returns IntegrationWhereInput.RevisionIDIn, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetRevisionIDIn() []uuid.UUID { return v.RevisionIDIn }
 
-// GetAddressLTE returns IntegrationWhereInput.AddressLTE, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetAddressLTE() *string { return v.AddressLTE }
+// GetRevisionIDNotIn returns IntegrationWhereInput.RevisionIDNotIn, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetRevisionIDNotIn() []uuid.UUID { return v.RevisionIDNotIn }
 
-// GetAddressContains returns IntegrationWhereInput.AddressContains, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetAddressContains() *string { return v.AddressContains }
+// GetRevisionIDIsNil returns IntegrationWhereInput.RevisionIDIsNil, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetRevisionIDIsNil() *bool { return v.RevisionIDIsNil }
 
-// GetAddressHasPrefix returns IntegrationWhereInput.AddressHasPrefix, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetAddressHasPrefix() *string { return v.AddressHasPrefix }
-
-// GetAddressHasSuffix returns IntegrationWhereInput.AddressHasSuffix, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetAddressHasSuffix() *string { return v.AddressHasSuffix }
-
-// GetAddressEqualFold returns IntegrationWhereInput.AddressEqualFold, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetAddressEqualFold() *string { return v.AddressEqualFold }
-
-// GetAddressContainsFold returns IntegrationWhereInput.AddressContainsFold, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetAddressContainsFold() *string { return v.AddressContainsFold }
-
-// GetConfigSchema returns IntegrationWhereInput.ConfigSchema, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetConfigSchema() *string { return v.ConfigSchema }
-
-// GetConfigSchemaNEQ returns IntegrationWhereInput.ConfigSchemaNEQ, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetConfigSchemaNEQ() *string { return v.ConfigSchemaNEQ }
-
-// GetConfigSchemaIn returns IntegrationWhereInput.ConfigSchemaIn, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetConfigSchemaIn() []string { return v.ConfigSchemaIn }
-
-// GetConfigSchemaNotIn returns IntegrationWhereInput.ConfigSchemaNotIn, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetConfigSchemaNotIn() []string { return v.ConfigSchemaNotIn }
-
-// GetConfigSchemaGT returns IntegrationWhereInput.ConfigSchemaGT, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetConfigSchemaGT() *string { return v.ConfigSchemaGT }
-
-// GetConfigSchemaGTE returns IntegrationWhereInput.ConfigSchemaGTE, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetConfigSchemaGTE() *string { return v.ConfigSchemaGTE }
-
-// GetConfigSchemaLT returns IntegrationWhereInput.ConfigSchemaLT, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetConfigSchemaLT() *string { return v.ConfigSchemaLT }
-
-// GetConfigSchemaLTE returns IntegrationWhereInput.ConfigSchemaLTE, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetConfigSchemaLTE() *string { return v.ConfigSchemaLTE }
-
-// GetConfigSchemaContains returns IntegrationWhereInput.ConfigSchemaContains, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetConfigSchemaContains() *string { return v.ConfigSchemaContains }
-
-// GetConfigSchemaHasPrefix returns IntegrationWhereInput.ConfigSchemaHasPrefix, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetConfigSchemaHasPrefix() *string { return v.ConfigSchemaHasPrefix }
-
-// GetConfigSchemaHasSuffix returns IntegrationWhereInput.ConfigSchemaHasSuffix, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetConfigSchemaHasSuffix() *string { return v.ConfigSchemaHasSuffix }
-
-// GetConfigSchemaIsNil returns IntegrationWhereInput.ConfigSchemaIsNil, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetConfigSchemaIsNil() *bool { return v.ConfigSchemaIsNil }
-
-// GetConfigSchemaNotNil returns IntegrationWhereInput.ConfigSchemaNotNil, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetConfigSchemaNotNil() *bool { return v.ConfigSchemaNotNil }
-
-// GetConfigSchemaEqualFold returns IntegrationWhereInput.ConfigSchemaEqualFold, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetConfigSchemaEqualFold() *string { return v.ConfigSchemaEqualFold }
-
-// GetConfigSchemaContainsFold returns IntegrationWhereInput.ConfigSchemaContainsFold, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetConfigSchemaContainsFold() *string {
-	return v.ConfigSchemaContainsFold
-}
-
-// GetPublishedID returns IntegrationWhereInput.PublishedID, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetPublishedID() *uuid.UUID { return v.PublishedID }
-
-// GetPublishedIDNEQ returns IntegrationWhereInput.PublishedIDNEQ, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetPublishedIDNEQ() *uuid.UUID { return v.PublishedIDNEQ }
-
-// GetPublishedIDIn returns IntegrationWhereInput.PublishedIDIn, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetPublishedIDIn() []uuid.UUID { return v.PublishedIDIn }
-
-// GetPublishedIDNotIn returns IntegrationWhereInput.PublishedIDNotIn, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetPublishedIDNotIn() []uuid.UUID { return v.PublishedIDNotIn }
-
-// GetPublishedIDIsNil returns IntegrationWhereInput.PublishedIDIsNil, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetPublishedIDIsNil() *bool { return v.PublishedIDIsNil }
-
-// GetPublishedIDNotNil returns IntegrationWhereInput.PublishedIDNotNil, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetPublishedIDNotNil() *bool { return v.PublishedIDNotNil }
+// GetRevisionIDNotNil returns IntegrationWhereInput.RevisionIDNotNil, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetRevisionIDNotNil() *bool { return v.RevisionIDNotNil }
 
 // GetOrganizationID returns IntegrationWhereInput.OrganizationID, and is useful for accessing the field via an interface.
 func (v *IntegrationWhereInput) GetOrganizationID() *uuid.UUID { return v.OrganizationID }
@@ -13238,27 +14569,27 @@ func (v *IntegrationWhereInput) GetHasOrganizationWith() []*OrganizationWhereInp
 	return v.HasOrganizationWith
 }
 
-// GetHasConnections returns IntegrationWhereInput.HasConnections, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetHasConnections() *bool { return v.HasConnections }
+// GetHasDeployments returns IntegrationWhereInput.HasDeployments, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetHasDeployments() *bool { return v.HasDeployments }
 
-// GetHasConnectionsWith returns IntegrationWhereInput.HasConnectionsWith, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetHasConnectionsWith() []*ConnectionWhereInput {
-	return v.HasConnectionsWith
+// GetHasDeploymentsWith returns IntegrationWhereInput.HasDeploymentsWith, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetHasDeploymentsWith() []*DeploymentWhereInput {
+	return v.HasDeploymentsWith
 }
 
-// GetHasPackages returns IntegrationWhereInput.HasPackages, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetHasPackages() *bool { return v.HasPackages }
+// GetHasRevisions returns IntegrationWhereInput.HasRevisions, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetHasRevisions() *bool { return v.HasRevisions }
 
-// GetHasPackagesWith returns IntegrationWhereInput.HasPackagesWith, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetHasPackagesWith() []*IntegrationPackageWhereInput {
-	return v.HasPackagesWith
+// GetHasRevisionsWith returns IntegrationWhereInput.HasRevisionsWith, and is useful for accessing the field via an interface.
+func (v *IntegrationWhereInput) GetHasRevisionsWith() []*IntegrationRevisionWhereInput {
+	return v.HasRevisionsWith
 }
 
 // GetHasPublished returns IntegrationWhereInput.HasPublished, and is useful for accessing the field via an interface.
 func (v *IntegrationWhereInput) GetHasPublished() *bool { return v.HasPublished }
 
 // GetHasPublishedWith returns IntegrationWhereInput.HasPublishedWith, and is useful for accessing the field via an interface.
-func (v *IntegrationWhereInput) GetHasPublishedWith() []*IntegrationPackageWhereInput {
+func (v *IntegrationWhereInput) GetHasPublishedWith() []*IntegrationRevisionWhereInput {
 	return v.HasPublishedWith
 }
 
@@ -13764,6 +15095,56 @@ func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeCo
 	return v.ConnectionFragment.Visibility
 }
 
+// GetOrganizationSlug returns ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection) GetOrganizationSlug() string {
+	return v.ConnectionFragment.OrganizationSlug
+}
+
+// GetOrganizationID returns ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection.OrganizationID, and is useful for accessing the field via an interface.
+func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection) GetOrganizationID() uuid.UUID {
+	return v.ConnectionFragment.OrganizationID
+}
+
+// GetIntegrationSlug returns ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection.IntegrationSlug, and is useful for accessing the field via an interface.
+func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection) GetIntegrationSlug() *string {
+	return v.ConnectionFragment.IntegrationSlug
+}
+
+// GetDeploymentSlug returns ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection.DeploymentSlug, and is useful for accessing the field via an interface.
+func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection) GetDeploymentSlug() *string {
+	return v.ConnectionFragment.DeploymentSlug
+}
+
+// GetDeploymentID returns ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection.DeploymentID, and is useful for accessing the field via an interface.
+func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection) GetDeploymentID() *uuid.UUID {
+	return v.ConnectionFragment.DeploymentID
+}
+
+// GetConfigURI returns ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection.ConfigURI, and is useful for accessing the field via an interface.
+func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection) GetConfigURI() *string {
+	return v.ConnectionFragment.ConfigURI
+}
+
+// GetCustomProtos returns ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection.CustomProtos, and is useful for accessing the field via an interface.
+func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection) GetCustomProtos() *string {
+	return v.ConnectionFragment.CustomProtos
+}
+
+// GetCustomGrpc returns ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection.CustomGrpc, and is useful for accessing the field via an interface.
+func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection) GetCustomGrpc() *bool {
+	return v.ConnectionFragment.CustomGrpc
+}
+
+// GetHeaders returns ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection.Headers, and is useful for accessing the field via an interface.
+func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection) GetHeaders() map[string]any {
+	return v.ConnectionFragment.Headers
+}
+
+// GetAddress returns ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection.Address, and is useful for accessing the field via an interface.
+func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection) GetAddress() *ConnectionFragmentAddress {
+	return v.ConnectionFragment.Address
+}
+
 // GetCreatedAt returns ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection.CreatedAt, and is useful for accessing the field via an interface.
 func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection) GetCreatedAt() time.Time {
 	return v.ConnectionFragment.CreatedAt
@@ -13772,16 +15153,6 @@ func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeCo
 // GetUpdatedAt returns ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection.UpdatedAt, and is useful for accessing the field via an interface.
 func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection) GetUpdatedAt() time.Time {
 	return v.ConnectionFragment.UpdatedAt
-}
-
-// GetIntegrationID returns ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection.IntegrationID, and is useful for accessing the field via an interface.
-func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection) GetIntegrationID() uuid.UUID {
-	return v.ConnectionFragment.IntegrationID
-}
-
-// GetOrganizationID returns ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection.OrganizationID, and is useful for accessing the field via an interface.
-func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection) GetOrganizationID() uuid.UUID {
-	return v.ConnectionFragment.OrganizationID
 }
 
 func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection) UnmarshalJSON(b []byte) error {
@@ -13818,13 +15189,29 @@ type __premarshalListConnectionsConnectionsConnectionConnectionEdgesConnectionEd
 
 	Visibility Visibility `json:"visibility"`
 
+	OrganizationSlug string `json:"organizationSlug"`
+
+	OrganizationID uuid.UUID `json:"organizationID"`
+
+	IntegrationSlug *string `json:"integrationSlug"`
+
+	DeploymentSlug *string `json:"deploymentSlug"`
+
+	DeploymentID *uuid.UUID `json:"deploymentID"`
+
+	ConfigURI *string `json:"configURI"`
+
+	CustomProtos *string `json:"customProtos"`
+
+	CustomGrpc *bool `json:"customGrpc"`
+
+	Headers map[string]any `json:"headers"`
+
+	Address *ConnectionFragmentAddress `json:"address"`
+
 	CreatedAt time.Time `json:"createdAt"`
 
 	UpdatedAt time.Time `json:"updatedAt"`
-
-	IntegrationID uuid.UUID `json:"integrationID"`
-
-	OrganizationID uuid.UUID `json:"organizationID"`
 }
 
 func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeConnection) MarshalJSON() ([]byte, error) {
@@ -13842,10 +15229,18 @@ func (v *ListConnectionsConnectionsConnectionConnectionEdgesConnectionEdgeNodeCo
 	retval.Slug = v.ConnectionFragment.Slug
 	retval.Name = v.ConnectionFragment.Name
 	retval.Visibility = v.ConnectionFragment.Visibility
+	retval.OrganizationSlug = v.ConnectionFragment.OrganizationSlug
+	retval.OrganizationID = v.ConnectionFragment.OrganizationID
+	retval.IntegrationSlug = v.ConnectionFragment.IntegrationSlug
+	retval.DeploymentSlug = v.ConnectionFragment.DeploymentSlug
+	retval.DeploymentID = v.ConnectionFragment.DeploymentID
+	retval.ConfigURI = v.ConnectionFragment.ConfigURI
+	retval.CustomProtos = v.ConnectionFragment.CustomProtos
+	retval.CustomGrpc = v.ConnectionFragment.CustomGrpc
+	retval.Headers = v.ConnectionFragment.Headers
+	retval.Address = v.ConnectionFragment.Address
 	retval.CreatedAt = v.ConnectionFragment.CreatedAt
 	retval.UpdatedAt = v.ConnectionFragment.UpdatedAt
-	retval.IntegrationID = v.ConnectionFragment.IntegrationID
-	retval.OrganizationID = v.ConnectionFragment.OrganizationID
 	return &retval, nil
 }
 
@@ -13857,6 +15252,215 @@ type ListConnectionsResponse struct {
 // GetConnections returns ListConnectionsResponse.Connections, and is useful for accessing the field via an interface.
 func (v *ListConnectionsResponse) GetConnections() *ListConnectionsConnectionsConnectionConnection {
 	return v.Connections
+}
+
+// ListDeploymentsDeploymentsDeploymentConnection includes the requested fields of the GraphQL type DeploymentConnection.
+// The GraphQL type's documentation follows.
+//
+// A connection to a list of items.
+type ListDeploymentsDeploymentsDeploymentConnection struct {
+	// A list of edges.
+	Edges []*ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdge `json:"edges"`
+	// Identifies the total count of items in the connection.
+	TotalCount int `json:"totalCount"`
+}
+
+// GetEdges returns ListDeploymentsDeploymentsDeploymentConnection.Edges, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnection) GetEdges() []*ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdge {
+	return v.Edges
+}
+
+// GetTotalCount returns ListDeploymentsDeploymentsDeploymentConnection.TotalCount, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnection) GetTotalCount() int { return v.TotalCount }
+
+// ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdge includes the requested fields of the GraphQL type DeploymentEdge.
+// The GraphQL type's documentation follows.
+//
+// An edge in a connection.
+type ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdge struct {
+	// The item at the end of the edge.
+	Node *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment `json:"node"`
+}
+
+// GetNode returns ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdge.Node, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdge) GetNode() *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment {
+	return v.Node
+}
+
+// ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment includes the requested fields of the GraphQL type Deployment.
+type ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment struct {
+	DeploymentFragment `json:"-"`
+}
+
+// GetId returns ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment.Id, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) GetId() uuid.UUID {
+	return v.DeploymentFragment.Id
+}
+
+// GetSlug returns ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment.Slug, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) GetSlug() string {
+	return v.DeploymentFragment.Slug
+}
+
+// GetState returns ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment.State, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) GetState() DeploymentState {
+	return v.DeploymentFragment.State
+}
+
+// GetVisibility returns ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment.Visibility, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) GetVisibility() Visibility {
+	return v.DeploymentFragment.Visibility
+}
+
+// GetOrganizationSlug returns ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) GetOrganizationSlug() string {
+	return v.DeploymentFragment.OrganizationSlug
+}
+
+// GetOrganizationID returns ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment.OrganizationID, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) GetOrganizationID() uuid.UUID {
+	return v.DeploymentFragment.OrganizationID
+}
+
+// GetIntegrationSlug returns ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment.IntegrationSlug, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) GetIntegrationSlug() string {
+	return v.DeploymentFragment.IntegrationSlug
+}
+
+// GetIntegrationID returns ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment.IntegrationID, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) GetIntegrationID() uuid.UUID {
+	return v.DeploymentFragment.IntegrationID
+}
+
+// GetRevisionID returns ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment.RevisionID, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) GetRevisionID() uuid.UUID {
+	return v.DeploymentFragment.RevisionID
+}
+
+// GetEtag returns ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment.Etag, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) GetEtag() string {
+	return v.DeploymentFragment.Etag
+}
+
+// GetEnv returns ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment.Env, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) GetEnv() map[string]any {
+	return v.DeploymentFragment.Env
+}
+
+// GetPorts returns ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment.Ports, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) GetPorts() map[string]any {
+	return v.DeploymentFragment.Ports
+}
+
+// GetAddress returns ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment.Address, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) GetAddress() *DeploymentFragmentAddress {
+	return v.DeploymentFragment.Address
+}
+
+// GetCreatedAt returns ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment.CreatedAt, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) GetCreatedAt() time.Time {
+	return v.DeploymentFragment.CreatedAt
+}
+
+// GetUpdatedAt returns ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) GetUpdatedAt() time.Time {
+	return v.DeploymentFragment.UpdatedAt
+}
+
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(
+		b, &v.DeploymentFragment)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type __premarshalListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment struct {
+	Id uuid.UUID `json:"id"`
+
+	Slug string `json:"slug"`
+
+	State DeploymentState `json:"state"`
+
+	Visibility Visibility `json:"visibility"`
+
+	OrganizationSlug string `json:"organizationSlug"`
+
+	OrganizationID uuid.UUID `json:"organizationID"`
+
+	IntegrationSlug string `json:"integrationSlug"`
+
+	IntegrationID uuid.UUID `json:"integrationID"`
+
+	RevisionID uuid.UUID `json:"revisionID"`
+
+	Etag string `json:"etag"`
+
+	Env map[string]any `json:"env"`
+
+	Ports map[string]any `json:"ports"`
+
+	Address *DeploymentFragmentAddress `json:"address"`
+
+	CreatedAt time.Time `json:"createdAt"`
+
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *ListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment) __premarshalJSON() (*__premarshalListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment, error) {
+	var retval __premarshalListDeploymentsDeploymentsDeploymentConnectionEdgesDeploymentEdgeNodeDeployment
+
+	retval.Id = v.DeploymentFragment.Id
+	retval.Slug = v.DeploymentFragment.Slug
+	retval.State = v.DeploymentFragment.State
+	retval.Visibility = v.DeploymentFragment.Visibility
+	retval.OrganizationSlug = v.DeploymentFragment.OrganizationSlug
+	retval.OrganizationID = v.DeploymentFragment.OrganizationID
+	retval.IntegrationSlug = v.DeploymentFragment.IntegrationSlug
+	retval.IntegrationID = v.DeploymentFragment.IntegrationID
+	retval.RevisionID = v.DeploymentFragment.RevisionID
+	retval.Etag = v.DeploymentFragment.Etag
+	retval.Env = v.DeploymentFragment.Env
+	retval.Ports = v.DeploymentFragment.Ports
+	retval.Address = v.DeploymentFragment.Address
+	retval.CreatedAt = v.DeploymentFragment.CreatedAt
+	retval.UpdatedAt = v.DeploymentFragment.UpdatedAt
+	return &retval, nil
+}
+
+// ListDeploymentsResponse is returned by ListDeployments on success.
+type ListDeploymentsResponse struct {
+	Deployments *ListDeploymentsDeploymentsDeploymentConnection `json:"deployments"`
+}
+
+// GetDeployments returns ListDeploymentsResponse.Deployments, and is useful for accessing the field via an interface.
+func (v *ListDeploymentsResponse) GetDeployments() *ListDeploymentsDeploymentsDeploymentConnection {
+	return v.Deployments
 }
 
 // ListDestinationsDestinationsDestinationConnection includes the requested fields of the GraphQL type DestinationConnection.
@@ -14697,29 +16301,24 @@ func (v *ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNo
 	return v.IntegrationFragment.Icon
 }
 
-// GetServiceNames returns ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration.ServiceNames, and is useful for accessing the field via an interface.
-func (v *ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration) GetServiceNames() []string {
-	return v.IntegrationFragment.ServiceNames
+// GetVisibility returns ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration.Visibility, and is useful for accessing the field via an interface.
+func (v *ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration) GetVisibility() Visibility {
+	return v.IntegrationFragment.Visibility
 }
 
-// GetConfigSchema returns ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration.ConfigSchema, and is useful for accessing the field via an interface.
-func (v *ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration) GetConfigSchema() *string {
-	return v.IntegrationFragment.ConfigSchema
-}
-
-// GetServerConfig returns ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration.ServerConfig, and is useful for accessing the field via an interface.
-func (v *ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration) GetServerConfig() *string {
-	return v.IntegrationFragment.ServerConfig
-}
-
-// GetPublished returns ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration.Published, and is useful for accessing the field via an interface.
-func (v *ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration) GetPublished() *IntegrationFragmentPublishedIntegrationPackage {
-	return v.IntegrationFragment.Published
+// GetOrganizationSlug returns ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration) GetOrganizationSlug() string {
+	return v.IntegrationFragment.OrganizationSlug
 }
 
 // GetOrganizationID returns ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration.OrganizationID, and is useful for accessing the field via an interface.
 func (v *ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration) GetOrganizationID() uuid.UUID {
 	return v.IntegrationFragment.OrganizationID
+}
+
+// GetRevisionID returns ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration.RevisionID, and is useful for accessing the field via an interface.
+func (v *ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration) GetRevisionID() *uuid.UUID {
+	return v.IntegrationFragment.RevisionID
 }
 
 // GetCreatedAt returns ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration.CreatedAt, and is useful for accessing the field via an interface.
@@ -14730,6 +16329,11 @@ func (v *ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNo
 // GetUpdatedAt returns ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration.UpdatedAt, and is useful for accessing the field via an interface.
 func (v *ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration) GetUpdatedAt() time.Time {
 	return v.IntegrationFragment.UpdatedAt
+}
+
+// GetPublished returns ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration.Published, and is useful for accessing the field via an interface.
+func (v *ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration) GetPublished() *IntegrationFragmentPublishedIntegrationRevision {
+	return v.IntegrationFragment.Published
 }
 
 func (v *ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration) UnmarshalJSON(b []byte) error {
@@ -14772,19 +16376,19 @@ type __premarshalListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrati
 
 	Icon string `json:"icon"`
 
-	ServiceNames []string `json:"serviceNames"`
+	Visibility Visibility `json:"visibility"`
 
-	ConfigSchema *string `json:"configSchema"`
-
-	ServerConfig *string `json:"serverConfig"`
-
-	Published *IntegrationFragmentPublishedIntegrationPackage `json:"published"`
+	OrganizationSlug string `json:"organizationSlug"`
 
 	OrganizationID uuid.UUID `json:"organizationID"`
+
+	RevisionID *uuid.UUID `json:"revisionID"`
 
 	CreatedAt time.Time `json:"createdAt"`
 
 	UpdatedAt time.Time `json:"updatedAt"`
+
+	Published *IntegrationFragmentPublishedIntegrationRevision `json:"published"`
 }
 
 func (v *ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNodeIntegration) MarshalJSON() ([]byte, error) {
@@ -14805,13 +16409,13 @@ func (v *ListIntegrationsIntegrationsIntegrationConnectionEdgesIntegrationEdgeNo
 	retval.Version = v.IntegrationFragment.Version
 	retval.Description = v.IntegrationFragment.Description
 	retval.Icon = v.IntegrationFragment.Icon
-	retval.ServiceNames = v.IntegrationFragment.ServiceNames
-	retval.ConfigSchema = v.IntegrationFragment.ConfigSchema
-	retval.ServerConfig = v.IntegrationFragment.ServerConfig
-	retval.Published = v.IntegrationFragment.Published
+	retval.Visibility = v.IntegrationFragment.Visibility
+	retval.OrganizationSlug = v.IntegrationFragment.OrganizationSlug
 	retval.OrganizationID = v.IntegrationFragment.OrganizationID
+	retval.RevisionID = v.IntegrationFragment.RevisionID
 	retval.CreatedAt = v.IntegrationFragment.CreatedAt
 	retval.UpdatedAt = v.IntegrationFragment.UpdatedAt
+	retval.Published = v.IntegrationFragment.Published
 	return &retval, nil
 }
 
@@ -15486,167 +17090,6 @@ type ListOrganizationsResponse struct {
 // GetOrganizations returns ListOrganizationsResponse.Organizations, and is useful for accessing the field via an interface.
 func (v *ListOrganizationsResponse) GetOrganizations() *ListOrganizationsOrganizationsOrganizationConnection {
 	return v.Organizations
-}
-
-// ListPackagesPackagesIntegrationPackageConnection includes the requested fields of the GraphQL type IntegrationPackageConnection.
-// The GraphQL type's documentation follows.
-//
-// A connection to a list of items.
-type ListPackagesPackagesIntegrationPackageConnection struct {
-	// Identifies the total count of items in the connection.
-	TotalCount int `json:"totalCount"`
-	// A list of edges.
-	Edges []*ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdge `json:"edges"`
-}
-
-// GetTotalCount returns ListPackagesPackagesIntegrationPackageConnection.TotalCount, and is useful for accessing the field via an interface.
-func (v *ListPackagesPackagesIntegrationPackageConnection) GetTotalCount() int { return v.TotalCount }
-
-// GetEdges returns ListPackagesPackagesIntegrationPackageConnection.Edges, and is useful for accessing the field via an interface.
-func (v *ListPackagesPackagesIntegrationPackageConnection) GetEdges() []*ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdge {
-	return v.Edges
-}
-
-// ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdge includes the requested fields of the GraphQL type IntegrationPackageEdge.
-// The GraphQL type's documentation follows.
-//
-// An edge in a connection.
-type ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdge struct {
-	// The item at the end of the edge.
-	Node *ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage `json:"node"`
-}
-
-// GetNode returns ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdge.Node, and is useful for accessing the field via an interface.
-func (v *ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdge) GetNode() *ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage {
-	return v.Node
-}
-
-// ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage includes the requested fields of the GraphQL type IntegrationPackage.
-type ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage struct {
-	IntegrationPackageFragment `json:"-"`
-}
-
-// GetId returns ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage.Id, and is useful for accessing the field via an interface.
-func (v *ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage) GetId() uuid.UUID {
-	return v.IntegrationPackageFragment.Id
-}
-
-// GetChecksum returns ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage.Checksum, and is useful for accessing the field via an interface.
-func (v *ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage) GetChecksum() string {
-	return v.IntegrationPackageFragment.Checksum
-}
-
-// GetSpec returns ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage.Spec, and is useful for accessing the field via an interface.
-func (v *ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage) GetSpec() []byte {
-	return v.IntegrationPackageFragment.Spec
-}
-
-// GetConfigSchema returns ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage.ConfigSchema, and is useful for accessing the field via an interface.
-func (v *ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage) GetConfigSchema() string {
-	return v.IntegrationPackageFragment.ConfigSchema
-}
-
-// GetServiceNames returns ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage.ServiceNames, and is useful for accessing the field via an interface.
-func (v *ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage) GetServiceNames() []string {
-	return v.IntegrationPackageFragment.ServiceNames
-}
-
-// GetIntegrationID returns ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage.IntegrationID, and is useful for accessing the field via an interface.
-func (v *ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage) GetIntegrationID() uuid.UUID {
-	return v.IntegrationPackageFragment.IntegrationID
-}
-
-// GetAuthorID returns ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage.AuthorID, and is useful for accessing the field via an interface.
-func (v *ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage) GetAuthorID() uuid.UUID {
-	return v.IntegrationPackageFragment.AuthorID
-}
-
-// GetCreatedAt returns ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage.CreatedAt, and is useful for accessing the field via an interface.
-func (v *ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage) GetCreatedAt() time.Time {
-	return v.IntegrationPackageFragment.CreatedAt
-}
-
-// GetUpdatedAt returns ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage.UpdatedAt, and is useful for accessing the field via an interface.
-func (v *ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage) GetUpdatedAt() time.Time {
-	return v.IntegrationPackageFragment.UpdatedAt
-}
-
-func (v *ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage) UnmarshalJSON(b []byte) error {
-
-	if string(b) == "null" {
-		return nil
-	}
-
-	var firstPass struct {
-		*ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage
-		graphql.NoUnmarshalJSON
-	}
-	firstPass.ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage = v
-
-	err := json.Unmarshal(b, &firstPass)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(
-		b, &v.IntegrationPackageFragment)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-type __premarshalListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage struct {
-	Id uuid.UUID `json:"id"`
-
-	Checksum string `json:"checksum"`
-
-	Spec []byte `json:"spec"`
-
-	ConfigSchema string `json:"configSchema"`
-
-	ServiceNames []string `json:"serviceNames"`
-
-	IntegrationID uuid.UUID `json:"integrationID"`
-
-	AuthorID uuid.UUID `json:"authorID"`
-
-	CreatedAt time.Time `json:"createdAt"`
-
-	UpdatedAt time.Time `json:"updatedAt"`
-}
-
-func (v *ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage) MarshalJSON() ([]byte, error) {
-	premarshaled, err := v.__premarshalJSON()
-	if err != nil {
-		return nil, err
-	}
-	return json.Marshal(premarshaled)
-}
-
-func (v *ListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage) __premarshalJSON() (*__premarshalListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage, error) {
-	var retval __premarshalListPackagesPackagesIntegrationPackageConnectionEdgesIntegrationPackageEdgeNodeIntegrationPackage
-
-	retval.Id = v.IntegrationPackageFragment.Id
-	retval.Checksum = v.IntegrationPackageFragment.Checksum
-	retval.Spec = v.IntegrationPackageFragment.Spec
-	retval.ConfigSchema = v.IntegrationPackageFragment.ConfigSchema
-	retval.ServiceNames = v.IntegrationPackageFragment.ServiceNames
-	retval.IntegrationID = v.IntegrationPackageFragment.IntegrationID
-	retval.AuthorID = v.IntegrationPackageFragment.AuthorID
-	retval.CreatedAt = v.IntegrationPackageFragment.CreatedAt
-	retval.UpdatedAt = v.IntegrationPackageFragment.UpdatedAt
-	return &retval, nil
-}
-
-// ListPackagesResponse is returned by ListPackages on success.
-type ListPackagesResponse struct {
-	Packages *ListPackagesPackagesIntegrationPackageConnection `json:"packages"`
-}
-
-// GetPackages returns ListPackagesResponse.Packages, and is useful for accessing the field via an interface.
-func (v *ListPackagesResponse) GetPackages() *ListPackagesPackagesIntegrationPackageConnection {
-	return v.Packages
 }
 
 // ListPersonalAccessTokensPersonalAccessTokensPersonalAccessTokenConnection includes the requested fields of the GraphQL type PersonalAccessTokenConnection.
@@ -16874,15 +18317,15 @@ func (v *ModelTypeOrder) GetField() ModelTypeOrderField { return v.Field }
 type ModelTypeOrderField string
 
 const (
-	ModelTypeOrderFieldName      ModelTypeOrderField = "NAME"
 	ModelTypeOrderFieldCreatedAt ModelTypeOrderField = "CREATED_AT"
 	ModelTypeOrderFieldUpdatedAt ModelTypeOrderField = "UPDATED_AT"
+	ModelTypeOrderFieldName      ModelTypeOrderField = "NAME"
 )
 
 var AllModelTypeOrderField = []ModelTypeOrderField{
-	ModelTypeOrderFieldName,
 	ModelTypeOrderFieldCreatedAt,
 	ModelTypeOrderFieldUpdatedAt,
+	ModelTypeOrderFieldName,
 }
 
 // ModelTypeWhereInput is used for filtering ModelType objects.
@@ -16900,20 +18343,20 @@ type ModelTypeWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
-	// name field predicates
-	Name             *string  `json:"name"`
-	NameNEQ          *string  `json:"nameNEQ"`
-	NameIn           []string `json:"nameIn"`
-	NameNotIn        []string `json:"nameNotIn"`
-	NameGT           *string  `json:"nameGT"`
-	NameGTE          *string  `json:"nameGTE"`
-	NameLT           *string  `json:"nameLT"`
-	NameLTE          *string  `json:"nameLTE"`
-	NameContains     *string  `json:"nameContains"`
-	NameHasPrefix    *string  `json:"nameHasPrefix"`
-	NameHasSuffix    *string  `json:"nameHasSuffix"`
-	NameEqualFold    *string  `json:"nameEqualFold"`
-	NameContainsFold *string  `json:"nameContainsFold"`
+	// slug field predicates
+	Slug             *string  `json:"slug"`
+	SlugNEQ          *string  `json:"slugNEQ"`
+	SlugIn           []string `json:"slugIn"`
+	SlugNotIn        []string `json:"slugNotIn"`
+	SlugGT           *string  `json:"slugGT"`
+	SlugGTE          *string  `json:"slugGTE"`
+	SlugLT           *string  `json:"slugLT"`
+	SlugLTE          *string  `json:"slugLTE"`
+	SlugContains     *string  `json:"slugContains"`
+	SlugHasPrefix    *string  `json:"slugHasPrefix"`
+	SlugHasSuffix    *string  `json:"slugHasSuffix"`
+	SlugEqualFold    *string  `json:"slugEqualFold"`
+	SlugContainsFold *string  `json:"slugContainsFold"`
 	// created_at field predicates
 	CreatedAt      *time.Time  `json:"createdAt"`
 	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
@@ -16932,20 +18375,20 @@ type ModelTypeWhereInput struct {
 	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
 	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
-	// slug field predicates
-	Slug             *string  `json:"slug"`
-	SlugNEQ          *string  `json:"slugNEQ"`
-	SlugIn           []string `json:"slugIn"`
-	SlugNotIn        []string `json:"slugNotIn"`
-	SlugGT           *string  `json:"slugGT"`
-	SlugGTE          *string  `json:"slugGTE"`
-	SlugLT           *string  `json:"slugLT"`
-	SlugLTE          *string  `json:"slugLTE"`
-	SlugContains     *string  `json:"slugContains"`
-	SlugHasPrefix    *string  `json:"slugHasPrefix"`
-	SlugHasSuffix    *string  `json:"slugHasSuffix"`
-	SlugEqualFold    *string  `json:"slugEqualFold"`
-	SlugContainsFold *string  `json:"slugContainsFold"`
+	// name field predicates
+	Name             *string  `json:"name"`
+	NameNEQ          *string  `json:"nameNEQ"`
+	NameIn           []string `json:"nameIn"`
+	NameNotIn        []string `json:"nameNotIn"`
+	NameGT           *string  `json:"nameGT"`
+	NameGTE          *string  `json:"nameGTE"`
+	NameLT           *string  `json:"nameLT"`
+	NameLTE          *string  `json:"nameLTE"`
+	NameContains     *string  `json:"nameContains"`
+	NameHasPrefix    *string  `json:"nameHasPrefix"`
+	NameHasSuffix    *string  `json:"nameHasSuffix"`
+	NameEqualFold    *string  `json:"nameEqualFold"`
+	NameContainsFold *string  `json:"nameContainsFold"`
 	// description field predicates
 	Description             *string  `json:"description"`
 	DescriptionNEQ          *string  `json:"descriptionNEQ"`
@@ -17036,6 +18479,14 @@ type ModelTypeWhereInput struct {
 	ModelerNEQ   *ModelerType  `json:"modelerNEQ"`
 	ModelerIn    []ModelerType `json:"modelerIn"`
 	ModelerNotIn []ModelerType `json:"modelerNotIn"`
+	// organization_id field predicates
+	OrganizationID      *uuid.UUID  `json:"organizationID"`
+	OrganizationIDNEQ   *uuid.UUID  `json:"organizationIDNEQ"`
+	OrganizationIDIn    []uuid.UUID `json:"organizationIDIn"`
+	OrganizationIDNotIn []uuid.UUID `json:"organizationIDNotIn"`
+	// organization edge predicates
+	HasOrganization     *bool                     `json:"hasOrganization"`
+	HasOrganizationWith []*OrganizationWhereInput `json:"hasOrganizationWith,omitempty"`
 	// parents edge predicates
 	HasParents     *bool                  `json:"hasParents"`
 	HasParentsWith []*ModelTypeWhereInput `json:"hasParentsWith,omitempty"`
@@ -17083,44 +18534,44 @@ func (v *ModelTypeWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 // GetIdLTE returns ModelTypeWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *ModelTypeWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
 
-// GetName returns ModelTypeWhereInput.Name, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetName() *string { return v.Name }
+// GetSlug returns ModelTypeWhereInput.Slug, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetSlug() *string { return v.Slug }
 
-// GetNameNEQ returns ModelTypeWhereInput.NameNEQ, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetNameNEQ() *string { return v.NameNEQ }
+// GetSlugNEQ returns ModelTypeWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
 
-// GetNameIn returns ModelTypeWhereInput.NameIn, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetNameIn() []string { return v.NameIn }
+// GetSlugIn returns ModelTypeWhereInput.SlugIn, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetSlugIn() []string { return v.SlugIn }
 
-// GetNameNotIn returns ModelTypeWhereInput.NameNotIn, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetNameNotIn() []string { return v.NameNotIn }
+// GetSlugNotIn returns ModelTypeWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
 
-// GetNameGT returns ModelTypeWhereInput.NameGT, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetNameGT() *string { return v.NameGT }
+// GetSlugGT returns ModelTypeWhereInput.SlugGT, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetSlugGT() *string { return v.SlugGT }
 
-// GetNameGTE returns ModelTypeWhereInput.NameGTE, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetNameGTE() *string { return v.NameGTE }
+// GetSlugGTE returns ModelTypeWhereInput.SlugGTE, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetSlugGTE() *string { return v.SlugGTE }
 
-// GetNameLT returns ModelTypeWhereInput.NameLT, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetNameLT() *string { return v.NameLT }
+// GetSlugLT returns ModelTypeWhereInput.SlugLT, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetSlugLT() *string { return v.SlugLT }
 
-// GetNameLTE returns ModelTypeWhereInput.NameLTE, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetNameLTE() *string { return v.NameLTE }
+// GetSlugLTE returns ModelTypeWhereInput.SlugLTE, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetSlugLTE() *string { return v.SlugLTE }
 
-// GetNameContains returns ModelTypeWhereInput.NameContains, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetNameContains() *string { return v.NameContains }
+// GetSlugContains returns ModelTypeWhereInput.SlugContains, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetSlugContains() *string { return v.SlugContains }
 
-// GetNameHasPrefix returns ModelTypeWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
+// GetSlugHasPrefix returns ModelTypeWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
 
-// GetNameHasSuffix returns ModelTypeWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
+// GetSlugHasSuffix returns ModelTypeWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
 
-// GetNameEqualFold returns ModelTypeWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
+// GetSlugEqualFold returns ModelTypeWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
 
-// GetNameContainsFold returns ModelTypeWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
+// GetSlugContainsFold returns ModelTypeWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
 
 // GetCreatedAt returns ModelTypeWhereInput.CreatedAt, and is useful for accessing the field via an interface.
 func (v *ModelTypeWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
@@ -17170,44 +18621,44 @@ func (v *ModelTypeWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT
 // GetUpdatedAtLTE returns ModelTypeWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
 func (v *ModelTypeWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
 
-// GetSlug returns ModelTypeWhereInput.Slug, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetSlug() *string { return v.Slug }
+// GetName returns ModelTypeWhereInput.Name, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetName() *string { return v.Name }
 
-// GetSlugNEQ returns ModelTypeWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
+// GetNameNEQ returns ModelTypeWhereInput.NameNEQ, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetNameNEQ() *string { return v.NameNEQ }
 
-// GetSlugIn returns ModelTypeWhereInput.SlugIn, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetSlugIn() []string { return v.SlugIn }
+// GetNameIn returns ModelTypeWhereInput.NameIn, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetNameIn() []string { return v.NameIn }
 
-// GetSlugNotIn returns ModelTypeWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
+// GetNameNotIn returns ModelTypeWhereInput.NameNotIn, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetNameNotIn() []string { return v.NameNotIn }
 
-// GetSlugGT returns ModelTypeWhereInput.SlugGT, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetSlugGT() *string { return v.SlugGT }
+// GetNameGT returns ModelTypeWhereInput.NameGT, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetNameGT() *string { return v.NameGT }
 
-// GetSlugGTE returns ModelTypeWhereInput.SlugGTE, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetSlugGTE() *string { return v.SlugGTE }
+// GetNameGTE returns ModelTypeWhereInput.NameGTE, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetNameGTE() *string { return v.NameGTE }
 
-// GetSlugLT returns ModelTypeWhereInput.SlugLT, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetSlugLT() *string { return v.SlugLT }
+// GetNameLT returns ModelTypeWhereInput.NameLT, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetNameLT() *string { return v.NameLT }
 
-// GetSlugLTE returns ModelTypeWhereInput.SlugLTE, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetSlugLTE() *string { return v.SlugLTE }
+// GetNameLTE returns ModelTypeWhereInput.NameLTE, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetNameLTE() *string { return v.NameLTE }
 
-// GetSlugContains returns ModelTypeWhereInput.SlugContains, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetSlugContains() *string { return v.SlugContains }
+// GetNameContains returns ModelTypeWhereInput.NameContains, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetNameContains() *string { return v.NameContains }
 
-// GetSlugHasPrefix returns ModelTypeWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
+// GetNameHasPrefix returns ModelTypeWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
 
-// GetSlugHasSuffix returns ModelTypeWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
+// GetNameHasSuffix returns ModelTypeWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
 
-// GetSlugEqualFold returns ModelTypeWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
+// GetNameEqualFold returns ModelTypeWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
 
-// GetSlugContainsFold returns ModelTypeWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
-func (v *ModelTypeWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
+// GetNameContainsFold returns ModelTypeWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
 
 // GetDescription returns ModelTypeWhereInput.Description, and is useful for accessing the field via an interface.
 func (v *ModelTypeWhereInput) GetDescription() *string { return v.Description }
@@ -17456,6 +18907,26 @@ func (v *ModelTypeWhereInput) GetModelerIn() []ModelerType { return v.ModelerIn 
 
 // GetModelerNotIn returns ModelTypeWhereInput.ModelerNotIn, and is useful for accessing the field via an interface.
 func (v *ModelTypeWhereInput) GetModelerNotIn() []ModelerType { return v.ModelerNotIn }
+
+// GetOrganizationID returns ModelTypeWhereInput.OrganizationID, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetOrganizationID() *uuid.UUID { return v.OrganizationID }
+
+// GetOrganizationIDNEQ returns ModelTypeWhereInput.OrganizationIDNEQ, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetOrganizationIDNEQ() *uuid.UUID { return v.OrganizationIDNEQ }
+
+// GetOrganizationIDIn returns ModelTypeWhereInput.OrganizationIDIn, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetOrganizationIDIn() []uuid.UUID { return v.OrganizationIDIn }
+
+// GetOrganizationIDNotIn returns ModelTypeWhereInput.OrganizationIDNotIn, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetOrganizationIDNotIn() []uuid.UUID { return v.OrganizationIDNotIn }
+
+// GetHasOrganization returns ModelTypeWhereInput.HasOrganization, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetHasOrganization() *bool { return v.HasOrganization }
+
+// GetHasOrganizationWith returns ModelTypeWhereInput.HasOrganizationWith, and is useful for accessing the field via an interface.
+func (v *ModelTypeWhereInput) GetHasOrganizationWith() []*OrganizationWhereInput {
+	return v.HasOrganizationWith
+}
 
 // GetHasParents returns ModelTypeWhereInput.HasParents, and is useful for accessing the field via an interface.
 func (v *ModelTypeWhereInput) GetHasParents() *bool { return v.HasParents }
@@ -17881,6 +19352,435 @@ func (v *MutationResponse) GetDeleteCatalog() *MutationDeleteCatalogCatalogDelet
 	return v.DeleteCatalog
 }
 
+// OperationWhereInput is used for filtering Operation objects.
+// Input was generated by ent.
+type OperationWhereInput struct {
+	Not *OperationWhereInput   `json:"not,omitempty"`
+	And []*OperationWhereInput `json:"and,omitempty"`
+	Or  []*OperationWhereInput `json:"or,omitempty"`
+	// id field predicates
+	Id      *uuid.UUID  `json:"id"`
+	IdNEQ   *uuid.UUID  `json:"idNEQ"`
+	IdIn    []uuid.UUID `json:"idIn"`
+	IdNotIn []uuid.UUID `json:"idNotIn"`
+	IdGT    *uuid.UUID  `json:"idGT"`
+	IdGTE   *uuid.UUID  `json:"idGTE"`
+	IdLT    *uuid.UUID  `json:"idLT"`
+	IdLTE   *uuid.UUID  `json:"idLTE"`
+	// organization_slug field predicates
+	OrganizationSlug             *string  `json:"organizationSlug"`
+	OrganizationSlugNEQ          *string  `json:"organizationSlugNEQ"`
+	OrganizationSlugIn           []string `json:"organizationSlugIn"`
+	OrganizationSlugNotIn        []string `json:"organizationSlugNotIn"`
+	OrganizationSlugGT           *string  `json:"organizationSlugGT"`
+	OrganizationSlugGTE          *string  `json:"organizationSlugGTE"`
+	OrganizationSlugLT           *string  `json:"organizationSlugLT"`
+	OrganizationSlugLTE          *string  `json:"organizationSlugLTE"`
+	OrganizationSlugContains     *string  `json:"organizationSlugContains"`
+	OrganizationSlugHasPrefix    *string  `json:"organizationSlugHasPrefix"`
+	OrganizationSlugHasSuffix    *string  `json:"organizationSlugHasSuffix"`
+	OrganizationSlugEqualFold    *string  `json:"organizationSlugEqualFold"`
+	OrganizationSlugContainsFold *string  `json:"organizationSlugContainsFold"`
+	// slug field predicates
+	Slug             *string  `json:"slug"`
+	SlugNEQ          *string  `json:"slugNEQ"`
+	SlugIn           []string `json:"slugIn"`
+	SlugNotIn        []string `json:"slugNotIn"`
+	SlugGT           *string  `json:"slugGT"`
+	SlugGTE          *string  `json:"slugGTE"`
+	SlugLT           *string  `json:"slugLT"`
+	SlugLTE          *string  `json:"slugLTE"`
+	SlugContains     *string  `json:"slugContains"`
+	SlugHasPrefix    *string  `json:"slugHasPrefix"`
+	SlugHasSuffix    *string  `json:"slugHasSuffix"`
+	SlugEqualFold    *string  `json:"slugEqualFold"`
+	SlugContainsFold *string  `json:"slugContainsFold"`
+	// created_at field predicates
+	CreatedAt      *time.Time  `json:"createdAt"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
+	CreatedAtIn    []time.Time `json:"createdAtIn"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE"`
+	// updated_at field predicates
+	UpdatedAt      *time.Time  `json:"updatedAt"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
+	// done field predicates
+	Done       *bool `json:"done"`
+	DoneNEQ    *bool `json:"doneNEQ"`
+	DoneIsNil  *bool `json:"doneIsNil"`
+	DoneNotNil *bool `json:"doneNotNil"`
+	// canceled field predicates
+	Canceled    *bool `json:"canceled"`
+	CanceledNEQ *bool `json:"canceledNEQ"`
+	// resource_type field predicates
+	ResourceType             *string  `json:"resourceType"`
+	ResourceTypeNEQ          *string  `json:"resourceTypeNEQ"`
+	ResourceTypeIn           []string `json:"resourceTypeIn"`
+	ResourceTypeNotIn        []string `json:"resourceTypeNotIn"`
+	ResourceTypeGT           *string  `json:"resourceTypeGT"`
+	ResourceTypeGTE          *string  `json:"resourceTypeGTE"`
+	ResourceTypeLT           *string  `json:"resourceTypeLT"`
+	ResourceTypeLTE          *string  `json:"resourceTypeLTE"`
+	ResourceTypeContains     *string  `json:"resourceTypeContains"`
+	ResourceTypeHasPrefix    *string  `json:"resourceTypeHasPrefix"`
+	ResourceTypeHasSuffix    *string  `json:"resourceTypeHasSuffix"`
+	ResourceTypeEqualFold    *string  `json:"resourceTypeEqualFold"`
+	ResourceTypeContainsFold *string  `json:"resourceTypeContainsFold"`
+	// resource_name field predicates
+	ResourceName             *string  `json:"resourceName"`
+	ResourceNameNEQ          *string  `json:"resourceNameNEQ"`
+	ResourceNameIn           []string `json:"resourceNameIn"`
+	ResourceNameNotIn        []string `json:"resourceNameNotIn"`
+	ResourceNameGT           *string  `json:"resourceNameGT"`
+	ResourceNameGTE          *string  `json:"resourceNameGTE"`
+	ResourceNameLT           *string  `json:"resourceNameLT"`
+	ResourceNameLTE          *string  `json:"resourceNameLTE"`
+	ResourceNameContains     *string  `json:"resourceNameContains"`
+	ResourceNameHasPrefix    *string  `json:"resourceNameHasPrefix"`
+	ResourceNameHasSuffix    *string  `json:"resourceNameHasSuffix"`
+	ResourceNameEqualFold    *string  `json:"resourceNameEqualFold"`
+	ResourceNameContainsFold *string  `json:"resourceNameContainsFold"`
+	// resource_id field predicates
+	ResourceID      *uuid.UUID  `json:"resourceID"`
+	ResourceIDNEQ   *uuid.UUID  `json:"resourceIDNEQ"`
+	ResourceIDIn    []uuid.UUID `json:"resourceIDIn"`
+	ResourceIDNotIn []uuid.UUID `json:"resourceIDNotIn"`
+	ResourceIDGT    *uuid.UUID  `json:"resourceIDGT"`
+	ResourceIDGTE   *uuid.UUID  `json:"resourceIDGTE"`
+	ResourceIDLT    *uuid.UUID  `json:"resourceIDLT"`
+	ResourceIDLTE   *uuid.UUID  `json:"resourceIDLTE"`
+	// organization_id field predicates
+	OrganizationID      *uuid.UUID  `json:"organizationID"`
+	OrganizationIDNEQ   *uuid.UUID  `json:"organizationIDNEQ"`
+	OrganizationIDIn    []uuid.UUID `json:"organizationIDIn"`
+	OrganizationIDNotIn []uuid.UUID `json:"organizationIDNotIn"`
+	// organization edge predicates
+	HasOrganization     *bool                     `json:"hasOrganization"`
+	HasOrganizationWith []*OrganizationWhereInput `json:"hasOrganizationWith,omitempty"`
+}
+
+// GetNot returns OperationWhereInput.Not, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetNot() *OperationWhereInput { return v.Not }
+
+// GetAnd returns OperationWhereInput.And, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetAnd() []*OperationWhereInput { return v.And }
+
+// GetOr returns OperationWhereInput.Or, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOr() []*OperationWhereInput { return v.Or }
+
+// GetId returns OperationWhereInput.Id, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetId() *uuid.UUID { return v.Id }
+
+// GetIdNEQ returns OperationWhereInput.IdNEQ, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetIdNEQ() *uuid.UUID { return v.IdNEQ }
+
+// GetIdIn returns OperationWhereInput.IdIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetIdIn() []uuid.UUID { return v.IdIn }
+
+// GetIdNotIn returns OperationWhereInput.IdNotIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetIdNotIn() []uuid.UUID { return v.IdNotIn }
+
+// GetIdGT returns OperationWhereInput.IdGT, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetIdGT() *uuid.UUID { return v.IdGT }
+
+// GetIdGTE returns OperationWhereInput.IdGTE, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetIdGTE() *uuid.UUID { return v.IdGTE }
+
+// GetIdLT returns OperationWhereInput.IdLT, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
+
+// GetIdLTE returns OperationWhereInput.IdLTE, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
+
+// GetOrganizationSlug returns OperationWhereInput.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationSlug() *string { return v.OrganizationSlug }
+
+// GetOrganizationSlugNEQ returns OperationWhereInput.OrganizationSlugNEQ, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationSlugNEQ() *string { return v.OrganizationSlugNEQ }
+
+// GetOrganizationSlugIn returns OperationWhereInput.OrganizationSlugIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationSlugIn() []string { return v.OrganizationSlugIn }
+
+// GetOrganizationSlugNotIn returns OperationWhereInput.OrganizationSlugNotIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationSlugNotIn() []string { return v.OrganizationSlugNotIn }
+
+// GetOrganizationSlugGT returns OperationWhereInput.OrganizationSlugGT, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationSlugGT() *string { return v.OrganizationSlugGT }
+
+// GetOrganizationSlugGTE returns OperationWhereInput.OrganizationSlugGTE, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationSlugGTE() *string { return v.OrganizationSlugGTE }
+
+// GetOrganizationSlugLT returns OperationWhereInput.OrganizationSlugLT, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationSlugLT() *string { return v.OrganizationSlugLT }
+
+// GetOrganizationSlugLTE returns OperationWhereInput.OrganizationSlugLTE, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationSlugLTE() *string { return v.OrganizationSlugLTE }
+
+// GetOrganizationSlugContains returns OperationWhereInput.OrganizationSlugContains, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationSlugContains() *string {
+	return v.OrganizationSlugContains
+}
+
+// GetOrganizationSlugHasPrefix returns OperationWhereInput.OrganizationSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationSlugHasPrefix() *string {
+	return v.OrganizationSlugHasPrefix
+}
+
+// GetOrganizationSlugHasSuffix returns OperationWhereInput.OrganizationSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationSlugHasSuffix() *string {
+	return v.OrganizationSlugHasSuffix
+}
+
+// GetOrganizationSlugEqualFold returns OperationWhereInput.OrganizationSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationSlugEqualFold() *string {
+	return v.OrganizationSlugEqualFold
+}
+
+// GetOrganizationSlugContainsFold returns OperationWhereInput.OrganizationSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationSlugContainsFold() *string {
+	return v.OrganizationSlugContainsFold
+}
+
+// GetSlug returns OperationWhereInput.Slug, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetSlug() *string { return v.Slug }
+
+// GetSlugNEQ returns OperationWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
+
+// GetSlugIn returns OperationWhereInput.SlugIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetSlugIn() []string { return v.SlugIn }
+
+// GetSlugNotIn returns OperationWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
+
+// GetSlugGT returns OperationWhereInput.SlugGT, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetSlugGT() *string { return v.SlugGT }
+
+// GetSlugGTE returns OperationWhereInput.SlugGTE, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetSlugGTE() *string { return v.SlugGTE }
+
+// GetSlugLT returns OperationWhereInput.SlugLT, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetSlugLT() *string { return v.SlugLT }
+
+// GetSlugLTE returns OperationWhereInput.SlugLTE, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetSlugLTE() *string { return v.SlugLTE }
+
+// GetSlugContains returns OperationWhereInput.SlugContains, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetSlugContains() *string { return v.SlugContains }
+
+// GetSlugHasPrefix returns OperationWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
+
+// GetSlugHasSuffix returns OperationWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
+
+// GetSlugEqualFold returns OperationWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
+
+// GetSlugContainsFold returns OperationWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
+
+// GetCreatedAt returns OperationWhereInput.CreatedAt, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
+
+// GetCreatedAtNEQ returns OperationWhereInput.CreatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetCreatedAtNEQ() *time.Time { return v.CreatedAtNEQ }
+
+// GetCreatedAtIn returns OperationWhereInput.CreatedAtIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetCreatedAtIn() []time.Time { return v.CreatedAtIn }
+
+// GetCreatedAtNotIn returns OperationWhereInput.CreatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetCreatedAtNotIn() []time.Time { return v.CreatedAtNotIn }
+
+// GetCreatedAtGT returns OperationWhereInput.CreatedAtGT, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetCreatedAtGT() *time.Time { return v.CreatedAtGT }
+
+// GetCreatedAtGTE returns OperationWhereInput.CreatedAtGTE, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetCreatedAtGTE() *time.Time { return v.CreatedAtGTE }
+
+// GetCreatedAtLT returns OperationWhereInput.CreatedAtLT, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetCreatedAtLT() *time.Time { return v.CreatedAtLT }
+
+// GetCreatedAtLTE returns OperationWhereInput.CreatedAtLTE, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetCreatedAtLTE() *time.Time { return v.CreatedAtLTE }
+
+// GetUpdatedAt returns OperationWhereInput.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetUpdatedAt() *time.Time { return v.UpdatedAt }
+
+// GetUpdatedAtNEQ returns OperationWhereInput.UpdatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetUpdatedAtNEQ() *time.Time { return v.UpdatedAtNEQ }
+
+// GetUpdatedAtIn returns OperationWhereInput.UpdatedAtIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetUpdatedAtIn() []time.Time { return v.UpdatedAtIn }
+
+// GetUpdatedAtNotIn returns OperationWhereInput.UpdatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetUpdatedAtNotIn() []time.Time { return v.UpdatedAtNotIn }
+
+// GetUpdatedAtGT returns OperationWhereInput.UpdatedAtGT, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetUpdatedAtGT() *time.Time { return v.UpdatedAtGT }
+
+// GetUpdatedAtGTE returns OperationWhereInput.UpdatedAtGTE, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetUpdatedAtGTE() *time.Time { return v.UpdatedAtGTE }
+
+// GetUpdatedAtLT returns OperationWhereInput.UpdatedAtLT, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
+
+// GetUpdatedAtLTE returns OperationWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
+
+// GetDone returns OperationWhereInput.Done, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetDone() *bool { return v.Done }
+
+// GetDoneNEQ returns OperationWhereInput.DoneNEQ, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetDoneNEQ() *bool { return v.DoneNEQ }
+
+// GetDoneIsNil returns OperationWhereInput.DoneIsNil, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetDoneIsNil() *bool { return v.DoneIsNil }
+
+// GetDoneNotNil returns OperationWhereInput.DoneNotNil, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetDoneNotNil() *bool { return v.DoneNotNil }
+
+// GetCanceled returns OperationWhereInput.Canceled, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetCanceled() *bool { return v.Canceled }
+
+// GetCanceledNEQ returns OperationWhereInput.CanceledNEQ, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetCanceledNEQ() *bool { return v.CanceledNEQ }
+
+// GetResourceType returns OperationWhereInput.ResourceType, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceType() *string { return v.ResourceType }
+
+// GetResourceTypeNEQ returns OperationWhereInput.ResourceTypeNEQ, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceTypeNEQ() *string { return v.ResourceTypeNEQ }
+
+// GetResourceTypeIn returns OperationWhereInput.ResourceTypeIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceTypeIn() []string { return v.ResourceTypeIn }
+
+// GetResourceTypeNotIn returns OperationWhereInput.ResourceTypeNotIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceTypeNotIn() []string { return v.ResourceTypeNotIn }
+
+// GetResourceTypeGT returns OperationWhereInput.ResourceTypeGT, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceTypeGT() *string { return v.ResourceTypeGT }
+
+// GetResourceTypeGTE returns OperationWhereInput.ResourceTypeGTE, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceTypeGTE() *string { return v.ResourceTypeGTE }
+
+// GetResourceTypeLT returns OperationWhereInput.ResourceTypeLT, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceTypeLT() *string { return v.ResourceTypeLT }
+
+// GetResourceTypeLTE returns OperationWhereInput.ResourceTypeLTE, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceTypeLTE() *string { return v.ResourceTypeLTE }
+
+// GetResourceTypeContains returns OperationWhereInput.ResourceTypeContains, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceTypeContains() *string { return v.ResourceTypeContains }
+
+// GetResourceTypeHasPrefix returns OperationWhereInput.ResourceTypeHasPrefix, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceTypeHasPrefix() *string { return v.ResourceTypeHasPrefix }
+
+// GetResourceTypeHasSuffix returns OperationWhereInput.ResourceTypeHasSuffix, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceTypeHasSuffix() *string { return v.ResourceTypeHasSuffix }
+
+// GetResourceTypeEqualFold returns OperationWhereInput.ResourceTypeEqualFold, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceTypeEqualFold() *string { return v.ResourceTypeEqualFold }
+
+// GetResourceTypeContainsFold returns OperationWhereInput.ResourceTypeContainsFold, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceTypeContainsFold() *string {
+	return v.ResourceTypeContainsFold
+}
+
+// GetResourceName returns OperationWhereInput.ResourceName, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceName() *string { return v.ResourceName }
+
+// GetResourceNameNEQ returns OperationWhereInput.ResourceNameNEQ, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceNameNEQ() *string { return v.ResourceNameNEQ }
+
+// GetResourceNameIn returns OperationWhereInput.ResourceNameIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceNameIn() []string { return v.ResourceNameIn }
+
+// GetResourceNameNotIn returns OperationWhereInput.ResourceNameNotIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceNameNotIn() []string { return v.ResourceNameNotIn }
+
+// GetResourceNameGT returns OperationWhereInput.ResourceNameGT, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceNameGT() *string { return v.ResourceNameGT }
+
+// GetResourceNameGTE returns OperationWhereInput.ResourceNameGTE, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceNameGTE() *string { return v.ResourceNameGTE }
+
+// GetResourceNameLT returns OperationWhereInput.ResourceNameLT, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceNameLT() *string { return v.ResourceNameLT }
+
+// GetResourceNameLTE returns OperationWhereInput.ResourceNameLTE, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceNameLTE() *string { return v.ResourceNameLTE }
+
+// GetResourceNameContains returns OperationWhereInput.ResourceNameContains, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceNameContains() *string { return v.ResourceNameContains }
+
+// GetResourceNameHasPrefix returns OperationWhereInput.ResourceNameHasPrefix, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceNameHasPrefix() *string { return v.ResourceNameHasPrefix }
+
+// GetResourceNameHasSuffix returns OperationWhereInput.ResourceNameHasSuffix, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceNameHasSuffix() *string { return v.ResourceNameHasSuffix }
+
+// GetResourceNameEqualFold returns OperationWhereInput.ResourceNameEqualFold, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceNameEqualFold() *string { return v.ResourceNameEqualFold }
+
+// GetResourceNameContainsFold returns OperationWhereInput.ResourceNameContainsFold, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceNameContainsFold() *string {
+	return v.ResourceNameContainsFold
+}
+
+// GetResourceID returns OperationWhereInput.ResourceID, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceID() *uuid.UUID { return v.ResourceID }
+
+// GetResourceIDNEQ returns OperationWhereInput.ResourceIDNEQ, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceIDNEQ() *uuid.UUID { return v.ResourceIDNEQ }
+
+// GetResourceIDIn returns OperationWhereInput.ResourceIDIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceIDIn() []uuid.UUID { return v.ResourceIDIn }
+
+// GetResourceIDNotIn returns OperationWhereInput.ResourceIDNotIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceIDNotIn() []uuid.UUID { return v.ResourceIDNotIn }
+
+// GetResourceIDGT returns OperationWhereInput.ResourceIDGT, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceIDGT() *uuid.UUID { return v.ResourceIDGT }
+
+// GetResourceIDGTE returns OperationWhereInput.ResourceIDGTE, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceIDGTE() *uuid.UUID { return v.ResourceIDGTE }
+
+// GetResourceIDLT returns OperationWhereInput.ResourceIDLT, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceIDLT() *uuid.UUID { return v.ResourceIDLT }
+
+// GetResourceIDLTE returns OperationWhereInput.ResourceIDLTE, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetResourceIDLTE() *uuid.UUID { return v.ResourceIDLTE }
+
+// GetOrganizationID returns OperationWhereInput.OrganizationID, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationID() *uuid.UUID { return v.OrganizationID }
+
+// GetOrganizationIDNEQ returns OperationWhereInput.OrganizationIDNEQ, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationIDNEQ() *uuid.UUID { return v.OrganizationIDNEQ }
+
+// GetOrganizationIDIn returns OperationWhereInput.OrganizationIDIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationIDIn() []uuid.UUID { return v.OrganizationIDIn }
+
+// GetOrganizationIDNotIn returns OperationWhereInput.OrganizationIDNotIn, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetOrganizationIDNotIn() []uuid.UUID { return v.OrganizationIDNotIn }
+
+// GetHasOrganization returns OperationWhereInput.HasOrganization, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetHasOrganization() *bool { return v.HasOrganization }
+
+// GetHasOrganizationWith returns OperationWhereInput.HasOrganizationWith, and is useful for accessing the field via an interface.
+func (v *OperationWhereInput) GetHasOrganizationWith() []*OrganizationWhereInput {
+	return v.HasOrganizationWith
+}
+
 // Possible directions in which to order a list of items when provided an `orderBy` argument.
 type OrderDirection string
 
@@ -17943,22 +19843,26 @@ func (v *OrganizationOrder) GetField() OrganizationOrderField { return v.Field }
 type OrganizationOrderField string
 
 const (
-	OrganizationOrderFieldName              OrganizationOrderField = "NAME"
 	OrganizationOrderFieldCreatedAt         OrganizationOrderField = "CREATED_AT"
 	OrganizationOrderFieldUpdatedAt         OrganizationOrderField = "UPDATED_AT"
+	OrganizationOrderFieldName              OrganizationOrderField = "NAME"
+	OrganizationOrderFieldOperationsCount   OrganizationOrderField = "OPERATIONS_COUNT"
 	OrganizationOrderFieldSpacesCount       OrganizationOrderField = "SPACES_COUNT"
 	OrganizationOrderFieldIntegrationsCount OrganizationOrderField = "INTEGRATIONS_COUNT"
+	OrganizationOrderFieldDeploymentsCount  OrganizationOrderField = "DEPLOYMENTS_COUNT"
 	OrganizationOrderFieldFlowsCount        OrganizationOrderField = "FLOWS_COUNT"
 	OrganizationOrderFieldDestinationsCount OrganizationOrderField = "DESTINATIONS_COUNT"
 	OrganizationOrderFieldCatalogsCount     OrganizationOrderField = "CATALOGS_COUNT"
 )
 
 var AllOrganizationOrderField = []OrganizationOrderField{
-	OrganizationOrderFieldName,
 	OrganizationOrderFieldCreatedAt,
 	OrganizationOrderFieldUpdatedAt,
+	OrganizationOrderFieldName,
+	OrganizationOrderFieldOperationsCount,
 	OrganizationOrderFieldSpacesCount,
 	OrganizationOrderFieldIntegrationsCount,
+	OrganizationOrderFieldDeploymentsCount,
 	OrganizationOrderFieldFlowsCount,
 	OrganizationOrderFieldDestinationsCount,
 	OrganizationOrderFieldCatalogsCount,
@@ -17979,20 +19883,34 @@ type OrganizationWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
-	// name field predicates
-	Name             *string  `json:"name"`
-	NameNEQ          *string  `json:"nameNEQ"`
-	NameIn           []string `json:"nameIn"`
-	NameNotIn        []string `json:"nameNotIn"`
-	NameGT           *string  `json:"nameGT"`
-	NameGTE          *string  `json:"nameGTE"`
-	NameLT           *string  `json:"nameLT"`
-	NameLTE          *string  `json:"nameLTE"`
-	NameContains     *string  `json:"nameContains"`
-	NameHasPrefix    *string  `json:"nameHasPrefix"`
-	NameHasSuffix    *string  `json:"nameHasSuffix"`
-	NameEqualFold    *string  `json:"nameEqualFold"`
-	NameContainsFold *string  `json:"nameContainsFold"`
+	// slug field predicates
+	Slug             *string  `json:"slug"`
+	SlugNEQ          *string  `json:"slugNEQ"`
+	SlugIn           []string `json:"slugIn"`
+	SlugNotIn        []string `json:"slugNotIn"`
+	SlugGT           *string  `json:"slugGT"`
+	SlugGTE          *string  `json:"slugGTE"`
+	SlugLT           *string  `json:"slugLT"`
+	SlugLTE          *string  `json:"slugLTE"`
+	SlugContains     *string  `json:"slugContains"`
+	SlugHasPrefix    *string  `json:"slugHasPrefix"`
+	SlugHasSuffix    *string  `json:"slugHasSuffix"`
+	SlugEqualFold    *string  `json:"slugEqualFold"`
+	SlugContainsFold *string  `json:"slugContainsFold"`
+	// tz_name field predicates
+	TzName             *string  `json:"tzName"`
+	TzNameNEQ          *string  `json:"tzNameNEQ"`
+	TzNameIn           []string `json:"tzNameIn"`
+	TzNameNotIn        []string `json:"tzNameNotIn"`
+	TzNameGT           *string  `json:"tzNameGT"`
+	TzNameGTE          *string  `json:"tzNameGTE"`
+	TzNameLT           *string  `json:"tzNameLT"`
+	TzNameLTE          *string  `json:"tzNameLTE"`
+	TzNameContains     *string  `json:"tzNameContains"`
+	TzNameHasPrefix    *string  `json:"tzNameHasPrefix"`
+	TzNameHasSuffix    *string  `json:"tzNameHasSuffix"`
+	TzNameEqualFold    *string  `json:"tzNameEqualFold"`
+	TzNameContainsFold *string  `json:"tzNameContainsFold"`
 	// created_at field predicates
 	CreatedAt      *time.Time  `json:"createdAt"`
 	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
@@ -18011,34 +19929,20 @@ type OrganizationWhereInput struct {
 	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
 	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
-	// tz_name field predicates
-	TzName             *string  `json:"tzName"`
-	TzNameNEQ          *string  `json:"tzNameNEQ"`
-	TzNameIn           []string `json:"tzNameIn"`
-	TzNameNotIn        []string `json:"tzNameNotIn"`
-	TzNameGT           *string  `json:"tzNameGT"`
-	TzNameGTE          *string  `json:"tzNameGTE"`
-	TzNameLT           *string  `json:"tzNameLT"`
-	TzNameLTE          *string  `json:"tzNameLTE"`
-	TzNameContains     *string  `json:"tzNameContains"`
-	TzNameHasPrefix    *string  `json:"tzNameHasPrefix"`
-	TzNameHasSuffix    *string  `json:"tzNameHasSuffix"`
-	TzNameEqualFold    *string  `json:"tzNameEqualFold"`
-	TzNameContainsFold *string  `json:"tzNameContainsFold"`
-	// slug field predicates
-	Slug             *string  `json:"slug"`
-	SlugNEQ          *string  `json:"slugNEQ"`
-	SlugIn           []string `json:"slugIn"`
-	SlugNotIn        []string `json:"slugNotIn"`
-	SlugGT           *string  `json:"slugGT"`
-	SlugGTE          *string  `json:"slugGTE"`
-	SlugLT           *string  `json:"slugLT"`
-	SlugLTE          *string  `json:"slugLTE"`
-	SlugContains     *string  `json:"slugContains"`
-	SlugHasPrefix    *string  `json:"slugHasPrefix"`
-	SlugHasSuffix    *string  `json:"slugHasSuffix"`
-	SlugEqualFold    *string  `json:"slugEqualFold"`
-	SlugContainsFold *string  `json:"slugContainsFold"`
+	// name field predicates
+	Name             *string  `json:"name"`
+	NameNEQ          *string  `json:"nameNEQ"`
+	NameIn           []string `json:"nameIn"`
+	NameNotIn        []string `json:"nameNotIn"`
+	NameGT           *string  `json:"nameGT"`
+	NameGTE          *string  `json:"nameGTE"`
+	NameLT           *string  `json:"nameLT"`
+	NameLTE          *string  `json:"nameLTE"`
+	NameContains     *string  `json:"nameContains"`
+	NameHasPrefix    *string  `json:"nameHasPrefix"`
+	NameHasSuffix    *string  `json:"nameHasSuffix"`
+	NameEqualFold    *string  `json:"nameEqualFold"`
+	NameContainsFold *string  `json:"nameContainsFold"`
 	// customer_id field predicates
 	CustomerID             *string  `json:"customerID"`
 	CustomerIDNEQ          *string  `json:"customerIDNEQ"`
@@ -18053,12 +19957,18 @@ type OrganizationWhereInput struct {
 	CustomerIDHasSuffix    *string  `json:"customerIDHasSuffix"`
 	CustomerIDEqualFold    *string  `json:"customerIDEqualFold"`
 	CustomerIDContainsFold *string  `json:"customerIDContainsFold"`
+	// operations edge predicates
+	HasOperations     *bool                  `json:"hasOperations"`
+	HasOperationsWith []*OperationWhereInput `json:"hasOperationsWith,omitempty"`
 	// spaces edge predicates
 	HasSpaces     *bool              `json:"hasSpaces"`
 	HasSpacesWith []*SpaceWhereInput `json:"hasSpacesWith,omitempty"`
 	// integrations edge predicates
 	HasIntegrations     *bool                    `json:"hasIntegrations"`
 	HasIntegrationsWith []*IntegrationWhereInput `json:"hasIntegrationsWith,omitempty"`
+	// deployments edge predicates
+	HasDeployments     *bool                   `json:"hasDeployments"`
+	HasDeploymentsWith []*DeploymentWhereInput `json:"hasDeploymentsWith,omitempty"`
 	// flows edge predicates
 	HasFlows     *bool             `json:"hasFlows"`
 	HasFlowsWith []*FlowWhereInput `json:"hasFlowsWith,omitempty"`
@@ -18074,6 +19984,9 @@ type OrganizationWhereInput struct {
 	// catalogs edge predicates
 	HasCatalogs     *bool                `json:"hasCatalogs"`
 	HasCatalogsWith []*CatalogWhereInput `json:"hasCatalogsWith,omitempty"`
+	// model_types edge predicates
+	HasModelTypes     *bool                  `json:"hasModelTypes"`
+	HasModelTypesWith []*ModelTypeWhereInput `json:"hasModelTypesWith,omitempty"`
 	// geo_maps edge predicates
 	HasGeoMaps     *bool               `json:"hasGeoMaps"`
 	HasGeoMapsWith []*GeoMapWhereInput `json:"hasGeoMapsWith,omitempty"`
@@ -18118,44 +20031,83 @@ func (v *OrganizationWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 // GetIdLTE returns OrganizationWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *OrganizationWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
 
-// GetName returns OrganizationWhereInput.Name, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetName() *string { return v.Name }
+// GetSlug returns OrganizationWhereInput.Slug, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetSlug() *string { return v.Slug }
 
-// GetNameNEQ returns OrganizationWhereInput.NameNEQ, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetNameNEQ() *string { return v.NameNEQ }
+// GetSlugNEQ returns OrganizationWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
 
-// GetNameIn returns OrganizationWhereInput.NameIn, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetNameIn() []string { return v.NameIn }
+// GetSlugIn returns OrganizationWhereInput.SlugIn, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetSlugIn() []string { return v.SlugIn }
 
-// GetNameNotIn returns OrganizationWhereInput.NameNotIn, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetNameNotIn() []string { return v.NameNotIn }
+// GetSlugNotIn returns OrganizationWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
 
-// GetNameGT returns OrganizationWhereInput.NameGT, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetNameGT() *string { return v.NameGT }
+// GetSlugGT returns OrganizationWhereInput.SlugGT, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetSlugGT() *string { return v.SlugGT }
 
-// GetNameGTE returns OrganizationWhereInput.NameGTE, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetNameGTE() *string { return v.NameGTE }
+// GetSlugGTE returns OrganizationWhereInput.SlugGTE, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetSlugGTE() *string { return v.SlugGTE }
 
-// GetNameLT returns OrganizationWhereInput.NameLT, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetNameLT() *string { return v.NameLT }
+// GetSlugLT returns OrganizationWhereInput.SlugLT, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetSlugLT() *string { return v.SlugLT }
 
-// GetNameLTE returns OrganizationWhereInput.NameLTE, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetNameLTE() *string { return v.NameLTE }
+// GetSlugLTE returns OrganizationWhereInput.SlugLTE, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetSlugLTE() *string { return v.SlugLTE }
 
-// GetNameContains returns OrganizationWhereInput.NameContains, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetNameContains() *string { return v.NameContains }
+// GetSlugContains returns OrganizationWhereInput.SlugContains, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetSlugContains() *string { return v.SlugContains }
 
-// GetNameHasPrefix returns OrganizationWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
+// GetSlugHasPrefix returns OrganizationWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
 
-// GetNameHasSuffix returns OrganizationWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
+// GetSlugHasSuffix returns OrganizationWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
 
-// GetNameEqualFold returns OrganizationWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
+// GetSlugEqualFold returns OrganizationWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
 
-// GetNameContainsFold returns OrganizationWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
+// GetSlugContainsFold returns OrganizationWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
+
+// GetTzName returns OrganizationWhereInput.TzName, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetTzName() *string { return v.TzName }
+
+// GetTzNameNEQ returns OrganizationWhereInput.TzNameNEQ, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetTzNameNEQ() *string { return v.TzNameNEQ }
+
+// GetTzNameIn returns OrganizationWhereInput.TzNameIn, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetTzNameIn() []string { return v.TzNameIn }
+
+// GetTzNameNotIn returns OrganizationWhereInput.TzNameNotIn, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetTzNameNotIn() []string { return v.TzNameNotIn }
+
+// GetTzNameGT returns OrganizationWhereInput.TzNameGT, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetTzNameGT() *string { return v.TzNameGT }
+
+// GetTzNameGTE returns OrganizationWhereInput.TzNameGTE, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetTzNameGTE() *string { return v.TzNameGTE }
+
+// GetTzNameLT returns OrganizationWhereInput.TzNameLT, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetTzNameLT() *string { return v.TzNameLT }
+
+// GetTzNameLTE returns OrganizationWhereInput.TzNameLTE, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetTzNameLTE() *string { return v.TzNameLTE }
+
+// GetTzNameContains returns OrganizationWhereInput.TzNameContains, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetTzNameContains() *string { return v.TzNameContains }
+
+// GetTzNameHasPrefix returns OrganizationWhereInput.TzNameHasPrefix, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetTzNameHasPrefix() *string { return v.TzNameHasPrefix }
+
+// GetTzNameHasSuffix returns OrganizationWhereInput.TzNameHasSuffix, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetTzNameHasSuffix() *string { return v.TzNameHasSuffix }
+
+// GetTzNameEqualFold returns OrganizationWhereInput.TzNameEqualFold, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetTzNameEqualFold() *string { return v.TzNameEqualFold }
+
+// GetTzNameContainsFold returns OrganizationWhereInput.TzNameContainsFold, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetTzNameContainsFold() *string { return v.TzNameContainsFold }
 
 // GetCreatedAt returns OrganizationWhereInput.CreatedAt, and is useful for accessing the field via an interface.
 func (v *OrganizationWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
@@ -18205,83 +20157,44 @@ func (v *OrganizationWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedA
 // GetUpdatedAtLTE returns OrganizationWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
 func (v *OrganizationWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
 
-// GetTzName returns OrganizationWhereInput.TzName, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetTzName() *string { return v.TzName }
+// GetName returns OrganizationWhereInput.Name, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetName() *string { return v.Name }
 
-// GetTzNameNEQ returns OrganizationWhereInput.TzNameNEQ, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetTzNameNEQ() *string { return v.TzNameNEQ }
+// GetNameNEQ returns OrganizationWhereInput.NameNEQ, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetNameNEQ() *string { return v.NameNEQ }
 
-// GetTzNameIn returns OrganizationWhereInput.TzNameIn, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetTzNameIn() []string { return v.TzNameIn }
+// GetNameIn returns OrganizationWhereInput.NameIn, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetNameIn() []string { return v.NameIn }
 
-// GetTzNameNotIn returns OrganizationWhereInput.TzNameNotIn, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetTzNameNotIn() []string { return v.TzNameNotIn }
+// GetNameNotIn returns OrganizationWhereInput.NameNotIn, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetNameNotIn() []string { return v.NameNotIn }
 
-// GetTzNameGT returns OrganizationWhereInput.TzNameGT, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetTzNameGT() *string { return v.TzNameGT }
+// GetNameGT returns OrganizationWhereInput.NameGT, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetNameGT() *string { return v.NameGT }
 
-// GetTzNameGTE returns OrganizationWhereInput.TzNameGTE, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetTzNameGTE() *string { return v.TzNameGTE }
+// GetNameGTE returns OrganizationWhereInput.NameGTE, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetNameGTE() *string { return v.NameGTE }
 
-// GetTzNameLT returns OrganizationWhereInput.TzNameLT, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetTzNameLT() *string { return v.TzNameLT }
+// GetNameLT returns OrganizationWhereInput.NameLT, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetNameLT() *string { return v.NameLT }
 
-// GetTzNameLTE returns OrganizationWhereInput.TzNameLTE, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetTzNameLTE() *string { return v.TzNameLTE }
+// GetNameLTE returns OrganizationWhereInput.NameLTE, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetNameLTE() *string { return v.NameLTE }
 
-// GetTzNameContains returns OrganizationWhereInput.TzNameContains, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetTzNameContains() *string { return v.TzNameContains }
+// GetNameContains returns OrganizationWhereInput.NameContains, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetNameContains() *string { return v.NameContains }
 
-// GetTzNameHasPrefix returns OrganizationWhereInput.TzNameHasPrefix, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetTzNameHasPrefix() *string { return v.TzNameHasPrefix }
+// GetNameHasPrefix returns OrganizationWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
 
-// GetTzNameHasSuffix returns OrganizationWhereInput.TzNameHasSuffix, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetTzNameHasSuffix() *string { return v.TzNameHasSuffix }
+// GetNameHasSuffix returns OrganizationWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
 
-// GetTzNameEqualFold returns OrganizationWhereInput.TzNameEqualFold, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetTzNameEqualFold() *string { return v.TzNameEqualFold }
+// GetNameEqualFold returns OrganizationWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
 
-// GetTzNameContainsFold returns OrganizationWhereInput.TzNameContainsFold, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetTzNameContainsFold() *string { return v.TzNameContainsFold }
-
-// GetSlug returns OrganizationWhereInput.Slug, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetSlug() *string { return v.Slug }
-
-// GetSlugNEQ returns OrganizationWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
-
-// GetSlugIn returns OrganizationWhereInput.SlugIn, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetSlugIn() []string { return v.SlugIn }
-
-// GetSlugNotIn returns OrganizationWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
-
-// GetSlugGT returns OrganizationWhereInput.SlugGT, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetSlugGT() *string { return v.SlugGT }
-
-// GetSlugGTE returns OrganizationWhereInput.SlugGTE, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetSlugGTE() *string { return v.SlugGTE }
-
-// GetSlugLT returns OrganizationWhereInput.SlugLT, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetSlugLT() *string { return v.SlugLT }
-
-// GetSlugLTE returns OrganizationWhereInput.SlugLTE, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetSlugLTE() *string { return v.SlugLTE }
-
-// GetSlugContains returns OrganizationWhereInput.SlugContains, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetSlugContains() *string { return v.SlugContains }
-
-// GetSlugHasPrefix returns OrganizationWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
-
-// GetSlugHasSuffix returns OrganizationWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
-
-// GetSlugEqualFold returns OrganizationWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
-
-// GetSlugContainsFold returns OrganizationWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
-func (v *OrganizationWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
+// GetNameContainsFold returns OrganizationWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
 
 // GetCustomerID returns OrganizationWhereInput.CustomerID, and is useful for accessing the field via an interface.
 func (v *OrganizationWhereInput) GetCustomerID() *string { return v.CustomerID }
@@ -18322,6 +20235,14 @@ func (v *OrganizationWhereInput) GetCustomerIDEqualFold() *string { return v.Cus
 // GetCustomerIDContainsFold returns OrganizationWhereInput.CustomerIDContainsFold, and is useful for accessing the field via an interface.
 func (v *OrganizationWhereInput) GetCustomerIDContainsFold() *string { return v.CustomerIDContainsFold }
 
+// GetHasOperations returns OrganizationWhereInput.HasOperations, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetHasOperations() *bool { return v.HasOperations }
+
+// GetHasOperationsWith returns OrganizationWhereInput.HasOperationsWith, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetHasOperationsWith() []*OperationWhereInput {
+	return v.HasOperationsWith
+}
+
 // GetHasSpaces returns OrganizationWhereInput.HasSpaces, and is useful for accessing the field via an interface.
 func (v *OrganizationWhereInput) GetHasSpaces() *bool { return v.HasSpaces }
 
@@ -18334,6 +20255,14 @@ func (v *OrganizationWhereInput) GetHasIntegrations() *bool { return v.HasIntegr
 // GetHasIntegrationsWith returns OrganizationWhereInput.HasIntegrationsWith, and is useful for accessing the field via an interface.
 func (v *OrganizationWhereInput) GetHasIntegrationsWith() []*IntegrationWhereInput {
 	return v.HasIntegrationsWith
+}
+
+// GetHasDeployments returns OrganizationWhereInput.HasDeployments, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetHasDeployments() *bool { return v.HasDeployments }
+
+// GetHasDeploymentsWith returns OrganizationWhereInput.HasDeploymentsWith, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetHasDeploymentsWith() []*DeploymentWhereInput {
+	return v.HasDeploymentsWith
 }
 
 // GetHasFlows returns OrganizationWhereInput.HasFlows, and is useful for accessing the field via an interface.
@@ -18371,6 +20300,14 @@ func (v *OrganizationWhereInput) GetHasCatalogs() *bool { return v.HasCatalogs }
 
 // GetHasCatalogsWith returns OrganizationWhereInput.HasCatalogsWith, and is useful for accessing the field via an interface.
 func (v *OrganizationWhereInput) GetHasCatalogsWith() []*CatalogWhereInput { return v.HasCatalogsWith }
+
+// GetHasModelTypes returns OrganizationWhereInput.HasModelTypes, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetHasModelTypes() *bool { return v.HasModelTypes }
+
+// GetHasModelTypesWith returns OrganizationWhereInput.HasModelTypesWith, and is useful for accessing the field via an interface.
+func (v *OrganizationWhereInput) GetHasModelTypesWith() []*ModelTypeWhereInput {
+	return v.HasModelTypesWith
+}
 
 // GetHasGeoMaps returns OrganizationWhereInput.HasGeoMaps, and is useful for accessing the field via an interface.
 func (v *OrganizationWhereInput) GetHasGeoMaps() *bool { return v.HasGeoMaps }
@@ -18444,16 +20381,16 @@ func (v *PersonalAccessTokenOrder) GetField() PersonalAccessTokenOrderField { re
 type PersonalAccessTokenOrderField string
 
 const (
-	PersonalAccessTokenOrderFieldName      PersonalAccessTokenOrderField = "NAME"
 	PersonalAccessTokenOrderFieldCreatedAt PersonalAccessTokenOrderField = "CREATED_AT"
 	PersonalAccessTokenOrderFieldUpdatedAt PersonalAccessTokenOrderField = "UPDATED_AT"
+	PersonalAccessTokenOrderFieldName      PersonalAccessTokenOrderField = "NAME"
 	PersonalAccessTokenOrderFieldExpiresAt PersonalAccessTokenOrderField = "EXPIRES_AT"
 )
 
 var AllPersonalAccessTokenOrderField = []PersonalAccessTokenOrderField{
-	PersonalAccessTokenOrderFieldName,
 	PersonalAccessTokenOrderFieldCreatedAt,
 	PersonalAccessTokenOrderFieldUpdatedAt,
+	PersonalAccessTokenOrderFieldName,
 	PersonalAccessTokenOrderFieldExpiresAt,
 }
 
@@ -18472,20 +20409,6 @@ type PersonalAccessTokenWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
-	// name field predicates
-	Name             *string  `json:"name"`
-	NameNEQ          *string  `json:"nameNEQ"`
-	NameIn           []string `json:"nameIn"`
-	NameNotIn        []string `json:"nameNotIn"`
-	NameGT           *string  `json:"nameGT"`
-	NameGTE          *string  `json:"nameGTE"`
-	NameLT           *string  `json:"nameLT"`
-	NameLTE          *string  `json:"nameLTE"`
-	NameContains     *string  `json:"nameContains"`
-	NameHasPrefix    *string  `json:"nameHasPrefix"`
-	NameHasSuffix    *string  `json:"nameHasSuffix"`
-	NameEqualFold    *string  `json:"nameEqualFold"`
-	NameContainsFold *string  `json:"nameContainsFold"`
 	// created_at field predicates
 	CreatedAt      *time.Time  `json:"createdAt"`
 	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
@@ -18504,6 +20427,20 @@ type PersonalAccessTokenWhereInput struct {
 	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
 	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
+	// name field predicates
+	Name             *string  `json:"name"`
+	NameNEQ          *string  `json:"nameNEQ"`
+	NameIn           []string `json:"nameIn"`
+	NameNotIn        []string `json:"nameNotIn"`
+	NameGT           *string  `json:"nameGT"`
+	NameGTE          *string  `json:"nameGTE"`
+	NameLT           *string  `json:"nameLT"`
+	NameLTE          *string  `json:"nameLTE"`
+	NameContains     *string  `json:"nameContains"`
+	NameHasPrefix    *string  `json:"nameHasPrefix"`
+	NameHasSuffix    *string  `json:"nameHasSuffix"`
+	NameEqualFold    *string  `json:"nameEqualFold"`
+	NameContainsFold *string  `json:"nameContainsFold"`
 	// user_id field predicates
 	UserID      *uuid.UUID  `json:"userID"`
 	UserIDNEQ   *uuid.UUID  `json:"userIDNEQ"`
@@ -18556,45 +20493,6 @@ func (v *PersonalAccessTokenWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 // GetIdLTE returns PersonalAccessTokenWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *PersonalAccessTokenWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
 
-// GetName returns PersonalAccessTokenWhereInput.Name, and is useful for accessing the field via an interface.
-func (v *PersonalAccessTokenWhereInput) GetName() *string { return v.Name }
-
-// GetNameNEQ returns PersonalAccessTokenWhereInput.NameNEQ, and is useful for accessing the field via an interface.
-func (v *PersonalAccessTokenWhereInput) GetNameNEQ() *string { return v.NameNEQ }
-
-// GetNameIn returns PersonalAccessTokenWhereInput.NameIn, and is useful for accessing the field via an interface.
-func (v *PersonalAccessTokenWhereInput) GetNameIn() []string { return v.NameIn }
-
-// GetNameNotIn returns PersonalAccessTokenWhereInput.NameNotIn, and is useful for accessing the field via an interface.
-func (v *PersonalAccessTokenWhereInput) GetNameNotIn() []string { return v.NameNotIn }
-
-// GetNameGT returns PersonalAccessTokenWhereInput.NameGT, and is useful for accessing the field via an interface.
-func (v *PersonalAccessTokenWhereInput) GetNameGT() *string { return v.NameGT }
-
-// GetNameGTE returns PersonalAccessTokenWhereInput.NameGTE, and is useful for accessing the field via an interface.
-func (v *PersonalAccessTokenWhereInput) GetNameGTE() *string { return v.NameGTE }
-
-// GetNameLT returns PersonalAccessTokenWhereInput.NameLT, and is useful for accessing the field via an interface.
-func (v *PersonalAccessTokenWhereInput) GetNameLT() *string { return v.NameLT }
-
-// GetNameLTE returns PersonalAccessTokenWhereInput.NameLTE, and is useful for accessing the field via an interface.
-func (v *PersonalAccessTokenWhereInput) GetNameLTE() *string { return v.NameLTE }
-
-// GetNameContains returns PersonalAccessTokenWhereInput.NameContains, and is useful for accessing the field via an interface.
-func (v *PersonalAccessTokenWhereInput) GetNameContains() *string { return v.NameContains }
-
-// GetNameHasPrefix returns PersonalAccessTokenWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
-func (v *PersonalAccessTokenWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
-
-// GetNameHasSuffix returns PersonalAccessTokenWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
-func (v *PersonalAccessTokenWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
-
-// GetNameEqualFold returns PersonalAccessTokenWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
-func (v *PersonalAccessTokenWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
-
-// GetNameContainsFold returns PersonalAccessTokenWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
-func (v *PersonalAccessTokenWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
-
 // GetCreatedAt returns PersonalAccessTokenWhereInput.CreatedAt, and is useful for accessing the field via an interface.
 func (v *PersonalAccessTokenWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
 
@@ -18642,6 +20540,45 @@ func (v *PersonalAccessTokenWhereInput) GetUpdatedAtLT() *time.Time { return v.U
 
 // GetUpdatedAtLTE returns PersonalAccessTokenWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
 func (v *PersonalAccessTokenWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
+
+// GetName returns PersonalAccessTokenWhereInput.Name, and is useful for accessing the field via an interface.
+func (v *PersonalAccessTokenWhereInput) GetName() *string { return v.Name }
+
+// GetNameNEQ returns PersonalAccessTokenWhereInput.NameNEQ, and is useful for accessing the field via an interface.
+func (v *PersonalAccessTokenWhereInput) GetNameNEQ() *string { return v.NameNEQ }
+
+// GetNameIn returns PersonalAccessTokenWhereInput.NameIn, and is useful for accessing the field via an interface.
+func (v *PersonalAccessTokenWhereInput) GetNameIn() []string { return v.NameIn }
+
+// GetNameNotIn returns PersonalAccessTokenWhereInput.NameNotIn, and is useful for accessing the field via an interface.
+func (v *PersonalAccessTokenWhereInput) GetNameNotIn() []string { return v.NameNotIn }
+
+// GetNameGT returns PersonalAccessTokenWhereInput.NameGT, and is useful for accessing the field via an interface.
+func (v *PersonalAccessTokenWhereInput) GetNameGT() *string { return v.NameGT }
+
+// GetNameGTE returns PersonalAccessTokenWhereInput.NameGTE, and is useful for accessing the field via an interface.
+func (v *PersonalAccessTokenWhereInput) GetNameGTE() *string { return v.NameGTE }
+
+// GetNameLT returns PersonalAccessTokenWhereInput.NameLT, and is useful for accessing the field via an interface.
+func (v *PersonalAccessTokenWhereInput) GetNameLT() *string { return v.NameLT }
+
+// GetNameLTE returns PersonalAccessTokenWhereInput.NameLTE, and is useful for accessing the field via an interface.
+func (v *PersonalAccessTokenWhereInput) GetNameLTE() *string { return v.NameLTE }
+
+// GetNameContains returns PersonalAccessTokenWhereInput.NameContains, and is useful for accessing the field via an interface.
+func (v *PersonalAccessTokenWhereInput) GetNameContains() *string { return v.NameContains }
+
+// GetNameHasPrefix returns PersonalAccessTokenWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
+func (v *PersonalAccessTokenWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
+
+// GetNameHasSuffix returns PersonalAccessTokenWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
+func (v *PersonalAccessTokenWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
+
+// GetNameEqualFold returns PersonalAccessTokenWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
+func (v *PersonalAccessTokenWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
+
+// GetNameContainsFold returns PersonalAccessTokenWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
+func (v *PersonalAccessTokenWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
 
 // GetUserID returns PersonalAccessTokenWhereInput.UserID, and is useful for accessing the field via an interface.
 func (v *PersonalAccessTokenWhereInput) GetUserID() *uuid.UUID { return v.UserID }
@@ -19269,18 +21206,18 @@ func (v *SchemaRefOrder) GetField() SchemaRefOrderField { return v.Field }
 type SchemaRefOrderField string
 
 const (
-	SchemaRefOrderFieldName        SchemaRefOrderField = "NAME"
+	SchemaRefOrderFieldAlias       SchemaRefOrderField = "ALIAS"
 	SchemaRefOrderFieldCreatedAt   SchemaRefOrderField = "CREATED_AT"
 	SchemaRefOrderFieldUpdatedAt   SchemaRefOrderField = "UPDATED_AT"
-	SchemaRefOrderFieldAlias       SchemaRefOrderField = "ALIAS"
+	SchemaRefOrderFieldName        SchemaRefOrderField = "NAME"
 	SchemaRefOrderFieldTablesCount SchemaRefOrderField = "TABLES_COUNT"
 )
 
 var AllSchemaRefOrderField = []SchemaRefOrderField{
-	SchemaRefOrderFieldName,
+	SchemaRefOrderFieldAlias,
 	SchemaRefOrderFieldCreatedAt,
 	SchemaRefOrderFieldUpdatedAt,
-	SchemaRefOrderFieldAlias,
+	SchemaRefOrderFieldName,
 	SchemaRefOrderFieldTablesCount,
 }
 
@@ -19299,38 +21236,6 @@ type SchemaRefWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
-	// name field predicates
-	Name             *string  `json:"name"`
-	NameNEQ          *string  `json:"nameNEQ"`
-	NameIn           []string `json:"nameIn"`
-	NameNotIn        []string `json:"nameNotIn"`
-	NameGT           *string  `json:"nameGT"`
-	NameGTE          *string  `json:"nameGTE"`
-	NameLT           *string  `json:"nameLT"`
-	NameLTE          *string  `json:"nameLTE"`
-	NameContains     *string  `json:"nameContains"`
-	NameHasPrefix    *string  `json:"nameHasPrefix"`
-	NameHasSuffix    *string  `json:"nameHasSuffix"`
-	NameEqualFold    *string  `json:"nameEqualFold"`
-	NameContainsFold *string  `json:"nameContainsFold"`
-	// created_at field predicates
-	CreatedAt      *time.Time  `json:"createdAt"`
-	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
-	CreatedAtIn    []time.Time `json:"createdAtIn"`
-	CreatedAtNotIn []time.Time `json:"createdAtNotIn"`
-	CreatedAtGT    *time.Time  `json:"createdAtGT"`
-	CreatedAtGTE   *time.Time  `json:"createdAtGTE"`
-	CreatedAtLT    *time.Time  `json:"createdAtLT"`
-	CreatedAtLTE   *time.Time  `json:"createdAtLTE"`
-	// updated_at field predicates
-	UpdatedAt      *time.Time  `json:"updatedAt"`
-	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ"`
-	UpdatedAtIn    []time.Time `json:"updatedAtIn"`
-	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn"`
-	UpdatedAtGT    *time.Time  `json:"updatedAtGT"`
-	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
-	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
-	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
 	// alias field predicates
 	Alias             *string  `json:"alias"`
 	AliasNEQ          *string  `json:"aliasNEQ"`
@@ -19380,6 +21285,24 @@ type SchemaRefWhereInput struct {
 	SyncedAtLTE    *time.Time  `json:"syncedAtLTE"`
 	SyncedAtIsNil  *bool       `json:"syncedAtIsNil"`
 	SyncedAtNotNil *bool       `json:"syncedAtNotNil"`
+	// created_at field predicates
+	CreatedAt      *time.Time  `json:"createdAt"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
+	CreatedAtIn    []time.Time `json:"createdAtIn"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE"`
+	// updated_at field predicates
+	UpdatedAt      *time.Time  `json:"updatedAt"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
 	// deleted_at field predicates
 	DeletedAt       *time.Time  `json:"deletedAt"`
 	DeletedAtNEQ    *time.Time  `json:"deletedAtNEQ"`
@@ -19391,6 +21314,20 @@ type SchemaRefWhereInput struct {
 	DeletedAtLTE    *time.Time  `json:"deletedAtLTE"`
 	DeletedAtIsNil  *bool       `json:"deletedAtIsNil"`
 	DeletedAtNotNil *bool       `json:"deletedAtNotNil"`
+	// name field predicates
+	Name             *string  `json:"name"`
+	NameNEQ          *string  `json:"nameNEQ"`
+	NameIn           []string `json:"nameIn"`
+	NameNotIn        []string `json:"nameNotIn"`
+	NameGT           *string  `json:"nameGT"`
+	NameGTE          *string  `json:"nameGTE"`
+	NameLT           *string  `json:"nameLT"`
+	NameLTE          *string  `json:"nameLTE"`
+	NameContains     *string  `json:"nameContains"`
+	NameHasPrefix    *string  `json:"nameHasPrefix"`
+	NameHasSuffix    *string  `json:"nameHasSuffix"`
+	NameEqualFold    *string  `json:"nameEqualFold"`
+	NameContainsFold *string  `json:"nameContainsFold"`
 	// description field predicates
 	Description             *string  `json:"description"`
 	DescriptionNEQ          *string  `json:"descriptionNEQ"`
@@ -19472,93 +21409,6 @@ func (v *SchemaRefWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 
 // GetIdLTE returns SchemaRefWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *SchemaRefWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
-
-// GetName returns SchemaRefWhereInput.Name, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetName() *string { return v.Name }
-
-// GetNameNEQ returns SchemaRefWhereInput.NameNEQ, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetNameNEQ() *string { return v.NameNEQ }
-
-// GetNameIn returns SchemaRefWhereInput.NameIn, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetNameIn() []string { return v.NameIn }
-
-// GetNameNotIn returns SchemaRefWhereInput.NameNotIn, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetNameNotIn() []string { return v.NameNotIn }
-
-// GetNameGT returns SchemaRefWhereInput.NameGT, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetNameGT() *string { return v.NameGT }
-
-// GetNameGTE returns SchemaRefWhereInput.NameGTE, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetNameGTE() *string { return v.NameGTE }
-
-// GetNameLT returns SchemaRefWhereInput.NameLT, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetNameLT() *string { return v.NameLT }
-
-// GetNameLTE returns SchemaRefWhereInput.NameLTE, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetNameLTE() *string { return v.NameLTE }
-
-// GetNameContains returns SchemaRefWhereInput.NameContains, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetNameContains() *string { return v.NameContains }
-
-// GetNameHasPrefix returns SchemaRefWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
-
-// GetNameHasSuffix returns SchemaRefWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
-
-// GetNameEqualFold returns SchemaRefWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
-
-// GetNameContainsFold returns SchemaRefWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
-
-// GetCreatedAt returns SchemaRefWhereInput.CreatedAt, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
-
-// GetCreatedAtNEQ returns SchemaRefWhereInput.CreatedAtNEQ, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetCreatedAtNEQ() *time.Time { return v.CreatedAtNEQ }
-
-// GetCreatedAtIn returns SchemaRefWhereInput.CreatedAtIn, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetCreatedAtIn() []time.Time { return v.CreatedAtIn }
-
-// GetCreatedAtNotIn returns SchemaRefWhereInput.CreatedAtNotIn, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetCreatedAtNotIn() []time.Time { return v.CreatedAtNotIn }
-
-// GetCreatedAtGT returns SchemaRefWhereInput.CreatedAtGT, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetCreatedAtGT() *time.Time { return v.CreatedAtGT }
-
-// GetCreatedAtGTE returns SchemaRefWhereInput.CreatedAtGTE, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetCreatedAtGTE() *time.Time { return v.CreatedAtGTE }
-
-// GetCreatedAtLT returns SchemaRefWhereInput.CreatedAtLT, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetCreatedAtLT() *time.Time { return v.CreatedAtLT }
-
-// GetCreatedAtLTE returns SchemaRefWhereInput.CreatedAtLTE, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetCreatedAtLTE() *time.Time { return v.CreatedAtLTE }
-
-// GetUpdatedAt returns SchemaRefWhereInput.UpdatedAt, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetUpdatedAt() *time.Time { return v.UpdatedAt }
-
-// GetUpdatedAtNEQ returns SchemaRefWhereInput.UpdatedAtNEQ, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetUpdatedAtNEQ() *time.Time { return v.UpdatedAtNEQ }
-
-// GetUpdatedAtIn returns SchemaRefWhereInput.UpdatedAtIn, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetUpdatedAtIn() []time.Time { return v.UpdatedAtIn }
-
-// GetUpdatedAtNotIn returns SchemaRefWhereInput.UpdatedAtNotIn, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetUpdatedAtNotIn() []time.Time { return v.UpdatedAtNotIn }
-
-// GetUpdatedAtGT returns SchemaRefWhereInput.UpdatedAtGT, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetUpdatedAtGT() *time.Time { return v.UpdatedAtGT }
-
-// GetUpdatedAtGTE returns SchemaRefWhereInput.UpdatedAtGTE, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetUpdatedAtGTE() *time.Time { return v.UpdatedAtGTE }
-
-// GetUpdatedAtLT returns SchemaRefWhereInput.UpdatedAtLT, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
-
-// GetUpdatedAtLTE returns SchemaRefWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
-func (v *SchemaRefWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
 
 // GetAlias returns SchemaRefWhereInput.Alias, and is useful for accessing the field via an interface.
 func (v *SchemaRefWhereInput) GetAlias() *string { return v.Alias }
@@ -19692,6 +21542,54 @@ func (v *SchemaRefWhereInput) GetSyncedAtIsNil() *bool { return v.SyncedAtIsNil 
 // GetSyncedAtNotNil returns SchemaRefWhereInput.SyncedAtNotNil, and is useful for accessing the field via an interface.
 func (v *SchemaRefWhereInput) GetSyncedAtNotNil() *bool { return v.SyncedAtNotNil }
 
+// GetCreatedAt returns SchemaRefWhereInput.CreatedAt, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
+
+// GetCreatedAtNEQ returns SchemaRefWhereInput.CreatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetCreatedAtNEQ() *time.Time { return v.CreatedAtNEQ }
+
+// GetCreatedAtIn returns SchemaRefWhereInput.CreatedAtIn, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetCreatedAtIn() []time.Time { return v.CreatedAtIn }
+
+// GetCreatedAtNotIn returns SchemaRefWhereInput.CreatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetCreatedAtNotIn() []time.Time { return v.CreatedAtNotIn }
+
+// GetCreatedAtGT returns SchemaRefWhereInput.CreatedAtGT, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetCreatedAtGT() *time.Time { return v.CreatedAtGT }
+
+// GetCreatedAtGTE returns SchemaRefWhereInput.CreatedAtGTE, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetCreatedAtGTE() *time.Time { return v.CreatedAtGTE }
+
+// GetCreatedAtLT returns SchemaRefWhereInput.CreatedAtLT, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetCreatedAtLT() *time.Time { return v.CreatedAtLT }
+
+// GetCreatedAtLTE returns SchemaRefWhereInput.CreatedAtLTE, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetCreatedAtLTE() *time.Time { return v.CreatedAtLTE }
+
+// GetUpdatedAt returns SchemaRefWhereInput.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetUpdatedAt() *time.Time { return v.UpdatedAt }
+
+// GetUpdatedAtNEQ returns SchemaRefWhereInput.UpdatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetUpdatedAtNEQ() *time.Time { return v.UpdatedAtNEQ }
+
+// GetUpdatedAtIn returns SchemaRefWhereInput.UpdatedAtIn, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetUpdatedAtIn() []time.Time { return v.UpdatedAtIn }
+
+// GetUpdatedAtNotIn returns SchemaRefWhereInput.UpdatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetUpdatedAtNotIn() []time.Time { return v.UpdatedAtNotIn }
+
+// GetUpdatedAtGT returns SchemaRefWhereInput.UpdatedAtGT, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetUpdatedAtGT() *time.Time { return v.UpdatedAtGT }
+
+// GetUpdatedAtGTE returns SchemaRefWhereInput.UpdatedAtGTE, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetUpdatedAtGTE() *time.Time { return v.UpdatedAtGTE }
+
+// GetUpdatedAtLT returns SchemaRefWhereInput.UpdatedAtLT, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
+
+// GetUpdatedAtLTE returns SchemaRefWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
+
 // GetDeletedAt returns SchemaRefWhereInput.DeletedAt, and is useful for accessing the field via an interface.
 func (v *SchemaRefWhereInput) GetDeletedAt() *time.Time { return v.DeletedAt }
 
@@ -19721,6 +21619,45 @@ func (v *SchemaRefWhereInput) GetDeletedAtIsNil() *bool { return v.DeletedAtIsNi
 
 // GetDeletedAtNotNil returns SchemaRefWhereInput.DeletedAtNotNil, and is useful for accessing the field via an interface.
 func (v *SchemaRefWhereInput) GetDeletedAtNotNil() *bool { return v.DeletedAtNotNil }
+
+// GetName returns SchemaRefWhereInput.Name, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetName() *string { return v.Name }
+
+// GetNameNEQ returns SchemaRefWhereInput.NameNEQ, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetNameNEQ() *string { return v.NameNEQ }
+
+// GetNameIn returns SchemaRefWhereInput.NameIn, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetNameIn() []string { return v.NameIn }
+
+// GetNameNotIn returns SchemaRefWhereInput.NameNotIn, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetNameNotIn() []string { return v.NameNotIn }
+
+// GetNameGT returns SchemaRefWhereInput.NameGT, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetNameGT() *string { return v.NameGT }
+
+// GetNameGTE returns SchemaRefWhereInput.NameGTE, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetNameGTE() *string { return v.NameGTE }
+
+// GetNameLT returns SchemaRefWhereInput.NameLT, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetNameLT() *string { return v.NameLT }
+
+// GetNameLTE returns SchemaRefWhereInput.NameLTE, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetNameLTE() *string { return v.NameLTE }
+
+// GetNameContains returns SchemaRefWhereInput.NameContains, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetNameContains() *string { return v.NameContains }
+
+// GetNameHasPrefix returns SchemaRefWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
+
+// GetNameHasSuffix returns SchemaRefWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
+
+// GetNameEqualFold returns SchemaRefWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
+
+// GetNameContainsFold returns SchemaRefWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
+func (v *SchemaRefWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
 
 // GetDescription returns SchemaRefWhereInput.Description, and is useful for accessing the field via an interface.
 func (v *SchemaRefWhereInput) GetDescription() *string { return v.Description }
@@ -20124,6 +22061,7 @@ func (v *SearchSearchSearchResultsResultsSearchResult) __premarshalJSON() (*__pr
 // SearchSearchSearchResultsResultsSearchResultNodeColumnRef
 // SearchSearchSearchResultsResultsSearchResultNodeConnection
 // SearchSearchSearchResultsResultsSearchResultNodeConnectionUser
+// SearchSearchSearchResultsResultsSearchResultNodeDeployment
 // SearchSearchSearchResultsResultsSearchResultNodeDestination
 // SearchSearchSearchResultsResultsSearchResultNodeEventSource
 // SearchSearchSearchResultsResultsSearchResultNodeFlow
@@ -20136,9 +22074,10 @@ func (v *SearchSearchSearchResultsResultsSearchResult) __premarshalJSON() (*__pr
 // SearchSearchSearchResultsResultsSearchResultNodeGeoSource
 // SearchSearchSearchResultsResultsSearchResultNodeIOSchema
 // SearchSearchSearchResultsResultsSearchResultNodeIntegration
-// SearchSearchSearchResultsResultsSearchResultNodeIntegrationPackage
+// SearchSearchSearchResultsResultsSearchResultNodeIntegrationRevision
 // SearchSearchSearchResultsResultsSearchResultNodeModel
 // SearchSearchSearchResultsResultsSearchResultNodeModelType
+// SearchSearchSearchResultsResultsSearchResultNodeOperation
 // SearchSearchSearchResultsResultsSearchResultNodeOrganization
 // SearchSearchSearchResultsResultsSearchResultNodePersonalAccessToken
 // SearchSearchSearchResultsResultsSearchResultNodeSQLQuery
@@ -20149,6 +22088,10 @@ func (v *SearchSearchSearchResultsResultsSearchResult) __premarshalJSON() (*__pr
 // SearchSearchSearchResultsResultsSearchResultNodeSourceType
 // SearchSearchSearchResultsResultsSearchResultNodeSpace
 // SearchSearchSearchResultsResultsSearchResultNodeTableRef
+// SearchSearchSearchResultsResultsSearchResultNodeTypeFile
+// SearchSearchSearchResultsResultsSearchResultNodeTypeMethod
+// SearchSearchSearchResultsResultsSearchResultNodeTypeSchema
+// SearchSearchSearchResultsResultsSearchResultNodeTypeService
 // SearchSearchSearchResultsResultsSearchResultNodeUser
 // The GraphQL type's documentation follows.
 //
@@ -20172,6 +22115,8 @@ func (v *SearchSearchSearchResultsResultsSearchResultNodeColumnRef) implementsGr
 func (v *SearchSearchSearchResultsResultsSearchResultNodeConnection) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
 }
 func (v *SearchSearchSearchResultsResultsSearchResultNodeConnectionUser) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
+}
+func (v *SearchSearchSearchResultsResultsSearchResultNodeDeployment) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
 }
 func (v *SearchSearchSearchResultsResultsSearchResultNodeDestination) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
 }
@@ -20197,11 +22142,13 @@ func (v *SearchSearchSearchResultsResultsSearchResultNodeIOSchema) implementsGra
 }
 func (v *SearchSearchSearchResultsResultsSearchResultNodeIntegration) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
 }
-func (v *SearchSearchSearchResultsResultsSearchResultNodeIntegrationPackage) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
+func (v *SearchSearchSearchResultsResultsSearchResultNodeIntegrationRevision) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
 }
 func (v *SearchSearchSearchResultsResultsSearchResultNodeModel) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
 }
 func (v *SearchSearchSearchResultsResultsSearchResultNodeModelType) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
+}
+func (v *SearchSearchSearchResultsResultsSearchResultNodeOperation) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
 }
 func (v *SearchSearchSearchResultsResultsSearchResultNodeOrganization) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
 }
@@ -20222,6 +22169,14 @@ func (v *SearchSearchSearchResultsResultsSearchResultNodeSourceType) implementsG
 func (v *SearchSearchSearchResultsResultsSearchResultNodeSpace) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
 }
 func (v *SearchSearchSearchResultsResultsSearchResultNodeTableRef) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
+}
+func (v *SearchSearchSearchResultsResultsSearchResultNodeTypeFile) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
+}
+func (v *SearchSearchSearchResultsResultsSearchResultNodeTypeMethod) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
+}
+func (v *SearchSearchSearchResultsResultsSearchResultNodeTypeSchema) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
+}
+func (v *SearchSearchSearchResultsResultsSearchResultNodeTypeService) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
 }
 func (v *SearchSearchSearchResultsResultsSearchResultNodeUser) implementsGraphQLInterfaceSearchSearchSearchResultsResultsSearchResultNode() {
 }
@@ -20251,6 +22206,9 @@ func __unmarshalSearchSearchSearchResultsResultsSearchResultNode(b []byte, v *Se
 		return json.Unmarshal(b, *v)
 	case "ConnectionUser":
 		*v = new(SearchSearchSearchResultsResultsSearchResultNodeConnectionUser)
+		return json.Unmarshal(b, *v)
+	case "Deployment":
+		*v = new(SearchSearchSearchResultsResultsSearchResultNodeDeployment)
 		return json.Unmarshal(b, *v)
 	case "Destination":
 		*v = new(SearchSearchSearchResultsResultsSearchResultNodeDestination)
@@ -20288,14 +22246,17 @@ func __unmarshalSearchSearchSearchResultsResultsSearchResultNode(b []byte, v *Se
 	case "Integration":
 		*v = new(SearchSearchSearchResultsResultsSearchResultNodeIntegration)
 		return json.Unmarshal(b, *v)
-	case "IntegrationPackage":
-		*v = new(SearchSearchSearchResultsResultsSearchResultNodeIntegrationPackage)
+	case "IntegrationRevision":
+		*v = new(SearchSearchSearchResultsResultsSearchResultNodeIntegrationRevision)
 		return json.Unmarshal(b, *v)
 	case "Model":
 		*v = new(SearchSearchSearchResultsResultsSearchResultNodeModel)
 		return json.Unmarshal(b, *v)
 	case "ModelType":
 		*v = new(SearchSearchSearchResultsResultsSearchResultNodeModelType)
+		return json.Unmarshal(b, *v)
+	case "Operation":
+		*v = new(SearchSearchSearchResultsResultsSearchResultNodeOperation)
 		return json.Unmarshal(b, *v)
 	case "Organization":
 		*v = new(SearchSearchSearchResultsResultsSearchResultNodeOrganization)
@@ -20326,6 +22287,18 @@ func __unmarshalSearchSearchSearchResultsResultsSearchResultNode(b []byte, v *Se
 		return json.Unmarshal(b, *v)
 	case "TableRef":
 		*v = new(SearchSearchSearchResultsResultsSearchResultNodeTableRef)
+		return json.Unmarshal(b, *v)
+	case "TypeFile":
+		*v = new(SearchSearchSearchResultsResultsSearchResultNodeTypeFile)
+		return json.Unmarshal(b, *v)
+	case "TypeMethod":
+		*v = new(SearchSearchSearchResultsResultsSearchResultNodeTypeMethod)
+		return json.Unmarshal(b, *v)
+	case "TypeSchema":
+		*v = new(SearchSearchSearchResultsResultsSearchResultNodeTypeSchema)
+		return json.Unmarshal(b, *v)
+	case "TypeService":
+		*v = new(SearchSearchSearchResultsResultsSearchResultNodeTypeService)
 		return json.Unmarshal(b, *v)
 	case "User":
 		*v = new(SearchSearchSearchResultsResultsSearchResultNodeUser)
@@ -20373,6 +22346,14 @@ func __marshalSearchSearchSearchResultsResultsSearchResultNode(v *SearchSearchSe
 		result := struct {
 			TypeName string `json:"__typename"`
 			*SearchSearchSearchResultsResultsSearchResultNodeConnectionUser
+		}{typename, v}
+		return json.Marshal(result)
+	case *SearchSearchSearchResultsResultsSearchResultNodeDeployment:
+		typename = "Deployment"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*SearchSearchSearchResultsResultsSearchResultNodeDeployment
 		}{typename, v}
 		return json.Marshal(result)
 	case *SearchSearchSearchResultsResultsSearchResultNodeDestination:
@@ -20471,12 +22452,12 @@ func __marshalSearchSearchSearchResultsResultsSearchResultNode(v *SearchSearchSe
 			*SearchSearchSearchResultsResultsSearchResultNodeIntegration
 		}{typename, v}
 		return json.Marshal(result)
-	case *SearchSearchSearchResultsResultsSearchResultNodeIntegrationPackage:
-		typename = "IntegrationPackage"
+	case *SearchSearchSearchResultsResultsSearchResultNodeIntegrationRevision:
+		typename = "IntegrationRevision"
 
 		result := struct {
 			TypeName string `json:"__typename"`
-			*SearchSearchSearchResultsResultsSearchResultNodeIntegrationPackage
+			*SearchSearchSearchResultsResultsSearchResultNodeIntegrationRevision
 		}{typename, v}
 		return json.Marshal(result)
 	case *SearchSearchSearchResultsResultsSearchResultNodeModel:
@@ -20493,6 +22474,14 @@ func __marshalSearchSearchSearchResultsResultsSearchResultNode(v *SearchSearchSe
 		result := struct {
 			TypeName string `json:"__typename"`
 			*SearchSearchSearchResultsResultsSearchResultNodeModelType
+		}{typename, v}
+		return json.Marshal(result)
+	case *SearchSearchSearchResultsResultsSearchResultNodeOperation:
+		typename = "Operation"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*SearchSearchSearchResultsResultsSearchResultNodeOperation
 		}{typename, v}
 		return json.Marshal(result)
 	case *SearchSearchSearchResultsResultsSearchResultNodeOrganization:
@@ -20575,6 +22564,38 @@ func __marshalSearchSearchSearchResultsResultsSearchResultNode(v *SearchSearchSe
 			*SearchSearchSearchResultsResultsSearchResultNodeTableRef
 		}{typename, v}
 		return json.Marshal(result)
+	case *SearchSearchSearchResultsResultsSearchResultNodeTypeFile:
+		typename = "TypeFile"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*SearchSearchSearchResultsResultsSearchResultNodeTypeFile
+		}{typename, v}
+		return json.Marshal(result)
+	case *SearchSearchSearchResultsResultsSearchResultNodeTypeMethod:
+		typename = "TypeMethod"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*SearchSearchSearchResultsResultsSearchResultNodeTypeMethod
+		}{typename, v}
+		return json.Marshal(result)
+	case *SearchSearchSearchResultsResultsSearchResultNodeTypeSchema:
+		typename = "TypeSchema"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*SearchSearchSearchResultsResultsSearchResultNodeTypeSchema
+		}{typename, v}
+		return json.Marshal(result)
+	case *SearchSearchSearchResultsResultsSearchResultNodeTypeService:
+		typename = "TypeService"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*SearchSearchSearchResultsResultsSearchResultNodeTypeService
+		}{typename, v}
+		return json.Marshal(result)
 	case *SearchSearchSearchResultsResultsSearchResultNodeUser:
 		typename = "User"
 
@@ -20646,6 +22667,19 @@ func (v *SearchSearchSearchResultsResultsSearchResultNodeConnectionUser) GetType
 func (v *SearchSearchSearchResultsResultsSearchResultNodeConnectionUser) GetId() uuid.UUID {
 	return v.Id
 }
+
+// SearchSearchSearchResultsResultsSearchResultNodeDeployment includes the requested fields of the GraphQL type Deployment.
+type SearchSearchSearchResultsResultsSearchResultNodeDeployment struct {
+	Type *string `json:"type"`
+	// The id of the object.
+	Id uuid.UUID `json:"id"`
+}
+
+// GetType returns SearchSearchSearchResultsResultsSearchResultNodeDeployment.Type, and is useful for accessing the field via an interface.
+func (v *SearchSearchSearchResultsResultsSearchResultNodeDeployment) GetType() *string { return v.Type }
+
+// GetId returns SearchSearchSearchResultsResultsSearchResultNodeDeployment.Id, and is useful for accessing the field via an interface.
+func (v *SearchSearchSearchResultsResultsSearchResultNodeDeployment) GetId() uuid.UUID { return v.Id }
 
 // SearchSearchSearchResultsResultsSearchResultNodeDestination includes the requested fields of the GraphQL type Destination.
 type SearchSearchSearchResultsResultsSearchResultNodeDestination struct {
@@ -20813,20 +22847,20 @@ func (v *SearchSearchSearchResultsResultsSearchResultNodeIntegration) GetType() 
 // GetId returns SearchSearchSearchResultsResultsSearchResultNodeIntegration.Id, and is useful for accessing the field via an interface.
 func (v *SearchSearchSearchResultsResultsSearchResultNodeIntegration) GetId() uuid.UUID { return v.Id }
 
-// SearchSearchSearchResultsResultsSearchResultNodeIntegrationPackage includes the requested fields of the GraphQL type IntegrationPackage.
-type SearchSearchSearchResultsResultsSearchResultNodeIntegrationPackage struct {
+// SearchSearchSearchResultsResultsSearchResultNodeIntegrationRevision includes the requested fields of the GraphQL type IntegrationRevision.
+type SearchSearchSearchResultsResultsSearchResultNodeIntegrationRevision struct {
 	Type *string `json:"type"`
 	// The id of the object.
 	Id uuid.UUID `json:"id"`
 }
 
-// GetType returns SearchSearchSearchResultsResultsSearchResultNodeIntegrationPackage.Type, and is useful for accessing the field via an interface.
-func (v *SearchSearchSearchResultsResultsSearchResultNodeIntegrationPackage) GetType() *string {
+// GetType returns SearchSearchSearchResultsResultsSearchResultNodeIntegrationRevision.Type, and is useful for accessing the field via an interface.
+func (v *SearchSearchSearchResultsResultsSearchResultNodeIntegrationRevision) GetType() *string {
 	return v.Type
 }
 
-// GetId returns SearchSearchSearchResultsResultsSearchResultNodeIntegrationPackage.Id, and is useful for accessing the field via an interface.
-func (v *SearchSearchSearchResultsResultsSearchResultNodeIntegrationPackage) GetId() uuid.UUID {
+// GetId returns SearchSearchSearchResultsResultsSearchResultNodeIntegrationRevision.Id, and is useful for accessing the field via an interface.
+func (v *SearchSearchSearchResultsResultsSearchResultNodeIntegrationRevision) GetId() uuid.UUID {
 	return v.Id
 }
 
@@ -20855,6 +22889,19 @@ func (v *SearchSearchSearchResultsResultsSearchResultNodeModelType) GetType() *s
 
 // GetId returns SearchSearchSearchResultsResultsSearchResultNodeModelType.Id, and is useful for accessing the field via an interface.
 func (v *SearchSearchSearchResultsResultsSearchResultNodeModelType) GetId() uuid.UUID { return v.Id }
+
+// SearchSearchSearchResultsResultsSearchResultNodeOperation includes the requested fields of the GraphQL type Operation.
+type SearchSearchSearchResultsResultsSearchResultNodeOperation struct {
+	Type *string `json:"type"`
+	// The id of the object.
+	Id uuid.UUID `json:"id"`
+}
+
+// GetType returns SearchSearchSearchResultsResultsSearchResultNodeOperation.Type, and is useful for accessing the field via an interface.
+func (v *SearchSearchSearchResultsResultsSearchResultNodeOperation) GetType() *string { return v.Type }
+
+// GetId returns SearchSearchSearchResultsResultsSearchResultNodeOperation.Id, and is useful for accessing the field via an interface.
+func (v *SearchSearchSearchResultsResultsSearchResultNodeOperation) GetId() uuid.UUID { return v.Id }
 
 // SearchSearchSearchResultsResultsSearchResultNodeOrganization includes the requested fields of the GraphQL type Organization.
 type SearchSearchSearchResultsResultsSearchResultNodeOrganization struct {
@@ -20997,6 +23044,60 @@ func (v *SearchSearchSearchResultsResultsSearchResultNodeTableRef) GetType() *st
 
 // GetId returns SearchSearchSearchResultsResultsSearchResultNodeTableRef.Id, and is useful for accessing the field via an interface.
 func (v *SearchSearchSearchResultsResultsSearchResultNodeTableRef) GetId() uuid.UUID { return v.Id }
+
+// SearchSearchSearchResultsResultsSearchResultNodeTypeFile includes the requested fields of the GraphQL type TypeFile.
+type SearchSearchSearchResultsResultsSearchResultNodeTypeFile struct {
+	Type *string `json:"type"`
+	// The id of the object.
+	Id uuid.UUID `json:"id"`
+}
+
+// GetType returns SearchSearchSearchResultsResultsSearchResultNodeTypeFile.Type, and is useful for accessing the field via an interface.
+func (v *SearchSearchSearchResultsResultsSearchResultNodeTypeFile) GetType() *string { return v.Type }
+
+// GetId returns SearchSearchSearchResultsResultsSearchResultNodeTypeFile.Id, and is useful for accessing the field via an interface.
+func (v *SearchSearchSearchResultsResultsSearchResultNodeTypeFile) GetId() uuid.UUID { return v.Id }
+
+// SearchSearchSearchResultsResultsSearchResultNodeTypeMethod includes the requested fields of the GraphQL type TypeMethod.
+type SearchSearchSearchResultsResultsSearchResultNodeTypeMethod struct {
+	Type *string `json:"type"`
+	// The id of the object.
+	Id uuid.UUID `json:"id"`
+}
+
+// GetType returns SearchSearchSearchResultsResultsSearchResultNodeTypeMethod.Type, and is useful for accessing the field via an interface.
+func (v *SearchSearchSearchResultsResultsSearchResultNodeTypeMethod) GetType() *string { return v.Type }
+
+// GetId returns SearchSearchSearchResultsResultsSearchResultNodeTypeMethod.Id, and is useful for accessing the field via an interface.
+func (v *SearchSearchSearchResultsResultsSearchResultNodeTypeMethod) GetId() uuid.UUID { return v.Id }
+
+// SearchSearchSearchResultsResultsSearchResultNodeTypeSchema includes the requested fields of the GraphQL type TypeSchema.
+type SearchSearchSearchResultsResultsSearchResultNodeTypeSchema struct {
+	Type *string `json:"type"`
+	// The id of the object.
+	Id uuid.UUID `json:"id"`
+}
+
+// GetType returns SearchSearchSearchResultsResultsSearchResultNodeTypeSchema.Type, and is useful for accessing the field via an interface.
+func (v *SearchSearchSearchResultsResultsSearchResultNodeTypeSchema) GetType() *string { return v.Type }
+
+// GetId returns SearchSearchSearchResultsResultsSearchResultNodeTypeSchema.Id, and is useful for accessing the field via an interface.
+func (v *SearchSearchSearchResultsResultsSearchResultNodeTypeSchema) GetId() uuid.UUID { return v.Id }
+
+// SearchSearchSearchResultsResultsSearchResultNodeTypeService includes the requested fields of the GraphQL type TypeService.
+type SearchSearchSearchResultsResultsSearchResultNodeTypeService struct {
+	Type *string `json:"type"`
+	// The id of the object.
+	Id uuid.UUID `json:"id"`
+}
+
+// GetType returns SearchSearchSearchResultsResultsSearchResultNodeTypeService.Type, and is useful for accessing the field via an interface.
+func (v *SearchSearchSearchResultsResultsSearchResultNodeTypeService) GetType() *string {
+	return v.Type
+}
+
+// GetId returns SearchSearchSearchResultsResultsSearchResultNodeTypeService.Id, and is useful for accessing the field via an interface.
+func (v *SearchSearchSearchResultsResultsSearchResultNodeTypeService) GetId() uuid.UUID { return v.Id }
 
 // SearchSearchSearchResultsResultsSearchResultNodeUser includes the requested fields of the GraphQL type User.
 type SearchSearchSearchResultsResultsSearchResultNodeUser struct {
@@ -21181,18 +23282,6 @@ func (v *SearchWhereInput) GetHasSpace() *bool { return v.HasSpace }
 
 // GetHasSpaceWith returns SearchWhereInput.HasSpaceWith, and is useful for accessing the field via an interface.
 func (v *SearchWhereInput) GetHasSpaceWith() []*SpaceWhereInput { return v.HasSpaceWith }
-
-type ServiceAuthType string
-
-const (
-	ServiceAuthTypeNone  ServiceAuthType = "NONE"
-	ServiceAuthTypeOauth ServiceAuthType = "OAUTH"
-)
-
-var AllServiceAuthType = []ServiceAuthType{
-	ServiceAuthTypeNone,
-	ServiceAuthTypeOauth,
-}
 
 // SourceFragment includes the GraphQL fields of Source requested by the fragment SourceFragment.
 type SourceFragment struct {
@@ -21423,6 +23512,48 @@ type SourceTypeWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
+	// organization_slug field predicates
+	OrganizationSlug             *string  `json:"organizationSlug"`
+	OrganizationSlugNEQ          *string  `json:"organizationSlugNEQ"`
+	OrganizationSlugIn           []string `json:"organizationSlugIn"`
+	OrganizationSlugNotIn        []string `json:"organizationSlugNotIn"`
+	OrganizationSlugGT           *string  `json:"organizationSlugGT"`
+	OrganizationSlugGTE          *string  `json:"organizationSlugGTE"`
+	OrganizationSlugLT           *string  `json:"organizationSlugLT"`
+	OrganizationSlugLTE          *string  `json:"organizationSlugLTE"`
+	OrganizationSlugContains     *string  `json:"organizationSlugContains"`
+	OrganizationSlugHasPrefix    *string  `json:"organizationSlugHasPrefix"`
+	OrganizationSlugHasSuffix    *string  `json:"organizationSlugHasSuffix"`
+	OrganizationSlugEqualFold    *string  `json:"organizationSlugEqualFold"`
+	OrganizationSlugContainsFold *string  `json:"organizationSlugContainsFold"`
+	// connection_slug field predicates
+	ConnectionSlug             *string  `json:"connectionSlug"`
+	ConnectionSlugNEQ          *string  `json:"connectionSlugNEQ"`
+	ConnectionSlugIn           []string `json:"connectionSlugIn"`
+	ConnectionSlugNotIn        []string `json:"connectionSlugNotIn"`
+	ConnectionSlugGT           *string  `json:"connectionSlugGT"`
+	ConnectionSlugGTE          *string  `json:"connectionSlugGTE"`
+	ConnectionSlugLT           *string  `json:"connectionSlugLT"`
+	ConnectionSlugLTE          *string  `json:"connectionSlugLTE"`
+	ConnectionSlugContains     *string  `json:"connectionSlugContains"`
+	ConnectionSlugHasPrefix    *string  `json:"connectionSlugHasPrefix"`
+	ConnectionSlugHasSuffix    *string  `json:"connectionSlugHasSuffix"`
+	ConnectionSlugEqualFold    *string  `json:"connectionSlugEqualFold"`
+	ConnectionSlugContainsFold *string  `json:"connectionSlugContainsFold"`
+	// slug field predicates
+	Slug             *string  `json:"slug"`
+	SlugNEQ          *string  `json:"slugNEQ"`
+	SlugIn           []string `json:"slugIn"`
+	SlugNotIn        []string `json:"slugNotIn"`
+	SlugGT           *string  `json:"slugGT"`
+	SlugGTE          *string  `json:"slugGTE"`
+	SlugLT           *string  `json:"slugLT"`
+	SlugLTE          *string  `json:"slugLTE"`
+	SlugContains     *string  `json:"slugContains"`
+	SlugHasPrefix    *string  `json:"slugHasPrefix"`
+	SlugHasSuffix    *string  `json:"slugHasSuffix"`
+	SlugEqualFold    *string  `json:"slugEqualFold"`
+	SlugContainsFold *string  `json:"slugContainsFold"`
 	// created_at field predicates
 	CreatedAt      *time.Time  `json:"createdAt"`
 	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
@@ -21441,20 +23572,6 @@ type SourceTypeWhereInput struct {
 	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
 	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
-	// slug field predicates
-	Slug             *string  `json:"slug"`
-	SlugNEQ          *string  `json:"slugNEQ"`
-	SlugIn           []string `json:"slugIn"`
-	SlugNotIn        []string `json:"slugNotIn"`
-	SlugGT           *string  `json:"slugGT"`
-	SlugGTE          *string  `json:"slugGTE"`
-	SlugLT           *string  `json:"slugLT"`
-	SlugLTE          *string  `json:"slugLTE"`
-	SlugContains     *string  `json:"slugContains"`
-	SlugHasPrefix    *string  `json:"slugHasPrefix"`
-	SlugHasSuffix    *string  `json:"slugHasSuffix"`
-	SlugEqualFold    *string  `json:"slugEqualFold"`
-	SlugContainsFold *string  `json:"slugContainsFold"`
 	// name field predicates
 	Name             *string  `json:"name"`
 	NameNEQ          *string  `json:"nameNEQ"`
@@ -21588,6 +23705,135 @@ func (v *SourceTypeWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 // GetIdLTE returns SourceTypeWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *SourceTypeWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
 
+// GetOrganizationSlug returns SourceTypeWhereInput.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetOrganizationSlug() *string { return v.OrganizationSlug }
+
+// GetOrganizationSlugNEQ returns SourceTypeWhereInput.OrganizationSlugNEQ, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetOrganizationSlugNEQ() *string { return v.OrganizationSlugNEQ }
+
+// GetOrganizationSlugIn returns SourceTypeWhereInput.OrganizationSlugIn, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetOrganizationSlugIn() []string { return v.OrganizationSlugIn }
+
+// GetOrganizationSlugNotIn returns SourceTypeWhereInput.OrganizationSlugNotIn, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetOrganizationSlugNotIn() []string { return v.OrganizationSlugNotIn }
+
+// GetOrganizationSlugGT returns SourceTypeWhereInput.OrganizationSlugGT, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetOrganizationSlugGT() *string { return v.OrganizationSlugGT }
+
+// GetOrganizationSlugGTE returns SourceTypeWhereInput.OrganizationSlugGTE, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetOrganizationSlugGTE() *string { return v.OrganizationSlugGTE }
+
+// GetOrganizationSlugLT returns SourceTypeWhereInput.OrganizationSlugLT, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetOrganizationSlugLT() *string { return v.OrganizationSlugLT }
+
+// GetOrganizationSlugLTE returns SourceTypeWhereInput.OrganizationSlugLTE, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetOrganizationSlugLTE() *string { return v.OrganizationSlugLTE }
+
+// GetOrganizationSlugContains returns SourceTypeWhereInput.OrganizationSlugContains, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetOrganizationSlugContains() *string {
+	return v.OrganizationSlugContains
+}
+
+// GetOrganizationSlugHasPrefix returns SourceTypeWhereInput.OrganizationSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetOrganizationSlugHasPrefix() *string {
+	return v.OrganizationSlugHasPrefix
+}
+
+// GetOrganizationSlugHasSuffix returns SourceTypeWhereInput.OrganizationSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetOrganizationSlugHasSuffix() *string {
+	return v.OrganizationSlugHasSuffix
+}
+
+// GetOrganizationSlugEqualFold returns SourceTypeWhereInput.OrganizationSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetOrganizationSlugEqualFold() *string {
+	return v.OrganizationSlugEqualFold
+}
+
+// GetOrganizationSlugContainsFold returns SourceTypeWhereInput.OrganizationSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetOrganizationSlugContainsFold() *string {
+	return v.OrganizationSlugContainsFold
+}
+
+// GetConnectionSlug returns SourceTypeWhereInput.ConnectionSlug, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetConnectionSlug() *string { return v.ConnectionSlug }
+
+// GetConnectionSlugNEQ returns SourceTypeWhereInput.ConnectionSlugNEQ, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetConnectionSlugNEQ() *string { return v.ConnectionSlugNEQ }
+
+// GetConnectionSlugIn returns SourceTypeWhereInput.ConnectionSlugIn, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetConnectionSlugIn() []string { return v.ConnectionSlugIn }
+
+// GetConnectionSlugNotIn returns SourceTypeWhereInput.ConnectionSlugNotIn, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetConnectionSlugNotIn() []string { return v.ConnectionSlugNotIn }
+
+// GetConnectionSlugGT returns SourceTypeWhereInput.ConnectionSlugGT, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetConnectionSlugGT() *string { return v.ConnectionSlugGT }
+
+// GetConnectionSlugGTE returns SourceTypeWhereInput.ConnectionSlugGTE, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetConnectionSlugGTE() *string { return v.ConnectionSlugGTE }
+
+// GetConnectionSlugLT returns SourceTypeWhereInput.ConnectionSlugLT, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetConnectionSlugLT() *string { return v.ConnectionSlugLT }
+
+// GetConnectionSlugLTE returns SourceTypeWhereInput.ConnectionSlugLTE, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetConnectionSlugLTE() *string { return v.ConnectionSlugLTE }
+
+// GetConnectionSlugContains returns SourceTypeWhereInput.ConnectionSlugContains, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetConnectionSlugContains() *string { return v.ConnectionSlugContains }
+
+// GetConnectionSlugHasPrefix returns SourceTypeWhereInput.ConnectionSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetConnectionSlugHasPrefix() *string { return v.ConnectionSlugHasPrefix }
+
+// GetConnectionSlugHasSuffix returns SourceTypeWhereInput.ConnectionSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetConnectionSlugHasSuffix() *string { return v.ConnectionSlugHasSuffix }
+
+// GetConnectionSlugEqualFold returns SourceTypeWhereInput.ConnectionSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetConnectionSlugEqualFold() *string { return v.ConnectionSlugEqualFold }
+
+// GetConnectionSlugContainsFold returns SourceTypeWhereInput.ConnectionSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetConnectionSlugContainsFold() *string {
+	return v.ConnectionSlugContainsFold
+}
+
+// GetSlug returns SourceTypeWhereInput.Slug, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetSlug() *string { return v.Slug }
+
+// GetSlugNEQ returns SourceTypeWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
+
+// GetSlugIn returns SourceTypeWhereInput.SlugIn, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetSlugIn() []string { return v.SlugIn }
+
+// GetSlugNotIn returns SourceTypeWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
+
+// GetSlugGT returns SourceTypeWhereInput.SlugGT, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetSlugGT() *string { return v.SlugGT }
+
+// GetSlugGTE returns SourceTypeWhereInput.SlugGTE, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetSlugGTE() *string { return v.SlugGTE }
+
+// GetSlugLT returns SourceTypeWhereInput.SlugLT, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetSlugLT() *string { return v.SlugLT }
+
+// GetSlugLTE returns SourceTypeWhereInput.SlugLTE, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetSlugLTE() *string { return v.SlugLTE }
+
+// GetSlugContains returns SourceTypeWhereInput.SlugContains, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetSlugContains() *string { return v.SlugContains }
+
+// GetSlugHasPrefix returns SourceTypeWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
+
+// GetSlugHasSuffix returns SourceTypeWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
+
+// GetSlugEqualFold returns SourceTypeWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
+
+// GetSlugContainsFold returns SourceTypeWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
+func (v *SourceTypeWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
+
 // GetCreatedAt returns SourceTypeWhereInput.CreatedAt, and is useful for accessing the field via an interface.
 func (v *SourceTypeWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
 
@@ -21635,45 +23881,6 @@ func (v *SourceTypeWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtL
 
 // GetUpdatedAtLTE returns SourceTypeWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
 func (v *SourceTypeWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
-
-// GetSlug returns SourceTypeWhereInput.Slug, and is useful for accessing the field via an interface.
-func (v *SourceTypeWhereInput) GetSlug() *string { return v.Slug }
-
-// GetSlugNEQ returns SourceTypeWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
-func (v *SourceTypeWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
-
-// GetSlugIn returns SourceTypeWhereInput.SlugIn, and is useful for accessing the field via an interface.
-func (v *SourceTypeWhereInput) GetSlugIn() []string { return v.SlugIn }
-
-// GetSlugNotIn returns SourceTypeWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
-func (v *SourceTypeWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
-
-// GetSlugGT returns SourceTypeWhereInput.SlugGT, and is useful for accessing the field via an interface.
-func (v *SourceTypeWhereInput) GetSlugGT() *string { return v.SlugGT }
-
-// GetSlugGTE returns SourceTypeWhereInput.SlugGTE, and is useful for accessing the field via an interface.
-func (v *SourceTypeWhereInput) GetSlugGTE() *string { return v.SlugGTE }
-
-// GetSlugLT returns SourceTypeWhereInput.SlugLT, and is useful for accessing the field via an interface.
-func (v *SourceTypeWhereInput) GetSlugLT() *string { return v.SlugLT }
-
-// GetSlugLTE returns SourceTypeWhereInput.SlugLTE, and is useful for accessing the field via an interface.
-func (v *SourceTypeWhereInput) GetSlugLTE() *string { return v.SlugLTE }
-
-// GetSlugContains returns SourceTypeWhereInput.SlugContains, and is useful for accessing the field via an interface.
-func (v *SourceTypeWhereInput) GetSlugContains() *string { return v.SlugContains }
-
-// GetSlugHasPrefix returns SourceTypeWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
-func (v *SourceTypeWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
-
-// GetSlugHasSuffix returns SourceTypeWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
-func (v *SourceTypeWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
-
-// GetSlugEqualFold returns SourceTypeWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
-func (v *SourceTypeWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
-
-// GetSlugContainsFold returns SourceTypeWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
-func (v *SourceTypeWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
 
 // GetName returns SourceTypeWhereInput.Name, and is useful for accessing the field via an interface.
 func (v *SourceTypeWhereInput) GetName() *string { return v.Name }
@@ -22597,9 +24804,9 @@ func (v *SpaceOrder) GetField() SpaceOrderField { return v.Field }
 type SpaceOrderField string
 
 const (
-	SpaceOrderFieldName            SpaceOrderField = "NAME"
 	SpaceOrderFieldCreatedAt       SpaceOrderField = "CREATED_AT"
 	SpaceOrderFieldUpdatedAt       SpaceOrderField = "UPDATED_AT"
+	SpaceOrderFieldName            SpaceOrderField = "NAME"
 	SpaceOrderFieldCatalogsCount   SpaceOrderField = "CATALOGS_COUNT"
 	SpaceOrderFieldGeoMapsCount    SpaceOrderField = "GEO_MAPS_COUNT"
 	SpaceOrderFieldFlowsCount      SpaceOrderField = "FLOWS_COUNT"
@@ -22608,9 +24815,9 @@ const (
 )
 
 var AllSpaceOrderField = []SpaceOrderField{
-	SpaceOrderFieldName,
 	SpaceOrderFieldCreatedAt,
 	SpaceOrderFieldUpdatedAt,
+	SpaceOrderFieldName,
 	SpaceOrderFieldCatalogsCount,
 	SpaceOrderFieldGeoMapsCount,
 	SpaceOrderFieldFlowsCount,
@@ -22633,20 +24840,48 @@ type SpaceWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
-	// name field predicates
-	Name             *string  `json:"name"`
-	NameNEQ          *string  `json:"nameNEQ"`
-	NameIn           []string `json:"nameIn"`
-	NameNotIn        []string `json:"nameNotIn"`
-	NameGT           *string  `json:"nameGT"`
-	NameGTE          *string  `json:"nameGTE"`
-	NameLT           *string  `json:"nameLT"`
-	NameLTE          *string  `json:"nameLTE"`
-	NameContains     *string  `json:"nameContains"`
-	NameHasPrefix    *string  `json:"nameHasPrefix"`
-	NameHasSuffix    *string  `json:"nameHasSuffix"`
-	NameEqualFold    *string  `json:"nameEqualFold"`
-	NameContainsFold *string  `json:"nameContainsFold"`
+	// organization_slug field predicates
+	OrganizationSlug             *string  `json:"organizationSlug"`
+	OrganizationSlugNEQ          *string  `json:"organizationSlugNEQ"`
+	OrganizationSlugIn           []string `json:"organizationSlugIn"`
+	OrganizationSlugNotIn        []string `json:"organizationSlugNotIn"`
+	OrganizationSlugGT           *string  `json:"organizationSlugGT"`
+	OrganizationSlugGTE          *string  `json:"organizationSlugGTE"`
+	OrganizationSlugLT           *string  `json:"organizationSlugLT"`
+	OrganizationSlugLTE          *string  `json:"organizationSlugLTE"`
+	OrganizationSlugContains     *string  `json:"organizationSlugContains"`
+	OrganizationSlugHasPrefix    *string  `json:"organizationSlugHasPrefix"`
+	OrganizationSlugHasSuffix    *string  `json:"organizationSlugHasSuffix"`
+	OrganizationSlugEqualFold    *string  `json:"organizationSlugEqualFold"`
+	OrganizationSlugContainsFold *string  `json:"organizationSlugContainsFold"`
+	// slug field predicates
+	Slug             *string  `json:"slug"`
+	SlugNEQ          *string  `json:"slugNEQ"`
+	SlugIn           []string `json:"slugIn"`
+	SlugNotIn        []string `json:"slugNotIn"`
+	SlugGT           *string  `json:"slugGT"`
+	SlugGTE          *string  `json:"slugGTE"`
+	SlugLT           *string  `json:"slugLT"`
+	SlugLTE          *string  `json:"slugLTE"`
+	SlugContains     *string  `json:"slugContains"`
+	SlugHasPrefix    *string  `json:"slugHasPrefix"`
+	SlugHasSuffix    *string  `json:"slugHasSuffix"`
+	SlugEqualFold    *string  `json:"slugEqualFold"`
+	SlugContainsFold *string  `json:"slugContainsFold"`
+	// tz_name field predicates
+	TzName             *string  `json:"tzName"`
+	TzNameNEQ          *string  `json:"tzNameNEQ"`
+	TzNameIn           []string `json:"tzNameIn"`
+	TzNameNotIn        []string `json:"tzNameNotIn"`
+	TzNameGT           *string  `json:"tzNameGT"`
+	TzNameGTE          *string  `json:"tzNameGTE"`
+	TzNameLT           *string  `json:"tzNameLT"`
+	TzNameLTE          *string  `json:"tzNameLTE"`
+	TzNameContains     *string  `json:"tzNameContains"`
+	TzNameHasPrefix    *string  `json:"tzNameHasPrefix"`
+	TzNameHasSuffix    *string  `json:"tzNameHasSuffix"`
+	TzNameEqualFold    *string  `json:"tzNameEqualFold"`
+	TzNameContainsFold *string  `json:"tzNameContainsFold"`
 	// created_at field predicates
 	CreatedAt      *time.Time  `json:"createdAt"`
 	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
@@ -22665,34 +24900,20 @@ type SpaceWhereInput struct {
 	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
 	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
-	// tz_name field predicates
-	TzName             *string  `json:"tzName"`
-	TzNameNEQ          *string  `json:"tzNameNEQ"`
-	TzNameIn           []string `json:"tzNameIn"`
-	TzNameNotIn        []string `json:"tzNameNotIn"`
-	TzNameGT           *string  `json:"tzNameGT"`
-	TzNameGTE          *string  `json:"tzNameGTE"`
-	TzNameLT           *string  `json:"tzNameLT"`
-	TzNameLTE          *string  `json:"tzNameLTE"`
-	TzNameContains     *string  `json:"tzNameContains"`
-	TzNameHasPrefix    *string  `json:"tzNameHasPrefix"`
-	TzNameHasSuffix    *string  `json:"tzNameHasSuffix"`
-	TzNameEqualFold    *string  `json:"tzNameEqualFold"`
-	TzNameContainsFold *string  `json:"tzNameContainsFold"`
-	// slug field predicates
-	Slug             *string  `json:"slug"`
-	SlugNEQ          *string  `json:"slugNEQ"`
-	SlugIn           []string `json:"slugIn"`
-	SlugNotIn        []string `json:"slugNotIn"`
-	SlugGT           *string  `json:"slugGT"`
-	SlugGTE          *string  `json:"slugGTE"`
-	SlugLT           *string  `json:"slugLT"`
-	SlugLTE          *string  `json:"slugLTE"`
-	SlugContains     *string  `json:"slugContains"`
-	SlugHasPrefix    *string  `json:"slugHasPrefix"`
-	SlugHasSuffix    *string  `json:"slugHasSuffix"`
-	SlugEqualFold    *string  `json:"slugEqualFold"`
-	SlugContainsFold *string  `json:"slugContainsFold"`
+	// name field predicates
+	Name             *string  `json:"name"`
+	NameNEQ          *string  `json:"nameNEQ"`
+	NameIn           []string `json:"nameIn"`
+	NameNotIn        []string `json:"nameNotIn"`
+	NameGT           *string  `json:"nameGT"`
+	NameGTE          *string  `json:"nameGTE"`
+	NameLT           *string  `json:"nameLT"`
+	NameLTE          *string  `json:"nameLTE"`
+	NameContains     *string  `json:"nameContains"`
+	NameHasPrefix    *string  `json:"nameHasPrefix"`
+	NameHasSuffix    *string  `json:"nameHasSuffix"`
+	NameEqualFold    *string  `json:"nameEqualFold"`
+	NameContainsFold *string  `json:"nameContainsFold"`
 	// organization_id field predicates
 	OrganizationID      *uuid.UUID  `json:"organizationID"`
 	OrganizationIDNEQ   *uuid.UUID  `json:"organizationIDNEQ"`
@@ -22751,44 +24972,124 @@ func (v *SpaceWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 // GetIdLTE returns SpaceWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *SpaceWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
 
-// GetName returns SpaceWhereInput.Name, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetName() *string { return v.Name }
+// GetOrganizationSlug returns SpaceWhereInput.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetOrganizationSlug() *string { return v.OrganizationSlug }
 
-// GetNameNEQ returns SpaceWhereInput.NameNEQ, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetNameNEQ() *string { return v.NameNEQ }
+// GetOrganizationSlugNEQ returns SpaceWhereInput.OrganizationSlugNEQ, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetOrganizationSlugNEQ() *string { return v.OrganizationSlugNEQ }
 
-// GetNameIn returns SpaceWhereInput.NameIn, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetNameIn() []string { return v.NameIn }
+// GetOrganizationSlugIn returns SpaceWhereInput.OrganizationSlugIn, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetOrganizationSlugIn() []string { return v.OrganizationSlugIn }
 
-// GetNameNotIn returns SpaceWhereInput.NameNotIn, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetNameNotIn() []string { return v.NameNotIn }
+// GetOrganizationSlugNotIn returns SpaceWhereInput.OrganizationSlugNotIn, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetOrganizationSlugNotIn() []string { return v.OrganizationSlugNotIn }
 
-// GetNameGT returns SpaceWhereInput.NameGT, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetNameGT() *string { return v.NameGT }
+// GetOrganizationSlugGT returns SpaceWhereInput.OrganizationSlugGT, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetOrganizationSlugGT() *string { return v.OrganizationSlugGT }
 
-// GetNameGTE returns SpaceWhereInput.NameGTE, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetNameGTE() *string { return v.NameGTE }
+// GetOrganizationSlugGTE returns SpaceWhereInput.OrganizationSlugGTE, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetOrganizationSlugGTE() *string { return v.OrganizationSlugGTE }
 
-// GetNameLT returns SpaceWhereInput.NameLT, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetNameLT() *string { return v.NameLT }
+// GetOrganizationSlugLT returns SpaceWhereInput.OrganizationSlugLT, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetOrganizationSlugLT() *string { return v.OrganizationSlugLT }
 
-// GetNameLTE returns SpaceWhereInput.NameLTE, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetNameLTE() *string { return v.NameLTE }
+// GetOrganizationSlugLTE returns SpaceWhereInput.OrganizationSlugLTE, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetOrganizationSlugLTE() *string { return v.OrganizationSlugLTE }
 
-// GetNameContains returns SpaceWhereInput.NameContains, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetNameContains() *string { return v.NameContains }
+// GetOrganizationSlugContains returns SpaceWhereInput.OrganizationSlugContains, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetOrganizationSlugContains() *string { return v.OrganizationSlugContains }
 
-// GetNameHasPrefix returns SpaceWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
+// GetOrganizationSlugHasPrefix returns SpaceWhereInput.OrganizationSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetOrganizationSlugHasPrefix() *string { return v.OrganizationSlugHasPrefix }
 
-// GetNameHasSuffix returns SpaceWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
+// GetOrganizationSlugHasSuffix returns SpaceWhereInput.OrganizationSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetOrganizationSlugHasSuffix() *string { return v.OrganizationSlugHasSuffix }
 
-// GetNameEqualFold returns SpaceWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
+// GetOrganizationSlugEqualFold returns SpaceWhereInput.OrganizationSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetOrganizationSlugEqualFold() *string { return v.OrganizationSlugEqualFold }
 
-// GetNameContainsFold returns SpaceWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
+// GetOrganizationSlugContainsFold returns SpaceWhereInput.OrganizationSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetOrganizationSlugContainsFold() *string {
+	return v.OrganizationSlugContainsFold
+}
+
+// GetSlug returns SpaceWhereInput.Slug, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetSlug() *string { return v.Slug }
+
+// GetSlugNEQ returns SpaceWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
+
+// GetSlugIn returns SpaceWhereInput.SlugIn, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetSlugIn() []string { return v.SlugIn }
+
+// GetSlugNotIn returns SpaceWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
+
+// GetSlugGT returns SpaceWhereInput.SlugGT, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetSlugGT() *string { return v.SlugGT }
+
+// GetSlugGTE returns SpaceWhereInput.SlugGTE, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetSlugGTE() *string { return v.SlugGTE }
+
+// GetSlugLT returns SpaceWhereInput.SlugLT, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetSlugLT() *string { return v.SlugLT }
+
+// GetSlugLTE returns SpaceWhereInput.SlugLTE, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetSlugLTE() *string { return v.SlugLTE }
+
+// GetSlugContains returns SpaceWhereInput.SlugContains, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetSlugContains() *string { return v.SlugContains }
+
+// GetSlugHasPrefix returns SpaceWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
+
+// GetSlugHasSuffix returns SpaceWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
+
+// GetSlugEqualFold returns SpaceWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
+
+// GetSlugContainsFold returns SpaceWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
+
+// GetTzName returns SpaceWhereInput.TzName, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetTzName() *string { return v.TzName }
+
+// GetTzNameNEQ returns SpaceWhereInput.TzNameNEQ, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetTzNameNEQ() *string { return v.TzNameNEQ }
+
+// GetTzNameIn returns SpaceWhereInput.TzNameIn, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetTzNameIn() []string { return v.TzNameIn }
+
+// GetTzNameNotIn returns SpaceWhereInput.TzNameNotIn, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetTzNameNotIn() []string { return v.TzNameNotIn }
+
+// GetTzNameGT returns SpaceWhereInput.TzNameGT, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetTzNameGT() *string { return v.TzNameGT }
+
+// GetTzNameGTE returns SpaceWhereInput.TzNameGTE, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetTzNameGTE() *string { return v.TzNameGTE }
+
+// GetTzNameLT returns SpaceWhereInput.TzNameLT, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetTzNameLT() *string { return v.TzNameLT }
+
+// GetTzNameLTE returns SpaceWhereInput.TzNameLTE, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetTzNameLTE() *string { return v.TzNameLTE }
+
+// GetTzNameContains returns SpaceWhereInput.TzNameContains, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetTzNameContains() *string { return v.TzNameContains }
+
+// GetTzNameHasPrefix returns SpaceWhereInput.TzNameHasPrefix, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetTzNameHasPrefix() *string { return v.TzNameHasPrefix }
+
+// GetTzNameHasSuffix returns SpaceWhereInput.TzNameHasSuffix, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetTzNameHasSuffix() *string { return v.TzNameHasSuffix }
+
+// GetTzNameEqualFold returns SpaceWhereInput.TzNameEqualFold, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetTzNameEqualFold() *string { return v.TzNameEqualFold }
+
+// GetTzNameContainsFold returns SpaceWhereInput.TzNameContainsFold, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetTzNameContainsFold() *string { return v.TzNameContainsFold }
 
 // GetCreatedAt returns SpaceWhereInput.CreatedAt, and is useful for accessing the field via an interface.
 func (v *SpaceWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
@@ -22838,83 +25139,44 @@ func (v *SpaceWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
 // GetUpdatedAtLTE returns SpaceWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
 func (v *SpaceWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
 
-// GetTzName returns SpaceWhereInput.TzName, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetTzName() *string { return v.TzName }
+// GetName returns SpaceWhereInput.Name, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetName() *string { return v.Name }
 
-// GetTzNameNEQ returns SpaceWhereInput.TzNameNEQ, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetTzNameNEQ() *string { return v.TzNameNEQ }
+// GetNameNEQ returns SpaceWhereInput.NameNEQ, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetNameNEQ() *string { return v.NameNEQ }
 
-// GetTzNameIn returns SpaceWhereInput.TzNameIn, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetTzNameIn() []string { return v.TzNameIn }
+// GetNameIn returns SpaceWhereInput.NameIn, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetNameIn() []string { return v.NameIn }
 
-// GetTzNameNotIn returns SpaceWhereInput.TzNameNotIn, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetTzNameNotIn() []string { return v.TzNameNotIn }
+// GetNameNotIn returns SpaceWhereInput.NameNotIn, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetNameNotIn() []string { return v.NameNotIn }
 
-// GetTzNameGT returns SpaceWhereInput.TzNameGT, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetTzNameGT() *string { return v.TzNameGT }
+// GetNameGT returns SpaceWhereInput.NameGT, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetNameGT() *string { return v.NameGT }
 
-// GetTzNameGTE returns SpaceWhereInput.TzNameGTE, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetTzNameGTE() *string { return v.TzNameGTE }
+// GetNameGTE returns SpaceWhereInput.NameGTE, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetNameGTE() *string { return v.NameGTE }
 
-// GetTzNameLT returns SpaceWhereInput.TzNameLT, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetTzNameLT() *string { return v.TzNameLT }
+// GetNameLT returns SpaceWhereInput.NameLT, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetNameLT() *string { return v.NameLT }
 
-// GetTzNameLTE returns SpaceWhereInput.TzNameLTE, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetTzNameLTE() *string { return v.TzNameLTE }
+// GetNameLTE returns SpaceWhereInput.NameLTE, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetNameLTE() *string { return v.NameLTE }
 
-// GetTzNameContains returns SpaceWhereInput.TzNameContains, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetTzNameContains() *string { return v.TzNameContains }
+// GetNameContains returns SpaceWhereInput.NameContains, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetNameContains() *string { return v.NameContains }
 
-// GetTzNameHasPrefix returns SpaceWhereInput.TzNameHasPrefix, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetTzNameHasPrefix() *string { return v.TzNameHasPrefix }
+// GetNameHasPrefix returns SpaceWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
 
-// GetTzNameHasSuffix returns SpaceWhereInput.TzNameHasSuffix, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetTzNameHasSuffix() *string { return v.TzNameHasSuffix }
+// GetNameHasSuffix returns SpaceWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
 
-// GetTzNameEqualFold returns SpaceWhereInput.TzNameEqualFold, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetTzNameEqualFold() *string { return v.TzNameEqualFold }
+// GetNameEqualFold returns SpaceWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
 
-// GetTzNameContainsFold returns SpaceWhereInput.TzNameContainsFold, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetTzNameContainsFold() *string { return v.TzNameContainsFold }
-
-// GetSlug returns SpaceWhereInput.Slug, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetSlug() *string { return v.Slug }
-
-// GetSlugNEQ returns SpaceWhereInput.SlugNEQ, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetSlugNEQ() *string { return v.SlugNEQ }
-
-// GetSlugIn returns SpaceWhereInput.SlugIn, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetSlugIn() []string { return v.SlugIn }
-
-// GetSlugNotIn returns SpaceWhereInput.SlugNotIn, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetSlugNotIn() []string { return v.SlugNotIn }
-
-// GetSlugGT returns SpaceWhereInput.SlugGT, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetSlugGT() *string { return v.SlugGT }
-
-// GetSlugGTE returns SpaceWhereInput.SlugGTE, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetSlugGTE() *string { return v.SlugGTE }
-
-// GetSlugLT returns SpaceWhereInput.SlugLT, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetSlugLT() *string { return v.SlugLT }
-
-// GetSlugLTE returns SpaceWhereInput.SlugLTE, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetSlugLTE() *string { return v.SlugLTE }
-
-// GetSlugContains returns SpaceWhereInput.SlugContains, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetSlugContains() *string { return v.SlugContains }
-
-// GetSlugHasPrefix returns SpaceWhereInput.SlugHasPrefix, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetSlugHasPrefix() *string { return v.SlugHasPrefix }
-
-// GetSlugHasSuffix returns SpaceWhereInput.SlugHasSuffix, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetSlugHasSuffix() *string { return v.SlugHasSuffix }
-
-// GetSlugEqualFold returns SpaceWhereInput.SlugEqualFold, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetSlugEqualFold() *string { return v.SlugEqualFold }
-
-// GetSlugContainsFold returns SpaceWhereInput.SlugContainsFold, and is useful for accessing the field via an interface.
-func (v *SpaceWhereInput) GetSlugContainsFold() *string { return v.SlugContainsFold }
+// GetNameContainsFold returns SpaceWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
+func (v *SpaceWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
 
 // GetOrganizationID returns SpaceWhereInput.OrganizationID, and is useful for accessing the field via an interface.
 func (v *SpaceWhereInput) GetOrganizationID() *uuid.UUID { return v.OrganizationID }
@@ -23599,328 +25861,6 @@ func (v *SyncModelSyncModelModelUpdatedModel) __premarshalJSON() (*__premarshalS
 	retval.CatalogID = v.ModelFragment.CatalogID
 	retval.CreatedAt = v.ModelFragment.CreatedAt
 	retval.UpdatedAt = v.ModelFragment.UpdatedAt
-	return &retval, nil
-}
-
-// SyncPackageInput is used to signal that an integration has changed and should be
-// updated by calling the GetPackage RPC method.
-type SyncPackageInput struct {
-	IntegrationID uuid.UUID `json:"integrationID"`
-	Checksum      string    `json:"checksum"`
-	Publish       *bool     `json:"publish"`
-}
-
-// GetIntegrationID returns SyncPackageInput.IntegrationID, and is useful for accessing the field via an interface.
-func (v *SyncPackageInput) GetIntegrationID() uuid.UUID { return v.IntegrationID }
-
-// GetChecksum returns SyncPackageInput.Checksum, and is useful for accessing the field via an interface.
-func (v *SyncPackageInput) GetChecksum() string { return v.Checksum }
-
-// GetPublish returns SyncPackageInput.Publish, and is useful for accessing the field via an interface.
-func (v *SyncPackageInput) GetPublish() *bool { return v.Publish }
-
-// SyncPackageResponse is returned by SyncPackage on success.
-type SyncPackageResponse struct {
-	SyncPackage *SyncPackageSyncPackageIntegrationPackageUpdated `json:"syncPackage"`
-}
-
-// GetSyncPackage returns SyncPackageResponse.SyncPackage, and is useful for accessing the field via an interface.
-func (v *SyncPackageResponse) GetSyncPackage() *SyncPackageSyncPackageIntegrationPackageUpdated {
-	return v.SyncPackage
-}
-
-// SyncPackageSyncPackageIntegrationPackageUpdated includes the requested fields of the GraphQL type IntegrationPackageUpdated.
-type SyncPackageSyncPackageIntegrationPackageUpdated struct {
-	IntegrationPackage *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage `json:"integrationPackage"`
-}
-
-// GetIntegrationPackage returns SyncPackageSyncPackageIntegrationPackageUpdated.IntegrationPackage, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdated) GetIntegrationPackage() *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage {
-	return v.IntegrationPackage
-}
-
-// SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage includes the requested fields of the GraphQL type IntegrationPackage.
-type SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage struct {
-	IntegrationPackageFragment `json:"-"`
-	Integration                *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration `json:"integration"`
-}
-
-// GetIntegration returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage.Integration, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage) GetIntegration() *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration {
-	return v.Integration
-}
-
-// GetId returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage.Id, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage) GetId() uuid.UUID {
-	return v.IntegrationPackageFragment.Id
-}
-
-// GetChecksum returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage.Checksum, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage) GetChecksum() string {
-	return v.IntegrationPackageFragment.Checksum
-}
-
-// GetSpec returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage.Spec, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage) GetSpec() []byte {
-	return v.IntegrationPackageFragment.Spec
-}
-
-// GetConfigSchema returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage.ConfigSchema, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage) GetConfigSchema() string {
-	return v.IntegrationPackageFragment.ConfigSchema
-}
-
-// GetServiceNames returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage.ServiceNames, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage) GetServiceNames() []string {
-	return v.IntegrationPackageFragment.ServiceNames
-}
-
-// GetIntegrationID returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage.IntegrationID, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage) GetIntegrationID() uuid.UUID {
-	return v.IntegrationPackageFragment.IntegrationID
-}
-
-// GetAuthorID returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage.AuthorID, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage) GetAuthorID() uuid.UUID {
-	return v.IntegrationPackageFragment.AuthorID
-}
-
-// GetCreatedAt returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage.CreatedAt, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage) GetCreatedAt() time.Time {
-	return v.IntegrationPackageFragment.CreatedAt
-}
-
-// GetUpdatedAt returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage.UpdatedAt, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage) GetUpdatedAt() time.Time {
-	return v.IntegrationPackageFragment.UpdatedAt
-}
-
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage) UnmarshalJSON(b []byte) error {
-
-	if string(b) == "null" {
-		return nil
-	}
-
-	var firstPass struct {
-		*SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage
-		graphql.NoUnmarshalJSON
-	}
-	firstPass.SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage = v
-
-	err := json.Unmarshal(b, &firstPass)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(
-		b, &v.IntegrationPackageFragment)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-type __premarshalSyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage struct {
-	Integration *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration `json:"integration"`
-
-	Id uuid.UUID `json:"id"`
-
-	Checksum string `json:"checksum"`
-
-	Spec []byte `json:"spec"`
-
-	ConfigSchema string `json:"configSchema"`
-
-	ServiceNames []string `json:"serviceNames"`
-
-	IntegrationID uuid.UUID `json:"integrationID"`
-
-	AuthorID uuid.UUID `json:"authorID"`
-
-	CreatedAt time.Time `json:"createdAt"`
-
-	UpdatedAt time.Time `json:"updatedAt"`
-}
-
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage) MarshalJSON() ([]byte, error) {
-	premarshaled, err := v.__premarshalJSON()
-	if err != nil {
-		return nil, err
-	}
-	return json.Marshal(premarshaled)
-}
-
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage) __premarshalJSON() (*__premarshalSyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage, error) {
-	var retval __premarshalSyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackage
-
-	retval.Integration = v.Integration
-	retval.Id = v.IntegrationPackageFragment.Id
-	retval.Checksum = v.IntegrationPackageFragment.Checksum
-	retval.Spec = v.IntegrationPackageFragment.Spec
-	retval.ConfigSchema = v.IntegrationPackageFragment.ConfigSchema
-	retval.ServiceNames = v.IntegrationPackageFragment.ServiceNames
-	retval.IntegrationID = v.IntegrationPackageFragment.IntegrationID
-	retval.AuthorID = v.IntegrationPackageFragment.AuthorID
-	retval.CreatedAt = v.IntegrationPackageFragment.CreatedAt
-	retval.UpdatedAt = v.IntegrationPackageFragment.UpdatedAt
-	return &retval, nil
-}
-
-// SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration includes the requested fields of the GraphQL type Integration.
-type SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration struct {
-	IntegrationFragment `json:"-"`
-}
-
-// GetId returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration.Id, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) GetId() uuid.UUID {
-	return v.IntegrationFragment.Id
-}
-
-// GetSlug returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration.Slug, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) GetSlug() string {
-	return v.IntegrationFragment.Slug
-}
-
-// GetName returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration.Name, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) GetName() string {
-	return v.IntegrationFragment.Name
-}
-
-// GetApiVersion returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration.ApiVersion, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) GetApiVersion() string {
-	return v.IntegrationFragment.ApiVersion
-}
-
-// GetVersion returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration.Version, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) GetVersion() string {
-	return v.IntegrationFragment.Version
-}
-
-// GetDescription returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration.Description, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) GetDescription() string {
-	return v.IntegrationFragment.Description
-}
-
-// GetIcon returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration.Icon, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) GetIcon() string {
-	return v.IntegrationFragment.Icon
-}
-
-// GetServiceNames returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration.ServiceNames, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) GetServiceNames() []string {
-	return v.IntegrationFragment.ServiceNames
-}
-
-// GetConfigSchema returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration.ConfigSchema, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) GetConfigSchema() *string {
-	return v.IntegrationFragment.ConfigSchema
-}
-
-// GetServerConfig returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration.ServerConfig, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) GetServerConfig() *string {
-	return v.IntegrationFragment.ServerConfig
-}
-
-// GetPublished returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration.Published, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) GetPublished() *IntegrationFragmentPublishedIntegrationPackage {
-	return v.IntegrationFragment.Published
-}
-
-// GetOrganizationID returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration.OrganizationID, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) GetOrganizationID() uuid.UUID {
-	return v.IntegrationFragment.OrganizationID
-}
-
-// GetCreatedAt returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration.CreatedAt, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) GetCreatedAt() time.Time {
-	return v.IntegrationFragment.CreatedAt
-}
-
-// GetUpdatedAt returns SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration.UpdatedAt, and is useful for accessing the field via an interface.
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) GetUpdatedAt() time.Time {
-	return v.IntegrationFragment.UpdatedAt
-}
-
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) UnmarshalJSON(b []byte) error {
-
-	if string(b) == "null" {
-		return nil
-	}
-
-	var firstPass struct {
-		*SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration
-		graphql.NoUnmarshalJSON
-	}
-	firstPass.SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration = v
-
-	err := json.Unmarshal(b, &firstPass)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(
-		b, &v.IntegrationFragment)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-type __premarshalSyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration struct {
-	Id uuid.UUID `json:"id"`
-
-	Slug string `json:"slug"`
-
-	Name string `json:"name"`
-
-	ApiVersion string `json:"apiVersion"`
-
-	Version string `json:"version"`
-
-	Description string `json:"description"`
-
-	Icon string `json:"icon"`
-
-	ServiceNames []string `json:"serviceNames"`
-
-	ConfigSchema *string `json:"configSchema"`
-
-	ServerConfig *string `json:"serverConfig"`
-
-	Published *IntegrationFragmentPublishedIntegrationPackage `json:"published"`
-
-	OrganizationID uuid.UUID `json:"organizationID"`
-
-	CreatedAt time.Time `json:"createdAt"`
-
-	UpdatedAt time.Time `json:"updatedAt"`
-}
-
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) MarshalJSON() ([]byte, error) {
-	premarshaled, err := v.__premarshalJSON()
-	if err != nil {
-		return nil, err
-	}
-	return json.Marshal(premarshaled)
-}
-
-func (v *SyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration) __premarshalJSON() (*__premarshalSyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration, error) {
-	var retval __premarshalSyncPackageSyncPackageIntegrationPackageUpdatedIntegrationPackageIntegration
-
-	retval.Id = v.IntegrationFragment.Id
-	retval.Slug = v.IntegrationFragment.Slug
-	retval.Name = v.IntegrationFragment.Name
-	retval.ApiVersion = v.IntegrationFragment.ApiVersion
-	retval.Version = v.IntegrationFragment.Version
-	retval.Description = v.IntegrationFragment.Description
-	retval.Icon = v.IntegrationFragment.Icon
-	retval.ServiceNames = v.IntegrationFragment.ServiceNames
-	retval.ConfigSchema = v.IntegrationFragment.ConfigSchema
-	retval.ServerConfig = v.IntegrationFragment.ServerConfig
-	retval.Published = v.IntegrationFragment.Published
-	retval.OrganizationID = v.IntegrationFragment.OrganizationID
-	retval.CreatedAt = v.IntegrationFragment.CreatedAt
-	retval.UpdatedAt = v.IntegrationFragment.UpdatedAt
 	return &retval, nil
 }
 
@@ -24637,20 +26577,20 @@ func (v *TableRefOrder) GetField() TableRefOrderField { return v.Field }
 type TableRefOrderField string
 
 const (
-	TableRefOrderFieldName         TableRefOrderField = "NAME"
+	TableRefOrderFieldAlias        TableRefOrderField = "ALIAS"
 	TableRefOrderFieldCreatedAt    TableRefOrderField = "CREATED_AT"
 	TableRefOrderFieldUpdatedAt    TableRefOrderField = "UPDATED_AT"
-	TableRefOrderFieldAlias        TableRefOrderField = "ALIAS"
+	TableRefOrderFieldName         TableRefOrderField = "NAME"
 	TableRefOrderFieldTotalRows    TableRefOrderField = "TOTAL_ROWS"
 	TableRefOrderFieldTotalBytes   TableRefOrderField = "TOTAL_BYTES"
 	TableRefOrderFieldColumnsCount TableRefOrderField = "COLUMNS_COUNT"
 )
 
 var AllTableRefOrderField = []TableRefOrderField{
-	TableRefOrderFieldName,
+	TableRefOrderFieldAlias,
 	TableRefOrderFieldCreatedAt,
 	TableRefOrderFieldUpdatedAt,
-	TableRefOrderFieldAlias,
+	TableRefOrderFieldName,
 	TableRefOrderFieldTotalRows,
 	TableRefOrderFieldTotalBytes,
 	TableRefOrderFieldColumnsCount,
@@ -24671,38 +26611,6 @@ type TableRefWhereInput struct {
 	IdGTE   *uuid.UUID  `json:"idGTE"`
 	IdLT    *uuid.UUID  `json:"idLT"`
 	IdLTE   *uuid.UUID  `json:"idLTE"`
-	// name field predicates
-	Name             *string  `json:"name"`
-	NameNEQ          *string  `json:"nameNEQ"`
-	NameIn           []string `json:"nameIn"`
-	NameNotIn        []string `json:"nameNotIn"`
-	NameGT           *string  `json:"nameGT"`
-	NameGTE          *string  `json:"nameGTE"`
-	NameLT           *string  `json:"nameLT"`
-	NameLTE          *string  `json:"nameLTE"`
-	NameContains     *string  `json:"nameContains"`
-	NameHasPrefix    *string  `json:"nameHasPrefix"`
-	NameHasSuffix    *string  `json:"nameHasSuffix"`
-	NameEqualFold    *string  `json:"nameEqualFold"`
-	NameContainsFold *string  `json:"nameContainsFold"`
-	// created_at field predicates
-	CreatedAt      *time.Time  `json:"createdAt"`
-	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
-	CreatedAtIn    []time.Time `json:"createdAtIn"`
-	CreatedAtNotIn []time.Time `json:"createdAtNotIn"`
-	CreatedAtGT    *time.Time  `json:"createdAtGT"`
-	CreatedAtGTE   *time.Time  `json:"createdAtGTE"`
-	CreatedAtLT    *time.Time  `json:"createdAtLT"`
-	CreatedAtLTE   *time.Time  `json:"createdAtLTE"`
-	// updated_at field predicates
-	UpdatedAt      *time.Time  `json:"updatedAt"`
-	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ"`
-	UpdatedAtIn    []time.Time `json:"updatedAtIn"`
-	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn"`
-	UpdatedAtGT    *time.Time  `json:"updatedAtGT"`
-	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
-	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
-	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
 	// alias field predicates
 	Alias             *string  `json:"alias"`
 	AliasNEQ          *string  `json:"aliasNEQ"`
@@ -24752,6 +26660,24 @@ type TableRefWhereInput struct {
 	SyncedAtLTE    *time.Time  `json:"syncedAtLTE"`
 	SyncedAtIsNil  *bool       `json:"syncedAtIsNil"`
 	SyncedAtNotNil *bool       `json:"syncedAtNotNil"`
+	// created_at field predicates
+	CreatedAt      *time.Time  `json:"createdAt"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
+	CreatedAtIn    []time.Time `json:"createdAtIn"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE"`
+	// updated_at field predicates
+	UpdatedAt      *time.Time  `json:"updatedAt"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
 	// deleted_at field predicates
 	DeletedAt       *time.Time  `json:"deletedAt"`
 	DeletedAtNEQ    *time.Time  `json:"deletedAtNEQ"`
@@ -24763,6 +26689,20 @@ type TableRefWhereInput struct {
 	DeletedAtLTE    *time.Time  `json:"deletedAtLTE"`
 	DeletedAtIsNil  *bool       `json:"deletedAtIsNil"`
 	DeletedAtNotNil *bool       `json:"deletedAtNotNil"`
+	// name field predicates
+	Name             *string  `json:"name"`
+	NameNEQ          *string  `json:"nameNEQ"`
+	NameIn           []string `json:"nameIn"`
+	NameNotIn        []string `json:"nameNotIn"`
+	NameGT           *string  `json:"nameGT"`
+	NameGTE          *string  `json:"nameGTE"`
+	NameLT           *string  `json:"nameLT"`
+	NameLTE          *string  `json:"nameLTE"`
+	NameContains     *string  `json:"nameContains"`
+	NameHasPrefix    *string  `json:"nameHasPrefix"`
+	NameHasSuffix    *string  `json:"nameHasSuffix"`
+	NameEqualFold    *string  `json:"nameEqualFold"`
+	NameContainsFold *string  `json:"nameContainsFold"`
 	// description field predicates
 	Description             *string  `json:"description"`
 	DescriptionNEQ          *string  `json:"descriptionNEQ"`
@@ -24865,93 +26805,6 @@ func (v *TableRefWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
 
 // GetIdLTE returns TableRefWhereInput.IdLTE, and is useful for accessing the field via an interface.
 func (v *TableRefWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
-
-// GetName returns TableRefWhereInput.Name, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetName() *string { return v.Name }
-
-// GetNameNEQ returns TableRefWhereInput.NameNEQ, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetNameNEQ() *string { return v.NameNEQ }
-
-// GetNameIn returns TableRefWhereInput.NameIn, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetNameIn() []string { return v.NameIn }
-
-// GetNameNotIn returns TableRefWhereInput.NameNotIn, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetNameNotIn() []string { return v.NameNotIn }
-
-// GetNameGT returns TableRefWhereInput.NameGT, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetNameGT() *string { return v.NameGT }
-
-// GetNameGTE returns TableRefWhereInput.NameGTE, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetNameGTE() *string { return v.NameGTE }
-
-// GetNameLT returns TableRefWhereInput.NameLT, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetNameLT() *string { return v.NameLT }
-
-// GetNameLTE returns TableRefWhereInput.NameLTE, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetNameLTE() *string { return v.NameLTE }
-
-// GetNameContains returns TableRefWhereInput.NameContains, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetNameContains() *string { return v.NameContains }
-
-// GetNameHasPrefix returns TableRefWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
-
-// GetNameHasSuffix returns TableRefWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
-
-// GetNameEqualFold returns TableRefWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
-
-// GetNameContainsFold returns TableRefWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
-
-// GetCreatedAt returns TableRefWhereInput.CreatedAt, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
-
-// GetCreatedAtNEQ returns TableRefWhereInput.CreatedAtNEQ, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetCreatedAtNEQ() *time.Time { return v.CreatedAtNEQ }
-
-// GetCreatedAtIn returns TableRefWhereInput.CreatedAtIn, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetCreatedAtIn() []time.Time { return v.CreatedAtIn }
-
-// GetCreatedAtNotIn returns TableRefWhereInput.CreatedAtNotIn, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetCreatedAtNotIn() []time.Time { return v.CreatedAtNotIn }
-
-// GetCreatedAtGT returns TableRefWhereInput.CreatedAtGT, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetCreatedAtGT() *time.Time { return v.CreatedAtGT }
-
-// GetCreatedAtGTE returns TableRefWhereInput.CreatedAtGTE, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetCreatedAtGTE() *time.Time { return v.CreatedAtGTE }
-
-// GetCreatedAtLT returns TableRefWhereInput.CreatedAtLT, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetCreatedAtLT() *time.Time { return v.CreatedAtLT }
-
-// GetCreatedAtLTE returns TableRefWhereInput.CreatedAtLTE, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetCreatedAtLTE() *time.Time { return v.CreatedAtLTE }
-
-// GetUpdatedAt returns TableRefWhereInput.UpdatedAt, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetUpdatedAt() *time.Time { return v.UpdatedAt }
-
-// GetUpdatedAtNEQ returns TableRefWhereInput.UpdatedAtNEQ, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetUpdatedAtNEQ() *time.Time { return v.UpdatedAtNEQ }
-
-// GetUpdatedAtIn returns TableRefWhereInput.UpdatedAtIn, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetUpdatedAtIn() []time.Time { return v.UpdatedAtIn }
-
-// GetUpdatedAtNotIn returns TableRefWhereInput.UpdatedAtNotIn, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetUpdatedAtNotIn() []time.Time { return v.UpdatedAtNotIn }
-
-// GetUpdatedAtGT returns TableRefWhereInput.UpdatedAtGT, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetUpdatedAtGT() *time.Time { return v.UpdatedAtGT }
-
-// GetUpdatedAtGTE returns TableRefWhereInput.UpdatedAtGTE, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetUpdatedAtGTE() *time.Time { return v.UpdatedAtGTE }
-
-// GetUpdatedAtLT returns TableRefWhereInput.UpdatedAtLT, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
-
-// GetUpdatedAtLTE returns TableRefWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
-func (v *TableRefWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
 
 // GetAlias returns TableRefWhereInput.Alias, and is useful for accessing the field via an interface.
 func (v *TableRefWhereInput) GetAlias() *string { return v.Alias }
@@ -25085,6 +26938,54 @@ func (v *TableRefWhereInput) GetSyncedAtIsNil() *bool { return v.SyncedAtIsNil }
 // GetSyncedAtNotNil returns TableRefWhereInput.SyncedAtNotNil, and is useful for accessing the field via an interface.
 func (v *TableRefWhereInput) GetSyncedAtNotNil() *bool { return v.SyncedAtNotNil }
 
+// GetCreatedAt returns TableRefWhereInput.CreatedAt, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
+
+// GetCreatedAtNEQ returns TableRefWhereInput.CreatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetCreatedAtNEQ() *time.Time { return v.CreatedAtNEQ }
+
+// GetCreatedAtIn returns TableRefWhereInput.CreatedAtIn, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetCreatedAtIn() []time.Time { return v.CreatedAtIn }
+
+// GetCreatedAtNotIn returns TableRefWhereInput.CreatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetCreatedAtNotIn() []time.Time { return v.CreatedAtNotIn }
+
+// GetCreatedAtGT returns TableRefWhereInput.CreatedAtGT, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetCreatedAtGT() *time.Time { return v.CreatedAtGT }
+
+// GetCreatedAtGTE returns TableRefWhereInput.CreatedAtGTE, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetCreatedAtGTE() *time.Time { return v.CreatedAtGTE }
+
+// GetCreatedAtLT returns TableRefWhereInput.CreatedAtLT, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetCreatedAtLT() *time.Time { return v.CreatedAtLT }
+
+// GetCreatedAtLTE returns TableRefWhereInput.CreatedAtLTE, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetCreatedAtLTE() *time.Time { return v.CreatedAtLTE }
+
+// GetUpdatedAt returns TableRefWhereInput.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetUpdatedAt() *time.Time { return v.UpdatedAt }
+
+// GetUpdatedAtNEQ returns TableRefWhereInput.UpdatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetUpdatedAtNEQ() *time.Time { return v.UpdatedAtNEQ }
+
+// GetUpdatedAtIn returns TableRefWhereInput.UpdatedAtIn, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetUpdatedAtIn() []time.Time { return v.UpdatedAtIn }
+
+// GetUpdatedAtNotIn returns TableRefWhereInput.UpdatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetUpdatedAtNotIn() []time.Time { return v.UpdatedAtNotIn }
+
+// GetUpdatedAtGT returns TableRefWhereInput.UpdatedAtGT, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetUpdatedAtGT() *time.Time { return v.UpdatedAtGT }
+
+// GetUpdatedAtGTE returns TableRefWhereInput.UpdatedAtGTE, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetUpdatedAtGTE() *time.Time { return v.UpdatedAtGTE }
+
+// GetUpdatedAtLT returns TableRefWhereInput.UpdatedAtLT, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
+
+// GetUpdatedAtLTE returns TableRefWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
+
 // GetDeletedAt returns TableRefWhereInput.DeletedAt, and is useful for accessing the field via an interface.
 func (v *TableRefWhereInput) GetDeletedAt() *time.Time { return v.DeletedAt }
 
@@ -25114,6 +27015,45 @@ func (v *TableRefWhereInput) GetDeletedAtIsNil() *bool { return v.DeletedAtIsNil
 
 // GetDeletedAtNotNil returns TableRefWhereInput.DeletedAtNotNil, and is useful for accessing the field via an interface.
 func (v *TableRefWhereInput) GetDeletedAtNotNil() *bool { return v.DeletedAtNotNil }
+
+// GetName returns TableRefWhereInput.Name, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetName() *string { return v.Name }
+
+// GetNameNEQ returns TableRefWhereInput.NameNEQ, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetNameNEQ() *string { return v.NameNEQ }
+
+// GetNameIn returns TableRefWhereInput.NameIn, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetNameIn() []string { return v.NameIn }
+
+// GetNameNotIn returns TableRefWhereInput.NameNotIn, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetNameNotIn() []string { return v.NameNotIn }
+
+// GetNameGT returns TableRefWhereInput.NameGT, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetNameGT() *string { return v.NameGT }
+
+// GetNameGTE returns TableRefWhereInput.NameGTE, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetNameGTE() *string { return v.NameGTE }
+
+// GetNameLT returns TableRefWhereInput.NameLT, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetNameLT() *string { return v.NameLT }
+
+// GetNameLTE returns TableRefWhereInput.NameLTE, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetNameLTE() *string { return v.NameLTE }
+
+// GetNameContains returns TableRefWhereInput.NameContains, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetNameContains() *string { return v.NameContains }
+
+// GetNameHasPrefix returns TableRefWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
+
+// GetNameHasSuffix returns TableRefWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
+
+// GetNameEqualFold returns TableRefWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
+
+// GetNameContainsFold returns TableRefWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
+func (v *TableRefWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
 
 // GetDescription returns TableRefWhereInput.Description, and is useful for accessing the field via an interface.
 func (v *TableRefWhereInput) GetDescription() *string { return v.Description }
@@ -25469,6 +27409,628 @@ func (v *TablesDeletedTablesDeletedTableRef) __premarshalJSON() (*__premarshalTa
 	return &retval, nil
 }
 
+// TypeSchemaWhereInput is used for filtering TypeSchema objects.
+// Input was generated by ent.
+type TypeSchemaWhereInput struct {
+	Not *TypeSchemaWhereInput   `json:"not,omitempty"`
+	And []*TypeSchemaWhereInput `json:"and,omitempty"`
+	Or  []*TypeSchemaWhereInput `json:"or,omitempty"`
+	// id field predicates
+	Id      *uuid.UUID  `json:"id"`
+	IdNEQ   *uuid.UUID  `json:"idNEQ"`
+	IdIn    []uuid.UUID `json:"idIn"`
+	IdNotIn []uuid.UUID `json:"idNotIn"`
+	IdGT    *uuid.UUID  `json:"idGT"`
+	IdGTE   *uuid.UUID  `json:"idGTE"`
+	IdLT    *uuid.UUID  `json:"idLT"`
+	IdLTE   *uuid.UUID  `json:"idLTE"`
+	// created_at field predicates
+	CreatedAt      *time.Time  `json:"createdAt"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ"`
+	CreatedAtIn    []time.Time `json:"createdAtIn"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE"`
+	// updated_at field predicates
+	UpdatedAt      *time.Time  `json:"updatedAt"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE"`
+	// name field predicates
+	Name             *string  `json:"name"`
+	NameNEQ          *string  `json:"nameNEQ"`
+	NameIn           []string `json:"nameIn"`
+	NameNotIn        []string `json:"nameNotIn"`
+	NameGT           *string  `json:"nameGT"`
+	NameGTE          *string  `json:"nameGTE"`
+	NameLT           *string  `json:"nameLT"`
+	NameLTE          *string  `json:"nameLTE"`
+	NameContains     *string  `json:"nameContains"`
+	NameHasPrefix    *string  `json:"nameHasPrefix"`
+	NameHasSuffix    *string  `json:"nameHasSuffix"`
+	NameEqualFold    *string  `json:"nameEqualFold"`
+	NameContainsFold *string  `json:"nameContainsFold"`
+	// proto_name field predicates
+	ProtoName             *string  `json:"protoName"`
+	ProtoNameNEQ          *string  `json:"protoNameNEQ"`
+	ProtoNameIn           []string `json:"protoNameIn"`
+	ProtoNameNotIn        []string `json:"protoNameNotIn"`
+	ProtoNameGT           *string  `json:"protoNameGT"`
+	ProtoNameGTE          *string  `json:"protoNameGTE"`
+	ProtoNameLT           *string  `json:"protoNameLT"`
+	ProtoNameLTE          *string  `json:"protoNameLTE"`
+	ProtoNameContains     *string  `json:"protoNameContains"`
+	ProtoNameHasPrefix    *string  `json:"protoNameHasPrefix"`
+	ProtoNameHasSuffix    *string  `json:"protoNameHasSuffix"`
+	ProtoNameEqualFold    *string  `json:"protoNameEqualFold"`
+	ProtoNameContainsFold *string  `json:"protoNameContainsFold"`
+	// mod_time field predicates
+	ModTime      *time.Time  `json:"modTime"`
+	ModTimeNEQ   *time.Time  `json:"modTimeNEQ"`
+	ModTimeIn    []time.Time `json:"modTimeIn"`
+	ModTimeNotIn []time.Time `json:"modTimeNotIn"`
+	ModTimeGT    *time.Time  `json:"modTimeGT"`
+	ModTimeGTE   *time.Time  `json:"modTimeGTE"`
+	ModTimeLT    *time.Time  `json:"modTimeLT"`
+	ModTimeLTE   *time.Time  `json:"modTimeLTE"`
+	// system_type field predicates
+	SystemType    *bool `json:"systemType"`
+	SystemTypeNEQ *bool `json:"systemTypeNEQ"`
+	// connection_slug field predicates
+	ConnectionSlug             *string  `json:"connectionSlug"`
+	ConnectionSlugNEQ          *string  `json:"connectionSlugNEQ"`
+	ConnectionSlugIn           []string `json:"connectionSlugIn"`
+	ConnectionSlugNotIn        []string `json:"connectionSlugNotIn"`
+	ConnectionSlugGT           *string  `json:"connectionSlugGT"`
+	ConnectionSlugGTE          *string  `json:"connectionSlugGTE"`
+	ConnectionSlugLT           *string  `json:"connectionSlugLT"`
+	ConnectionSlugLTE          *string  `json:"connectionSlugLTE"`
+	ConnectionSlugContains     *string  `json:"connectionSlugContains"`
+	ConnectionSlugHasPrefix    *string  `json:"connectionSlugHasPrefix"`
+	ConnectionSlugHasSuffix    *string  `json:"connectionSlugHasSuffix"`
+	ConnectionSlugIsNil        *bool    `json:"connectionSlugIsNil"`
+	ConnectionSlugNotNil       *bool    `json:"connectionSlugNotNil"`
+	ConnectionSlugEqualFold    *string  `json:"connectionSlugEqualFold"`
+	ConnectionSlugContainsFold *string  `json:"connectionSlugContainsFold"`
+	// deployment_slug field predicates
+	DeploymentSlug             *string  `json:"deploymentSlug"`
+	DeploymentSlugNEQ          *string  `json:"deploymentSlugNEQ"`
+	DeploymentSlugIn           []string `json:"deploymentSlugIn"`
+	DeploymentSlugNotIn        []string `json:"deploymentSlugNotIn"`
+	DeploymentSlugGT           *string  `json:"deploymentSlugGT"`
+	DeploymentSlugGTE          *string  `json:"deploymentSlugGTE"`
+	DeploymentSlugLT           *string  `json:"deploymentSlugLT"`
+	DeploymentSlugLTE          *string  `json:"deploymentSlugLTE"`
+	DeploymentSlugContains     *string  `json:"deploymentSlugContains"`
+	DeploymentSlugHasPrefix    *string  `json:"deploymentSlugHasPrefix"`
+	DeploymentSlugHasSuffix    *string  `json:"deploymentSlugHasSuffix"`
+	DeploymentSlugIsNil        *bool    `json:"deploymentSlugIsNil"`
+	DeploymentSlugNotNil       *bool    `json:"deploymentSlugNotNil"`
+	DeploymentSlugEqualFold    *string  `json:"deploymentSlugEqualFold"`
+	DeploymentSlugContainsFold *string  `json:"deploymentSlugContainsFold"`
+	// integration_slug field predicates
+	IntegrationSlug             *string  `json:"integrationSlug"`
+	IntegrationSlugNEQ          *string  `json:"integrationSlugNEQ"`
+	IntegrationSlugIn           []string `json:"integrationSlugIn"`
+	IntegrationSlugNotIn        []string `json:"integrationSlugNotIn"`
+	IntegrationSlugGT           *string  `json:"integrationSlugGT"`
+	IntegrationSlugGTE          *string  `json:"integrationSlugGTE"`
+	IntegrationSlugLT           *string  `json:"integrationSlugLT"`
+	IntegrationSlugLTE          *string  `json:"integrationSlugLTE"`
+	IntegrationSlugContains     *string  `json:"integrationSlugContains"`
+	IntegrationSlugHasPrefix    *string  `json:"integrationSlugHasPrefix"`
+	IntegrationSlugHasSuffix    *string  `json:"integrationSlugHasSuffix"`
+	IntegrationSlugIsNil        *bool    `json:"integrationSlugIsNil"`
+	IntegrationSlugNotNil       *bool    `json:"integrationSlugNotNil"`
+	IntegrationSlugEqualFold    *string  `json:"integrationSlugEqualFold"`
+	IntegrationSlugContainsFold *string  `json:"integrationSlugContainsFold"`
+	// organization_slug field predicates
+	OrganizationSlug             *string  `json:"organizationSlug"`
+	OrganizationSlugNEQ          *string  `json:"organizationSlugNEQ"`
+	OrganizationSlugIn           []string `json:"organizationSlugIn"`
+	OrganizationSlugNotIn        []string `json:"organizationSlugNotIn"`
+	OrganizationSlugGT           *string  `json:"organizationSlugGT"`
+	OrganizationSlugGTE          *string  `json:"organizationSlugGTE"`
+	OrganizationSlugLT           *string  `json:"organizationSlugLT"`
+	OrganizationSlugLTE          *string  `json:"organizationSlugLTE"`
+	OrganizationSlugContains     *string  `json:"organizationSlugContains"`
+	OrganizationSlugHasPrefix    *string  `json:"organizationSlugHasPrefix"`
+	OrganizationSlugHasSuffix    *string  `json:"organizationSlugHasSuffix"`
+	OrganizationSlugEqualFold    *string  `json:"organizationSlugEqualFold"`
+	OrganizationSlugContainsFold *string  `json:"organizationSlugContainsFold"`
+	// connection_id field predicates
+	ConnectionID       *uuid.UUID  `json:"connectionID"`
+	ConnectionIDNEQ    *uuid.UUID  `json:"connectionIDNEQ"`
+	ConnectionIDIn     []uuid.UUID `json:"connectionIDIn"`
+	ConnectionIDNotIn  []uuid.UUID `json:"connectionIDNotIn"`
+	ConnectionIDIsNil  *bool       `json:"connectionIDIsNil"`
+	ConnectionIDNotNil *bool       `json:"connectionIDNotNil"`
+	// deployment_id field predicates
+	DeploymentID       *uuid.UUID  `json:"deploymentID"`
+	DeploymentIDNEQ    *uuid.UUID  `json:"deploymentIDNEQ"`
+	DeploymentIDIn     []uuid.UUID `json:"deploymentIDIn"`
+	DeploymentIDNotIn  []uuid.UUID `json:"deploymentIDNotIn"`
+	DeploymentIDIsNil  *bool       `json:"deploymentIDIsNil"`
+	DeploymentIDNotNil *bool       `json:"deploymentIDNotNil"`
+	// organization_id field predicates
+	OrganizationID      *uuid.UUID  `json:"organizationID"`
+	OrganizationIDNEQ   *uuid.UUID  `json:"organizationIDNEQ"`
+	OrganizationIDIn    []uuid.UUID `json:"organizationIDIn"`
+	OrganizationIDNotIn []uuid.UUID `json:"organizationIDNotIn"`
+	// connection edge predicates
+	HasConnection     *bool                   `json:"hasConnection"`
+	HasConnectionWith []*ConnectionWhereInput `json:"hasConnectionWith,omitempty"`
+	// deployment edge predicates
+	HasDeployment     *bool                   `json:"hasDeployment"`
+	HasDeploymentWith []*DeploymentWhereInput `json:"hasDeploymentWith,omitempty"`
+	// organization edge predicates
+	HasOrganization     *bool                     `json:"hasOrganization"`
+	HasOrganizationWith []*OrganizationWhereInput `json:"hasOrganizationWith,omitempty"`
+}
+
+// GetNot returns TypeSchemaWhereInput.Not, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetNot() *TypeSchemaWhereInput { return v.Not }
+
+// GetAnd returns TypeSchemaWhereInput.And, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetAnd() []*TypeSchemaWhereInput { return v.And }
+
+// GetOr returns TypeSchemaWhereInput.Or, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOr() []*TypeSchemaWhereInput { return v.Or }
+
+// GetId returns TypeSchemaWhereInput.Id, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetId() *uuid.UUID { return v.Id }
+
+// GetIdNEQ returns TypeSchemaWhereInput.IdNEQ, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIdNEQ() *uuid.UUID { return v.IdNEQ }
+
+// GetIdIn returns TypeSchemaWhereInput.IdIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIdIn() []uuid.UUID { return v.IdIn }
+
+// GetIdNotIn returns TypeSchemaWhereInput.IdNotIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIdNotIn() []uuid.UUID { return v.IdNotIn }
+
+// GetIdGT returns TypeSchemaWhereInput.IdGT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIdGT() *uuid.UUID { return v.IdGT }
+
+// GetIdGTE returns TypeSchemaWhereInput.IdGTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIdGTE() *uuid.UUID { return v.IdGTE }
+
+// GetIdLT returns TypeSchemaWhereInput.IdLT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIdLT() *uuid.UUID { return v.IdLT }
+
+// GetIdLTE returns TypeSchemaWhereInput.IdLTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIdLTE() *uuid.UUID { return v.IdLTE }
+
+// GetCreatedAt returns TypeSchemaWhereInput.CreatedAt, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetCreatedAt() *time.Time { return v.CreatedAt }
+
+// GetCreatedAtNEQ returns TypeSchemaWhereInput.CreatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetCreatedAtNEQ() *time.Time { return v.CreatedAtNEQ }
+
+// GetCreatedAtIn returns TypeSchemaWhereInput.CreatedAtIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetCreatedAtIn() []time.Time { return v.CreatedAtIn }
+
+// GetCreatedAtNotIn returns TypeSchemaWhereInput.CreatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetCreatedAtNotIn() []time.Time { return v.CreatedAtNotIn }
+
+// GetCreatedAtGT returns TypeSchemaWhereInput.CreatedAtGT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetCreatedAtGT() *time.Time { return v.CreatedAtGT }
+
+// GetCreatedAtGTE returns TypeSchemaWhereInput.CreatedAtGTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetCreatedAtGTE() *time.Time { return v.CreatedAtGTE }
+
+// GetCreatedAtLT returns TypeSchemaWhereInput.CreatedAtLT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetCreatedAtLT() *time.Time { return v.CreatedAtLT }
+
+// GetCreatedAtLTE returns TypeSchemaWhereInput.CreatedAtLTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetCreatedAtLTE() *time.Time { return v.CreatedAtLTE }
+
+// GetUpdatedAt returns TypeSchemaWhereInput.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetUpdatedAt() *time.Time { return v.UpdatedAt }
+
+// GetUpdatedAtNEQ returns TypeSchemaWhereInput.UpdatedAtNEQ, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetUpdatedAtNEQ() *time.Time { return v.UpdatedAtNEQ }
+
+// GetUpdatedAtIn returns TypeSchemaWhereInput.UpdatedAtIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetUpdatedAtIn() []time.Time { return v.UpdatedAtIn }
+
+// GetUpdatedAtNotIn returns TypeSchemaWhereInput.UpdatedAtNotIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetUpdatedAtNotIn() []time.Time { return v.UpdatedAtNotIn }
+
+// GetUpdatedAtGT returns TypeSchemaWhereInput.UpdatedAtGT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetUpdatedAtGT() *time.Time { return v.UpdatedAtGT }
+
+// GetUpdatedAtGTE returns TypeSchemaWhereInput.UpdatedAtGTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetUpdatedAtGTE() *time.Time { return v.UpdatedAtGTE }
+
+// GetUpdatedAtLT returns TypeSchemaWhereInput.UpdatedAtLT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetUpdatedAtLT() *time.Time { return v.UpdatedAtLT }
+
+// GetUpdatedAtLTE returns TypeSchemaWhereInput.UpdatedAtLTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetUpdatedAtLTE() *time.Time { return v.UpdatedAtLTE }
+
+// GetName returns TypeSchemaWhereInput.Name, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetName() *string { return v.Name }
+
+// GetNameNEQ returns TypeSchemaWhereInput.NameNEQ, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetNameNEQ() *string { return v.NameNEQ }
+
+// GetNameIn returns TypeSchemaWhereInput.NameIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetNameIn() []string { return v.NameIn }
+
+// GetNameNotIn returns TypeSchemaWhereInput.NameNotIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetNameNotIn() []string { return v.NameNotIn }
+
+// GetNameGT returns TypeSchemaWhereInput.NameGT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetNameGT() *string { return v.NameGT }
+
+// GetNameGTE returns TypeSchemaWhereInput.NameGTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetNameGTE() *string { return v.NameGTE }
+
+// GetNameLT returns TypeSchemaWhereInput.NameLT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetNameLT() *string { return v.NameLT }
+
+// GetNameLTE returns TypeSchemaWhereInput.NameLTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetNameLTE() *string { return v.NameLTE }
+
+// GetNameContains returns TypeSchemaWhereInput.NameContains, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetNameContains() *string { return v.NameContains }
+
+// GetNameHasPrefix returns TypeSchemaWhereInput.NameHasPrefix, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetNameHasPrefix() *string { return v.NameHasPrefix }
+
+// GetNameHasSuffix returns TypeSchemaWhereInput.NameHasSuffix, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetNameHasSuffix() *string { return v.NameHasSuffix }
+
+// GetNameEqualFold returns TypeSchemaWhereInput.NameEqualFold, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetNameEqualFold() *string { return v.NameEqualFold }
+
+// GetNameContainsFold returns TypeSchemaWhereInput.NameContainsFold, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetNameContainsFold() *string { return v.NameContainsFold }
+
+// GetProtoName returns TypeSchemaWhereInput.ProtoName, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetProtoName() *string { return v.ProtoName }
+
+// GetProtoNameNEQ returns TypeSchemaWhereInput.ProtoNameNEQ, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetProtoNameNEQ() *string { return v.ProtoNameNEQ }
+
+// GetProtoNameIn returns TypeSchemaWhereInput.ProtoNameIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetProtoNameIn() []string { return v.ProtoNameIn }
+
+// GetProtoNameNotIn returns TypeSchemaWhereInput.ProtoNameNotIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetProtoNameNotIn() []string { return v.ProtoNameNotIn }
+
+// GetProtoNameGT returns TypeSchemaWhereInput.ProtoNameGT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetProtoNameGT() *string { return v.ProtoNameGT }
+
+// GetProtoNameGTE returns TypeSchemaWhereInput.ProtoNameGTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetProtoNameGTE() *string { return v.ProtoNameGTE }
+
+// GetProtoNameLT returns TypeSchemaWhereInput.ProtoNameLT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetProtoNameLT() *string { return v.ProtoNameLT }
+
+// GetProtoNameLTE returns TypeSchemaWhereInput.ProtoNameLTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetProtoNameLTE() *string { return v.ProtoNameLTE }
+
+// GetProtoNameContains returns TypeSchemaWhereInput.ProtoNameContains, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetProtoNameContains() *string { return v.ProtoNameContains }
+
+// GetProtoNameHasPrefix returns TypeSchemaWhereInput.ProtoNameHasPrefix, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetProtoNameHasPrefix() *string { return v.ProtoNameHasPrefix }
+
+// GetProtoNameHasSuffix returns TypeSchemaWhereInput.ProtoNameHasSuffix, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetProtoNameHasSuffix() *string { return v.ProtoNameHasSuffix }
+
+// GetProtoNameEqualFold returns TypeSchemaWhereInput.ProtoNameEqualFold, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetProtoNameEqualFold() *string { return v.ProtoNameEqualFold }
+
+// GetProtoNameContainsFold returns TypeSchemaWhereInput.ProtoNameContainsFold, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetProtoNameContainsFold() *string { return v.ProtoNameContainsFold }
+
+// GetModTime returns TypeSchemaWhereInput.ModTime, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetModTime() *time.Time { return v.ModTime }
+
+// GetModTimeNEQ returns TypeSchemaWhereInput.ModTimeNEQ, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetModTimeNEQ() *time.Time { return v.ModTimeNEQ }
+
+// GetModTimeIn returns TypeSchemaWhereInput.ModTimeIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetModTimeIn() []time.Time { return v.ModTimeIn }
+
+// GetModTimeNotIn returns TypeSchemaWhereInput.ModTimeNotIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetModTimeNotIn() []time.Time { return v.ModTimeNotIn }
+
+// GetModTimeGT returns TypeSchemaWhereInput.ModTimeGT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetModTimeGT() *time.Time { return v.ModTimeGT }
+
+// GetModTimeGTE returns TypeSchemaWhereInput.ModTimeGTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetModTimeGTE() *time.Time { return v.ModTimeGTE }
+
+// GetModTimeLT returns TypeSchemaWhereInput.ModTimeLT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetModTimeLT() *time.Time { return v.ModTimeLT }
+
+// GetModTimeLTE returns TypeSchemaWhereInput.ModTimeLTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetModTimeLTE() *time.Time { return v.ModTimeLTE }
+
+// GetSystemType returns TypeSchemaWhereInput.SystemType, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetSystemType() *bool { return v.SystemType }
+
+// GetSystemTypeNEQ returns TypeSchemaWhereInput.SystemTypeNEQ, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetSystemTypeNEQ() *bool { return v.SystemTypeNEQ }
+
+// GetConnectionSlug returns TypeSchemaWhereInput.ConnectionSlug, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionSlug() *string { return v.ConnectionSlug }
+
+// GetConnectionSlugNEQ returns TypeSchemaWhereInput.ConnectionSlugNEQ, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionSlugNEQ() *string { return v.ConnectionSlugNEQ }
+
+// GetConnectionSlugIn returns TypeSchemaWhereInput.ConnectionSlugIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionSlugIn() []string { return v.ConnectionSlugIn }
+
+// GetConnectionSlugNotIn returns TypeSchemaWhereInput.ConnectionSlugNotIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionSlugNotIn() []string { return v.ConnectionSlugNotIn }
+
+// GetConnectionSlugGT returns TypeSchemaWhereInput.ConnectionSlugGT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionSlugGT() *string { return v.ConnectionSlugGT }
+
+// GetConnectionSlugGTE returns TypeSchemaWhereInput.ConnectionSlugGTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionSlugGTE() *string { return v.ConnectionSlugGTE }
+
+// GetConnectionSlugLT returns TypeSchemaWhereInput.ConnectionSlugLT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionSlugLT() *string { return v.ConnectionSlugLT }
+
+// GetConnectionSlugLTE returns TypeSchemaWhereInput.ConnectionSlugLTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionSlugLTE() *string { return v.ConnectionSlugLTE }
+
+// GetConnectionSlugContains returns TypeSchemaWhereInput.ConnectionSlugContains, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionSlugContains() *string { return v.ConnectionSlugContains }
+
+// GetConnectionSlugHasPrefix returns TypeSchemaWhereInput.ConnectionSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionSlugHasPrefix() *string { return v.ConnectionSlugHasPrefix }
+
+// GetConnectionSlugHasSuffix returns TypeSchemaWhereInput.ConnectionSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionSlugHasSuffix() *string { return v.ConnectionSlugHasSuffix }
+
+// GetConnectionSlugIsNil returns TypeSchemaWhereInput.ConnectionSlugIsNil, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionSlugIsNil() *bool { return v.ConnectionSlugIsNil }
+
+// GetConnectionSlugNotNil returns TypeSchemaWhereInput.ConnectionSlugNotNil, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionSlugNotNil() *bool { return v.ConnectionSlugNotNil }
+
+// GetConnectionSlugEqualFold returns TypeSchemaWhereInput.ConnectionSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionSlugEqualFold() *string { return v.ConnectionSlugEqualFold }
+
+// GetConnectionSlugContainsFold returns TypeSchemaWhereInput.ConnectionSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionSlugContainsFold() *string {
+	return v.ConnectionSlugContainsFold
+}
+
+// GetDeploymentSlug returns TypeSchemaWhereInput.DeploymentSlug, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentSlug() *string { return v.DeploymentSlug }
+
+// GetDeploymentSlugNEQ returns TypeSchemaWhereInput.DeploymentSlugNEQ, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentSlugNEQ() *string { return v.DeploymentSlugNEQ }
+
+// GetDeploymentSlugIn returns TypeSchemaWhereInput.DeploymentSlugIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentSlugIn() []string { return v.DeploymentSlugIn }
+
+// GetDeploymentSlugNotIn returns TypeSchemaWhereInput.DeploymentSlugNotIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentSlugNotIn() []string { return v.DeploymentSlugNotIn }
+
+// GetDeploymentSlugGT returns TypeSchemaWhereInput.DeploymentSlugGT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentSlugGT() *string { return v.DeploymentSlugGT }
+
+// GetDeploymentSlugGTE returns TypeSchemaWhereInput.DeploymentSlugGTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentSlugGTE() *string { return v.DeploymentSlugGTE }
+
+// GetDeploymentSlugLT returns TypeSchemaWhereInput.DeploymentSlugLT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentSlugLT() *string { return v.DeploymentSlugLT }
+
+// GetDeploymentSlugLTE returns TypeSchemaWhereInput.DeploymentSlugLTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentSlugLTE() *string { return v.DeploymentSlugLTE }
+
+// GetDeploymentSlugContains returns TypeSchemaWhereInput.DeploymentSlugContains, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentSlugContains() *string { return v.DeploymentSlugContains }
+
+// GetDeploymentSlugHasPrefix returns TypeSchemaWhereInput.DeploymentSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentSlugHasPrefix() *string { return v.DeploymentSlugHasPrefix }
+
+// GetDeploymentSlugHasSuffix returns TypeSchemaWhereInput.DeploymentSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentSlugHasSuffix() *string { return v.DeploymentSlugHasSuffix }
+
+// GetDeploymentSlugIsNil returns TypeSchemaWhereInput.DeploymentSlugIsNil, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentSlugIsNil() *bool { return v.DeploymentSlugIsNil }
+
+// GetDeploymentSlugNotNil returns TypeSchemaWhereInput.DeploymentSlugNotNil, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentSlugNotNil() *bool { return v.DeploymentSlugNotNil }
+
+// GetDeploymentSlugEqualFold returns TypeSchemaWhereInput.DeploymentSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentSlugEqualFold() *string { return v.DeploymentSlugEqualFold }
+
+// GetDeploymentSlugContainsFold returns TypeSchemaWhereInput.DeploymentSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentSlugContainsFold() *string {
+	return v.DeploymentSlugContainsFold
+}
+
+// GetIntegrationSlug returns TypeSchemaWhereInput.IntegrationSlug, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIntegrationSlug() *string { return v.IntegrationSlug }
+
+// GetIntegrationSlugNEQ returns TypeSchemaWhereInput.IntegrationSlugNEQ, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIntegrationSlugNEQ() *string { return v.IntegrationSlugNEQ }
+
+// GetIntegrationSlugIn returns TypeSchemaWhereInput.IntegrationSlugIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIntegrationSlugIn() []string { return v.IntegrationSlugIn }
+
+// GetIntegrationSlugNotIn returns TypeSchemaWhereInput.IntegrationSlugNotIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIntegrationSlugNotIn() []string { return v.IntegrationSlugNotIn }
+
+// GetIntegrationSlugGT returns TypeSchemaWhereInput.IntegrationSlugGT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIntegrationSlugGT() *string { return v.IntegrationSlugGT }
+
+// GetIntegrationSlugGTE returns TypeSchemaWhereInput.IntegrationSlugGTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIntegrationSlugGTE() *string { return v.IntegrationSlugGTE }
+
+// GetIntegrationSlugLT returns TypeSchemaWhereInput.IntegrationSlugLT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIntegrationSlugLT() *string { return v.IntegrationSlugLT }
+
+// GetIntegrationSlugLTE returns TypeSchemaWhereInput.IntegrationSlugLTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIntegrationSlugLTE() *string { return v.IntegrationSlugLTE }
+
+// GetIntegrationSlugContains returns TypeSchemaWhereInput.IntegrationSlugContains, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIntegrationSlugContains() *string { return v.IntegrationSlugContains }
+
+// GetIntegrationSlugHasPrefix returns TypeSchemaWhereInput.IntegrationSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIntegrationSlugHasPrefix() *string {
+	return v.IntegrationSlugHasPrefix
+}
+
+// GetIntegrationSlugHasSuffix returns TypeSchemaWhereInput.IntegrationSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIntegrationSlugHasSuffix() *string {
+	return v.IntegrationSlugHasSuffix
+}
+
+// GetIntegrationSlugIsNil returns TypeSchemaWhereInput.IntegrationSlugIsNil, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIntegrationSlugIsNil() *bool { return v.IntegrationSlugIsNil }
+
+// GetIntegrationSlugNotNil returns TypeSchemaWhereInput.IntegrationSlugNotNil, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIntegrationSlugNotNil() *bool { return v.IntegrationSlugNotNil }
+
+// GetIntegrationSlugEqualFold returns TypeSchemaWhereInput.IntegrationSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIntegrationSlugEqualFold() *string {
+	return v.IntegrationSlugEqualFold
+}
+
+// GetIntegrationSlugContainsFold returns TypeSchemaWhereInput.IntegrationSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetIntegrationSlugContainsFold() *string {
+	return v.IntegrationSlugContainsFold
+}
+
+// GetOrganizationSlug returns TypeSchemaWhereInput.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationSlug() *string { return v.OrganizationSlug }
+
+// GetOrganizationSlugNEQ returns TypeSchemaWhereInput.OrganizationSlugNEQ, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationSlugNEQ() *string { return v.OrganizationSlugNEQ }
+
+// GetOrganizationSlugIn returns TypeSchemaWhereInput.OrganizationSlugIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationSlugIn() []string { return v.OrganizationSlugIn }
+
+// GetOrganizationSlugNotIn returns TypeSchemaWhereInput.OrganizationSlugNotIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationSlugNotIn() []string { return v.OrganizationSlugNotIn }
+
+// GetOrganizationSlugGT returns TypeSchemaWhereInput.OrganizationSlugGT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationSlugGT() *string { return v.OrganizationSlugGT }
+
+// GetOrganizationSlugGTE returns TypeSchemaWhereInput.OrganizationSlugGTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationSlugGTE() *string { return v.OrganizationSlugGTE }
+
+// GetOrganizationSlugLT returns TypeSchemaWhereInput.OrganizationSlugLT, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationSlugLT() *string { return v.OrganizationSlugLT }
+
+// GetOrganizationSlugLTE returns TypeSchemaWhereInput.OrganizationSlugLTE, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationSlugLTE() *string { return v.OrganizationSlugLTE }
+
+// GetOrganizationSlugContains returns TypeSchemaWhereInput.OrganizationSlugContains, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationSlugContains() *string {
+	return v.OrganizationSlugContains
+}
+
+// GetOrganizationSlugHasPrefix returns TypeSchemaWhereInput.OrganizationSlugHasPrefix, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationSlugHasPrefix() *string {
+	return v.OrganizationSlugHasPrefix
+}
+
+// GetOrganizationSlugHasSuffix returns TypeSchemaWhereInput.OrganizationSlugHasSuffix, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationSlugHasSuffix() *string {
+	return v.OrganizationSlugHasSuffix
+}
+
+// GetOrganizationSlugEqualFold returns TypeSchemaWhereInput.OrganizationSlugEqualFold, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationSlugEqualFold() *string {
+	return v.OrganizationSlugEqualFold
+}
+
+// GetOrganizationSlugContainsFold returns TypeSchemaWhereInput.OrganizationSlugContainsFold, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationSlugContainsFold() *string {
+	return v.OrganizationSlugContainsFold
+}
+
+// GetConnectionID returns TypeSchemaWhereInput.ConnectionID, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionID() *uuid.UUID { return v.ConnectionID }
+
+// GetConnectionIDNEQ returns TypeSchemaWhereInput.ConnectionIDNEQ, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionIDNEQ() *uuid.UUID { return v.ConnectionIDNEQ }
+
+// GetConnectionIDIn returns TypeSchemaWhereInput.ConnectionIDIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionIDIn() []uuid.UUID { return v.ConnectionIDIn }
+
+// GetConnectionIDNotIn returns TypeSchemaWhereInput.ConnectionIDNotIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionIDNotIn() []uuid.UUID { return v.ConnectionIDNotIn }
+
+// GetConnectionIDIsNil returns TypeSchemaWhereInput.ConnectionIDIsNil, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionIDIsNil() *bool { return v.ConnectionIDIsNil }
+
+// GetConnectionIDNotNil returns TypeSchemaWhereInput.ConnectionIDNotNil, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetConnectionIDNotNil() *bool { return v.ConnectionIDNotNil }
+
+// GetDeploymentID returns TypeSchemaWhereInput.DeploymentID, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentID() *uuid.UUID { return v.DeploymentID }
+
+// GetDeploymentIDNEQ returns TypeSchemaWhereInput.DeploymentIDNEQ, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentIDNEQ() *uuid.UUID { return v.DeploymentIDNEQ }
+
+// GetDeploymentIDIn returns TypeSchemaWhereInput.DeploymentIDIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentIDIn() []uuid.UUID { return v.DeploymentIDIn }
+
+// GetDeploymentIDNotIn returns TypeSchemaWhereInput.DeploymentIDNotIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentIDNotIn() []uuid.UUID { return v.DeploymentIDNotIn }
+
+// GetDeploymentIDIsNil returns TypeSchemaWhereInput.DeploymentIDIsNil, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentIDIsNil() *bool { return v.DeploymentIDIsNil }
+
+// GetDeploymentIDNotNil returns TypeSchemaWhereInput.DeploymentIDNotNil, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetDeploymentIDNotNil() *bool { return v.DeploymentIDNotNil }
+
+// GetOrganizationID returns TypeSchemaWhereInput.OrganizationID, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationID() *uuid.UUID { return v.OrganizationID }
+
+// GetOrganizationIDNEQ returns TypeSchemaWhereInput.OrganizationIDNEQ, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationIDNEQ() *uuid.UUID { return v.OrganizationIDNEQ }
+
+// GetOrganizationIDIn returns TypeSchemaWhereInput.OrganizationIDIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationIDIn() []uuid.UUID { return v.OrganizationIDIn }
+
+// GetOrganizationIDNotIn returns TypeSchemaWhereInput.OrganizationIDNotIn, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetOrganizationIDNotIn() []uuid.UUID { return v.OrganizationIDNotIn }
+
+// GetHasConnection returns TypeSchemaWhereInput.HasConnection, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetHasConnection() *bool { return v.HasConnection }
+
+// GetHasConnectionWith returns TypeSchemaWhereInput.HasConnectionWith, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetHasConnectionWith() []*ConnectionWhereInput {
+	return v.HasConnectionWith
+}
+
+// GetHasDeployment returns TypeSchemaWhereInput.HasDeployment, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetHasDeployment() *bool { return v.HasDeployment }
+
+// GetHasDeploymentWith returns TypeSchemaWhereInput.HasDeploymentWith, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetHasDeploymentWith() []*DeploymentWhereInput {
+	return v.HasDeploymentWith
+}
+
+// GetHasOrganization returns TypeSchemaWhereInput.HasOrganization, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetHasOrganization() *bool { return v.HasOrganization }
+
+// GetHasOrganizationWith returns TypeSchemaWhereInput.HasOrganizationWith, and is useful for accessing the field via an interface.
+func (v *TypeSchemaWhereInput) GetHasOrganizationWith() []*OrganizationWhereInput {
+	return v.HasOrganizationWith
+}
+
 // UpdateCatalogInput is used for update Catalog object.
 // Input was generated by ent.
 type UpdateCatalogInput struct {
@@ -25769,6 +28331,56 @@ func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) GetVisibil
 	return v.ConnectionFragment.Visibility
 }
 
+// GetOrganizationSlug returns UpdateConnectionUpdateConnectionConnectionUpdatedConnection.OrganizationSlug, and is useful for accessing the field via an interface.
+func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) GetOrganizationSlug() string {
+	return v.ConnectionFragment.OrganizationSlug
+}
+
+// GetOrganizationID returns UpdateConnectionUpdateConnectionConnectionUpdatedConnection.OrganizationID, and is useful for accessing the field via an interface.
+func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) GetOrganizationID() uuid.UUID {
+	return v.ConnectionFragment.OrganizationID
+}
+
+// GetIntegrationSlug returns UpdateConnectionUpdateConnectionConnectionUpdatedConnection.IntegrationSlug, and is useful for accessing the field via an interface.
+func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) GetIntegrationSlug() *string {
+	return v.ConnectionFragment.IntegrationSlug
+}
+
+// GetDeploymentSlug returns UpdateConnectionUpdateConnectionConnectionUpdatedConnection.DeploymentSlug, and is useful for accessing the field via an interface.
+func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) GetDeploymentSlug() *string {
+	return v.ConnectionFragment.DeploymentSlug
+}
+
+// GetDeploymentID returns UpdateConnectionUpdateConnectionConnectionUpdatedConnection.DeploymentID, and is useful for accessing the field via an interface.
+func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) GetDeploymentID() *uuid.UUID {
+	return v.ConnectionFragment.DeploymentID
+}
+
+// GetConfigURI returns UpdateConnectionUpdateConnectionConnectionUpdatedConnection.ConfigURI, and is useful for accessing the field via an interface.
+func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) GetConfigURI() *string {
+	return v.ConnectionFragment.ConfigURI
+}
+
+// GetCustomProtos returns UpdateConnectionUpdateConnectionConnectionUpdatedConnection.CustomProtos, and is useful for accessing the field via an interface.
+func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) GetCustomProtos() *string {
+	return v.ConnectionFragment.CustomProtos
+}
+
+// GetCustomGrpc returns UpdateConnectionUpdateConnectionConnectionUpdatedConnection.CustomGrpc, and is useful for accessing the field via an interface.
+func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) GetCustomGrpc() *bool {
+	return v.ConnectionFragment.CustomGrpc
+}
+
+// GetHeaders returns UpdateConnectionUpdateConnectionConnectionUpdatedConnection.Headers, and is useful for accessing the field via an interface.
+func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) GetHeaders() map[string]any {
+	return v.ConnectionFragment.Headers
+}
+
+// GetAddress returns UpdateConnectionUpdateConnectionConnectionUpdatedConnection.Address, and is useful for accessing the field via an interface.
+func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) GetAddress() *ConnectionFragmentAddress {
+	return v.ConnectionFragment.Address
+}
+
 // GetCreatedAt returns UpdateConnectionUpdateConnectionConnectionUpdatedConnection.CreatedAt, and is useful for accessing the field via an interface.
 func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) GetCreatedAt() time.Time {
 	return v.ConnectionFragment.CreatedAt
@@ -25777,16 +28389,6 @@ func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) GetCreated
 // GetUpdatedAt returns UpdateConnectionUpdateConnectionConnectionUpdatedConnection.UpdatedAt, and is useful for accessing the field via an interface.
 func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) GetUpdatedAt() time.Time {
 	return v.ConnectionFragment.UpdatedAt
-}
-
-// GetIntegrationID returns UpdateConnectionUpdateConnectionConnectionUpdatedConnection.IntegrationID, and is useful for accessing the field via an interface.
-func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) GetIntegrationID() uuid.UUID {
-	return v.ConnectionFragment.IntegrationID
-}
-
-// GetOrganizationID returns UpdateConnectionUpdateConnectionConnectionUpdatedConnection.OrganizationID, and is useful for accessing the field via an interface.
-func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) GetOrganizationID() uuid.UUID {
-	return v.ConnectionFragment.OrganizationID
 }
 
 func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) UnmarshalJSON(b []byte) error {
@@ -25823,13 +28425,29 @@ type __premarshalUpdateConnectionUpdateConnectionConnectionUpdatedConnection str
 
 	Visibility Visibility `json:"visibility"`
 
+	OrganizationSlug string `json:"organizationSlug"`
+
+	OrganizationID uuid.UUID `json:"organizationID"`
+
+	IntegrationSlug *string `json:"integrationSlug"`
+
+	DeploymentSlug *string `json:"deploymentSlug"`
+
+	DeploymentID *uuid.UUID `json:"deploymentID"`
+
+	ConfigURI *string `json:"configURI"`
+
+	CustomProtos *string `json:"customProtos"`
+
+	CustomGrpc *bool `json:"customGrpc"`
+
+	Headers map[string]any `json:"headers"`
+
+	Address *ConnectionFragmentAddress `json:"address"`
+
 	CreatedAt time.Time `json:"createdAt"`
 
 	UpdatedAt time.Time `json:"updatedAt"`
-
-	IntegrationID uuid.UUID `json:"integrationID"`
-
-	OrganizationID uuid.UUID `json:"organizationID"`
 }
 
 func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) MarshalJSON() ([]byte, error) {
@@ -25847,10 +28465,18 @@ func (v *UpdateConnectionUpdateConnectionConnectionUpdatedConnection) __premarsh
 	retval.Slug = v.ConnectionFragment.Slug
 	retval.Name = v.ConnectionFragment.Name
 	retval.Visibility = v.ConnectionFragment.Visibility
+	retval.OrganizationSlug = v.ConnectionFragment.OrganizationSlug
+	retval.OrganizationID = v.ConnectionFragment.OrganizationID
+	retval.IntegrationSlug = v.ConnectionFragment.IntegrationSlug
+	retval.DeploymentSlug = v.ConnectionFragment.DeploymentSlug
+	retval.DeploymentID = v.ConnectionFragment.DeploymentID
+	retval.ConfigURI = v.ConnectionFragment.ConfigURI
+	retval.CustomProtos = v.ConnectionFragment.CustomProtos
+	retval.CustomGrpc = v.ConnectionFragment.CustomGrpc
+	retval.Headers = v.ConnectionFragment.Headers
+	retval.Address = v.ConnectionFragment.Address
 	retval.CreatedAt = v.ConnectionFragment.CreatedAt
 	retval.UpdatedAt = v.ConnectionFragment.UpdatedAt
-	retval.IntegrationID = v.ConnectionFragment.IntegrationID
-	retval.OrganizationID = v.ConnectionFragment.OrganizationID
 	return &retval, nil
 }
 
@@ -26226,23 +28852,23 @@ func (v *UpdateModelUpdateModelModelUpdatedModel) __premarshalJSON() (*__premars
 // UpdateOrganizationInput is used for update Organization object.
 // Input was generated by ent.
 type UpdateOrganizationInput struct {
-	Name *string `json:"name"`
+	Slug *string `json:"slug"`
 	// Timezone name (e.g. America/Los_Angeles)
 	TzName              *string     `json:"tzName"`
-	Slug                *string     `json:"slug"`
+	Name                *string     `json:"name"`
 	AddConnectionIDs    []uuid.UUID `json:"addConnectionIDs"`
 	RemoveConnectionIDs []uuid.UUID `json:"removeConnectionIDs"`
 	ClearConnections    *bool       `json:"clearConnections"`
 }
 
-// GetName returns UpdateOrganizationInput.Name, and is useful for accessing the field via an interface.
-func (v *UpdateOrganizationInput) GetName() *string { return v.Name }
+// GetSlug returns UpdateOrganizationInput.Slug, and is useful for accessing the field via an interface.
+func (v *UpdateOrganizationInput) GetSlug() *string { return v.Slug }
 
 // GetTzName returns UpdateOrganizationInput.TzName, and is useful for accessing the field via an interface.
 func (v *UpdateOrganizationInput) GetTzName() *string { return v.TzName }
 
-// GetSlug returns UpdateOrganizationInput.Slug, and is useful for accessing the field via an interface.
-func (v *UpdateOrganizationInput) GetSlug() *string { return v.Slug }
+// GetName returns UpdateOrganizationInput.Name, and is useful for accessing the field via an interface.
+func (v *UpdateOrganizationInput) GetName() *string { return v.Name }
 
 // GetAddConnectionIDs returns UpdateOrganizationInput.AddConnectionIDs, and is useful for accessing the field via an interface.
 func (v *UpdateOrganizationInput) GetAddConnectionIDs() []uuid.UUID { return v.AddConnectionIDs }
@@ -26529,17 +29155,17 @@ func (v *UpdatePersonalAccessTokenUpdatePersonalAccessTokenPersonalAccessTokenUp
 // UpdateSchemaRefInput is used for update SchemaRef object.
 // Input was generated by ent.
 type UpdateSchemaRefInput struct {
-	Name             *string `json:"name"`
 	AutoSync         *bool   `json:"autoSync"`
+	Name             *string `json:"name"`
 	Description      *string `json:"description"`
 	ClearDescription *bool   `json:"clearDescription"`
 }
 
-// GetName returns UpdateSchemaRefInput.Name, and is useful for accessing the field via an interface.
-func (v *UpdateSchemaRefInput) GetName() *string { return v.Name }
-
 // GetAutoSync returns UpdateSchemaRefInput.AutoSync, and is useful for accessing the field via an interface.
 func (v *UpdateSchemaRefInput) GetAutoSync() *bool { return v.AutoSync }
+
+// GetName returns UpdateSchemaRefInput.Name, and is useful for accessing the field via an interface.
+func (v *UpdateSchemaRefInput) GetName() *string { return v.Name }
 
 // GetDescription returns UpdateSchemaRefInput.Description, and is useful for accessing the field via an interface.
 func (v *UpdateSchemaRefInput) GetDescription() *string { return v.Description }
@@ -26942,9 +29568,9 @@ func (v *UpdateSourceUpdateSourceSourceUpdatedSource) __premarshalJSON() (*__pre
 // UpdateSpaceInput is used for update Space object.
 // Input was generated by ent.
 type UpdateSpaceInput struct {
-	Name *string `json:"name"`
 	// Timezone name (e.g. America/Los_Angeles)
 	TzName           *string     `json:"tzName"`
+	Name             *string     `json:"name"`
 	AddCatalogIDs    []uuid.UUID `json:"addCatalogIDs"`
 	RemoveCatalogIDs []uuid.UUID `json:"removeCatalogIDs"`
 	ClearCatalogs    *bool       `json:"clearCatalogs"`
@@ -26959,11 +29585,11 @@ type UpdateSpaceInput struct {
 	ClearFlowRuns    *bool       `json:"clearFlowRuns"`
 }
 
-// GetName returns UpdateSpaceInput.Name, and is useful for accessing the field via an interface.
-func (v *UpdateSpaceInput) GetName() *string { return v.Name }
-
 // GetTzName returns UpdateSpaceInput.TzName, and is useful for accessing the field via an interface.
 func (v *UpdateSpaceInput) GetTzName() *string { return v.TzName }
+
+// GetName returns UpdateSpaceInput.Name, and is useful for accessing the field via an interface.
+func (v *UpdateSpaceInput) GetName() *string { return v.Name }
 
 // GetAddCatalogIDs returns UpdateSpaceInput.AddCatalogIDs, and is useful for accessing the field via an interface.
 func (v *UpdateSpaceInput) GetAddCatalogIDs() []uuid.UUID { return v.AddCatalogIDs }
@@ -27283,9 +29909,9 @@ type UserWhereInput struct {
 	TermsAndPrivacyAcceptedAtLTE    *time.Time  `json:"termsAndPrivacyAcceptedAtLTE"`
 	TermsAndPrivacyAcceptedAtIsNil  *bool       `json:"termsAndPrivacyAcceptedAtIsNil"`
 	TermsAndPrivacyAcceptedAtNotNil *bool       `json:"termsAndPrivacyAcceptedAtNotNil"`
-	// packages edge predicates
-	HasPackages     *bool                           `json:"hasPackages"`
-	HasPackagesWith []*IntegrationPackageWhereInput `json:"hasPackagesWith,omitempty"`
+	// integration_revisions edge predicates
+	HasIntegrationRevisions     *bool                            `json:"hasIntegrationRevisions"`
+	HasIntegrationRevisionsWith []*IntegrationRevisionWhereInput `json:"hasIntegrationRevisionsWith,omitempty"`
 	// personal_access_tokens edge predicates
 	HasPersonalAccessTokens     *bool                            `json:"hasPersonalAccessTokens"`
 	HasPersonalAccessTokensWith []*PersonalAccessTokenWhereInput `json:"hasPersonalAccessTokensWith,omitempty"`
@@ -27746,12 +30372,12 @@ func (v *UserWhereInput) GetTermsAndPrivacyAcceptedAtNotNil() *bool {
 	return v.TermsAndPrivacyAcceptedAtNotNil
 }
 
-// GetHasPackages returns UserWhereInput.HasPackages, and is useful for accessing the field via an interface.
-func (v *UserWhereInput) GetHasPackages() *bool { return v.HasPackages }
+// GetHasIntegrationRevisions returns UserWhereInput.HasIntegrationRevisions, and is useful for accessing the field via an interface.
+func (v *UserWhereInput) GetHasIntegrationRevisions() *bool { return v.HasIntegrationRevisions }
 
-// GetHasPackagesWith returns UserWhereInput.HasPackagesWith, and is useful for accessing the field via an interface.
-func (v *UserWhereInput) GetHasPackagesWith() []*IntegrationPackageWhereInput {
-	return v.HasPackagesWith
+// GetHasIntegrationRevisionsWith returns UserWhereInput.HasIntegrationRevisionsWith, and is useful for accessing the field via an interface.
+func (v *UserWhereInput) GetHasIntegrationRevisionsWith() []*IntegrationRevisionWhereInput {
+	return v.HasIntegrationRevisionsWith
 }
 
 // GetHasPersonalAccessTokens returns UserWhereInput.HasPersonalAccessTokens, and is useful for accessing the field via an interface.
@@ -27866,14 +30492,6 @@ type __CreateFlowRunInput struct {
 
 // GetInput returns __CreateFlowRunInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateFlowRunInput) GetInput() *CreateFlowRunInput { return v.Input }
-
-// __CreateIntegrationInput is used internally by genqlient
-type __CreateIntegrationInput struct {
-	Input *CreateIntegrationInput `json:"input,omitempty"`
-}
-
-// GetInput returns __CreateIntegrationInput.Input, and is useful for accessing the field via an interface.
-func (v *__CreateIntegrationInput) GetInput() *CreateIntegrationInput { return v.Input }
 
 // __CreateModelInput is used internally by genqlient
 type __CreateModelInput struct {
@@ -28259,6 +30877,18 @@ func (v *__ListConnectionsInput) GetOrderBy() *ConnectionOrder { return v.OrderB
 // GetWhere returns __ListConnectionsInput.Where, and is useful for accessing the field via an interface.
 func (v *__ListConnectionsInput) GetWhere() *ConnectionWhereInput { return v.Where }
 
+// __ListDeploymentsInput is used internally by genqlient
+type __ListDeploymentsInput struct {
+	OrderBy *DeploymentOrder      `json:"orderBy,omitempty"`
+	Where   *DeploymentWhereInput `json:"where,omitempty"`
+}
+
+// GetOrderBy returns __ListDeploymentsInput.OrderBy, and is useful for accessing the field via an interface.
+func (v *__ListDeploymentsInput) GetOrderBy() *DeploymentOrder { return v.OrderBy }
+
+// GetWhere returns __ListDeploymentsInput.Where, and is useful for accessing the field via an interface.
+func (v *__ListDeploymentsInput) GetWhere() *DeploymentWhereInput { return v.Where }
+
 // __ListDestinationsInput is used internally by genqlient
 type __ListDestinationsInput struct {
 	OrderBy *DestinationOrder      `json:"orderBy,omitempty"`
@@ -28378,18 +31008,6 @@ func (v *__ListOrganizationsInput) GetOrderBy() *OrganizationOrder { return v.Or
 
 // GetWhere returns __ListOrganizationsInput.Where, and is useful for accessing the field via an interface.
 func (v *__ListOrganizationsInput) GetWhere() *OrganizationWhereInput { return v.Where }
-
-// __ListPackagesInput is used internally by genqlient
-type __ListPackagesInput struct {
-	OrderBy *IntegrationPackageOrder      `json:"orderBy,omitempty"`
-	Where   *IntegrationPackageWhereInput `json:"where,omitempty"`
-}
-
-// GetOrderBy returns __ListPackagesInput.OrderBy, and is useful for accessing the field via an interface.
-func (v *__ListPackagesInput) GetOrderBy() *IntegrationPackageOrder { return v.OrderBy }
-
-// GetWhere returns __ListPackagesInput.Where, and is useful for accessing the field via an interface.
-func (v *__ListPackagesInput) GetWhere() *IntegrationPackageWhereInput { return v.Where }
 
 // __ListPersonalAccessTokensInput is used internally by genqlient
 type __ListPersonalAccessTokensInput struct {
@@ -28559,14 +31177,6 @@ type __SyncModelInput struct {
 // GetId returns __SyncModelInput.Id, and is useful for accessing the field via an interface.
 func (v *__SyncModelInput) GetId() uuid.UUID { return v.Id }
 
-// __SyncPackageInput is used internally by genqlient
-type __SyncPackageInput struct {
-	Input *SyncPackageInput `json:"input,omitempty"`
-}
-
-// GetInput returns __SyncPackageInput.Input, and is useful for accessing the field via an interface.
-func (v *__SyncPackageInput) GetInput() *SyncPackageInput { return v.Input }
-
 // __SyncSchemaInput is used internally by genqlient
 type __SyncSchemaInput struct {
 	Id       uuid.UUID `json:"id"`
@@ -28711,11 +31321,11 @@ query CheckConnection ($id: ID, $slug: String) {
 			type
 			required
 			success
-			error
+			message
 		}
 		configCheck {
 			success
-			error
+			message
 		}
 	}
 }
@@ -28899,10 +31509,24 @@ fragment ConnectionFragment on Connection {
 	slug
 	name
 	visibility
+	organizationSlug
+	organizationID
+	integrationSlug
+	deploymentSlug
+	deploymentID
+	configURI
+	customProtos
+	customGrpc
+	headers
+	address {
+		... AddressFragment
+	}
 	createdAt
 	updatedAt
-	integrationID
-	organizationID
+}
+fragment AddressFragment on Address {
+	network
+	target
 }
 `
 
@@ -29199,78 +31823,6 @@ func CreateFlowRun(
 	}
 
 	data_ = &CreateFlowRunResponse{}
-	resp_ := &graphql.Response{Data: data_}
-
-	err_ = client_.MakeRequest(
-		ctx_,
-		req_,
-		resp_,
-	)
-
-	return data_, err_
-}
-
-// The mutation executed by CreateIntegration.
-const CreateIntegration_Operation = `
-mutation CreateIntegration ($input: CreateIntegrationInput!) {
-	createIntegration(input: $input) {
-		created
-		error
-		integration {
-			... IntegrationFragment
-		}
-	}
-}
-fragment IntegrationFragment on Integration {
-	id
-	slug
-	name
-	apiVersion
-	version
-	description
-	icon
-	serviceNames
-	configSchema
-	serverConfig
-	published {
-		... IntegrationPackageFragment
-	}
-	organizationID
-	createdAt
-	updatedAt
-}
-fragment IntegrationPackageFragment on IntegrationPackage {
-	id
-	checksum
-	spec
-	configSchema
-	serviceNames
-	integrationID
-	authorID
-	createdAt
-	updatedAt
-}
-`
-
-func CreateIntegration(
-	ctx_ context.Context,
-	input *CreateIntegrationInput,
-) (data_ *CreateIntegrationResponse, err_ error) {
-	req_ := &graphql.Request{
-		OpName: "CreateIntegration",
-		Query:  CreateIntegration_Operation,
-		Variables: &__CreateIntegrationInput{
-			Input: input,
-		},
-	}
-	var client_ graphql.Client
-
-	client_, err_ = cloud.GetGraphClient(ctx_)
-	if err_ != nil {
-		return nil, err_
-	}
-
-	data_ = &CreateIntegrationResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -30326,10 +32878,24 @@ fragment ConnectionFragment on Connection {
 	slug
 	name
 	visibility
+	organizationSlug
+	organizationID
+	integrationSlug
+	deploymentSlug
+	deploymentID
+	configURI
+	customProtos
+	customGrpc
+	headers
+	address {
+		... AddressFragment
+	}
 	createdAt
 	updatedAt
-	integrationID
-	organizationID
+}
+fragment AddressFragment on Address {
+	network
+	target
 }
 `
 
@@ -30587,22 +33153,24 @@ fragment IntegrationFragment on Integration {
 	version
 	description
 	icon
-	serviceNames
-	configSchema
-	serverConfig
-	published {
-		... IntegrationPackageFragment
-	}
+	visibility
+	organizationSlug
 	organizationID
+	revisionID
 	createdAt
 	updatedAt
+	published {
+		... IntegrationRevisionFragment
+	}
 }
-fragment IntegrationPackageFragment on IntegrationPackage {
+fragment IntegrationRevisionFragment on IntegrationRevision {
 	id
-	checksum
-	spec
-	configSchema
-	serviceNames
+	slug
+	integrationSlug
+	organizationSlug
+	specEtag
+	sourceURI
+	sourceEtag
 	integrationID
 	authorID
 	createdAt
@@ -31344,10 +33912,24 @@ fragment ConnectionFragment on Connection {
 	slug
 	name
 	visibility
+	organizationSlug
+	organizationID
+	integrationSlug
+	deploymentSlug
+	deploymentID
+	configURI
+	customProtos
+	customGrpc
+	headers
+	address {
+		... AddressFragment
+	}
 	createdAt
 	updatedAt
-	integrationID
-	organizationID
+}
+fragment AddressFragment on Address {
+	network
+	target
 }
 `
 
@@ -31372,6 +33954,72 @@ func ListConnections(
 	}
 
 	data_ = &ListConnectionsResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by ListDeployments.
+const ListDeployments_Operation = `
+query ListDeployments ($orderBy: DeploymentOrder, $where: DeploymentWhereInput) {
+	deployments(orderBy: $orderBy, where: $where) {
+		edges {
+			node {
+				... DeploymentFragment
+			}
+		}
+		totalCount
+	}
+}
+fragment DeploymentFragment on Deployment {
+	id
+	slug
+	state
+	visibility
+	organizationSlug
+	organizationID
+	integrationSlug
+	integrationID
+	revisionID
+	etag
+	env
+	ports
+	address {
+		network
+		target
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func ListDeployments(
+	ctx_ context.Context,
+	orderBy *DeploymentOrder,
+	where *DeploymentWhereInput,
+) (data_ *ListDeploymentsResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ListDeployments",
+		Query:  ListDeployments_Operation,
+		Variables: &__ListDeploymentsInput{
+			OrderBy: orderBy,
+			Where:   where,
+		},
+	}
+	var client_ graphql.Client
+
+	client_, err_ = cloud.GetGraphClient(ctx_)
+	if err_ != nil {
+		return nil, err_
+	}
+
+	data_ = &ListDeploymentsResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -31692,22 +34340,24 @@ fragment IntegrationFragment on Integration {
 	version
 	description
 	icon
-	serviceNames
-	configSchema
-	serverConfig
-	published {
-		... IntegrationPackageFragment
-	}
+	visibility
+	organizationSlug
 	organizationID
+	revisionID
 	createdAt
 	updatedAt
+	published {
+		... IntegrationRevisionFragment
+	}
 }
-fragment IntegrationPackageFragment on IntegrationPackage {
+fragment IntegrationRevisionFragment on IntegrationRevision {
 	id
-	checksum
-	spec
-	configSchema
-	serviceNames
+	slug
+	integrationSlug
+	organizationSlug
+	specEtag
+	sourceURI
+	sourceEtag
 	integrationID
 	authorID
 	createdAt
@@ -31966,63 +34616,6 @@ func ListOrganizations(
 	}
 
 	data_ = &ListOrganizationsResponse{}
-	resp_ := &graphql.Response{Data: data_}
-
-	err_ = client_.MakeRequest(
-		ctx_,
-		req_,
-		resp_,
-	)
-
-	return data_, err_
-}
-
-// The query executed by ListPackages.
-const ListPackages_Operation = `
-query ListPackages ($orderBy: IntegrationPackageOrder, $where: IntegrationPackageWhereInput) {
-	packages(orderBy: $orderBy, where: $where) {
-		totalCount
-		edges {
-			node {
-				... IntegrationPackageFragment
-			}
-		}
-	}
-}
-fragment IntegrationPackageFragment on IntegrationPackage {
-	id
-	checksum
-	spec
-	configSchema
-	serviceNames
-	integrationID
-	authorID
-	createdAt
-	updatedAt
-}
-`
-
-func ListPackages(
-	ctx_ context.Context,
-	orderBy *IntegrationPackageOrder,
-	where *IntegrationPackageWhereInput,
-) (data_ *ListPackagesResponse, err_ error) {
-	req_ := &graphql.Request{
-		OpName: "ListPackages",
-		Query:  ListPackages_Operation,
-		Variables: &__ListPackagesInput{
-			OrderBy: orderBy,
-			Where:   where,
-		},
-	}
-	var client_ graphql.Client
-
-	client_, err_ = cloud.GetGraphClient(ctx_)
-	if err_ != nil {
-		return nil, err_
-	}
-
-	data_ = &ListPackagesResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -32851,79 +35444,6 @@ func SyncModel(
 	return data_, err_
 }
 
-// The mutation executed by SyncPackage.
-const SyncPackage_Operation = `
-mutation SyncPackage ($input: SyncPackageInput!) {
-	syncPackage(input: $input) {
-		integrationPackage {
-			... IntegrationPackageFragment
-			integration {
-				... IntegrationFragment
-			}
-		}
-	}
-}
-fragment IntegrationPackageFragment on IntegrationPackage {
-	id
-	checksum
-	spec
-	configSchema
-	serviceNames
-	integrationID
-	authorID
-	createdAt
-	updatedAt
-}
-fragment IntegrationFragment on Integration {
-	id
-	slug
-	name
-	apiVersion
-	version
-	description
-	icon
-	serviceNames
-	configSchema
-	serverConfig
-	published {
-		... IntegrationPackageFragment
-	}
-	organizationID
-	createdAt
-	updatedAt
-}
-`
-
-func SyncPackage(
-	ctx_ context.Context,
-	input *SyncPackageInput,
-) (data_ *SyncPackageResponse, err_ error) {
-	req_ := &graphql.Request{
-		OpName: "SyncPackage",
-		Query:  SyncPackage_Operation,
-		Variables: &__SyncPackageInput{
-			Input: input,
-		},
-	}
-	var client_ graphql.Client
-
-	client_, err_ = cloud.GetGraphClient(ctx_)
-	if err_ != nil {
-		return nil, err_
-	}
-
-	data_ = &SyncPackageResponse{}
-	resp_ := &graphql.Response{Data: data_}
-
-	err_ = client_.MakeRequest(
-		ctx_,
-		req_,
-		resp_,
-	)
-
-	return data_, err_
-}
-
 // The mutation executed by SyncSchema.
 const SyncSchema_Operation = `
 mutation SyncSchema ($id: ID!, $autoSync: Boolean) {
@@ -33267,10 +35787,24 @@ fragment ConnectionFragment on Connection {
 	slug
 	name
 	visibility
+	organizationSlug
+	organizationID
+	integrationSlug
+	deploymentSlug
+	deploymentID
+	configURI
+	customProtos
+	customGrpc
+	headers
+	address {
+		... AddressFragment
+	}
 	createdAt
 	updatedAt
-	integrationID
-	organizationID
+}
+fragment AddressFragment on Address {
+	network
+	target
 }
 `
 
