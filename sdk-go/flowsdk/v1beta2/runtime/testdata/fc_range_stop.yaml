@@ -9,7 +9,7 @@ spec:
         end: 100
         step: 1
         rate:
-          count: 100
+          count: 10
           interval: "1s"
   outputs:
     - id: result

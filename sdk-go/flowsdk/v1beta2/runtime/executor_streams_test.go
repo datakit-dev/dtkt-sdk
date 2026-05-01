@@ -248,3 +248,99 @@ func TestGraph_Stream_BidiThrottle(t *testing.T) {
 		assert.GreaterOrEqual(t, elapsed, 300*time.Millisecond)
 	})
 }
+
+// --- Stream error paths ---
+
+// Server stream that sends 2 messages then aborts mid-flight. With the default
+// TERMINATE strategy, the executor returns the abort error.
+func TestGraph_Stream_Error_Aborted(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "stream_aborted.yaml")
+
+		pubsub := newPubSub()
+		defer pubsub.Close() //nolint:errcheck
+
+		feedInput(pubsub, "inputs.msg", 1)
+		ctx := testContext(t)
+		err := NewExecutor(pubsub, testTopics, append(mockRPCOptions(), extraOpts...)...).Execute(ctx, graph)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "stream aborted mid-flight")
+	})
+}
+
+// Server stream that closes immediately with no messages: flow completes
+// successfully and produces no outputs.
+func TestGraph_Stream_Error_Empty(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "stream_empty.yaml")
+
+		pubsub := newPubSub()
+		defer pubsub.Close() //nolint:errcheck
+
+		feedInput(pubsub, "inputs.msg", 1)
+		ctx := testContext(t)
+		err := NewExecutor(pubsub, testTopics, append(mockRPCOptions(), extraOpts...)...).Execute(ctx, graph)
+		require.NoError(t, err)
+
+		assert.Empty(t, collectOutputs(ctx, pubsub, "outputs.result"))
+	})
+}
+
+// Server stream that opens but never sends or closes. Terminate() cancels the
+// per-handler context; Execute returns ErrTerminated.
+func TestGraph_Stream_Error_Idle_Terminate(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "stream_idle.yaml")
+
+		pubsub := newPubSub()
+		defer pubsub.Close() //nolint:errcheck
+
+		feedInput(pubsub, "inputs.msg", 1)
+		ctx := testContext(t)
+		exec := NewExecutor(pubsub, testTopics, append(mockRPCOptions(), extraOpts...)...)
+
+		done := make(chan error, 1)
+		go func() {
+			done <- exec.Execute(ctx, graph)
+		}()
+
+		// Wait for the stream to open and idle, then terminate.
+		time.Sleep(100 * time.Millisecond)
+		exec.Terminate()
+
+		err := <-done
+		assert.ErrorIs(t, err, ErrTerminated)
+	})
+}
+
+// Bidi stream that accepts one message then returns DeadlineExceeded.
+func TestGraph_Stream_Error_BidiDeadline(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "stream_bidi_deadline.yaml")
+
+		pubsub := newPubSub()
+		defer pubsub.Close() //nolint:errcheck
+
+		feedInput(pubsub, "inputs.msg", 1)
+		ctx := testContext(t)
+		err := NewExecutor(pubsub, testTopics, append(mockRPCOptions(), extraOpts...)...).Execute(ctx, graph)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "deadline exceeded")
+	})
+}
+
+// Client stream that accepts 2 messages then fails with InvalidArgument.
+func TestGraph_Stream_Error_ClientStreamInvalid(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "stream_client_invalid.yaml")
+
+		pubsub := newPubSub()
+		defer pubsub.Close() //nolint:errcheck
+
+		feedInput(pubsub, "inputs.msg", 1, 2, 3)
+		ctx := testContext(t)
+		err := NewExecutor(pubsub, testTopics, append(mockRPCOptions(), extraOpts...)...).Execute(ctx, graph)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "invalid payload")
+	})
+}

@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: stream_idle
+  inputs:
+    - id: msg
+      int64: {}
+  streams:
+    - id: idle
+      call:
+        connection: echo
+        method: stream.Idle
+        request: "= inputs.msg.value"
+  outputs:
+    - id: result
+      value: "= streams.idle.value"
