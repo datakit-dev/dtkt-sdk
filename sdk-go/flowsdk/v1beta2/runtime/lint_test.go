@@ -1,19 +1,14 @@
 package runtime
 
 import (
-	"fmt"
 	"testing"
 
-	"buf.build/go/protovalidate"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/reflect/protodesc"
-	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/descriptorpb"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/rpc/mock"
 )
 
 func TestLint_ValidGraph(t *testing.T) {
@@ -222,24 +217,17 @@ func TestLint_SchemaEOFInRequest(t *testing.T) {
 
 // --- Test resolver ---
 
-// newConflictResolver builds a test resolver with a "test.Shared" message type
-// from a uniquely-named file. Two resolvers built with different filenames but
-// the same package/message name simulate a proto conflict.
-func newConflictResolver(t *testing.T, fileName string) *testResolver {
+// newConflictResolver builds a test resolver with a "test.Shared" message
+// type from a uniquely-named file. Two resolvers built with different
+// filenames but the same package/message name simulate a proto conflict.
+func newConflictResolver(t *testing.T, fileName string) *flowResolver {
 	t.Helper()
-	fd := &descriptorpb.FileDescriptorProto{
-		Name:    proto.String(fileName),
-		Syntax:  proto.String("proto3"),
-		Package: proto.String("test"),
-		MessageType: []*descriptorpb.DescriptorProto{
-			{Name: proto.String("Shared")},
-		},
-	}
-	file, err := protodesc.NewFile(fd, nil)
-	if err != nil {
-		t.Fatalf("building conflict descriptor: %v", err)
-	}
-	return &testResolver{file: file}
+	file := buildSyntheticFile(t, syntheticFileSpec{
+		fileName:    fileName,
+		packageName: "test",
+		messages:    []syntheticMessage{{name: "Shared"}},
+	})
+	return newFlowResolver(mock.NewClient(), file)
 }
 
 func TestLint_ProtoConflict(t *testing.T) {
@@ -273,88 +261,42 @@ func TestLint_ProtoNoConflictSameFile(t *testing.T) {
 	}
 }
 
-// testResolver is a minimal shared.Resolver for lint tests. It builds a proto
-// descriptor with a known message schema: TestRequest{name string, count int32,
-// active bool, tags repeated string, nested TestNested{value string}}.
-type testResolver struct {
-	file protoreflect.FileDescriptor
-}
-
-func newTestResolver(t *testing.T) *testResolver {
+// newTestResolver builds a flowResolver with a synthetic test.Service
+// descriptor: TestRequest{name string, count int32, active bool,
+// tags repeated string, nested TestNested{value string}} and TestResponse{}.
+// Used by lint tests that exercise schema validation against a known shape.
+func newTestResolver(t *testing.T) *flowResolver {
 	t.Helper()
-	fd := &descriptorpb.FileDescriptorProto{
-		Name:    proto.String("test.proto"),
-		Syntax:  proto.String("proto3"),
-		Package: proto.String("test"),
-		MessageType: []*descriptorpb.DescriptorProto{
+	file := buildSyntheticFile(t, syntheticFileSpec{
+		fileName:    "test.proto",
+		packageName: "test",
+		messages: []syntheticMessage{
 			{
-				Name: proto.String("TestRequest"),
-				Field: []*descriptorpb.FieldDescriptorProto{
-					{Name: proto.String("name"), Number: proto.Int32(1), Type: descriptorpb.FieldDescriptorProto_TYPE_STRING.Enum(), Label: descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL.Enum()},
-					{Name: proto.String("count"), Number: proto.Int32(2), Type: descriptorpb.FieldDescriptorProto_TYPE_INT32.Enum(), Label: descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL.Enum()},
-					{Name: proto.String("active"), Number: proto.Int32(3), Type: descriptorpb.FieldDescriptorProto_TYPE_BOOL.Enum(), Label: descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL.Enum()},
-					{Name: proto.String("tags"), Number: proto.Int32(4), Type: descriptorpb.FieldDescriptorProto_TYPE_STRING.Enum(), Label: descriptorpb.FieldDescriptorProto_LABEL_REPEATED.Enum()},
-					{Name: proto.String("nested"), Number: proto.Int32(5), Type: descriptorpb.FieldDescriptorProto_TYPE_MESSAGE.Enum(), TypeName: proto.String(".test.TestNested"), Label: descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL.Enum()},
+				name: "TestRequest",
+				fields: []syntheticField{
+					{name: "name", number: 1, fieldType: descriptorpb.FieldDescriptorProto_TYPE_STRING},
+					{name: "count", number: 2, fieldType: descriptorpb.FieldDescriptorProto_TYPE_INT32},
+					{name: "active", number: 3, fieldType: descriptorpb.FieldDescriptorProto_TYPE_BOOL},
+					{name: "tags", number: 4, fieldType: descriptorpb.FieldDescriptorProto_TYPE_STRING, repeated: true},
+					{name: "nested", number: 5, fieldType: descriptorpb.FieldDescriptorProto_TYPE_MESSAGE, typeName: ".test.TestNested"},
 				},
 			},
 			{
-				Name: proto.String("TestNested"),
-				Field: []*descriptorpb.FieldDescriptorProto{
-					{Name: proto.String("value"), Number: proto.Int32(1), Type: descriptorpb.FieldDescriptorProto_TYPE_STRING.Enum(), Label: descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL.Enum()},
+				name: "TestNested",
+				fields: []syntheticField{
+					{name: "value", number: 1, fieldType: descriptorpb.FieldDescriptorProto_TYPE_STRING},
 				},
 			},
-			{Name: proto.String("TestResponse")},
+			{name: "TestResponse"},
 		},
-		Service: []*descriptorpb.ServiceDescriptorProto{{
-			Name: proto.String("Service"),
-			Method: []*descriptorpb.MethodDescriptorProto{
-				{
-					Name:            proto.String("Do"),
-					InputType:       proto.String(".test.TestRequest"),
-					OutputType:      proto.String(".test.TestResponse"),
-					ClientStreaming: proto.Bool(false),
-					ServerStreaming: proto.Bool(false),
+		services: []syntheticService{
+			{
+				name: "Service",
+				methods: []syntheticMethod{
+					{name: "Do", inputType: ".test.TestRequest", outputType: ".test.TestResponse"},
 				},
 			},
-		}},
-	}
-	file, err := protodesc.NewFile(fd, nil)
-	if err != nil {
-		t.Fatalf("building test descriptor: %v", err)
-	}
-	return &testResolver{file: file}
-}
-
-func (r *testResolver) FindMethodByName(name protoreflect.FullName) (protoreflect.MethodDescriptor, error) {
-	for i := range r.file.Services().Len() {
-		svc := r.file.Services().Get(i)
-		for j := range svc.Methods().Len() {
-			md := svc.Methods().Get(j)
-			if md.FullName() == name {
-				return md, nil
-			}
-		}
-	}
-	return nil, fmt.Errorf("method %q not found", name)
-}
-
-func (r *testResolver) FindMessageByName(protoreflect.FullName) (protoreflect.MessageType, error) {
-	return nil, protoregistry.NotFound
-}
-func (r *testResolver) FindMessageByURL(string) (protoreflect.MessageType, error) {
-	return nil, protoregistry.NotFound
-}
-func (r *testResolver) FindExtensionByName(protoreflect.FullName) (protoreflect.ExtensionType, error) {
-	return nil, protoregistry.NotFound
-}
-func (r *testResolver) FindExtensionByNumber(protoreflect.FullName, protoreflect.FieldNumber) (protoreflect.ExtensionType, error) {
-	return nil, protoregistry.NotFound
-}
-func (r *testResolver) RangeServices(func(protoreflect.ServiceDescriptor) bool) {}
-func (r *testResolver) RangeMethods(func(protoreflect.MethodDescriptor) bool)   {}
-func (r *testResolver) RangeFiles(f func(protoreflect.FileDescriptor) bool) {
-	f(r.file)
-}
-func (r *testResolver) GetValidator() (protovalidate.Validator, error) {
-	return nil, fmt.Errorf("test: validator not available")
+		},
+	})
+	return newFlowResolver(mock.NewClient(), file)
 }

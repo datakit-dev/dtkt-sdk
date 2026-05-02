@@ -2,11 +2,14 @@ package runtime
 
 import (
 	"errors"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
+	flowsdkv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -357,5 +360,47 @@ func TestErrorStrategy_Continue_MultipleErrors(t *testing.T) {
 		phases := collectPhases(ctx, failCh)
 		require.NotEmpty(t, phases)
 		assert.Equal(t, flowv1beta2.RunSnapshot_PHASE_ERRORED, phases[len(phases)-1])
+	})
+}
+
+// Flow.error_strategy round-trips through the YAML decoder: a positive
+// assertion that the spec field is parsed (independent of whether the
+// runtime honors it).
+
+func TestErrorStrategy_FromSpec_Decodes(t *testing.T) {
+	f, err := os.Open("testdata/error_strategy_continue.yaml")
+	require.NoError(t, err)
+	defer f.Close()
+	spec, err := flowsdkv1beta2.ReadSpec(encoding.YAML, f)
+	require.NoError(t, err)
+	require.Equal(t,
+		flowv1beta2.ErrorStrategy_ERROR_STRATEGY_CONTINUE,
+		spec.GetFlow().GetErrorStrategy(),
+		"Flow.error_strategy must round-trip through YAML decode")
+}
+
+// CONTINUE: error_strategy declared in the Flow spec is honored end-to-end.
+// No WithErrorStrategy option -- the runtime picks up the strategy from the
+// spec (carried through Graph.error_strategy by graph.Build()) and lets the
+// generator path complete despite the failed input path.
+
+func TestErrorStrategy_Continue_FromSpec(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "error_strategy_continue.yaml")
+
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck
+
+		feedInput(ps, "inputs.fail_input", 99)
+
+		ctx := testContext(t)
+		err := NewExecutor(ps, testTopics, append(mockRPCOptions(), extraOpts...)...).Execute(ctx, graph)
+
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "internal server error")
+
+		results := collectOutputs(ctx, ps, "outputs.ok_result")
+		require.Len(t, results, 3, "generator path should produce all values")
+		assert.Equal(t, []int64{1, 2, 3}, outputInt64s(results))
 	})
 }

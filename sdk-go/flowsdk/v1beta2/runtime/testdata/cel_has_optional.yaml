@@ -1,0 +1,11 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: cel_has_optional
+  description: "Use has() to check optional subfield presence inside a structured value"
+  inputs:
+    - id: x
+      string: {}
+  outputs:
+    - id: result
+      value: "= has(inputs.x.value.nickname) ? inputs.x.value.nickname : 'anonymous'"

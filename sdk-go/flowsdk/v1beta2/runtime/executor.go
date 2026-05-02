@@ -439,8 +439,12 @@ func (e *Executor) Execute(ctx context.Context, graph *flowv1beta2.Graph) error 
 	// Route interaction responses from the external channel to handlers.
 	startInteractionDemux(gCtx, e.interactionResponse, interactionHandlers)
 
-	// Determine effective error strategy.
+	// Determine effective error strategy. Precedence: option override
+	// (WithErrorStrategy) wins over the spec field carried on the graph.
 	strategy := e.errorStrategy
+	if strategy == flowv1beta2.ErrorStrategy_ERROR_STRATEGY_UNSPECIFIED {
+		strategy = graph.GetErrorStrategy()
+	}
 	if strategy == flowv1beta2.ErrorStrategy_ERROR_STRATEGY_UNSPECIFIED {
 		strategy = flowv1beta2.ErrorStrategy_ERROR_STRATEGY_TERMINATE
 	}

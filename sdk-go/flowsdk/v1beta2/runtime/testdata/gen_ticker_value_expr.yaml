@@ -5,7 +5,7 @@ spec:
   generators:
     - id: tick
       ticker:
-        interval: "0.01s"
+        interval: "0.05s"
         value: "= this.count * 100"
   outputs:
     - id: result

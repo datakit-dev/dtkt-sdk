@@ -125,6 +125,7 @@ func Build(flow *flowv1beta2.Flow) (*flowv1beta2.Graph, error) {
 	g := &flowv1beta2.Graph{}
 	g.SetNodes(nodes)
 	g.SetEdges(edges)
+	g.SetErrorStrategy(flow.GetErrorStrategy())
 	return g, nil
 }
 

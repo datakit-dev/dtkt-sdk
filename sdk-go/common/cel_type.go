@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"sync"
 	"unicode"
 
 	"buf.build/go/protovalidate"
@@ -23,6 +24,7 @@ type (
 	CELTypes struct {
 		resolver     CELResolver
 		registry     *types.Registry
+		mu           sync.RWMutex
 		fieldAliases map[string]map[string]string
 	}
 	CELResolver interface {
@@ -243,7 +245,10 @@ func (t *CELTypes) wrapProtoMessage(val ref.Val, msg proto.Message) ref.Val {
 
 func (t *CELTypes) aliasMap(desc protoreflect.MessageDescriptor) map[string]string {
 	fullName := string(desc.FullName())
-	if cached, ok := t.fieldAliases[fullName]; ok {
+	t.mu.RLock()
+	cached, ok := t.fieldAliases[fullName]
+	t.mu.RUnlock()
+	if ok {
 		return cached
 	}
 
@@ -257,7 +262,14 @@ func (t *CELTypes) aliasMap(desc protoreflect.MessageDescriptor) map[string]stri
 		aliases[jsonName] = protoName
 	}
 
-	t.fieldAliases[fullName] = aliases
+	t.mu.Lock()
+	if existing, ok := t.fieldAliases[fullName]; ok {
+		// Lost the race; reuse the entry another goroutine wrote.
+		aliases = existing
+	} else {
+		t.fieldAliases[fullName] = aliases
+	}
+	t.mu.Unlock()
 	return aliases
 }
 

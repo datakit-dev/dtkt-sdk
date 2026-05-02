@@ -10,7 +10,7 @@ spec:
   generators:
     - id: tick
       ticker:
-        interval: "0.01s"
+        interval: "0.05s"
   outputs:
     - id: result
       value: "= int(generators.tick.eval_count)"

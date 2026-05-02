@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: stream_eof_close_request
+  inputs:
+    - id: x
+      int64: {}
+  streams:
+    - id: echo
+      call:
+        connection: echo
+        method: echo.BidiEcho
+        request: "= inputs.x.value == 99 ? EOF() : inputs.x.value"
+  outputs:
+    - id: result
+      value: "= streams.echo.value"

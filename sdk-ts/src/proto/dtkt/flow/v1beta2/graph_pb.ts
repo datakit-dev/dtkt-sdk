@@ -5,7 +5,7 @@
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_buf_validate_validate } from "../../../buf/validate/validate_pb";
-import type { Action, ActionValid, Connection, ConnectionValid, Generator, GeneratorValid, Input, InputValid, Interaction, InteractionValid, Output, OutputValid, Stream, StreamValid, Var, VarValid } from "./spec_pb";
+import type { Action, ActionValid, Connection, ConnectionValid, ErrorStrategy, Generator, GeneratorValid, Input, InputValid, Interaction, InteractionValid, Output, OutputValid, Stream, StreamValid, Var, VarValid } from "./spec_pb";
 import { file_dtkt_flow_v1beta2_spec } from "./spec_pb";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -13,7 +13,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dtkt/flow/v1beta2/graph.proto.
  */
 export const file_dtkt_flow_v1beta2_graph: GenFile = /*@__PURE__*/
-  fileDesc("Ch1kdGt0L2Zsb3cvdjFiZXRhMi9ncmFwaC5wcm90bxIRZHRrdC5mbG93LnYxYmV0YTIiVwoFR3JhcGgSJgoFbm9kZXMYASADKAsyFy5kdGt0LmZsb3cudjFiZXRhMi5Ob2RlEiYKBWVkZ2VzGAIgAygLMhcuZHRrdC5mbG93LnYxYmV0YTIuRWRnZSKCAgoERWRnZRJ8CgZzb3VyY2UYASABKAlCbLpIacgBAXJkMmJeKGNvbm5lY3Rpb25zfGlucHV0c3xnZW5lcmF0b3JzfHZhcnN8YWN0aW9uc3xzdHJlYW1zfGludGVyYWN0aW9uc3xvdXRwdXRzKVwuW2EtekEtWl1bYS16QS1aMC05X10qJBJ8CgZ0YXJnZXQYAiABKAlCbLpIacgBAXJkMmJeKGNvbm5lY3Rpb25zfGlucHV0c3xnZW5lcmF0b3JzfHZhcnN8YWN0aW9uc3xzdHJlYW1zfGludGVyYWN0aW9uc3xvdXRwdXRzKVwuW2EtekEtWl1bYS16QS1aMC05X10qJCKHBAoETm9kZRJ4CgJpZBgBIAEoCUJsukhpyAEBcmQyYl4oY29ubmVjdGlvbnN8aW5wdXRzfGdlbmVyYXRvcnN8dmFyc3xhY3Rpb25zfHN0cmVhbXN8aW50ZXJhY3Rpb25zfG91dHB1dHMpXC5bYS16QS1aXVthLXpBLVowLTlfXSokEjMKCmNvbm5lY3Rpb24YCCABKAsyHS5kdGt0LmZsb3cudjFiZXRhMi5Db25uZWN0aW9uSAASKQoFaW5wdXQYCSABKAsyGC5kdGt0LmZsb3cudjFiZXRhMi5JbnB1dEgAEjEKCWdlbmVyYXRvchgKIAEoCzIcLmR0a3QuZmxvdy52MWJldGEyLkdlbmVyYXRvckgAEiUKA3ZhchgLIAEoCzIWLmR0a3QuZmxvdy52MWJldGEyLlZhckgAEisKBmFjdGlvbhgMIAEoCzIZLmR0a3QuZmxvdy52MWJldGEyLkFjdGlvbkgAEisKBnN0cmVhbRgNIAEoCzIZLmR0a3QuZmxvdy52MWJldGEyLlN0cmVhbUgAEjUKC2ludGVyYWN0aW9uGA4gASgLMh4uZHRrdC5mbG93LnYxYmV0YTIuSW50ZXJhY3Rpb25IABIrCgZvdXRwdXQYDyABKAsyGS5kdGt0LmZsb3cudjFiZXRhMi5PdXRwdXRIAEINCgR0eXBlEgW6SAIIAULXAQoXcHJvdG8uZHRrdC5mbG93LnYxYmV0YTJCCkdyYXBoUHJvdG9QAVpKZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9mbG93L3YxYmV0YTI7Zmxvd3YxYmV0YTKiAgNERliqAhFEdGt0LkZsb3cuVjFiZXRhMsoCEUR0a3RcRmxvd1xWMWJldGEy4gIdRHRrdFxGbG93XFYxYmV0YTJcR1BCTWV0YWRhdGHqAhNEdGt0OjpGbG93OjpWMWJldGEyYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_flow_v1beta2_spec]);
+  fileDesc("Ch1kdGt0L2Zsb3cvdjFiZXRhMi9ncmFwaC5wcm90bxIRZHRrdC5mbG93LnYxYmV0YTIimwEKBUdyYXBoEiYKBW5vZGVzGAEgAygLMhcuZHRrdC5mbG93LnYxYmV0YTIuTm9kZRImCgVlZGdlcxgCIAMoCzIXLmR0a3QuZmxvdy52MWJldGEyLkVkZ2USQgoOZXJyb3Jfc3RyYXRlZ3kYAyABKA4yIC5kdGt0LmZsb3cudjFiZXRhMi5FcnJvclN0cmF0ZWd5Qgi6SAWCAQIQASKCAgoERWRnZRJ8CgZzb3VyY2UYASABKAlCbLpIacgBAXJkMmJeKGNvbm5lY3Rpb25zfGlucHV0c3xnZW5lcmF0b3JzfHZhcnN8YWN0aW9uc3xzdHJlYW1zfGludGVyYWN0aW9uc3xvdXRwdXRzKVwuW2EtekEtWl1bYS16QS1aMC05X10qJBJ8CgZ0YXJnZXQYAiABKAlCbLpIacgBAXJkMmJeKGNvbm5lY3Rpb25zfGlucHV0c3xnZW5lcmF0b3JzfHZhcnN8YWN0aW9uc3xzdHJlYW1zfGludGVyYWN0aW9uc3xvdXRwdXRzKVwuW2EtekEtWl1bYS16QS1aMC05X10qJCKHBAoETm9kZRJ4CgJpZBgBIAEoCUJsukhpyAEBcmQyYl4oY29ubmVjdGlvbnN8aW5wdXRzfGdlbmVyYXRvcnN8dmFyc3xhY3Rpb25zfHN0cmVhbXN8aW50ZXJhY3Rpb25zfG91dHB1dHMpXC5bYS16QS1aXVthLXpBLVowLTlfXSokEjMKCmNvbm5lY3Rpb24YCCABKAsyHS5kdGt0LmZsb3cudjFiZXRhMi5Db25uZWN0aW9uSAASKQoFaW5wdXQYCSABKAsyGC5kdGt0LmZsb3cudjFiZXRhMi5JbnB1dEgAEjEKCWdlbmVyYXRvchgKIAEoCzIcLmR0a3QuZmxvdy52MWJldGEyLkdlbmVyYXRvckgAEiUKA3ZhchgLIAEoCzIWLmR0a3QuZmxvdy52MWJldGEyLlZhckgAEisKBmFjdGlvbhgMIAEoCzIZLmR0a3QuZmxvdy52MWJldGEyLkFjdGlvbkgAEisKBnN0cmVhbRgNIAEoCzIZLmR0a3QuZmxvdy52MWJldGEyLlN0cmVhbUgAEjUKC2ludGVyYWN0aW9uGA4gASgLMh4uZHRrdC5mbG93LnYxYmV0YTIuSW50ZXJhY3Rpb25IABIrCgZvdXRwdXQYDyABKAsyGS5kdGt0LmZsb3cudjFiZXRhMi5PdXRwdXRIAEINCgR0eXBlEgW6SAIIAULXAQoXcHJvdG8uZHRrdC5mbG93LnYxYmV0YTJCCkdyYXBoUHJvdG9QAVpKZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9mbG93L3YxYmV0YTI7Zmxvd3YxYmV0YTKiAgNERliqAhFEdGt0LkZsb3cuVjFiZXRhMsoCEUR0a3RcRmxvd1xWMWJldGEy4gIdRHRrdFxGbG93XFYxYmV0YTJcR1BCTWV0YWRhdGHqAhNEdGt0OjpGbG93OjpWMWJldGEyYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_flow_v1beta2_spec]);
 
 /**
  * A Flow gets compiled into a Graph, which is a DAG representation of all the nodes
@@ -36,6 +36,14 @@ export type Graph = Message<"dtkt.flow.v1beta2.Graph"> & {
    * @generated from field: repeated dtkt.flow.v1beta2.Edge edges = 2;
    */
   edges: Edge[];
+
+  /**
+   * Carried over from Flow.error_strategy. Determines runtime behavior when
+   * a node enters PHASE_ERRORED. Default (UNSPECIFIED) = TERMINATE.
+   *
+   * @generated from field: dtkt.flow.v1beta2.ErrorStrategy error_strategy = 3;
+   */
+  errorStrategy: ErrorStrategy;
 };
 
 /**
@@ -59,6 +67,14 @@ export type GraphValid = Message<"dtkt.flow.v1beta2.Graph"> & {
    * @generated from field: repeated dtkt.flow.v1beta2.Edge edges = 2;
    */
   edges: EdgeValid[];
+
+  /**
+   * Carried over from Flow.error_strategy. Determines runtime behavior when
+   * a node enters PHASE_ERRORED. Default (UNSPECIFIED) = TERMINATE.
+   *
+   * @generated from field: dtkt.flow.v1beta2.ErrorStrategy error_strategy = 3;
+   */
+  errorStrategy: ErrorStrategy;
 };
 
 /**

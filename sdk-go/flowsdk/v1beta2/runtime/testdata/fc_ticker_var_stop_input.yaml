@@ -13,7 +13,7 @@ spec:
   generators:
     - id: tick
       ticker:
-        interval: "0.01s"
+        interval: "0.05s"
   vars:
     - id: evenOrOdd
       value: |

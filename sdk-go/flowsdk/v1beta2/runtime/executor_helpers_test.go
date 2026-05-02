@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 	"testing"
 	"time"
 
 	expr "cel.dev/expr"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
 	flowsdkv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2"
@@ -171,12 +173,26 @@ func assertNoGoroutineLeak(t *testing.T, before int) {
 
 // nativeToExpr converts a Go native value to a cel.expr.Value using the
 // standard CEL conversion pipeline: NativeToValue → cel.ValueAsProto.
+//
+// Non-WKT proto.Message inputs are wrapped directly via Any. cel-go's
+// DefaultTypeAdapter only knows protos pre-registered in its global
+// pb.DefaultDb, and falls back to reflection-based mapping for anything
+// else - producing a generic MapValue keyed by Go's PascalCase field
+// names. Wrapping in Any preserves the type URL so the receive-side
+// adapter (which has the proper resolver) can deserialize it as a typed
+// proto and CEL can access fields by their proto/JSON names.
 func nativeToExpr(v any) (*expr.Value, error) {
 	if v == nil {
 		return &expr.Value{Kind: &expr.Value_NullValue{}}, nil
 	}
 	if ev, ok := v.(*expr.Value); ok {
 		return ev, nil
+	}
+	if msg, ok := v.(proto.Message); ok {
+		fullName := string(msg.ProtoReflect().Descriptor().FullName())
+		if !strings.HasPrefix(fullName, "google.protobuf.") {
+			return protoToExpr(msg)
+		}
 	}
 	refVal := types.DefaultTypeAdapter.NativeToValue(v)
 	if types.IsError(refVal) {

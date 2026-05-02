@@ -1,0 +1,11 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: cel_missing_field
+  description: "Access a non-existent subfield without has() - expected to error"
+  inputs:
+    - id: x
+      string: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value.nonexistent_field"

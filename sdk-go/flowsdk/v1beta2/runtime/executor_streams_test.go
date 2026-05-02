@@ -225,6 +225,31 @@ func TestGraph_Stream_BidiCloseRequestWhen(t *testing.T) {
 	})
 }
 
+// Stream with EOF() in MethodCall.request -- when the request expression
+// evaluates to EOF(), the runtime is documented to close the client side of
+// the stream (an ergonomic alternative to close_request_when).
+
+func TestGraph_Stream_BidiEOFInRequest(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "stream_eof_close_request.yaml")
+
+		pubsub := newPubSub()
+		defer pubsub.Close() //nolint:errcheck
+
+		// Feed values: 1, 2, 99 (EOF trigger), 3 -- only 1 and 2 should echo;
+		// the EOF() should close the request side and stop the stream.
+		feedInput(pubsub, "inputs.x", 1, 2, 99, 3)
+		ctx := testContext(t)
+		err := NewExecutor(pubsub, testTopics, append(mockRPCOptions(), extraOpts...)...).Execute(ctx, graph)
+		require.NoError(t, err)
+
+		results := collectOutputs(ctx, pubsub, "outputs.result")
+		require.Len(t, results, 2)
+		assert.Equal(t, int64(1), results[0].GetValue().GetInt64Value())
+		assert.Equal(t, int64(2), results[1].GetValue().GetInt64Value())
+	})
+}
+
 // Stream throttle (bidi stream with rate limiting)
 
 func TestGraph_Stream_BidiThrottle(t *testing.T) {

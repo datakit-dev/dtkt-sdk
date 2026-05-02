@@ -241,3 +241,23 @@ func TestGraph_Action_MemoizeDifferentInputs(t *testing.T) {
 		assert.Equal(t, 3, callCount, "RPC should be called once per unique input value")
 	})
 }
+
+// MethodCall.response post-processes the raw RPC reply with a CEL expression
+// where `this.response` is bound to the raw value.
+
+func TestGraph_Action_ResponseProjection(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "action_response_projection.yaml")
+
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck
+
+		feedInput(ps, "inputs.x", 5, 7)
+		ctx := testContext(t)
+		err := NewExecutor(ps, testTopics, append(mockRPCOptions(), extraOpts...)...).Execute(ctx, graph)
+		require.NoError(t, err)
+
+		// echo returns the request as-is; response CEL multiplies by 2.
+		assert.Equal(t, []int64{10, 14}, outputInt64s(collectOutputs(ctx, ps, "outputs.result")))
+	})
+}

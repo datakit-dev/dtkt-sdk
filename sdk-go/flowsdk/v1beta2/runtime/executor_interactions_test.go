@@ -126,6 +126,38 @@ func TestGraph_Interaction_ResponseClose(t *testing.T) {
 	})
 }
 
+// Interaction: form with inputs[] (confirm + input elements). The runtime
+// accepts the form definition, prompts, and forwards the response value.
+
+func TestGraph_Interaction_FormInputs(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "interaction_form.yaml")
+
+		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 4)
+		response := make(chan *flowv1beta2.InteractionResponseEvent, 4)
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck
+
+		go func() {
+			for p := range prompt {
+				anyVal, _ := common.WrapProtoAny(int64(7))
+				response <- &flowv1beta2.InteractionResponseEvent{Id: p.GetId(), Token: p.GetToken(), Value: anyVal}
+			}
+			close(response)
+		}()
+
+		feedInput(ps, "inputs.x", int64(1))
+		ctx := testContext(t)
+		err := NewExecutor(ps, testTopics, append([]Option{WithInteractions(prompt, response)}, extraOpts...)...).Execute(ctx, graph)
+		close(prompt)
+		require.NoError(t, err)
+
+		results := collectOutputs(ctx, ps, "outputs.result")
+		require.Len(t, results, 1)
+		assert.Equal(t, int64(7), results[0].GetValue().GetInt64Value())
+	})
+}
+
 // Interaction: wrong token is dropped, correct token is delivered
 
 func TestGraph_Interaction_WrongTokenDropped(t *testing.T) {

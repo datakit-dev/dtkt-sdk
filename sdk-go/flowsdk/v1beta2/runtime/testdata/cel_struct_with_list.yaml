@@ -1,0 +1,11 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: cel_struct_with_list
+  description: "Access subfield of a struct nested inside a list"
+  inputs:
+    - id: x
+      string: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value.items[1].id"

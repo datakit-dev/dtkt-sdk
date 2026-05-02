@@ -1,0 +1,41 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: cel_package_access
+  description: "Action returns a typed Package; outputs read its nested fields via CEL"
+  inputs:
+    - id: trigger
+      int64: {}
+  actions:
+    - id: pkg
+      call:
+        connection: pkg
+        method: pkg.Fixed
+        request: "= inputs.trigger.value"
+  outputs:
+    - id: identity_name
+      value: "= actions.pkg.value.identity.name"
+    - id: identity_version
+      value: "= actions.pkg.value.identity.version"
+    - id: description
+      value: "= actions.pkg.value.description"
+    - id: type
+      value: "= actions.pkg.value.type"
+    - id: first_runtime
+      value: "= actions.pkg.value.runtimes[0]"
+    - id: second_runtime
+      value: "= actions.pkg.value.runtimes[1]"
+    - id: first_platform_os
+      value: "= actions.pkg.value.platforms[0].os"
+    - id: second_platform_arch
+      value: "= actions.pkg.value.platforms[1].arch"
+    - id: build_env_foo
+      value: '= actions.pkg.value.build.env["FOO"]'
+    - id: build_env_baz
+      value: '= actions.pkg.value.build.env["BAZ"]'
+    - id: ports_count
+      value: "= size(actions.pkg.value.deploy.ports)"
+    - id: first_port_name
+      value: "= actions.pkg.value.deploy.ports[0].name"
+    - id: second_port_protocol
+      value: "= actions.pkg.value.deploy.ports[1].protocol"

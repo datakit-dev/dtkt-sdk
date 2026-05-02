@@ -1,0 +1,11 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: cel_struct_nested
+  description: "Access deeply nested subfield of a structured input value"
+  inputs:
+    - id: x
+      string: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value.address.city"

@@ -15,6 +15,9 @@ message Graph {
   repeated Node nodes = 1;
   // Directed edges connecting nodes. Each edge represents a data dependency.
   repeated Edge edges = 2;
+  // Carried over from Flow.error_strategy. Determines runtime behavior when
+  // a node enters PHASE_ERRORED. Default (UNSPECIFIED) = TERMINATE.
+  ErrorStrategy error_strategy = 3 [(buf.validate.field).enum.defined_only = true];
 }
 
 // Edge is a directed data dependency between two nodes in the graph.

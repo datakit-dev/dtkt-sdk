@@ -1,0 +1,11 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: cel_comprehension_exists
+  description: "exists() macro over a list of structs nested inside an input value"
+  inputs:
+    - id: x
+      string: {}
+  outputs:
+    - id: result
+      value: '= inputs.x.value.items.exists(i, i.name == "needle")'

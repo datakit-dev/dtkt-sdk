@@ -31,7 +31,10 @@ type Graph struct {
 	// All nodes in the graph.
 	Nodes []*Node `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty"`
 	// Directed edges connecting nodes. Each edge represents a data dependency.
-	Edges         []*Edge `protobuf:"bytes,2,rep,name=edges,proto3" json:"edges,omitempty"`
+	Edges []*Edge `protobuf:"bytes,2,rep,name=edges,proto3" json:"edges,omitempty"`
+	// Carried over from Flow.error_strategy. Determines runtime behavior when
+	// a node enters PHASE_ERRORED. Default (UNSPECIFIED) = TERMINATE.
+	ErrorStrategy ErrorStrategy `protobuf:"varint,3,opt,name=error_strategy,json=errorStrategy,proto3,enum=dtkt.flow.v1beta2.ErrorStrategy" json:"error_strategy,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -75,12 +78,23 @@ func (x *Graph) GetEdges() []*Edge {
 	return nil
 }
 
+func (x *Graph) GetErrorStrategy() ErrorStrategy {
+	if x != nil {
+		return x.ErrorStrategy
+	}
+	return ErrorStrategy_ERROR_STRATEGY_UNSPECIFIED
+}
+
 func (x *Graph) SetNodes(v []*Node) {
 	x.Nodes = v
 }
 
 func (x *Graph) SetEdges(v []*Edge) {
 	x.Edges = v
+}
+
+func (x *Graph) SetErrorStrategy(v ErrorStrategy) {
+	x.ErrorStrategy = v
 }
 
 type Graph_builder struct {
@@ -90,6 +104,9 @@ type Graph_builder struct {
 	Nodes []*Node
 	// Directed edges connecting nodes. Each edge represents a data dependency.
 	Edges []*Edge
+	// Carried over from Flow.error_strategy. Determines runtime behavior when
+	// a node enters PHASE_ERRORED. Default (UNSPECIFIED) = TERMINATE.
+	ErrorStrategy ErrorStrategy
 }
 
 func (b0 Graph_builder) Build() *Graph {
@@ -98,6 +115,7 @@ func (b0 Graph_builder) Build() *Graph {
 	_, _ = b, x
 	x.Nodes = b.Nodes
 	x.Edges = b.Edges
+	x.ErrorStrategy = b.ErrorStrategy
 	return m0
 }
 
@@ -670,10 +688,11 @@ var File_dtkt_flow_v1beta2_graph_proto protoreflect.FileDescriptor
 
 const file_dtkt_flow_v1beta2_graph_proto_rawDesc = "" +
 	"\n" +
-	"\x1ddtkt/flow/v1beta2/graph.proto\x12\x11dtkt.flow.v1beta2\x1a\x1bbuf/validate/validate.proto\x1a\x1cdtkt/flow/v1beta2/spec.proto\"e\n" +
+	"\x1ddtkt/flow/v1beta2/graph.proto\x12\x11dtkt.flow.v1beta2\x1a\x1bbuf/validate/validate.proto\x1a\x1cdtkt/flow/v1beta2/spec.proto\"\xb8\x01\n" +
 	"\x05Graph\x12-\n" +
 	"\x05nodes\x18\x01 \x03(\v2\x17.dtkt.flow.v1beta2.NodeR\x05nodes\x12-\n" +
-	"\x05edges\x18\x02 \x03(\v2\x17.dtkt.flow.v1beta2.EdgeR\x05edges\"\x94\x02\n" +
+	"\x05edges\x18\x02 \x03(\v2\x17.dtkt.flow.v1beta2.EdgeR\x05edges\x12Q\n" +
+	"\x0eerror_strategy\x18\x03 \x01(\x0e2 .dtkt.flow.v1beta2.ErrorStrategyB\b\xbaH\x05\x82\x01\x02\x10\x01R\rerrorStrategy\"\x94\x02\n" +
 	"\x04Edge\x12\x84\x01\n" +
 	"\x06source\x18\x01 \x01(\tBl\xbaHi\xc8\x01\x01rd2b^(connections|inputs|generators|vars|actions|streams|interactions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]*$R\x06source\x12\x84\x01\n" +
 	"\x06target\x18\x02 \x01(\tBl\xbaHi\xc8\x01\x01rd2b^(connections|inputs|generators|vars|actions|streams|interactions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]*$R\x06target\"\xd3\x04\n" +
@@ -699,31 +718,33 @@ var file_dtkt_flow_v1beta2_graph_proto_goTypes = []any{
 	(*Graph)(nil),       // 0: dtkt.flow.v1beta2.Graph
 	(*Edge)(nil),        // 1: dtkt.flow.v1beta2.Edge
 	(*Node)(nil),        // 2: dtkt.flow.v1beta2.Node
-	(*Connection)(nil),  // 3: dtkt.flow.v1beta2.Connection
-	(*Input)(nil),       // 4: dtkt.flow.v1beta2.Input
-	(*Generator)(nil),   // 5: dtkt.flow.v1beta2.Generator
-	(*Var)(nil),         // 6: dtkt.flow.v1beta2.Var
-	(*Action)(nil),      // 7: dtkt.flow.v1beta2.Action
-	(*Stream)(nil),      // 8: dtkt.flow.v1beta2.Stream
-	(*Interaction)(nil), // 9: dtkt.flow.v1beta2.Interaction
-	(*Output)(nil),      // 10: dtkt.flow.v1beta2.Output
+	(ErrorStrategy)(0),  // 3: dtkt.flow.v1beta2.ErrorStrategy
+	(*Connection)(nil),  // 4: dtkt.flow.v1beta2.Connection
+	(*Input)(nil),       // 5: dtkt.flow.v1beta2.Input
+	(*Generator)(nil),   // 6: dtkt.flow.v1beta2.Generator
+	(*Var)(nil),         // 7: dtkt.flow.v1beta2.Var
+	(*Action)(nil),      // 8: dtkt.flow.v1beta2.Action
+	(*Stream)(nil),      // 9: dtkt.flow.v1beta2.Stream
+	(*Interaction)(nil), // 10: dtkt.flow.v1beta2.Interaction
+	(*Output)(nil),      // 11: dtkt.flow.v1beta2.Output
 }
 var file_dtkt_flow_v1beta2_graph_proto_depIdxs = []int32{
 	2,  // 0: dtkt.flow.v1beta2.Graph.nodes:type_name -> dtkt.flow.v1beta2.Node
 	1,  // 1: dtkt.flow.v1beta2.Graph.edges:type_name -> dtkt.flow.v1beta2.Edge
-	3,  // 2: dtkt.flow.v1beta2.Node.connection:type_name -> dtkt.flow.v1beta2.Connection
-	4,  // 3: dtkt.flow.v1beta2.Node.input:type_name -> dtkt.flow.v1beta2.Input
-	5,  // 4: dtkt.flow.v1beta2.Node.generator:type_name -> dtkt.flow.v1beta2.Generator
-	6,  // 5: dtkt.flow.v1beta2.Node.var:type_name -> dtkt.flow.v1beta2.Var
-	7,  // 6: dtkt.flow.v1beta2.Node.action:type_name -> dtkt.flow.v1beta2.Action
-	8,  // 7: dtkt.flow.v1beta2.Node.stream:type_name -> dtkt.flow.v1beta2.Stream
-	9,  // 8: dtkt.flow.v1beta2.Node.interaction:type_name -> dtkt.flow.v1beta2.Interaction
-	10, // 9: dtkt.flow.v1beta2.Node.output:type_name -> dtkt.flow.v1beta2.Output
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	3,  // 2: dtkt.flow.v1beta2.Graph.error_strategy:type_name -> dtkt.flow.v1beta2.ErrorStrategy
+	4,  // 3: dtkt.flow.v1beta2.Node.connection:type_name -> dtkt.flow.v1beta2.Connection
+	5,  // 4: dtkt.flow.v1beta2.Node.input:type_name -> dtkt.flow.v1beta2.Input
+	6,  // 5: dtkt.flow.v1beta2.Node.generator:type_name -> dtkt.flow.v1beta2.Generator
+	7,  // 6: dtkt.flow.v1beta2.Node.var:type_name -> dtkt.flow.v1beta2.Var
+	8,  // 7: dtkt.flow.v1beta2.Node.action:type_name -> dtkt.flow.v1beta2.Action
+	9,  // 8: dtkt.flow.v1beta2.Node.stream:type_name -> dtkt.flow.v1beta2.Stream
+	10, // 9: dtkt.flow.v1beta2.Node.interaction:type_name -> dtkt.flow.v1beta2.Interaction
+	11, // 10: dtkt.flow.v1beta2.Node.output:type_name -> dtkt.flow.v1beta2.Output
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_flow_v1beta2_graph_proto_init() }

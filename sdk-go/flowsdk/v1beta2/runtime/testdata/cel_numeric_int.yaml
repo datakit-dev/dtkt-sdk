@@ -1,0 +1,11 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: cel_numeric_int
+  description: "Numeric subfield from a Go-int-valued struct -> int64 output"
+  inputs:
+    - id: x
+      string: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value.count"

@@ -1,0 +1,19 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: cel_stream_namespace
+  description: "Server-stream yields typed Package messages; output reads nested fields per element"
+  inputs:
+    - id: trigger
+      int64: {}
+  streams:
+    - id: pkgs
+      call:
+        connection: pkg
+        method: pkg.Stream
+        request: "= inputs.trigger.value"
+  outputs:
+    - id: name
+      value: "= streams.pkgs.value.identity.name"
+    - id: version
+      value: "= streams.pkgs.value.identity.version"

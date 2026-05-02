@@ -1,0 +1,21 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: interaction_form
+  inputs:
+    - id: x
+      int64: {}
+  interactions:
+    - id: ask
+      when: "= inputs.x.value > 0"
+      inputs:
+        - id: agree
+          title: "Do you agree?"
+          confirm: {}
+        - id: notes
+          title: "= 'Notes for value ' + string(inputs.x.value)"
+          description: "Optional details"
+          input: {}
+  outputs:
+    - id: result
+      value: "= interactions.ask.value"

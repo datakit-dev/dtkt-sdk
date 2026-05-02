@@ -184,12 +184,16 @@ func newMockRPCClient() *mock.Client {
 }
 
 // mockRPCOptions returns a WithConnectors option backed by the mock client
-// registered under every connection ID used in testdata flows.
+// registered under every connection ID used in testdata flows. The resolver
+// is a flowResolver with no extra files, so generic flow tests don't pay
+// for typed proto registration but typed-proto tests can swap in a
+// different helper (packageMockOptions, echoRequestCaptureOptions) that
+// registers the relevant FileDescriptors.
 func mockRPCOptions() []Option {
 	c := newMockRPCClient()
 	connectors := rpc.Connectors{}
 	for _, id := range []string{"echo", "random", "log"} {
-		connectors[id] = &rpc.Connector{Client: c, Resolver: c}
+		connectors[id] = &rpc.Connector{Client: c, Resolver: newFlowResolver(c)}
 	}
 	return []Option{WithConnectors(connectors)}
 }

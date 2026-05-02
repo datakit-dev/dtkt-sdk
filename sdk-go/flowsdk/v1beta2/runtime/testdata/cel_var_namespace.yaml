@@ -1,0 +1,14 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: cel_var_namespace
+  description: "Var produces a struct, output reads a subfield from the vars namespace"
+  inputs:
+    - id: x
+      string: {}
+  vars:
+    - id: data
+      value: '= {"original": inputs.x.value, "shouted": inputs.x.value + "!"}'
+  outputs:
+    - id: result
+      value: "= vars.data.value.shouted"
