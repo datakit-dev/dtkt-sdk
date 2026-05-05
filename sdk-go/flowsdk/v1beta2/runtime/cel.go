@@ -40,6 +40,7 @@ type nodeRef struct {
 	ch         <-chan *pubsub.Message
 	ctx        context.Context
 	suspendCh  <-chan struct{} // optional: handler's suspend signal
+	stopCh     <-chan struct{} // optional: handler's graceful-stop signal
 	node       executor.StateNode
 	chanClosed bool // channel itself was closed (not EOF value)
 	consumed   bool
@@ -53,15 +54,35 @@ func (nr *nodeRef) recv() error {
 		return nil
 	}
 	for {
-		// Multiplexes ctx cancellation, operator suspend, and the input
-		// channel. errOperatorSuspended is returned WITHOUT consuming a
-		// message, so the next recv (after resume) picks up the same
-		// buffered message — no data loss across suspend cycles.
+		// Priority check: control signals (ctx cancel, operator suspend,
+		// operator stop) take precedence over input messages. Without this,
+		// Go's select randomization can pick a buffered input (e.g. an EOF
+		// marker) over an already-signaled suspendCh, causing the handler
+		// to exit naturally instead of suspending -- a race that masks
+		// suspend semantics. errOperatorSuspended/errOperatorStopped are
+		// returned WITHOUT consuming a message, so the next recv (after
+		// resume, for suspend) picks up the same buffered message.
+		//
+		// stopCh (StopNode -- per-node graceful stop) wins over input by
+		// design: StopNode means "exit at the next safe point", not
+		// "drain everything first". For drain-and-exit semantics, FC.stop
+		// uses input EOF cascade instead of stopCh.
 		select {
 		case <-nr.ctx.Done():
 			return nr.ctx.Err()
 		case <-nr.suspendCh:
 			return errOperatorSuspended
+		case <-nr.stopCh:
+			return errOperatorStopped
+		default:
+		}
+		select {
+		case <-nr.ctx.Done():
+			return nr.ctx.Err()
+		case <-nr.suspendCh:
+			return errOperatorSuspended
+		case <-nr.stopCh:
+			return errOperatorStopped
 		case msg, ok := <-nr.ch:
 			if !ok {
 				nr.chanClosed = true
@@ -96,18 +117,16 @@ func newActivation(adapter types.Adapter) *activation {
 	}
 }
 
-func newActivationFromChannels(ctx context.Context, inputs map[string]<-chan *pubsub.Message, adapter types.Adapter) *activation {
-	return newActivationFromChannelsSuspendable(ctx, inputs, adapter, nil)
-}
-
-// newActivationFromChannelsSuspendable is the suspend-aware variant. When
+// newActivationFromChannelsInterruptible is the interrupt-aware variant. When
 // suspendCh fires before any input arrives, recv returns errOperatorSuspended
 // without consuming a message; the caller pauses, then re-creates the
-// activation after resume to pick up where it left off.
-func newActivationFromChannelsSuspendable(ctx context.Context, inputs map[string]<-chan *pubsub.Message, adapter types.Adapter, suspendCh <-chan struct{}) *activation {
+// activation after resume to pick up where it left off. When stopCh fires,
+// recv returns errOperatorStopped without consuming a message; the caller
+// exits cleanly (no resume).
+func newActivationFromChannelsInterruptible(ctx context.Context, inputs map[string]<-chan *pubsub.Message, adapter types.Adapter, suspendCh, stopCh <-chan struct{}) *activation {
 	a := newActivation(adapter)
 	for nodeID, ch := range inputs {
-		a.refs[nodeID] = &nodeRef{ch: ch, ctx: ctx, suspendCh: suspendCh}
+		a.refs[nodeID] = &nodeRef{ch: ch, ctx: ctx, suspendCh: suspendCh, stopCh: stopCh}
 	}
 	return a
 }
@@ -236,15 +255,6 @@ func celEnvOptions() []cel.EnvOption {
 				},
 			),
 			cel.Overload("now", nil, cel.TimestampType),
-		),
-		cel.Function("EOF",
-			cel.Overload("eof_zero",
-				[]*cel.Type{},
-				cel.DynType,
-				cel.FunctionBinding(func(values ...ref.Val) ref.Val {
-					return eofRefValInstance
-				}),
-			),
 		),
 	}
 }

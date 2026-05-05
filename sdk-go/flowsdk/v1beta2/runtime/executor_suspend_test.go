@@ -1,10 +1,12 @@
 package runtime
 
 import (
+	"context"
 	"math/rand"
 	"testing"
 	"time"
 
+	expr "cel.dev/expr"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -140,6 +142,9 @@ func TestCommand_Suspend_ThenStop(t *testing.T) {
 		defer ps.Close() //nolint:errcheck
 
 		ctx := testContext(t)
+		flowCh, err := ps.Subscribe(ctx, testTopics.Flow())
+		require.NoError(t, err)
+
 		exec := NewExecutor(ps, testTopics, extraOpts...)
 
 		done := make(chan error, 1)
@@ -150,11 +155,40 @@ func TestCommand_Suspend_ThenStop(t *testing.T) {
 		time.Sleep(50 * time.Millisecond)
 		exec.Suspend()
 
-		// Stop should wake parked goroutines and drain.
+		// Stop must wake suspended goroutines (via stopCh in waitForResume)
+		// and drain. The Stop should complete promptly -- without the wake,
+		// the suspended handlers would hang indefinitely.
+		stopStart := time.Now()
 		exec.Stop()
+		err = <-done
+		stopElapsed := time.Since(stopStart)
+		require.NoError(t, err, "Stop should drain suspended handlers cleanly")
+		assert.Less(t, stopElapsed, 2*time.Second,
+			"Stop on suspended flow must wake handlers promptly; took %v", stopElapsed)
 
-		err := <-done
-		assert.NoError(t, err)
+		// Flow's terminal state must be SUCCEEDED (graceful Stop, not
+		// ERRORED or CANCELLED).
+		var lastFlowPhase flowv1beta2.RunSnapshot_Phase
+		drainCtx, drainCancel := context.WithTimeout(ctx, 1*time.Second)
+		defer drainCancel()
+	drain:
+		for {
+			select {
+			case <-drainCtx.Done():
+				break drain
+			case msg := <-flowCh:
+				evt := msg.Payload.(*flowv1beta2.RunSnapshot_FlowEvent)
+				msg.Ack()
+				if evt.WhichData() == flowv1beta2.RunSnapshot_FlowEvent_Flow_case {
+					lastFlowPhase = evt.GetFlow().GetPhase()
+					if lastFlowPhase == flowv1beta2.RunSnapshot_PHASE_SUCCEEDED {
+						break drain
+					}
+				}
+			}
+		}
+		assert.Equal(t, flowv1beta2.RunSnapshot_PHASE_SUCCEEDED, lastFlowPhase,
+			"flow terminal phase after Suspend+Stop must be SUCCEEDED (graceful), got %v", lastFlowPhase)
 	})
 }
 
@@ -274,10 +308,19 @@ func TestCommand_RetrySuspend_Resume(t *testing.T) {
 		require.True(t, waitForPhase(ctx, actionCh, flowv1beta2.RunSnapshot_PHASE_SUSPENDED),
 			"expected action to reach PHASE_SUSPENDED")
 
-		// Resume -- handler re-runs, reads EOF from input, completes cleanly.
+		// Behavioral verification: while suspended, handler must not emit
+		// further outputs (proves it actually parked in waitForResume).
+		assertNoOutputDuring(t, actionCh, 100*time.Millisecond)
+
+		// Resume -- handler unparks, reads EOF from input, completes cleanly.
 		exec.ResumeNode("actions.echo", nil)
 
-		err = <-done
+		// After resume, the action's terminal phase must be SUCCEEDED
+		// (proves the handler actually unparked and reached its post-loop
+		// publish, not just that Execute returned).
+		requirePhaseWithin(t, actionCh, flowv1beta2.RunSnapshot_PHASE_SUCCEEDED, 500*time.Millisecond)
+
+		err = requireExecuteReturnsBy(t, done, 500*time.Millisecond)
 		assert.NoError(t, err, "after resume with EOF available, flow should complete")
 	})
 }
@@ -326,6 +369,8 @@ func TestCommand_Suspend_WithErrorStrategy_Stop(t *testing.T) {
 		defer ps.Close() //nolint:errcheck
 
 		ctx := testContext(t)
+		gen1Ch, err := ps.Subscribe(ctx, testTopics.For("generators.gen1"))
+		require.NoError(t, err)
 
 		exec := NewExecutor(ps, testTopics, append(extraOpts,
 			WithErrorStrategy(flowv1beta2.ErrorStrategy_ERROR_STRATEGY_STOP))...)
@@ -334,14 +379,22 @@ func TestCommand_Suspend_WithErrorStrategy_Stop(t *testing.T) {
 			done <- exec.Execute(ctx, graph)
 		}()
 
-		// Suspend one generator, then stop the flow.
+		// Suspend gen1 and verify it actually parked (PHASE_SUSPENDED).
 		time.Sleep(50 * time.Millisecond)
 		exec.SuspendNode("generators.gen1")
-		time.Sleep(50 * time.Millisecond)
-		exec.Stop()
+		require.True(t, waitForPhase(ctx, gen1Ch, flowv1beta2.RunSnapshot_PHASE_SUSPENDED),
+			"gen1 must reach PHASE_SUSPENDED before flow Stop")
 
-		err := <-done
-		assert.NoError(t, err)
+		// Stop must wake the suspended generator (via stopCh in its
+		// select) so it exits with PHASE_SUCCEEDED. Without the wake,
+		// the suspended generator would hang and Stop would never return.
+		stopStart := time.Now()
+		exec.Stop()
+		err = <-done
+		stopElapsed := time.Since(stopStart)
+		require.NoError(t, err)
+		assert.Less(t, stopElapsed, 2*time.Second,
+			"Stop on flow with suspended generator must wake it promptly; took %v", stopElapsed)
 	})
 }
 
@@ -448,10 +501,10 @@ func TestCommand_Suspend_Resume_OutputContinuity(t *testing.T) {
 		for time.Now().Before(drainDeadline) {
 			node := readOutput(100 * time.Millisecond)
 			if node == nil {
-				continue // timeout — no event in flight, that's fine
+				continue // timeout - no event in flight, that's fine
 			}
 			require.False(t, node.GetClosed(),
-				"output stream published Closed:true during suspend window — subscribers would exit and miss post-resume values")
+				"output stream published Closed:true during suspend window - subscribers would exit and miss post-resume values")
 		}
 
 		// Resume and confirm a NEW output value arrives. If the suspend
@@ -459,7 +512,7 @@ func TestCommand_Suspend_Resume_OutputContinuity(t *testing.T) {
 		exec.Resume()
 
 		postResume := readOutput(3 * time.Second)
-		require.NotNil(t, postResume, "no output produced after resume — suspend likely closed the output stream")
+		require.NotNil(t, postResume, "no output produced after resume - suspend likely closed the output stream")
 		require.False(t, postResume.GetClosed(), "post-resume value should not be a Closed marker")
 
 		exec.Stop()
@@ -471,7 +524,7 @@ func TestCommand_Suspend_Resume_OutputContinuity(t *testing.T) {
 
 // Suspend + Resume across many cycles with variable cadence must produce
 // the same value sequence as an uninterrupted run. This is the strict
-// version of the contract — not just "ticks keep coming after resume" but
+// version of the contract - not just "ticks keep coming after resume" but
 // "the actual sequence of values is identical."
 //
 // gen_rate_limited.yaml emits a deterministic counter (1, 2, 3, ...). We
@@ -576,7 +629,7 @@ func runManyCyclesPreservesSequence(t *testing.T, extraOpts []Option) {
 		err = <-done
 		require.NoError(t, err)
 
-		// The contract: values are exactly 1, 2, 3, ..., len(collected) — same
+		// The contract: values are exactly 1, 2, 3, ..., len(collected) - same
 		// as if no suspend/resume cycle had happened. No duplicates, no skips,
 		// strictly monotonic. The exact length depends on how many values
 		// snuck through during transitions, but every position must equal
@@ -673,7 +726,7 @@ func TestCommand_Suspend_Resume_DoesNotHang_ServerStream(t *testing.T) {
 	})
 }
 
-// Client stream: many requests, one response. Same shape as above —
+// Client stream: many requests, one response. Same shape as above -
 // just verify suspend/resume doesn't break it.
 
 func TestCommand_Suspend_Resume_DoesNotHang_ClientStream(t *testing.T) {
@@ -943,7 +996,7 @@ func runHandlerSuspendResumeSequenceWith(
 // only ONE node at a time. Two contracts must hold:
 //
 //   1. Final sequence at the output is exactly 1, 2, 3, ... (no
-//      skips, no dupes) — same as whole-flow suspend.
+//      skips, no dupes) - same as whole-flow suspend.
 //   2. While the target node is suspended, the OTHER nodes in the flow
 //      MUST continue running. We verify this by subscribing to a
 //      witness topic upstream of the suspended node and asserting it
@@ -957,12 +1010,12 @@ func runHandlerSuspendResumeSequenceWith(
 func TestCommand_SuspendNode_Resume_Var_OtherNodesKeepRunning(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		runSingleNodeSuspendIsolationTest(t, singleNodeSuspendIsolationCase{
-			fixture:        "suspend_resume_var.yaml",
-			suspendedNode:  "vars.passthrough",
-			witnessTopic:   "generators.seq", // must keep flowing
-			expectWitness:  true,
-			pauseDuration:  300 * time.Millisecond,
-			extraOpts:      extraOpts,
+			fixture:       "suspend_resume_var.yaml",
+			suspendedNode: "vars.passthrough",
+			witnessTopic:  "generators.seq", // must keep flowing
+			expectWitness: true,
+			pauseDuration: 300 * time.Millisecond,
+			extraOpts:     extraOpts,
 		})
 	})
 }
@@ -973,12 +1026,12 @@ func TestCommand_SuspendNode_Resume_Var_OtherNodesKeepRunning(t *testing.T) {
 func TestCommand_SuspendNode_Resume_Output_OtherNodesKeepRunning(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		runSingleNodeSuspendIsolationTest(t, singleNodeSuspendIsolationCase{
-			fixture:        "suspend_resume_var.yaml",
-			suspendedNode:  "outputs.result",
-			witnessTopic:   "vars.passthrough", // must keep flowing
-			expectWitness:  true,
-			pauseDuration:  300 * time.Millisecond,
-			extraOpts:      extraOpts,
+			fixture:       "suspend_resume_var.yaml",
+			suspendedNode: "outputs.result",
+			witnessTopic:  "vars.passthrough", // must keep flowing
+			expectWitness: true,
+			pauseDuration: 300 * time.Millisecond,
+			extraOpts:     extraOpts,
 		})
 	})
 }
@@ -992,17 +1045,17 @@ func TestCommand_SuspendNode_Resume_Output_OtherNodesKeepRunning(t *testing.T) {
 //
 // This is the only single-node case where the witness assertion is
 // "the suspended node itself stays quiet" rather than "an unaffected
-// node keeps moving" — because suspending the source IS supposed to
+// node keeps moving" - because suspending the source IS supposed to
 // stop the data flow.
 func TestCommand_SuspendNode_Resume_Generator_StopsProducing(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		runSingleNodeSuspendIsolationTest(t, singleNodeSuspendIsolationCase{
-			fixture:        "suspend_resume_var.yaml",
-			suspendedNode:  "generators.seq",
-			witnessTopic:   "generators.seq", // suspended node's OWN topic
-			expectWitness:  false,            // must NOT flow during suspend
-			pauseDuration:  300 * time.Millisecond,
-			extraOpts:      extraOpts,
+			fixture:       "suspend_resume_var.yaml",
+			suspendedNode: "generators.seq",
+			witnessTopic:  "generators.seq", // suspended node's OWN topic
+			expectWitness: false,            // must NOT flow during suspend
+			pauseDuration: 300 * time.Millisecond,
+			extraOpts:     extraOpts,
 		})
 	})
 }
@@ -1106,7 +1159,7 @@ draindrain:
 
 	// Bookkeeping invariant: SuspendNode must mark ONLY the target node
 	// as suspended. Downstream nodes that go quiet because they have no
-	// input to consume are "starved" — they're still running their
+	// input to consume are "starved" - they're still running their
 	// goroutines, just blocked on a channel read. They must NOT be in
 	// suspendedNodes.
 	exec.mu.Lock()
@@ -1147,7 +1200,7 @@ draindrain:
 			"witness topic %s expected to keep receiving values while %s is suspended, got %d (before=%d)",
 			tc.witnessTopic, tc.suspendedNode, witnessDuringPause, witnessBefore)
 	} else {
-		// Allow up to one in-flight value to drain after suspend — the
+		// Allow up to one in-flight value to drain after suspend - the
 		// outbox relay may have committed/queued a value just before
 		// the suspend signal was processed. Anything more than 1 means
 		// the suspend didn't actually take effect.
@@ -1194,7 +1247,10 @@ func TestCommand_SuspendNode_Input(t *testing.T) {
 
 		ctx := testContext(t)
 
-		// Subscribe to output to confirm the action processed.
+		// Subscribe to output to confirm the action processed AND to a
+		// second value AFTER SuspendNode("inputs.msg") to prove the
+		// suspend was a no-op (otherwise the flow would have stopped
+		// processing further inputs).
 		outputCh, err := ps.Subscribe(ctx, testTopics.For("outputs.result"))
 		require.NoError(t, err)
 
@@ -1204,16 +1260,21 @@ func TestCommand_SuspendNode_Input(t *testing.T) {
 			done <- exec.Execute(ctx, graph)
 		}()
 
-		// Wait for output.
-		select {
-		case msg := <-outputCh:
-			msg.Ack()
-		case <-time.After(5 * time.Second):
-			t.Fatal("timeout waiting for output")
-		}
+		// Wait for the first echo (input value 42) to flow through.
+		first := waitForOutputValue(t, outputCh, 5*time.Second)
+		assert.Equal(t, int64(42), first.GetInt64Value(), "first echo before suspend")
 
-		// SuspendNode on input is a no-op (inputs don't have resume channels).
+		// SuspendNode on an Input is documented as a no-op (inputs aren't
+		// in the handlers map, they're managed by bridges). Verify by
+		// pushing another value AFTER the suspend call: it must still
+		// flow through, proving the suspend didn't pause the input.
 		exec.SuspendNode("inputs.msg")
+		val2, _ := nativeToExpr(99)
+		ps.Publish(topic, pubsub.NewMessage(val2)) //nolint:errcheck
+
+		second := waitForOutputValue(t, outputCh, 1*time.Second)
+		assert.Equal(t, int64(99), second.GetInt64Value(),
+			"second echo after SuspendNode(input) must still flow -- input suspend is a no-op")
 
 		// Stop should still work normally.
 		exec.Stop()
@@ -1221,4 +1282,30 @@ func TestCommand_SuspendNode_Input(t *testing.T) {
 		err = <-done
 		assert.NoError(t, err)
 	})
+}
+
+// waitForOutputValue reads a NODE_OUTPUT event off ch within timeout and
+// returns the inner value. Skips NODE_UPDATE state events and EOF/Closed
+// terminals.
+func waitForOutputValue(t *testing.T, ch <-chan *pubsub.Message, timeout time.Duration) *expr.Value {
+	t.Helper()
+	deadline := time.After(timeout)
+	for {
+		select {
+		case <-deadline:
+			t.Fatalf("timeout waiting for output value")
+		case msg := <-ch:
+			evt := msg.Payload.(*flowv1beta2.RunSnapshot_FlowEvent)
+			msg.Ack()
+			if evt.GetEventType() != flowv1beta2.RunSnapshot_FlowEvent_EVENT_TYPE_NODE_OUTPUT {
+				continue
+			}
+			node := runtimeNodeFromEvent(evt)
+			out, ok := node.(*flowv1beta2.RunSnapshot_OutputNode)
+			if !ok || out.GetClosed() || isEOFValue(out.GetValue()) {
+				continue
+			}
+			return out.GetValue()
+		}
+	}
 }

@@ -1,0 +1,17 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: nc_edge_inference
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: counter
+      value: "= inputs.x.value"
+    - id: gated
+      value: "= 1"
+      node_control:
+        stop_when: "= vars.counter.value >= 3"
+  outputs:
+    - id: result
+      value: "= vars.gated.value"

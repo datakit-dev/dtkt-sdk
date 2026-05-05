@@ -1,6 +1,6 @@
 package spec_test
 
-// // stream_test.go — black-box tests for ServerStream, ClientStream, BidiStream.
+// // stream_test.go - black-box tests for ServerStream, ClientStream, BidiStream.
 // // Stream nodes are constructed via exported Test* helpers in export_test.go which
 // // are only compiled during tests of this package.
 

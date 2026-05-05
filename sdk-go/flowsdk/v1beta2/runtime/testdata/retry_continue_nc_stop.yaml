@@ -1,0 +1,29 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: retry_continue_nc_stop
+  description: |
+    Action's retry strategy emits the error message as the value on
+    NotFound (code 5). NC.stop_when on the action triggers
+    unconditionally on every iteration. Verifies that CONTINUE still
+    reaches checkLifecycle so NC.stop fires AFTER the converted value
+    is published.
+  inputs:
+    - id: msg
+      int64: {}
+  actions:
+    - id: echo
+      retry_strategy:
+        continue_when: "= this.error.message"
+        backoff:
+          initial_backoff: "0.001s"
+          max_attempts: 1
+      call:
+        connection: echo
+        method: error.NotFound
+        request: "= inputs.msg.value"
+      node_control:
+        stop_when: "= true"
+  outputs:
+    - id: result
+      value: "= actions.echo.value"

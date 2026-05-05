@@ -126,9 +126,93 @@ func TestGraph_Interaction_ResponseClose(t *testing.T) {
 	})
 }
 
+// Interaction: response value passes through a transform pipeline.
+
+func TestGraph_Interaction_Transforms(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "interaction_transforms.yaml")
+
+		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 4)
+		response := make(chan *flowv1beta2.InteractionResponseEvent, 4)
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck
+
+		go func() {
+			for p := range prompt {
+				anyVal, _ := common.WrapProtoAny(int64(5))
+				response <- &flowv1beta2.InteractionResponseEvent{Id: p.GetId(), Token: p.GetToken(), Value: anyVal}
+			}
+			close(response)
+		}()
+
+		feedInput(ps, "inputs.x", int64(1))
+		ctx := testContext(t)
+		err := NewExecutor(ps, testTopics, append([]Option{WithInteractions(prompt, response)}, extraOpts...)...).Execute(ctx, graph)
+		close(prompt)
+		require.NoError(t, err)
+
+		results := collectOutputs(ctx, ps, "outputs.result")
+		require.Len(t, results, 1)
+		// Transform: response 5 mapped *10 -> 50.
+		assert.Equal(t, int64(50), results[0].GetValue().GetInt64Value())
+	})
+}
+
+// Interaction: form with select / multi_select / file elements. Verifies the
+// runtime accepts the full form-element oneof set without a crash and routes
+// the response through.
+
+// TestGraph_Interaction_FormElements_All verifies the runtime accepts an
+// interaction with multiple form-element variants (select, multi_select,
+// file). The form definition's variants are validated at graph.Build()
+// time -- a malformed variant would fail loadFlow. Runtime behavior:
+// prompt is emitted on inputs.x>0, response with value=11 flows back to
+// the output. We assert (a) at least one prompt was raised with a non-empty
+// id+token (proves the form-bearing interaction reached the prompt path),
+// (b) the response value flows through to the output.
+func TestGraph_Interaction_FormElements_All(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "interaction_form_elements.yaml")
+
+		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 4)
+		response := make(chan *flowv1beta2.InteractionResponseEvent, 4)
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck
+
+		var promptCount int
+		go func() {
+			for p := range prompt {
+				promptCount++
+				assert.NotEmpty(t, p.GetId(), "prompt must carry interaction id")
+				assert.NotEmpty(t, p.GetToken(), "prompt must carry token")
+				anyVal, _ := common.WrapProtoAny(int64(11))
+				response <- &flowv1beta2.InteractionResponseEvent{Id: p.GetId(), Token: p.GetToken(), Value: anyVal}
+			}
+			close(response)
+		}()
+
+		feedInput(ps, "inputs.x", int64(1))
+		ctx := testContext(t)
+		err := NewExecutor(ps, testTopics, append([]Option{WithInteractions(prompt, response)}, extraOpts...)...).Execute(ctx, graph)
+		close(prompt)
+		require.NoError(t, err)
+
+		assert.GreaterOrEqual(t, promptCount, 1, "form-elements interaction must raise a prompt")
+
+		results := collectOutputs(ctx, ps, "outputs.result")
+		require.Len(t, results, 1)
+		assert.Equal(t, int64(11), results[0].GetValue().GetInt64Value())
+	})
+}
+
 // Interaction: form with inputs[] (confirm + input elements). The runtime
 // accepts the form definition, prompts, and forwards the response value.
 
+// TestGraph_Interaction_FormInputs verifies an interaction with form
+// inputs (confirm + input elements) round-trips. The form definition is
+// validated at graph.Build(); runtime emits the prompt and routes the
+// response back. Same shape as FormElements_All but with the
+// interaction_form.yaml fixture variant.
 func TestGraph_Interaction_FormInputs(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		graph := loadFlow(t, "interaction_form.yaml")
@@ -138,8 +222,12 @@ func TestGraph_Interaction_FormInputs(t *testing.T) {
 		ps := newPubSub()
 		defer ps.Close() //nolint:errcheck
 
+		var promptCount int
 		go func() {
 			for p := range prompt {
+				promptCount++
+				assert.NotEmpty(t, p.GetId(), "prompt must carry interaction id")
+				assert.NotEmpty(t, p.GetToken(), "prompt must carry token")
 				anyVal, _ := common.WrapProtoAny(int64(7))
 				response <- &flowv1beta2.InteractionResponseEvent{Id: p.GetId(), Token: p.GetToken(), Value: anyVal}
 			}
@@ -151,6 +239,8 @@ func TestGraph_Interaction_FormInputs(t *testing.T) {
 		err := NewExecutor(ps, testTopics, append([]Option{WithInteractions(prompt, response)}, extraOpts...)...).Execute(ctx, graph)
 		close(prompt)
 		require.NoError(t, err)
+
+		assert.GreaterOrEqual(t, promptCount, 1, "form-input interaction must raise a prompt")
 
 		results := collectOutputs(ctx, ps, "outputs.result")
 		require.Len(t, results, 1)

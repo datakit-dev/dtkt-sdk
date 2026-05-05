@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Running scan (no window) — emits on every input
+// Running scan (no window) - emits on every input
 
 func TestGraph_Scan_RunningTotal(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {

@@ -146,6 +146,13 @@ func TestGraph_Action_RetryWhenMatch(t *testing.T) {
 }
 
 // Retry: suspend_when suspends the node on PermissionDenied (code 7).
+//
+// Behavioral verification:
+//   - assertNoOutputDuring after PHASE_SUSPENDED proves the retry-suspend
+//     actually parked the handler (a buggy suspend that published the
+//     phase but kept retrying would emit further outputs).
+//   - requirePhaseWithin(SUCCEEDED) after ResumeNode proves resume
+//     unparked the handler and it ran to completion (fast-fail on hang).
 
 func TestGraph_Action_RetrySuspend(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
@@ -170,11 +177,107 @@ func TestGraph_Action_RetrySuspend(t *testing.T) {
 		// Wait for the action to reach PHASE_SUSPENDED.
 		require.True(t, waitForPhase(ctx, actionCh, flowv1beta2.RunSnapshot_PHASE_SUSPENDED),
 			"expected action to reach PHASE_SUSPENDED")
+		assertNoOutputDuring(t, actionCh, 100*time.Millisecond)
 
 		// Resume the node -- it will read EOF from the input and complete.
 		exec.ResumeNode("actions.echo", nil)
+		requirePhaseWithin(t, actionCh, flowv1beta2.RunSnapshot_PHASE_SUCCEEDED, 500*time.Millisecond)
 
-		err = <-done
+		err = requireExecuteReturnsBy(t, done, 500*time.Millisecond)
+		assert.NoError(t, err, "after resume, flow should complete cleanly (input EOF)")
+	})
+}
+
+// Stream retry: skip_when drops the failing item and the flow completes
+// cleanly with no output.
+
+func TestGraph_Stream_RetrySkip(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "stream_retry_skip.yaml")
+
+		pubsub := newPubSub()
+		defer pubsub.Close() //nolint:errcheck
+
+		feedInput(pubsub, "inputs.msg", 99)
+		ctx := testContext(t)
+		err := NewExecutor(pubsub, testTopics, append(mockRPCOptions(), extraOpts...)...).Execute(ctx, graph)
+		require.NoError(t, err)
+
+		results := collectOutputs(ctx, pubsub, "outputs.result")
+		assert.Empty(t, results)
+	})
+}
+
+// Stream retry: terminate_when surfaces a TerminateError on Internal (code 13).
+
+func TestGraph_Stream_RetryTerminate(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "stream_retry_terminate.yaml")
+
+		pubsub := newPubSub()
+		defer pubsub.Close() //nolint:errcheck
+
+		feedInput(pubsub, "inputs.msg", 99)
+		ctx := testContext(t)
+		err := NewExecutor(pubsub, testTopics, append(mockRPCOptions(), extraOpts...)...).Execute(ctx, graph)
+		require.Error(t, err)
+
+		var termErr *TerminateError
+		assert.True(t, errors.As(err, &termErr), "expected TerminateError, got %T: %v", err, err)
+	})
+}
+
+// Stream retry: continue_when emits the error message as the stream's value
+// instead of propagating the error.
+
+func TestGraph_Stream_RetryContinue(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "stream_retry_continue.yaml")
+
+		pubsub := newPubSub()
+		defer pubsub.Close() //nolint:errcheck
+
+		feedInput(pubsub, "inputs.msg", 99)
+		ctx := testContext(t)
+		err := NewExecutor(pubsub, testTopics, append(mockRPCOptions(), extraOpts...)...).Execute(ctx, graph)
+		require.NoError(t, err)
+
+		results := collectOutputs(ctx, pubsub, "outputs.result")
+		require.Len(t, results, 1)
+		assert.Equal(t, "stream resource not found", results[0].GetValue().GetStringValue())
+	})
+}
+
+// Stream retry: suspend_when parks the node; resume drains it cleanly.
+// Same behavioral verification as TestGraph_Action_RetrySuspend.
+
+func TestGraph_Stream_RetrySuspend(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "stream_retry_suspend.yaml")
+
+		pubsub := newPubSub()
+		defer pubsub.Close() //nolint:errcheck
+
+		feedInput(pubsub, "inputs.msg", 99)
+		ctx := testContext(t)
+
+		streamCh, err := pubsub.Subscribe(ctx, testTopics.For("streams.echo"))
+		require.NoError(t, err)
+
+		exec := NewExecutor(pubsub, testTopics, append(mockRPCOptions(), extraOpts...)...)
+		done := make(chan error, 1)
+		go func() {
+			done <- exec.Execute(ctx, graph)
+		}()
+
+		require.True(t, waitForPhase(ctx, streamCh, flowv1beta2.RunSnapshot_PHASE_SUSPENDED),
+			"expected stream to reach PHASE_SUSPENDED")
+		assertNoOutputDuring(t, streamCh, 100*time.Millisecond)
+
+		exec.ResumeNode("streams.echo", nil)
+		requirePhaseWithin(t, streamCh, flowv1beta2.RunSnapshot_PHASE_SUCCEEDED, 500*time.Millisecond)
+
+		err = requireExecuteReturnsBy(t, done, 500*time.Millisecond)
 		assert.NoError(t, err, "after resume, flow should complete cleanly (input EOF)")
 	})
 }
@@ -253,6 +356,13 @@ func TestGraph_Action_NoRetryStrategy(t *testing.T) {
 		ctx := testContext(t)
 		err := NewExecutor(pubsub, testTopics, append(mockRPCOptions(), extraOpts...)...).Execute(ctx, graph)
 		require.NoError(t, err)
+
+		// Without a retry strategy the action runs once and the echo
+		// returns the input value. Verify the value flowed through (not
+		// just that Execute returned nil).
+		results := outputInt64s(collectOutputs(ctx, pubsub, "outputs.result"))
+		assert.Equal(t, []int64{42}, results,
+			"action without retry must execute and return the input value")
 	})
 }
 

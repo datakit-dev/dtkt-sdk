@@ -1,0 +1,20 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: retry_inactive_nc_active
+  inputs:
+    - id: msg
+      int64: {}
+  actions:
+    - id: call
+      retry_strategy:
+        suspend_when: "= this.error.code == 7"
+      call:
+        connection: echo
+        method: echo.Echo
+        request: "= inputs.msg.value"
+      node_control:
+        stop_when: "= true"
+  outputs:
+    - id: result
+      value: "= actions.call.value"

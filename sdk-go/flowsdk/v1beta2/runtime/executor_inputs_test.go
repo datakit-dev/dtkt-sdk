@@ -4,9 +4,11 @@ import (
 	"sort"
 	"testing"
 
+	expr "cel.dev/expr"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // Input value types -- passthrough (no transforms)
@@ -383,5 +385,158 @@ func TestGraph_Input_RequestEventEmitted(t *testing.T) {
 		}
 		sort.Strings(ids)
 		assert.Equal(t, []string{"inputs.a", "inputs.b"}, ids)
+	})
+}
+
+// Message-typed input: spec carries a fully-qualified proto type name; the
+// fed value is a structpb.Struct (matching that type) which CEL accesses
+// transparently. Verifies the `Input.message` oneof branch end-to-end.
+func TestGraph_Input_Message(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "input_message_to_output.yaml")
+
+		s, err := structpb.NewStruct(map[string]any{
+			"name": "alice",
+			"age":  42,
+		})
+		require.NoError(t, err)
+
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck
+
+		feedInput(ps, "inputs.payload", s)
+		ctx := testContext(t)
+		err = NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
+		require.NoError(t, err)
+
+		results := collectOutputs(ctx, ps, "outputs.result")
+		require.Len(t, results, 1)
+		fields := results[0].GetValue().GetMapValue().GetEntries()
+		got := make(map[string]string, len(fields))
+		for _, e := range fields {
+			got[e.GetKey().GetStringValue()] = e.GetValue().GetStringValue()
+		}
+		assert.Equal(t, "alice", got["name"])
+	})
+}
+
+// Message-typed input + transforms: feeds two structs, only the high-priority
+// one passes the filter transform.
+func TestGraph_Input_Message_Transforms(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "input_message_transforms.yaml")
+
+		high, err := structpb.NewStruct(map[string]any{"priority": "high", "name": "urgent"})
+		require.NoError(t, err)
+		low, err := structpb.NewStruct(map[string]any{"priority": "low", "name": "later"})
+		require.NoError(t, err)
+
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck
+
+		feedInput(ps, "inputs.payload", low, high)
+		ctx := testContext(t)
+		err = NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
+		require.NoError(t, err)
+
+		results := collectOutputs(ctx, ps, "outputs.result")
+		require.Len(t, results, 1)
+		fields := results[0].GetValue().GetMapValue().GetEntries()
+		got := map[string]string{}
+		for _, e := range fields {
+			got[e.GetKey().GetStringValue()] = e.GetValue().GetStringValue()
+		}
+		assert.Equal(t, "high", got["priority"])
+		assert.Equal(t, "urgent", got["name"])
+	})
+}
+
+// Message-typed input + cache: feed once; ticker drives two output evals;
+// the second eval reads the cached value (no new input). Asserts the same
+// payload appears twice.
+func TestGraph_Input_Message_Cache(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "input_message_cache.yaml")
+
+		s, err := structpb.NewStruct(map[string]any{"name": "cached", "n": 7})
+		require.NoError(t, err)
+
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck
+
+		// Send a single value; the input topic stays open (no EOF) so cache
+		// fallback fires on subsequent throttle windows.
+		sendInput(ps, "inputs.payload", s)
+		ctx := testContext(t)
+		err = NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
+		require.NoError(t, err)
+
+		results := collectOutputs(ctx, ps, "outputs.result")
+		require.GreaterOrEqual(t, len(results), 2,
+			"expected ticker to drive at least two output evals reading the cached value")
+		// All outputs should carry the same cached payload.
+		for _, r := range results {
+			fields := r.GetValue().GetMapValue().GetEntries()
+			var name string
+			for _, e := range fields {
+				if e.GetKey().GetStringValue() == "name" {
+					name = e.GetValue().GetStringValue()
+				}
+			}
+			assert.Equal(t, "cached", name, "expected every emit to use the cached payload")
+		}
+	})
+}
+
+// Message-typed input + default: no value fed; runtime falls back to the
+// declared Struct default. Exercises the path that lint.go:372 references
+// via HasDefault and that input.go:inputTypeDefault populates for Message.
+func TestGraph_Input_Message_Default(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "input_message_default.yaml")
+
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck
+
+		// Intentionally no feedInput; runtime should resolve via default.
+		ctx := testContext(t)
+		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
+		require.NoError(t, err)
+
+		results := collectOutputs(ctx, ps, "outputs.result")
+		require.GreaterOrEqual(t, len(results), 1,
+			"expected at least one emit driven by the ticker resolving to default")
+		// Each emit's value carries the default Struct payload.
+		for _, r := range results {
+			fields := r.GetValue().GetMapValue().GetEntries()
+			var name string
+			for _, e := range fields {
+				if e.GetKey().GetStringValue() == "name" {
+					name = e.GetValue().GetStringValue()
+				}
+			}
+			assert.Equal(t, "fallback", name, "expected default Struct payload")
+		}
+	})
+}
+
+// Message-typed input + nullable: explicit null fed. CEL value should
+// surface as a NullValue downstream.
+func TestGraph_Input_Message_Nullable(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "input_message_nullable.yaml")
+
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck
+
+		feedInput(ps, "inputs.payload", nil)
+		ctx := testContext(t)
+		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
+		require.NoError(t, err)
+
+		results := collectOutputs(ctx, ps, "outputs.result")
+		require.Len(t, results, 1)
+		_, isNull := results[0].GetValue().GetKind().(*expr.Value_NullValue)
+		assert.True(t, isNull, "expected null payload, got %T", results[0].GetValue().GetKind())
 	})
 }

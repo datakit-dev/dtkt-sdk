@@ -1,0 +1,14 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: output_scan
+  inputs:
+    - id: x
+      int64: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value"
+      transforms:
+        - scan:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"

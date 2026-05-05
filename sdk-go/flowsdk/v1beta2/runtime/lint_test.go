@@ -92,15 +92,6 @@ func TestLint_InvalidActionWhen(t *testing.T) {
 	assert.Contains(t, result.Error(), "when")
 }
 
-func TestLint_InvalidStreamCloseRequestWhen(t *testing.T) {
-	graph := loadFlow(t, "lint_invalid_stream_close_when.yaml")
-
-	result := Lint(graph)
-	require.NotEmpty(t, result.Diagnostics)
-	assert.Contains(t, result.Error(), "streams.bad")
-	assert.Contains(t, result.Error(), "close_request_when")
-}
-
 func TestLint_NoUpstreamDependencies(t *testing.T) {
 	graph := loadFlow(t, "lint_no_upstream.yaml")
 
@@ -121,6 +112,15 @@ func TestLint_InvalidRetryStrategyCEL(t *testing.T) {
 
 func TestLint_ValidConnection(t *testing.T) {
 	graph := loadFlow(t, "lint_valid_connection.yaml")
+
+	result := Lint(graph)
+	require.Empty(t, result.Diagnostics)
+}
+
+// Connection.package and Connection.services are mutually exclusive (oneof
+// at the message level). This fixture covers the package branch.
+func TestLint_ValidConnection_Package(t *testing.T) {
+	graph := loadFlow(t, "lint_valid_connection_package.yaml")
 
 	result := Lint(graph)
 	require.Empty(t, result.Diagnostics)
@@ -204,15 +204,6 @@ func TestLint_SchemaCELTypeMismatch(t *testing.T) {
 	assert.Contains(t, result.Error(), "CEL expression returns int")
 	assert.Contains(t, result.Error(), "request.count")
 	assert.Contains(t, result.Error(), "CEL expression returns bool")
-}
-
-func TestLint_SchemaEOFInRequest(t *testing.T) {
-	// EOF() is a CEL expression -- schema validation should skip it.
-	graph := loadFlow(t, "lint_schema_eof_request.yaml")
-	resolvers := map[string]shared.Resolver{"myconn": newTestResolver(t)}
-
-	result := Lint(graph, resolvers)
-	require.Empty(t, result.Diagnostics)
 }
 
 // --- Test resolver ---

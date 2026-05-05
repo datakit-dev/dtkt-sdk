@@ -119,9 +119,11 @@ func TestGraph_Join_TwoInputs(t *testing.T) {
 
 // Fan-in: multiple vars feed into one output with reduce
 
-func TestGraph_Join_FanInWithReduce(t *testing.T) {
+// One input feeds two filtered vars feeding two separate outputs.
+// (Originally misnamed "FanInWithReduce" -- the fixture is actually
+// fan-out with filters, no reduce. Renamed to match what's verified.)
+func TestGraph_Join_OneInputTwoFilteredOutputs(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
-		// Two vars fan into a single output that sums everything.
 		graph := loadFlow(t, "join_fan_in.yaml")
 
 		pubsub := newPubSub()

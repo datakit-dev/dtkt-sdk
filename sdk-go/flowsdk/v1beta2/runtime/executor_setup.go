@@ -63,9 +63,7 @@ func buildCELEnvAndValidate(graph *flowv1beta2.Graph, resolved map[string]*rpc.C
 // runState holds per-execution infrastructure created by setupRunState.
 type runState struct {
 	genCtx      context.Context
-	parkCtx     context.Context
 	handlerCtxs map[string]context.Context
-	resumeChans map[string]chan *expr.Value
 	performStop func()
 	cleanup     func() // must be deferred by caller
 }
@@ -85,7 +83,6 @@ func (e *Executor) setupRunState(
 	strategy flowv1beta2.ErrorStrategy,
 ) (*runState, error) {
 	genCtx, genCancel := context.WithCancel(gCtx)
-	parkCtx, parkCancel := context.WithCancel(gCtx)
 
 	var stopOnce sync.Once
 	performStop := func() {
@@ -93,18 +90,36 @@ func (e *Executor) setupRunState(
 			for _, id := range inputNodeIDs {
 				_ = e.pubsub.Publish(e.topics.InputFor(id), pubsub.NewMessage(newEOFValue()))
 			}
-			genCancel()
-			parkCancel()
-			// Wake any handlers currently paused via the suspendable mixin
-			// so they can observe the input EOFs and exit cleanly. Without
-			// this a flow that was suspended at the moment Stop was called
-			// would never drain.
+			// Don't cancel genCtx anymore: generators implement
+			// selfStoppable now, so we signal their stopCh and they exit
+			// gracefully with PHASE_SUCCEEDED. Cancelling ctx would race
+			// with stopCh and could cause the generator to return ctx.Err
+			// without publishing its terminal phase.
+			//
+			// Signal stopCh on:
+			//   - suspended handlers (their waitForResume returns
+			//     suspendStopped → exit cleanly)
+			//   - generators (no input to drain; stopCh wins their select
+			//     and they publish PHASE_SUCCEEDED)
+			//
+			// Running non-generator handlers are NOT signaled here: stopCh
+			// wins over input in recv()'s select, and they have buffered
+			// input (from feedInput or upstream) that must drain naturally
+			// via the EOF cascade above.
 			e.mu.Lock()
 			for id := range e.suspendedNodes {
-				if sh, ok := e.handlers[id].(selfSuspendable); ok {
-					sh.resume()
+				if sh, ok := e.handlers[id].(selfStoppable); ok {
+					sh.requestStop()
 				}
 				delete(e.suspendedNodes, id)
+			}
+			for id, h := range e.handlers {
+				if !isGenerator(e.nodeProtos[id]) {
+					continue
+				}
+				if sh, ok := h.(selfStoppable); ok {
+					sh.requestStop()
+				}
 			}
 			e.mu.Unlock()
 		})
@@ -125,12 +140,6 @@ func (e *Executor) setupRunState(
 		handlerCtxMap[id] = nodeCtx
 	}
 
-	// Create resume channels for suspend/resume support.
-	resumeChans := make(map[string]chan *expr.Value, len(handlers))
-	for id := range handlers {
-		resumeChans[id] = make(chan *expr.Value, 1)
-	}
-
 	// Store per-execution state on the Executor.
 	e.mu.Lock()
 	e.stopFn = performStop
@@ -145,31 +154,78 @@ func (e *Executor) setupRunState(
 	e.handlerPub = handlerPub
 	e.stoppedNodes = make(map[string]bool)
 	e.suspendedNodes = make(map[string]bool)
-	e.resumeChans = resumeChans
+	e.terminalNodes = make(map[string]bool)
 	e.handlers = handlers
-	e.parkCancelFn = parkCancel
 	e.mu.Unlock()
 
-	// Wire flow_control callbacks.
+	// Wire flow_control, node_control, and self-suspend callbacks.
 	for id, h := range handlers {
 		np := nodeProtos[id]
+		holder, hasHolder := h.(lifecycleHolder)
+
 		fc, err := nodeFlowControl(celEnv, np)
 		if err != nil {
 			genCancel()
-			parkCancel()
 			return nil, fmt.Errorf("compiling flow_control for node %s: %w", id, err)
 		}
-		if fc != nil {
-			if holder, ok := h.(flowControlHolder); ok {
-				cb := makeFlowControlCallback(id, fc, performStop, e.Terminate, e.Suspend)
-				holder.setFlowControlCallback(cb)
-			}
+		if fc != nil && hasHolder {
+			holder.setFlowControlCallback(
+				makeFlowControlCallback(id, fc, performStop, e.Terminate, e.Suspend),
+			)
+		}
+
+		nc, err := nodeNodeControl(celEnv, np)
+		if err != nil {
+			genCancel()
+			return nil, fmt.Errorf("compiling node_control for node %s: %w", id, err)
+		}
+		if nc != nil && hasHolder {
+			nodeID := id
+			holder.setNodeControlCallback(
+				makeNodeControlCallback(nodeID, nc,
+					func() { e.StopNode(nodeID) },
+					func() { e.TerminateNode(nodeID) },
+					func() { e.SuspendNode(nodeID) },
+				),
+			)
+		}
+
+		// RPC handlers (unary, server_stream, client_stream, bidi_stream) may
+		// surface *SuspendError from their retry strategy. Give them a
+		// bookkeeping callback so they can self-suspend without involving the
+		// launchHandlers wrapper. The callback marks suspendedNodes[id]=true
+		// and publishes PHASE_SUSPENDED; the handler then parks via its own
+		// waitForResume.
+		//
+		// Idempotent against suspendedNodes: if NC.suspend (via the lifecycle
+		// callback) already marked this node suspended in the same iteration,
+		// skip the duplicate PHASE_SUSPENDED publish. Avoids two SUSPENDED
+		// state events on the wire when retry.suspend and NC.suspend both
+		// fire on the same iteration.
+		if rs, ok := h.(retrySuspender); ok {
+			nodeID := id
+			nodeProto := np
+			rs.setSelfSuspendCallback(func(suspendErr error) {
+				e.mu.Lock()
+				if e.suspendedNodes[nodeID] {
+					e.mu.Unlock()
+					return
+				}
+				e.suspendedNodes[nodeID] = true
+				e.mu.Unlock()
+				if err := publishPhaseChange(handlerPub, e.topics.For(nodeID), nodeProto,
+					flowv1beta2.RunSnapshot_PHASE_SUSPENDED, suspendErr); err != nil {
+					slog.Error("publish phase change failed",
+						slog.String("node", nodeID),
+						slog.String("phase", "SUSPENDED"),
+						slog.Any("err", err))
+				}
+			})
 		}
 	}
 
 	cleanup := func() {
 		genCancel()
-		parkCancel()
 		e.mu.Lock()
 		e.clearRunState()
 		e.mu.Unlock()
@@ -177,9 +233,7 @@ func (e *Executor) setupRunState(
 
 	return &runState{
 		genCtx:      genCtx,
-		parkCtx:     parkCtx,
 		handlerCtxs: handlerCtxMap,
-		resumeChans: resumeChans,
 		performStop: performStop,
 		cleanup:     cleanup,
 	}, nil
@@ -277,6 +331,7 @@ func (e *Executor) buildInteractionHandlers(
 			adapter:     celEnv.TypeAdapter(),
 		}
 		h.initSuspendable()
+		h.initStoppable()
 		interactionHandlers[nodeID] = h
 	}
 	return interactionHandlers, nil
@@ -542,9 +597,7 @@ type launchOpts struct {
 	handlers    map[string]executor.NodeHandler
 	nodeProtos  map[string]*flowv1beta2.Node
 	handlerCtxs map[string]context.Context
-	resumeChans map[string]chan *expr.Value
 	handlerPub  pubsub.Publisher
-	parkCtx     context.Context
 	gCtx        context.Context
 	genCtx      context.Context
 	strategy    flowv1beta2.ErrorStrategy
@@ -560,8 +613,12 @@ type launchResults struct {
 }
 
 // launchHandlers launches all node handlers in the errgroup with error
-// interception and suspend/resume support. Returns a launchResults whose
-// fields should be checked after g.Wait().
+// interception. Suspend/resume is handled entirely inside each handler via
+// the suspendableMixin: NC and operator SuspendNode signal via mixin.suspendCh,
+// retry-strategy SuspendError is caught by the handler itself which then
+// calls selfSuspend + waitForResume. The wrapper here only deals with
+// post-Run terminal disposition (clean exit, errored, terminated) and
+// flow-level error_strategy.
 func (e *Executor) launchHandlers(g *errgroup.Group, opts launchOpts) *launchResults {
 	res := &launchResults{}
 
@@ -573,120 +630,59 @@ func (e *Executor) launchHandlers(g *errgroup.Group, opts launchOpts) *launchRes
 	for id, h := range opts.handlers {
 		nodeProto := opts.nodeProtos[id]
 		handlerCtx := opts.handlerCtxs[id]
-		resumeCh := opts.resumeChans[id]
 
 		g.Go(func() error {
-			for {
-				runErr := h.Run(handlerCtx)
-				if runErr == nil {
-					if e.awaitResume(id, nodeProto, &handlerCtx, resumeCh, opts) {
-						continue
-					}
-					return nil
+			defer func() {
+				// Mark this node as terminal once its handler returns. Operator
+				// commands (StopNode/TerminateNode/SuspendNode) check this and
+				// no-op for terminal nodes -- prevents stale flag accumulation
+				// (e.g. SuspendNode on an already-SUCCEEDED node previously
+				// left suspendedNodes[id]=true with no handler to ever clear).
+				e.mu.Lock()
+				if e.terminalNodes != nil {
+					e.terminalNodes[id] = true
 				}
+				// A node that exits is no longer suspended either.
+				delete(e.suspendedNodes, id)
+				e.mu.Unlock()
+			}()
 
-				// SuspendError from retry strategy.
-				var suspendErr *SuspendError
-				if errors.As(runErr, &suspendErr) {
-					if err := publishPhaseChange(opts.handlerPub, e.topics.For(id), nodeProto, flowv1beta2.RunSnapshot_PHASE_SUSPENDED, runErr); err != nil {
-						slog.Error("publish phase change failed", slog.String("node", id), slog.String("phase", "SUSPENDED"), slog.Any("err", err))
-					}
-					e.mu.Lock()
-					e.suspendedNodes[id] = true
-					e.mu.Unlock()
-					if e.parkAndResume(id, nodeProto, &handlerCtx, resumeCh, opts) {
-						continue
-					}
-					return nil
-				}
+			runErr := h.Run(handlerCtx)
+			if runErr == nil {
+				return nil
+			}
 
-				// Context errors: check for operator-initiated suspend.
-				if errors.Is(runErr, context.Canceled) || errors.Is(runErr, context.DeadlineExceeded) {
-					if e.awaitResume(id, nodeProto, &handlerCtx, resumeCh, opts) {
-						continue
-					}
-					return nil
-				}
+			// Context errors: handler exited because something cancelled its
+			// context (per-node Terminate, parent ctx cancel, etc.). Quiet exit.
+			if errors.Is(runErr, context.Canceled) || errors.Is(runErr, context.DeadlineExceeded) {
+				return nil
+			}
 
-				// Publish PHASE_ERRORED for the failing node.
-				if err := publishTerminalPhase(opts.handlerPub, e.topics.For(id), nodeProto, flowv1beta2.RunSnapshot_PHASE_ERRORED, runErr); err != nil {
-					slog.Error("publish terminal phase failed", slog.String("node", id), slog.String("phase", "ERRORED"), slog.Any("err", err))
-				}
+			// Publish PHASE_ERRORED for the failing node.
+			if err := publishTerminalPhase(opts.handlerPub, e.topics.For(id), nodeProto, flowv1beta2.RunSnapshot_PHASE_ERRORED, runErr); err != nil {
+				slog.Error("publish terminal phase failed", slog.String("node", id), slog.String("phase", "ERRORED"), slog.Any("err", err))
+			}
 
-				var termErr *TerminateError
-				if errors.As(runErr, &termErr) {
-					return fmt.Errorf("node %s: %w", id, runErr)
-				}
+			var termErr *TerminateError
+			if errors.As(runErr, &termErr) {
+				return fmt.Errorf("node %s: %w", id, runErr)
+			}
 
-				switch opts.strategy {
-				case flowv1beta2.ErrorStrategy_ERROR_STRATEGY_CONTINUE:
-					nodeErr := fmt.Errorf("node %s: %w", id, runErr)
-					res.mu.Lock()
-					res.continueErr = errors.Join(res.continueErr, nodeErr)
-					res.mu.Unlock()
-					return nil
-				case flowv1beta2.ErrorStrategy_ERROR_STRATEGY_STOP:
-					signalStop(id, runErr)
-					return nil
-				default: // TERMINATE
-					return fmt.Errorf("node %s: %w", id, runErr)
-				}
+			switch opts.strategy {
+			case flowv1beta2.ErrorStrategy_ERROR_STRATEGY_CONTINUE:
+				nodeErr := fmt.Errorf("node %s: %w", id, runErr)
+				res.mu.Lock()
+				res.continueErr = errors.Join(res.continueErr, nodeErr)
+				res.mu.Unlock()
+				return nil
+			case flowv1beta2.ErrorStrategy_ERROR_STRATEGY_STOP:
+				signalStop(id, runErr)
+				return nil
+			default: // TERMINATE
+				return fmt.Errorf("node %s: %w", id, runErr)
 			}
 		})
 	}
 
 	return res
-}
-
-// awaitResume checks whether a node is suspended and, if so, parks its
-// goroutine until resumed or the flow stops. It returns true when the
-// handler loop should continue (i.e. the node was resumed).
-func (e *Executor) awaitResume(
-	id string,
-	nodeProto *flowv1beta2.Node,
-	handlerCtx *context.Context,
-	resumeCh <-chan *expr.Value,
-	opts launchOpts,
-) bool {
-	e.mu.Lock()
-	isSuspended := e.suspendedNodes[id]
-	e.mu.Unlock()
-	if !isSuspended {
-		return false
-	}
-	if err := publishPhaseChange(opts.handlerPub, e.topics.For(id), nodeProto, flowv1beta2.RunSnapshot_PHASE_SUSPENDED, nil); err != nil {
-		slog.Error("publish phase change failed", slog.String("node", id), slog.String("phase", "SUSPENDED"), slog.Any("err", err))
-	}
-	return e.parkAndResume(id, nodeProto, handlerCtx, resumeCh, opts)
-}
-
-// parkAndResume parks the current goroutine until the node is resumed or the
-// park context is cancelled. Returns true when the handler loop should
-// continue (node was resumed).
-func (e *Executor) parkAndResume(
-	id string,
-	nodeProto *flowv1beta2.Node,
-	handlerCtx *context.Context,
-	resumeCh <-chan *expr.Value,
-	opts launchOpts,
-) bool {
-	select {
-	case <-opts.parkCtx.Done():
-		return false
-	case <-resumeCh:
-		e.mu.Lock()
-		delete(e.suspendedNodes, id)
-		parent := opts.gCtx
-		if isGenerator(nodeProto) {
-			parent = opts.genCtx
-		}
-		newCtx, newCancel := context.WithCancel(parent)
-		e.nodeCtxs[id] = newCancel
-		*handlerCtx = newCtx
-		e.mu.Unlock()
-		if err := publishPhaseChange(opts.handlerPub, e.topics.For(id), nodeProto, flowv1beta2.RunSnapshot_PHASE_PENDING, nil); err != nil {
-			slog.Error("publish phase change failed", slog.String("node", id), slog.String("phase", "PENDING"), slog.Any("err", err))
-		}
-		return true
-	}
 }

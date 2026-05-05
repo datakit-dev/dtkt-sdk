@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: nc_suspend_over_stop
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: doubled
+      value: "= inputs.x.value * 2"
+      node_control:
+        stop_when: "= true"
+        suspend_when: "= true"
+  outputs:
+    - id: result
+      value: "= vars.doubled.value"

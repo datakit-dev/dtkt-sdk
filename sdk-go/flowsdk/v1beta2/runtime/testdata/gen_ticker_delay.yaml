@@ -1,0 +1,18 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: gen_ticker_delay
+  description: |
+    Ticker generator with an initial delay before the first emission.
+    Verifies that no value is emitted before `delay` elapses, then ticks
+    fire at `interval` until stop_when reaches the cap.
+  generators:
+    - id: tick
+      ticker:
+        delay: "0.05s"
+        interval: "0.05s"
+  outputs:
+    - id: result
+      value: "= generators.tick.value"
+      flow_control:
+        stop_when: "= int(generators.tick.eval_count) >= 2"

@@ -433,10 +433,10 @@ correct typed map on the `RunSnapshot` snapshot.
 ### CEL Environment Options
 
 `celEnvOptions()` returns the v1beta2-specific `[]cel.EnvOption` (variable
-declarations, `EOF()` function, flat node type registration). The actual CEL
-environment is created via `common.NewCELEnv(opts...)` which adds the standard
-extension set (URL validation, encoders, string v4, list, proto, enum). This
-ensures v1beta2 CEL has the same capabilities as v1beta1 and the rest of the SDK.
+declarations and flat node type registration). The actual CEL environment is
+created via `common.NewCELEnv(opts...)` which adds the standard extension set
+(URL validation, encoders, string v4, list, proto, enum). This ensures v1beta2
+CEL has the same capabilities as v1beta1 and the rest of the SDK.
 
 ```go
 func celEnvOptions() []cel.EnvOption {
@@ -450,7 +450,6 @@ func celEnvOptions() []cel.EnvOption {
         cel.Variable("inputs", cel.DynType),
         cel.Variable("vars", cel.DynType),
         // ...one per namespace
-        cel.Function("EOF", ...),
     }
 }
 ```
@@ -1160,22 +1159,51 @@ flow-level (affects all nodes) and node-level (targets a specific node by ID).
 | **SuspendNodeEvent** | Pause a single node after current operation. | → PHASE_SUSPENDED |
 | **ResumeNodeEvent** | Resume a SUSPENDED/ERRORED/CANCELLED node. Optional `value` replaces pending input. | → PHASE_PENDING |
 
-**StopNodeEvent by node type:**
-- Input: close input (EOF), mark SUCCEEDED when drained
-- Generator: stop firing, SUCCEEDED
-- Var/Output: stop evaluating, SUCCEEDED
-- Action (unary): if idle, SUCCEEDED. If mid-RPC, wait for completion, then SUCCEEDED
-- Stream: close request side (EOF), wait for response close, then SUCCEEDED
-- Interaction: cancel outstanding token, SUCCEEDED
+**StopNodeEvent is graceful per type.** Handlers that embed `stoppableMixin`
+honor `requestStop()` at their next safe pause point: between iterations, never
+mid-consume. In-flight RPCs / stream sends / prompt waits complete naturally.
+The handler then publishes its own terminal Closed:true with PHASE_SUCCEEDED.
+Nodes without the mixin (currently generators) fall back to context cancel.
+- Input: emit EOF on the input topic; the bridge propagates downstream.
+- Generator: cancel ctx (no mixin yet); SUCCEEDED on exit.
+- Var/Output: requestStop; finish current iteration, then SUCCEEDED.
+- Action (unary): if idle, exit at next iteration. If mid-RPC, wait for
+  completion, then SUCCEEDED.
+- Stream: pause at the next send-side iteration. In-flight stream completes,
+  then SUCCEEDED.
+- Interaction: cancel outstanding token; SUCCEEDED.
 
-**TerminateNodeEvent by node type:**
-- Input/Generator/Var/Output: CANCELLED immediately
-- Action: if idle, CANCELLED. If mid-RPC, cancel RPC context → CANCELLED with error
-- Stream: cancel stream, close both sides → CANCELLED with error if active
-- Interaction: cancel outstanding token, CANCELLED
+**TerminateNodeEvent cancels the node ctx immediately.** The handler exits with
+ctx.Canceled (swallowed by the launch wrapper) and publishes PHASE_CANCELLED.
+It does NOT terminate the flow itself -- other nodes keep running until the
+graph naturally drains.
 
 **Node-level stop/terminate do NOT trigger `error_strategy`.** They are
 operator-initiated clean transitions, not unexpected errors.
+
+#### CEL-driven counterparts: FlowControl vs NodeControl
+
+The `StopFlowEvent` / `TerminateFlowEvent` / `SuspendFlowEvent` external
+commands have CEL counterparts on the spec itself. Both compile through
+`compileLifecycleControl` to the same internal representation; only the wired
+action functions differ.
+
+| Spec field | Scope | Wired actions |
+|---|---|---|
+| `flow_control.stop_when` / `terminate_when` / `suspend_when` | Whole flow | `performStop` / `e.Terminate` / `e.Suspend` |
+| `node_control.stop_when` / `terminate_when` / `suspend_when` | Single node | `e.StopNode(id)` / `e.TerminateNode(id)` / `e.SuspendNode(id)` |
+
+A node may declare both. They fire independently; **NodeControl runs first
+per iteration, then FlowControl**. The narrower-scope (per-node) state
+events land cleanly on the wire before any FC-driven flow-wide cancel can
+race with them. Edges from CEL expressions on either field are collected
+during `graph.Build` so dependency resolution stays correct.
+
+For the user-visible distinction between these and `RetryStrategy`, see the
+"When to use RetryStrategy vs NodeControl / FlowControl" section in
+`spec.proto` -- the short version is RetryStrategy fires synchronously inside
+the handler's call site (RPC error -> retry/skip/suspend in place), whereas
+FlowControl/NodeControl fire reactively on the next activation cycle.
 
 **ResumeNodeEvent value injection:**
 - If `value` is provided (google.protobuf.Any), it replaces the node's pending
@@ -1233,36 +1261,29 @@ on `flow.errored`). Simple version: callback functions registered on the executo
 
 ## Sentinel Values & CEL Functions
 
-### EOF sentinel
-`EOF` signals end-of-stream. Represented internally as a `flowv1beta2.EOF` proto
-message wrapped in `cel.expr.Value.object_value`. The runtime detects it and
-triggers control-flow behavior:
+### EOF sentinel (internal)
+`EOF` is the internal end-of-stream marker on node-to-node topics. It is a
+`flowv1beta2.EOF` proto message wrapped in `cel.expr.Value.object_value`,
+emitted by handlers on natural exit and detected by downstream consumers via
+`isEOFValue`. The runtime uses it to signal:
 
-- **Stream request input**: closes the client side (equivalent to CloseSend).
-  Ergonomic alternative to `close_request_when` -- both approaches are supported.
-- **Generator value**: signals the generator is done.
-- **Input**: closes the input channel.
+- **Generator value**: generator is done.
+- **Input topic**: input channel exhausted.
+- **Per-node terminal events** published by `publishTerminalPhase` for
+  Var/Action/Stream/Output/Interaction handlers.
 
-All three stream handlers (bidi, client-stream, server-stream) already detect EOF
-values in the input receive loop and close the request side accordingly.
+EOF is wire plumbing only -- it is not user-facing. There is no `EOF()` CEL
+function and no `Stream.close_request_when`. Per-node lifecycle control is
+expressed via `node_control.stop_when` / `terminate_when` / `suspend_when`,
+documented on `NodeControl` in `flow.proto`.
 
-### EOF() CEL function
-Custom CEL function that returns the EOF sentinel value. Required so that CEL
-expressions can produce the sentinel:
-
-```yaml
-request: "= condition ? EOF() : value"
-```
-
-Registered in `compileCEL()` as a zero-argument function returning the EOF
-sentinel `*expr.Value`. Generator expressions also receive `this.count` (int64)
-and `this.time` (timestamp) in their CEL activation.
-
-### No other custom functions
-All data access is through globals and `this` context variables (documented on
-the `Flow` message in `flow.proto`). Standard CEL functions (size, has, type,
-int, uint, double, string, bytes, matches, contains, startsWith, endsWith,
-timestamp, duration, list/map operations, ternary `? :`, etc.) are available.
+### Custom CEL functions
+Generator expressions receive `this.count` (int64) and `this.time` (timestamp)
+in their activation. No other custom functions are registered. All data access
+is through globals and `this` context variables (documented on the `Flow`
+message in `flow.proto`). Standard CEL functions (size, has, type, int, uint,
+double, string, bytes, matches, contains, startsWith, endsWith, timestamp,
+duration, list/map operations, ternary `? :`, etc.) are available.
 
 ---
 

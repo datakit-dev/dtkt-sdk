@@ -43,7 +43,7 @@ func IsRuntimeDone(run *Runtime) (doneErr *DoneError, ok bool) {
 				ok = true
 			}
 			if value.GetIsError() {
-				return false // error found — stop immediately
+				return false // error found - stop immediately
 			}
 		}
 		return true

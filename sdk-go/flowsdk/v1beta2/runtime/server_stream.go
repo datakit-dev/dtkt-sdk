@@ -19,8 +19,9 @@ import (
 
 // serverStreamHandler sends each incoming message as a request and forwards the stream of responses.
 type serverStreamHandler struct {
-	flowControlMixin
+	lifecycleMixin
 	suspendableMixin
+	stoppableMixin
 	id                   string
 	method               protoreflect.FullName
 	inputs               map[string]<-chan *pubsub.Message
@@ -29,7 +30,6 @@ type serverStreamHandler struct {
 	client               rpc.Client
 	env                  shared.Env
 	whenProg             cel.Program
-	closeRequestWhenProg cel.Program
 	throttle             time.Duration
 	request              *compiledRequest // nil = use FirstInputValue
 	responseProg         cel.Program      // nil = use raw response
@@ -45,6 +45,7 @@ func (h *serverStreamHandler) Run(ctx context.Context) error {
 	}
 
 	var iterCount int
+loop:
 	for {
 		// Pause point: between iterations only. An in-flight stream call
 		// completes naturally; suspend never aborts the connection.
@@ -52,20 +53,33 @@ func (h *serverStreamHandler) Run(ctx context.Context) error {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
+			case <-h.StopChan():
+				break loop // exit outer loop; post-loop SUCCEEDED publish fires
 			case <-h.SuspendChan():
-				if !h.pauseUntilResume(ctx) {
+				res := h.waitForResume(ctx, h.StopChan())
+				if res == suspendCancelled {
 					return ctx.Err()
+				}
+				if res == suspendStopped {
+					break loop
 				}
 				continue
 			case <-time.After(h.throttle):
 			}
 		}
 
-		act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan())
+		act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan(), h.StopChan())
 		vars, err := act.Resolve()
+		if errors.Is(err, errOperatorStopped) {
+			break
+		}
 		if errors.Is(err, errOperatorSuspended) {
-			if !h.pauseUntilResume(ctx) {
+			res := h.waitForResume(ctx, h.StopChan())
+			if res == suspendCancelled {
 				return ctx.Err()
+			}
+			if res == suspendStopped {
+				break loop
 			}
 			continue
 		}
@@ -83,16 +97,6 @@ func (h *serverStreamHandler) Run(ctx context.Context) error {
 			}
 			if result.Value() != true {
 				continue
-			}
-		}
-
-		if h.closeRequestWhenProg != nil {
-			result, err := evalCEL(h.closeRequestWhenProg, vars)
-			if err != nil {
-				return fmt.Errorf("server-stream %s close_request_when: %w", h.id, err)
-			}
-			if result.Value() == true {
-				break
 			}
 		}
 
@@ -133,6 +137,16 @@ func (h *serverStreamHandler) Run(ctx context.Context) error {
 			return nil
 		})
 		if err == errSkipped {
+			// Lifecycle pipeline: SKIP still goes through checkLifecycle
+			// so NC/FC can react.
+			nc, fc := h.checkLifecycle(vars)
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			if nc == LifecycleStop || fc == LifecycleStop {
+				h.requestStop()
+				break loop
+			}
 			continue
 		}
 		var contErr *ContinueError
@@ -141,12 +155,45 @@ func (h *serverStreamHandler) Run(ctx context.Context) error {
 			if pubErr := publish(cloneStreamNode(streamState)); pubErr != nil {
 				return pubErr
 			}
+			// Lifecycle pipeline: CONTINUE emitted an error-derived value;
+			// NC/FC still react to the iteration.
+			nc, fc := h.checkLifecycle(vars)
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			if nc == LifecycleStop || fc == LifecycleStop {
+				h.requestStop()
+				break loop
+			}
+			continue
+		}
+		var suspendErr *SuspendError
+		if errors.As(err, &suspendErr) {
+			// Lifecycle pipeline: retry → NC → FC. NC/FC may promote to
+			// terminate (cancelling ctx) or stop. checkLifecycle returns
+			// the action each control selected.
+			nc, fc := h.checkLifecycle(vars)
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			if nc == LifecycleStop || fc == LifecycleStop {
+				h.requestStop()
+				break loop
+			}
+			h.selfSuspend(err)
+			res := h.waitForResume(ctx, h.StopChan())
+			if res == suspendCancelled {
+				return ctx.Err()
+			}
+			if res == suspendStopped {
+				break loop
+			}
 			continue
 		}
 		if err != nil {
 			return fmt.Errorf("server-stream %s call %q: %w", h.id, h.method, err)
 		}
-		h.checkFC(vars)
+		h.checkLifecycle(vars)
 	}
 
 	streamState.SetRequestClosed(true)

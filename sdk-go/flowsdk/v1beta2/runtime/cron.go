@@ -14,6 +14,7 @@ import (
 )
 
 type cronHandler struct {
+	stoppableMixin
 	id           string
 	pubsub       executor.PubSub
 	topic        string
@@ -38,6 +39,18 @@ func (h *cronHandler) resume() {
 	}
 }
 
+// publishSucceeded emits the terminal SUCCEEDED state with EOF so
+// downstream consumers see graceful exit.
+func (h *cronHandler) publishSucceeded() error {
+	return publishNode(h.pubsub, h.topic, flowv1beta2.RunSnapshot_GeneratorNode_builder{
+		Id:        h.id,
+		Value:     newEOFValue(),
+		Done:      true,
+		EvalCount: uint64(h.count),
+		Phase:     flowv1beta2.RunSnapshot_PHASE_SUCCEEDED,
+	}.Build())
+}
+
 func (h *cronHandler) Run(ctx context.Context) error {
 	for {
 		next := h.schedule.Next(time.Now())
@@ -45,14 +58,11 @@ func (h *cronHandler) Run(ctx context.Context) error {
 
 		select {
 		case <-ctx.Done():
-			_ = publishNode(h.pubsub, h.topic, flowv1beta2.RunSnapshot_GeneratorNode_builder{
-				Id:        h.id,
-				Value:     newEOFValue(),
-				Done:      true,
-				EvalCount: uint64(h.count),
-				Phase:     flowv1beta2.RunSnapshot_PHASE_SUCCEEDED,
-			}.Build())
-			return nil
+			// Terminate path: ctx-cancel exits quietly; the canceller is
+			// responsible for any per-node terminal phase publish.
+			return ctx.Err()
+		case <-h.StopChan():
+			return h.publishSucceeded()
 		case <-h.suspendCh:
 			_ = publishStateEvent(h.pubsub, h.topic, flowv1beta2.RunSnapshot_GeneratorNode_builder{
 				Id:    h.id,
@@ -60,16 +70,9 @@ func (h *cronHandler) Run(ctx context.Context) error {
 			}.Build())
 			select {
 			case <-ctx.Done():
-				// Publish EOF so downstream consumers don't hang waiting
-				// for a marker that would otherwise never come.
-				_ = publishNode(h.pubsub, h.topic, flowv1beta2.RunSnapshot_GeneratorNode_builder{
-					Id:        h.id,
-					Value:     newEOFValue(),
-					Done:      true,
-					EvalCount: uint64(h.count),
-					Phase:     flowv1beta2.RunSnapshot_PHASE_SUCCEEDED,
-				}.Build())
-				return nil
+				return ctx.Err()
+			case <-h.StopChan():
+				return h.publishSucceeded()
 			case <-h.resumeCh:
 				_ = publishStateEvent(h.pubsub, h.topic, flowv1beta2.RunSnapshot_GeneratorNode_builder{
 					Id:    h.id,

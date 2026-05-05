@@ -1,0 +1,20 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: nc_action_memoize_stop
+  description: "NC.stop_when on an Action with memoize cache enabled"
+  inputs:
+    - id: msg
+      int64: {}
+  actions:
+    - id: call
+      memoize: true
+      call:
+        connection: echo
+        method: echo.Echo
+        request: "= inputs.msg.value"
+      node_control:
+        stop_when: "= inputs.msg.value >= 3"
+  outputs:
+    - id: result
+      value: "= actions.call.value"

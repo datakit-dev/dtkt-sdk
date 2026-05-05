@@ -77,14 +77,29 @@ func TestErrorStrategy_Stop_ActionError(t *testing.T) {
 		feedInput(ps, "inputs.msg", 99)
 
 		ctx := testContext(t)
+		actionCh, err := ps.Subscribe(ctx, testTopics.For("actions.call"))
+		require.NoError(t, err)
+
 		opts := append(mockRPCOptions(),
 			WithErrorStrategy(flowv1beta2.ErrorStrategy_ERROR_STRATEGY_STOP))
 		opts = append(opts, extraOpts...)
-		err := NewExecutor(ps, testTopics, opts...).Execute(ctx, graph)
+		err = NewExecutor(ps, testTopics, opts...).Execute(ctx, graph)
 
-		// STOP still returns the error after draining.
+		// STOP returns the error after draining.
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "internal server error")
+
+		// Action's terminal phase is PHASE_ERRORED -- proves the error
+		// surfaced through the node-level lifecycle, not just the
+		// flow-level error.
+		actionPhases := collectPhases(ctx, actionCh)
+		require.NotEmpty(t, actionPhases)
+		assert.Equal(t, flowv1beta2.RunSnapshot_PHASE_ERRORED, actionPhases[len(actionPhases)-1],
+			"action terminal phase: %v", phaseNames(actionPhases))
+
+		// No successful outputs (the action errored, no value to forward).
+		results := collectOutputs(ctx, ps, "outputs.result")
+		assert.Empty(t, results, "no values forwarded when action errors under STOP")
 	})
 }
 
@@ -118,7 +133,12 @@ func TestErrorStrategy_Stop_MultiPath(t *testing.T) {
 	})
 }
 
-// STOP: generator + action error -- generator stops gracefully.
+// STOP: generator + action error -- the action errors on first call and
+// triggers STOP. Behavioral assertions:
+//   - Execute returns the underlying error
+//   - The errored action publishes PHASE_ERRORED as its terminal phase
+//   - The output topic produces NO successful values (the only path is
+//     generator -> action -> output and the action always errors)
 
 func TestErrorStrategy_Stop_Generator(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
@@ -128,14 +148,27 @@ func TestErrorStrategy_Stop_Generator(t *testing.T) {
 		defer ps.Close() //nolint:errcheck
 
 		ctx := testContext(t)
+		actionCh, err := ps.Subscribe(ctx, testTopics.For("actions.call"))
+		require.NoError(t, err)
+
 		opts := append(mockRPCOptions(),
 			WithErrorStrategy(flowv1beta2.ErrorStrategy_ERROR_STRATEGY_STOP))
 		opts = append(opts, extraOpts...)
-		err := NewExecutor(ps, testTopics, opts...).Execute(ctx, graph)
+		err = NewExecutor(ps, testTopics, opts...).Execute(ctx, graph)
 
-		// STOP still returns the error.
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "internal server error")
+
+		// Action publishes PHASE_ERRORED as terminal phase.
+		actionPhases := collectPhases(ctx, actionCh)
+		require.NotEmpty(t, actionPhases)
+		assert.Equal(t, flowv1beta2.RunSnapshot_PHASE_ERRORED, actionPhases[len(actionPhases)-1],
+			"action terminal phase must be ERRORED; got %v", phaseNames(actionPhases))
+
+		// No successful output values: the action errors before publishing
+		// any value, so the downstream output gets nothing to forward.
+		results := collectOutputs(ctx, ps, "outputs.result")
+		assert.Empty(t, results, "no values should be forwarded when action always errors")
 	})
 }
 
@@ -195,7 +228,10 @@ func TestErrorStrategy_Stop_NodePhase(t *testing.T) {
 // --- CONTINUE strategy ---
 
 // CONTINUE: action error does not terminate the flow; error is returned
-// after all nodes complete.
+// after all nodes complete. Behavioral assertions:
+//   - Execute returns the error
+//   - The errored action's terminal phase is PHASE_ERRORED
+//   - Output topic gets no value (the action errored, no value to forward)
 
 func TestErrorStrategy_Continue_ActionError(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
@@ -207,14 +243,24 @@ func TestErrorStrategy_Continue_ActionError(t *testing.T) {
 		feedInput(ps, "inputs.msg", 99)
 
 		ctx := testContext(t)
+		actionCh, err := ps.Subscribe(ctx, testTopics.For("actions.call"))
+		require.NoError(t, err)
+
 		opts := append(mockRPCOptions(),
 			WithErrorStrategy(flowv1beta2.ErrorStrategy_ERROR_STRATEGY_CONTINUE))
 		opts = append(opts, extraOpts...)
-		err := NewExecutor(ps, testTopics, opts...).Execute(ctx, graph)
+		err = NewExecutor(ps, testTopics, opts...).Execute(ctx, graph)
 
-		// CONTINUE still returns the error after all nodes complete.
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "internal server error")
+
+		actionPhases := collectPhases(ctx, actionCh)
+		require.NotEmpty(t, actionPhases)
+		assert.Equal(t, flowv1beta2.RunSnapshot_PHASE_ERRORED, actionPhases[len(actionPhases)-1],
+			"action terminal phase: %v", phaseNames(actionPhases))
+
+		results := collectOutputs(ctx, ps, "outputs.result")
+		assert.Empty(t, results, "no values should be forwarded when action errors")
 	})
 }
 

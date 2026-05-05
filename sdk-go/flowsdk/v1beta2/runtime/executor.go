@@ -50,20 +50,19 @@ type Executor struct {
 	errorStrategy        flowv1beta2.ErrorStrategy
 
 	// Per-execution state, protected by mu. Set during Execute, nil otherwise.
-	mu           sync.Mutex
-	stopFn       func()                        // graceful stop: EOF injection + generator cancel
-	terminateFn  func()                        // immediate cancel: cancels runCtx
-	nodeCtxs     map[string]context.CancelFunc // per-node context cancellation
-	nodeProtos   map[string]*flowv1beta2.Node  // node protos for phase publishing
-	handlerPub   pubsub.Publisher              // publisher for terminal phase events
-	terminated   bool                          // true if Terminate() was called
-	stoppedNodes map[string]bool               // nodes stopped by StopNode (→ SUCCEEDED)
-	handlers     map[string]executor.NodeHandler // handler reference for suspend routing
+	mu            sync.Mutex
+	stopFn        func()                          // graceful stop: EOF injection + generator cancel
+	terminateFn   func()                          // immediate cancel: cancels runCtx
+	nodeCtxs      map[string]context.CancelFunc   // per-node context cancellation
+	nodeProtos    map[string]*flowv1beta2.Node    // node protos for phase publishing
+	handlerPub    pubsub.Publisher                // publisher for terminal phase events
+	terminated    bool                            // true if Terminate() was called
+	stoppedNodes  map[string]bool                 // nodes stopped by StopNode (→ SUCCEEDED)
+	handlers      map[string]executor.NodeHandler // handler reference for suspend routing
+	terminalNodes map[string]bool                 // nodes whose handler has exited; operator events become no-ops
 
 	// Suspend/resume state, also protected by mu.
-	suspendedNodes map[string]bool             // nodes in PHASE_SUSPENDED
-	resumeChans    map[string]chan *expr.Value  // resume channels per non-generator handler
-	parkCancelFn   context.CancelFunc          // wakes suspended goroutines on stop
+	suspendedNodes map[string]bool // nodes in PHASE_SUSPENDED
 }
 
 type Option func(*Executor)
@@ -163,54 +162,108 @@ func (e *Executor) Terminate() {
 	}
 }
 
-// StopNode initiates a graceful stop of a single node. The effect depends
-// on the node type:
-//   - Input: publishes EOF to the input topic
-//   - Generator: cancels the generator's context (stops firing)
-//   - Other: cancels the node's context (finishes current operation, then stops)
+// currentPhase derives the current logical phase of a node from the
+// executor's tracking maps. Used by operator methods to consult the
+// transition table before mutating state.
 //
-// The stopped node transitions to PHASE_SUCCEEDED. Does not trigger
-// error_strategy. No-op if the flow is not running or the node ID is unknown.
+// Must be called with e.mu held.
+//
+// We don't distinguish PENDING from RUNNING because the executor doesn't
+// track when a handler's first iteration actually runs -- the transition
+// table treats both the same for all operator events anyway (Stop/
+// Terminate/Suspend valid on both; Resume invalid on both).
+//
+// All terminal phases (SUCCEEDED/CANCELLED/ERRORED/FAILED) collapse to
+// SUCCEEDED here because the transition table has no entries for any
+// terminal phase -- any event is invalid -- so the specific phase doesn't
+// affect validity decisions.
+func (e *Executor) currentPhase(nodeID string) flowv1beta2.RunSnapshot_Phase {
+	if e.terminalNodes[nodeID] {
+		return flowv1beta2.RunSnapshot_PHASE_SUCCEEDED
+	}
+	if e.suspendedNodes[nodeID] {
+		return flowv1beta2.RunSnapshot_PHASE_SUSPENDED
+	}
+	if e.stoppedNodes[nodeID] {
+		return flowv1beta2.RunSnapshot_PHASE_STOPPING
+	}
+	return flowv1beta2.RunSnapshot_PHASE_RUNNING
+}
+
+// StopNode initiates a graceful stop of a single node. The node transitions
+// to PHASE_STOPPING immediately, drains its in-flight work per-type, and
+// then transitions to PHASE_SUCCEEDED on natural exit. Per-type drain:
+//   - Input: publishes EOF on the input topic; downstream subscribers
+//     drain to PHASE_SUCCEEDED.
+//   - Generator (ticker/cron/range): signals stopCh via the stoppable
+//     mixin; the handler exits with PHASE_SUCCEEDED at its next safe point.
+//   - Stream / unary action / interaction / var / output / switch: signals
+//     the stoppable mixin so the handler exits its main loop at a safe
+//     point. In-flight RPCs / streams / prompts complete naturally; ctx
+//     is NOT cancelled (that's TerminateNode's job).
+//
+// Does not trigger error_strategy. No-op if the flow is not running, the
+// node ID is unknown, or the (currentPhase, eventStop) transition is
+// invalid per the transition table (validateNodeTransition).
 func (e *Executor) StopNode(nodeID string) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	if e.stopFn == nil {
 		return // not running
 	}
+	np, ok := e.nodeProtos[nodeID]
+	if !ok {
+		return // unknown node
+	}
 
-	// For input nodes, inject EOF to close the input.
-	if np, ok := e.nodeProtos[nodeID]; ok && np.WhichType() == flowv1beta2.Node_Input_case {
+	// Consult the transition table. Invalid (phase, event) -> no-op.
+	if _, ok := validateNodeTransition(e.currentPhase(nodeID), eventStop); !ok {
+		return
+	}
+
+	// Input nodes: inject EOF on the input topic. The bridge goroutine
+	// observes the EOF, propagates downstream, and the input node's
+	// handler publishes PHASE_SUCCEEDED on exit.
+	if np.WhichType() == flowv1beta2.Node_Input_case {
 		_ = e.pubsub.Publish(e.topics.InputFor(nodeID), pubsub.NewMessage(newEOFValue()))
 		return
 	}
 
-	// Track this node as operator-stopped so the handler wrapper publishes
-	// PHASE_SUCCEEDED instead of silently swallowing the context error.
-	if e.stoppedNodes == nil {
-		e.stoppedNodes = make(map[string]bool)
-	}
+	// Publish PHASE_STOPPING (transient state) so observers see the
+	// drain in progress. PHASE_SUCCEEDED is published by the handler
+	// itself on natural exit (post-loop EOF/SUCCEEDED publish).
+	_ = publishPhaseChange(e.handlerPub, e.topics.For(nodeID), np,
+		flowv1beta2.RunSnapshot_PHASE_STOPPING, nil)
+
+	// Mark stoppedNodes so currentPhase reports STOPPING. This makes
+	// subsequent transitions consult the table correctly: e.g.
+	// STOPPING+Stop is idempotent (no-op), STOPPING+Suspend is invalid.
+	// terminalNodes will overwrite this in the lifecycle wrapper's defer
+	// when the handler exits.
 	e.stoppedNodes[nodeID] = true
 
-	// Publish PHASE_SUCCEEDED for the stopped node.
-	if np, ok := e.nodeProtos[nodeID]; ok {
-		_ = publishTerminalPhase(e.handlerPub, e.topics.For(nodeID), np,
-			flowv1beta2.RunSnapshot_PHASE_SUCCEEDED, nil)
-	}
-
-	// Cancel the node's context.
-	if cancel, ok := e.nodeCtxs[nodeID]; ok {
-		cancel()
+	// All long-lived handlers implement selfStoppable. Stop signals stopCh;
+	// the handler exits cleanly with PHASE_SUCCEEDED via its post-loop
+	// publish. Suspended handlers also see stopCh, so a suspended-then-
+	// stopped handler exits gracefully.
+	if sh, ok := e.handlers[nodeID].(selfStoppable); ok {
+		sh.requestStop()
+		delete(e.suspendedNodes, nodeID)
 	}
 }
 
 // TerminateNode cancels a single node immediately. The node transitions to
-// PHASE_CANCELLED. Does not trigger error_strategy. No-op if the flow is not
-// running or the node ID is unknown.
+// PHASE_CANCELLED. Does not trigger error_strategy. No-op if the flow is
+// not running, the node ID is unknown, or the (currentPhase, eventTerminate)
+// transition is invalid per the transition table.
 func (e *Executor) TerminateNode(nodeID string) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	if e.terminateFn == nil {
 		return // not running
+	}
+	if _, ok := validateNodeTransition(e.currentPhase(nodeID), eventTerminate); !ok {
+		return
 	}
 
 	if cancel, ok := e.nodeCtxs[nodeID]; ok {
@@ -224,7 +277,7 @@ func (e *Executor) TerminateNode(nodeID string) {
 }
 
 // Suspend pauses every running handler in place. Every handler implements
-// selfSuspendable, so we never cancel handler contexts on suspend — that
+// selfSuspendable, so we never cancel handler contexts on suspend - that
 // reservation belongs to "stop forever". Each handler honors the suspend
 // signal at a safe pause point in its loop (between iterations, never
 // mid-consume), which preserves goroutine lifetimes and eliminates the
@@ -238,9 +291,9 @@ func (e *Executor) Suspend() {
 	if e.stopFn == nil {
 		return
 	}
-	for id := range e.resumeChans {
-		if e.suspendedNodes[id] {
-			continue
+	for id := range e.handlers {
+		if e.suspendedNodes[id] || e.terminalNodes[id] {
+			continue // skip already-suspended and terminal nodes
 		}
 		e.suspendedNodes[id] = true
 		if sh, ok := e.handlers[id].(selfSuspendable); ok {
@@ -250,18 +303,21 @@ func (e *Executor) Suspend() {
 	}
 }
 
-// SuspendNode suspends a single handler. See Suspend.
+// SuspendNode suspends a single handler. See Suspend. No-op if the flow
+// is not running, the node ID is unknown, or the (currentPhase,
+// eventSuspend) transition is invalid (e.g. node is already SUSPENDED,
+// STOPPING, or terminal).
 func (e *Executor) SuspendNode(nodeID string) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	if e.stopFn == nil {
 		return
 	}
-	if _, ok := e.resumeChans[nodeID]; !ok {
+	if _, ok := e.handlers[nodeID]; !ok {
 		return
 	}
-	if e.suspendedNodes[nodeID] {
-		return
+	if _, ok := validateNodeTransition(e.currentPhase(nodeID), eventSuspend); !ok {
+		return // invalid transition (idempotent on SUSPENDED, no-op on terminal/stopping)
 	}
 	e.suspendedNodes[nodeID] = true
 	if sh, ok := e.handlers[nodeID].(selfSuspendable); ok {
@@ -286,7 +342,7 @@ func (e *Executor) publishSuspendedPhase(nodeID string) {
 
 // Resume signals every suspended handler to continue, and clears the
 // suspendedNodes entry for each. Resume is the single writer that flips
-// nodes back to "running" — handlers no longer participate in the
+// nodes back to "running" - handlers no longer participate in the
 // bookkeeping. This eliminates the race where a Suspend/Resume/Suspend
 // triple could silently no-op the second Suspend.
 // Safe to call concurrently. No-op if no nodes are suspended.
@@ -301,28 +357,25 @@ func (e *Executor) Resume() {
 	}
 }
 
-// ResumeNode resumes a single suspended node. For non-self-suspendable
-// handlers (legacy retry-driven SuspendError path), still uses the
-// resumeChans signal. For all current handlers, sh.resume() suffices.
-func (e *Executor) ResumeNode(nodeID string, val *expr.Value) {
+// ResumeNode resumes a single suspended node. Signals the handler's mixin
+// resumeCh so its waitForResume returns and clears the suspendedNodes
+// flag. The `val` parameter is currently unused -- kept on the signature
+// for future "resume with corrected input" support; today every handler
+// resumes from where it was suspended and reads the next input naturally.
+//
+// All current handlers implement selfSuspendable. No-op if the
+// (currentPhase, eventResume) transition is invalid (i.e. node is not
+// currently SUSPENDED).
+func (e *Executor) ResumeNode(nodeID string, _ *expr.Value) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	if !e.suspendedNodes[nodeID] {
+	if _, ok := validateNodeTransition(e.currentPhase(nodeID), eventResume); !ok {
 		return
 	}
 	if sh, ok := e.handlers[nodeID].(selfSuspendable); ok {
 		sh.resume()
-		delete(e.suspendedNodes, nodeID)
-		return
 	}
-	// Fallback: send via resumeChans (used by retry-strategy SuspendError
-	// path where parkAndResume blocks on this channel).
-	if ch, ok := e.resumeChans[nodeID]; ok {
-		select {
-		case ch <- val:
-		default:
-		}
-	}
+	delete(e.suspendedNodes, nodeID)
 }
 
 // clearRunState clears all per-execution state. Must be called with mu held.
@@ -336,8 +389,7 @@ func (e *Executor) clearRunState() {
 	e.stoppedNodes = nil
 	e.handlers = nil
 	e.suspendedNodes = nil
-	e.resumeChans = nil
-	e.parkCancelFn = nil
+	e.terminalNodes = nil
 }
 
 func (e *Executor) Execute(ctx context.Context, graph *flowv1beta2.Graph) error {
@@ -456,14 +508,14 @@ func (e *Executor) Execute(ctx context.Context, graph *flowv1beta2.Graph) error 
 	}
 	defer rs.cleanup()
 
-	// Launch all handlers with error interception and suspend/resume support.
+	// Launch all handlers. Suspend/resume is fully handled inside each handler
+	// via the suspendableMixin -- this wrapper only intercepts terminal errors
+	// and applies flow-level error_strategy.
 	res := e.launchHandlers(g, launchOpts{
 		handlers:    handlers,
 		nodeProtos:  nodeProtos,
 		handlerCtxs: rs.handlerCtxs,
-		resumeChans: rs.resumeChans,
 		handlerPub:  handlerPub,
-		parkCtx:     rs.parkCtx,
 		gCtx:        gCtx,
 		genCtx:      rs.genCtx,
 		strategy:    strategy,
@@ -495,15 +547,17 @@ func (e *Executor) Execute(ctx context.Context, graph *flowv1beta2.Graph) error 
 		err = resContinueErr
 	}
 
-	// If Terminate() was called, return ErrTerminated
-	// (handlers swallow context.Canceled, so err is nil).
-	if err == nil {
-		e.mu.Lock()
-		wasTerminated := e.terminated
-		e.mu.Unlock()
-		if wasTerminated {
-			err = ErrTerminated
-		}
+	// If Terminate() was called, surface ErrTerminated. Most handlers exit
+	// with nil (context.Canceled is swallowed by the launchHandlers wrapper),
+	// but the input-bridge goroutines return ctx.Err() directly on cancel
+	// and may race ahead of handler exits, leaving g.Wait with
+	// context.Canceled. In either case the flow-level signal we want to
+	// expose is ErrTerminated, so override.
+	e.mu.Lock()
+	wasTerminated := e.terminated
+	e.mu.Unlock()
+	if wasTerminated && (err == nil || errors.Is(err, context.Canceled)) {
+		err = ErrTerminated
 	}
 
 	// Emit flow-level terminal event before draining the outbox.

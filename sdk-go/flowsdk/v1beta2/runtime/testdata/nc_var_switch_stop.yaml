@@ -1,0 +1,23 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: nc_var_switch_stop
+  description: "NC.stop_when on a Var that uses switch (not value) -- exercises switchHandler path"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: bucket
+      switch:
+        value: "= inputs.x.value"
+        case:
+          - value: "= this.value < 10"
+            return: '= "low"'
+          - value: "= this.value < 100"
+            return: '= "mid"'
+        default: '= "high"'
+      node_control:
+        stop_when: "= inputs.x.value >= 50"
+  outputs:
+    - id: result
+      value: "= vars.bucket.value"

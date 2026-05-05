@@ -1,0 +1,25 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: interaction_form_elements
+  inputs:
+    - id: x
+      int64: {}
+  interactions:
+    - id: form
+      when: "= inputs.x.value > 0"
+      inputs:
+        - id: choose
+          title: "Pick one"
+          select:
+            method_name: "test.OptionsService/List"
+        - id: pickMany
+          title: "Pick many"
+          multi_select:
+            method_name: "test.OptionsService/List"
+        - id: upload
+          title: "Upload a file"
+          file: {}
+  outputs:
+    - id: result
+      value: "= interactions.form.value"

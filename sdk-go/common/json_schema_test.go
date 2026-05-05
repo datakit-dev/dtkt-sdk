@@ -133,7 +133,7 @@ func Test_SliceSchema(t *testing.T) {
 // Regression: when the top-level Go type is a slice (or map) of a struct that
 // has nested struct fields (e.g. `OptString`), the reflector emits the nested
 // struct definitions in $defs and references them via $ref "#/$defs/Foo".
-// Those definitions must live at the schema root — if they end up nested
+// Those definitions must live at the schema root - if they end up nested
 // inside `items` or `additionalProperties`, the json-schema compiler fails
 // with `compile: json-pointer ... not found` when resolving the $ref.
 type optString struct {
@@ -170,7 +170,7 @@ func Test_NestedDefsHoistedFromArrayItems(t *testing.T) {
 	}
 	if items, ok := raw["items"].(map[string]any); ok {
 		if _, nested := items["$defs"]; nested {
-			t.Errorf("$defs leaked into items — $ref pointers won't resolve")
+			t.Errorf("$defs leaked into items - $ref pointers won't resolve")
 		}
 	}
 }
@@ -194,7 +194,7 @@ func Test_NestedDefsHoistedFromMapValues(t *testing.T) {
 	}
 	if ap, ok := raw["additionalProperties"].(map[string]any); ok {
 		if _, nested := ap["$defs"]; nested {
-			t.Errorf("$defs leaked into additionalProperties — $ref pointers won't resolve")
+			t.Errorf("$defs leaked into additionalProperties - $ref pointers won't resolve")
 		}
 	}
 }

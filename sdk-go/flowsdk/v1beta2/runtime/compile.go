@@ -50,17 +50,16 @@ type compiledCron struct {
 }
 
 type compiledCall struct {
-	method               protoreflect.FullName
-	kind                 rpc.MethodKind
-	client               rpc.Client
-	env                  shared.Env // connection-specific env
-	whenProg             cel.Program
-	closeRequestWhenProg cel.Program // nil for actions
-	throttle             time.Duration
-	request              *compiledRequest
-	responseProg         cel.Program
-	retry                *compiledRetryStrategy
-	cache                cache.Cache // nil unless action with memoize
+	method       protoreflect.FullName
+	kind         rpc.MethodKind
+	client       rpc.Client
+	env          shared.Env // connection-specific env
+	whenProg     cel.Program
+	throttle     time.Duration
+	request      *compiledRequest
+	responseProg cel.Program
+	retry        *compiledRetryStrategy
+	cache        cache.Cache // nil unless action with memoize
 }
 
 type compiledOutput struct {
@@ -229,19 +228,12 @@ func compileGenerator(env shared.Env, node *flowv1beta2.Node) (any, error) {
 
 func compileStream(env shared.Env, node *flowv1beta2.Node, connectors map[string]*rpc.Connector) (any, error) {
 	stream := node.GetStream()
-	var whenProg, closeReqWhenProg cel.Program
+	var whenProg cel.Program
 	if w := stream.GetWhen(); w != "" {
 		var err error
 		whenProg, err = compileCEL(env, w)
 		if err != nil {
 			return nil, fmt.Errorf("compiling stream when CEL for %s: %w", node.GetId(), err)
-		}
-	}
-	if crw := stream.GetCloseRequestWhen(); crw != "" {
-		var err error
-		closeReqWhenProg, err = compileCEL(env, crw)
-		if err != nil {
-			return nil, fmt.Errorf("compiling stream close_request_when CEL for %s: %w", node.GetId(), err)
 		}
 	}
 	retry, err := compileRetryStrategy(env, stream.GetRetryStrategy())
@@ -277,16 +269,15 @@ func compileStream(env shared.Env, node *flowv1beta2.Node, connectors map[string
 			}
 		}
 		return &compiledCall{
-			method:               methodName,
-			kind:                 kind,
-			client:               conn.Client,
-			env:                  connRuntimeEnv(env, conn.Resolver),
-			whenProg:             whenProg,
-			closeRequestWhenProg: closeReqWhenProg,
-			throttle:             rateToDuration(stream.GetThrottle()),
-			request:              reqTree,
-			responseProg:         respProg,
-			retry:                retry,
+			method:       methodName,
+			kind:         kind,
+			client:       conn.Client,
+			env:          connRuntimeEnv(env, conn.Resolver),
+			whenProg:     whenProg,
+			throttle:     rateToDuration(stream.GetThrottle()),
+			request:      reqTree,
+			responseProg: respProg,
+			retry:        retry,
 		}, nil
 
 	default:

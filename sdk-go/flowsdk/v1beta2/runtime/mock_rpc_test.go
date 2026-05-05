@@ -150,6 +150,21 @@ func newMockRPCClient() *mock.Client {
 		return nil
 	})
 
+	// Server stream: fails to open with NotFound (code 5).
+	c.RegisterServerStream("error.StreamNotFound", func(_ context.Context, _ proto.Message, _ func(proto.Message) error) error {
+		return status.Error(codes.NotFound, "stream resource not found")
+	})
+
+	// Server stream: fails to open with PermissionDenied (code 7).
+	c.RegisterServerStream("error.StreamPermissionDenied", func(_ context.Context, _ proto.Message, _ func(proto.Message) error) error {
+		return status.Error(codes.PermissionDenied, "stream access denied")
+	})
+
+	// Server stream: fails to open with Internal (code 13).
+	c.RegisterServerStream("error.StreamInternal", func(_ context.Context, _ proto.Message, _ func(proto.Message) error) error {
+		return status.Error(codes.Internal, "stream internal error")
+	})
+
 	// Unary: blocks forever until context is cancelled (simulates hung/unresponsive RPC).
 	c.RegisterUnary("error.Hang", func(ctx context.Context, _ proto.Message) (proto.Message, error) {
 		<-ctx.Done()

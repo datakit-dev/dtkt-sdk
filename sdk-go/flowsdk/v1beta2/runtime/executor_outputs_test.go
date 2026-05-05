@@ -61,6 +61,27 @@ func TestGraph_Output_ReduceTransform(t *testing.T) {
 	})
 }
 
+// Output.transforms.scan -- emits every intermediate accumulator value.
+// (reduce is covered in TestGraph_Output_ReduceTransform; this is the scan
+// twin so the spec's whole transform palette is exercised at the Output node.)
+
+func TestGraph_Output_ScanTransform(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "output_scan.yaml")
+
+		pubsub := newPubSub()
+		defer pubsub.Close() //nolint:errcheck
+
+		feedInput(pubsub, "inputs.x", 10, 20, 30)
+		ctx := testContext(t)
+		err := NewExecutor(pubsub, testTopics, extraOpts...).Execute(ctx, graph)
+		require.NoError(t, err)
+
+		results := outputInt64s(collectOutputs(ctx, pubsub, "outputs.result"))
+		assert.Equal(t, []int64{10, 30, 60}, results)
+	})
+}
+
 // Output throttle: rate-limits how often the output CEL evaluates
 
 func TestGraph_Output_Throttle(t *testing.T) {

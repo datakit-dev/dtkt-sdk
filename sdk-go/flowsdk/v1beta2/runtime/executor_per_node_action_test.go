@@ -107,14 +107,14 @@ var nodeFixtures = []nodeFixture{
 // optionally wire up mocks/responders, expose the executor, the pubsub,
 // the done channel, and a cleanup func.
 type nodeTestRig struct {
-	t              *testing.T
-	exec           *Executor
-	ps             executor.PubSub
-	ctx            context.Context
-	doneCh         chan error
-	cancel         func() // signals interaction responder to exit (no-op otherwise)
-	responderDone  chan struct{}
-	promptCh       chan *flowv1beta2.InteractionRequestEvent
+	t             *testing.T
+	exec          *Executor
+	ps            executor.PubSub
+	ctx           context.Context
+	doneCh        chan error
+	cancel        func() // signals interaction responder to exit (no-op otherwise)
+	responderDone chan struct{}
+	promptCh      chan *flowv1beta2.InteractionRequestEvent
 }
 
 // setupNodeRig builds the rig for a given fixture and option set. Caller
@@ -235,15 +235,16 @@ func waitForPhaseOnChan(ch <-chan *pubsub.Message, phase flowv1beta2.RunSnapshot
 
 // TestPerNode_SuspendNode_Isolation runs SuspendNode on each handler type and
 // verifies the unified-suspend contract:
-//   1. PHASE_SUSPENDED is published on the target node's topic.
-//   2. Only the target node is in suspendedNodes.
-//   3. The witness topic continues to receive values during the pause
-//      (or doesn't, for the "self == source" cases).
-//   4. ResumeNode unblocks normal operation; flow stops cleanly.
+//  1. PHASE_SUSPENDED is published on the target node's topic.
+//  2. Only the target node is in suspendedNodes.
+//  3. The witness topic continues to receive values during the pause
+//     (or doesn't, for the "self == source" cases).
+//  4. ResumeNode unblocks normal operation; flow stops cleanly.
 func TestPerNode_SuspendNode_Isolation(t *testing.T) {
 	for _, tc := range nodeFixtures {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
+			parallelByDefault(t)
 			withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 				rig := setupNodeRig(t, tc, extraOpts)
 				defer rig.cleanup()
@@ -291,7 +292,7 @@ func TestPerNode_SuspendNode_Isolation(t *testing.T) {
 						"%s: witness %s should receive values while %s is suspended; got %d",
 						tc.name, tc.witnessTopic, tc.targetNode, witnessCount)
 				} else {
-					// Suspended source — allow up to 1 in-flight value
+					// Suspended source - allow up to 1 in-flight value
 					// (outbox relay may have one queued).
 					require.LessOrEqualf(t, witnessCount, 1,
 						"%s: witness %s (= target) expected ≤1 in-flight values during suspend; got %d",
@@ -315,8 +316,8 @@ func TestPerNode_SuspendNode_Isolation(t *testing.T) {
 // -- Test 2: StopNode --------------------------------------------------------
 
 // TestPerNode_StopNode runs StopNode on each handler type and verifies:
-//   1. The target node transitions to PHASE_SUCCEEDED on its topic.
-//   2. The flow drains and exits without hanging.
+//  1. The target node transitions to PHASE_SUCCEEDED on its topic.
+//  2. The flow drains and exits without hanging.
 //
 // StopNode is graceful: in-flight work completes, the rest of the flow
 // shuts down naturally as EOFs cascade.
@@ -325,11 +326,9 @@ func TestPerNode_StopNode(t *testing.T) {
 		tc := tc
 		// StopNode on a stream/interaction in the middle of an in-flight
 		// operation has nuanced semantics that aren't worth over-asserting
-		// here. Skip those — they're covered by other targeted tests.
-		if tc.name == "server_stream" || tc.name == "client_stream" || tc.name == "interaction" {
-			continue
-		}
+		// here. Skip those - they're covered by other targeted tests.
 		t.Run(tc.name, func(t *testing.T) {
+			parallelByDefault(t)
 			withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 				rig := setupNodeRig(t, tc, extraOpts)
 				defer rig.cleanup()
@@ -360,25 +359,23 @@ func TestPerNode_StopNode(t *testing.T) {
 
 // TestPerNode_TerminateNode runs TerminateNode on each handler type and
 // verifies:
-//   1. The target node transitions to PHASE_CANCELLED on its topic.
-//   2. The flow exits without hanging (Terminate may or may not
-//      propagate to a flow-level Cancel depending on the strategy;
-//      we just verify the target node is cancelled and the flow
-//      exits via Stop or naturally).
+//  1. The target node transitions to PHASE_CANCELLED on its topic.
+//  2. The flow exits without hanging (Terminate may or may not
+//     propagate to a flow-level Cancel depending on the strategy;
+//     we just verify the target node is cancelled and the flow
+//     exits via Stop or naturally).
 func TestPerNode_TerminateNode(t *testing.T) {
 	for _, tc := range nodeFixtures {
 		tc := tc
 		// TerminateNode on streams/interactions has the same caveat as
 		// StopNode (in-flight semantics); skip for now.
-		if tc.name == "server_stream" || tc.name == "client_stream" || tc.name == "interaction" {
-			continue
-		}
 		t.Run(tc.name, func(t *testing.T) {
+			parallelByDefault(t)
 			withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 				rig := setupNodeRig(t, tc, extraOpts)
 				defer rig.cleanup()
 
-				// Subscribe BEFORE the action — see StopNode test rationale.
+				// Subscribe BEFORE the action - see StopNode test rationale.
 				topicCh, err := rig.ps.Subscribe(rig.ctx, testTopics.For(tc.targetNode))
 				require.NoError(t, err)
 
@@ -402,15 +399,13 @@ func TestPerNode_TerminateNode(t *testing.T) {
 // -- Test 4: combined action sequences --------------------------------------
 
 // TestPerNode_SuspendThenStop verifies that a suspended node can still
-// be stopped — the SuspendNode followed by StopNode sequence resolves
+// be stopped - the SuspendNode followed by StopNode sequence resolves
 // without deadlock and the target node ends in PHASE_SUCCEEDED.
 func TestPerNode_SuspendThenStop(t *testing.T) {
 	for _, tc := range nodeFixtures {
 		tc := tc
-		if tc.name == "server_stream" || tc.name == "client_stream" || tc.name == "interaction" {
-			continue
-		}
 		t.Run(tc.name, func(t *testing.T) {
+			parallelByDefault(t)
 			withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 				rig := setupNodeRig(t, tc, extraOpts)
 				defer rig.cleanup()
@@ -437,15 +432,13 @@ func TestPerNode_SuspendThenStop(t *testing.T) {
 }
 
 // TestPerNode_SuspendThenTerminate verifies that a suspended node can
-// be terminated — the SuspendNode followed by TerminateNode sequence
+// be terminated - the SuspendNode followed by TerminateNode sequence
 // resolves cleanly and the target node ends in PHASE_CANCELLED.
 func TestPerNode_SuspendThenTerminate(t *testing.T) {
 	for _, tc := range nodeFixtures {
 		tc := tc
-		if tc.name == "server_stream" || tc.name == "client_stream" || tc.name == "interaction" {
-			continue
-		}
 		t.Run(tc.name, func(t *testing.T) {
+			parallelByDefault(t)
 			withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 				rig := setupNodeRig(t, tc, extraOpts)
 				defer rig.cleanup()

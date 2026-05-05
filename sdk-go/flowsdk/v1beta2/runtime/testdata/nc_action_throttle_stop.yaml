@@ -1,0 +1,22 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: nc_action_throttle_stop
+  description: "NC.stop_when on a throttled Action; verifies throttle wait honors stopCh"
+  inputs:
+    - id: msg
+      int64: {}
+  actions:
+    - id: call
+      throttle:
+        count: 1
+        interval: "1s"
+      call:
+        connection: echo
+        method: echo.Echo
+        request: "= inputs.msg.value"
+      node_control:
+        stop_when: "= true"
+  outputs:
+    - id: result
+      value: "= actions.call.value"

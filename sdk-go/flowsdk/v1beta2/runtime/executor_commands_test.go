@@ -1,7 +1,6 @@
 package runtime
 
 import (
-	"errors"
 	"testing"
 	"time"
 
@@ -78,18 +77,31 @@ func TestCommand_Stop_Input(t *testing.T) {
 			done <- exec.Execute(ctx, graph)
 		}()
 
-		// Wait for the output to arrive, then stop.
+		// Wait for the output to arrive: proves the value flowed through
+		// before stop fired (echo round-trip succeeded).
+		var firstOut *flowv1beta2.RunSnapshot_OutputNode
 		select {
 		case msg := <-outputCh:
+			evt := msg.Payload.(*flowv1beta2.RunSnapshot_FlowEvent)
 			msg.Ack()
+			firstOut, _ = runtimeNodeFromEvent(evt).(*flowv1beta2.RunSnapshot_OutputNode)
 		case <-time.After(5 * time.Second):
 			t.Fatal("timeout waiting for output")
 		}
+		require.NotNil(t, firstOut, "first output must be an OutputNode")
+		assert.Equal(t, int64(42), firstOut.GetValue().GetInt64Value(),
+			"echo should return 42 (proves value flowed through before stop)")
 
+		// Now stop and assert clean shutdown within a tight bound (proves
+		// the stop signal actually propagated, not a coincidental natural
+		// completion).
+		stopStart := time.Now()
 		exec.Stop()
-
 		err = <-done
+		stopElapsed := time.Since(stopStart)
 		assert.NoError(t, err, "operator Stop should return nil (clean shutdown)")
+		assert.Less(t, stopElapsed, 2*time.Second,
+			"Stop must terminate the flow promptly; took %v", stopElapsed)
 	})
 }
 
@@ -270,12 +282,19 @@ func TestCommand_StopNode_Input(t *testing.T) {
 		ps := newPubSub()
 		defer ps.Close() //nolint:errcheck
 
+		ctx := testContext(t)
+
+		// Subscribe to the input topic so we can observe the EOF that
+		// StopNode publishes (the contract-level behavior of StopNode on
+		// an Input node is "publish EOF to the input topic").
+		inputCh, err := ps.Subscribe(ctx, testTopics.For("inputs.msg"))
+		require.NoError(t, err)
+
 		// Feed a value but no EOF.
 		topic := testTopics.InputFor("inputs.msg")
 		val, _ := nativeToExpr(42)
 		ps.Publish(topic, pubsub.NewMessage(val)) //nolint:errcheck
 
-		ctx := testContext(t)
 		exec := NewExecutor(ps, testTopics, append(mockRPCOptions(), extraOpts...)...)
 
 		done := make(chan error, 1)
@@ -287,8 +306,19 @@ func TestCommand_StopNode_Input(t *testing.T) {
 		time.Sleep(200 * time.Millisecond)
 		exec.StopNode("inputs.msg")
 
-		err := <-done
+		err = requireExecuteReturnsBy(t, done, 500*time.Millisecond)
 		assert.NoError(t, err, "StopNode on input should cause clean shutdown")
+
+		// Verify the output value (echo of 42) reached outputs and the
+		// input topic ended with PHASE_SUCCEEDED via EOF (StopNode's
+		// contract for Inputs).
+		results := outputInt64s(collectOutputs(ctx, ps, "outputs.result"))
+		assert.Equal(t, []int64{42}, results,
+			"echo should publish 42 before StopNode caused EOF")
+		inputPhases := collectPhases(ctx, inputCh)
+		require.NotEmpty(t, inputPhases)
+		assert.Equal(t, flowv1beta2.RunSnapshot_PHASE_SUCCEEDED, inputPhases[len(inputPhases)-1],
+			"input terminal phase: %v", phaseNames(inputPhases))
 	})
 }
 
@@ -358,8 +388,11 @@ func TestCommand_TerminateNode_UnknownNode(t *testing.T) {
 
 // --- Interaction between error strategy and operator commands ---
 
-// Stop overrides active error-triggered STOP (no confict, same mechanism).
-// If a handler errors with STOP strategy and operator also calls Stop, flow drains once.
+// Stop overrides active error-triggered STOP (no conflict, same mechanism).
+// If a handler errors with STOP strategy and the operator also calls Stop,
+// the flow drains once and returns the error from the failing action.
+// Calling Stop a second time is idempotent. We assert both: error message
+// is the action's, and the second Stop didn't cause a second drain.
 
 func TestCommand_Stop_WithErrorStrategy(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
@@ -381,20 +414,24 @@ func TestCommand_Stop_WithErrorStrategy(t *testing.T) {
 			done <- exec.Execute(ctx, graph)
 		}()
 
-		// The error-triggered STOP drains on its own. Also calling Stop
-		// should be harmless.
+		// The error-triggered STOP drains on its own. Operator Stop is
+		// idempotent on top of that.
 		time.Sleep(100 * time.Millisecond)
 		exec.Stop()
 
 		err := <-done
-		// The error-triggered stopErr should be returned.
-		if err != nil {
-			assert.Contains(t, err.Error(), "internal server error")
-		}
+		// The error-triggered stopErr is the contract: the action's
+		// "internal server error" surfaces. (Either it returned by the
+		// time we called Stop, or our Stop is a no-op idempotent.) Either
+		// way, err must be non-nil and carry that message.
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "internal server error")
 	})
 }
 
-// Terminate after error-triggered STOP: Terminate wins (ErrTerminated).
+// Terminate after Stop: Terminate wins (ErrTerminated). The flow's
+// final terminal state is CANCELLED (terminate-driven), not whatever
+// Stop's drain might have produced.
 
 func TestCommand_Terminate_OverridesStop(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
@@ -411,15 +448,18 @@ func TestCommand_Terminate_OverridesStop(t *testing.T) {
 			done <- exec.Execute(ctx, graph)
 		}()
 
+		// Give the flow a moment to start, call Stop, then Terminate
+		// quickly enough that ctx-cancel beats stop's natural drain.
 		time.Sleep(50 * time.Millisecond)
 		exec.Stop()
 		exec.Terminate()
 
 		err := <-done
-		// Terminate cancels the context; either ErrTerminated or nil is acceptable
-		// (if the flow already drained before Terminate took effect).
-		if err != nil && !errors.Is(err, ErrTerminated) {
-			t.Errorf("expected nil or ErrTerminated, got %v", err)
-		}
+		// Long-running generator with no natural completion -- Terminate
+		// MUST surface ErrTerminated. A nil here would mean either Stop
+		// somehow drained a never-ending generator (impossible without
+		// terminate) or Terminate didn't propagate.
+		assert.ErrorIs(t, err, ErrTerminated,
+			"long-running generator must surface ErrTerminated after Terminate (proves it overrode Stop)")
 	})
 }

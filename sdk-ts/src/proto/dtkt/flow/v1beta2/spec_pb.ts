@@ -23,7 +23,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dtkt/flow/v1beta2/spec.proto.
  */
 export const file_dtkt_flow_v1beta2_spec: GenFile = /*@__PURE__*/
-  fileDesc("ChxkdGt0L2Zsb3cvdjFiZXRhMi9zcGVjLnByb3RvEhFkdGt0LmZsb3cudjFiZXRhMiLlAwoERmxvdxIUCgRuYW1lGAEgASgJQga6SAPIAQESEwoLZGVzY3JpcHRpb24YAiABKAkSMgoLY29ubmVjdGlvbnMYAyADKAsyHS5kdGt0LmZsb3cudjFiZXRhMi5Db25uZWN0aW9uEigKBmlucHV0cxgEIAMoCzIYLmR0a3QuZmxvdy52MWJldGEyLklucHV0EjAKCmdlbmVyYXRvcnMYBSADKAsyHC5kdGt0LmZsb3cudjFiZXRhMi5HZW5lcmF0b3ISJAoEdmFycxgGIAMoCzIWLmR0a3QuZmxvdy52MWJldGEyLlZhchIqCgdhY3Rpb25zGAcgAygLMhkuZHRrdC5mbG93LnYxYmV0YTIuQWN0aW9uEioKB3N0cmVhbXMYCCADKAsyGS5kdGt0LmZsb3cudjFiZXRhMi5TdHJlYW0SNAoMaW50ZXJhY3Rpb25zGAkgAygLMh4uZHRrdC5mbG93LnYxYmV0YTIuSW50ZXJhY3Rpb24SKgoHb3V0cHV0cxgKIAMoCzIZLmR0a3QuZmxvdy52MWJldGEyLk91dHB1dBJCCg5lcnJvcl9zdHJhdGVneRgLIAEoDjIgLmR0a3QuZmxvdy52MWJldGEyLkVycm9yU3RyYXRlZ3lCCLpIBYIBAhABIooBCgtGbG93Q29udHJvbBIlCglzdG9wX3doZW4YASABKAlCErpID9gBAXIKMgheXHM/PVxzPxIqCg50ZXJtaW5hdGVfd2hlbhgCIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EigKDHN1c3BlbmRfd2hlbhgDIAEoCUISukgP2AEBcgoyCF5ccz89XHM/IqEBCgpDb25uZWN0aW9uEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSNgoHcGFja2FnZRgCIAEoCzIlLmR0a3Quc2hhcmVkLnYxYmV0YTEuUGFja2FnZS5JZGVudGl0eRIQCghzZXJ2aWNlcxgDIAMoCToaukgXIhUKB3BhY2thZ2UKCHNlcnZpY2VzEAEiywUKBUlucHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSJwoEYm9vbBgDIAEoCzIXLmR0a3QuZmxvdy52MWJldGEyLkJvb2xIABIpCgVieXRlcxgEIAEoCzIYLmR0a3QuZmxvdy52MWJldGEyLkJ5dGVzSAASKwoGZG91YmxlGAUgASgLMhkuZHRrdC5mbG93LnYxYmV0YTIuRG91YmxlSAASKQoFZmxvYXQYBiABKAsyGC5kdGt0LmZsb3cudjFiZXRhMi5GbG9hdEgAEikKBWludDY0GAcgASgLMhguZHRrdC5mbG93LnYxYmV0YTIuSW50NjRIABIrCgZ1aW50NjQYCCABKAsyGS5kdGt0LmZsb3cudjFiZXRhMi5VaW50NjRIABIpCgVpbnQzMhgJIAEoCzIYLmR0a3QuZmxvdy52MWJldGEyLkludDMySAASKwoGdWludDMyGAogASgLMhkuZHRrdC5mbG93LnYxYmV0YTIuVWludDMySAASKwoGc3RyaW5nGAsgASgLMhkuZHRrdC5mbG93LnYxYmV0YTIuU3RyaW5nSAASJwoEbGlzdBgMIAEoCzIXLmR0a3QuZmxvdy52MWJldGEyLkxpc3RIABIlCgNtYXAYDSABKAsyFi5kdGt0LmZsb3cudjFiZXRhMi5NYXBIABItCgdtZXNzYWdlGA4gASgLMhouZHRrdC5mbG93LnYxYmV0YTIuTWVzc2FnZUgAEg0KBWNhY2hlGBQgASgIEhAKCGNvbnN0YW50GBcgASgIEikKCHRocm90dGxlGBYgASgLMhcuZHRrdC5mbG93LnYxYmV0YTIuUmF0ZRIwCgp0cmFuc2Zvcm1zGBUgAygLMhwuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtQg0KBHR5cGUSBbpIAggBIp8CCgNWYXISLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBINCgVjYWNoZRgCIAEoCBI2CgV2YWx1ZRgDIAEoCUIlukgiciAyCF5ccz89XHM/kgITID0gaW5wdXRzLmZvby52YWx1ZUgAEisKBnN3aXRjaBgEIAEoCzIZLmR0a3QuZmxvdy52MWJldGEyLlN3aXRjaEgAEjAKCnRyYW5zZm9ybXMYBSADKAsyHC5kdGt0LmZsb3cudjFiZXRhMi5UcmFuc2Zvcm0SNAoMZmxvd19jb250cm9sGAYgASgLMh4uZHRrdC5mbG93LnYxYmV0YTIuRmxvd0NvbnRyb2xCDQoEdHlwZRIFukgCCAEi0gIKBkFjdGlvbhItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokEiAKBHdoZW4YAiABKAlCErpID9gBAXIKMgheXHM/PVxzPxINCgVjYWNoZRgKIAEoCBIpCgh0aHJvdHRsZRgMIAEoCzIXLmR0a3QuZmxvdy52MWJldGEyLlJhdGUSOAoOcmV0cnlfc3RyYXRlZ3kYCyABKAsyIC5kdGt0LmZsb3cudjFiZXRhMi5SZXRyeVN0cmF0ZWd5Eg8KB21lbW9pemUYDSABKAgSLQoEY2FsbBgEIAEoCzIdLmR0a3QuZmxvdy52MWJldGEyLk1ldGhvZENhbGxIABI0CgxmbG93X2NvbnRyb2wYDiABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5GbG93Q29udHJvbEINCgR0eXBlEgW6SAIIASLtAQoGT3V0cHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSIQoFdmFsdWUYAiABKAlCErpID8gBAXIKMgheXHM/PVxzPxIwCgp0cmFuc2Zvcm1zGAMgAygLMhwuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtEikKCHRocm90dGxlGAQgASgLMhcuZHRrdC5mbG93LnYxYmV0YTIuUmF0ZRI0CgxmbG93X2NvbnRyb2wYBSABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5GbG93Q29udHJvbCLiAgoGU3RyZWFtEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSIAoEd2hlbhgMIAEoCUISukgP2AEBcgoyCF5ccz89XHM/Ei4KEmNsb3NlX3JlcXVlc3Rfd2hlbhgNIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EikKCHRocm90dGxlGA8gASgLMhcuZHRrdC5mbG93LnYxYmV0YTIuUmF0ZRI4Cg5yZXRyeV9zdHJhdGVneRgOIAEoCzIgLmR0a3QuZmxvdy52MWJldGEyLlJldHJ5U3RyYXRlZ3kSLQoEY2FsbBgCIAEoCzIdLmR0a3QuZmxvdy52MWJldGEyLk1ldGhvZENhbGxIABI0CgxmbG93X2NvbnRyb2wYECABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5GbG93Q29udHJvbEINCgR0eXBlEgW6SAIIASK6AQoKTWV0aG9kQ2FsbBI1Cgpjb25uZWN0aW9uGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSJgoGbWV0aG9kGAIgASgJQha6SBPIAQFyDjIMW2EtekEtWi5fL10rEicKB3JlcXVlc3QYBCABKAsyFi5nb29nbGUucHJvdG9idWYuVmFsdWUSJAoIcmVzcG9uc2UYBSABKAlCErpID9gBAXIKMgheXHM/PVxzPyKoBwoLSW50ZXJhY3Rpb24SLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIwCgp0cmFuc2Zvcm1zGAIgAygLMhwuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtEjQKBmlucHV0cxgDIAMoCzIkLmR0a3QuZmxvdy52MWJldGEyLkludGVyYWN0aW9uLklucHV0EiAKBHdoZW4YBCABKAlCErpID9gBAXIKMgheXHM/PVxzPxI0CgxmbG93X2NvbnRyb2wYBSABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5GbG93Q29udHJvbBofCg5Db25maXJtQmluZGluZxINCgV2YWx1ZRgBIAEoCBodCgxJbnB1dEJpbmRpbmcSDQoFdmFsdWUYASABKAkaHAoLRmlsZUJpbmRpbmcSDQoFdmFsdWUYASABKAwaNAoNU2VsZWN0QmluZGluZxIjCgV2YWx1ZRgBIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnkaOQoSTXVsdGlTZWxlY3RCaW5kaW5nEiMKBXZhbHVlGAEgAygLMhQuZ29vZ2xlLnByb3RvYnVmLkFueRraAwoFSW5wdXQSLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIpCgV0aXRsZRgCIAEoCUIaukgXyAEBchIyEF5ccz8oPSk/XHM/KC4qKSQSMQoLZGVzY3JpcHRpb24YAyABKAlCF7pIFHISMhBeXHM/KD0pP1xzPyguKikkSAGIAQESOQoHY29uZmlybRgEIAEoCzImLmR0a3QucHJvdG9mb3JtLnYxYmV0YTEuQ29uZmlybUVsZW1lbnRIABI1CgVpbnB1dBgFIAEoCzIkLmR0a3QucHJvdG9mb3JtLnYxYmV0YTEuSW5wdXRFbGVtZW50SAASMwoEZmlsZRgGIAEoCzIjLmR0a3QucHJvdG9mb3JtLnYxYmV0YTEuRmlsZUVsZW1lbnRIABI3CgZzZWxlY3QYByABKAsyJS5kdGt0LnByb3RvZm9ybS52MWJldGExLlNlbGVjdEVsZW1lbnRIABJCCgxtdWx0aV9zZWxlY3QYCCABKAsyKi5kdGt0LnByb3RvZm9ybS52MWJldGExLk11bHRpU2VsZWN0RWxlbWVudEgAQhAKB2VsZW1lbnQSBbpIAggBQg4KDF9kZXNjcmlwdGlvbiKvAQoHQmFja29mZhI6Cg9pbml0aWFsX2JhY2tvZmYYASABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CBrpIA8gBARIaChJiYWNrb2ZmX211bHRpcGxpZXIYAiABKAESLgoLbWF4X2JhY2tvZmYYAyABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SHAoMbWF4X2F0dGVtcHRzGAQgASgNQga6SAPIAQEihgIKDVJldHJ5U3RyYXRlZ3kSIAoEd2hlbhgBIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EisKB2JhY2tvZmYYAiABKAsyGi5kdGt0LmZsb3cudjFiZXRhMi5CYWNrb2ZmEiUKCXNraXBfd2hlbhgDIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EigKDHN1c3BlbmRfd2hlbhgEIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EioKDnRlcm1pbmF0ZV93aGVuGAUgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8SKQoNY29udGludWVfd2hlbhgGIAEoCUISukgP2AEBcgoyCF5ccz89XHM/Is0BCgZTd2l0Y2gSIQoFdmFsdWUYASABKAlCErpID8gBAXIKMgheXHM/PVxzPxIsCgRjYXNlGAIgAygLMh4uZHRrdC5mbG93LnYxYmV0YTIuU3dpdGNoLkNhc2USIwoHZGVmYXVsdBgDIAEoCUISukgPyAEBcgoyCF5ccz89XHM/Gk0KBENhc2USIQoFdmFsdWUYASABKAlCErpID8gBAXIKMgheXHM/PVxzPxIiCgZyZXR1cm4YAiABKAlCErpID8gBAXIKMgheXHM/PVxzPyJSCgRSYXRlEhUKBWNvdW50GAEgASgNQga6SAPIAQESMwoIaW50ZXJ2YWwYAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CBrpIA8gBASKeBAoJR2VuZXJhdG9yEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSNQoGdGlja2VyGAIgASgLMiMuZHRrdC5mbG93LnYxYmV0YTIuR2VuZXJhdG9yLlRpY2tlckgAEjEKBGNyb24YAyABKAsyIS5kdGt0LmZsb3cudjFiZXRhMi5HZW5lcmF0b3IuQ3JvbkgAEjMKBXJhbmdlGAQgASgLMiIuZHRrdC5mbG93LnYxYmV0YTIuR2VuZXJhdG9yLlJhbmdlSAAaigEKBlRpY2tlchIzCghpbnRlcnZhbBgBIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIGukgDyAEBEigKBWRlbGF5GAIgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEiEKBXZhbHVlGAMgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8aRQoEQ3JvbhIaCgpleHByZXNzaW9uGAEgASgJQga6SAPIAQESIQoFdmFsdWUYAiABKAlCErpID9gBAXIKMgheXHM/PVxzPxpgCgVSYW5nZRINCgVzdGFydBgBIAEoAxITCgNlbmQYAiABKANCBrpIA8gBARIMCgRzdGVwGAMgASgDEiUKBHJhdGUYBCABKAsyFy5kdGt0LmZsb3cudjFiZXRhMi5SYXRlQg0KBHR5cGUSBbpIAggBIqwJCglUcmFuc2Zvcm0SHgoDbWFwGAEgASgJQg+6SAxyCjIIXlxzPz1ccz9IABIRCgdmbGF0dGVuGAIgASgISAASIQoGZmlsdGVyGAMgASgJQg+6SAxyCjIIXlxzPz1ccz9IABI1CgZyZWR1Y2UYBCABKAsyIy5kdGt0LmZsb3cudjFiZXRhMi5UcmFuc2Zvcm0uUmVkdWNlSAASMQoEc2NhbhgFIAEoCzIhLmR0a3QuZmxvdy52MWJldGEyLlRyYW5zZm9ybS5TY2FuSAAarwUKB0dyb3VwQnkSHwoDa2V5GAEgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8SOwoGd2luZG93GAIgASgLMisuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtLkdyb3VwQnkuV2luZG93GsUECgZXaW5kb3cSQgoFZml4ZWQYASABKAsyMS5kdGt0LmZsb3cudjFiZXRhMi5UcmFuc2Zvcm0uR3JvdXBCeS5XaW5kb3cuRml4ZWRIABJGCgdzbGlkaW5nGAIgASgLMjMuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtLkdyb3VwQnkuV2luZG93LlNsaWRpbmdIABJGCgdzZXNzaW9uGAMgASgLMjMuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtLkdyb3VwQnkuV2luZG93LlNlc3Npb25IABJCCgVldmVudBgEIAEoCzIxLmR0a3QuZmxvdy52MWJldGEyLlRyYW5zZm9ybS5Hcm91cEJ5LldpbmRvdy5FdmVudEgAGjoKBUZpeGVkEjEKBmxlbmd0aBgBIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIGukgDyAEBGm4KB1NsaWRpbmcSMQoGbGVuZ3RoGAEgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uQga6SAPIAQESMAoFc2xpZGUYAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CBrpIA8gBARo9CgdTZXNzaW9uEjIKB3RpbWVvdXQYASABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CBrpIA8gBARopCgVFdmVudBIgCgR3aGVuGAEgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz9CDQoEdHlwZRIFukgCCAEajgEKBlJlZHVjZRIjCgdpbml0aWFsGAEgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8SJwoLYWNjdW11bGF0b3IYAiABKAlCErpID8gBAXIKMgheXHM/PVxzPxI2Cghncm91cF9ieRgDIAEoCzIkLmR0a3QuZmxvdy52MWJldGEyLlRyYW5zZm9ybS5Hcm91cEJ5GowBCgRTY2FuEiMKB2luaXRpYWwYASABKAlCErpID8gBAXIKMgheXHM/PVxzPxInCgthY2N1bXVsYXRvchgCIAEoCUISukgPyAEBcgoyCF5ccz89XHM/EjYKCGdyb3VwX2J5GAMgASgLMiQuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtLkdyb3VwQnlCDQoEdHlwZRIFukgCCAEqgwEKDUVycm9yU3RyYXRlZ3kSHgoaRVJST1JfU1RSQVRFR1lfVU5TUEVDSUZJRUQQABIcChhFUlJPUl9TVFJBVEVHWV9URVJNSU5BVEUQARIXChNFUlJPUl9TVFJBVEVHWV9TVE9QEAISGwoXRVJST1JfU1RSQVRFR1lfQ09OVElOVUUQA0LWAQoXcHJvdG8uZHRrdC5mbG93LnYxYmV0YTJCCVNwZWNQcm90b1ABWkpnaXRodWIuY29tL2RhdGFraXQtZGV2L2R0a3Qtc2RrL3Nkay1nby9wcm90by9kdGt0L2Zsb3cvdjFiZXRhMjtmbG93djFiZXRhMqICA0RGWKoCEUR0a3QuRmxvdy5WMWJldGEyygIRRHRrdFxGbG93XFYxYmV0YTLiAh1EdGt0XEZsb3dcVjFiZXRhMlxHUEJNZXRhZGF0YeoCE0R0a3Q6OkZsb3c6OlYxYmV0YTJiBnByb3RvMw", [file_buf_validate_validate, file_dtkt_flow_v1beta2_types, file_dtkt_protoform_v1beta1_protoform, file_dtkt_shared_v1beta1_messages, file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_struct]);
+  fileDesc("ChxkdGt0L2Zsb3cvdjFiZXRhMi9zcGVjLnByb3RvEhFkdGt0LmZsb3cudjFiZXRhMiLlAwoERmxvdxIUCgRuYW1lGAEgASgJQga6SAPIAQESEwoLZGVzY3JpcHRpb24YAiABKAkSMgoLY29ubmVjdGlvbnMYAyADKAsyHS5kdGt0LmZsb3cudjFiZXRhMi5Db25uZWN0aW9uEigKBmlucHV0cxgEIAMoCzIYLmR0a3QuZmxvdy52MWJldGEyLklucHV0EjAKCmdlbmVyYXRvcnMYBSADKAsyHC5kdGt0LmZsb3cudjFiZXRhMi5HZW5lcmF0b3ISJAoEdmFycxgGIAMoCzIWLmR0a3QuZmxvdy52MWJldGEyLlZhchIqCgdhY3Rpb25zGAcgAygLMhkuZHRrdC5mbG93LnYxYmV0YTIuQWN0aW9uEioKB3N0cmVhbXMYCCADKAsyGS5kdGt0LmZsb3cudjFiZXRhMi5TdHJlYW0SNAoMaW50ZXJhY3Rpb25zGAkgAygLMh4uZHRrdC5mbG93LnYxYmV0YTIuSW50ZXJhY3Rpb24SKgoHb3V0cHV0cxgKIAMoCzIZLmR0a3QuZmxvdy52MWJldGEyLk91dHB1dBJCCg5lcnJvcl9zdHJhdGVneRgLIAEoDjIgLmR0a3QuZmxvdy52MWJldGEyLkVycm9yU3RyYXRlZ3lCCLpIBYIBAhABIooBCgtGbG93Q29udHJvbBIlCglzdG9wX3doZW4YASABKAlCErpID9gBAXIKMgheXHM/PVxzPxIqCg50ZXJtaW5hdGVfd2hlbhgCIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EigKDHN1c3BlbmRfd2hlbhgDIAEoCUISukgP2AEBcgoyCF5ccz89XHM/IooBCgtOb2RlQ29udHJvbBIlCglzdG9wX3doZW4YASABKAlCErpID9gBAXIKMgheXHM/PVxzPxIqCg50ZXJtaW5hdGVfd2hlbhgCIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EigKDHN1c3BlbmRfd2hlbhgDIAEoCUISukgP2AEBcgoyCF5ccz89XHM/IqEBCgpDb25uZWN0aW9uEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSNgoHcGFja2FnZRgCIAEoCzIlLmR0a3Quc2hhcmVkLnYxYmV0YTEuUGFja2FnZS5JZGVudGl0eRIQCghzZXJ2aWNlcxgDIAMoCToaukgXIhUKB3BhY2thZ2UKCHNlcnZpY2VzEAEiywUKBUlucHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSJwoEYm9vbBgDIAEoCzIXLmR0a3QuZmxvdy52MWJldGEyLkJvb2xIABIpCgVieXRlcxgEIAEoCzIYLmR0a3QuZmxvdy52MWJldGEyLkJ5dGVzSAASKwoGZG91YmxlGAUgASgLMhkuZHRrdC5mbG93LnYxYmV0YTIuRG91YmxlSAASKQoFZmxvYXQYBiABKAsyGC5kdGt0LmZsb3cudjFiZXRhMi5GbG9hdEgAEikKBWludDY0GAcgASgLMhguZHRrdC5mbG93LnYxYmV0YTIuSW50NjRIABIrCgZ1aW50NjQYCCABKAsyGS5kdGt0LmZsb3cudjFiZXRhMi5VaW50NjRIABIpCgVpbnQzMhgJIAEoCzIYLmR0a3QuZmxvdy52MWJldGEyLkludDMySAASKwoGdWludDMyGAogASgLMhkuZHRrdC5mbG93LnYxYmV0YTIuVWludDMySAASKwoGc3RyaW5nGAsgASgLMhkuZHRrdC5mbG93LnYxYmV0YTIuU3RyaW5nSAASJwoEbGlzdBgMIAEoCzIXLmR0a3QuZmxvdy52MWJldGEyLkxpc3RIABIlCgNtYXAYDSABKAsyFi5kdGt0LmZsb3cudjFiZXRhMi5NYXBIABItCgdtZXNzYWdlGA4gASgLMhouZHRrdC5mbG93LnYxYmV0YTIuTWVzc2FnZUgAEg0KBWNhY2hlGBQgASgIEhAKCGNvbnN0YW50GBcgASgIEikKCHRocm90dGxlGBYgASgLMhcuZHRrdC5mbG93LnYxYmV0YTIuUmF0ZRIwCgp0cmFuc2Zvcm1zGBUgAygLMhwuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtQg0KBHR5cGUSBbpIAggBItUCCgNWYXISLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBINCgVjYWNoZRgCIAEoCBI2CgV2YWx1ZRgDIAEoCUIlukgiciAyCF5ccz89XHM/kgITID0gaW5wdXRzLmZvby52YWx1ZUgAEisKBnN3aXRjaBgEIAEoCzIZLmR0a3QuZmxvdy52MWJldGEyLlN3aXRjaEgAEjAKCnRyYW5zZm9ybXMYBSADKAsyHC5kdGt0LmZsb3cudjFiZXRhMi5UcmFuc2Zvcm0SNAoMZmxvd19jb250cm9sGAYgASgLMh4uZHRrdC5mbG93LnYxYmV0YTIuRmxvd0NvbnRyb2wSNAoMbm9kZV9jb250cm9sGAcgASgLMh4uZHRrdC5mbG93LnYxYmV0YTIuTm9kZUNvbnRyb2xCDQoEdHlwZRIFukgCCAEiiAMKBkFjdGlvbhItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokEiAKBHdoZW4YAiABKAlCErpID9gBAXIKMgheXHM/PVxzPxItCgRjYWxsGAQgASgLMh0uZHRrdC5mbG93LnYxYmV0YTIuTWV0aG9kQ2FsbEgAEg0KBWNhY2hlGAogASgIEikKCHRocm90dGxlGAwgASgLMhcuZHRrdC5mbG93LnYxYmV0YTIuUmF0ZRIPCgdtZW1vaXplGA0gASgIEjgKDnJldHJ5X3N0cmF0ZWd5GAsgASgLMiAuZHRrdC5mbG93LnYxYmV0YTIuUmV0cnlTdHJhdGVneRI0CgxmbG93X2NvbnRyb2wYDiABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5GbG93Q29udHJvbBI0Cgxub2RlX2NvbnRyb2wYDyABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5Ob2RlQ29udHJvbEINCgR0eXBlEgW6SAIIASKjAgoGT3V0cHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSIQoFdmFsdWUYAiABKAlCErpID8gBAXIKMgheXHM/PVxzPxIpCgh0aHJvdHRsZRgEIAEoCzIXLmR0a3QuZmxvdy52MWJldGEyLlJhdGUSMAoKdHJhbnNmb3JtcxgDIAMoCzIcLmR0a3QuZmxvdy52MWJldGEyLlRyYW5zZm9ybRI0CgxmbG93X2NvbnRyb2wYBSABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5GbG93Q29udHJvbBI0Cgxub2RlX2NvbnRyb2wYBiABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5Ob2RlQ29udHJvbCLoAgoGU3RyZWFtEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSIAoEd2hlbhgMIAEoCUISukgP2AEBcgoyCF5ccz89XHM/Ei0KBGNhbGwYAiABKAsyHS5kdGt0LmZsb3cudjFiZXRhMi5NZXRob2RDYWxsSAASKQoIdGhyb3R0bGUYDyABKAsyFy5kdGt0LmZsb3cudjFiZXRhMi5SYXRlEjgKDnJldHJ5X3N0cmF0ZWd5GA4gASgLMiAuZHRrdC5mbG93LnYxYmV0YTIuUmV0cnlTdHJhdGVneRI0CgxmbG93X2NvbnRyb2wYECABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5GbG93Q29udHJvbBI0Cgxub2RlX2NvbnRyb2wYESABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5Ob2RlQ29udHJvbEINCgR0eXBlEgW6SAIIASK6AQoKTWV0aG9kQ2FsbBI1Cgpjb25uZWN0aW9uGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSJgoGbWV0aG9kGAIgASgJQha6SBPIAQFyDjIMW2EtekEtWi5fL10rEicKB3JlcXVlc3QYBCABKAsyFi5nb29nbGUucHJvdG9idWYuVmFsdWUSJAoIcmVzcG9uc2UYBSABKAlCErpID9gBAXIKMgheXHM/PVxzPyLkBwoLSW50ZXJhY3Rpb24SLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIgCgR3aGVuGAQgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8SNAoGaW5wdXRzGAMgAygLMiQuZHRrdC5mbG93LnYxYmV0YTIuSW50ZXJhY3Rpb24uSW5wdXQSMAoKdHJhbnNmb3JtcxgCIAMoCzIcLmR0a3QuZmxvdy52MWJldGEyLlRyYW5zZm9ybRI0CgxmbG93X2NvbnRyb2wYBSABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5GbG93Q29udHJvbBI0Cgxub2RlX2NvbnRyb2wYBiABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5Ob2RlQ29udHJvbBofCg5Db25maXJtQmluZGluZxINCgV2YWx1ZRgBIAEoCBodCgxJbnB1dEJpbmRpbmcSDQoFdmFsdWUYASABKAkaHAoLRmlsZUJpbmRpbmcSDQoFdmFsdWUYASABKAwaNAoNU2VsZWN0QmluZGluZxIjCgV2YWx1ZRgBIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnkaOQoSTXVsdGlTZWxlY3RCaW5kaW5nEiMKBXZhbHVlGAEgAygLMhQuZ29vZ2xlLnByb3RvYnVmLkFueRrgAwoFSW5wdXQSLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIsCgV0aXRsZRgCIAEoCUIdukgayAEBchUyE15ccz8oPSk/XHM/W1xzXFNdKiQSNAoLZGVzY3JpcHRpb24YAyABKAlCGrpIF3IVMhNeXHM/KD0pP1xzP1tcc1xTXSokSAGIAQESOQoHY29uZmlybRgEIAEoCzImLmR0a3QucHJvdG9mb3JtLnYxYmV0YTEuQ29uZmlybUVsZW1lbnRIABI1CgVpbnB1dBgFIAEoCzIkLmR0a3QucHJvdG9mb3JtLnYxYmV0YTEuSW5wdXRFbGVtZW50SAASMwoEZmlsZRgGIAEoCzIjLmR0a3QucHJvdG9mb3JtLnYxYmV0YTEuRmlsZUVsZW1lbnRIABI3CgZzZWxlY3QYByABKAsyJS5kdGt0LnByb3RvZm9ybS52MWJldGExLlNlbGVjdEVsZW1lbnRIABJCCgxtdWx0aV9zZWxlY3QYCCABKAsyKi5kdGt0LnByb3RvZm9ybS52MWJldGExLk11bHRpU2VsZWN0RWxlbWVudEgAQhAKB2VsZW1lbnQSBbpIAggBQg4KDF9kZXNjcmlwdGlvbiKvAQoHQmFja29mZhI6Cg9pbml0aWFsX2JhY2tvZmYYASABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CBrpIA8gBARIaChJiYWNrb2ZmX211bHRpcGxpZXIYAiABKAESLgoLbWF4X2JhY2tvZmYYAyABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SHAoMbWF4X2F0dGVtcHRzGAQgASgNQga6SAPIAQEihgIKDVJldHJ5U3RyYXRlZ3kSIAoEd2hlbhgBIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EisKB2JhY2tvZmYYAiABKAsyGi5kdGt0LmZsb3cudjFiZXRhMi5CYWNrb2ZmEiUKCXNraXBfd2hlbhgDIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EikKDWNvbnRpbnVlX3doZW4YBiABKAlCErpID9gBAXIKMgheXHM/PVxzPxIoCgxzdXNwZW5kX3doZW4YBCABKAlCErpID9gBAXIKMgheXHM/PVxzPxIqCg50ZXJtaW5hdGVfd2hlbhgFIAEoCUISukgP2AEBcgoyCF5ccz89XHM/Is0BCgZTd2l0Y2gSIQoFdmFsdWUYASABKAlCErpID8gBAXIKMgheXHM/PVxzPxIsCgRjYXNlGAIgAygLMh4uZHRrdC5mbG93LnYxYmV0YTIuU3dpdGNoLkNhc2USIwoHZGVmYXVsdBgDIAEoCUISukgPyAEBcgoyCF5ccz89XHM/Gk0KBENhc2USIQoFdmFsdWUYASABKAlCErpID8gBAXIKMgheXHM/PVxzPxIiCgZyZXR1cm4YAiABKAlCErpID8gBAXIKMgheXHM/PVxzPyJSCgRSYXRlEhUKBWNvdW50GAEgASgNQga6SAPIAQESMwoIaW50ZXJ2YWwYAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CBrpIA8gBASKeBAoJR2VuZXJhdG9yEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSNQoGdGlja2VyGAIgASgLMiMuZHRrdC5mbG93LnYxYmV0YTIuR2VuZXJhdG9yLlRpY2tlckgAEjEKBGNyb24YAyABKAsyIS5kdGt0LmZsb3cudjFiZXRhMi5HZW5lcmF0b3IuQ3JvbkgAEjMKBXJhbmdlGAQgASgLMiIuZHRrdC5mbG93LnYxYmV0YTIuR2VuZXJhdG9yLlJhbmdlSAAaigEKBlRpY2tlchIzCghpbnRlcnZhbBgBIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIGukgDyAEBEigKBWRlbGF5GAIgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEiEKBXZhbHVlGAMgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8aRQoEQ3JvbhIaCgpleHByZXNzaW9uGAEgASgJQga6SAPIAQESIQoFdmFsdWUYAiABKAlCErpID9gBAXIKMgheXHM/PVxzPxpgCgVSYW5nZRINCgVzdGFydBgBIAEoAxITCgNlbmQYAiABKANCBrpIA8gBARIMCgRzdGVwGAMgASgDEiUKBHJhdGUYBCABKAsyFy5kdGt0LmZsb3cudjFiZXRhMi5SYXRlQg0KBHR5cGUSBbpIAggBIqwJCglUcmFuc2Zvcm0SHgoDbWFwGAEgASgJQg+6SAxyCjIIXlxzPz1ccz9IABIRCgdmbGF0dGVuGAIgASgISAASIQoGZmlsdGVyGAMgASgJQg+6SAxyCjIIXlxzPz1ccz9IABI1CgZyZWR1Y2UYBCABKAsyIy5kdGt0LmZsb3cudjFiZXRhMi5UcmFuc2Zvcm0uUmVkdWNlSAASMQoEc2NhbhgFIAEoCzIhLmR0a3QuZmxvdy52MWJldGEyLlRyYW5zZm9ybS5TY2FuSAAarwUKB0dyb3VwQnkSHwoDa2V5GAEgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8SOwoGd2luZG93GAIgASgLMisuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtLkdyb3VwQnkuV2luZG93GsUECgZXaW5kb3cSQgoFZml4ZWQYASABKAsyMS5kdGt0LmZsb3cudjFiZXRhMi5UcmFuc2Zvcm0uR3JvdXBCeS5XaW5kb3cuRml4ZWRIABJGCgdzbGlkaW5nGAIgASgLMjMuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtLkdyb3VwQnkuV2luZG93LlNsaWRpbmdIABJGCgdzZXNzaW9uGAMgASgLMjMuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtLkdyb3VwQnkuV2luZG93LlNlc3Npb25IABJCCgVldmVudBgEIAEoCzIxLmR0a3QuZmxvdy52MWJldGEyLlRyYW5zZm9ybS5Hcm91cEJ5LldpbmRvdy5FdmVudEgAGjoKBUZpeGVkEjEKBmxlbmd0aBgBIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIGukgDyAEBGm4KB1NsaWRpbmcSMQoGbGVuZ3RoGAEgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uQga6SAPIAQESMAoFc2xpZGUYAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CBrpIA8gBARo9CgdTZXNzaW9uEjIKB3RpbWVvdXQYASABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CBrpIA8gBARopCgVFdmVudBIgCgR3aGVuGAEgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz9CDQoEdHlwZRIFukgCCAEajgEKBlJlZHVjZRIjCgdpbml0aWFsGAEgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8SJwoLYWNjdW11bGF0b3IYAiABKAlCErpID8gBAXIKMgheXHM/PVxzPxI2Cghncm91cF9ieRgDIAEoCzIkLmR0a3QuZmxvdy52MWJldGEyLlRyYW5zZm9ybS5Hcm91cEJ5GowBCgRTY2FuEiMKB2luaXRpYWwYASABKAlCErpID8gBAXIKMgheXHM/PVxzPxInCgthY2N1bXVsYXRvchgCIAEoCUISukgPyAEBcgoyCF5ccz89XHM/EjYKCGdyb3VwX2J5GAMgASgLMiQuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtLkdyb3VwQnlCDQoEdHlwZRIFukgCCAEqgwEKDUVycm9yU3RyYXRlZ3kSHgoaRVJST1JfU1RSQVRFR1lfVU5TUEVDSUZJRUQQABIcChhFUlJPUl9TVFJBVEVHWV9URVJNSU5BVEUQARIXChNFUlJPUl9TVFJBVEVHWV9TVE9QEAISGwoXRVJST1JfU1RSQVRFR1lfQ09OVElOVUUQA0LWAQoXcHJvdG8uZHRrdC5mbG93LnYxYmV0YTJCCVNwZWNQcm90b1ABWkpnaXRodWIuY29tL2RhdGFraXQtZGV2L2R0a3Qtc2RrL3Nkay1nby9wcm90by9kdGt0L2Zsb3cvdjFiZXRhMjtmbG93djFiZXRhMqICA0RGWKoCEUR0a3QuRmxvdy5WMWJldGEyygIRRHRrdFxGbG93XFYxYmV0YTLiAh1EdGt0XEZsb3dcVjFiZXRhMlxHUEJNZXRhZGF0YeoCE0R0a3Q6OkZsb3c6OlYxYmV0YTJiBnByb3RvMw", [file_buf_validate_validate, file_dtkt_flow_v1beta2_types, file_dtkt_protoform_v1beta1_protoform, file_dtkt_shared_v1beta1_messages, file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_struct]);
 
 /**
  * Flow defines a directed acyclic graph of nodes connected by data dependencies.
@@ -71,12 +71,18 @@ export const file_dtkt_flow_v1beta2_spec: GenFile = /*@__PURE__*/
  *   Action.when                            (globals only)
  *   Stream.when                            (globals only)
  *   Interaction.when                       (globals only)
- *   Stream.close_request_when              (globals only)
  *   Output.value                           (globals only)
  *   Switch.value                           (globals only)
  *   MethodCall.request (embedded in Value) (globals only)
  *   Transform.Reduce.initial               (globals only)
  *   Transform.Scan.initial                 (globals only)
+ *
+ *   FlowControl.stop_when                  (globals only)
+ *   FlowControl.terminate_when             (globals only)
+ *   FlowControl.suspend_when               (globals only)
+ *   NodeControl.stop_when                  (globals only)
+ *   NodeControl.terminate_when             (globals only)
+ *   NodeControl.suspend_when               (globals only)
  *
  *   Switch.Case.value                      this.value    (switch discriminant)
  *   Switch.Case.return                     this.value    (switch discriminant)
@@ -96,40 +102,44 @@ export const file_dtkt_flow_v1beta2_spec: GenFile = /*@__PURE__*/
  *   RetryStrategy.when                     this.response (RPC result, if any)
  *                                          this.error    (google.rpc.Status, if any)
  *   RetryStrategy.skip_when                this.error       (google.rpc.Status)
+ *   RetryStrategy.continue_when            this.error       (google.rpc.Status)
  *   RetryStrategy.suspend_when             this.error       (google.rpc.Status)
  *   RetryStrategy.terminate_when           this.error       (google.rpc.Status)
- *   RetryStrategy.continue_when            this.error       (google.rpc.Status)
  *
  * Generator Ticker/Cron value expressions receive only a `this` context:
  *
  *   Ticker.value / Cron.value              this.count (int64), this.time (timestamp)
  *
- * Sentinel Values
- * ─────────────────────────────────────────────────────────────────────────────
- * Certain special values carry control-flow semantics when produced by CEL
- * expressions. The runtime detects these and acts accordingly.
- *
- *   EOF          Signals end-of-stream. When a CEL expression evaluates to
- *                `EOF`, the runtime treats it as a terminal value:
- *                - In a Stream's MethodCall.request: closes the client side of
- *                  the stream (equivalent to CloseSend). This is an ergonomic
- *                  alternative to `close_request_when`.
- *                - In a Generator's value: signals the generator is done.
- *                - In an Input: closes the input channel.
- *                Represented internally as a `Runtime.EOF` proto message
- *                wrapped in a `cel.expr.Value.object_value`.
- *
  * Built-in CEL Functions
  * ─────────────────────────────────────────────────────────────────────────────
- * In addition to the standard CEL functions (size, has, type, int, uint, double,
- * string, bytes, matches, contains, startsWith, endsWith, timestamp, duration,
- * list/map operations, ternary `? :`, etc.), the following are available:
+ * Only the standard CEL functions are available (size, has, type, int, uint,
+ * double, string, bytes, matches, contains, startsWith, endsWith, timestamp,
+ * duration, list/map operations, ternary `? :`, etc.). All data access is
+ * through the globals and `this` context variables documented above.
  *
- *   EOF()        Returns the EOF sentinel value. Use in request expressions to
- *                close a stream: `request: "= condition ? EOF() : value"`.
+ * When to use RetryStrategy vs NodeControl / FlowControl
+ * ─────────────────────────────────────────────────────────────────────────────
+ * There are surface-level overlaps between RetryStrategy (on Action/Stream)
+ * and NodeControl / FlowControl. Both can express "suspend on error" or
+ * "terminate on error". They are kept distinct because their timing is not
+ * equivalent:
  *
- * No other custom functions are defined. All data access is through the globals
- * and `this` context variables documented above.
+ *   RetryStrategy.{suspend,terminate,skip,continue}_when fire SYNCHRONOUSLY
+ *   inside the RPC retry loop -- between "the RPC just errored" and "would
+ *   the node emit/escalate next". They have access to `this.error` and
+ *   `this.response` for the just-completed call. Same iteration.
+ *
+ *   NodeControl / FlowControl fire REACTIVELY on the next activation cycle
+ *   when CEL globals change. Even if a global like `actions.foo.last_error`
+ *   were available, there's a window between the error landing and the
+ *   lifecycle CEL re-evaluating during which the handler could iterate
+ *   again or emit. That window is unsafe for `suspend` (the operator wanted
+ *   the node halted before the next iteration); harmless for `terminate`
+ *   (the flow is dying either way).
+ *
+ * Use RetryStrategy when the trigger is an RPC error and the action must
+ * happen before the next iteration. Use NodeControl / FlowControl when the
+ * trigger is general flow state and reactive timing is acceptable.
  *
  * @generated from message dtkt.flow.v1beta2.Flow
  */
@@ -255,12 +265,18 @@ export type Flow = Message<"dtkt.flow.v1beta2.Flow"> & {
  *   Action.when                            (globals only)
  *   Stream.when                            (globals only)
  *   Interaction.when                       (globals only)
- *   Stream.close_request_when              (globals only)
  *   Output.value                           (globals only)
  *   Switch.value                           (globals only)
  *   MethodCall.request (embedded in Value) (globals only)
  *   Transform.Reduce.initial               (globals only)
  *   Transform.Scan.initial                 (globals only)
+ *
+ *   FlowControl.stop_when                  (globals only)
+ *   FlowControl.terminate_when             (globals only)
+ *   FlowControl.suspend_when               (globals only)
+ *   NodeControl.stop_when                  (globals only)
+ *   NodeControl.terminate_when             (globals only)
+ *   NodeControl.suspend_when               (globals only)
  *
  *   Switch.Case.value                      this.value    (switch discriminant)
  *   Switch.Case.return                     this.value    (switch discriminant)
@@ -280,40 +296,44 @@ export type Flow = Message<"dtkt.flow.v1beta2.Flow"> & {
  *   RetryStrategy.when                     this.response (RPC result, if any)
  *                                          this.error    (google.rpc.Status, if any)
  *   RetryStrategy.skip_when                this.error       (google.rpc.Status)
+ *   RetryStrategy.continue_when            this.error       (google.rpc.Status)
  *   RetryStrategy.suspend_when             this.error       (google.rpc.Status)
  *   RetryStrategy.terminate_when           this.error       (google.rpc.Status)
- *   RetryStrategy.continue_when            this.error       (google.rpc.Status)
  *
  * Generator Ticker/Cron value expressions receive only a `this` context:
  *
  *   Ticker.value / Cron.value              this.count (int64), this.time (timestamp)
  *
- * Sentinel Values
- * ─────────────────────────────────────────────────────────────────────────────
- * Certain special values carry control-flow semantics when produced by CEL
- * expressions. The runtime detects these and acts accordingly.
- *
- *   EOF          Signals end-of-stream. When a CEL expression evaluates to
- *                `EOF`, the runtime treats it as a terminal value:
- *                - In a Stream's MethodCall.request: closes the client side of
- *                  the stream (equivalent to CloseSend). This is an ergonomic
- *                  alternative to `close_request_when`.
- *                - In a Generator's value: signals the generator is done.
- *                - In an Input: closes the input channel.
- *                Represented internally as a `Runtime.EOF` proto message
- *                wrapped in a `cel.expr.Value.object_value`.
- *
  * Built-in CEL Functions
  * ─────────────────────────────────────────────────────────────────────────────
- * In addition to the standard CEL functions (size, has, type, int, uint, double,
- * string, bytes, matches, contains, startsWith, endsWith, timestamp, duration,
- * list/map operations, ternary `? :`, etc.), the following are available:
+ * Only the standard CEL functions are available (size, has, type, int, uint,
+ * double, string, bytes, matches, contains, startsWith, endsWith, timestamp,
+ * duration, list/map operations, ternary `? :`, etc.). All data access is
+ * through the globals and `this` context variables documented above.
  *
- *   EOF()        Returns the EOF sentinel value. Use in request expressions to
- *                close a stream: `request: "= condition ? EOF() : value"`.
+ * When to use RetryStrategy vs NodeControl / FlowControl
+ * ─────────────────────────────────────────────────────────────────────────────
+ * There are surface-level overlaps between RetryStrategy (on Action/Stream)
+ * and NodeControl / FlowControl. Both can express "suspend on error" or
+ * "terminate on error". They are kept distinct because their timing is not
+ * equivalent:
  *
- * No other custom functions are defined. All data access is through the globals
- * and `this` context variables documented above.
+ *   RetryStrategy.{suspend,terminate,skip,continue}_when fire SYNCHRONOUSLY
+ *   inside the RPC retry loop -- between "the RPC just errored" and "would
+ *   the node emit/escalate next". They have access to `this.error` and
+ *   `this.response` for the just-completed call. Same iteration.
+ *
+ *   NodeControl / FlowControl fire REACTIVELY on the next activation cycle
+ *   when CEL globals change. Even if a global like `actions.foo.last_error`
+ *   were available, there's a window between the error landing and the
+ *   lifecycle CEL re-evaluating during which the handler could iterate
+ *   again or emit. That window is unsafe for `suspend` (the operator wanted
+ *   the node halted before the next iteration); harmless for `terminate`
+ *   (the flow is dying either way).
+ *
+ * Use RetryStrategy when the trigger is an RPC error and the action must
+ * happen before the next iteration. Use NodeControl / FlowControl when the
+ * trigger is general flow state and reactive timing is acceptable.
  *
  * @generated from message dtkt.flow.v1beta2.Flow
  */
@@ -401,13 +421,21 @@ export const FlowSchema: GenMessage<Flow, {validType: FlowValid}> = /*@__PURE__*
   messageDesc(file_dtkt_flow_v1beta2_spec, 0);
 
 /**
- * FlowControl allows a node to trigger flow-level lifecycle actions based on
- * CEL boolean expressions evaluated alongside the node's normal processing.
- * The expressions receive the same globals as other CEL fields on the node,
- * plus `this` context where applicable.
+ * FlowControl declares CEL-driven lifecycle triggers that act on the WHOLE
+ * flow. The expressions are evaluated reactively alongside the host node's
+ * normal processing; when a condition evaluates to true, the corresponding
+ * action is applied to the entire flow regardless of which node hosts the
+ * FlowControl.
  *
- * When a condition evaluates to true, the corresponding action is applied to
- * the entire flow -- not just the declaring node.
+ * For per-node lifecycle triggers (acting only on the declaring node), see
+ * NodeControl. For RPC-error-gated synchronous triggers, see RetryStrategy.
+ *
+ * Ordering vs NodeControl: when a node declares both NC and FC, NC fires
+ * FIRST on each iteration. Both run independently; ordering only affects
+ * the wire-publish sequence when both fire the same iteration. NC-first
+ * ensures per-node state events (e.g. PHASE_STOPPING for the controlled
+ * node) land cleanly before any FC-driven flow-wide cancel races with
+ * them.
  *
  * @generated from message dtkt.flow.v1beta2.FlowControl
  */
@@ -445,6 +473,66 @@ export type FlowControlValid = FlowControl;
  */
 export const FlowControlSchema: GenMessage<FlowControl, {validType: FlowControlValid}> = /*@__PURE__*/
   messageDesc(file_dtkt_flow_v1beta2_spec, 1);
+
+/**
+ * NodeControl declares CEL-driven lifecycle triggers scoped to the declaring
+ * node only. Other nodes are unaffected. The expressions are evaluated
+ * reactively alongside the host node's normal processing.
+ *
+ * For flow-wide lifecycle triggers, see FlowControl. For RPC-error-gated
+ * synchronous triggers, see RetryStrategy.
+ *
+ * Ordering vs FlowControl: when a node declares both NC and FC, NC fires
+ * FIRST. NC-first ensures per-node state events (e.g. the PHASE_STOPPING
+ * emitted by node_control.stop_when) reach observers before any FC-driven
+ * flow-wide cancel can race with them. Both still fire independently when
+ * their conditions match the same iteration.
+ *
+ * @generated from message dtkt.flow.v1beta2.NodeControl
+ */
+export type NodeControl = Message<"dtkt.flow.v1beta2.NodeControl"> & {
+  /**
+   * Graceful stop of THIS node only. Per-type drain semantics:
+   *   - Stream: close the request side, wait for the server to drain the
+   *     response side, then mark PHASE_SUCCEEDED.
+   *   - Action (mid-RPC): finish the current call, then PHASE_SUCCEEDED.
+   *   - Action (idle), Var, Output: PHASE_SUCCEEDED immediately.
+   *   - Input: publish EOF on the input topic, drain downstream subscribers.
+   *   - Generator (Ticker/Cron/Range): stop firing, PHASE_SUCCEEDED.
+   *   - Interaction: cancel pending prompt token, PHASE_SUCCEEDED.
+   * Node -> STOPPING -> SUCCEEDED. Other nodes unaffected.
+   *
+   * @generated from field: string stop_when = 1;
+   */
+  stopWhen: string;
+
+  /**
+   * Immediate cancel of THIS node only. The node's context is cancelled and
+   * any in-flight operation is aborted. Node -> CANCELLED. Other nodes
+   * unaffected.
+   *
+   * @generated from field: string terminate_when = 2;
+   */
+  terminateWhen: string;
+
+  /**
+   * Suspend THIS node until an external Resume. The node pauses at a safe
+   * point; in-flight operations on streams stay open. Node -> SUSPENDED.
+   * Other nodes unaffected.
+   *
+   * @generated from field: string suspend_when = 3;
+   */
+  suspendWhen: string;
+};
+
+export type NodeControlValid = NodeControl;
+
+/**
+ * Describes the message dtkt.flow.v1beta2.NodeControl.
+ * Use `create(NodeControlSchema)` to create a new message.
+ */
+export const NodeControlSchema: GenMessage<NodeControl, {validType: NodeControlValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta2_spec, 2);
 
 /**
  * Connection declares a gRPC/Connect service endpoint used by actions and streams.
@@ -507,7 +595,7 @@ export type ConnectionValid = Message<"dtkt.flow.v1beta2.Connection"> & {
  * Use `create(ConnectionSchema)` to create a new message.
  */
 export const ConnectionSchema: GenMessage<Connection, {validType: ConnectionValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 2);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 3);
 
 /**
  * Input declares an external input to the flow, provided at runtime.
@@ -619,13 +707,16 @@ export type Input = Message<"dtkt.flow.v1beta2.Input"> & {
   constant: boolean;
 
   /**
-   * Resolution throttle. Controls how often the input resolves a fresh value.
-   * Wait window per attempt is interval/count. If no value arrives within
-   * the window, falls back to cache (if enabled), then the type's default (if
-   * set), then sends a request event to the client. If unset and cache is true
-   * or the type has a default, the executor's default throttle is injected
-   * (WithDefaultInputThrottle). If unset and neither applies, blocks until a
-   * value arrives.
+   * Resolution throttle. Controls how often the input resolves a fresh
+   * value. The wait window per attempt is `interval` / `count`. If no value
+   * arrives within the window, the runtime falls back to the cached value
+   * (when `cache` is true), then to the type's default (when set), then
+   * sends a request event to the external client.
+   *
+   * If unset and either `cache` is true or the type has a default, the
+   * runtime applies a small default throttle so the fallback chain can
+   * fire. If unset and neither applies, the input blocks until a value
+   * arrives.
    *
    * @generated from field: dtkt.flow.v1beta2.Rate throttle = 22;
    */
@@ -750,13 +841,16 @@ export type InputValid = Message<"dtkt.flow.v1beta2.Input"> & {
   constant: boolean;
 
   /**
-   * Resolution throttle. Controls how often the input resolves a fresh value.
-   * Wait window per attempt is interval/count. If no value arrives within
-   * the window, falls back to cache (if enabled), then the type's default (if
-   * set), then sends a request event to the client. If unset and cache is true
-   * or the type has a default, the executor's default throttle is injected
-   * (WithDefaultInputThrottle). If unset and neither applies, blocks until a
-   * value arrives.
+   * Resolution throttle. Controls how often the input resolves a fresh
+   * value. The wait window per attempt is `interval` / `count`. If no value
+   * arrives within the window, the runtime falls back to the cached value
+   * (when `cache` is true), then to the type's default (when set), then
+   * sends a request event to the external client.
+   *
+   * If unset and either `cache` is true or the type has a default, the
+   * runtime applies a small default throttle so the fallback chain can
+   * fire. If unset and neither applies, the input blocks until a value
+   * arrives.
    *
    * @generated from field: dtkt.flow.v1beta2.Rate throttle = 22;
    */
@@ -776,7 +870,7 @@ export type InputValid = Message<"dtkt.flow.v1beta2.Input"> & {
  * Use `create(InputSchema)` to create a new message.
  */
 export const InputSchema: GenMessage<Input, {validType: InputValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 3);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 4);
 
 /**
  * Var declares an intermediate CEL variable or switch expression within the flow.
@@ -830,11 +924,19 @@ export type Var = Message<"dtkt.flow.v1beta2.Var"> & {
   transforms: Transform[];
 
   /**
-   * Flow-level lifecycle control evaluated alongside the var expression.
+   * Flow-wide lifecycle control evaluated alongside the var expression.
    *
    * @generated from field: dtkt.flow.v1beta2.FlowControl flow_control = 6;
    */
   flowControl?: FlowControl;
+
+  /**
+   * Per-node lifecycle control evaluated alongside the var expression.
+   * Affects only this var; other nodes continue.
+   *
+   * @generated from field: dtkt.flow.v1beta2.NodeControl node_control = 7;
+   */
+  nodeControl?: NodeControl;
 };
 
 /**
@@ -889,11 +991,19 @@ export type VarValid = Message<"dtkt.flow.v1beta2.Var"> & {
   transforms: TransformValid[];
 
   /**
-   * Flow-level lifecycle control evaluated alongside the var expression.
+   * Flow-wide lifecycle control evaluated alongside the var expression.
    *
    * @generated from field: dtkt.flow.v1beta2.FlowControl flow_control = 6;
    */
   flowControl?: FlowControlValid;
+
+  /**
+   * Per-node lifecycle control evaluated alongside the var expression.
+   * Affects only this var; other nodes continue.
+   *
+   * @generated from field: dtkt.flow.v1beta2.NodeControl node_control = 7;
+   */
+  nodeControl?: NodeControlValid;
 };
 
 /**
@@ -901,7 +1011,7 @@ export type VarValid = Message<"dtkt.flow.v1beta2.Var"> & {
  * Use `create(VarSchema)` to create a new message.
  */
 export const VarSchema: GenMessage<Var, {validType: VarValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 4);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 5);
 
 /**
  * Action declares a unary RPC method call node.
@@ -924,38 +1034,6 @@ export type Action = Message<"dtkt.flow.v1beta2.Action"> & {
   when: string;
 
   /**
-   * If true, the executor will cache the result of this action and return the cached value for subsequent calls.
-   *
-   * @generated from field: bool cache = 10;
-   */
-  cache: boolean;
-
-  /**
-   * Throttle for RPC invocations. Limits how often upstream
-   * subscription changes can trigger the action's method call.
-   *
-   * @generated from field: dtkt.flow.v1beta2.Rate throttle = 12;
-   */
-  throttle?: Rate;
-
-  /**
-   * Error handling strategy for this action.
-   *
-   * @generated from field: dtkt.flow.v1beta2.RetryStrategy retry_strategy = 11;
-   */
-  retryStrategy?: RetryStrategy;
-
-  /**
-   * If true, skip the RPC when the same request input has been seen before
-   * and return the previously cached response. Keyed by a deterministic hash
-   * of the resolved request value. Only applicable to unary RPCs (Actions);
-   * streaming RPCs have no stable request-to-response mapping.
-   *
-   * @generated from field: bool memoize = 13;
-   */
-  memoize: boolean;
-
-  /**
    * The RPC call type. Exactly one must be set.
    *
    * @generated from oneof dtkt.flow.v1beta2.Action.type
@@ -971,11 +1049,53 @@ export type Action = Message<"dtkt.flow.v1beta2.Action"> & {
   } | { case: undefined; value?: undefined };
 
   /**
-   * Flow-level lifecycle control evaluated alongside the action.
+   * If true, the executor will cache the result of this action and return the cached value for subsequent calls.
+   *
+   * @generated from field: bool cache = 10;
+   */
+  cache: boolean;
+
+  /**
+   * Throttle for RPC invocations. Limits how often upstream
+   * subscription changes can trigger the action's method call.
+   *
+   * @generated from field: dtkt.flow.v1beta2.Rate throttle = 12;
+   */
+  throttle?: Rate;
+
+  /**
+   * If true, skip the RPC when the same request input has been seen before
+   * and return the previously cached response. Keyed by a deterministic hash
+   * of the resolved request value. Only applicable to unary RPCs (Actions);
+   * streaming RPCs have no stable request-to-response mapping.
+   *
+   * @generated from field: bool memoize = 13;
+   */
+  memoize: boolean;
+
+  /**
+   * Error handling strategy for this action. Fires synchronously inside the
+   * RPC retry loop with `this.error` / `this.response` in scope. For
+   * state-driven (reactive) lifecycle triggers see flow_control / node_control.
+   *
+   * @generated from field: dtkt.flow.v1beta2.RetryStrategy retry_strategy = 11;
+   */
+  retryStrategy?: RetryStrategy;
+
+  /**
+   * Flow-wide lifecycle control evaluated alongside the action.
    *
    * @generated from field: dtkt.flow.v1beta2.FlowControl flow_control = 14;
    */
   flowControl?: FlowControl;
+
+  /**
+   * Per-node lifecycle control evaluated alongside the action.
+   * Affects only this action; other nodes continue.
+   *
+   * @generated from field: dtkt.flow.v1beta2.NodeControl node_control = 15;
+   */
+  nodeControl?: NodeControl;
 };
 
 /**
@@ -999,38 +1119,6 @@ export type ActionValid = Message<"dtkt.flow.v1beta2.Action"> & {
   when: string;
 
   /**
-   * If true, the executor will cache the result of this action and return the cached value for subsequent calls.
-   *
-   * @generated from field: bool cache = 10;
-   */
-  cache: boolean;
-
-  /**
-   * Throttle for RPC invocations. Limits how often upstream
-   * subscription changes can trigger the action's method call.
-   *
-   * @generated from field: dtkt.flow.v1beta2.Rate throttle = 12;
-   */
-  throttle?: RateValid;
-
-  /**
-   * Error handling strategy for this action.
-   *
-   * @generated from field: dtkt.flow.v1beta2.RetryStrategy retry_strategy = 11;
-   */
-  retryStrategy?: RetryStrategyValid;
-
-  /**
-   * If true, skip the RPC when the same request input has been seen before
-   * and return the previously cached response. Keyed by a deterministic hash
-   * of the resolved request value. Only applicable to unary RPCs (Actions);
-   * streaming RPCs have no stable request-to-response mapping.
-   *
-   * @generated from field: bool memoize = 13;
-   */
-  memoize: boolean;
-
-  /**
    * The RPC call type. Exactly one must be set.
    *
    * @generated from oneof dtkt.flow.v1beta2.Action.type
@@ -1046,11 +1134,53 @@ export type ActionValid = Message<"dtkt.flow.v1beta2.Action"> & {
   } | { case: undefined; value?: undefined };
 
   /**
-   * Flow-level lifecycle control evaluated alongside the action.
+   * If true, the executor will cache the result of this action and return the cached value for subsequent calls.
+   *
+   * @generated from field: bool cache = 10;
+   */
+  cache: boolean;
+
+  /**
+   * Throttle for RPC invocations. Limits how often upstream
+   * subscription changes can trigger the action's method call.
+   *
+   * @generated from field: dtkt.flow.v1beta2.Rate throttle = 12;
+   */
+  throttle?: RateValid;
+
+  /**
+   * If true, skip the RPC when the same request input has been seen before
+   * and return the previously cached response. Keyed by a deterministic hash
+   * of the resolved request value. Only applicable to unary RPCs (Actions);
+   * streaming RPCs have no stable request-to-response mapping.
+   *
+   * @generated from field: bool memoize = 13;
+   */
+  memoize: boolean;
+
+  /**
+   * Error handling strategy for this action. Fires synchronously inside the
+   * RPC retry loop with `this.error` / `this.response` in scope. For
+   * state-driven (reactive) lifecycle triggers see flow_control / node_control.
+   *
+   * @generated from field: dtkt.flow.v1beta2.RetryStrategy retry_strategy = 11;
+   */
+  retryStrategy?: RetryStrategyValid;
+
+  /**
+   * Flow-wide lifecycle control evaluated alongside the action.
    *
    * @generated from field: dtkt.flow.v1beta2.FlowControl flow_control = 14;
    */
   flowControl?: FlowControlValid;
+
+  /**
+   * Per-node lifecycle control evaluated alongside the action.
+   * Affects only this action; other nodes continue.
+   *
+   * @generated from field: dtkt.flow.v1beta2.NodeControl node_control = 15;
+   */
+  nodeControl?: NodeControlValid;
 };
 
 /**
@@ -1058,7 +1188,7 @@ export type ActionValid = Message<"dtkt.flow.v1beta2.Action"> & {
  * Use `create(ActionSchema)` to create a new message.
  */
 export const ActionSchema: GenMessage<Action, {validType: ActionValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 5);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 6);
 
 /**
  * Output declares an external output from the flow.
@@ -1081,14 +1211,6 @@ export type Output = Message<"dtkt.flow.v1beta2.Output"> & {
   value: string;
 
   /**
-   * An ordered pipeline of transforms applied to the output value.
-   * Each step receives `this.value` from the previous stage.
-   *
-   * @generated from field: repeated dtkt.flow.v1beta2.Transform transforms = 3;
-   */
-  transforms: Transform[];
-
-  /**
    * Throttle for output evaluation. Limits how often upstream
    * subscription changes can trigger the output's CEL evaluation.
    *
@@ -1097,11 +1219,27 @@ export type Output = Message<"dtkt.flow.v1beta2.Output"> & {
   throttle?: Rate;
 
   /**
-   * Flow-level lifecycle control evaluated alongside the output.
+   * An ordered pipeline of transforms applied to the output value.
+   * Each step receives `this.value` from the previous stage.
+   *
+   * @generated from field: repeated dtkt.flow.v1beta2.Transform transforms = 3;
+   */
+  transforms: Transform[];
+
+  /**
+   * Flow-wide lifecycle control evaluated alongside the output.
    *
    * @generated from field: dtkt.flow.v1beta2.FlowControl flow_control = 5;
    */
   flowControl?: FlowControl;
+
+  /**
+   * Per-node lifecycle control evaluated alongside the output.
+   * Affects only this output; other nodes continue.
+   *
+   * @generated from field: dtkt.flow.v1beta2.NodeControl node_control = 6;
+   */
+  nodeControl?: NodeControl;
 };
 
 /**
@@ -1125,14 +1263,6 @@ export type OutputValid = Message<"dtkt.flow.v1beta2.Output"> & {
   value: string;
 
   /**
-   * An ordered pipeline of transforms applied to the output value.
-   * Each step receives `this.value` from the previous stage.
-   *
-   * @generated from field: repeated dtkt.flow.v1beta2.Transform transforms = 3;
-   */
-  transforms: TransformValid[];
-
-  /**
    * Throttle for output evaluation. Limits how often upstream
    * subscription changes can trigger the output's CEL evaluation.
    *
@@ -1141,11 +1271,27 @@ export type OutputValid = Message<"dtkt.flow.v1beta2.Output"> & {
   throttle?: RateValid;
 
   /**
-   * Flow-level lifecycle control evaluated alongside the output.
+   * An ordered pipeline of transforms applied to the output value.
+   * Each step receives `this.value` from the previous stage.
+   *
+   * @generated from field: repeated dtkt.flow.v1beta2.Transform transforms = 3;
+   */
+  transforms: TransformValid[];
+
+  /**
+   * Flow-wide lifecycle control evaluated alongside the output.
    *
    * @generated from field: dtkt.flow.v1beta2.FlowControl flow_control = 5;
    */
   flowControl?: FlowControlValid;
+
+  /**
+   * Per-node lifecycle control evaluated alongside the output.
+   * Affects only this output; other nodes continue.
+   *
+   * @generated from field: dtkt.flow.v1beta2.NodeControl node_control = 6;
+   */
+  nodeControl?: NodeControlValid;
 };
 
 /**
@@ -1153,10 +1299,33 @@ export type OutputValid = Message<"dtkt.flow.v1beta2.Output"> & {
  * Use `create(OutputSchema)` to create a new message.
  */
 export const OutputSchema: GenMessage<Output, {validType: OutputValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 6);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 7);
 
 /**
  * Stream declares a streaming RPC method call node.
+ *
+ * Open semantics depend on the streaming RPC kind set in `call.method`:
+ *
+ *   - Server-stream (one request, streamed responses): the open and the
+ *     first request are atomic at the wire level. The connection opens
+ *     on the first iteration where `when` evaluates true (or the first
+ *     iteration when `when` is unset), using the resolved request value.
+ *     The node remains in PHASE_PENDING until then.
+ *
+ *   - Bidi-stream and client-stream (one or more requests, with one or
+ *     more responses): the wire-level open is independent of any request,
+ *     so the connection is established when the node handler is scheduled,
+ *     before any request is sent. The node enters PHASE_RUNNING as soon
+ *     as the open completes. Subscription patterns where the server
+ *     pushes responses before (or instead of) any client request are
+ *     supported on bidi via this eager-open behavior.
+ *
+ * In all cases, the connection persists until the request side closes
+ * (input EOF, node_control.stop_when, or retry-strategy escalation),
+ * then the response side drains, then the node transitions to
+ * PHASE_SUCCEEDED. Streams are not re-opened within the same node
+ * lifetime; if you need multiple sessions, file a feature request so we
+ * can design the surface against a concrete use case.
  *
  * @generated from message dtkt.flow.v1beta2.Stream
  */
@@ -1169,36 +1338,18 @@ export type Stream = Message<"dtkt.flow.v1beta2.Stream"> & {
   id: string;
 
   /**
-   * CEL boolean. Globals only. Defines when to perform a client-side action on the
-   * stream (e.g., start the stream, send a ping). For MethodCalls, automatically
-   * starts the stream if it is closed or not yet open.
+   * CEL boolean evaluated each iteration when an upstream value changes.
+   * When true, sends a request on the stream's request side. When false,
+   * the iteration is skipped (the stream stays open if already established;
+   * the response side keeps draining). Globals only.
+   *
+   * For server-stream calls, the first true evaluation also opens the
+   * connection -- see the message-level Stream doc above for the per-kind
+   * open semantics.
    *
    * @generated from field: string when = 12;
    */
   when: string;
-
-  /**
-   * CEL boolean. Globals only. Defines when to close the request (client) side of
-   * the stream. For MethodCalls, sends an EOF and sets request_closed.
-   *
-   * @generated from field: string close_request_when = 13;
-   */
-  closeRequestWhen: string;
-
-  /**
-   * Throttle for stream requests. Limits how often upstream
-   * subscription changes can trigger sending a request on the stream.
-   *
-   * @generated from field: dtkt.flow.v1beta2.Rate throttle = 15;
-   */
-  throttle?: Rate;
-
-  /**
-   * Error handling strategy for this stream.
-   *
-   * @generated from field: dtkt.flow.v1beta2.RetryStrategy retry_strategy = 14;
-   */
-  retryStrategy?: RetryStrategy;
 
   /**
    * The streaming RPC call type. Exactly one must be set.
@@ -1216,15 +1367,65 @@ export type Stream = Message<"dtkt.flow.v1beta2.Stream"> & {
   } | { case: undefined; value?: undefined };
 
   /**
-   * Flow-level lifecycle control evaluated alongside the stream.
+   * Throttle for stream requests. Limits how often upstream
+   * subscription changes can trigger sending a request on the stream.
+   *
+   * @generated from field: dtkt.flow.v1beta2.Rate throttle = 15;
+   */
+  throttle?: Rate;
+
+  /**
+   * Error handling strategy for this stream. Fires synchronously inside the
+   * RPC retry loop with `this.error` / `this.response` in scope. For
+   * state-driven (reactive) lifecycle triggers see flow_control / node_control.
+   *
+   * @generated from field: dtkt.flow.v1beta2.RetryStrategy retry_strategy = 14;
+   */
+  retryStrategy?: RetryStrategy;
+
+  /**
+   * Flow-wide lifecycle control evaluated alongside the stream.
    *
    * @generated from field: dtkt.flow.v1beta2.FlowControl flow_control = 16;
    */
   flowControl?: FlowControl;
+
+  /**
+   * Per-node lifecycle control evaluated alongside the stream. To close just
+   * the request (client) side of a stream and let the response side drain,
+   * use node_control.stop_when -- the runtime's graceful per-node stop
+   * semantic for streams is exactly that.
+   *
+   * @generated from field: dtkt.flow.v1beta2.NodeControl node_control = 17;
+   */
+  nodeControl?: NodeControl;
 };
 
 /**
  * Stream declares a streaming RPC method call node.
+ *
+ * Open semantics depend on the streaming RPC kind set in `call.method`:
+ *
+ *   - Server-stream (one request, streamed responses): the open and the
+ *     first request are atomic at the wire level. The connection opens
+ *     on the first iteration where `when` evaluates true (or the first
+ *     iteration when `when` is unset), using the resolved request value.
+ *     The node remains in PHASE_PENDING until then.
+ *
+ *   - Bidi-stream and client-stream (one or more requests, with one or
+ *     more responses): the wire-level open is independent of any request,
+ *     so the connection is established when the node handler is scheduled,
+ *     before any request is sent. The node enters PHASE_RUNNING as soon
+ *     as the open completes. Subscription patterns where the server
+ *     pushes responses before (or instead of) any client request are
+ *     supported on bidi via this eager-open behavior.
+ *
+ * In all cases, the connection persists until the request side closes
+ * (input EOF, node_control.stop_when, or retry-strategy escalation),
+ * then the response side drains, then the node transitions to
+ * PHASE_SUCCEEDED. Streams are not re-opened within the same node
+ * lifetime; if you need multiple sessions, file a feature request so we
+ * can design the surface against a concrete use case.
  *
  * @generated from message dtkt.flow.v1beta2.Stream
  */
@@ -1237,36 +1438,18 @@ export type StreamValid = Message<"dtkt.flow.v1beta2.Stream"> & {
   id: string;
 
   /**
-   * CEL boolean. Globals only. Defines when to perform a client-side action on the
-   * stream (e.g., start the stream, send a ping). For MethodCalls, automatically
-   * starts the stream if it is closed or not yet open.
+   * CEL boolean evaluated each iteration when an upstream value changes.
+   * When true, sends a request on the stream's request side. When false,
+   * the iteration is skipped (the stream stays open if already established;
+   * the response side keeps draining). Globals only.
+   *
+   * For server-stream calls, the first true evaluation also opens the
+   * connection -- see the message-level Stream doc above for the per-kind
+   * open semantics.
    *
    * @generated from field: string when = 12;
    */
   when: string;
-
-  /**
-   * CEL boolean. Globals only. Defines when to close the request (client) side of
-   * the stream. For MethodCalls, sends an EOF and sets request_closed.
-   *
-   * @generated from field: string close_request_when = 13;
-   */
-  closeRequestWhen: string;
-
-  /**
-   * Throttle for stream requests. Limits how often upstream
-   * subscription changes can trigger sending a request on the stream.
-   *
-   * @generated from field: dtkt.flow.v1beta2.Rate throttle = 15;
-   */
-  throttle?: RateValid;
-
-  /**
-   * Error handling strategy for this stream.
-   *
-   * @generated from field: dtkt.flow.v1beta2.RetryStrategy retry_strategy = 14;
-   */
-  retryStrategy?: RetryStrategyValid;
 
   /**
    * The streaming RPC call type. Exactly one must be set.
@@ -1284,11 +1467,38 @@ export type StreamValid = Message<"dtkt.flow.v1beta2.Stream"> & {
   } | { case: undefined; value?: undefined };
 
   /**
-   * Flow-level lifecycle control evaluated alongside the stream.
+   * Throttle for stream requests. Limits how often upstream
+   * subscription changes can trigger sending a request on the stream.
+   *
+   * @generated from field: dtkt.flow.v1beta2.Rate throttle = 15;
+   */
+  throttle?: RateValid;
+
+  /**
+   * Error handling strategy for this stream. Fires synchronously inside the
+   * RPC retry loop with `this.error` / `this.response` in scope. For
+   * state-driven (reactive) lifecycle triggers see flow_control / node_control.
+   *
+   * @generated from field: dtkt.flow.v1beta2.RetryStrategy retry_strategy = 14;
+   */
+  retryStrategy?: RetryStrategyValid;
+
+  /**
+   * Flow-wide lifecycle control evaluated alongside the stream.
    *
    * @generated from field: dtkt.flow.v1beta2.FlowControl flow_control = 16;
    */
   flowControl?: FlowControlValid;
+
+  /**
+   * Per-node lifecycle control evaluated alongside the stream. To close just
+   * the request (client) side of a stream and let the response side drain,
+   * use node_control.stop_when -- the runtime's graceful per-node stop
+   * semantic for streams is exactly that.
+   *
+   * @generated from field: dtkt.flow.v1beta2.NodeControl node_control = 17;
+   */
+  nodeControl?: NodeControlValid;
 };
 
 /**
@@ -1296,7 +1506,7 @@ export type StreamValid = Message<"dtkt.flow.v1beta2.Stream"> & {
  * Use `create(StreamSchema)` to create a new message.
  */
 export const StreamSchema: GenMessage<Stream, {validType: StreamValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 7);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 8);
 
 /**
  * MethodCall configures a gRPC method invocation on a Connection.
@@ -1375,7 +1585,7 @@ export type MethodCallValid = Message<"dtkt.flow.v1beta2.MethodCall"> & {
  * Use `create(MethodCallSchema)` to create a new message.
  */
 export const MethodCallSchema: GenMessage<MethodCall, {validType: MethodCallValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 8);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 9);
 
 /**
  * Interaction defines an in-flow interaction requiring a response from an
@@ -1393,21 +1603,6 @@ export type Interaction = Message<"dtkt.flow.v1beta2.Interaction"> & {
   id: string;
 
   /**
-   * An ordered pipeline of transforms applied to interaction results.
-   * Each step receives `this.value` from the previous stage.
-   *
-   * @generated from field: repeated dtkt.flow.v1beta2.Transform transforms = 2;
-   */
-  transforms: Transform[];
-
-  /**
-   * The interaction's form fields.
-   *
-   * @generated from field: repeated dtkt.flow.v1beta2.Interaction.Input inputs = 3;
-   */
-  inputs: Interaction_Input[];
-
-  /**
    * CEL boolean guard. Globals only. If false, the interaction is skipped for
    * this iteration. Also serves as the upstream trigger -- any node references
    * in the expression create graph edges.
@@ -1417,11 +1612,34 @@ export type Interaction = Message<"dtkt.flow.v1beta2.Interaction"> & {
   when: string;
 
   /**
-   * Flow-level lifecycle control evaluated alongside the interaction.
+   * The interaction's form fields.
+   *
+   * @generated from field: repeated dtkt.flow.v1beta2.Interaction.Input inputs = 3;
+   */
+  inputs: Interaction_Input[];
+
+  /**
+   * An ordered pipeline of transforms applied to interaction results.
+   * Each step receives `this.value` from the previous stage.
+   *
+   * @generated from field: repeated dtkt.flow.v1beta2.Transform transforms = 2;
+   */
+  transforms: Transform[];
+
+  /**
+   * Flow-wide lifecycle control evaluated alongside the interaction.
    *
    * @generated from field: dtkt.flow.v1beta2.FlowControl flow_control = 5;
    */
   flowControl?: FlowControl;
+
+  /**
+   * Per-node lifecycle control evaluated alongside the interaction.
+   * Affects only this interaction; other nodes continue.
+   *
+   * @generated from field: dtkt.flow.v1beta2.NodeControl node_control = 6;
+   */
+  nodeControl?: NodeControl;
 };
 
 /**
@@ -1440,21 +1658,6 @@ export type InteractionValid = Message<"dtkt.flow.v1beta2.Interaction"> & {
   id: string;
 
   /**
-   * An ordered pipeline of transforms applied to interaction results.
-   * Each step receives `this.value` from the previous stage.
-   *
-   * @generated from field: repeated dtkt.flow.v1beta2.Transform transforms = 2;
-   */
-  transforms: TransformValid[];
-
-  /**
-   * The interaction's form fields.
-   *
-   * @generated from field: repeated dtkt.flow.v1beta2.Interaction.Input inputs = 3;
-   */
-  inputs: Interaction_InputValid[];
-
-  /**
    * CEL boolean guard. Globals only. If false, the interaction is skipped for
    * this iteration. Also serves as the upstream trigger -- any node references
    * in the expression create graph edges.
@@ -1464,11 +1667,34 @@ export type InteractionValid = Message<"dtkt.flow.v1beta2.Interaction"> & {
   when: string;
 
   /**
-   * Flow-level lifecycle control evaluated alongside the interaction.
+   * The interaction's form fields.
+   *
+   * @generated from field: repeated dtkt.flow.v1beta2.Interaction.Input inputs = 3;
+   */
+  inputs: Interaction_InputValid[];
+
+  /**
+   * An ordered pipeline of transforms applied to interaction results.
+   * Each step receives `this.value` from the previous stage.
+   *
+   * @generated from field: repeated dtkt.flow.v1beta2.Transform transforms = 2;
+   */
+  transforms: TransformValid[];
+
+  /**
+   * Flow-wide lifecycle control evaluated alongside the interaction.
    *
    * @generated from field: dtkt.flow.v1beta2.FlowControl flow_control = 5;
    */
   flowControl?: FlowControlValid;
+
+  /**
+   * Per-node lifecycle control evaluated alongside the interaction.
+   * Affects only this interaction; other nodes continue.
+   *
+   * @generated from field: dtkt.flow.v1beta2.NodeControl node_control = 6;
+   */
+  nodeControl?: NodeControlValid;
 };
 
 /**
@@ -1476,7 +1702,7 @@ export type InteractionValid = Message<"dtkt.flow.v1beta2.Interaction"> & {
  * Use `create(InteractionSchema)` to create a new message.
  */
 export const InteractionSchema: GenMessage<Interaction, {validType: InteractionValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 9);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 10);
 
 /**
  * ConfirmBinding holds a boolean response from a confirm element.
@@ -1499,7 +1725,7 @@ export type Interaction_ConfirmBindingValid = Interaction_ConfirmBinding;
  * Use `create(Interaction_ConfirmBindingSchema)` to create a new message.
  */
 export const Interaction_ConfirmBindingSchema: GenMessage<Interaction_ConfirmBinding, {validType: Interaction_ConfirmBindingValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 9, 0);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 10, 0);
 
 /**
  * InputBinding holds a text response from an input element.
@@ -1522,7 +1748,7 @@ export type Interaction_InputBindingValid = Interaction_InputBinding;
  * Use `create(Interaction_InputBindingSchema)` to create a new message.
  */
 export const Interaction_InputBindingSchema: GenMessage<Interaction_InputBinding, {validType: Interaction_InputBindingValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 9, 1);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 10, 1);
 
 /**
  * FileBinding holds a binary response from a file element.
@@ -1545,7 +1771,7 @@ export type Interaction_FileBindingValid = Interaction_FileBinding;
  * Use `create(Interaction_FileBindingSchema)` to create a new message.
  */
 export const Interaction_FileBindingSchema: GenMessage<Interaction_FileBinding, {validType: Interaction_FileBindingValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 9, 2);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 10, 2);
 
 /**
  * SelectBinding holds a single selection from a select element.
@@ -1568,7 +1794,7 @@ export type Interaction_SelectBindingValid = Interaction_SelectBinding;
  * Use `create(Interaction_SelectBindingSchema)` to create a new message.
  */
 export const Interaction_SelectBindingSchema: GenMessage<Interaction_SelectBinding, {validType: Interaction_SelectBindingValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 9, 3);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 10, 3);
 
 /**
  * MultiSelectBinding holds multiple selections from a multi-select element.
@@ -1591,7 +1817,7 @@ export type Interaction_MultiSelectBindingValid = Interaction_MultiSelectBinding
  * Use `create(Interaction_MultiSelectBindingSchema)` to create a new message.
  */
 export const Interaction_MultiSelectBindingSchema: GenMessage<Interaction_MultiSelectBinding, {validType: Interaction_MultiSelectBindingValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 9, 4);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 10, 4);
 
 /**
  * Input defines a single form field within an interaction.
@@ -1748,7 +1974,7 @@ export type Interaction_InputValid = Message<"dtkt.flow.v1beta2.Interaction.Inpu
  * Use `create(Interaction_InputSchema)` to create a new message.
  */
 export const Interaction_InputSchema: GenMessage<Interaction_Input, {validType: Interaction_InputValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 9, 5);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 10, 5);
 
 /**
  * Backoff configures exponential backoff for retry strategies.
@@ -1829,10 +2055,18 @@ export type BackoffValid = Message<"dtkt.flow.v1beta2.Backoff"> & {
  * Use `create(BackoffSchema)` to create a new message.
  */
 export const BackoffSchema: GenMessage<Backoff, {validType: BackoffValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 10);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 11);
 
 /**
- * RetryStrategy configures error handling for Action and Stream nodes.
+ * RetryStrategy configures synchronous error handling for Action and Stream
+ * nodes. All `*_when` fields are evaluated inside the RPC retry loop -- after
+ * an RPC errors and before the node iterates again -- with `this.error` and
+ * (for `when`) `this.response` in scope.
+ *
+ * For state-driven (reactive) lifecycle triggers that fire on the next
+ * activation cycle rather than synchronously, see FlowControl and NodeControl.
+ * The header doc block "When to use RetryStrategy vs NodeControl / FlowControl"
+ * explains when to pick which.
  *
  * @generated from message dtkt.flow.v1beta2.RetryStrategy
  */
@@ -1862,23 +2096,6 @@ export type RetryStrategy = Message<"dtkt.flow.v1beta2.RetryStrategy"> & {
   skipWhen: string;
 
   /**
-   * CEL boolean. If true, suspend the node until an external Resume.
-   * The Resume call may optionally provide a new request value.
-   * `this.error` = gRPC Status. Globals also available.
-   *
-   * @generated from field: string suspend_when = 4;
-   */
-  suspendWhen: string;
-
-  /**
-   * CEL boolean. If true, terminate the entire flow.
-   * `this.error` = gRPC Status. Globals also available.
-   *
-   * @generated from field: string terminate_when = 5;
-   */
-  terminateWhen: string;
-
-  /**
    * CEL expression. When non-null and non-false, the result is emitted as
    * the node's output value instead of propagating the error. This allows
    * error information to flow downstream for handling by other nodes.
@@ -1891,10 +2108,44 @@ export type RetryStrategy = Message<"dtkt.flow.v1beta2.RetryStrategy"> & {
    * @generated from field: string continue_when = 6;
    */
   continueWhen: string;
+
+  /**
+   * CEL boolean. If true, suspend the node until an external Resume.
+   * The Resume call may optionally provide a new request value.
+   * `this.error` = gRPC Status. Globals also available.
+   *
+   * Fires synchronously inside the retry loop -- the node will not iterate
+   * again before the suspend takes effect. For a reactive (next-activation)
+   * alternative driven by general flow state instead of RPC error, see
+   * NodeControl.suspend_when.
+   *
+   * @generated from field: string suspend_when = 4;
+   */
+  suspendWhen: string;
+
+  /**
+   * CEL boolean. If true, terminate the entire flow.
+   * `this.error` = gRPC Status. Globals also available.
+   *
+   * Fires synchronously inside the retry loop. For a reactive (next-activation)
+   * alternative driven by general flow state instead of RPC error, see
+   * FlowControl.terminate_when.
+   *
+   * @generated from field: string terminate_when = 5;
+   */
+  terminateWhen: string;
 };
 
 /**
- * RetryStrategy configures error handling for Action and Stream nodes.
+ * RetryStrategy configures synchronous error handling for Action and Stream
+ * nodes. All `*_when` fields are evaluated inside the RPC retry loop -- after
+ * an RPC errors and before the node iterates again -- with `this.error` and
+ * (for `when`) `this.response` in scope.
+ *
+ * For state-driven (reactive) lifecycle triggers that fire on the next
+ * activation cycle rather than synchronously, see FlowControl and NodeControl.
+ * The header doc block "When to use RetryStrategy vs NodeControl / FlowControl"
+ * explains when to pick which.
  *
  * @generated from message dtkt.flow.v1beta2.RetryStrategy
  */
@@ -1924,23 +2175,6 @@ export type RetryStrategyValid = Message<"dtkt.flow.v1beta2.RetryStrategy"> & {
   skipWhen: string;
 
   /**
-   * CEL boolean. If true, suspend the node until an external Resume.
-   * The Resume call may optionally provide a new request value.
-   * `this.error` = gRPC Status. Globals also available.
-   *
-   * @generated from field: string suspend_when = 4;
-   */
-  suspendWhen: string;
-
-  /**
-   * CEL boolean. If true, terminate the entire flow.
-   * `this.error` = gRPC Status. Globals also available.
-   *
-   * @generated from field: string terminate_when = 5;
-   */
-  terminateWhen: string;
-
-  /**
    * CEL expression. When non-null and non-false, the result is emitted as
    * the node's output value instead of propagating the error. This allows
    * error information to flow downstream for handling by other nodes.
@@ -1953,6 +2187,32 @@ export type RetryStrategyValid = Message<"dtkt.flow.v1beta2.RetryStrategy"> & {
    * @generated from field: string continue_when = 6;
    */
   continueWhen: string;
+
+  /**
+   * CEL boolean. If true, suspend the node until an external Resume.
+   * The Resume call may optionally provide a new request value.
+   * `this.error` = gRPC Status. Globals also available.
+   *
+   * Fires synchronously inside the retry loop -- the node will not iterate
+   * again before the suspend takes effect. For a reactive (next-activation)
+   * alternative driven by general flow state instead of RPC error, see
+   * NodeControl.suspend_when.
+   *
+   * @generated from field: string suspend_when = 4;
+   */
+  suspendWhen: string;
+
+  /**
+   * CEL boolean. If true, terminate the entire flow.
+   * `this.error` = gRPC Status. Globals also available.
+   *
+   * Fires synchronously inside the retry loop. For a reactive (next-activation)
+   * alternative driven by general flow state instead of RPC error, see
+   * FlowControl.terminate_when.
+   *
+   * @generated from field: string terminate_when = 5;
+   */
+  terminateWhen: string;
 };
 
 /**
@@ -1960,7 +2220,7 @@ export type RetryStrategyValid = Message<"dtkt.flow.v1beta2.RetryStrategy"> & {
  * Use `create(RetryStrategySchema)` to create a new message.
  */
 export const RetryStrategySchema: GenMessage<RetryStrategy, {validType: RetryStrategyValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 11);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 12);
 
 /**
  * Switch evaluates a CEL discriminant and branches into ordered cases.
@@ -2023,7 +2283,7 @@ export type SwitchValid = Message<"dtkt.flow.v1beta2.Switch"> & {
  * Use `create(SwitchSchema)` to create a new message.
  */
 export const SwitchSchema: GenMessage<Switch, {validType: SwitchValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 12);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 13);
 
 /**
  * Case is a single branch in a switch expression.
@@ -2072,7 +2332,7 @@ export type Switch_CaseValid = Message<"dtkt.flow.v1beta2.Switch.Case"> & {
  * Use `create(Switch_CaseSchema)` to create a new message.
  */
 export const Switch_CaseSchema: GenMessage<Switch_Case, {validType: Switch_CaseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 12, 0);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 13, 0);
 
 /**
  * Rate limits throughput to at most `count` events per `interval`.
@@ -2121,7 +2381,7 @@ export type RateValid = Message<"dtkt.flow.v1beta2.Rate"> & {
  * Use `create(RateSchema)` to create a new message.
  */
 export const RateSchema: GenMessage<Rate, {validType: RateValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 13);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 14);
 
 /**
  * Generator produces a stream of values based on internal logic (time-based,
@@ -2220,7 +2480,7 @@ export type GeneratorValid = Message<"dtkt.flow.v1beta2.Generator"> & {
  * Use `create(GeneratorSchema)` to create a new message.
  */
 export const GeneratorSchema: GenMessage<Generator, {validType: GeneratorValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 14);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 15);
 
 /**
  * Ticker emits on a fixed time interval.
@@ -2285,7 +2545,7 @@ export type Generator_TickerValid = Message<"dtkt.flow.v1beta2.Generator.Ticker"
  * Use `create(Generator_TickerSchema)` to create a new message.
  */
 export const Generator_TickerSchema: GenMessage<Generator_Ticker, {validType: Generator_TickerValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 14, 0);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 15, 0);
 
 /**
  * Cron emits on a cron schedule expression.
@@ -2294,7 +2554,10 @@ export const Generator_TickerSchema: GenMessage<Generator_Ticker, {validType: Ge
  */
 export type Generator_Cron = Message<"dtkt.flow.v1beta2.Generator.Cron"> & {
   /**
-   * Cron expression (e.g. "*\/5 * * * *"). Uses robfig/cron v3 syntax.
+   * Standard 5-field cron expression (minute, hour, day-of-month, month,
+   * day-of-week), e.g. "*\/5 * * * *". Predefined descriptors are also
+   * accepted: "@every <duration>", "@hourly", "@daily", "@weekly",
+   * "@monthly", "@yearly".
    *
    * @generated from field: string expression = 1;
    */
@@ -2316,7 +2579,10 @@ export type Generator_Cron = Message<"dtkt.flow.v1beta2.Generator.Cron"> & {
  */
 export type Generator_CronValid = Message<"dtkt.flow.v1beta2.Generator.Cron"> & {
   /**
-   * Cron expression (e.g. "*\/5 * * * *"). Uses robfig/cron v3 syntax.
+   * Standard 5-field cron expression (minute, hour, day-of-month, month,
+   * day-of-week), e.g. "*\/5 * * * *". Predefined descriptors are also
+   * accepted: "@every <duration>", "@hourly", "@daily", "@weekly",
+   * "@monthly", "@yearly".
    *
    * @generated from field: string expression = 1;
    */
@@ -2336,7 +2602,7 @@ export type Generator_CronValid = Message<"dtkt.flow.v1beta2.Generator.Cron"> & 
  * Use `create(Generator_CronSchema)` to create a new message.
  */
 export const Generator_CronSchema: GenMessage<Generator_Cron, {validType: Generator_CronValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 14, 1);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 15, 1);
 
 /**
  * Range emits a bounded sequence of values. Both start and end are inclusive.\n  // For example, start=1 end=3 step=1 emits [1, 2, 3].
@@ -2415,7 +2681,7 @@ export type Generator_RangeValid = Message<"dtkt.flow.v1beta2.Generator.Range"> 
  * Use `create(Generator_RangeSchema)` to create a new message.
  */
 export const Generator_RangeSchema: GenMessage<Generator_Range, {validType: Generator_RangeValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 14, 2);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 15, 2);
 
 /**
  * Transform is a single step in an ordered pipeline applied to a node's value.
@@ -2534,7 +2800,7 @@ export type TransformValid = Message<"dtkt.flow.v1beta2.Transform"> & {
  * Use `create(TransformSchema)` to create a new message.
  */
 export const TransformSchema: GenMessage<Transform, {validType: TransformValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 15);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 16);
 
 /**
  * GroupBy defines how input data is partitioned for accumulation.
@@ -2585,7 +2851,7 @@ export type Transform_GroupByValid = Message<"dtkt.flow.v1beta2.Transform.GroupB
  * Use `create(Transform_GroupBySchema)` to create a new message.
  */
 export const Transform_GroupBySchema: GenMessage<Transform_GroupBy, {validType: Transform_GroupByValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 15, 0);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 16, 0);
 
 /**
  * Window defines a temporal boundary for grouping input data.
@@ -2684,7 +2950,7 @@ export type Transform_GroupBy_WindowValid = Message<"dtkt.flow.v1beta2.Transform
  * Use `create(Transform_GroupBy_WindowSchema)` to create a new message.
  */
 export const Transform_GroupBy_WindowSchema: GenMessage<Transform_GroupBy_Window, {validType: Transform_GroupBy_WindowValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 15, 0, 0);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 16, 0, 0);
 
 /**
  * Fixed (tumbling) windows have a static size and do not overlap.
@@ -2719,7 +2985,7 @@ export type Transform_GroupBy_Window_FixedValid = Message<"dtkt.flow.v1beta2.Tra
  * Use `create(Transform_GroupBy_Window_FixedSchema)` to create a new message.
  */
 export const Transform_GroupBy_Window_FixedSchema: GenMessage<Transform_GroupBy_Window_Fixed, {validType: Transform_GroupBy_Window_FixedValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 15, 0, 0, 0);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 16, 0, 0, 0);
 
 /**
  * Sliding windows have a fixed size but may overlap; `slide` controls how often a new window starts.
@@ -2768,7 +3034,7 @@ export type Transform_GroupBy_Window_SlidingValid = Message<"dtkt.flow.v1beta2.T
  * Use `create(Transform_GroupBy_Window_SlidingSchema)` to create a new message.
  */
 export const Transform_GroupBy_Window_SlidingSchema: GenMessage<Transform_GroupBy_Window_Sliding, {validType: Transform_GroupBy_Window_SlidingValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 15, 0, 0, 1);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 16, 0, 0, 1);
 
 /**
  * Session windows group data based on activity; they close after `timeout` of inactivity.
@@ -2803,7 +3069,7 @@ export type Transform_GroupBy_Window_SessionValid = Message<"dtkt.flow.v1beta2.T
  * Use `create(Transform_GroupBy_Window_SessionSchema)` to create a new message.
  */
 export const Transform_GroupBy_Window_SessionSchema: GenMessage<Transform_GroupBy_Window_Session, {validType: Transform_GroupBy_Window_SessionValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 15, 0, 0, 2);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 16, 0, 0, 2);
 
 /**
  * Event windows close when a CEL boolean evaluates to true.
@@ -2840,7 +3106,7 @@ export type Transform_GroupBy_Window_EventValid = Message<"dtkt.flow.v1beta2.Tra
  * Use `create(Transform_GroupBy_Window_EventSchema)` to create a new message.
  */
 export const Transform_GroupBy_Window_EventSchema: GenMessage<Transform_GroupBy_Window_Event, {validType: Transform_GroupBy_Window_EventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 15, 0, 0, 3);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 16, 0, 0, 3);
 
 /**
  * Reduce accumulates values into a single result, emitted when the stream ends or a window closes.
@@ -2905,7 +3171,7 @@ export type Transform_ReduceValid = Message<"dtkt.flow.v1beta2.Transform.Reduce"
  * Use `create(Transform_ReduceSchema)` to create a new message.
  */
 export const Transform_ReduceSchema: GenMessage<Transform_Reduce, {validType: Transform_ReduceValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 15, 1);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 16, 1);
 
 /**
  * Scan accumulates values like Reduce but emits every intermediate accumulator value.
@@ -2970,7 +3236,7 @@ export type Transform_ScanValid = Message<"dtkt.flow.v1beta2.Transform.Scan"> & 
  * Use `create(Transform_ScanSchema)` to create a new message.
  */
 export const Transform_ScanSchema: GenMessage<Transform_Scan, {validType: Transform_ScanValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_spec, 15, 2);
+  messageDesc(file_dtkt_flow_v1beta2_spec, 16, 2);
 
 /**
  * ErrorStrategy controls flow behavior when a node enters PHASE_ERRORED.

@@ -128,12 +128,18 @@ func (x ErrorStrategy) Number() protoreflect.EnumNumber {
 //	Action.when                            (globals only)
 //	Stream.when                            (globals only)
 //	Interaction.when                       (globals only)
-//	Stream.close_request_when              (globals only)
 //	Output.value                           (globals only)
 //	Switch.value                           (globals only)
 //	MethodCall.request (embedded in Value) (globals only)
 //	Transform.Reduce.initial               (globals only)
 //	Transform.Scan.initial                 (globals only)
+//
+//	FlowControl.stop_when                  (globals only)
+//	FlowControl.terminate_when             (globals only)
+//	FlowControl.suspend_when               (globals only)
+//	NodeControl.stop_when                  (globals only)
+//	NodeControl.terminate_when             (globals only)
+//	NodeControl.suspend_when               (globals only)
 //
 //	Switch.Case.value                      this.value    (switch discriminant)
 //	Switch.Case.return                     this.value    (switch discriminant)
@@ -153,40 +159,44 @@ func (x ErrorStrategy) Number() protoreflect.EnumNumber {
 //	RetryStrategy.when                     this.response (RPC result, if any)
 //	                                       this.error    (google.rpc.Status, if any)
 //	RetryStrategy.skip_when                this.error       (google.rpc.Status)
+//	RetryStrategy.continue_when            this.error       (google.rpc.Status)
 //	RetryStrategy.suspend_when             this.error       (google.rpc.Status)
 //	RetryStrategy.terminate_when           this.error       (google.rpc.Status)
-//	RetryStrategy.continue_when            this.error       (google.rpc.Status)
 //
 // Generator Ticker/Cron value expressions receive only a `this` context:
 //
 //	Ticker.value / Cron.value              this.count (int64), this.time (timestamp)
 //
-// Sentinel Values
-// ─────────────────────────────────────────────────────────────────────────────
-// Certain special values carry control-flow semantics when produced by CEL
-// expressions. The runtime detects these and acts accordingly.
-//
-//	EOF          Signals end-of-stream. When a CEL expression evaluates to
-//	             `EOF`, the runtime treats it as a terminal value:
-//	             - In a Stream's MethodCall.request: closes the client side of
-//	               the stream (equivalent to CloseSend). This is an ergonomic
-//	               alternative to `close_request_when`.
-//	             - In a Generator's value: signals the generator is done.
-//	             - In an Input: closes the input channel.
-//	             Represented internally as a `Runtime.EOF` proto message
-//	             wrapped in a `cel.expr.Value.object_value`.
-//
 // Built-in CEL Functions
 // ─────────────────────────────────────────────────────────────────────────────
-// In addition to the standard CEL functions (size, has, type, int, uint, double,
-// string, bytes, matches, contains, startsWith, endsWith, timestamp, duration,
-// list/map operations, ternary `? :`, etc.), the following are available:
+// Only the standard CEL functions are available (size, has, type, int, uint,
+// double, string, bytes, matches, contains, startsWith, endsWith, timestamp,
+// duration, list/map operations, ternary `? :`, etc.). All data access is
+// through the globals and `this` context variables documented above.
 //
-//	EOF()        Returns the EOF sentinel value. Use in request expressions to
-//	             close a stream: `request: "= condition ? EOF() : value"`.
+// When to use RetryStrategy vs NodeControl / FlowControl
+// ─────────────────────────────────────────────────────────────────────────────
+// There are surface-level overlaps between RetryStrategy (on Action/Stream)
+// and NodeControl / FlowControl. Both can express "suspend on error" or
+// "terminate on error". They are kept distinct because their timing is not
+// equivalent:
 //
-// No other custom functions are defined. All data access is through the globals
-// and `this` context variables documented above.
+//	RetryStrategy.{suspend,terminate,skip,continue}_when fire SYNCHRONOUSLY
+//	inside the RPC retry loop -- between "the RPC just errored" and "would
+//	the node emit/escalate next". They have access to `this.error` and
+//	`this.response` for the just-completed call. Same iteration.
+//
+//	NodeControl / FlowControl fire REACTIVELY on the next activation cycle
+//	when CEL globals change. Even if a global like `actions.foo.last_error`
+//	were available, there's a window between the error landing and the
+//	lifecycle CEL re-evaluating during which the handler could iterate
+//	again or emit. That window is unsafe for `suspend` (the operator wanted
+//	the node halted before the next iteration); harmless for `terminate`
+//	(the flow is dying either way).
+//
+// Use RetryStrategy when the trigger is an RPC error and the action must
+// happen before the next iteration. Use NodeControl / FlowControl when the
+// trigger is general flow state and reactive timing is acceptable.
 type Flow struct {
 	state                    protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Name          string                 `protobuf:"bytes,1,opt,name=name,proto3"`
@@ -410,13 +420,21 @@ func (b0 Flow_builder) Build() *Flow {
 	return m0
 }
 
-// FlowControl allows a node to trigger flow-level lifecycle actions based on
-// CEL boolean expressions evaluated alongside the node's normal processing.
-// The expressions receive the same globals as other CEL fields on the node,
-// plus `this` context where applicable.
+// FlowControl declares CEL-driven lifecycle triggers that act on the WHOLE
+// flow. The expressions are evaluated reactively alongside the host node's
+// normal processing; when a condition evaluates to true, the corresponding
+// action is applied to the entire flow regardless of which node hosts the
+// FlowControl.
 //
-// When a condition evaluates to true, the corresponding action is applied to
-// the entire flow -- not just the declaring node.
+// For per-node lifecycle triggers (acting only on the declaring node), see
+// NodeControl. For RPC-error-gated synchronous triggers, see RetryStrategy.
+//
+// Ordering vs NodeControl: when a node declares both NC and FC, NC fires
+// FIRST on each iteration. Both run independently; ordering only affects
+// the wire-publish sequence when both fire the same iteration. NC-first
+// ensures per-node state events (e.g. PHASE_STOPPING for the controlled
+// node) land cleanly before any FC-driven flow-wide cancel races with
+// them.
 type FlowControl struct {
 	state                    protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_StopWhen      string                 `protobuf:"bytes,1,opt,name=stop_when,json=stopWhen,proto3"`
@@ -508,6 +526,119 @@ func (b0 FlowControl_builder) Build() *FlowControl {
 	return m0
 }
 
+// NodeControl declares CEL-driven lifecycle triggers scoped to the declaring
+// node only. Other nodes are unaffected. The expressions are evaluated
+// reactively alongside the host node's normal processing.
+//
+// For flow-wide lifecycle triggers, see FlowControl. For RPC-error-gated
+// synchronous triggers, see RetryStrategy.
+//
+// Ordering vs FlowControl: when a node declares both NC and FC, NC fires
+// FIRST. NC-first ensures per-node state events (e.g. the PHASE_STOPPING
+// emitted by node_control.stop_when) reach observers before any FC-driven
+// flow-wide cancel can race with them. Both still fire independently when
+// their conditions match the same iteration.
+type NodeControl struct {
+	state                    protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_StopWhen      string                 `protobuf:"bytes,1,opt,name=stop_when,json=stopWhen,proto3"`
+	xxx_hidden_TerminateWhen string                 `protobuf:"bytes,2,opt,name=terminate_when,json=terminateWhen,proto3"`
+	xxx_hidden_SuspendWhen   string                 `protobuf:"bytes,3,opt,name=suspend_when,json=suspendWhen,proto3"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
+}
+
+func (x *NodeControl) Reset() {
+	*x = NodeControl{}
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NodeControl) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NodeControl) ProtoMessage() {}
+
+func (x *NodeControl) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *NodeControl) GetStopWhen() string {
+	if x != nil {
+		return x.xxx_hidden_StopWhen
+	}
+	return ""
+}
+
+func (x *NodeControl) GetTerminateWhen() string {
+	if x != nil {
+		return x.xxx_hidden_TerminateWhen
+	}
+	return ""
+}
+
+func (x *NodeControl) GetSuspendWhen() string {
+	if x != nil {
+		return x.xxx_hidden_SuspendWhen
+	}
+	return ""
+}
+
+func (x *NodeControl) SetStopWhen(v string) {
+	x.xxx_hidden_StopWhen = v
+}
+
+func (x *NodeControl) SetTerminateWhen(v string) {
+	x.xxx_hidden_TerminateWhen = v
+}
+
+func (x *NodeControl) SetSuspendWhen(v string) {
+	x.xxx_hidden_SuspendWhen = v
+}
+
+type NodeControl_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Graceful stop of THIS node only. Per-type drain semantics:
+	//   - Stream: close the request side, wait for the server to drain the
+	//     response side, then mark PHASE_SUCCEEDED.
+	//   - Action (mid-RPC): finish the current call, then PHASE_SUCCEEDED.
+	//   - Action (idle), Var, Output: PHASE_SUCCEEDED immediately.
+	//   - Input: publish EOF on the input topic, drain downstream subscribers.
+	//   - Generator (Ticker/Cron/Range): stop firing, PHASE_SUCCEEDED.
+	//   - Interaction: cancel pending prompt token, PHASE_SUCCEEDED.
+	//
+	// Node -> STOPPING -> SUCCEEDED. Other nodes unaffected.
+	StopWhen string
+	// Immediate cancel of THIS node only. The node's context is cancelled and
+	// any in-flight operation is aborted. Node -> CANCELLED. Other nodes
+	// unaffected.
+	TerminateWhen string
+	// Suspend THIS node until an external Resume. The node pauses at a safe
+	// point; in-flight operations on streams stay open. Node -> SUSPENDED.
+	// Other nodes unaffected.
+	SuspendWhen string
+}
+
+func (b0 NodeControl_builder) Build() *NodeControl {
+	m0 := &NodeControl{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_StopWhen = b.StopWhen
+	x.xxx_hidden_TerminateWhen = b.TerminateWhen
+	x.xxx_hidden_SuspendWhen = b.SuspendWhen
+	return m0
+}
+
 // Connection declares a gRPC/Connect service endpoint used by actions and streams.
 type Connection struct {
 	state               protoimpl.MessageState    `protogen:"opaque.v1"`
@@ -520,7 +651,7 @@ type Connection struct {
 
 func (x *Connection) Reset() {
 	*x = Connection{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[2]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -532,7 +663,7 @@ func (x *Connection) String() string {
 func (*Connection) ProtoMessage() {}
 
 func (x *Connection) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[2]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -623,7 +754,7 @@ type Input struct {
 
 func (x *Input) Reset() {
 	*x = Input{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[3]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -635,7 +766,7 @@ func (x *Input) String() string {
 func (*Input) ProtoMessage() {}
 
 func (x *Input) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[3]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1173,13 +1304,16 @@ type Input_builder struct {
 	// for the flow's lifetime. The input channel closes after the first value.
 	// Implicitly cached.
 	Constant bool
-	// Resolution throttle. Controls how often the input resolves a fresh value.
-	// Wait window per attempt is interval/count. If no value arrives within
-	// the window, falls back to cache (if enabled), then the type's default (if
-	// set), then sends a request event to the client. If unset and cache is true
-	// or the type has a default, the executor's default throttle is injected
-	// (WithDefaultInputThrottle). If unset and neither applies, blocks until a
-	// value arrives.
+	// Resolution throttle. Controls how often the input resolves a fresh
+	// value. The wait window per attempt is `interval` / `count`. If no value
+	// arrives within the window, the runtime falls back to the cached value
+	// (when `cache` is true), then to the type's default (when set), then
+	// sends a request event to the external client.
+	//
+	// If unset and either `cache` is true or the type has a default, the
+	// runtime applies a small default throttle so the fallback chain can
+	// fire. If unset and neither applies, the input blocks until a value
+	// arrives.
 	Throttle *Rate
 	// An ordered pipeline of transforms applied to the input value.
 	// Each step receives `this.value` from the previous stage.
@@ -1237,7 +1371,7 @@ func (b0 Input_builder) Build() *Input {
 type case_Input_Type protoreflect.FieldNumber
 
 func (x case_Input_Type) String() string {
-	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[3].Descriptor()
+	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[4].Descriptor()
 	if x == 0 {
 		return "not set"
 	}
@@ -1328,13 +1462,14 @@ type Var struct {
 	xxx_hidden_Type        isVar_Type             `protobuf_oneof:"type"`
 	xxx_hidden_Transforms  *[]*Transform          `protobuf:"bytes,5,rep,name=transforms,proto3"`
 	xxx_hidden_FlowControl *FlowControl           `protobuf:"bytes,6,opt,name=flow_control,json=flowControl,proto3"`
+	xxx_hidden_NodeControl *NodeControl           `protobuf:"bytes,7,opt,name=node_control,json=nodeControl,proto3"`
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Var) Reset() {
 	*x = Var{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[4]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1346,7 +1481,7 @@ func (x *Var) String() string {
 func (*Var) ProtoMessage() {}
 
 func (x *Var) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[4]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1405,6 +1540,13 @@ func (x *Var) GetFlowControl() *FlowControl {
 	return nil
 }
 
+func (x *Var) GetNodeControl() *NodeControl {
+	if x != nil {
+		return x.xxx_hidden_NodeControl
+	}
+	return nil
+}
+
 func (x *Var) SetId(v string) {
 	x.xxx_hidden_Id = v
 }
@@ -1431,6 +1573,10 @@ func (x *Var) SetTransforms(v []*Transform) {
 
 func (x *Var) SetFlowControl(v *FlowControl) {
 	x.xxx_hidden_FlowControl = v
+}
+
+func (x *Var) SetNodeControl(v *NodeControl) {
+	x.xxx_hidden_NodeControl = v
 }
 
 func (x *Var) HasType() bool {
@@ -1463,6 +1609,13 @@ func (x *Var) HasFlowControl() bool {
 	return x.xxx_hidden_FlowControl != nil
 }
 
+func (x *Var) HasNodeControl() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_NodeControl != nil
+}
+
 func (x *Var) ClearType() {
 	x.xxx_hidden_Type = nil
 }
@@ -1481,6 +1634,10 @@ func (x *Var) ClearSwitch() {
 
 func (x *Var) ClearFlowControl() {
 	x.xxx_hidden_FlowControl = nil
+}
+
+func (x *Var) ClearNodeControl() {
+	x.xxx_hidden_NodeControl = nil
 }
 
 const Var_Type_not_set_case case_Var_Type = 0
@@ -1519,8 +1676,11 @@ type Var_builder struct {
 	// An ordered pipeline of transforms applied to the var value.
 	// Each step receives `this.value` from the previous stage.
 	Transforms []*Transform
-	// Flow-level lifecycle control evaluated alongside the var expression.
+	// Flow-wide lifecycle control evaluated alongside the var expression.
 	FlowControl *FlowControl
+	// Per-node lifecycle control evaluated alongside the var expression.
+	// Affects only this var; other nodes continue.
+	NodeControl *NodeControl
 }
 
 func (b0 Var_builder) Build() *Var {
@@ -1537,13 +1697,14 @@ func (b0 Var_builder) Build() *Var {
 	}
 	x.xxx_hidden_Transforms = &b.Transforms
 	x.xxx_hidden_FlowControl = b.FlowControl
+	x.xxx_hidden_NodeControl = b.NodeControl
 	return m0
 }
 
 type case_Var_Type protoreflect.FieldNumber
 
 func (x case_Var_Type) String() string {
-	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[4].Descriptor()
+	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[5].Descriptor()
 	if x == 0 {
 		return "not set"
 	}
@@ -1573,19 +1734,20 @@ type Action struct {
 	state                    protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Id            string                 `protobuf:"bytes,1,opt,name=id,proto3"`
 	xxx_hidden_When          string                 `protobuf:"bytes,2,opt,name=when,proto3"`
+	xxx_hidden_Type          isAction_Type          `protobuf_oneof:"type"`
 	xxx_hidden_Cache         bool                   `protobuf:"varint,10,opt,name=cache,proto3"`
 	xxx_hidden_Throttle      *Rate                  `protobuf:"bytes,12,opt,name=throttle,proto3"`
-	xxx_hidden_RetryStrategy *RetryStrategy         `protobuf:"bytes,11,opt,name=retry_strategy,json=retryStrategy,proto3"`
 	xxx_hidden_Memoize       bool                   `protobuf:"varint,13,opt,name=memoize,proto3"`
-	xxx_hidden_Type          isAction_Type          `protobuf_oneof:"type"`
+	xxx_hidden_RetryStrategy *RetryStrategy         `protobuf:"bytes,11,opt,name=retry_strategy,json=retryStrategy,proto3"`
 	xxx_hidden_FlowControl   *FlowControl           `protobuf:"bytes,14,opt,name=flow_control,json=flowControl,proto3"`
+	xxx_hidden_NodeControl   *NodeControl           `protobuf:"bytes,15,opt,name=node_control,json=nodeControl,proto3"`
 	unknownFields            protoimpl.UnknownFields
 	sizeCache                protoimpl.SizeCache
 }
 
 func (x *Action) Reset() {
 	*x = Action{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[5]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1597,7 +1759,7 @@ func (x *Action) String() string {
 func (*Action) ProtoMessage() {}
 
 func (x *Action) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[5]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1622,6 +1784,15 @@ func (x *Action) GetWhen() string {
 	return ""
 }
 
+func (x *Action) GetCall() *MethodCall {
+	if x != nil {
+		if x, ok := x.xxx_hidden_Type.(*action_Call); ok {
+			return x.Call
+		}
+	}
+	return nil
+}
+
 func (x *Action) GetCache() bool {
 	if x != nil {
 		return x.xxx_hidden_Cache
@@ -1636,13 +1807,6 @@ func (x *Action) GetThrottle() *Rate {
 	return nil
 }
 
-func (x *Action) GetRetryStrategy() *RetryStrategy {
-	if x != nil {
-		return x.xxx_hidden_RetryStrategy
-	}
-	return nil
-}
-
 func (x *Action) GetMemoize() bool {
 	if x != nil {
 		return x.xxx_hidden_Memoize
@@ -1650,11 +1814,9 @@ func (x *Action) GetMemoize() bool {
 	return false
 }
 
-func (x *Action) GetCall() *MethodCall {
+func (x *Action) GetRetryStrategy() *RetryStrategy {
 	if x != nil {
-		if x, ok := x.xxx_hidden_Type.(*action_Call); ok {
-			return x.Call
-		}
+		return x.xxx_hidden_RetryStrategy
 	}
 	return nil
 }
@@ -1662,6 +1824,13 @@ func (x *Action) GetCall() *MethodCall {
 func (x *Action) GetFlowControl() *FlowControl {
 	if x != nil {
 		return x.xxx_hidden_FlowControl
+	}
+	return nil
+}
+
+func (x *Action) GetNodeControl() *NodeControl {
+	if x != nil {
+		return x.xxx_hidden_NodeControl
 	}
 	return nil
 }
@@ -1674,22 +1843,6 @@ func (x *Action) SetWhen(v string) {
 	x.xxx_hidden_When = v
 }
 
-func (x *Action) SetCache(v bool) {
-	x.xxx_hidden_Cache = v
-}
-
-func (x *Action) SetThrottle(v *Rate) {
-	x.xxx_hidden_Throttle = v
-}
-
-func (x *Action) SetRetryStrategy(v *RetryStrategy) {
-	x.xxx_hidden_RetryStrategy = v
-}
-
-func (x *Action) SetMemoize(v bool) {
-	x.xxx_hidden_Memoize = v
-}
-
 func (x *Action) SetCall(v *MethodCall) {
 	if v == nil {
 		x.xxx_hidden_Type = nil
@@ -1698,22 +1851,28 @@ func (x *Action) SetCall(v *MethodCall) {
 	x.xxx_hidden_Type = &action_Call{v}
 }
 
+func (x *Action) SetCache(v bool) {
+	x.xxx_hidden_Cache = v
+}
+
+func (x *Action) SetThrottle(v *Rate) {
+	x.xxx_hidden_Throttle = v
+}
+
+func (x *Action) SetMemoize(v bool) {
+	x.xxx_hidden_Memoize = v
+}
+
+func (x *Action) SetRetryStrategy(v *RetryStrategy) {
+	x.xxx_hidden_RetryStrategy = v
+}
+
 func (x *Action) SetFlowControl(v *FlowControl) {
 	x.xxx_hidden_FlowControl = v
 }
 
-func (x *Action) HasThrottle() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Throttle != nil
-}
-
-func (x *Action) HasRetryStrategy() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_RetryStrategy != nil
+func (x *Action) SetNodeControl(v *NodeControl) {
+	x.xxx_hidden_NodeControl = v
 }
 
 func (x *Action) HasType() bool {
@@ -1731,6 +1890,20 @@ func (x *Action) HasCall() bool {
 	return ok
 }
 
+func (x *Action) HasThrottle() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Throttle != nil
+}
+
+func (x *Action) HasRetryStrategy() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_RetryStrategy != nil
+}
+
 func (x *Action) HasFlowControl() bool {
 	if x == nil {
 		return false
@@ -1738,12 +1911,11 @@ func (x *Action) HasFlowControl() bool {
 	return x.xxx_hidden_FlowControl != nil
 }
 
-func (x *Action) ClearThrottle() {
-	x.xxx_hidden_Throttle = nil
-}
-
-func (x *Action) ClearRetryStrategy() {
-	x.xxx_hidden_RetryStrategy = nil
+func (x *Action) HasNodeControl() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_NodeControl != nil
 }
 
 func (x *Action) ClearType() {
@@ -1756,8 +1928,20 @@ func (x *Action) ClearCall() {
 	}
 }
 
+func (x *Action) ClearThrottle() {
+	x.xxx_hidden_Throttle = nil
+}
+
+func (x *Action) ClearRetryStrategy() {
+	x.xxx_hidden_RetryStrategy = nil
+}
+
 func (x *Action) ClearFlowControl() {
 	x.xxx_hidden_FlowControl = nil
+}
+
+func (x *Action) ClearNodeControl() {
+	x.xxx_hidden_NodeControl = nil
 }
 
 const Action_Type_not_set_case case_Action_Type = 0
@@ -1782,26 +1966,31 @@ type Action_builder struct {
 	Id string
 	// CEL boolean guard. Globals only. If false, the action is skipped.
 	When string
-	// If true, the executor will cache the result of this action and return the cached value for subsequent calls.
-	Cache bool
-	// Throttle for RPC invocations. Limits how often upstream
-	// subscription changes can trigger the action's method call.
-	Throttle *Rate
-	// Error handling strategy for this action.
-	RetryStrategy *RetryStrategy
-	// If true, skip the RPC when the same request input has been seen before
-	// and return the previously cached response. Keyed by a deterministic hash
-	// of the resolved request value. Only applicable to unary RPCs (Actions);
-	// streaming RPCs have no stable request-to-response mapping.
-	Memoize bool
 	// The RPC call type. Exactly one must be set.
 
 	// Fields of oneof xxx_hidden_Type:
 	// Unary method call configuration.
 	Call *MethodCall
 	// -- end of xxx_hidden_Type
-	// Flow-level lifecycle control evaluated alongside the action.
+	// If true, the executor will cache the result of this action and return the cached value for subsequent calls.
+	Cache bool
+	// Throttle for RPC invocations. Limits how often upstream
+	// subscription changes can trigger the action's method call.
+	Throttle *Rate
+	// If true, skip the RPC when the same request input has been seen before
+	// and return the previously cached response. Keyed by a deterministic hash
+	// of the resolved request value. Only applicable to unary RPCs (Actions);
+	// streaming RPCs have no stable request-to-response mapping.
+	Memoize bool
+	// Error handling strategy for this action. Fires synchronously inside the
+	// RPC retry loop with `this.error` / `this.response` in scope. For
+	// state-driven (reactive) lifecycle triggers see flow_control / node_control.
+	RetryStrategy *RetryStrategy
+	// Flow-wide lifecycle control evaluated alongside the action.
 	FlowControl *FlowControl
+	// Per-node lifecycle control evaluated alongside the action.
+	// Affects only this action; other nodes continue.
+	NodeControl *NodeControl
 }
 
 func (b0 Action_builder) Build() *Action {
@@ -1810,21 +1999,22 @@ func (b0 Action_builder) Build() *Action {
 	_, _ = b, x
 	x.xxx_hidden_Id = b.Id
 	x.xxx_hidden_When = b.When
-	x.xxx_hidden_Cache = b.Cache
-	x.xxx_hidden_Throttle = b.Throttle
-	x.xxx_hidden_RetryStrategy = b.RetryStrategy
-	x.xxx_hidden_Memoize = b.Memoize
 	if b.Call != nil {
 		x.xxx_hidden_Type = &action_Call{b.Call}
 	}
+	x.xxx_hidden_Cache = b.Cache
+	x.xxx_hidden_Throttle = b.Throttle
+	x.xxx_hidden_Memoize = b.Memoize
+	x.xxx_hidden_RetryStrategy = b.RetryStrategy
 	x.xxx_hidden_FlowControl = b.FlowControl
+	x.xxx_hidden_NodeControl = b.NodeControl
 	return m0
 }
 
 type case_Action_Type protoreflect.FieldNumber
 
 func (x case_Action_Type) String() string {
-	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[5].Descriptor()
+	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[6].Descriptor()
 	if x == 0 {
 		return "not set"
 	}
@@ -1847,16 +2037,17 @@ type Output struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Id          string                 `protobuf:"bytes,1,opt,name=id,proto3"`
 	xxx_hidden_Value       string                 `protobuf:"bytes,2,opt,name=value,proto3"`
-	xxx_hidden_Transforms  *[]*Transform          `protobuf:"bytes,3,rep,name=transforms,proto3"`
 	xxx_hidden_Throttle    *Rate                  `protobuf:"bytes,4,opt,name=throttle,proto3"`
+	xxx_hidden_Transforms  *[]*Transform          `protobuf:"bytes,3,rep,name=transforms,proto3"`
 	xxx_hidden_FlowControl *FlowControl           `protobuf:"bytes,5,opt,name=flow_control,json=flowControl,proto3"`
+	xxx_hidden_NodeControl *NodeControl           `protobuf:"bytes,6,opt,name=node_control,json=nodeControl,proto3"`
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Output) Reset() {
 	*x = Output{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[6]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1868,7 +2059,7 @@ func (x *Output) String() string {
 func (*Output) ProtoMessage() {}
 
 func (x *Output) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[6]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1893,6 +2084,13 @@ func (x *Output) GetValue() string {
 	return ""
 }
 
+func (x *Output) GetThrottle() *Rate {
+	if x != nil {
+		return x.xxx_hidden_Throttle
+	}
+	return nil
+}
+
 func (x *Output) GetTransforms() []*Transform {
 	if x != nil {
 		if x.xxx_hidden_Transforms != nil {
@@ -1902,16 +2100,16 @@ func (x *Output) GetTransforms() []*Transform {
 	return nil
 }
 
-func (x *Output) GetThrottle() *Rate {
+func (x *Output) GetFlowControl() *FlowControl {
 	if x != nil {
-		return x.xxx_hidden_Throttle
+		return x.xxx_hidden_FlowControl
 	}
 	return nil
 }
 
-func (x *Output) GetFlowControl() *FlowControl {
+func (x *Output) GetNodeControl() *NodeControl {
 	if x != nil {
-		return x.xxx_hidden_FlowControl
+		return x.xxx_hidden_NodeControl
 	}
 	return nil
 }
@@ -1924,16 +2122,20 @@ func (x *Output) SetValue(v string) {
 	x.xxx_hidden_Value = v
 }
 
-func (x *Output) SetTransforms(v []*Transform) {
-	x.xxx_hidden_Transforms = &v
-}
-
 func (x *Output) SetThrottle(v *Rate) {
 	x.xxx_hidden_Throttle = v
 }
 
+func (x *Output) SetTransforms(v []*Transform) {
+	x.xxx_hidden_Transforms = &v
+}
+
 func (x *Output) SetFlowControl(v *FlowControl) {
 	x.xxx_hidden_FlowControl = v
+}
+
+func (x *Output) SetNodeControl(v *NodeControl) {
+	x.xxx_hidden_NodeControl = v
 }
 
 func (x *Output) HasThrottle() bool {
@@ -1950,12 +2152,23 @@ func (x *Output) HasFlowControl() bool {
 	return x.xxx_hidden_FlowControl != nil
 }
 
+func (x *Output) HasNodeControl() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_NodeControl != nil
+}
+
 func (x *Output) ClearThrottle() {
 	x.xxx_hidden_Throttle = nil
 }
 
 func (x *Output) ClearFlowControl() {
 	x.xxx_hidden_FlowControl = nil
+}
+
+func (x *Output) ClearNodeControl() {
+	x.xxx_hidden_NodeControl = nil
 }
 
 type Output_builder struct {
@@ -1965,14 +2178,17 @@ type Output_builder struct {
 	Id string
 	// CEL expression. Globals only.
 	Value string
-	// An ordered pipeline of transforms applied to the output value.
-	// Each step receives `this.value` from the previous stage.
-	Transforms []*Transform
 	// Throttle for output evaluation. Limits how often upstream
 	// subscription changes can trigger the output's CEL evaluation.
 	Throttle *Rate
-	// Flow-level lifecycle control evaluated alongside the output.
+	// An ordered pipeline of transforms applied to the output value.
+	// Each step receives `this.value` from the previous stage.
+	Transforms []*Transform
+	// Flow-wide lifecycle control evaluated alongside the output.
 	FlowControl *FlowControl
+	// Per-node lifecycle control evaluated alongside the output.
+	// Affects only this output; other nodes continue.
+	NodeControl *NodeControl
 }
 
 func (b0 Output_builder) Build() *Output {
@@ -1981,29 +2197,53 @@ func (b0 Output_builder) Build() *Output {
 	_, _ = b, x
 	x.xxx_hidden_Id = b.Id
 	x.xxx_hidden_Value = b.Value
-	x.xxx_hidden_Transforms = &b.Transforms
 	x.xxx_hidden_Throttle = b.Throttle
+	x.xxx_hidden_Transforms = &b.Transforms
 	x.xxx_hidden_FlowControl = b.FlowControl
+	x.xxx_hidden_NodeControl = b.NodeControl
 	return m0
 }
 
 // Stream declares a streaming RPC method call node.
+//
+// Open semantics depend on the streaming RPC kind set in `call.method`:
+//
+//   - Server-stream (one request, streamed responses): the open and the
+//     first request are atomic at the wire level. The connection opens
+//     on the first iteration where `when` evaluates true (or the first
+//     iteration when `when` is unset), using the resolved request value.
+//     The node remains in PHASE_PENDING until then.
+//
+//   - Bidi-stream and client-stream (one or more requests, with one or
+//     more responses): the wire-level open is independent of any request,
+//     so the connection is established when the node handler is scheduled,
+//     before any request is sent. The node enters PHASE_RUNNING as soon
+//     as the open completes. Subscription patterns where the server
+//     pushes responses before (or instead of) any client request are
+//     supported on bidi via this eager-open behavior.
+//
+// In all cases, the connection persists until the request side closes
+// (input EOF, node_control.stop_when, or retry-strategy escalation),
+// then the response side drains, then the node transitions to
+// PHASE_SUCCEEDED. Streams are not re-opened within the same node
+// lifetime; if you need multiple sessions, file a feature request so we
+// can design the surface against a concrete use case.
 type Stream struct {
-	state                       protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Id               string                 `protobuf:"bytes,1,opt,name=id,proto3"`
-	xxx_hidden_When             string                 `protobuf:"bytes,12,opt,name=when,proto3"`
-	xxx_hidden_CloseRequestWhen string                 `protobuf:"bytes,13,opt,name=close_request_when,json=closeRequestWhen,proto3"`
-	xxx_hidden_Throttle         *Rate                  `protobuf:"bytes,15,opt,name=throttle,proto3"`
-	xxx_hidden_RetryStrategy    *RetryStrategy         `protobuf:"bytes,14,opt,name=retry_strategy,json=retryStrategy,proto3"`
-	xxx_hidden_Type             isStream_Type          `protobuf_oneof:"type"`
-	xxx_hidden_FlowControl      *FlowControl           `protobuf:"bytes,16,opt,name=flow_control,json=flowControl,proto3"`
-	unknownFields               protoimpl.UnknownFields
-	sizeCache                   protoimpl.SizeCache
+	state                    protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id            string                 `protobuf:"bytes,1,opt,name=id,proto3"`
+	xxx_hidden_When          string                 `protobuf:"bytes,12,opt,name=when,proto3"`
+	xxx_hidden_Type          isStream_Type          `protobuf_oneof:"type"`
+	xxx_hidden_Throttle      *Rate                  `protobuf:"bytes,15,opt,name=throttle,proto3"`
+	xxx_hidden_RetryStrategy *RetryStrategy         `protobuf:"bytes,14,opt,name=retry_strategy,json=retryStrategy,proto3"`
+	xxx_hidden_FlowControl   *FlowControl           `protobuf:"bytes,16,opt,name=flow_control,json=flowControl,proto3"`
+	xxx_hidden_NodeControl   *NodeControl           `protobuf:"bytes,17,opt,name=node_control,json=nodeControl,proto3"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
 }
 
 func (x *Stream) Reset() {
 	*x = Stream{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[7]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2015,7 +2255,7 @@ func (x *Stream) String() string {
 func (*Stream) ProtoMessage() {}
 
 func (x *Stream) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[7]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2040,11 +2280,13 @@ func (x *Stream) GetWhen() string {
 	return ""
 }
 
-func (x *Stream) GetCloseRequestWhen() string {
+func (x *Stream) GetCall() *MethodCall {
 	if x != nil {
-		return x.xxx_hidden_CloseRequestWhen
+		if x, ok := x.xxx_hidden_Type.(*stream_Call); ok {
+			return x.Call
+		}
 	}
-	return ""
+	return nil
 }
 
 func (x *Stream) GetThrottle() *Rate {
@@ -2061,18 +2303,16 @@ func (x *Stream) GetRetryStrategy() *RetryStrategy {
 	return nil
 }
 
-func (x *Stream) GetCall() *MethodCall {
+func (x *Stream) GetFlowControl() *FlowControl {
 	if x != nil {
-		if x, ok := x.xxx_hidden_Type.(*stream_Call); ok {
-			return x.Call
-		}
+		return x.xxx_hidden_FlowControl
 	}
 	return nil
 }
 
-func (x *Stream) GetFlowControl() *FlowControl {
+func (x *Stream) GetNodeControl() *NodeControl {
 	if x != nil {
-		return x.xxx_hidden_FlowControl
+		return x.xxx_hidden_NodeControl
 	}
 	return nil
 }
@@ -2085,8 +2325,12 @@ func (x *Stream) SetWhen(v string) {
 	x.xxx_hidden_When = v
 }
 
-func (x *Stream) SetCloseRequestWhen(v string) {
-	x.xxx_hidden_CloseRequestWhen = v
+func (x *Stream) SetCall(v *MethodCall) {
+	if v == nil {
+		x.xxx_hidden_Type = nil
+		return
+	}
+	x.xxx_hidden_Type = &stream_Call{v}
 }
 
 func (x *Stream) SetThrottle(v *Rate) {
@@ -2097,30 +2341,12 @@ func (x *Stream) SetRetryStrategy(v *RetryStrategy) {
 	x.xxx_hidden_RetryStrategy = v
 }
 
-func (x *Stream) SetCall(v *MethodCall) {
-	if v == nil {
-		x.xxx_hidden_Type = nil
-		return
-	}
-	x.xxx_hidden_Type = &stream_Call{v}
-}
-
 func (x *Stream) SetFlowControl(v *FlowControl) {
 	x.xxx_hidden_FlowControl = v
 }
 
-func (x *Stream) HasThrottle() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Throttle != nil
-}
-
-func (x *Stream) HasRetryStrategy() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_RetryStrategy != nil
+func (x *Stream) SetNodeControl(v *NodeControl) {
+	x.xxx_hidden_NodeControl = v
 }
 
 func (x *Stream) HasType() bool {
@@ -2138,6 +2364,20 @@ func (x *Stream) HasCall() bool {
 	return ok
 }
 
+func (x *Stream) HasThrottle() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Throttle != nil
+}
+
+func (x *Stream) HasRetryStrategy() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_RetryStrategy != nil
+}
+
 func (x *Stream) HasFlowControl() bool {
 	if x == nil {
 		return false
@@ -2145,12 +2385,11 @@ func (x *Stream) HasFlowControl() bool {
 	return x.xxx_hidden_FlowControl != nil
 }
 
-func (x *Stream) ClearThrottle() {
-	x.xxx_hidden_Throttle = nil
-}
-
-func (x *Stream) ClearRetryStrategy() {
-	x.xxx_hidden_RetryStrategy = nil
+func (x *Stream) HasNodeControl() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_NodeControl != nil
 }
 
 func (x *Stream) ClearType() {
@@ -2163,8 +2402,20 @@ func (x *Stream) ClearCall() {
 	}
 }
 
+func (x *Stream) ClearThrottle() {
+	x.xxx_hidden_Throttle = nil
+}
+
+func (x *Stream) ClearRetryStrategy() {
+	x.xxx_hidden_RetryStrategy = nil
+}
+
 func (x *Stream) ClearFlowControl() {
 	x.xxx_hidden_FlowControl = nil
+}
+
+func (x *Stream) ClearNodeControl() {
+	x.xxx_hidden_NodeControl = nil
 }
 
 const Stream_Type_not_set_case case_Stream_Type = 0
@@ -2187,26 +2438,35 @@ type Stream_builder struct {
 
 	// Unique identifier for this stream within the flow.
 	Id string
-	// CEL boolean. Globals only. Defines when to perform a client-side action on the
-	// stream (e.g., start the stream, send a ping). For MethodCalls, automatically
-	// starts the stream if it is closed or not yet open.
+	// CEL boolean evaluated each iteration when an upstream value changes.
+	// When true, sends a request on the stream's request side. When false,
+	// the iteration is skipped (the stream stays open if already established;
+	// the response side keeps draining). Globals only.
+	//
+	// For server-stream calls, the first true evaluation also opens the
+	// connection -- see the message-level Stream doc above for the per-kind
+	// open semantics.
 	When string
-	// CEL boolean. Globals only. Defines when to close the request (client) side of
-	// the stream. For MethodCalls, sends an EOF and sets request_closed.
-	CloseRequestWhen string
-	// Throttle for stream requests. Limits how often upstream
-	// subscription changes can trigger sending a request on the stream.
-	Throttle *Rate
-	// Error handling strategy for this stream.
-	RetryStrategy *RetryStrategy
 	// The streaming RPC call type. Exactly one must be set.
 
 	// Fields of oneof xxx_hidden_Type:
 	// Streaming method call configuration.
 	Call *MethodCall
 	// -- end of xxx_hidden_Type
-	// Flow-level lifecycle control evaluated alongside the stream.
+	// Throttle for stream requests. Limits how often upstream
+	// subscription changes can trigger sending a request on the stream.
+	Throttle *Rate
+	// Error handling strategy for this stream. Fires synchronously inside the
+	// RPC retry loop with `this.error` / `this.response` in scope. For
+	// state-driven (reactive) lifecycle triggers see flow_control / node_control.
+	RetryStrategy *RetryStrategy
+	// Flow-wide lifecycle control evaluated alongside the stream.
 	FlowControl *FlowControl
+	// Per-node lifecycle control evaluated alongside the stream. To close just
+	// the request (client) side of a stream and let the response side drain,
+	// use node_control.stop_when -- the runtime's graceful per-node stop
+	// semantic for streams is exactly that.
+	NodeControl *NodeControl
 }
 
 func (b0 Stream_builder) Build() *Stream {
@@ -2215,20 +2475,20 @@ func (b0 Stream_builder) Build() *Stream {
 	_, _ = b, x
 	x.xxx_hidden_Id = b.Id
 	x.xxx_hidden_When = b.When
-	x.xxx_hidden_CloseRequestWhen = b.CloseRequestWhen
-	x.xxx_hidden_Throttle = b.Throttle
-	x.xxx_hidden_RetryStrategy = b.RetryStrategy
 	if b.Call != nil {
 		x.xxx_hidden_Type = &stream_Call{b.Call}
 	}
+	x.xxx_hidden_Throttle = b.Throttle
+	x.xxx_hidden_RetryStrategy = b.RetryStrategy
 	x.xxx_hidden_FlowControl = b.FlowControl
+	x.xxx_hidden_NodeControl = b.NodeControl
 	return m0
 }
 
 type case_Stream_Type protoreflect.FieldNumber
 
 func (x case_Stream_Type) String() string {
-	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[7].Descriptor()
+	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[8].Descriptor()
 	if x == 0 {
 		return "not set"
 	}
@@ -2259,7 +2519,7 @@ type MethodCall struct {
 
 func (x *MethodCall) Reset() {
 	*x = MethodCall{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[8]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2271,7 +2531,7 @@ func (x *MethodCall) String() string {
 func (*MethodCall) ProtoMessage() {}
 
 func (x *MethodCall) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[8]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2368,17 +2628,18 @@ func (b0 MethodCall_builder) Build() *MethodCall {
 type Interaction struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Id          string                 `protobuf:"bytes,1,opt,name=id,proto3"`
-	xxx_hidden_Transforms  *[]*Transform          `protobuf:"bytes,2,rep,name=transforms,proto3"`
-	xxx_hidden_Inputs      *[]*Interaction_Input  `protobuf:"bytes,3,rep,name=inputs,proto3"`
 	xxx_hidden_When        string                 `protobuf:"bytes,4,opt,name=when,proto3"`
+	xxx_hidden_Inputs      *[]*Interaction_Input  `protobuf:"bytes,3,rep,name=inputs,proto3"`
+	xxx_hidden_Transforms  *[]*Transform          `protobuf:"bytes,2,rep,name=transforms,proto3"`
 	xxx_hidden_FlowControl *FlowControl           `protobuf:"bytes,5,opt,name=flow_control,json=flowControl,proto3"`
+	xxx_hidden_NodeControl *NodeControl           `protobuf:"bytes,6,opt,name=node_control,json=nodeControl,proto3"`
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Interaction) Reset() {
 	*x = Interaction{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[9]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2390,7 +2651,7 @@ func (x *Interaction) String() string {
 func (*Interaction) ProtoMessage() {}
 
 func (x *Interaction) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[9]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2408,13 +2669,11 @@ func (x *Interaction) GetId() string {
 	return ""
 }
 
-func (x *Interaction) GetTransforms() []*Transform {
+func (x *Interaction) GetWhen() string {
 	if x != nil {
-		if x.xxx_hidden_Transforms != nil {
-			return *x.xxx_hidden_Transforms
-		}
+		return x.xxx_hidden_When
 	}
-	return nil
+	return ""
 }
 
 func (x *Interaction) GetInputs() []*Interaction_Input {
@@ -2426,11 +2685,13 @@ func (x *Interaction) GetInputs() []*Interaction_Input {
 	return nil
 }
 
-func (x *Interaction) GetWhen() string {
+func (x *Interaction) GetTransforms() []*Transform {
 	if x != nil {
-		return x.xxx_hidden_When
+		if x.xxx_hidden_Transforms != nil {
+			return *x.xxx_hidden_Transforms
+		}
 	}
-	return ""
+	return nil
 }
 
 func (x *Interaction) GetFlowControl() *FlowControl {
@@ -2440,24 +2701,35 @@ func (x *Interaction) GetFlowControl() *FlowControl {
 	return nil
 }
 
+func (x *Interaction) GetNodeControl() *NodeControl {
+	if x != nil {
+		return x.xxx_hidden_NodeControl
+	}
+	return nil
+}
+
 func (x *Interaction) SetId(v string) {
 	x.xxx_hidden_Id = v
-}
-
-func (x *Interaction) SetTransforms(v []*Transform) {
-	x.xxx_hidden_Transforms = &v
-}
-
-func (x *Interaction) SetInputs(v []*Interaction_Input) {
-	x.xxx_hidden_Inputs = &v
 }
 
 func (x *Interaction) SetWhen(v string) {
 	x.xxx_hidden_When = v
 }
 
+func (x *Interaction) SetInputs(v []*Interaction_Input) {
+	x.xxx_hidden_Inputs = &v
+}
+
+func (x *Interaction) SetTransforms(v []*Transform) {
+	x.xxx_hidden_Transforms = &v
+}
+
 func (x *Interaction) SetFlowControl(v *FlowControl) {
 	x.xxx_hidden_FlowControl = v
+}
+
+func (x *Interaction) SetNodeControl(v *NodeControl) {
+	x.xxx_hidden_NodeControl = v
 }
 
 func (x *Interaction) HasFlowControl() bool {
@@ -2467,8 +2739,19 @@ func (x *Interaction) HasFlowControl() bool {
 	return x.xxx_hidden_FlowControl != nil
 }
 
+func (x *Interaction) HasNodeControl() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_NodeControl != nil
+}
+
 func (x *Interaction) ClearFlowControl() {
 	x.xxx_hidden_FlowControl = nil
+}
+
+func (x *Interaction) ClearNodeControl() {
+	x.xxx_hidden_NodeControl = nil
 }
 
 type Interaction_builder struct {
@@ -2476,17 +2759,20 @@ type Interaction_builder struct {
 
 	// Unique, human-readable identifier for this interaction within the flow.
 	Id string
-	// An ordered pipeline of transforms applied to interaction results.
-	// Each step receives `this.value` from the previous stage.
-	Transforms []*Transform
-	// The interaction's form fields.
-	Inputs []*Interaction_Input
 	// CEL boolean guard. Globals only. If false, the interaction is skipped for
 	// this iteration. Also serves as the upstream trigger -- any node references
 	// in the expression create graph edges.
 	When string
-	// Flow-level lifecycle control evaluated alongside the interaction.
+	// The interaction's form fields.
+	Inputs []*Interaction_Input
+	// An ordered pipeline of transforms applied to interaction results.
+	// Each step receives `this.value` from the previous stage.
+	Transforms []*Transform
+	// Flow-wide lifecycle control evaluated alongside the interaction.
 	FlowControl *FlowControl
+	// Per-node lifecycle control evaluated alongside the interaction.
+	// Affects only this interaction; other nodes continue.
+	NodeControl *NodeControl
 }
 
 func (b0 Interaction_builder) Build() *Interaction {
@@ -2494,10 +2780,11 @@ func (b0 Interaction_builder) Build() *Interaction {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Id = b.Id
-	x.xxx_hidden_Transforms = &b.Transforms
-	x.xxx_hidden_Inputs = &b.Inputs
 	x.xxx_hidden_When = b.When
+	x.xxx_hidden_Inputs = &b.Inputs
+	x.xxx_hidden_Transforms = &b.Transforms
 	x.xxx_hidden_FlowControl = b.FlowControl
+	x.xxx_hidden_NodeControl = b.NodeControl
 	return m0
 }
 
@@ -2514,7 +2801,7 @@ type Backoff struct {
 
 func (x *Backoff) Reset() {
 	*x = Backoff{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[10]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2526,7 +2813,7 @@ func (x *Backoff) String() string {
 func (*Backoff) ProtoMessage() {}
 
 func (x *Backoff) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[10]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2629,22 +2916,30 @@ func (b0 Backoff_builder) Build() *Backoff {
 	return m0
 }
 
-// RetryStrategy configures error handling for Action and Stream nodes.
+// RetryStrategy configures synchronous error handling for Action and Stream
+// nodes. All `*_when` fields are evaluated inside the RPC retry loop -- after
+// an RPC errors and before the node iterates again -- with `this.error` and
+// (for `when`) `this.response` in scope.
+//
+// For state-driven (reactive) lifecycle triggers that fire on the next
+// activation cycle rather than synchronously, see FlowControl and NodeControl.
+// The header doc block "When to use RetryStrategy vs NodeControl / FlowControl"
+// explains when to pick which.
 type RetryStrategy struct {
 	state                    protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_When          string                 `protobuf:"bytes,1,opt,name=when,proto3"`
 	xxx_hidden_Backoff       *Backoff               `protobuf:"bytes,2,opt,name=backoff,proto3"`
 	xxx_hidden_SkipWhen      string                 `protobuf:"bytes,3,opt,name=skip_when,json=skipWhen,proto3"`
+	xxx_hidden_ContinueWhen  string                 `protobuf:"bytes,6,opt,name=continue_when,json=continueWhen,proto3"`
 	xxx_hidden_SuspendWhen   string                 `protobuf:"bytes,4,opt,name=suspend_when,json=suspendWhen,proto3"`
 	xxx_hidden_TerminateWhen string                 `protobuf:"bytes,5,opt,name=terminate_when,json=terminateWhen,proto3"`
-	xxx_hidden_ContinueWhen  string                 `protobuf:"bytes,6,opt,name=continue_when,json=continueWhen,proto3"`
 	unknownFields            protoimpl.UnknownFields
 	sizeCache                protoimpl.SizeCache
 }
 
 func (x *RetryStrategy) Reset() {
 	*x = RetryStrategy{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[11]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2656,7 +2951,7 @@ func (x *RetryStrategy) String() string {
 func (*RetryStrategy) ProtoMessage() {}
 
 func (x *RetryStrategy) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[11]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2688,6 +2983,13 @@ func (x *RetryStrategy) GetSkipWhen() string {
 	return ""
 }
 
+func (x *RetryStrategy) GetContinueWhen() string {
+	if x != nil {
+		return x.xxx_hidden_ContinueWhen
+	}
+	return ""
+}
+
 func (x *RetryStrategy) GetSuspendWhen() string {
 	if x != nil {
 		return x.xxx_hidden_SuspendWhen
@@ -2698,13 +3000,6 @@ func (x *RetryStrategy) GetSuspendWhen() string {
 func (x *RetryStrategy) GetTerminateWhen() string {
 	if x != nil {
 		return x.xxx_hidden_TerminateWhen
-	}
-	return ""
-}
-
-func (x *RetryStrategy) GetContinueWhen() string {
-	if x != nil {
-		return x.xxx_hidden_ContinueWhen
 	}
 	return ""
 }
@@ -2721,16 +3016,16 @@ func (x *RetryStrategy) SetSkipWhen(v string) {
 	x.xxx_hidden_SkipWhen = v
 }
 
+func (x *RetryStrategy) SetContinueWhen(v string) {
+	x.xxx_hidden_ContinueWhen = v
+}
+
 func (x *RetryStrategy) SetSuspendWhen(v string) {
 	x.xxx_hidden_SuspendWhen = v
 }
 
 func (x *RetryStrategy) SetTerminateWhen(v string) {
 	x.xxx_hidden_TerminateWhen = v
-}
-
-func (x *RetryStrategy) SetContinueWhen(v string) {
-	x.xxx_hidden_ContinueWhen = v
 }
 
 func (x *RetryStrategy) HasBackoff() bool {
@@ -2756,13 +3051,6 @@ type RetryStrategy_builder struct {
 	// CEL boolean. If true, skip the current item and continue processing.
 	// `this.error` = gRPC Status. Globals also available.
 	SkipWhen string
-	// CEL boolean. If true, suspend the node until an external Resume.
-	// The Resume call may optionally provide a new request value.
-	// `this.error` = gRPC Status. Globals also available.
-	SuspendWhen string
-	// CEL boolean. If true, terminate the entire flow.
-	// `this.error` = gRPC Status. Globals also available.
-	TerminateWhen string
 	// CEL expression. When non-null and non-false, the result is emitted as
 	// the node's output value instead of propagating the error. This allows
 	// error information to flow downstream for handling by other nodes.
@@ -2772,6 +3060,22 @@ type RetryStrategy_builder struct {
 	// On NotFound (code 5), emits the error message as a string value;
 	// on any other error code, evaluates to false and does not activate.
 	ContinueWhen string
+	// CEL boolean. If true, suspend the node until an external Resume.
+	// The Resume call may optionally provide a new request value.
+	// `this.error` = gRPC Status. Globals also available.
+	//
+	// Fires synchronously inside the retry loop -- the node will not iterate
+	// again before the suspend takes effect. For a reactive (next-activation)
+	// alternative driven by general flow state instead of RPC error, see
+	// NodeControl.suspend_when.
+	SuspendWhen string
+	// CEL boolean. If true, terminate the entire flow.
+	// `this.error` = gRPC Status. Globals also available.
+	//
+	// Fires synchronously inside the retry loop. For a reactive (next-activation)
+	// alternative driven by general flow state instead of RPC error, see
+	// FlowControl.terminate_when.
+	TerminateWhen string
 }
 
 func (b0 RetryStrategy_builder) Build() *RetryStrategy {
@@ -2781,9 +3085,9 @@ func (b0 RetryStrategy_builder) Build() *RetryStrategy {
 	x.xxx_hidden_When = b.When
 	x.xxx_hidden_Backoff = b.Backoff
 	x.xxx_hidden_SkipWhen = b.SkipWhen
+	x.xxx_hidden_ContinueWhen = b.ContinueWhen
 	x.xxx_hidden_SuspendWhen = b.SuspendWhen
 	x.xxx_hidden_TerminateWhen = b.TerminateWhen
-	x.xxx_hidden_ContinueWhen = b.ContinueWhen
 	return m0
 }
 
@@ -2799,7 +3103,7 @@ type Switch struct {
 
 func (x *Switch) Reset() {
 	*x = Switch{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[12]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2811,7 +3115,7 @@ func (x *Switch) String() string {
 func (*Switch) ProtoMessage() {}
 
 func (x *Switch) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[12]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2889,7 +3193,7 @@ type Rate struct {
 
 func (x *Rate) Reset() {
 	*x = Rate{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[13]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2901,7 +3205,7 @@ func (x *Rate) String() string {
 func (*Rate) ProtoMessage() {}
 
 func (x *Rate) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[13]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2975,7 +3279,7 @@ type Generator struct {
 
 func (x *Generator) Reset() {
 	*x = Generator{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[14]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2987,7 +3291,7 @@ func (x *Generator) String() string {
 func (*Generator) ProtoMessage() {}
 
 func (x *Generator) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[14]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3171,7 +3475,7 @@ func (b0 Generator_builder) Build() *Generator {
 type case_Generator_Type protoreflect.FieldNumber
 
 func (x case_Generator_Type) String() string {
-	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[14].Descriptor()
+	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[15].Descriptor()
 	if x == 0 {
 		return "not set"
 	}
@@ -3214,7 +3518,7 @@ type Transform struct {
 
 func (x *Transform) Reset() {
 	*x = Transform{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[15]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3226,7 +3530,7 @@ func (x *Transform) String() string {
 func (*Transform) ProtoMessage() {}
 
 func (x *Transform) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[15]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3463,7 +3767,7 @@ func (b0 Transform_builder) Build() *Transform {
 type case_Transform_Type protoreflect.FieldNumber
 
 func (x case_Transform_Type) String() string {
-	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[15].Descriptor()
+	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[16].Descriptor()
 	if x == 0 {
 		return "not set"
 	}
@@ -3520,7 +3824,7 @@ type Interaction_ConfirmBinding struct {
 
 func (x *Interaction_ConfirmBinding) Reset() {
 	*x = Interaction_ConfirmBinding{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[16]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3532,7 +3836,7 @@ func (x *Interaction_ConfirmBinding) String() string {
 func (*Interaction_ConfirmBinding) ProtoMessage() {}
 
 func (x *Interaction_ConfirmBinding) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[16]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3579,7 +3883,7 @@ type Interaction_InputBinding struct {
 
 func (x *Interaction_InputBinding) Reset() {
 	*x = Interaction_InputBinding{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[17]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3591,7 +3895,7 @@ func (x *Interaction_InputBinding) String() string {
 func (*Interaction_InputBinding) ProtoMessage() {}
 
 func (x *Interaction_InputBinding) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[17]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3638,7 +3942,7 @@ type Interaction_FileBinding struct {
 
 func (x *Interaction_FileBinding) Reset() {
 	*x = Interaction_FileBinding{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[18]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3650,7 +3954,7 @@ func (x *Interaction_FileBinding) String() string {
 func (*Interaction_FileBinding) ProtoMessage() {}
 
 func (x *Interaction_FileBinding) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[18]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3700,7 +4004,7 @@ type Interaction_SelectBinding struct {
 
 func (x *Interaction_SelectBinding) Reset() {
 	*x = Interaction_SelectBinding{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[19]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3712,7 +4016,7 @@ func (x *Interaction_SelectBinding) String() string {
 func (*Interaction_SelectBinding) ProtoMessage() {}
 
 func (x *Interaction_SelectBinding) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[19]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3770,7 +4074,7 @@ type Interaction_MultiSelectBinding struct {
 
 func (x *Interaction_MultiSelectBinding) Reset() {
 	*x = Interaction_MultiSelectBinding{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[20]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3782,7 +4086,7 @@ func (x *Interaction_MultiSelectBinding) String() string {
 func (*Interaction_MultiSelectBinding) ProtoMessage() {}
 
 func (x *Interaction_MultiSelectBinding) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[20]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3836,7 +4140,7 @@ type Interaction_Input struct {
 
 func (x *Interaction_Input) Reset() {
 	*x = Interaction_Input{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[21]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3848,7 +4152,7 @@ func (x *Interaction_Input) String() string {
 func (*Interaction_Input) ProtoMessage() {}
 
 func (x *Interaction_Input) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[21]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4157,7 +4461,7 @@ func (b0 Interaction_Input_builder) Build() *Interaction_Input {
 type case_Interaction_Input_Element protoreflect.FieldNumber
 
 func (x case_Interaction_Input_Element) String() string {
-	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[21].Descriptor()
+	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[22].Descriptor()
 	if x == 0 {
 		return "not set"
 	}
@@ -4214,7 +4518,7 @@ type Switch_Case struct {
 
 func (x *Switch_Case) Reset() {
 	*x = Switch_Case{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[22]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4226,7 +4530,7 @@ func (x *Switch_Case) String() string {
 func (*Switch_Case) ProtoMessage() {}
 
 func (x *Switch_Case) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[22]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4289,7 +4593,7 @@ type Generator_Ticker struct {
 
 func (x *Generator_Ticker) Reset() {
 	*x = Generator_Ticker{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[23]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4301,7 +4605,7 @@ func (x *Generator_Ticker) String() string {
 func (*Generator_Ticker) ProtoMessage() {}
 
 func (x *Generator_Ticker) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[23]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4400,7 +4704,7 @@ type Generator_Cron struct {
 
 func (x *Generator_Cron) Reset() {
 	*x = Generator_Cron{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[24]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4412,7 +4716,7 @@ func (x *Generator_Cron) String() string {
 func (*Generator_Cron) ProtoMessage() {}
 
 func (x *Generator_Cron) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[24]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4448,7 +4752,10 @@ func (x *Generator_Cron) SetValue(v string) {
 type Generator_Cron_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Cron expression (e.g. "*/5 * * * *"). Uses robfig/cron v3 syntax.
+	// Standard 5-field cron expression (minute, hour, day-of-month, month,
+	// day-of-week), e.g. "*/5 * * * *". Predefined descriptors are also
+	// accepted: "@every <duration>", "@hourly", "@daily", "@weekly",
+	// "@monthly", "@yearly".
 	Expression string
 	// CEL expression. `this.count` (int64) and `this.time` (timestamp) available.
 	// No globals -- generators are pure sources.
@@ -4477,7 +4784,7 @@ type Generator_Range struct {
 
 func (x *Generator_Range) Reset() {
 	*x = Generator_Range{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[25]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4489,7 +4796,7 @@ func (x *Generator_Range) String() string {
 func (*Generator_Range) ProtoMessage() {}
 
 func (x *Generator_Range) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[25]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4591,7 +4898,7 @@ type Transform_GroupBy struct {
 
 func (x *Transform_GroupBy) Reset() {
 	*x = Transform_GroupBy{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[26]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4603,7 +4910,7 @@ func (x *Transform_GroupBy) String() string {
 func (*Transform_GroupBy) ProtoMessage() {}
 
 func (x *Transform_GroupBy) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[26]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4678,7 +4985,7 @@ type Transform_Reduce struct {
 
 func (x *Transform_Reduce) Reset() {
 	*x = Transform_Reduce{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[27]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4690,7 +4997,7 @@ func (x *Transform_Reduce) String() string {
 func (*Transform_Reduce) ProtoMessage() {}
 
 func (x *Transform_Reduce) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[27]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4779,7 +5086,7 @@ type Transform_Scan struct {
 
 func (x *Transform_Scan) Reset() {
 	*x = Transform_Scan{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[28]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4791,7 +5098,7 @@ func (x *Transform_Scan) String() string {
 func (*Transform_Scan) ProtoMessage() {}
 
 func (x *Transform_Scan) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[28]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4878,7 +5185,7 @@ type Transform_GroupBy_Window struct {
 
 func (x *Transform_GroupBy_Window) Reset() {
 	*x = Transform_GroupBy_Window{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[29]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4890,7 +5197,7 @@ func (x *Transform_GroupBy_Window) String() string {
 func (*Transform_GroupBy_Window) ProtoMessage() {}
 
 func (x *Transform_GroupBy_Window) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[29]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5099,7 +5406,7 @@ func (b0 Transform_GroupBy_Window_builder) Build() *Transform_GroupBy_Window {
 type case_Transform_GroupBy_Window_Type protoreflect.FieldNumber
 
 func (x case_Transform_GroupBy_Window_Type) String() string {
-	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[29].Descriptor()
+	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[30].Descriptor()
 	if x == 0 {
 		return "not set"
 	}
@@ -5148,7 +5455,7 @@ type Transform_GroupBy_Window_Fixed struct {
 
 func (x *Transform_GroupBy_Window_Fixed) Reset() {
 	*x = Transform_GroupBy_Window_Fixed{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[30]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5160,7 +5467,7 @@ func (x *Transform_GroupBy_Window_Fixed) String() string {
 func (*Transform_GroupBy_Window_Fixed) ProtoMessage() {}
 
 func (x *Transform_GroupBy_Window_Fixed) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[30]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5219,7 +5526,7 @@ type Transform_GroupBy_Window_Sliding struct {
 
 func (x *Transform_GroupBy_Window_Sliding) Reset() {
 	*x = Transform_GroupBy_Window_Sliding{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[31]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5231,7 +5538,7 @@ func (x *Transform_GroupBy_Window_Sliding) String() string {
 func (*Transform_GroupBy_Window_Sliding) ProtoMessage() {}
 
 func (x *Transform_GroupBy_Window_Sliding) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[31]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5314,7 +5621,7 @@ type Transform_GroupBy_Window_Session struct {
 
 func (x *Transform_GroupBy_Window_Session) Reset() {
 	*x = Transform_GroupBy_Window_Session{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[32]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5326,7 +5633,7 @@ func (x *Transform_GroupBy_Window_Session) String() string {
 func (*Transform_GroupBy_Window_Session) ProtoMessage() {}
 
 func (x *Transform_GroupBy_Window_Session) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[32]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5385,7 +5692,7 @@ type Transform_GroupBy_Window_Event struct {
 
 func (x *Transform_GroupBy_Window_Event) Reset() {
 	*x = Transform_GroupBy_Window_Event{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[33]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5397,7 +5704,7 @@ func (x *Transform_GroupBy_Window_Event) String() string {
 func (*Transform_GroupBy_Window_Event) ProtoMessage() {}
 
 func (x *Transform_GroupBy_Window_Event) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[33]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5460,6 +5767,13 @@ const file_dtkt_flow_v1beta2_spec_proto_rawDesc = "" +
 	"\x0eterminate_when\x18\x02 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
 	"2\b^\\s?=\\s?R\rterminateWhen\x125\n" +
 	"\fsuspend_when\x18\x03 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
+	"2\b^\\s?=\\s?R\vsuspendWhen\"\xb0\x01\n" +
+	"\vNodeControl\x12/\n" +
+	"\tstop_when\x18\x01 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
+	"2\b^\\s?=\\s?R\bstopWhen\x129\n" +
+	"\x0eterminate_when\x18\x02 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
+	"2\b^\\s?=\\s?R\rterminateWhen\x125\n" +
+	"\fsuspend_when\x18\x03 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
 	"2\b^\\s?=\\s?R\vsuspendWhen\"\xb8\x01\n" +
 	"\n" +
 	"Connection\x121\n" +
@@ -5489,7 +5803,7 @@ const file_dtkt_flow_v1beta2_spec_proto_rawDesc = "" +
 	"\n" +
 	"transforms\x18\x15 \x03(\v2\x1c.dtkt.flow.v1beta2.TransformR\n" +
 	"transformsB\r\n" +
-	"\x04type\x12\x05\xbaH\x02\b\x01\"\xd2\x02\n" +
+	"\x04type\x12\x05\xbaH\x02\b\x01\"\x95\x03\n" +
 	"\x03Var\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12\x14\n" +
 	"\x05cache\x18\x02 \x01(\bR\x05cache\x12=\n" +
@@ -5498,39 +5812,41 @@ const file_dtkt_flow_v1beta2_spec_proto_rawDesc = "" +
 	"\n" +
 	"transforms\x18\x05 \x03(\v2\x1c.dtkt.flow.v1beta2.TransformR\n" +
 	"transforms\x12A\n" +
-	"\fflow_control\x18\x06 \x01(\v2\x1e.dtkt.flow.v1beta2.FlowControlR\vflowControlB\r\n" +
-	"\x04type\x12\x05\xbaH\x02\b\x01\"\x98\x03\n" +
+	"\fflow_control\x18\x06 \x01(\v2\x1e.dtkt.flow.v1beta2.FlowControlR\vflowControl\x12A\n" +
+	"\fnode_control\x18\a \x01(\v2\x1e.dtkt.flow.v1beta2.NodeControlR\vnodeControlB\r\n" +
+	"\x04type\x12\x05\xbaH\x02\b\x01\"\xdb\x03\n" +
 	"\x06Action\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12&\n" +
 	"\x04when\x18\x02 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
-	"2\b^\\s?=\\s?R\x04when\x12\x14\n" +
+	"2\b^\\s?=\\s?R\x04when\x123\n" +
+	"\x04call\x18\x04 \x01(\v2\x1d.dtkt.flow.v1beta2.MethodCallH\x00R\x04call\x12\x14\n" +
 	"\x05cache\x18\n" +
 	" \x01(\bR\x05cache\x123\n" +
-	"\bthrottle\x18\f \x01(\v2\x17.dtkt.flow.v1beta2.RateR\bthrottle\x12G\n" +
-	"\x0eretry_strategy\x18\v \x01(\v2 .dtkt.flow.v1beta2.RetryStrategyR\rretryStrategy\x12\x18\n" +
-	"\amemoize\x18\r \x01(\bR\amemoize\x123\n" +
-	"\x04call\x18\x04 \x01(\v2\x1d.dtkt.flow.v1beta2.MethodCallH\x00R\x04call\x12A\n" +
-	"\fflow_control\x18\x0e \x01(\v2\x1e.dtkt.flow.v1beta2.FlowControlR\vflowControlB\r\n" +
-	"\x04type\x12\x05\xbaH\x02\b\x01\"\x9b\x02\n" +
+	"\bthrottle\x18\f \x01(\v2\x17.dtkt.flow.v1beta2.RateR\bthrottle\x12\x18\n" +
+	"\amemoize\x18\r \x01(\bR\amemoize\x12G\n" +
+	"\x0eretry_strategy\x18\v \x01(\v2 .dtkt.flow.v1beta2.RetryStrategyR\rretryStrategy\x12A\n" +
+	"\fflow_control\x18\x0e \x01(\v2\x1e.dtkt.flow.v1beta2.FlowControlR\vflowControl\x12A\n" +
+	"\fnode_control\x18\x0f \x01(\v2\x1e.dtkt.flow.v1beta2.NodeControlR\vnodeControlB\r\n" +
+	"\x04type\x12\x05\xbaH\x02\b\x01\"\xde\x02\n" +
 	"\x06Output\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12(\n" +
 	"\x05value\x18\x02 \x01(\tB\x12\xbaH\x0f\xc8\x01\x01r\n" +
-	"2\b^\\s?=\\s?R\x05value\x12<\n" +
+	"2\b^\\s?=\\s?R\x05value\x123\n" +
+	"\bthrottle\x18\x04 \x01(\v2\x17.dtkt.flow.v1beta2.RateR\bthrottle\x12<\n" +
 	"\n" +
 	"transforms\x18\x03 \x03(\v2\x1c.dtkt.flow.v1beta2.TransformR\n" +
-	"transforms\x123\n" +
-	"\bthrottle\x18\x04 \x01(\v2\x17.dtkt.flow.v1beta2.RateR\bthrottle\x12A\n" +
-	"\fflow_control\x18\x05 \x01(\v2\x1e.dtkt.flow.v1beta2.FlowControlR\vflowControl\"\xaa\x03\n" +
+	"transforms\x12A\n" +
+	"\fflow_control\x18\x05 \x01(\v2\x1e.dtkt.flow.v1beta2.FlowControlR\vflowControl\x12A\n" +
+	"\fnode_control\x18\x06 \x01(\v2\x1e.dtkt.flow.v1beta2.NodeControlR\vnodeControl\"\xab\x03\n" +
 	"\x06Stream\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12&\n" +
 	"\x04when\x18\f \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
-	"2\b^\\s?=\\s?R\x04when\x12@\n" +
-	"\x12close_request_when\x18\r \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
-	"2\b^\\s?=\\s?R\x10closeRequestWhen\x123\n" +
+	"2\b^\\s?=\\s?R\x04when\x123\n" +
+	"\x04call\x18\x02 \x01(\v2\x1d.dtkt.flow.v1beta2.MethodCallH\x00R\x04call\x123\n" +
 	"\bthrottle\x18\x0f \x01(\v2\x17.dtkt.flow.v1beta2.RateR\bthrottle\x12G\n" +
-	"\x0eretry_strategy\x18\x0e \x01(\v2 .dtkt.flow.v1beta2.RetryStrategyR\rretryStrategy\x123\n" +
-	"\x04call\x18\x02 \x01(\v2\x1d.dtkt.flow.v1beta2.MethodCallH\x00R\x04call\x12A\n" +
-	"\fflow_control\x18\x10 \x01(\v2\x1e.dtkt.flow.v1beta2.FlowControlR\vflowControlB\r\n" +
+	"\x0eretry_strategy\x18\x0e \x01(\v2 .dtkt.flow.v1beta2.RetryStrategyR\rretryStrategy\x12A\n" +
+	"\fflow_control\x18\x10 \x01(\v2\x1e.dtkt.flow.v1beta2.FlowControlR\vflowControl\x12A\n" +
+	"\fnode_control\x18\x11 \x01(\v2\x1e.dtkt.flow.v1beta2.NodeControlR\vnodeControlB\r\n" +
 	"\x04type\x12\x05\xbaH\x02\b\x01\"\xe1\x01\n" +
 	"\n" +
 	"MethodCall\x12A\n" +
@@ -5540,16 +5856,17 @@ const file_dtkt_flow_v1beta2_spec_proto_rawDesc = "" +
 	"\x06method\x18\x02 \x01(\tB\x16\xbaH\x13\xc8\x01\x01r\x0e2\f[a-zA-Z._/]+R\x06method\x120\n" +
 	"\arequest\x18\x04 \x01(\v2\x16.google.protobuf.ValueR\arequest\x12.\n" +
 	"\bresponse\x18\x05 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
-	"2\b^\\s?=\\s?R\bresponse\"\xb9\b\n" +
+	"2\b^\\s?=\\s?R\bresponse\"\x82\t\n" +
 	"\vInteraction\x121\n" +
-	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12<\n" +
+	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12&\n" +
+	"\x04when\x18\x04 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
+	"2\b^\\s?=\\s?R\x04when\x12<\n" +
+	"\x06inputs\x18\x03 \x03(\v2$.dtkt.flow.v1beta2.Interaction.InputR\x06inputs\x12<\n" +
 	"\n" +
 	"transforms\x18\x02 \x03(\v2\x1c.dtkt.flow.v1beta2.TransformR\n" +
-	"transforms\x12<\n" +
-	"\x06inputs\x18\x03 \x03(\v2$.dtkt.flow.v1beta2.Interaction.InputR\x06inputs\x12&\n" +
-	"\x04when\x18\x04 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
-	"2\b^\\s?=\\s?R\x04when\x12A\n" +
-	"\fflow_control\x18\x05 \x01(\v2\x1e.dtkt.flow.v1beta2.FlowControlR\vflowControl\x1a&\n" +
+	"transforms\x12A\n" +
+	"\fflow_control\x18\x05 \x01(\v2\x1e.dtkt.flow.v1beta2.FlowControlR\vflowControl\x12A\n" +
+	"\fnode_control\x18\x06 \x01(\v2\x1e.dtkt.flow.v1beta2.NodeControlR\vnodeControl\x1a&\n" +
 	"\x0eConfirmBinding\x12\x14\n" +
 	"\x05value\x18\x01 \x01(\bR\x05value\x1a$\n" +
 	"\fInputBinding\x12\x14\n" +
@@ -5559,11 +5876,11 @@ const file_dtkt_flow_v1beta2_spec_proto_rawDesc = "" +
 	"\rSelectBinding\x12*\n" +
 	"\x05value\x18\x01 \x01(\v2\x14.google.protobuf.AnyR\x05value\x1a@\n" +
 	"\x12MultiSelectBinding\x12*\n" +
-	"\x05value\x18\x01 \x03(\v2\x14.google.protobuf.AnyR\x05value\x1a\x9d\x04\n" +
+	"\x05value\x18\x01 \x03(\v2\x14.google.protobuf.AnyR\x05value\x1a\xa3\x04\n" +
 	"\x05Input\x121\n" +
-	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x120\n" +
-	"\x05title\x18\x02 \x01(\tB\x1a\xbaH\x17\xc8\x01\x01r\x122\x10^\\s?(=)?\\s?(.*)$R\x05title\x12>\n" +
-	"\vdescription\x18\x03 \x01(\tB\x17\xbaH\x14r\x122\x10^\\s?(=)?\\s?(.*)$H\x01R\vdescription\x88\x01\x01\x12B\n" +
+	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x123\n" +
+	"\x05title\x18\x02 \x01(\tB\x1d\xbaH\x1a\xc8\x01\x01r\x152\x13^\\s?(=)?\\s?[\\s\\S]*$R\x05title\x12A\n" +
+	"\vdescription\x18\x03 \x01(\tB\x1a\xbaH\x17r\x152\x13^\\s?(=)?\\s?[\\s\\S]*$H\x01R\vdescription\x88\x01\x01\x12B\n" +
 	"\aconfirm\x18\x04 \x01(\v2&.dtkt.protoform.v1beta1.ConfirmElementH\x00R\aconfirm\x12<\n" +
 	"\x05input\x18\x05 \x01(\v2$.dtkt.protoform.v1beta1.InputElementH\x00R\x05input\x129\n" +
 	"\x04file\x18\x06 \x01(\v2#.dtkt.protoform.v1beta1.FileElementH\x00R\x04file\x12?\n" +
@@ -5582,13 +5899,13 @@ const file_dtkt_flow_v1beta2_spec_proto_rawDesc = "" +
 	"2\b^\\s?=\\s?R\x04when\x124\n" +
 	"\abackoff\x18\x02 \x01(\v2\x1a.dtkt.flow.v1beta2.BackoffR\abackoff\x12/\n" +
 	"\tskip_when\x18\x03 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
-	"2\b^\\s?=\\s?R\bskipWhen\x125\n" +
+	"2\b^\\s?=\\s?R\bskipWhen\x127\n" +
+	"\rcontinue_when\x18\x06 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
+	"2\b^\\s?=\\s?R\fcontinueWhen\x125\n" +
 	"\fsuspend_when\x18\x04 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
 	"2\b^\\s?=\\s?R\vsuspendWhen\x129\n" +
 	"\x0eterminate_when\x18\x05 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
-	"2\b^\\s?=\\s?R\rterminateWhen\x127\n" +
-	"\rcontinue_when\x18\x06 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
-	"2\b^\\s?=\\s?R\fcontinueWhen\"\xf2\x01\n" +
+	"2\b^\\s?=\\s?R\rterminateWhen\"\xf2\x01\n" +
 	"\x06Switch\x12(\n" +
 	"\x05value\x18\x01 \x01(\tB\x12\xbaH\x0f\xc8\x01\x01r\n" +
 	"2\b^\\s?=\\s?R\x05value\x122\n" +
@@ -5675,144 +5992,150 @@ const file_dtkt_flow_v1beta2_spec_proto_rawDesc = "" +
 	"\x17proto.dtkt.flow.v1beta2B\tSpecProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2;flowv1beta2\xa2\x02\x03DFX\xaa\x02\x11Dtkt.Flow.V1beta2\xca\x02\x11Dtkt\\Flow\\V1beta2\xe2\x02\x1dDtkt\\Flow\\V1beta2\\GPBMetadata\xea\x02\x13Dtkt::Flow::V1beta2b\x06proto3"
 
 var file_dtkt_flow_v1beta2_spec_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_dtkt_flow_v1beta2_spec_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
+var file_dtkt_flow_v1beta2_spec_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
 var file_dtkt_flow_v1beta2_spec_proto_goTypes = []any{
 	(ErrorStrategy)(0),                       // 0: dtkt.flow.v1beta2.ErrorStrategy
 	(*Flow)(nil),                             // 1: dtkt.flow.v1beta2.Flow
 	(*FlowControl)(nil),                      // 2: dtkt.flow.v1beta2.FlowControl
-	(*Connection)(nil),                       // 3: dtkt.flow.v1beta2.Connection
-	(*Input)(nil),                            // 4: dtkt.flow.v1beta2.Input
-	(*Var)(nil),                              // 5: dtkt.flow.v1beta2.Var
-	(*Action)(nil),                           // 6: dtkt.flow.v1beta2.Action
-	(*Output)(nil),                           // 7: dtkt.flow.v1beta2.Output
-	(*Stream)(nil),                           // 8: dtkt.flow.v1beta2.Stream
-	(*MethodCall)(nil),                       // 9: dtkt.flow.v1beta2.MethodCall
-	(*Interaction)(nil),                      // 10: dtkt.flow.v1beta2.Interaction
-	(*Backoff)(nil),                          // 11: dtkt.flow.v1beta2.Backoff
-	(*RetryStrategy)(nil),                    // 12: dtkt.flow.v1beta2.RetryStrategy
-	(*Switch)(nil),                           // 13: dtkt.flow.v1beta2.Switch
-	(*Rate)(nil),                             // 14: dtkt.flow.v1beta2.Rate
-	(*Generator)(nil),                        // 15: dtkt.flow.v1beta2.Generator
-	(*Transform)(nil),                        // 16: dtkt.flow.v1beta2.Transform
-	(*Interaction_ConfirmBinding)(nil),       // 17: dtkt.flow.v1beta2.Interaction.ConfirmBinding
-	(*Interaction_InputBinding)(nil),         // 18: dtkt.flow.v1beta2.Interaction.InputBinding
-	(*Interaction_FileBinding)(nil),          // 19: dtkt.flow.v1beta2.Interaction.FileBinding
-	(*Interaction_SelectBinding)(nil),        // 20: dtkt.flow.v1beta2.Interaction.SelectBinding
-	(*Interaction_MultiSelectBinding)(nil),   // 21: dtkt.flow.v1beta2.Interaction.MultiSelectBinding
-	(*Interaction_Input)(nil),                // 22: dtkt.flow.v1beta2.Interaction.Input
-	(*Switch_Case)(nil),                      // 23: dtkt.flow.v1beta2.Switch.Case
-	(*Generator_Ticker)(nil),                 // 24: dtkt.flow.v1beta2.Generator.Ticker
-	(*Generator_Cron)(nil),                   // 25: dtkt.flow.v1beta2.Generator.Cron
-	(*Generator_Range)(nil),                  // 26: dtkt.flow.v1beta2.Generator.Range
-	(*Transform_GroupBy)(nil),                // 27: dtkt.flow.v1beta2.Transform.GroupBy
-	(*Transform_Reduce)(nil),                 // 28: dtkt.flow.v1beta2.Transform.Reduce
-	(*Transform_Scan)(nil),                   // 29: dtkt.flow.v1beta2.Transform.Scan
-	(*Transform_GroupBy_Window)(nil),         // 30: dtkt.flow.v1beta2.Transform.GroupBy.Window
-	(*Transform_GroupBy_Window_Fixed)(nil),   // 31: dtkt.flow.v1beta2.Transform.GroupBy.Window.Fixed
-	(*Transform_GroupBy_Window_Sliding)(nil), // 32: dtkt.flow.v1beta2.Transform.GroupBy.Window.Sliding
-	(*Transform_GroupBy_Window_Session)(nil), // 33: dtkt.flow.v1beta2.Transform.GroupBy.Window.Session
-	(*Transform_GroupBy_Window_Event)(nil),   // 34: dtkt.flow.v1beta2.Transform.GroupBy.Window.Event
-	(*v1beta1.Package_Identity)(nil),         // 35: dtkt.shared.v1beta1.Package.Identity
-	(*Bool)(nil),                             // 36: dtkt.flow.v1beta2.Bool
-	(*Bytes)(nil),                            // 37: dtkt.flow.v1beta2.Bytes
-	(*Double)(nil),                           // 38: dtkt.flow.v1beta2.Double
-	(*Float)(nil),                            // 39: dtkt.flow.v1beta2.Float
-	(*Int64)(nil),                            // 40: dtkt.flow.v1beta2.Int64
-	(*Uint64)(nil),                           // 41: dtkt.flow.v1beta2.Uint64
-	(*Int32)(nil),                            // 42: dtkt.flow.v1beta2.Int32
-	(*Uint32)(nil),                           // 43: dtkt.flow.v1beta2.Uint32
-	(*String)(nil),                           // 44: dtkt.flow.v1beta2.String
-	(*List)(nil),                             // 45: dtkt.flow.v1beta2.List
-	(*Map)(nil),                              // 46: dtkt.flow.v1beta2.Map
-	(*Message)(nil),                          // 47: dtkt.flow.v1beta2.Message
-	(*structpb.Value)(nil),                   // 48: google.protobuf.Value
-	(*durationpb.Duration)(nil),              // 49: google.protobuf.Duration
-	(*anypb.Any)(nil),                        // 50: google.protobuf.Any
-	(*v1beta11.ConfirmElement)(nil),          // 51: dtkt.protoform.v1beta1.ConfirmElement
-	(*v1beta11.InputElement)(nil),            // 52: dtkt.protoform.v1beta1.InputElement
-	(*v1beta11.FileElement)(nil),             // 53: dtkt.protoform.v1beta1.FileElement
-	(*v1beta11.SelectElement)(nil),           // 54: dtkt.protoform.v1beta1.SelectElement
-	(*v1beta11.MultiSelectElement)(nil),      // 55: dtkt.protoform.v1beta1.MultiSelectElement
+	(*NodeControl)(nil),                      // 3: dtkt.flow.v1beta2.NodeControl
+	(*Connection)(nil),                       // 4: dtkt.flow.v1beta2.Connection
+	(*Input)(nil),                            // 5: dtkt.flow.v1beta2.Input
+	(*Var)(nil),                              // 6: dtkt.flow.v1beta2.Var
+	(*Action)(nil),                           // 7: dtkt.flow.v1beta2.Action
+	(*Output)(nil),                           // 8: dtkt.flow.v1beta2.Output
+	(*Stream)(nil),                           // 9: dtkt.flow.v1beta2.Stream
+	(*MethodCall)(nil),                       // 10: dtkt.flow.v1beta2.MethodCall
+	(*Interaction)(nil),                      // 11: dtkt.flow.v1beta2.Interaction
+	(*Backoff)(nil),                          // 12: dtkt.flow.v1beta2.Backoff
+	(*RetryStrategy)(nil),                    // 13: dtkt.flow.v1beta2.RetryStrategy
+	(*Switch)(nil),                           // 14: dtkt.flow.v1beta2.Switch
+	(*Rate)(nil),                             // 15: dtkt.flow.v1beta2.Rate
+	(*Generator)(nil),                        // 16: dtkt.flow.v1beta2.Generator
+	(*Transform)(nil),                        // 17: dtkt.flow.v1beta2.Transform
+	(*Interaction_ConfirmBinding)(nil),       // 18: dtkt.flow.v1beta2.Interaction.ConfirmBinding
+	(*Interaction_InputBinding)(nil),         // 19: dtkt.flow.v1beta2.Interaction.InputBinding
+	(*Interaction_FileBinding)(nil),          // 20: dtkt.flow.v1beta2.Interaction.FileBinding
+	(*Interaction_SelectBinding)(nil),        // 21: dtkt.flow.v1beta2.Interaction.SelectBinding
+	(*Interaction_MultiSelectBinding)(nil),   // 22: dtkt.flow.v1beta2.Interaction.MultiSelectBinding
+	(*Interaction_Input)(nil),                // 23: dtkt.flow.v1beta2.Interaction.Input
+	(*Switch_Case)(nil),                      // 24: dtkt.flow.v1beta2.Switch.Case
+	(*Generator_Ticker)(nil),                 // 25: dtkt.flow.v1beta2.Generator.Ticker
+	(*Generator_Cron)(nil),                   // 26: dtkt.flow.v1beta2.Generator.Cron
+	(*Generator_Range)(nil),                  // 27: dtkt.flow.v1beta2.Generator.Range
+	(*Transform_GroupBy)(nil),                // 28: dtkt.flow.v1beta2.Transform.GroupBy
+	(*Transform_Reduce)(nil),                 // 29: dtkt.flow.v1beta2.Transform.Reduce
+	(*Transform_Scan)(nil),                   // 30: dtkt.flow.v1beta2.Transform.Scan
+	(*Transform_GroupBy_Window)(nil),         // 31: dtkt.flow.v1beta2.Transform.GroupBy.Window
+	(*Transform_GroupBy_Window_Fixed)(nil),   // 32: dtkt.flow.v1beta2.Transform.GroupBy.Window.Fixed
+	(*Transform_GroupBy_Window_Sliding)(nil), // 33: dtkt.flow.v1beta2.Transform.GroupBy.Window.Sliding
+	(*Transform_GroupBy_Window_Session)(nil), // 34: dtkt.flow.v1beta2.Transform.GroupBy.Window.Session
+	(*Transform_GroupBy_Window_Event)(nil),   // 35: dtkt.flow.v1beta2.Transform.GroupBy.Window.Event
+	(*v1beta1.Package_Identity)(nil),         // 36: dtkt.shared.v1beta1.Package.Identity
+	(*Bool)(nil),                             // 37: dtkt.flow.v1beta2.Bool
+	(*Bytes)(nil),                            // 38: dtkt.flow.v1beta2.Bytes
+	(*Double)(nil),                           // 39: dtkt.flow.v1beta2.Double
+	(*Float)(nil),                            // 40: dtkt.flow.v1beta2.Float
+	(*Int64)(nil),                            // 41: dtkt.flow.v1beta2.Int64
+	(*Uint64)(nil),                           // 42: dtkt.flow.v1beta2.Uint64
+	(*Int32)(nil),                            // 43: dtkt.flow.v1beta2.Int32
+	(*Uint32)(nil),                           // 44: dtkt.flow.v1beta2.Uint32
+	(*String)(nil),                           // 45: dtkt.flow.v1beta2.String
+	(*List)(nil),                             // 46: dtkt.flow.v1beta2.List
+	(*Map)(nil),                              // 47: dtkt.flow.v1beta2.Map
+	(*Message)(nil),                          // 48: dtkt.flow.v1beta2.Message
+	(*structpb.Value)(nil),                   // 49: google.protobuf.Value
+	(*durationpb.Duration)(nil),              // 50: google.protobuf.Duration
+	(*anypb.Any)(nil),                        // 51: google.protobuf.Any
+	(*v1beta11.ConfirmElement)(nil),          // 52: dtkt.protoform.v1beta1.ConfirmElement
+	(*v1beta11.InputElement)(nil),            // 53: dtkt.protoform.v1beta1.InputElement
+	(*v1beta11.FileElement)(nil),             // 54: dtkt.protoform.v1beta1.FileElement
+	(*v1beta11.SelectElement)(nil),           // 55: dtkt.protoform.v1beta1.SelectElement
+	(*v1beta11.MultiSelectElement)(nil),      // 56: dtkt.protoform.v1beta1.MultiSelectElement
 }
 var file_dtkt_flow_v1beta2_spec_proto_depIdxs = []int32{
-	3,  // 0: dtkt.flow.v1beta2.Flow.connections:type_name -> dtkt.flow.v1beta2.Connection
-	4,  // 1: dtkt.flow.v1beta2.Flow.inputs:type_name -> dtkt.flow.v1beta2.Input
-	15, // 2: dtkt.flow.v1beta2.Flow.generators:type_name -> dtkt.flow.v1beta2.Generator
-	5,  // 3: dtkt.flow.v1beta2.Flow.vars:type_name -> dtkt.flow.v1beta2.Var
-	6,  // 4: dtkt.flow.v1beta2.Flow.actions:type_name -> dtkt.flow.v1beta2.Action
-	8,  // 5: dtkt.flow.v1beta2.Flow.streams:type_name -> dtkt.flow.v1beta2.Stream
-	10, // 6: dtkt.flow.v1beta2.Flow.interactions:type_name -> dtkt.flow.v1beta2.Interaction
-	7,  // 7: dtkt.flow.v1beta2.Flow.outputs:type_name -> dtkt.flow.v1beta2.Output
+	4,  // 0: dtkt.flow.v1beta2.Flow.connections:type_name -> dtkt.flow.v1beta2.Connection
+	5,  // 1: dtkt.flow.v1beta2.Flow.inputs:type_name -> dtkt.flow.v1beta2.Input
+	16, // 2: dtkt.flow.v1beta2.Flow.generators:type_name -> dtkt.flow.v1beta2.Generator
+	6,  // 3: dtkt.flow.v1beta2.Flow.vars:type_name -> dtkt.flow.v1beta2.Var
+	7,  // 4: dtkt.flow.v1beta2.Flow.actions:type_name -> dtkt.flow.v1beta2.Action
+	9,  // 5: dtkt.flow.v1beta2.Flow.streams:type_name -> dtkt.flow.v1beta2.Stream
+	11, // 6: dtkt.flow.v1beta2.Flow.interactions:type_name -> dtkt.flow.v1beta2.Interaction
+	8,  // 7: dtkt.flow.v1beta2.Flow.outputs:type_name -> dtkt.flow.v1beta2.Output
 	0,  // 8: dtkt.flow.v1beta2.Flow.error_strategy:type_name -> dtkt.flow.v1beta2.ErrorStrategy
-	35, // 9: dtkt.flow.v1beta2.Connection.package:type_name -> dtkt.shared.v1beta1.Package.Identity
-	36, // 10: dtkt.flow.v1beta2.Input.bool:type_name -> dtkt.flow.v1beta2.Bool
-	37, // 11: dtkt.flow.v1beta2.Input.bytes:type_name -> dtkt.flow.v1beta2.Bytes
-	38, // 12: dtkt.flow.v1beta2.Input.double:type_name -> dtkt.flow.v1beta2.Double
-	39, // 13: dtkt.flow.v1beta2.Input.float:type_name -> dtkt.flow.v1beta2.Float
-	40, // 14: dtkt.flow.v1beta2.Input.int64:type_name -> dtkt.flow.v1beta2.Int64
-	41, // 15: dtkt.flow.v1beta2.Input.uint64:type_name -> dtkt.flow.v1beta2.Uint64
-	42, // 16: dtkt.flow.v1beta2.Input.int32:type_name -> dtkt.flow.v1beta2.Int32
-	43, // 17: dtkt.flow.v1beta2.Input.uint32:type_name -> dtkt.flow.v1beta2.Uint32
-	44, // 18: dtkt.flow.v1beta2.Input.string:type_name -> dtkt.flow.v1beta2.String
-	45, // 19: dtkt.flow.v1beta2.Input.list:type_name -> dtkt.flow.v1beta2.List
-	46, // 20: dtkt.flow.v1beta2.Input.map:type_name -> dtkt.flow.v1beta2.Map
-	47, // 21: dtkt.flow.v1beta2.Input.message:type_name -> dtkt.flow.v1beta2.Message
-	14, // 22: dtkt.flow.v1beta2.Input.throttle:type_name -> dtkt.flow.v1beta2.Rate
-	16, // 23: dtkt.flow.v1beta2.Input.transforms:type_name -> dtkt.flow.v1beta2.Transform
-	13, // 24: dtkt.flow.v1beta2.Var.switch:type_name -> dtkt.flow.v1beta2.Switch
-	16, // 25: dtkt.flow.v1beta2.Var.transforms:type_name -> dtkt.flow.v1beta2.Transform
+	36, // 9: dtkt.flow.v1beta2.Connection.package:type_name -> dtkt.shared.v1beta1.Package.Identity
+	37, // 10: dtkt.flow.v1beta2.Input.bool:type_name -> dtkt.flow.v1beta2.Bool
+	38, // 11: dtkt.flow.v1beta2.Input.bytes:type_name -> dtkt.flow.v1beta2.Bytes
+	39, // 12: dtkt.flow.v1beta2.Input.double:type_name -> dtkt.flow.v1beta2.Double
+	40, // 13: dtkt.flow.v1beta2.Input.float:type_name -> dtkt.flow.v1beta2.Float
+	41, // 14: dtkt.flow.v1beta2.Input.int64:type_name -> dtkt.flow.v1beta2.Int64
+	42, // 15: dtkt.flow.v1beta2.Input.uint64:type_name -> dtkt.flow.v1beta2.Uint64
+	43, // 16: dtkt.flow.v1beta2.Input.int32:type_name -> dtkt.flow.v1beta2.Int32
+	44, // 17: dtkt.flow.v1beta2.Input.uint32:type_name -> dtkt.flow.v1beta2.Uint32
+	45, // 18: dtkt.flow.v1beta2.Input.string:type_name -> dtkt.flow.v1beta2.String
+	46, // 19: dtkt.flow.v1beta2.Input.list:type_name -> dtkt.flow.v1beta2.List
+	47, // 20: dtkt.flow.v1beta2.Input.map:type_name -> dtkt.flow.v1beta2.Map
+	48, // 21: dtkt.flow.v1beta2.Input.message:type_name -> dtkt.flow.v1beta2.Message
+	15, // 22: dtkt.flow.v1beta2.Input.throttle:type_name -> dtkt.flow.v1beta2.Rate
+	17, // 23: dtkt.flow.v1beta2.Input.transforms:type_name -> dtkt.flow.v1beta2.Transform
+	14, // 24: dtkt.flow.v1beta2.Var.switch:type_name -> dtkt.flow.v1beta2.Switch
+	17, // 25: dtkt.flow.v1beta2.Var.transforms:type_name -> dtkt.flow.v1beta2.Transform
 	2,  // 26: dtkt.flow.v1beta2.Var.flow_control:type_name -> dtkt.flow.v1beta2.FlowControl
-	14, // 27: dtkt.flow.v1beta2.Action.throttle:type_name -> dtkt.flow.v1beta2.Rate
-	12, // 28: dtkt.flow.v1beta2.Action.retry_strategy:type_name -> dtkt.flow.v1beta2.RetryStrategy
-	9,  // 29: dtkt.flow.v1beta2.Action.call:type_name -> dtkt.flow.v1beta2.MethodCall
-	2,  // 30: dtkt.flow.v1beta2.Action.flow_control:type_name -> dtkt.flow.v1beta2.FlowControl
-	16, // 31: dtkt.flow.v1beta2.Output.transforms:type_name -> dtkt.flow.v1beta2.Transform
-	14, // 32: dtkt.flow.v1beta2.Output.throttle:type_name -> dtkt.flow.v1beta2.Rate
-	2,  // 33: dtkt.flow.v1beta2.Output.flow_control:type_name -> dtkt.flow.v1beta2.FlowControl
-	14, // 34: dtkt.flow.v1beta2.Stream.throttle:type_name -> dtkt.flow.v1beta2.Rate
-	12, // 35: dtkt.flow.v1beta2.Stream.retry_strategy:type_name -> dtkt.flow.v1beta2.RetryStrategy
-	9,  // 36: dtkt.flow.v1beta2.Stream.call:type_name -> dtkt.flow.v1beta2.MethodCall
-	2,  // 37: dtkt.flow.v1beta2.Stream.flow_control:type_name -> dtkt.flow.v1beta2.FlowControl
-	48, // 38: dtkt.flow.v1beta2.MethodCall.request:type_name -> google.protobuf.Value
-	16, // 39: dtkt.flow.v1beta2.Interaction.transforms:type_name -> dtkt.flow.v1beta2.Transform
-	22, // 40: dtkt.flow.v1beta2.Interaction.inputs:type_name -> dtkt.flow.v1beta2.Interaction.Input
-	2,  // 41: dtkt.flow.v1beta2.Interaction.flow_control:type_name -> dtkt.flow.v1beta2.FlowControl
-	49, // 42: dtkt.flow.v1beta2.Backoff.initial_backoff:type_name -> google.protobuf.Duration
-	49, // 43: dtkt.flow.v1beta2.Backoff.max_backoff:type_name -> google.protobuf.Duration
-	11, // 44: dtkt.flow.v1beta2.RetryStrategy.backoff:type_name -> dtkt.flow.v1beta2.Backoff
-	23, // 45: dtkt.flow.v1beta2.Switch.case:type_name -> dtkt.flow.v1beta2.Switch.Case
-	49, // 46: dtkt.flow.v1beta2.Rate.interval:type_name -> google.protobuf.Duration
-	24, // 47: dtkt.flow.v1beta2.Generator.ticker:type_name -> dtkt.flow.v1beta2.Generator.Ticker
-	25, // 48: dtkt.flow.v1beta2.Generator.cron:type_name -> dtkt.flow.v1beta2.Generator.Cron
-	26, // 49: dtkt.flow.v1beta2.Generator.range:type_name -> dtkt.flow.v1beta2.Generator.Range
-	28, // 50: dtkt.flow.v1beta2.Transform.reduce:type_name -> dtkt.flow.v1beta2.Transform.Reduce
-	29, // 51: dtkt.flow.v1beta2.Transform.scan:type_name -> dtkt.flow.v1beta2.Transform.Scan
-	50, // 52: dtkt.flow.v1beta2.Interaction.SelectBinding.value:type_name -> google.protobuf.Any
-	50, // 53: dtkt.flow.v1beta2.Interaction.MultiSelectBinding.value:type_name -> google.protobuf.Any
-	51, // 54: dtkt.flow.v1beta2.Interaction.Input.confirm:type_name -> dtkt.protoform.v1beta1.ConfirmElement
-	52, // 55: dtkt.flow.v1beta2.Interaction.Input.input:type_name -> dtkt.protoform.v1beta1.InputElement
-	53, // 56: dtkt.flow.v1beta2.Interaction.Input.file:type_name -> dtkt.protoform.v1beta1.FileElement
-	54, // 57: dtkt.flow.v1beta2.Interaction.Input.select:type_name -> dtkt.protoform.v1beta1.SelectElement
-	55, // 58: dtkt.flow.v1beta2.Interaction.Input.multi_select:type_name -> dtkt.protoform.v1beta1.MultiSelectElement
-	49, // 59: dtkt.flow.v1beta2.Generator.Ticker.interval:type_name -> google.protobuf.Duration
-	49, // 60: dtkt.flow.v1beta2.Generator.Ticker.delay:type_name -> google.protobuf.Duration
-	14, // 61: dtkt.flow.v1beta2.Generator.Range.rate:type_name -> dtkt.flow.v1beta2.Rate
-	30, // 62: dtkt.flow.v1beta2.Transform.GroupBy.window:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window
-	27, // 63: dtkt.flow.v1beta2.Transform.Reduce.group_by:type_name -> dtkt.flow.v1beta2.Transform.GroupBy
-	27, // 64: dtkt.flow.v1beta2.Transform.Scan.group_by:type_name -> dtkt.flow.v1beta2.Transform.GroupBy
-	31, // 65: dtkt.flow.v1beta2.Transform.GroupBy.Window.fixed:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window.Fixed
-	32, // 66: dtkt.flow.v1beta2.Transform.GroupBy.Window.sliding:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window.Sliding
-	33, // 67: dtkt.flow.v1beta2.Transform.GroupBy.Window.session:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window.Session
-	34, // 68: dtkt.flow.v1beta2.Transform.GroupBy.Window.event:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window.Event
-	49, // 69: dtkt.flow.v1beta2.Transform.GroupBy.Window.Fixed.length:type_name -> google.protobuf.Duration
-	49, // 70: dtkt.flow.v1beta2.Transform.GroupBy.Window.Sliding.length:type_name -> google.protobuf.Duration
-	49, // 71: dtkt.flow.v1beta2.Transform.GroupBy.Window.Sliding.slide:type_name -> google.protobuf.Duration
-	49, // 72: dtkt.flow.v1beta2.Transform.GroupBy.Window.Session.timeout:type_name -> google.protobuf.Duration
-	73, // [73:73] is the sub-list for method output_type
-	73, // [73:73] is the sub-list for method input_type
-	73, // [73:73] is the sub-list for extension type_name
-	73, // [73:73] is the sub-list for extension extendee
-	0,  // [0:73] is the sub-list for field type_name
+	3,  // 27: dtkt.flow.v1beta2.Var.node_control:type_name -> dtkt.flow.v1beta2.NodeControl
+	10, // 28: dtkt.flow.v1beta2.Action.call:type_name -> dtkt.flow.v1beta2.MethodCall
+	15, // 29: dtkt.flow.v1beta2.Action.throttle:type_name -> dtkt.flow.v1beta2.Rate
+	13, // 30: dtkt.flow.v1beta2.Action.retry_strategy:type_name -> dtkt.flow.v1beta2.RetryStrategy
+	2,  // 31: dtkt.flow.v1beta2.Action.flow_control:type_name -> dtkt.flow.v1beta2.FlowControl
+	3,  // 32: dtkt.flow.v1beta2.Action.node_control:type_name -> dtkt.flow.v1beta2.NodeControl
+	15, // 33: dtkt.flow.v1beta2.Output.throttle:type_name -> dtkt.flow.v1beta2.Rate
+	17, // 34: dtkt.flow.v1beta2.Output.transforms:type_name -> dtkt.flow.v1beta2.Transform
+	2,  // 35: dtkt.flow.v1beta2.Output.flow_control:type_name -> dtkt.flow.v1beta2.FlowControl
+	3,  // 36: dtkt.flow.v1beta2.Output.node_control:type_name -> dtkt.flow.v1beta2.NodeControl
+	10, // 37: dtkt.flow.v1beta2.Stream.call:type_name -> dtkt.flow.v1beta2.MethodCall
+	15, // 38: dtkt.flow.v1beta2.Stream.throttle:type_name -> dtkt.flow.v1beta2.Rate
+	13, // 39: dtkt.flow.v1beta2.Stream.retry_strategy:type_name -> dtkt.flow.v1beta2.RetryStrategy
+	2,  // 40: dtkt.flow.v1beta2.Stream.flow_control:type_name -> dtkt.flow.v1beta2.FlowControl
+	3,  // 41: dtkt.flow.v1beta2.Stream.node_control:type_name -> dtkt.flow.v1beta2.NodeControl
+	49, // 42: dtkt.flow.v1beta2.MethodCall.request:type_name -> google.protobuf.Value
+	23, // 43: dtkt.flow.v1beta2.Interaction.inputs:type_name -> dtkt.flow.v1beta2.Interaction.Input
+	17, // 44: dtkt.flow.v1beta2.Interaction.transforms:type_name -> dtkt.flow.v1beta2.Transform
+	2,  // 45: dtkt.flow.v1beta2.Interaction.flow_control:type_name -> dtkt.flow.v1beta2.FlowControl
+	3,  // 46: dtkt.flow.v1beta2.Interaction.node_control:type_name -> dtkt.flow.v1beta2.NodeControl
+	50, // 47: dtkt.flow.v1beta2.Backoff.initial_backoff:type_name -> google.protobuf.Duration
+	50, // 48: dtkt.flow.v1beta2.Backoff.max_backoff:type_name -> google.protobuf.Duration
+	12, // 49: dtkt.flow.v1beta2.RetryStrategy.backoff:type_name -> dtkt.flow.v1beta2.Backoff
+	24, // 50: dtkt.flow.v1beta2.Switch.case:type_name -> dtkt.flow.v1beta2.Switch.Case
+	50, // 51: dtkt.flow.v1beta2.Rate.interval:type_name -> google.protobuf.Duration
+	25, // 52: dtkt.flow.v1beta2.Generator.ticker:type_name -> dtkt.flow.v1beta2.Generator.Ticker
+	26, // 53: dtkt.flow.v1beta2.Generator.cron:type_name -> dtkt.flow.v1beta2.Generator.Cron
+	27, // 54: dtkt.flow.v1beta2.Generator.range:type_name -> dtkt.flow.v1beta2.Generator.Range
+	29, // 55: dtkt.flow.v1beta2.Transform.reduce:type_name -> dtkt.flow.v1beta2.Transform.Reduce
+	30, // 56: dtkt.flow.v1beta2.Transform.scan:type_name -> dtkt.flow.v1beta2.Transform.Scan
+	51, // 57: dtkt.flow.v1beta2.Interaction.SelectBinding.value:type_name -> google.protobuf.Any
+	51, // 58: dtkt.flow.v1beta2.Interaction.MultiSelectBinding.value:type_name -> google.protobuf.Any
+	52, // 59: dtkt.flow.v1beta2.Interaction.Input.confirm:type_name -> dtkt.protoform.v1beta1.ConfirmElement
+	53, // 60: dtkt.flow.v1beta2.Interaction.Input.input:type_name -> dtkt.protoform.v1beta1.InputElement
+	54, // 61: dtkt.flow.v1beta2.Interaction.Input.file:type_name -> dtkt.protoform.v1beta1.FileElement
+	55, // 62: dtkt.flow.v1beta2.Interaction.Input.select:type_name -> dtkt.protoform.v1beta1.SelectElement
+	56, // 63: dtkt.flow.v1beta2.Interaction.Input.multi_select:type_name -> dtkt.protoform.v1beta1.MultiSelectElement
+	50, // 64: dtkt.flow.v1beta2.Generator.Ticker.interval:type_name -> google.protobuf.Duration
+	50, // 65: dtkt.flow.v1beta2.Generator.Ticker.delay:type_name -> google.protobuf.Duration
+	15, // 66: dtkt.flow.v1beta2.Generator.Range.rate:type_name -> dtkt.flow.v1beta2.Rate
+	31, // 67: dtkt.flow.v1beta2.Transform.GroupBy.window:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window
+	28, // 68: dtkt.flow.v1beta2.Transform.Reduce.group_by:type_name -> dtkt.flow.v1beta2.Transform.GroupBy
+	28, // 69: dtkt.flow.v1beta2.Transform.Scan.group_by:type_name -> dtkt.flow.v1beta2.Transform.GroupBy
+	32, // 70: dtkt.flow.v1beta2.Transform.GroupBy.Window.fixed:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window.Fixed
+	33, // 71: dtkt.flow.v1beta2.Transform.GroupBy.Window.sliding:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window.Sliding
+	34, // 72: dtkt.flow.v1beta2.Transform.GroupBy.Window.session:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window.Session
+	35, // 73: dtkt.flow.v1beta2.Transform.GroupBy.Window.event:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window.Event
+	50, // 74: dtkt.flow.v1beta2.Transform.GroupBy.Window.Fixed.length:type_name -> google.protobuf.Duration
+	50, // 75: dtkt.flow.v1beta2.Transform.GroupBy.Window.Sliding.length:type_name -> google.protobuf.Duration
+	50, // 76: dtkt.flow.v1beta2.Transform.GroupBy.Window.Sliding.slide:type_name -> google.protobuf.Duration
+	50, // 77: dtkt.flow.v1beta2.Transform.GroupBy.Window.Session.timeout:type_name -> google.protobuf.Duration
+	78, // [78:78] is the sub-list for method output_type
+	78, // [78:78] is the sub-list for method input_type
+	78, // [78:78] is the sub-list for extension type_name
+	78, // [78:78] is the sub-list for extension extendee
+	0,  // [0:78] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_flow_v1beta2_spec_proto_init() }
@@ -5821,7 +6144,7 @@ func file_dtkt_flow_v1beta2_spec_proto_init() {
 		return
 	}
 	file_dtkt_flow_v1beta2_types_proto_init()
-	file_dtkt_flow_v1beta2_spec_proto_msgTypes[3].OneofWrappers = []any{
+	file_dtkt_flow_v1beta2_spec_proto_msgTypes[4].OneofWrappers = []any{
 		(*input_Bool)(nil),
 		(*input_Bytes)(nil),
 		(*input_Double)(nil),
@@ -5835,36 +6158,36 @@ func file_dtkt_flow_v1beta2_spec_proto_init() {
 		(*input_Map)(nil),
 		(*input_Message)(nil),
 	}
-	file_dtkt_flow_v1beta2_spec_proto_msgTypes[4].OneofWrappers = []any{
+	file_dtkt_flow_v1beta2_spec_proto_msgTypes[5].OneofWrappers = []any{
 		(*var_Value)(nil),
 		(*var_Switch)(nil),
 	}
-	file_dtkt_flow_v1beta2_spec_proto_msgTypes[5].OneofWrappers = []any{
+	file_dtkt_flow_v1beta2_spec_proto_msgTypes[6].OneofWrappers = []any{
 		(*action_Call)(nil),
 	}
-	file_dtkt_flow_v1beta2_spec_proto_msgTypes[7].OneofWrappers = []any{
+	file_dtkt_flow_v1beta2_spec_proto_msgTypes[8].OneofWrappers = []any{
 		(*stream_Call)(nil),
 	}
-	file_dtkt_flow_v1beta2_spec_proto_msgTypes[14].OneofWrappers = []any{
+	file_dtkt_flow_v1beta2_spec_proto_msgTypes[15].OneofWrappers = []any{
 		(*generator_Ticker_)(nil),
 		(*generator_Cron_)(nil),
 		(*generator_Range_)(nil),
 	}
-	file_dtkt_flow_v1beta2_spec_proto_msgTypes[15].OneofWrappers = []any{
+	file_dtkt_flow_v1beta2_spec_proto_msgTypes[16].OneofWrappers = []any{
 		(*transform_Map)(nil),
 		(*transform_Flatten)(nil),
 		(*transform_Filter)(nil),
 		(*transform_Reduce_)(nil),
 		(*transform_Scan_)(nil),
 	}
-	file_dtkt_flow_v1beta2_spec_proto_msgTypes[21].OneofWrappers = []any{
+	file_dtkt_flow_v1beta2_spec_proto_msgTypes[22].OneofWrappers = []any{
 		(*interaction_Input_Confirm)(nil),
 		(*interaction_Input_Input)(nil),
 		(*interaction_Input_File)(nil),
 		(*interaction_Input_Select)(nil),
 		(*interaction_Input_MultiSelect)(nil),
 	}
-	file_dtkt_flow_v1beta2_spec_proto_msgTypes[29].OneofWrappers = []any{
+	file_dtkt_flow_v1beta2_spec_proto_msgTypes[30].OneofWrappers = []any{
 		(*transform_GroupBy_Window_Fixed_)(nil),
 		(*transform_GroupBy_Window_Sliding_)(nil),
 		(*transform_GroupBy_Window_Session_)(nil),
@@ -5876,7 +6199,7 @@ func file_dtkt_flow_v1beta2_spec_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_flow_v1beta2_spec_proto_rawDesc), len(file_dtkt_flow_v1beta2_spec_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   34,
+			NumMessages:   35,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

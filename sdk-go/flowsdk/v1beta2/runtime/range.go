@@ -11,6 +11,7 @@ import (
 )
 
 type rangeHandler struct {
+	stoppableMixin
 	id        string
 	pubsub    executor.PubSub
 	topic     string
@@ -50,7 +51,9 @@ func (h *rangeHandler) Run(ctx context.Context) error {
 		defer ticker.Stop()
 	}
 
-	publishEOF := func() error {
+	// publishSucceeded emits the terminal SUCCEEDED state with EOF.
+	// Used both for natural completion (end of range) and operator stop.
+	publishSucceeded := func() error {
 		return publishNode(h.pubsub, h.topic, flowv1beta2.RunSnapshot_GeneratorNode_builder{
 			Id:        h.id,
 			Value:     newEOFValue(),
@@ -60,7 +63,9 @@ func (h *rangeHandler) Run(ctx context.Context) error {
 		}.Build())
 	}
 
-	parkSuspend := func() bool {
+	// parkSuspend returns suspendStopped/suspendCancelled/suspendResumed
+	// depending on which signal wakes the handler.
+	parkSuspend := func() suspendResult {
 		if ticker != nil {
 			ticker.Stop()
 		}
@@ -70,7 +75,9 @@ func (h *rangeHandler) Run(ctx context.Context) error {
 		}.Build())
 		select {
 		case <-ctx.Done():
-			return false
+			return suspendCancelled
+		case <-h.StopChan():
+			return suspendStopped
 		case <-h.resumeCh:
 			_ = publishStateEvent(h.pubsub, h.topic, flowv1beta2.RunSnapshot_GeneratorNode_builder{
 				Id:    h.id,
@@ -79,7 +86,7 @@ func (h *rangeHandler) Run(ctx context.Context) error {
 			if ticker != nil {
 				ticker.Reset(h.rate.GetInterval().AsDuration() / time.Duration(h.rate.GetCount()))
 			}
-			return true
+			return suspendResumed
 		}
 	}
 
@@ -87,12 +94,15 @@ func (h *rangeHandler) Run(ctx context.Context) error {
 		if ticker != nil && h.evalCount > 0 {
 			select {
 			case <-ctx.Done():
-				_ = publishEOF()
-				return nil
+				return ctx.Err()
+			case <-h.StopChan():
+				return publishSucceeded()
 			case <-h.suspendCh:
-				if !parkSuspend() {
-					_ = publishEOF()
-					return nil
+				switch parkSuspend() {
+				case suspendCancelled:
+					return ctx.Err()
+				case suspendStopped:
+					return publishSucceeded()
 				}
 				i-- // re-emit current value after resume
 				continue
@@ -101,12 +111,15 @@ func (h *rangeHandler) Run(ctx context.Context) error {
 		} else {
 			select {
 			case <-ctx.Done():
-				_ = publishEOF()
-				return nil
+				return ctx.Err()
+			case <-h.StopChan():
+				return publishSucceeded()
 			case <-h.suspendCh:
-				if !parkSuspend() {
-					_ = publishEOF()
-					return nil
+				switch parkSuspend() {
+				case suspendCancelled:
+					return ctx.Err()
+				case suspendStopped:
+					return publishSucceeded()
 				}
 				i-- // re-emit current value after resume
 				continue
@@ -126,11 +139,5 @@ func (h *rangeHandler) Run(ctx context.Context) error {
 		}
 	}
 
-	return publishNode(h.pubsub, h.topic, flowv1beta2.RunSnapshot_GeneratorNode_builder{
-		Id:        h.id,
-		Value:     newEOFValue(),
-		Done:      true,
-		EvalCount: h.evalCount,
-		Phase:     flowv1beta2.RunSnapshot_PHASE_SUCCEEDED,
-	}.Build())
+	return publishSucceeded()
 }

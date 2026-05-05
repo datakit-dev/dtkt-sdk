@@ -17,6 +17,7 @@ import (
 )
 
 func TestGraph_Outbox_InputToVarToOutput(t *testing.T) {
+	parallelByDefault(t)
 	graph := loadFlow(t, "outbox_input_var_output.yaml")
 
 	ps := newPubSub()
@@ -51,6 +52,7 @@ func TestGraph_Outbox_InputToVarToOutput(t *testing.T) {
 }
 
 func TestGraph_Outbox_Chain(t *testing.T) {
+	parallelByDefault(t)
 	// input → var A → var B → output
 	// All intermediate publishes go through the outbox.
 	graph := loadFlow(t, "outbox_chain.yaml")
@@ -83,6 +85,7 @@ func TestGraph_Outbox_Chain(t *testing.T) {
 }
 
 func TestGraph_Outbox_RangeGenerator(t *testing.T) {
+	parallelByDefault(t)
 	// Range generator → output, with outbox wiring.
 	graph := loadFlow(t, "outbox_range_generator.yaml")
 
@@ -106,6 +109,7 @@ func TestGraph_Outbox_RangeGenerator(t *testing.T) {
 }
 
 func TestGraph_Outbox_SnapshotCaptures(t *testing.T) {
+	parallelByDefault(t)
 	// Verify that SnapshotAt reconstructs state from outbox events.
 	graph := loadFlow(t, "outbox_snapshot.yaml")
 
@@ -188,6 +192,7 @@ func (f *failingStoreBeginner) Begin(ctx context.Context) (outbox.Tx, error) {
 }
 
 func TestTxPublisher_BeginError(t *testing.T) {
+	parallelByDefault(t)
 	tp := &txPublisher{txBeginner: &failingTxBeginner{}, snap: &flowv1beta2.RunSnapshot{}}
 	msg := pubsub.NewMessage(&flowv1beta2.RunSnapshot_FlowEvent{
 		Data: &flowv1beta2.RunSnapshot_FlowEvent_Var{Var: &flowv1beta2.RunSnapshot_VarNode{Id: "n1"}},
@@ -198,6 +203,7 @@ func TestTxPublisher_BeginError(t *testing.T) {
 }
 
 func TestTxPublisher_CommitError(t *testing.T) {
+	parallelByDefault(t)
 	store := outboxmem.New()
 	tp := &txPublisher{txBeginner: &failingCommitBeginner{storage: store}, snap: &flowv1beta2.RunSnapshot{}}
 	msg := pubsub.NewMessage(&flowv1beta2.RunSnapshot_FlowEvent{
@@ -209,6 +215,7 @@ func TestTxPublisher_CommitError(t *testing.T) {
 }
 
 func TestTxPublisher_PublishError_Rollback(t *testing.T) {
+	parallelByDefault(t)
 	tp := &txPublisher{txBeginner: &failingStoreBeginner{}, snap: &flowv1beta2.RunSnapshot{}}
 	msg := pubsub.NewMessage(&flowv1beta2.RunSnapshot_FlowEvent{
 		Data: &flowv1beta2.RunSnapshot_FlowEvent_Var{Var: &flowv1beta2.RunSnapshot_VarNode{Id: "n1"}},
@@ -219,6 +226,7 @@ func TestTxPublisher_PublishError_Rollback(t *testing.T) {
 }
 
 func TestTxPublisher_NoMessages(t *testing.T) {
+	parallelByDefault(t)
 	store := outboxmem.New()
 	tp := &txPublisher{txBeginner: store, snap: &flowv1beta2.RunSnapshot{}}
 	// Publishing with no messages still opens and commits a tx.
@@ -226,11 +234,13 @@ func TestTxPublisher_NoMessages(t *testing.T) {
 }
 
 func TestTxPublisher_Close(t *testing.T) {
+	parallelByDefault(t)
 	tp := &txPublisher{txBeginner: &failingTxBeginner{}, snap: &flowv1beta2.RunSnapshot{}}
 	require.NoError(t, tp.Close())
 }
 
 func TestOutboxPubSub_Subscribe(t *testing.T) {
+	parallelByDefault(t)
 	ps := newPubSub()
 	defer func() { _ = ps.Close() }()
 
@@ -241,9 +251,23 @@ func TestOutboxPubSub_Subscribe(t *testing.T) {
 	ch, err := ops.Subscribe(ctx, "test.topic")
 	require.NoError(t, err)
 	require.NotNil(t, ch)
+
+	// Publish via the pubsub directly and verify the message arrives on
+	// the subscription channel. Proves the subscribe wiring delivers
+	// messages, not just returns a dead channel.
+	val, _ := nativeToExpr(int64(7))
+	require.NoError(t, ps.Publish("test.topic", pubsub.NewMessage(val)))
+	select {
+	case msg := <-ch:
+		require.NotNil(t, msg, "expected message on outbox subscribe channel")
+		msg.Ack()
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("subscribed channel did not receive published message; outbox Subscribe is not wired through")
+	}
 }
 
 func TestOutboxPubSub_Close(t *testing.T) {
+	parallelByDefault(t)
 	ps := newPubSub()
 	ops := &outboxPubSub{pub: ps, sub: ps}
 	require.NoError(t, ops.Close())

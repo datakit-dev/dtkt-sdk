@@ -1,0 +1,21 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: state_machine_terminal_probe
+  description: |
+    One input-driven output (exits quickly when x=42 + EOF arrive) and a
+    long-running ticker that keeps the flow alive. Used by
+    TestStateMachine_TerminalNodesFlag_SetOnHandlerExit to probe operator
+    events on a terminal node while Execute is still running.
+  inputs:
+    - id: x
+      int64: {}
+  generators:
+    - id: tick
+      ticker:
+        interval: "1s"
+  outputs:
+    - id: result
+      value: "= inputs.x.value"
+    - id: ticks
+      value: "= generators.tick.value"

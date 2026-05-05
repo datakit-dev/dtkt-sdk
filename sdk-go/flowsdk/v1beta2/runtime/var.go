@@ -16,8 +16,9 @@ import (
 )
 
 type varHandler struct {
-	flowControlMixin
+	lifecycleMixin
 	suspendableMixin
+	stoppableMixin
 	id          string
 	inputs      map[string]<-chan *pubsub.Message
 	pubsub      executor.PubSub
@@ -35,11 +36,18 @@ func (h *varHandler) Run(ctx context.Context) error {
 
 	var evalCount uint64
 	for {
-		act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.adapter, h.SuspendChan())
+		act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
 		vars, err := act.Resolve()
+		if errors.Is(err, errOperatorStopped) {
+			break
+		}
 		if errors.Is(err, errOperatorSuspended) {
-			if !h.pauseUntilResume(ctx) {
+			res := h.waitForResume(ctx, h.StopChan())
+			if res == suspendCancelled {
 				return ctx.Err()
+			}
+			if res == suspendStopped {
+				break
 			}
 			continue
 		}
@@ -69,7 +77,7 @@ func (h *varHandler) Run(ctx context.Context) error {
 		if err := publishNode(h.pubsub, h.topic, node); err != nil {
 			return err
 		}
-		h.checkFC(vars)
+		h.checkLifecycle(vars)
 	}
 	return publishNode(h.pubsub, h.topic, flowv1beta2.RunSnapshot_VarNode_builder{
 		Id:        h.id,
@@ -112,11 +120,18 @@ func (h *varHandler) runWithTransforms(ctx context.Context) error {
 
 	g.Go(func() error {
 		for {
-			act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.adapter, h.SuspendChan())
+			act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
 			vars, err := act.Resolve()
+			if errors.Is(err, errOperatorStopped) {
+				break
+			}
 			if errors.Is(err, errOperatorSuspended) {
-				if !h.pauseUntilResume(ctx) {
+				res := h.waitForResume(ctx, h.StopChan())
+				if res == suspendCancelled {
 					return ctx.Err()
+				}
+				if res == suspendStopped {
+					break
 				}
 				continue
 			}

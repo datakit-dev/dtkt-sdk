@@ -18,8 +18,9 @@ import (
 
 // clientStreamHandler streams all incoming messages as requests and forwards the single response.
 type clientStreamHandler struct {
-	flowControlMixin
+	lifecycleMixin
 	suspendableMixin
+	stoppableMixin
 	id                   string
 	method               protoreflect.FullName
 	inputs               map[string]<-chan *pubsub.Message
@@ -28,7 +29,6 @@ type clientStreamHandler struct {
 	client               rpc.Client
 	env                  shared.Env
 	whenProg             cel.Program
-	closeRequestWhenProg cel.Program
 	throttle             time.Duration
 	request              *compiledRequest // nil = use FirstInputValue
 	responseProg         cel.Program      // nil = use raw response
@@ -37,37 +37,61 @@ type clientStreamHandler struct {
 
 func (h *clientStreamHandler) Run(ctx context.Context) error {
 	var stream rpc.ClientStream
-	err := executeWithRetry(ctx, h.retry, nil, func(ctx context.Context) error {
-		var openErr error
-		stream, openErr = h.client.CallClientStream(ctx, h.method)
-		return openErr
-	})
-	var contErr *ContinueError
-	if errors.As(err, &contErr) {
-		streamState := &flowv1beta2.RunSnapshot_StreamNode{}
-		streamState.SetId(h.id)
-		streamState.SetPhase(flowv1beta2.RunSnapshot_PHASE_RUNNING)
-		streamState.SetValue(contErr.Value)
-		publish := func(node *flowv1beta2.RunSnapshot_StreamNode) error {
-			return publishNode(h.pubsub, h.topic, node)
+	for {
+		err := executeWithRetry(ctx, h.retry, nil, func(ctx context.Context) error {
+			var openErr error
+			stream, openErr = h.client.CallClientStream(ctx, h.method)
+			return openErr
+		})
+		var contErr *ContinueError
+		if errors.As(err, &contErr) {
+			streamState := &flowv1beta2.RunSnapshot_StreamNode{}
+			streamState.SetId(h.id)
+			streamState.SetPhase(flowv1beta2.RunSnapshot_PHASE_RUNNING)
+			streamState.SetValue(contErr.Value)
+			publish := func(node *flowv1beta2.RunSnapshot_StreamNode) error {
+				return publishNode(h.pubsub, h.topic, node)
+			}
+			if pubErr := publish(cloneStreamNode(streamState)); pubErr != nil {
+				return pubErr
+			}
+			streamState.SetValue(newEOFValue())
+			streamState.SetRequestClosed(true)
+			streamState.SetPhase(flowv1beta2.RunSnapshot_PHASE_SUCCEEDED)
+			return publish(cloneStreamNode(streamState))
 		}
-		if pubErr := publish(cloneStreamNode(streamState)); pubErr != nil {
-			return pubErr
+		var suspendErr *SuspendError
+		if errors.As(err, &suspendErr) {
+			h.selfSuspend(err)
+			res := h.waitForResume(ctx, h.StopChan())
+			if res == suspendCancelled {
+				return ctx.Err()
+			}
+			if res == suspendStopped {
+				// Stopped while suspended waiting to retry the open; publish a
+				// minimal terminal SUCCEEDED state and exit cleanly. The
+				// stream was never opened, so there's nothing to drain.
+				streamState := &flowv1beta2.RunSnapshot_StreamNode{}
+				streamState.SetId(h.id)
+				streamState.SetRequestClosed(true)
+				streamState.SetResponseClosed(true)
+				streamState.SetValue(newEOFValue())
+				streamState.SetPhase(flowv1beta2.RunSnapshot_PHASE_SUCCEEDED)
+				return publishNode(h.pubsub, h.topic, cloneStreamNode(streamState))
+			}
+			continue // retry the open after resume
 		}
-		streamState.SetValue(newEOFValue())
-		streamState.SetRequestClosed(true)
-		streamState.SetPhase(flowv1beta2.RunSnapshot_PHASE_SUCCEEDED)
-		return publish(cloneStreamNode(streamState))
-	}
-	if err != nil {
-		return fmt.Errorf("client-stream %s open %q: %w", h.id, h.method, err)
+		if err != nil {
+			return fmt.Errorf("client-stream %s open %q: %w", h.id, h.method, err)
+		}
+		break // stream opened successfully
 	}
 
 	streamState := &flowv1beta2.RunSnapshot_StreamNode{}
 	streamState.SetId(h.id)
 	streamState.SetPhase(flowv1beta2.RunSnapshot_PHASE_RUNNING)
 
-	// Feed input messages into the stream, applying when/close_request_when guards.
+	// Feed input messages into the stream, applying the `when` guard.
 	sendDone := make(chan error, 1)
 	go func() {
 		var iterCount int
@@ -79,9 +103,17 @@ func (h *clientStreamHandler) Run(ctx context.Context) error {
 				case <-ctx.Done():
 					sendDone <- ctx.Err()
 					return
+				case <-h.StopChan():
+					sendDone <- nil // graceful stop; defer CloseSend, recv drains
+					return
 				case <-h.SuspendChan():
-					if !h.pauseUntilResume(ctx) {
+					res := h.waitForResume(ctx, h.StopChan())
+					if res == suspendCancelled {
 						sendDone <- ctx.Err()
+						return
+					}
+					if res == suspendStopped {
+						sendDone <- nil // graceful stop while suspended
 						return
 					}
 					continue
@@ -89,11 +121,20 @@ func (h *clientStreamHandler) Run(ctx context.Context) error {
 				}
 			}
 
-			act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan())
+			act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan(), h.StopChan())
 			vars, err := act.Resolve()
+			if errors.Is(err, errOperatorStopped) {
+				sendDone <- nil // graceful: close-send via defer, recv drains
+				return
+			}
 			if errors.Is(err, errOperatorSuspended) {
-				if !h.pauseUntilResume(ctx) {
+				res := h.waitForResume(ctx, h.StopChan())
+				if res == suspendCancelled {
 					sendDone <- ctx.Err()
+					return
+				}
+				if res == suspendStopped {
+					sendDone <- nil // graceful stop while suspended
 					return
 				}
 				continue
@@ -101,14 +142,6 @@ func (h *clientStreamHandler) Run(ctx context.Context) error {
 			if err != nil || act.AnyEOF() {
 				sendDone <- nil
 				return
-			}
-
-			if h.closeRequestWhenProg != nil {
-				result, err := evalCEL(h.closeRequestWhenProg, vars)
-				if err == nil && result.Value() == true {
-					sendDone <- nil
-					return
-				}
 			}
 
 			if h.whenProg != nil {

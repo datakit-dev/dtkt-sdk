@@ -86,7 +86,7 @@ outputs:
 `
 
 // TestExec_TickerWithDefault verifies that an input with a default value does
-// not require external injection — the executor self-triggers it and the flow
+// not require external injection - the executor self-triggers it and the flow
 // runs to completion.
 func TestExec_TickerWithDefault(t *testing.T) {
 	ctx, cancel := context.WithCancelCause(t.Context())
@@ -144,7 +144,7 @@ outputs:
 }
 
 // TestExec_RequiredInputBlocks verifies that a required (no-default) input
-// does NOT self-fire — the executor waits for external injection.
+// does NOT self-fire - the executor waits for external injection.
 func TestExec_RequiredInputBlocksThenProceeds(t *testing.T) {
 	const requiredInputSpec = `
 name: RequiredInput
@@ -171,7 +171,7 @@ outputs:
 	case <-exec.Ready():
 		t.Fatal("executor should not be ready before required input is injected")
 	case <-time.After(300 * time.Millisecond):
-		// expected — no spurious trigger
+		// expected - no spurious trigger
 	}
 
 	// Now inject the required value via the input's send channel.
@@ -200,7 +200,7 @@ outputs:
 }
 
 // TestExec_CachedRequiredInput_PersistsAcrossCycles verifies that a required
-// input with cache:true only needs to be injected once — the value is re-used
+// input with cache:true only needs to be injected once - the value is re-used
 // on every subsequent cycle without blocking on sendCh again.
 func TestExec_CachedRequiredInput_PersistsAcrossCycles(t *testing.T) {
 	const cachedInputSpec = `
@@ -250,7 +250,7 @@ outputs:
 	for {
 		select {
 		case <-ctx.Done():
-			t.Fatalf("timed out after %d cycles — cached input likely blocked on sendCh", cycleCount)
+			t.Fatalf("timed out after %d cycles - cached input likely blocked on sendCh", cycleCount)
 		case <-exec.Ready():
 			require.NoError(t, exec.Eval())
 			cycleCount++

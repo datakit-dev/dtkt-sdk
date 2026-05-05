@@ -37,13 +37,20 @@ func TestGraph_Stream_ServerStream(t *testing.T) {
 		pubsub := newPubSub()
 		defer pubsub.Close() //nolint:errcheck
 
-		feedInput(pubsub, "inputs.count", 1)
+		// random.Numbers mock emits N int64s in [0, 100). count=3 means 3
+		// emissions in order from the server stream.
+		feedInput(pubsub, "inputs.count", 3)
 		ctx := testContext(t)
 		err := NewExecutor(pubsub, testTopics, append(mockRPCOptions(), extraOpts...)...).Execute(ctx, graph)
 		require.NoError(t, err)
 
 		results := collectOutputs(ctx, pubsub, "outputs.result")
-		require.Len(t, results, 1)
+		require.Len(t, results, 3, "expected 3 server-stream emissions for count=3")
+		for i, r := range results {
+			v := r.GetValue().GetInt64Value()
+			assert.GreaterOrEqual(t, v, int64(0), "result[%d] must be int64 in [0,100)", i)
+			assert.Less(t, v, int64(100), "result[%d] must be int64 in [0,100)", i)
+		}
 	})
 }
 
@@ -200,53 +207,6 @@ func TestGraph_Stream_ServerStreamWhen(t *testing.T) {
 		results := collectOutputs(ctx, pubsub, "outputs.result")
 		require.Len(t, results, 1)
 		assert.Equal(t, int64(8), results[0].GetValue().GetInt64Value())
-	})
-}
-
-// Stream with `close_request_when` -- bidi closes request side
-
-func TestGraph_Stream_BidiCloseRequestWhen(t *testing.T) {
-	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
-		graph := loadFlow(t, "stream_bidi_close_request.yaml")
-
-		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
-
-		// Feed values: 1, 2, 99 (close trigger) -- only 1 and 2 should echo
-		feedInput(pubsub, "inputs.x", 1, 2, 99)
-		ctx := testContext(t)
-		err := NewExecutor(pubsub, testTopics, append(mockRPCOptions(), extraOpts...)...).Execute(ctx, graph)
-		require.NoError(t, err)
-
-		results := collectOutputs(ctx, pubsub, "outputs.result")
-		require.Len(t, results, 2)
-		assert.Equal(t, int64(1), results[0].GetValue().GetInt64Value())
-		assert.Equal(t, int64(2), results[1].GetValue().GetInt64Value())
-	})
-}
-
-// Stream with EOF() in MethodCall.request -- when the request expression
-// evaluates to EOF(), the runtime is documented to close the client side of
-// the stream (an ergonomic alternative to close_request_when).
-
-func TestGraph_Stream_BidiEOFInRequest(t *testing.T) {
-	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
-		graph := loadFlow(t, "stream_eof_close_request.yaml")
-
-		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
-
-		// Feed values: 1, 2, 99 (EOF trigger), 3 -- only 1 and 2 should echo;
-		// the EOF() should close the request side and stop the stream.
-		feedInput(pubsub, "inputs.x", 1, 2, 99, 3)
-		ctx := testContext(t)
-		err := NewExecutor(pubsub, testTopics, append(mockRPCOptions(), extraOpts...)...).Execute(ctx, graph)
-		require.NoError(t, err)
-
-		results := collectOutputs(ctx, pubsub, "outputs.result")
-		require.Len(t, results, 2)
-		assert.Equal(t, int64(1), results[0].GetValue().GetInt64Value())
-		assert.Equal(t, int64(2), results[1].GetValue().GetInt64Value())
 	})
 }
 

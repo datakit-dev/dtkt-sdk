@@ -20,7 +20,7 @@ type Executor struct {
 	triggeredIds,
 	eofIds []string
 
-	// Internal node accounting — populated during startNodeExecution, independent
+	// Internal node accounting - populated during startNodeExecution, independent
 	// of the runtime's channel maps which may be accessed externally (e.g. to
 	// inject values). Using executor-owned sets ensures activeCount and trigger
 	// iteration are not affected by external channel creation.
@@ -106,7 +106,7 @@ func (e *Executor) Start() error {
 							e.emittedIds = e.emittedIds[:0]
 							e.triggeredIds = e.triggeredIds[:0]
 
-							// Wait for exec.Reset() — ensures runtime.Reset() has run before we
+							// Wait for exec.Reset() - ensures runtime.Reset() has run before we
 							// send the next cycle's triggers (prevents bidiEcho.Recv from reading
 							// a stale SUCCESS value from the previous cycle).
 							select {
@@ -313,7 +313,7 @@ func (e *Executor) sendTriggersForReadyNodes() error {
 				continue
 			}
 
-			// Skip cache-enabled inputs that already have a captured value — the ack
+			// Skip cache-enabled inputs that already have a captured value - the ack
 			// goroutine re-emits the cached value each cycle without reading sendCh, so
 			// sending a nil trigger would pump a value through the Recv→valueCh→Send→
 			// sendCh pipeline that nobody ever drains, eventually deadlocking.
@@ -337,7 +337,7 @@ func (e *Executor) sendTriggersForReadyNodes() error {
 		// - If a required input has Completed (CurrValue is set via applyValue
 		//   at ack time), it does not block the trigger.
 		// - If a required input has NOT yet received a value (UNSPECIFIED state),
-		//   it DOES block the trigger — the downstream node must wait.
+		//   it DOES block the trigger - the downstream node must wait.
 		if slices.ContainsFunc(e.graph.Forward(id), func(depID string) bool {
 			if !slices.Contains(e.sendNodeIds, depID) || slices.Contains(e.eofIds, depID) {
 				return false
@@ -345,7 +345,7 @@ func (e *Executor) sendTriggersForReadyNodes() error {
 
 			if node, ok := e.run.nodes.Load(depID); ok {
 				// A cached predecessor always has its value ready and will ack
-				// immediately via the hasCached fast path — never blocks a trigger.
+				// immediately via the hasCached fast path - never blocks a trigger.
 				if _, cached := node.hasCached(); cached {
 					return false
 				}

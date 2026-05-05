@@ -1,0 +1,28 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: retry_skip_nc_stop
+  description: |
+    Action's retry strategy skips on NotFound (code 5). NC.stop_when on
+    the action triggers unconditionally on every iteration. Verifies that
+    SKIP still reaches checkLifecycle so NC.stop fires and the node exits
+    with SUCCEEDED -- not stuck in a skip-loop.
+  inputs:
+    - id: msg
+      int64: {}
+  actions:
+    - id: echo
+      retry_strategy:
+        skip_when: "= this.error.code == 5"
+        backoff:
+          initial_backoff: "0.001s"
+          max_attempts: 1
+      call:
+        connection: echo
+        method: error.NotFound
+        request: "= inputs.msg.value"
+      node_control:
+        stop_when: "= true"
+  outputs:
+    - id: result
+      value: "= actions.echo.value"

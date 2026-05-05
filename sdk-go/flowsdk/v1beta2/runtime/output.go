@@ -18,8 +18,9 @@ import (
 
 // outputHandler receives messages, evaluates a CEL expression, and publishes the result to the output PubSub topic.
 type outputHandler struct {
-	flowControlMixin
+	lifecycleMixin
 	suspendableMixin
+	stoppableMixin
 	id          string
 	inputs      map[string]<-chan *pubsub.Message
 	program     cel.Program
@@ -40,20 +41,30 @@ func (h *outputHandler) Run(ctx context.Context) error {
 		iterCount int
 		eofSeen   bool
 	)
+loop:
 	for {
 		if h.throttle > 0 && iterCount > 0 {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
+			case <-h.StopChan():
+				break loop // graceful stop; post-loop EOF publish fires
 			case <-time.After(h.throttle):
 			}
 		}
 
-		act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.adapter, h.SuspendChan())
+		act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
 		vars, err := act.Resolve()
+		if errors.Is(err, errOperatorStopped) {
+			break
+		}
 		if errors.Is(err, errOperatorSuspended) {
-			if !h.pauseUntilResume(ctx) {
+			res := h.waitForResume(ctx, h.StopChan())
+			if res == suspendCancelled {
 				return ctx.Err()
+			}
+			if res == suspendStopped {
+				break
 			}
 			continue
 		}
@@ -91,14 +102,14 @@ func (h *outputHandler) Run(ctx context.Context) error {
 		if err := publishNode(h.pubsub, h.outputTopic, node); err != nil {
 			return fmt.Errorf("output %s publish: %w", h.id, err)
 		}
-		h.checkFC(vars)
+		h.checkLifecycle(vars)
 	}
 
 	// Publish a Closed:true EOF marker on exit so subscribers know the
 	// stream has ended. Under the unified suspend design this code path
-	// is reached ONLY on real termination — input drained (AnyEOF), or
+	// is reached ONLY on real termination - input drained (AnyEOF), or
 	// ctx cancelled by Stop/Terminate. Suspend never reaches here; it's
-	// handled at the top of the loop via pauseUntilResume.
+	// handled at the top of the loop via waitForResume.
 	phase := flowv1beta2.RunSnapshot_PHASE_SUCCEEDED
 	if !eofSeen && ctx.Err() != nil {
 		phase = flowv1beta2.RunSnapshot_PHASE_CANCELLED
@@ -144,20 +155,30 @@ func (h *outputHandler) runWithTransforms(ctx context.Context) error {
 	var eofSeen bool
 	g.Go(func() error {
 		var iterCount int
+	loop:
 		for {
 			if h.throttle > 0 && iterCount > 0 {
 				select {
 				case <-ctx.Done():
 					return ctx.Err()
+				case <-h.StopChan():
+					break loop // graceful stop; post-loop EOF publish fires
 				case <-time.After(h.throttle):
 				}
 			}
 
-			act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.adapter, h.SuspendChan())
+			act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
 			vars, err := act.Resolve()
+			if errors.Is(err, errOperatorStopped) {
+				break
+			}
 			if errors.Is(err, errOperatorSuspended) {
-				if !h.pauseUntilResume(ctx) {
+				res := h.waitForResume(ctx, h.StopChan())
+				if res == suspendCancelled {
 					return ctx.Err()
+				}
+				if res == suspendStopped {
+					break
 				}
 				continue
 			}

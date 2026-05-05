@@ -22,8 +22,9 @@ import (
 
 // unaryHandler sends each incoming message as a request and forwards the single response.
 type unaryHandler struct {
-	flowControlMixin
+	lifecycleMixin
 	suspendableMixin
+	stoppableMixin
 	id           string
 	method       protoreflect.FullName
 	inputs       map[string]<-chan *pubsub.Message
@@ -41,19 +42,26 @@ type unaryHandler struct {
 
 func (h *unaryHandler) Run(ctx context.Context) error {
 	var evalCount uint64
+loop:
 	for {
 		// Pause point: between iterations, BEFORE starting the next call.
 		// An in-flight call from the previous iteration always completes
 		// naturally. Suspend never aborts an RPC mid-flight (we can't
 		// guarantee that's safe / idempotent on the server side).
-		act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan())
+		act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan(), h.StopChan())
 		if h.throttle > 0 && evalCount > 0 {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
+			case <-h.StopChan():
+				break loop // graceful stop; post-loop SUCCEEDED publish fires
 			case <-h.SuspendChan():
-				if !h.pauseUntilResume(ctx) {
+				res := h.waitForResume(ctx, h.StopChan())
+				if res == suspendCancelled {
 					return ctx.Err()
+				}
+				if res == suspendStopped {
+					break loop
 				}
 				continue
 			case <-time.After(h.throttle):
@@ -61,9 +69,16 @@ func (h *unaryHandler) Run(ctx context.Context) error {
 		}
 
 		vars, err := act.Resolve()
+		if errors.Is(err, errOperatorStopped) {
+			break
+		}
 		if errors.Is(err, errOperatorSuspended) {
-			if !h.pauseUntilResume(ctx) {
+			res := h.waitForResume(ctx, h.StopChan())
+			if res == suspendCancelled {
 				return ctx.Err()
+			}
+			if res == suspendStopped {
+				break loop
 			}
 			continue
 		}
@@ -97,6 +112,17 @@ func (h *unaryHandler) Run(ctx context.Context) error {
 			return callErr
 		})
 		if err == errSkipped {
+			// Lifecycle pipeline: retry's SKIP outcome still goes through
+			// checkLifecycle. NC/FC may decide to stop/terminate based on
+			// the iteration's vars (e.g. NC.stop_when after N skips).
+			nc, fc := h.checkLifecycle(vars)
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			if nc == LifecycleStop || fc == LifecycleStop {
+				h.requestStop()
+				break loop
+			}
 			continue
 		}
 		var contErr *ContinueError
@@ -109,6 +135,44 @@ func (h *unaryHandler) Run(ctx context.Context) error {
 			}.Build()
 			if err := publishNode(h.pubsub, h.topic, node); err != nil {
 				return err
+			}
+			// Lifecycle pipeline: retry's CONTINUE emits an error-derived
+			// value; NC/FC should still react to the iteration as if a
+			// normal value had been published.
+			nc, fc := h.checkLifecycle(vars)
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			if nc == LifecycleStop || fc == LifecycleStop {
+				h.requestStop()
+				break loop
+			}
+			continue
+		}
+		var suspendErr *SuspendError
+		if errors.As(err, &suspendErr) {
+			// Lifecycle pipeline: retry's SUSPEND outcome is the iteration's
+			// "starting intent". NC and FC may promote it (terminate beats
+			// suspend; stop also wins) or no-op. checkLifecycle returns the
+			// action each control selected; we branch on it.
+			nc, fc := h.checkLifecycle(vars)
+			// Terminate cancels ctx; we exit on ctx.Err.
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			// Stop fired (NC or FC): exit the loop instead of suspending.
+			// (recv() can't see this -- we're between iterations.)
+			if nc == LifecycleStop || fc == LifecycleStop {
+				h.requestStop()
+				break loop
+			}
+			h.selfSuspend(err)
+			res := h.waitForResume(ctx, h.StopChan())
+			if res == suspendCancelled {
+				return ctx.Err()
+			}
+			if res == suspendStopped {
+				break loop
 			}
 			continue
 		}
@@ -130,7 +194,7 @@ func (h *unaryHandler) Run(ctx context.Context) error {
 		if err := publishNode(h.pubsub, h.topic, node); err != nil {
 			return err
 		}
-		h.checkFC(vars)
+		h.checkLifecycle(vars)
 	}
 
 	return publishNode(h.pubsub, h.topic, flowv1beta2.RunSnapshot_ActionNode_builder{

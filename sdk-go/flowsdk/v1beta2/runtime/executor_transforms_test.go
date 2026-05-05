@@ -426,11 +426,17 @@ func TestGraph_Transform_ContextCancel(t *testing.T) {
 		ctx, cancel := context.WithTimeout(testContext(t), 50*time.Millisecond)
 		defer cancel()
 
+		start := time.Now()
 		err := NewExecutor(pubsub, testTopics, extraOpts...).Execute(ctx, graph)
-		// Should return cleanly or with context deadline error.
+		elapsed := time.Since(start)
 		if err != nil {
 			require.ErrorIs(t, err, context.DeadlineExceeded)
 		}
+		// Verify ctx cancellation actually took effect: Execute must
+		// return well within 1s even though the ticker would otherwise
+		// run forever.
+		assert.Less(t, elapsed, 1*time.Second,
+			"Execute should respond to ctx cancel; took %v (deadline was 50ms)", elapsed)
 	})
 }
 

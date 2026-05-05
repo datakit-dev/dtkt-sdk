@@ -207,11 +207,6 @@ func lintNode(node *flowv1beta2.Node, resolvers map[string]shared.Resolver, env 
 				celDiag("when", err)
 			}
 		}
-		if crw := s.GetCloseRequestWhen(); crw != "" {
-			if _, err := parseCEL(crw); err != nil {
-				celDiag("close_request_when", err)
-			}
-		}
 		if call := s.GetCall(); call != nil {
 			appendWith(lintMethodCall(call, resolvers, env))
 		}

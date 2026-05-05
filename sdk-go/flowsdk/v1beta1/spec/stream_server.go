@@ -18,7 +18,7 @@ var _ shared.ExecNode = (*ServerStream)(nil)
 var _ ExecNodeCloser = (*ServerStream)(nil)
 
 // ServerStream implements a server-streaming RPC: one request, N responses.
-// It is self-starting (no Recv trigger needed) — it opens the stream on first
+// It is self-starting (no Recv trigger needed) - it opens the stream on first
 // Send invocation and emits each response as an independent event.
 type ServerStream struct {
 	id     string

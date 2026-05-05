@@ -21,8 +21,9 @@ import (
 // external source (CLI, gRPC bidi stream, etc.). The prompt is sent via the
 // prompt channel; the response arrives via TryDeliver from the demux goroutine.
 type interactionHandler struct {
-	flowControlMixin
+	lifecycleMixin
 	suspendableMixin
+	stoppableMixin
 	id          string
 	inputs      map[string]<-chan *pubsub.Message
 	pubsub      executor.PubSub
@@ -63,13 +64,20 @@ func (h *interactionHandler) Run(ctx context.Context) error {
 
 	for {
 		// Pause point: between iterations only. An in-flight prompt
-		// completes naturally — we don't cancel a prompt the operator
+		// completes naturally - we don't cancel a prompt the operator
 		// is already responding to.
-		act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.adapter, h.SuspendChan())
+		act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
 		vars, err := act.Resolve()
+		if errors.Is(err, errOperatorStopped) {
+			break
+		}
 		if errors.Is(err, errOperatorSuspended) {
-			if !h.pauseUntilResume(ctx) {
+			res := h.waitForResume(ctx, h.StopChan())
+			if res == suspendCancelled {
 				return ctx.Err()
+			}
+			if res == suspendStopped {
+				break
 			}
 			continue
 		}
@@ -107,7 +115,7 @@ func (h *interactionHandler) Run(ctx context.Context) error {
 		if err := publishNode(h.pubsub, h.topic, node); err != nil {
 			return err
 		}
-		h.checkFC(vars)
+		h.checkLifecycle(vars)
 	}
 	return publishNode(h.pubsub, h.topic, flowv1beta2.RunSnapshot_InteractionNode_builder{
 		Id:    h.id,
@@ -149,11 +157,18 @@ func (h *interactionHandler) runWithTransforms(ctx context.Context) error {
 
 	g.Go(func() error {
 		for {
-			act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.adapter, h.SuspendChan())
+			act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
 			vars, err := act.Resolve()
+			if errors.Is(err, errOperatorStopped) {
+				break
+			}
 			if errors.Is(err, errOperatorSuspended) {
-				if !h.pauseUntilResume(ctx) {
+				res := h.waitForResume(ctx, h.StopChan())
+				if res == suspendCancelled {
 					return ctx.Err()
+				}
+				if res == suspendStopped {
+					break
 				}
 				continue
 			}

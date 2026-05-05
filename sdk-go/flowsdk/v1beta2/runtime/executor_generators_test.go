@@ -74,8 +74,12 @@ func TestGraph_Generator_Ticker(t *testing.T) {
 		err := NewExecutor(pubsub, testTopics, extraOpts...).Execute(ctx, graph)
 		require.NoError(t, err)
 
-		results := collectOutputs(ctx, pubsub, "outputs.result")
-		require.Len(t, results, 5)
+		// Ticker without a value expression emits the monotonic eval_count.
+		// FC.stop_when fires at eval_count >= 5, so we expect exactly
+		// [1,2,3,4,5].
+		results := outputInt64s(collectOutputs(ctx, pubsub, "outputs.result"))
+		assert.Equal(t, []int64{1, 2, 3, 4, 5}, results,
+			"ticker default value is the monotonic eval_count")
 	})
 }
 
@@ -93,6 +97,30 @@ func TestGraph_Generator_TickerWithValueExpr(t *testing.T) {
 		results := outputInt64s(collectOutputs(ctx, pubsub, "outputs.result"))
 		// value = count * 100; stop at eval_count >= 5.
 		assert.Equal(t, []int64{100, 200, 300, 400, 500}, results)
+	})
+}
+
+// Ticker generator with initial delay -- the first emission is gated by `delay`.
+// Verifies the field is honored, not just decoded.
+
+func TestGraph_Generator_TickerDelay(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "gen_ticker_delay.yaml")
+
+		pubsub := newPubSub()
+		defer pubsub.Close() //nolint:errcheck
+
+		ctx := testContext(t)
+		start := time.Now()
+		err := NewExecutor(pubsub, testTopics, extraOpts...).Execute(ctx, graph)
+		elapsed := time.Since(start)
+		require.NoError(t, err)
+
+		results := collectOutputs(ctx, pubsub, "outputs.result")
+		require.Len(t, results, 2)
+		// 50ms delay + 50ms interval = at least ~100ms total before stop.
+		assert.GreaterOrEqual(t, elapsed, 80*time.Millisecond,
+			"first tick must wait for delay before emitting")
 	})
 }
 
@@ -166,42 +194,3 @@ func TestGraph_Generator_CronInvalidExpression(t *testing.T) {
 	})
 }
 
-// CEL EOF() function
-
-func TestCEL_EOF_Function(t *testing.T) {
-	env, err := buildCELEnv(nil)
-	require.NoError(t, err)
-	prog, err := compileCEL(env, "= EOF()")
-	require.NoError(t, err, "EOF() should compile")
-
-	result, err := evalCEL(prog, nil)
-	require.NoError(t, err, "EOF() should evaluate")
-
-	val, err := refValToExpr(result)
-	require.NoError(t, err, "EOF() result should convert to expr.Value")
-	assert.True(t, isEOFValue(val), "EOF() result should be recognized as EOF")
-}
-
-func TestCEL_EOF_Conditional(t *testing.T) {
-	env, err := buildCELEnv(nil)
-	require.NoError(t, err)
-	prog, err := compileCEL(env, "= this.count > 2 ? EOF() : this.count")
-	require.NoError(t, err)
-
-	// count=1: should return 1
-	result, err := evalCEL(prog, map[string]any{"this": map[string]any{"count": int64(1)}})
-	require.NoError(t, err)
-	val, err := refValToExpr(result)
-	require.NoError(t, err)
-	assert.False(t, isEOFValue(val))
-	assert.Equal(t, int64(1), val.GetInt64Value())
-
-	// count=3: should return EOF
-	result, err = evalCEL(prog, map[string]any{"this": map[string]any{"count": int64(3)}})
-	require.NoError(t, err)
-	val, err = refValToExpr(result)
-	require.NoError(t, err)
-	assert.True(t, isEOFValue(val))
-}
-
-// CEL EOF() function

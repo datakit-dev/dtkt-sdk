@@ -13,7 +13,7 @@ spec:
         start: 1
         end: 1000000
         rate:
-          count: 100
+          count: 10
           interval: "1s"
   vars:
     - id: passthrough

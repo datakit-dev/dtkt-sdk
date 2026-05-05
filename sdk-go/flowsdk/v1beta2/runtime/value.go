@@ -3,7 +3,6 @@ package runtime
 import (
 	"context"
 	"fmt"
-	"reflect"
 
 	expr "cel.dev/expr"
 	"github.com/google/cel-go/cel"
@@ -21,28 +20,10 @@ import (
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
-// eofRefVal is a CEL ref.Val that wraps the EOF proto sentinel.
-// Used by the EOF() CEL function. refValToExpr handles it via the proto.Message
-// default case, producing an ObjectValue that isEOFValue recognizes.
-type eofRefVal struct{}
-
-var eofRefValInstance ref.Val = eofRefVal{}
-
-func (eofRefVal) ConvertToNative(typeDesc reflect.Type) (any, error) {
-	eof := &flowv1beta2.EOF{}
-	if typeDesc == reflect.TypeOf((*anypb.Any)(nil)) {
-		return anypb.New(eof)
-	}
-	return eof, nil
-}
-func (eofRefVal) ConvertToType(typeVal ref.Type) ref.Val { return types.NewErr("no conversion") }
-func (eofRefVal) Equal(other ref.Val) ref.Val            { _, ok := other.(eofRefVal); return types.Bool(ok) }
-func (eofRefVal) Type() ref.Type {
-	return types.NewObjectType("dtkt.flow.v1beta2.EOF")
-}
-func (eofRefVal) Value() any { return &flowv1beta2.EOF{} }
-
 // newEOFValue creates a cel.expr.Value representing end-of-stream.
+// This is the runtime's internal "topic done" marker -- every handler
+// publishes one when its loop exits cleanly, and downstream consumers
+// detect it via isEOFValue to terminate their own loops. Not user-facing.
 func newEOFValue() *expr.Value {
 	eofAny, _ := anypb.New(&flowv1beta2.EOF{})
 	return &expr.Value{Kind: &expr.Value_ObjectValue{ObjectValue: eofAny}}

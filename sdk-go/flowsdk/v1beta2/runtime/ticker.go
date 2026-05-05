@@ -14,6 +14,7 @@ import (
 
 // tickerHandler generates messages on a time interval.
 type tickerHandler struct {
+	stoppableMixin
 	id           string
 	pubsub       executor.PubSub
 	topic        string
@@ -39,11 +40,25 @@ func (h *tickerHandler) resume() {
 	}
 }
 
+// publishSucceeded emits the terminal SUCCEEDED state with EOF so
+// downstream consumers see graceful exit.
+func (h *tickerHandler) publishSucceeded() error {
+	return publishNode(h.pubsub, h.topic, flowv1beta2.RunSnapshot_GeneratorNode_builder{
+		Id:        h.id,
+		Value:     newEOFValue(),
+		Done:      true,
+		EvalCount: uint64(h.count),
+		Phase:     flowv1beta2.RunSnapshot_PHASE_SUCCEEDED,
+	}.Build())
+}
+
 func (h *tickerHandler) Run(ctx context.Context) error {
 	if h.delay > 0 {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
+		case <-h.StopChan():
+			return h.publishSucceeded()
 		case <-time.After(h.delay):
 		}
 	}
@@ -54,14 +69,14 @@ func (h *tickerHandler) Run(ctx context.Context) error {
 	for {
 		select {
 		case <-ctx.Done():
-			_ = publishNode(h.pubsub, h.topic, flowv1beta2.RunSnapshot_GeneratorNode_builder{
-				Id:        h.id,
-				Value:     newEOFValue(),
-				Done:      true,
-				EvalCount: uint64(h.count),
-				Phase:     flowv1beta2.RunSnapshot_PHASE_SUCCEEDED,
-			}.Build())
-			return nil
+			// Terminate path: ctx is cancelled either by TerminateNode
+			// (which already published PHASE_CANCELLED) or by flow-wide
+			// runCtx cancel. Return ctx.Err quietly; the lifecycle wrapper
+			// treats it as a clean exit and does not double-publish.
+			return ctx.Err()
+		case <-h.StopChan():
+			// Graceful stop: handler exits with PHASE_SUCCEEDED.
+			return h.publishSucceeded()
 		case <-h.suspendCh:
 			ticker.Stop()
 			_ = publishStateEvent(h.pubsub, h.topic, flowv1beta2.RunSnapshot_GeneratorNode_builder{
@@ -70,16 +85,9 @@ func (h *tickerHandler) Run(ctx context.Context) error {
 			}.Build())
 			select {
 			case <-ctx.Done():
-				// Publish EOF so downstream consumers don't hang waiting
-				// for a marker that would otherwise never come.
-				_ = publishNode(h.pubsub, h.topic, flowv1beta2.RunSnapshot_GeneratorNode_builder{
-					Id:        h.id,
-					Value:     newEOFValue(),
-					Done:      true,
-					EvalCount: uint64(h.count),
-					Phase:     flowv1beta2.RunSnapshot_PHASE_SUCCEEDED,
-				}.Build())
-				return nil
+				return ctx.Err()
+			case <-h.StopChan():
+				return h.publishSucceeded()
 			case <-h.resumeCh:
 				_ = publishStateEvent(h.pubsub, h.topic, flowv1beta2.RunSnapshot_GeneratorNode_builder{
 					Id:    h.id,

@@ -56,7 +56,7 @@ func groupOf(exec *Executor, nodeID string) (int, bool) {
 	return -1, false
 }
 
-// TestGraph_SingleNode — one node, no edges → one group.
+// TestGraph_SingleNode - one node, no edges → one group.
 func TestGraph_SingleNode(t *testing.T) {
 	g := buildGraph(t, []string{"vars.a"}, nil)
 	exec, err := NewExecutor(&Runtime{
@@ -71,7 +71,7 @@ func TestGraph_SingleNode(t *testing.T) {
 	assert.Equal(t, 0, idx)
 }
 
-// TestGraph_IndependentNodes — three nodes, no edges → all in group 0.
+// TestGraph_IndependentNodes - three nodes, no edges → all in group 0.
 func TestGraph_IndependentNodes(t *testing.T) {
 	g := buildGraph(t, []string{"vars.a", "vars.b", "vars.c"}, nil)
 	exec, err := NewExecutor(&Runtime{}, g)
@@ -83,7 +83,7 @@ func TestGraph_IndependentNodes(t *testing.T) {
 	}
 }
 
-// TestGraph_LinearChain — a→b→c must produce three separate groups in order.
+// TestGraph_LinearChain - a→b→c must produce three separate groups in order.
 func TestGraph_LinearChain(t *testing.T) {
 	g := buildGraph(t,
 		[]string{"vars.a", "vars.b", "vars.c"},
@@ -100,7 +100,7 @@ func TestGraph_LinearChain(t *testing.T) {
 	assert.Less(t, ib, ic, "b before c")
 }
 
-// TestGraph_Diamond — a→b, a→c, b→d, c→d: b and c are parallel; d is last.
+// TestGraph_Diamond - a→b, a→c, b→d, c→d: b and c are parallel; d is last.
 func TestGraph_Diamond(t *testing.T) {
 	g := buildGraph(t,
 		[]string{"vars.a", "vars.b", "vars.c", "vars.d"},
@@ -123,7 +123,7 @@ func TestGraph_Diamond(t *testing.T) {
 	assert.Less(t, ic, id)
 }
 
-// TestGraph_ComplexDAG — two roots fan out, merge, fan out and merge again.
+// TestGraph_ComplexDAG - two roots fan out, merge, fan out and merge again.
 func TestGraph_ComplexDAG(t *testing.T) {
 	//   a   b
 	//  / \ / \

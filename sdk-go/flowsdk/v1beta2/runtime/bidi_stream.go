@@ -20,49 +20,72 @@ import (
 
 // bidiStreamHandler streams messages in both directions concurrently.
 type bidiStreamHandler struct {
-	flowControlMixin
+	lifecycleMixin
 	suspendableMixin
-	id                   string
-	method               protoreflect.FullName
-	inputs               map[string]<-chan *pubsub.Message
-	pubsub               executor.PubSub
-	topic                string
-	client               rpc.Client
-	env                  shared.Env
-	whenProg             cel.Program
-	closeRequestWhenProg cel.Program
-	throttle             time.Duration
-	request              *compiledRequest // nil = use FirstInputValue
-	responseProg         cel.Program      // nil = use raw response
-	retry                *compiledRetryStrategy
+	stoppableMixin
+	id           string
+	method       protoreflect.FullName
+	inputs       map[string]<-chan *pubsub.Message
+	pubsub       executor.PubSub
+	topic        string
+	client       rpc.Client
+	env          shared.Env
+	whenProg     cel.Program
+	throttle     time.Duration
+	request      *compiledRequest // nil = use FirstInputValue
+	responseProg cel.Program      // nil = use raw response
+	retry        *compiledRetryStrategy
 }
 
 func (h *bidiStreamHandler) Run(ctx context.Context) error {
 	var stream rpc.BidiStream
-	err := executeWithRetry(ctx, h.retry, nil, func(ctx context.Context) error {
-		var openErr error
-		stream, openErr = h.client.CallBidiStream(ctx, h.method)
-		return openErr
-	})
-	var contErr *ContinueError
-	if errors.As(err, &contErr) {
-		streamState := &flowv1beta2.RunSnapshot_StreamNode{}
-		streamState.SetId(h.id)
-		streamState.SetPhase(flowv1beta2.RunSnapshot_PHASE_RUNNING)
-		streamState.SetValue(contErr.Value)
-		publish := func(node *flowv1beta2.RunSnapshot_StreamNode) error {
-			return publishNode(h.pubsub, h.topic, node)
+	for {
+		err := executeWithRetry(ctx, h.retry, nil, func(ctx context.Context) error {
+			var openErr error
+			stream, openErr = h.client.CallBidiStream(ctx, h.method)
+			return openErr
+		})
+		var contErr *ContinueError
+		if errors.As(err, &contErr) {
+			streamState := &flowv1beta2.RunSnapshot_StreamNode{}
+			streamState.SetId(h.id)
+			streamState.SetPhase(flowv1beta2.RunSnapshot_PHASE_RUNNING)
+			streamState.SetValue(contErr.Value)
+			publish := func(node *flowv1beta2.RunSnapshot_StreamNode) error {
+				return publishNode(h.pubsub, h.topic, node)
+			}
+			if pubErr := publish(cloneStreamNode(streamState)); pubErr != nil {
+				return pubErr
+			}
+			streamState.SetValue(newEOFValue())
+			streamState.SetResponseClosed(true)
+			streamState.SetPhase(flowv1beta2.RunSnapshot_PHASE_SUCCEEDED)
+			return publish(cloneStreamNode(streamState))
 		}
-		if pubErr := publish(cloneStreamNode(streamState)); pubErr != nil {
-			return pubErr
+		var suspendErr *SuspendError
+		if errors.As(err, &suspendErr) {
+			h.selfSuspend(err)
+			res := h.waitForResume(ctx, h.StopChan())
+			if res == suspendCancelled {
+				return ctx.Err()
+			}
+			if res == suspendStopped {
+				// Stopped while suspended waiting to retry the open; publish a
+				// minimal terminal SUCCEEDED state and exit cleanly.
+				streamState := &flowv1beta2.RunSnapshot_StreamNode{}
+				streamState.SetId(h.id)
+				streamState.SetRequestClosed(true)
+				streamState.SetResponseClosed(true)
+				streamState.SetValue(newEOFValue())
+				streamState.SetPhase(flowv1beta2.RunSnapshot_PHASE_SUCCEEDED)
+				return publishNode(h.pubsub, h.topic, cloneStreamNode(streamState))
+			}
+			continue // retry the open after resume
 		}
-		streamState.SetValue(newEOFValue())
-		streamState.SetResponseClosed(true)
-		streamState.SetPhase(flowv1beta2.RunSnapshot_PHASE_SUCCEEDED)
-		return publish(cloneStreamNode(streamState))
-	}
-	if err != nil {
-		return fmt.Errorf("bidi-stream %s open %q: %w", h.id, h.method, err)
+		if err != nil {
+			return fmt.Errorf("bidi-stream %s open %q: %w", h.id, h.method, err)
+		}
+		break // stream opened successfully
 	}
 
 	streamState := &flowv1beta2.RunSnapshot_StreamNode{}
@@ -71,45 +94,51 @@ func (h *bidiStreamHandler) Run(ctx context.Context) error {
 
 	var mu sync.Mutex // protects streamState shared between send/receive goroutines
 
-	// Feed input messages into the stream, applying when/close_request_when guards.
+	// Feed input messages into the stream, applying the `when` guard.
 	go func() {
 		defer stream.CloseSend() //nolint:errcheck
 		var iterCount int
 		for {
 			// Pause the SEND side only. Recv (the other goroutine, below)
-			// keeps reading from the stream — we cannot guarantee that
+			// keeps reading from the stream - we cannot guarantee that
 			// closing/restarting a bidi stream is idempotent on the
 			// server side, so the connection stays open through suspend.
 			if h.throttle > 0 && iterCount > 0 {
 				select {
 				case <-ctx.Done():
 					return
+				case <-h.StopChan():
+					return // graceful stop; defer stream.CloseSend() fires
 				case <-h.SuspendChan():
-					if !h.pauseUntilResume(ctx) {
+					res := h.waitForResume(ctx, h.StopChan())
+					if res == suspendCancelled {
 						return
+					}
+					if res == suspendStopped {
+						return // graceful stop while suspended
 					}
 					continue
 				case <-time.After(h.throttle):
 				}
 			}
 
-			act := newActivationFromChannelsSuspendable(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan())
+			act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan(), h.StopChan())
 			vars, err := act.Resolve()
+			if errors.Is(err, errOperatorStopped) {
+				return // exit send goroutine; defer stream.CloseSend() fires
+			}
 			if errors.Is(err, errOperatorSuspended) {
-				if !h.pauseUntilResume(ctx) {
+				res := h.waitForResume(ctx, h.StopChan())
+				if res == suspendCancelled {
 					return
+				}
+				if res == suspendStopped {
+					return // graceful stop while suspended
 				}
 				continue
 			}
 			if err != nil || act.AnyEOF() {
 				return
-			}
-
-			if h.closeRequestWhenProg != nil {
-				result, err := evalCEL(h.closeRequestWhenProg, vars)
-				if err == nil && result.Value() == true {
-					return
-				}
 			}
 
 			if h.whenProg != nil {

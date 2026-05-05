@@ -91,7 +91,7 @@ func (f *FeatureCollectionStream) Read(p []byte) (int, error) {
 			return 0, fmt.Errorf("invalid feature at line: %w", err)
 		}
 		if ft.Type != "Feature" {
-			return 0, fmt.Errorf("unexpected type %q — only GeoJSON Features are supported", ft.Type)
+			return 0, fmt.Errorf("unexpected type %q - only GeoJSON Features are supported", ft.Type)
 		}
 
 		// Set up the next chunk to emit (feature with optional comma)
@@ -102,6 +102,6 @@ func (f *FeatureCollectionStream) Read(p []byte) (int, error) {
 		f.first = false
 		f.curr = strings.NewReader(comma + string(raw))
 
-		// Loop again — now `f.curr != nil`, so it'll emit in the next `Read(p)`
+		// Loop again - now `f.curr != nil`, so it'll emit in the next `Read(p)`
 	}
 }

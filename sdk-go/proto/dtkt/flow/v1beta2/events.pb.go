@@ -610,11 +610,11 @@ func (b0 SuspendFlowEvent_builder) Build() *SuspendFlowEvent {
 	return m0
 }
 
-// ResumeFlowEvent requests resumption of a suspended, errored, or cancelled flow.
-// Behavior: all nodes in PHASE_SUSPENDED, PHASE_ERRORED, or PHASE_CANCELLED
-// transition back to PHASE_PENDING, then re-enter the normal execution loop.
-// Nodes already in terminal phases (SUCCEEDED, FAILED) are left as-is.
-// Flow transitions SUSPENDED/ERRORED -> RUNNING.
+// ResumeFlowEvent requests resumption of a suspended or errored flow.
+// Behavior: nodes in PHASE_SUSPENDED or PHASE_ERRORED transition back to
+// PHASE_PENDING and re-enter the normal execution loop. Nodes already in
+// terminal phases (SUCCEEDED, FAILED, CANCELLED) are left as-is. Flow
+// transitions SUSPENDED/ERRORED -> RUNNING.
 //
 // If a resumed node hits the same error again, it will re-enter PHASE_ERRORED
 // and the flow's error_strategy applies as usual.
@@ -623,6 +623,14 @@ func (b0 SuspendFlowEvent_builder) Build() *SuspendFlowEvent {
 // the succeeded nodes stay done, errored nodes restart. Downstream nodes that
 // were starved (blocked waiting on the errored node) will begin receiving
 // messages again once the resumed node produces output.
+//
+// CANCELLED is NOT resumable: cancellation is an explicit operator decision
+// to stop. Operators who want to pause and later continue should use
+// SuspendFlowEvent / SuspendNodeEvent instead.
+//
+// NOTE (runtime gap): PHASE_ERRORED resume is a documented spec promise that
+// is not yet implemented in the v1beta2 runtime; only PHASE_SUSPENDED resume
+// works today. Tracked as Step N in flowsdk-v1beta2-cleanup-plan.md.
 type ResumeFlowEvent struct {
 	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -666,19 +674,24 @@ func (b0 ResumeFlowEvent_builder) Build() *ResumeFlowEvent {
 	return m0
 }
 
-// StopNodeEvent requests a graceful shutdown of a specific node.
-// Behavior varies by node type:
+// StopNodeEvent requests a graceful shutdown of a specific node. The node
+// transitions to PHASE_STOPPING immediately, drains its in-flight work
+// per-type as documented below, and then transitions to PHASE_SUCCEEDED.
+//
+// Per-type drain semantics:
 //   - Input: close the input (EOF), mark PHASE_SUCCEEDED when drained.
 //   - Generator: stop firing, mark PHASE_SUCCEEDED.
 //   - Var/Output: stop evaluating, mark PHASE_SUCCEEDED.
 //   - Action (unary): if idle, mark PHASE_SUCCEEDED immediately. If mid-RPC,
 //     wait for the current call to complete, then mark PHASE_SUCCEEDED.
-//   - Stream: close the request side (EOF), wait for server to close response
-//     side, then mark PHASE_SUCCEEDED.
+//   - Stream: close the request (client) side, let the response side drain
+//     until the server closes it, then mark PHASE_SUCCEEDED.
 //   - Interaction: cancel outstanding token (if any), mark PHASE_SUCCEEDED.
 //
-// Stopping a node does NOT trigger the flow's error_strategy -- it is a clean
-// shutdown. Downstream dependents will be starved (no more messages).
+// Stopping a node does NOT trigger the flow's error_strategy -- it is a
+// clean shutdown. Downstream dependents observe an EOF marker on the
+// stopped node's topic and propagate the EOF through the graph as their
+// own loops exit naturally.
 type StopNodeEvent struct {
 	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Node ID to stop.
@@ -739,7 +752,10 @@ func (b0 StopNodeEvent_builder) Build() *StopNodeEvent {
 }
 
 // TerminateNodeEvent requests immediate cancellation of a specific node.
-// Behavior varies by node type:
+// Unlike StopNodeEvent, in-flight operations are aborted -- the node's
+// context is cancelled and any active RPC, stream, or prompt is dropped.
+//
+// Per-type behavior:
 //   - Input/Generator/Var/Output: mark PHASE_CANCELLED immediately.
 //   - Action (unary): if idle, mark PHASE_CANCELLED. If mid-RPC, cancel the
 //     RPC context; node transitions to PHASE_CANCELLED with a CANCELLED error.
@@ -748,7 +764,8 @@ func (b0 StopNodeEvent_builder) Build() *StopNodeEvent {
 //   - Interaction: cancel outstanding token, mark PHASE_CANCELLED.
 //
 // Terminating a node does NOT trigger the flow's error_strategy -- PHASE_CANCELLED
-// is distinct from PHASE_ERRORED. Downstream dependents will be starved.
+// is distinct from PHASE_ERRORED. Downstream dependents observe the
+// terminal EOF marker on the cancelled node's topic and propagate cleanly.
 type TerminateNodeEvent struct {
 	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Node ID to terminate.
@@ -877,9 +894,9 @@ func (b0 SuspendNodeEvent_builder) Build() *SuspendNodeEvent {
 	return m0
 }
 
-// ResumeNodeEvent requests resumption of a specific suspended, errored, or
-// cancelled node. The node transitions back to PHASE_PENDING, then re-enters
-// the normal execution loop.
+// ResumeNodeEvent requests resumption of a specific suspended or errored
+// node. The node transitions back to PHASE_PENDING, then re-enters the
+// normal execution loop.
 //
 // If value is provided, it replaces the node's pending input for the next
 // evaluation. Use this to provide a corrected request when resuming an errored
@@ -890,7 +907,13 @@ func (b0 SuspendNodeEvent_builder) Build() *SuspendNodeEvent {
 // RPC. If the same error occurs, it re-enters PHASE_ERRORED and error_strategy
 // applies again. The provided value (if any) is used as the MethodCall request.
 //
-// Edge case: resuming a node that is SUCCEEDED or FAILED is a no-op.
+// Edge case: resuming a node that is SUCCEEDED, FAILED, or CANCELLED is a
+// no-op. CANCELLED in particular is intentionally terminal -- use
+// SuspendNodeEvent if you may want to resume later.
+//
+// NOTE (runtime gap): PHASE_ERRORED resume is a documented spec promise that
+// is not yet implemented in the v1beta2 runtime; only PHASE_SUSPENDED resume
+// works today. Tracked as Step N in flowsdk-v1beta2-cleanup-plan.md.
 type ResumeNodeEvent struct {
 	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Node ID to resume.

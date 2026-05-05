@@ -1,0 +1,19 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: nc_var_transforms_stop
+  description: "NC.stop_when on a Var with a transform pipeline (filter→map)"
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: shaped
+      value: "= inputs.x.value"
+      transforms:
+        - filter: "= this.value % 2 == 0"
+        - map: "= this.value * 10"
+      node_control:
+        stop_when: "= inputs.x.value >= 5"
+  outputs:
+    - id: result
+      value: "= vars.shaped.value"

@@ -57,12 +57,18 @@ option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1be
 //   Action.when                            (globals only)
 //   Stream.when                            (globals only)
 //   Interaction.when                       (globals only)
-//   Stream.close_request_when              (globals only)
 //   Output.value                           (globals only)
 //   Switch.value                           (globals only)
 //   MethodCall.request (embedded in Value) (globals only)
 //   Transform.Reduce.initial               (globals only)
 //   Transform.Scan.initial                 (globals only)
+//
+//   FlowControl.stop_when                  (globals only)
+//   FlowControl.terminate_when             (globals only)
+//   FlowControl.suspend_when               (globals only)
+//   NodeControl.stop_when                  (globals only)
+//   NodeControl.terminate_when             (globals only)
+//   NodeControl.suspend_when               (globals only)
 //
 //   Switch.Case.value                      this.value    (switch discriminant)
 //   Switch.Case.return                     this.value    (switch discriminant)
@@ -82,40 +88,44 @@ option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1be
 //   RetryStrategy.when                     this.response (RPC result, if any)
 //                                          this.error    (google.rpc.Status, if any)
 //   RetryStrategy.skip_when                this.error       (google.rpc.Status)
+//   RetryStrategy.continue_when            this.error       (google.rpc.Status)
 //   RetryStrategy.suspend_when             this.error       (google.rpc.Status)
 //   RetryStrategy.terminate_when           this.error       (google.rpc.Status)
-//   RetryStrategy.continue_when            this.error       (google.rpc.Status)
 //
 // Generator Ticker/Cron value expressions receive only a `this` context:
 //
 //   Ticker.value / Cron.value              this.count (int64), this.time (timestamp)
 //
-// Sentinel Values
-// ─────────────────────────────────────────────────────────────────────────────
-// Certain special values carry control-flow semantics when produced by CEL
-// expressions. The runtime detects these and acts accordingly.
-//
-//   EOF          Signals end-of-stream. When a CEL expression evaluates to
-//                `EOF`, the runtime treats it as a terminal value:
-//                - In a Stream's MethodCall.request: closes the client side of
-//                  the stream (equivalent to CloseSend). This is an ergonomic
-//                  alternative to `close_request_when`.
-//                - In a Generator's value: signals the generator is done.
-//                - In an Input: closes the input channel.
-//                Represented internally as a `Runtime.EOF` proto message
-//                wrapped in a `cel.expr.Value.object_value`.
-//
 // Built-in CEL Functions
 // ─────────────────────────────────────────────────────────────────────────────
-// In addition to the standard CEL functions (size, has, type, int, uint, double,
-// string, bytes, matches, contains, startsWith, endsWith, timestamp, duration,
-// list/map operations, ternary `? :`, etc.), the following are available:
+// Only the standard CEL functions are available (size, has, type, int, uint,
+// double, string, bytes, matches, contains, startsWith, endsWith, timestamp,
+// duration, list/map operations, ternary `? :`, etc.). All data access is
+// through the globals and `this` context variables documented above.
 //
-//   EOF()        Returns the EOF sentinel value. Use in request expressions to
-//                close a stream: `request: "= condition ? EOF() : value"`.
+// When to use RetryStrategy vs NodeControl / FlowControl
+// ─────────────────────────────────────────────────────────────────────────────
+// There are surface-level overlaps between RetryStrategy (on Action/Stream)
+// and NodeControl / FlowControl. Both can express "suspend on error" or
+// "terminate on error". They are kept distinct because their timing is not
+// equivalent:
 //
-// No other custom functions are defined. All data access is through the globals
-// and `this` context variables documented above.
+//   RetryStrategy.{suspend,terminate,skip,continue}_when fire SYNCHRONOUSLY
+//   inside the RPC retry loop -- between "the RPC just errored" and "would
+//   the node emit/escalate next". They have access to `this.error` and
+//   `this.response` for the just-completed call. Same iteration.
+//
+//   NodeControl / FlowControl fire REACTIVELY on the next activation cycle
+//   when CEL globals change. Even if a global like `actions.foo.last_error`
+//   were available, there's a window between the error landing and the
+//   lifecycle CEL re-evaluating during which the handler could iterate
+//   again or emit. That window is unsafe for `suspend` (the operator wanted
+//   the node halted before the next iteration); harmless for `terminate`
+//   (the flow is dying either way).
+//
+// Use RetryStrategy when the trigger is an RPC error and the action must
+// happen before the next iteration. Use NodeControl / FlowControl when the
+// trigger is general flow state and reactive timing is acceptable.
 message Flow {
   string name = 1 [(buf.validate.field).required = true];
   string description = 2;
@@ -164,13 +174,21 @@ enum ErrorStrategy {
   ERROR_STRATEGY_CONTINUE = 3;
 }
 
-// FlowControl allows a node to trigger flow-level lifecycle actions based on
-// CEL boolean expressions evaluated alongside the node's normal processing.
-// The expressions receive the same globals as other CEL fields on the node,
-// plus `this` context where applicable.
+// FlowControl declares CEL-driven lifecycle triggers that act on the WHOLE
+// flow. The expressions are evaluated reactively alongside the host node's
+// normal processing; when a condition evaluates to true, the corresponding
+// action is applied to the entire flow regardless of which node hosts the
+// FlowControl.
 //
-// When a condition evaluates to true, the corresponding action is applied to
-// the entire flow -- not just the declaring node.
+// For per-node lifecycle triggers (acting only on the declaring node), see
+// NodeControl. For RPC-error-gated synchronous triggers, see RetryStrategy.
+//
+// Ordering vs NodeControl: when a node declares both NC and FC, NC fires
+// FIRST on each iteration. Both run independently; ordering only affects
+// the wire-publish sequence when both fire the same iteration. NC-first
+// ensures per-node state events (e.g. PHASE_STOPPING for the controlled
+// node) land cleanly before any FC-driven flow-wide cancel races with
+// them.
 message FlowControl {
   // Graceful stop: EOF is injected into external inputs, generator contexts
   // are cancelled, and in-flight messages drain. Flow -> STOPPING -> SUCCEEDED.
@@ -188,6 +206,50 @@ message FlowControl {
 
   // Suspend the entire flow until an external Resume. All node processing
   // pauses. Flow -> SUSPENDED.
+  string suspend_when = 3 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+}
+
+// NodeControl declares CEL-driven lifecycle triggers scoped to the declaring
+// node only. Other nodes are unaffected. The expressions are evaluated
+// reactively alongside the host node's normal processing.
+//
+// For flow-wide lifecycle triggers, see FlowControl. For RPC-error-gated
+// synchronous triggers, see RetryStrategy.
+//
+// Ordering vs FlowControl: when a node declares both NC and FC, NC fires
+// FIRST. NC-first ensures per-node state events (e.g. the PHASE_STOPPING
+// emitted by node_control.stop_when) reach observers before any FC-driven
+// flow-wide cancel can race with them. Both still fire independently when
+// their conditions match the same iteration.
+message NodeControl {
+  // Graceful stop of THIS node only. Per-type drain semantics:
+  //   - Stream: close the request side, wait for the server to drain the
+  //     response side, then mark PHASE_SUCCEEDED.
+  //   - Action (mid-RPC): finish the current call, then PHASE_SUCCEEDED.
+  //   - Action (idle), Var, Output: PHASE_SUCCEEDED immediately.
+  //   - Input: publish EOF on the input topic, drain downstream subscribers.
+  //   - Generator (Ticker/Cron/Range): stop firing, PHASE_SUCCEEDED.
+  //   - Interaction: cancel pending prompt token, PHASE_SUCCEEDED.
+  // Node -> STOPPING -> SUCCEEDED. Other nodes unaffected.
+  string stop_when = 1 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // Immediate cancel of THIS node only. The node's context is cancelled and
+  // any in-flight operation is aborted. Node -> CANCELLED. Other nodes
+  // unaffected.
+  string terminate_when = 2 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // Suspend THIS node until an external Resume. The node pauses at a safe
+  // point; in-flight operations on streams stay open. Node -> SUSPENDED.
+  // Other nodes unaffected.
   string suspend_when = 3 [
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
     (buf.validate.field).string.pattern = "^\\s?=\\s?"
@@ -252,13 +314,16 @@ message Input {
   // Implicitly cached.
   bool constant = 23;
 
-  // Resolution throttle. Controls how often the input resolves a fresh value.
-  // Wait window per attempt is interval/count. If no value arrives within
-  // the window, falls back to cache (if enabled), then the type's default (if
-  // set), then sends a request event to the client. If unset and cache is true
-  // or the type has a default, the executor's default throttle is injected
-  // (WithDefaultInputThrottle). If unset and neither applies, blocks until a
-  // value arrives.
+  // Resolution throttle. Controls how often the input resolves a fresh
+  // value. The wait window per attempt is `interval` / `count`. If no value
+  // arrives within the window, the runtime falls back to the cached value
+  // (when `cache` is true), then to the type's default (when set), then
+  // sends a request event to the external client.
+  //
+  // If unset and either `cache` is true or the type has a default, the
+  // runtime applies a small default throttle so the fallback chain can
+  // fire. If unset and neither applies, the input blocks until a value
+  // arrives.
   Rate throttle = 22;
 
   // An ordered pipeline of transforms applied to the input value.
@@ -295,8 +360,12 @@ message Var {
   // Each step receives `this.value` from the previous stage.
   repeated Transform transforms = 5;
 
-  // Flow-level lifecycle control evaluated alongside the var expression.
+  // Flow-wide lifecycle control evaluated alongside the var expression.
   FlowControl flow_control = 6;
+
+  // Per-node lifecycle control evaluated alongside the var expression.
+  // Affects only this var; other nodes continue.
+  NodeControl node_control = 7;
 }
 
 // Action declares a unary RPC method call node.
@@ -313,22 +382,6 @@ message Action {
     (buf.validate.field).string.pattern = "^\\s?=\\s?"
   ];
 
-  // If true, the executor will cache the result of this action and return the cached value for subsequent calls.
-  bool cache = 10;
-
-  // Throttle for RPC invocations. Limits how often upstream
-  // subscription changes can trigger the action's method call.
-  Rate throttle = 12;
-
-  // Error handling strategy for this action.
-  RetryStrategy retry_strategy = 11;
-
-  // If true, skip the RPC when the same request input has been seen before
-  // and return the previously cached response. Keyed by a deterministic hash
-  // of the resolved request value. Only applicable to unary RPCs (Actions);
-  // streaming RPCs have no stable request-to-response mapping.
-  bool memoize = 13;
-
   // The RPC call type. Exactly one must be set.
   oneof type {
     option (buf.validate.oneof).required = true;
@@ -336,8 +389,30 @@ message Action {
     MethodCall call = 4;
   }
 
-  // Flow-level lifecycle control evaluated alongside the action.
+  // If true, the executor will cache the result of this action and return the cached value for subsequent calls.
+  bool cache = 10;
+
+  // Throttle for RPC invocations. Limits how often upstream
+  // subscription changes can trigger the action's method call.
+  Rate throttle = 12;
+
+  // If true, skip the RPC when the same request input has been seen before
+  // and return the previously cached response. Keyed by a deterministic hash
+  // of the resolved request value. Only applicable to unary RPCs (Actions);
+  // streaming RPCs have no stable request-to-response mapping.
+  bool memoize = 13;
+
+  // Error handling strategy for this action. Fires synchronously inside the
+  // RPC retry loop with `this.error` / `this.response` in scope. For
+  // state-driven (reactive) lifecycle triggers see flow_control / node_control.
+  RetryStrategy retry_strategy = 11;
+
+  // Flow-wide lifecycle control evaluated alongside the action.
   FlowControl flow_control = 14;
+
+  // Per-node lifecycle control evaluated alongside the action.
+  // Affects only this action; other nodes continue.
+  NodeControl node_control = 15;
 }
 
 // Output declares an external output from the flow.
@@ -354,19 +429,46 @@ message Output {
     (buf.validate.field).string.pattern = "^\\s?=\\s?"
   ];
 
-  // An ordered pipeline of transforms applied to the output value.
-  // Each step receives `this.value` from the previous stage.
-  repeated Transform transforms = 3;
-
   // Throttle for output evaluation. Limits how often upstream
   // subscription changes can trigger the output's CEL evaluation.
   Rate throttle = 4;
 
-  // Flow-level lifecycle control evaluated alongside the output.
+  // An ordered pipeline of transforms applied to the output value.
+  // Each step receives `this.value` from the previous stage.
+  repeated Transform transforms = 3;
+
+  // Flow-wide lifecycle control evaluated alongside the output.
   FlowControl flow_control = 5;
+
+  // Per-node lifecycle control evaluated alongside the output.
+  // Affects only this output; other nodes continue.
+  NodeControl node_control = 6;
 }
 
 // Stream declares a streaming RPC method call node.
+//
+// Open semantics depend on the streaming RPC kind set in `call.method`:
+//
+//   - Server-stream (one request, streamed responses): the open and the
+//     first request are atomic at the wire level. The connection opens
+//     on the first iteration where `when` evaluates true (or the first
+//     iteration when `when` is unset), using the resolved request value.
+//     The node remains in PHASE_PENDING until then.
+//
+//   - Bidi-stream and client-stream (one or more requests, with one or
+//     more responses): the wire-level open is independent of any request,
+//     so the connection is established when the node handler is scheduled,
+//     before any request is sent. The node enters PHASE_RUNNING as soon
+//     as the open completes. Subscription patterns where the server
+//     pushes responses before (or instead of) any client request are
+//     supported on bidi via this eager-open behavior.
+//
+// In all cases, the connection persists until the request side closes
+// (input EOF, node_control.stop_when, or retry-strategy escalation),
+// then the response side drains, then the node transitions to
+// PHASE_SUCCEEDED. Streams are not re-opened within the same node
+// lifetime; if you need multiple sessions, file a feature request so we
+// can design the surface against a concrete use case.
 message Stream {
   // Unique identifier for this stream within the flow.
   string id = 1 [
@@ -374,27 +476,18 @@ message Stream {
     (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
   ];
 
-  // CEL boolean. Globals only. Defines when to perform a client-side action on the
-  // stream (e.g., start the stream, send a ping). For MethodCalls, automatically
-  // starts the stream if it is closed or not yet open.
+  // CEL boolean evaluated each iteration when an upstream value changes.
+  // When true, sends a request on the stream's request side. When false,
+  // the iteration is skipped (the stream stays open if already established;
+  // the response side keeps draining). Globals only.
+  //
+  // For server-stream calls, the first true evaluation also opens the
+  // connection -- see the message-level Stream doc above for the per-kind
+  // open semantics.
   string when = 12 [
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
     (buf.validate.field).string.pattern = "^\\s?=\\s?"
   ];
-
-  // CEL boolean. Globals only. Defines when to close the request (client) side of
-  // the stream. For MethodCalls, sends an EOF and sets request_closed.
-  string close_request_when = 13 [
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
-  ];
-
-  // Throttle for stream requests. Limits how often upstream
-  // subscription changes can trigger sending a request on the stream.
-  Rate throttle = 15;
-
-  // Error handling strategy for this stream.
-  RetryStrategy retry_strategy = 14;
 
   // The streaming RPC call type. Exactly one must be set.
   oneof type {
@@ -403,8 +496,23 @@ message Stream {
     MethodCall call = 2;
   }
 
-  // Flow-level lifecycle control evaluated alongside the stream.
+  // Throttle for stream requests. Limits how often upstream
+  // subscription changes can trigger sending a request on the stream.
+  Rate throttle = 15;
+
+  // Error handling strategy for this stream. Fires synchronously inside the
+  // RPC retry loop with `this.error` / `this.response` in scope. For
+  // state-driven (reactive) lifecycle triggers see flow_control / node_control.
+  RetryStrategy retry_strategy = 14;
+
+  // Flow-wide lifecycle control evaluated alongside the stream.
   FlowControl flow_control = 16;
+
+  // Per-node lifecycle control evaluated alongside the stream. To close just
+  // the request (client) side of a stream and let the response side drain,
+  // use node_control.stop_when -- the runtime's graceful per-node stop
+  // semantic for streams is exactly that.
+  NodeControl node_control = 17;
 }
 
 // MethodCall configures a gRPC method invocation on a Connection.
@@ -477,11 +585,11 @@ message Interaction {
     // Optionally CEL (prefix with `=`). Globals available.
     string title = 2 [
       (buf.validate.field).required = true,
-      (buf.validate.field).string.pattern = "^\\s?(=)?\\s?(.*)$"
+      (buf.validate.field).string.pattern = "^\\s?(=)?\\s?[\\s\\S]*$"
     ];
 
     // Optionally CEL (prefix with `=`). Globals available.
-    optional string description = 3 [(buf.validate.field).string.pattern = "^\\s?(=)?\\s?(.*)$"];
+    optional string description = 3 [(buf.validate.field).string.pattern = "^\\s?(=)?\\s?[\\s\\S]*$"];
 
     // The form element type. Exactly one must be set.
     oneof element {
@@ -505,13 +613,6 @@ message Interaction {
     (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
   ];
 
-  // An ordered pipeline of transforms applied to interaction results.
-  // Each step receives `this.value` from the previous stage.
-  repeated Transform transforms = 2;
-
-  // The interaction's form fields.
-  repeated Input inputs = 3;
-
   // CEL boolean guard. Globals only. If false, the interaction is skipped for
   // this iteration. Also serves as the upstream trigger -- any node references
   // in the expression create graph edges.
@@ -520,8 +621,19 @@ message Interaction {
     (buf.validate.field).string.pattern = "^\\s?=\\s?"
   ];
 
-  // Flow-level lifecycle control evaluated alongside the interaction.
+  // The interaction's form fields.
+  repeated Input inputs = 3;
+
+  // An ordered pipeline of transforms applied to interaction results.
+  // Each step receives `this.value` from the previous stage.
+  repeated Transform transforms = 2;
+
+  // Flow-wide lifecycle control evaluated alongside the interaction.
   FlowControl flow_control = 5;
+
+  // Per-node lifecycle control evaluated alongside the interaction.
+  // Affects only this interaction; other nodes continue.
+  NodeControl node_control = 6;
 }
 
 // Backoff configures exponential backoff for retry strategies.
@@ -541,7 +653,15 @@ message Backoff {
   uint32 max_attempts = 4 [(buf.validate.field).required = true];
 }
 
-// RetryStrategy configures error handling for Action and Stream nodes.
+// RetryStrategy configures synchronous error handling for Action and Stream
+// nodes. All `*_when` fields are evaluated inside the RPC retry loop -- after
+// an RPC errors and before the node iterates again -- with `this.error` and
+// (for `when`) `this.response` in scope.
+//
+// For state-driven (reactive) lifecycle triggers that fire on the next
+// activation cycle rather than synchronously, see FlowControl and NodeControl.
+// The header doc block "When to use RetryStrategy vs NodeControl / FlowControl"
+// explains when to pick which.
 message RetryStrategy {
   // CEL boolean that activates this retry strategy.
   // `this.response` = RPC result (if any), `this.error` = google.rpc.Status (if any).
@@ -561,21 +681,6 @@ message RetryStrategy {
     (buf.validate.field).string.pattern = "^\\s?=\\s?"
   ];
 
-  // CEL boolean. If true, suspend the node until an external Resume.
-  // The Resume call may optionally provide a new request value.
-  // `this.error` = gRPC Status. Globals also available.
-  string suspend_when = 4 [
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
-  ];
-
-  // CEL boolean. If true, terminate the entire flow.
-  // `this.error` = gRPC Status. Globals also available.
-  string terminate_when = 5 [
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
-  ];
-
   // CEL expression. When non-null and non-false, the result is emitted as
   // the node's output value instead of propagating the error. This allows
   // error information to flow downstream for handling by other nodes.
@@ -585,6 +690,30 @@ message RetryStrategy {
   // On NotFound (code 5), emits the error message as a string value;
   // on any other error code, evaluates to false and does not activate.
   string continue_when = 6 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // CEL boolean. If true, suspend the node until an external Resume.
+  // The Resume call may optionally provide a new request value.
+  // `this.error` = gRPC Status. Globals also available.
+  //
+  // Fires synchronously inside the retry loop -- the node will not iterate
+  // again before the suspend takes effect. For a reactive (next-activation)
+  // alternative driven by general flow state instead of RPC error, see
+  // NodeControl.suspend_when.
+  string suspend_when = 4 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
+
+  // CEL boolean. If true, terminate the entire flow.
+  // `this.error` = gRPC Status. Globals also available.
+  //
+  // Fires synchronously inside the retry loop. For a reactive (next-activation)
+  // alternative driven by general flow state instead of RPC error, see
+  // FlowControl.terminate_when.
+  string terminate_when = 5 [
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
     (buf.validate.field).string.pattern = "^\\s?=\\s?"
   ];
@@ -647,7 +776,10 @@ message Generator {
 
   // Cron emits on a cron schedule expression.
   message Cron {
-    // Cron expression (e.g. "*/5 * * * *"). Uses robfig/cron v3 syntax.
+    // Standard 5-field cron expression (minute, hour, day-of-month, month,
+    // day-of-week), e.g. "*/5 * * * *". Predefined descriptors are also
+    // accepted: "@every <duration>", "@hourly", "@daily", "@weekly",
+    // "@monthly", "@yearly".
     string expression = 1 [(buf.validate.field).required = true];
     // CEL expression. `this.count` (int64) and `this.time` (timestamp) available.
     // No globals -- generators are pure sources.

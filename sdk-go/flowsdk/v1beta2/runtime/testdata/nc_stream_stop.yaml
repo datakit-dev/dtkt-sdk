@@ -1,16 +1,18 @@
 apiVersion: v1beta2
 kind: Flow
 spec:
-  name: stream_eof_close_request
+  name: nc_stream_stop
   inputs:
-    - id: x
-      int64: {}
+    - id: msg
+      string: {}
   streams:
     - id: echo
       call:
         connection: echo
-        method: echo.BidiEcho
-        request: "= inputs.x.value == 99 ? EOF() : inputs.x.value"
+        method: echo.Echo
+        request: "= inputs.msg.value"
+      node_control:
+        stop_when: "= true"
   outputs:
     - id: result
       value: "= streams.echo.value"

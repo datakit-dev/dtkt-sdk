@@ -135,6 +135,18 @@ func inputTypeDefault(inp *flowv1beta2.Input) *expr.Value {
 		if s.HasDefault() {
 			return &expr.Value{Kind: &expr.Value_StringValue{StringValue: s.GetDefault()}}
 		}
+	case flowv1beta2.Input_Message_case:
+		m := inp.GetMessage()
+		if m.HasDefault() {
+			// Wrap the Struct default as an Any-encoded ObjectValue. The
+			// downstream CEL type adapter handles google.protobuf.Struct
+			// transparently (unwraps to a map). Errors here mean the Struct
+			// is malformed; fall through to nil and the input blocks --
+			// caller responsibility to provide a valid default.
+			if v, err := protoToExpr(m.GetDefault()); err == nil {
+				return v
+			}
+		}
 	}
 	return nil
 }

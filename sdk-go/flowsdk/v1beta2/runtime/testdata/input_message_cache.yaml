@@ -1,0 +1,19 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_message_cache
+  description: "Message-typed input with cache: true; one feed, two reads"
+  inputs:
+    - id: payload
+      message:
+        type: google.protobuf.Struct
+      cache: true
+  generators:
+    - id: tick
+      ticker:
+        interval: "0.05s"
+  outputs:
+    - id: result
+      value: "= inputs.payload.value"
+      flow_control:
+        stop_when: "= int(generators.tick.eval_count) >= 2"

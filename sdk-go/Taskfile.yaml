@@ -24,6 +24,14 @@ tasks:
     cmds:
       - task: go:test
 
+  test:leakcheck:
+    desc: Run flowsdk runtime tests in serial-with-goroutine-leak-check mode (slower; for periodic / pre-merge audits)
+    cmds:
+      # Build with the `leakcheck` tag to flip withAndWithoutOutbox from
+      # parallel-no-check to serial-with-leak-detect. See
+      # flowsdk/v1beta2/runtime/leakcheck_*_test.go for the constant gating.
+      - GOEXPERIMENT=jsonv2 go test -tags=leakcheck ./flowsdk/v1beta2/runtime/ -count=1 -timeout 600s {{.CLI_ARGS}}
+
   legal:license-notices-md:
     desc: Generate license notices in markdown format (excludes permissive licenses without notice requirements)
     cmds:

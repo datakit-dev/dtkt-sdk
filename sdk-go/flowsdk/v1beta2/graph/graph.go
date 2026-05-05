@@ -154,6 +154,7 @@ func collectExpressions(node *flowv1beta2.Node) []string {
 		}
 		exprs = append(exprs, collectTransformExpressions(v.GetTransforms())...)
 		exprs = append(exprs, collectFlowControlExpressions(v.GetFlowControl())...)
+		exprs = append(exprs, collectNodeControlExpressions(v.GetNodeControl())...)
 
 	case flowv1beta2.Node_Action_case:
 		a := node.GetAction()
@@ -163,20 +164,21 @@ func collectExpressions(node *flowv1beta2.Node) []string {
 		if call := a.GetCall(); call != nil {
 			exprs = append(exprs, collectMethodCallExpressions(call)...)
 		}
+		exprs = append(exprs, collectRetryStrategyExpressions(a.GetRetryStrategy())...)
 		exprs = append(exprs, collectFlowControlExpressions(a.GetFlowControl())...)
+		exprs = append(exprs, collectNodeControlExpressions(a.GetNodeControl())...)
 
 	case flowv1beta2.Node_Stream_case:
 		s := node.GetStream()
 		if s.GetWhen() != "" {
 			exprs = append(exprs, s.GetWhen())
 		}
-		if s.GetCloseRequestWhen() != "" {
-			exprs = append(exprs, s.GetCloseRequestWhen())
-		}
 		if call := s.GetCall(); call != nil {
 			exprs = append(exprs, collectMethodCallExpressions(call)...)
 		}
+		exprs = append(exprs, collectRetryStrategyExpressions(s.GetRetryStrategy())...)
 		exprs = append(exprs, collectFlowControlExpressions(s.GetFlowControl())...)
+		exprs = append(exprs, collectNodeControlExpressions(s.GetNodeControl())...)
 
 	case flowv1beta2.Node_Generator_case:
 		gen := node.GetGenerator()
@@ -195,17 +197,53 @@ func collectExpressions(node *flowv1beta2.Node) []string {
 		exprs = append(exprs, node.GetOutput().GetValue())
 		exprs = append(exprs, collectTransformExpressions(node.GetOutput().GetTransforms())...)
 		exprs = append(exprs, collectFlowControlExpressions(node.GetOutput().GetFlowControl())...)
+		exprs = append(exprs, collectNodeControlExpressions(node.GetOutput().GetNodeControl())...)
 
 	case flowv1beta2.Node_Interaction_case:
 		if inter := node.GetInteraction(); inter != nil {
 			if inter.GetWhen() != "" {
 				exprs = append(exprs, inter.GetWhen())
 			}
+			for _, in := range inter.GetInputs() {
+				if t := in.GetTitle(); strings.HasPrefix(strings.TrimSpace(t), "=") {
+					exprs = append(exprs, t)
+				}
+				if d := in.GetDescription(); strings.HasPrefix(strings.TrimSpace(d), "=") {
+					exprs = append(exprs, d)
+				}
+			}
 			exprs = append(exprs, collectTransformExpressions(inter.GetTransforms())...)
 			exprs = append(exprs, collectFlowControlExpressions(inter.GetFlowControl())...)
+			exprs = append(exprs, collectNodeControlExpressions(inter.GetNodeControl())...)
 		}
 	}
 
+	return exprs
+}
+
+// collectRetryStrategyExpressions gathers CEL expression strings from a
+// RetryStrategy proto. These expressions can reference other nodes via the
+// global activation, so they must contribute to edge inference.
+func collectRetryStrategyExpressions(r *flowv1beta2.RetryStrategy) []string {
+	if r == nil {
+		return nil
+	}
+	var exprs []string
+	if s := r.GetWhen(); s != "" {
+		exprs = append(exprs, s)
+	}
+	if s := r.GetSkipWhen(); s != "" {
+		exprs = append(exprs, s)
+	}
+	if s := r.GetSuspendWhen(); s != "" {
+		exprs = append(exprs, s)
+	}
+	if s := r.GetTerminateWhen(); s != "" {
+		exprs = append(exprs, s)
+	}
+	if s := r.GetContinueWhen(); s != "" {
+		exprs = append(exprs, s)
+	}
 	return exprs
 }
 
@@ -222,6 +260,24 @@ func collectFlowControlExpressions(fc *flowv1beta2.FlowControl) []string {
 		exprs = append(exprs, s)
 	}
 	if s := fc.GetSuspendWhen(); s != "" {
+		exprs = append(exprs, s)
+	}
+	return exprs
+}
+
+// collectNodeControlExpressions gathers CEL expression strings from a NodeControl proto.
+func collectNodeControlExpressions(nc *flowv1beta2.NodeControl) []string {
+	if nc == nil {
+		return nil
+	}
+	var exprs []string
+	if s := nc.GetStopWhen(); s != "" {
+		exprs = append(exprs, s)
+	}
+	if s := nc.GetTerminateWhen(); s != "" {
+		exprs = append(exprs, s)
+	}
+	if s := nc.GetSuspendWhen(); s != "" {
 		exprs = append(exprs, s)
 	}
 	return exprs

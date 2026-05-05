@@ -2,7 +2,6 @@ package runtime
 
 import (
 	"context"
-	"errors"
 	"testing"
 	"time"
 
@@ -44,6 +43,7 @@ func collectFlowStates(ctx context.Context, ch <-chan *pubsub.Message) []*flowv1
 }
 
 func TestFlowState_Success(t *testing.T) {
+	parallelByDefault(t)
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		graph := loadFlow(t, "outbox_input_var_output.yaml")
 
@@ -85,6 +85,7 @@ func TestFlowState_Success(t *testing.T) {
 }
 
 func TestFlowState_Error(t *testing.T) {
+	parallelByDefault(t)
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		graph := loadFlow(t, "action_error_internal.yaml")
 
@@ -111,6 +112,7 @@ func TestFlowState_Error(t *testing.T) {
 }
 
 func TestFlowState_Terminate(t *testing.T) {
+	parallelByDefault(t)
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		graph := loadFlow(t, "gen_long_running.yaml")
 
@@ -165,6 +167,7 @@ func TestFlowState_Terminate(t *testing.T) {
 }
 
 func TestFlowState_Outbox_Snapshot(t *testing.T) {
+	parallelByDefault(t)
 	// Verify the FlowState is materialized in the outbox snapshot.
 	graph := loadFlow(t, "outbox_input_var_output.yaml")
 
@@ -191,6 +194,7 @@ func TestFlowState_Outbox_Snapshot(t *testing.T) {
 }
 
 func TestFlowState_Outbox_ErrorSnapshot(t *testing.T) {
+	parallelByDefault(t)
 	graph := loadFlow(t, "action_error_internal.yaml")
 
 	ps := newPubSub()
@@ -213,6 +217,7 @@ func TestFlowState_Outbox_ErrorSnapshot(t *testing.T) {
 }
 
 func TestFlowState_Outbox_Events(t *testing.T) {
+	parallelByDefault(t)
 	// Verify that FlowState FLOW_UPDATE events are in the outbox event log.
 	graph := loadFlow(t, "outbox_input_var_output.yaml")
 
@@ -247,6 +252,7 @@ func TestFlowState_Outbox_Events(t *testing.T) {
 }
 
 func TestFlowState_DirectPubSub(t *testing.T) {
+	parallelByDefault(t)
 	// Without an outbox, FlowState events should still be published to the flow topic.
 	graph := loadFlow(t, "outbox_input_var_output.yaml")
 
@@ -268,9 +274,13 @@ func TestFlowState_DirectPubSub(t *testing.T) {
 }
 
 // TestFlowState_ContextCancelled verifies that external context cancellation
-// results in an ERRORED FlowState (not CANCELLED, which is reserved for Terminate).
+// results in an ERRORED FlowState (not CANCELLED, which is reserved for
+// Terminate). Uses a truly endless ticker so ctx cancel reliably wins --
+// previously used gen_long_running.yaml (range 1..1M) which can complete
+// in microseconds before our cancel, making the assertion racy.
 func TestFlowState_ContextCancelled(t *testing.T) {
-	graph := loadFlow(t, "gen_long_running.yaml")
+	parallelByDefault(t)
+	graph := loadFlow(t, "gen_truly_endless.yaml")
 
 	ps := newPubSub()
 	defer ps.Close() //nolint:errcheck
@@ -308,24 +318,15 @@ gotRunning:
 
 	cancel()
 	err = <-execDone
-	// Context cancellation may return context.Canceled or nil (if
-	// the generator happened to finish between cancel and drain).
-	if err != nil && !errors.Is(err, context.Canceled) {
-		t.Logf("Execute returned: %v (type %T)", err, err)
-	}
+	require.Error(t, err, "ctx cancel must surface an error from Execute (not nil)")
+	require.ErrorIs(t, err, context.Canceled,
+		"ctx cancel must surface as context.Canceled, got %v", err)
 
 	termCtx, termCancel := context.WithTimeout(outerCtx, 2*time.Second)
 	defer termCancel()
 	states := collectFlowStates(termCtx, flowCh)
 	require.NotEmpty(t, states)
 	last := states[len(states)-1]
-	// External cancel produces ERRORED (if cancel won) or SUCCEEDED (if generator won).
-	// Both are acceptable outcomes since it's a race between cancel and completion.
-	assert.Contains(t,
-		[]flowv1beta2.RunSnapshot_Phase{
-			flowv1beta2.RunSnapshot_PHASE_ERRORED,
-			flowv1beta2.RunSnapshot_PHASE_SUCCEEDED,
-		},
-		last.GetPhase(),
-		"context cancel should produce ERRORED or SUCCEEDED, got %v", last.GetPhase())
+	assert.Equal(t, flowv1beta2.RunSnapshot_PHASE_ERRORED, last.GetPhase(),
+		"external ctx cancel must produce PHASE_ERRORED (not CANCELLED, which is Terminate's)")
 }

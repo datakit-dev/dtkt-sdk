@@ -1,0 +1,14 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_message_transforms
+  description: "Message-typed input through a transform pipeline (filter)"
+  inputs:
+    - id: payload
+      message:
+        type: google.protobuf.Struct
+      transforms:
+        - filter: "= this.value.priority == 'high'"
+  outputs:
+    - id: result
+      value: "= inputs.payload.value"

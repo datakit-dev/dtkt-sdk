@@ -30,7 +30,7 @@ var (
 	// safe point (between iterations) without exiting its goroutine, and
 	// without interrupting any in-flight external operation. For streams
 	// this means the connection stays open and the receive side keeps
-	// flowing — only the publish side pauses. For unary actions the
+	// flowing - only the publish side pauses. For unary actions the
 	// current call completes naturally; only the next iteration pauses.
 	//
 	// This design is intentional: closing a stream or aborting a call
@@ -47,6 +47,25 @@ var (
 	_ selfSuspendable = (*clientStreamHandler)(nil)
 	_ selfSuspendable = (*bidiStreamHandler)(nil)
 	_ selfSuspendable = (*interactionHandler)(nil)
+
+	// Every handler that runs in launchHandlers also implements
+	// selfStoppable. Stop signals stopCh; the handler exits with
+	// PHASE_SUCCEEDED at its next safe point. This is distinct from
+	// TerminateNode which cancels ctx and exits with PHASE_CANCELLED.
+	// Generators (ticker/cron/range) used to fall through to ctx-cancel
+	// for stop -- conflating stop with terminate at the wire level. They
+	// now implement selfStoppable directly so the two paths are distinct.
+	_ selfStoppable = (*tickerHandler)(nil)
+	_ selfStoppable = (*cronHandler)(nil)
+	_ selfStoppable = (*rangeHandler)(nil)
+	_ selfStoppable = (*varHandler)(nil)
+	_ selfStoppable = (*switchHandler)(nil)
+	_ selfStoppable = (*outputHandler)(nil)
+	_ selfStoppable = (*unaryHandler)(nil)
+	_ selfStoppable = (*serverStreamHandler)(nil)
+	_ selfStoppable = (*clientStreamHandler)(nil)
+	_ selfStoppable = (*bidiStreamHandler)(nil)
+	_ selfStoppable = (*interactionHandler)(nil)
 )
 
 // newHandler creates a NodeHandler from a compiled node and its wired
@@ -70,6 +89,7 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 			adapter:     adapter,
 		}
 		h.initSuspendable()
+		h.initStoppable()
 		return h, nil
 
 	case *compiledVarValue:
@@ -84,10 +104,11 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 			adapter:     adapter,
 		}
 		h.initSuspendable()
+		h.initStoppable()
 		return h, nil
 
 	case *compiledTicker:
-		return &tickerHandler{
+		h := &tickerHandler{
 			id:           nodeID,
 			pubsub:       ps,
 			topic:        topic,
@@ -96,10 +117,12 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 			valueProgram: c.valueProgram,
 			suspendCh:    make(chan struct{}, 1),
 			resumeCh:     make(chan struct{}, 1),
-		}, nil
+		}
+		h.initStoppable()
+		return h, nil
 
 	case *compiledRange:
-		return &rangeHandler{
+		h := &rangeHandler{
 			id:        nodeID,
 			pubsub:    ps,
 			topic:     topic,
@@ -109,10 +132,12 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 			rate:      c.rate,
 			suspendCh: make(chan struct{}, 1),
 			resumeCh:  make(chan struct{}, 1),
-		}, nil
+		}
+		h.initStoppable()
+		return h, nil
 
 	case *compiledCron:
-		return &cronHandler{
+		h := &cronHandler{
 			id:           nodeID,
 			pubsub:       ps,
 			topic:        topic,
@@ -120,7 +145,9 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 			valueProgram: c.valueProgram,
 			suspendCh:    make(chan struct{}, 1),
 			resumeCh:     make(chan struct{}, 1),
-		}, nil
+		}
+		h.initStoppable()
+		return h, nil
 
 	case *compiledCall:
 		switch c.kind {
@@ -141,60 +168,61 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 				retry:        c.retry,
 			}
 			h.initSuspendable()
+			h.initStoppable()
 			return h, nil
 		case rpc.MethodServerStream:
 			h := &serverStreamHandler{
-				id:                   nodeID,
-				method:               c.method,
-				inputs:               inputs,
-				pubsub:               ps,
-				topic:                topic,
-				client:               c.client,
-				env:                  c.env,
-				whenProg:             c.whenProg,
-				closeRequestWhenProg: c.closeRequestWhenProg,
-				throttle:             c.throttle,
-				request:              c.request,
-				responseProg:         c.responseProg,
-				retry:                c.retry,
+				id:           nodeID,
+				method:       c.method,
+				inputs:       inputs,
+				pubsub:       ps,
+				topic:        topic,
+				client:       c.client,
+				env:          c.env,
+				whenProg:     c.whenProg,
+				throttle:     c.throttle,
+				request:      c.request,
+				responseProg: c.responseProg,
+				retry:        c.retry,
 			}
 			h.initSuspendable()
+			h.initStoppable()
 			return h, nil
 		case rpc.MethodClientStream:
 			h := &clientStreamHandler{
-				id:                   nodeID,
-				method:               c.method,
-				inputs:               inputs,
-				pubsub:               ps,
-				topic:                topic,
-				client:               c.client,
-				env:                  c.env,
-				whenProg:             c.whenProg,
-				closeRequestWhenProg: c.closeRequestWhenProg,
-				throttle:             c.throttle,
-				request:              c.request,
-				responseProg:         c.responseProg,
-				retry:                c.retry,
+				id:           nodeID,
+				method:       c.method,
+				inputs:       inputs,
+				pubsub:       ps,
+				topic:        topic,
+				client:       c.client,
+				env:          c.env,
+				whenProg:     c.whenProg,
+				throttle:     c.throttle,
+				request:      c.request,
+				responseProg: c.responseProg,
+				retry:        c.retry,
 			}
 			h.initSuspendable()
+			h.initStoppable()
 			return h, nil
 		case rpc.MethodBidiStream:
 			h := &bidiStreamHandler{
-				id:                   nodeID,
-				method:               c.method,
-				inputs:               inputs,
-				pubsub:               ps,
-				topic:                topic,
-				client:               c.client,
-				env:                  c.env,
-				whenProg:             c.whenProg,
-				closeRequestWhenProg: c.closeRequestWhenProg,
-				throttle:             c.throttle,
-				request:              c.request,
-				responseProg:         c.responseProg,
-				retry:                c.retry,
+				id:           nodeID,
+				method:       c.method,
+				inputs:       inputs,
+				pubsub:       ps,
+				topic:        topic,
+				client:       c.client,
+				env:          c.env,
+				whenProg:     c.whenProg,
+				throttle:     c.throttle,
+				request:      c.request,
+				responseProg: c.responseProg,
+				retry:        c.retry,
 			}
 			h.initSuspendable()
+			h.initStoppable()
 			return h, nil
 		default:
 			return nil, fmt.Errorf("unsupported method kind for %q on node %s", c.method, nodeID)
@@ -213,6 +241,7 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 			adapter:     adapter,
 		}
 		h.initSuspendable()
+		h.initStoppable()
 		return h, nil
 
 	default:

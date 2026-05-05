@@ -118,7 +118,7 @@ export type RuleValid = Rule;
  * Describes the message buf.validate.Rule.
  * Use `create(RuleSchema)` to create a new message.
  */
-export const RuleSchema: GenMessage<Rule, {validType: RuleValid}> = /*@__PURE__*/
+export const RuleSchema: GenMessage<Rule, { validType: RuleValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 0);
 
 /**
@@ -221,7 +221,7 @@ export type MessageRulesValid = MessageRules;
  * Describes the message buf.validate.MessageRules.
  * Use `create(MessageRulesSchema)` to create a new message.
  */
-export const MessageRulesSchema: GenMessage<MessageRules, {validType: MessageRulesValid}> = /*@__PURE__*/
+export const MessageRulesSchema: GenMessage<MessageRules, { validType: MessageRulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 1);
 
 /**
@@ -251,7 +251,7 @@ export type MessageOneofRuleValid = MessageOneofRule;
  * Describes the message buf.validate.MessageOneofRule.
  * Use `create(MessageOneofRuleSchema)` to create a new message.
  */
-export const MessageOneofRuleSchema: GenMessage<MessageOneofRule, {validType: MessageOneofRuleValid}> = /*@__PURE__*/
+export const MessageOneofRuleSchema: GenMessage<MessageOneofRule, { validType: MessageOneofRuleValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 2);
 
 /**
@@ -290,7 +290,7 @@ export type OneofRulesValid = OneofRules;
  * Describes the message buf.validate.OneofRules.
  * Use `create(OneofRulesSchema)` to create a new message.
  */
-export const OneofRulesSchema: GenMessage<OneofRules, {validType: OneofRulesValid}> = /*@__PURE__*/
+export const OneofRulesSchema: GenMessage<OneofRules, { validType: OneofRulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 3);
 
 /**
@@ -571,7 +571,7 @@ export type FieldRulesValid = FieldRules;
  * Describes the message buf.validate.FieldRules.
  * Use `create(FieldRulesSchema)` to create a new message.
  */
-export const FieldRulesSchema: GenMessage<FieldRules, {validType: FieldRulesValid}> = /*@__PURE__*/
+export const FieldRulesSchema: GenMessage<FieldRules, { validType: FieldRulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 4);
 
 /**
@@ -608,7 +608,7 @@ export type PredefinedRulesValid = PredefinedRules;
  * Describes the message buf.validate.PredefinedRules.
  * Use `create(PredefinedRulesSchema)` to create a new message.
  */
-export const PredefinedRulesSchema: GenMessage<PredefinedRules, {validType: PredefinedRulesValid}> = /*@__PURE__*/
+export const PredefinedRulesSchema: GenMessage<PredefinedRules, { validType: PredefinedRulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 5);
 
 /**
@@ -792,7 +792,7 @@ export type FloatRulesValid = FloatRules;
  * Describes the message buf.validate.FloatRules.
  * Use `create(FloatRulesSchema)` to create a new message.
  */
-export const FloatRulesSchema: GenMessage<FloatRules, {validType: FloatRulesValid}> = /*@__PURE__*/
+export const FloatRulesSchema: GenMessage<FloatRules, { validType: FloatRulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 6);
 
 /**
@@ -976,7 +976,7 @@ export type DoubleRulesValid = DoubleRules;
  * Describes the message buf.validate.DoubleRules.
  * Use `create(DoubleRulesSchema)` to create a new message.
  */
-export const DoubleRulesSchema: GenMessage<DoubleRules, {validType: DoubleRulesValid}> = /*@__PURE__*/
+export const DoubleRulesSchema: GenMessage<DoubleRules, { validType: DoubleRulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 7);
 
 /**
@@ -1152,7 +1152,7 @@ export type Int32RulesValid = Int32Rules;
  * Describes the message buf.validate.Int32Rules.
  * Use `create(Int32RulesSchema)` to create a new message.
  */
-export const Int32RulesSchema: GenMessage<Int32Rules, {validType: Int32RulesValid}> = /*@__PURE__*/
+export const Int32RulesSchema: GenMessage<Int32Rules, { validType: Int32RulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 8);
 
 /**
@@ -1328,7 +1328,7 @@ export type Int64RulesValid = Int64Rules;
  * Describes the message buf.validate.Int64Rules.
  * Use `create(Int64RulesSchema)` to create a new message.
  */
-export const Int64RulesSchema: GenMessage<Int64Rules, {validType: Int64RulesValid}> = /*@__PURE__*/
+export const Int64RulesSchema: GenMessage<Int64Rules, { validType: Int64RulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 9);
 
 /**
@@ -1504,7 +1504,7 @@ export type UInt32RulesValid = UInt32Rules;
  * Describes the message buf.validate.UInt32Rules.
  * Use `create(UInt32RulesSchema)` to create a new message.
  */
-export const UInt32RulesSchema: GenMessage<UInt32Rules, {validType: UInt32RulesValid}> = /*@__PURE__*/
+export const UInt32RulesSchema: GenMessage<UInt32Rules, { validType: UInt32RulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 10);
 
 /**
@@ -1680,7 +1680,7 @@ export type UInt64RulesValid = UInt64Rules;
  * Describes the message buf.validate.UInt64Rules.
  * Use `create(UInt64RulesSchema)` to create a new message.
  */
-export const UInt64RulesSchema: GenMessage<UInt64Rules, {validType: UInt64RulesValid}> = /*@__PURE__*/
+export const UInt64RulesSchema: GenMessage<UInt64Rules, { validType: UInt64RulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 11);
 
 /**
@@ -1855,7 +1855,7 @@ export type SInt32RulesValid = SInt32Rules;
  * Describes the message buf.validate.SInt32Rules.
  * Use `create(SInt32RulesSchema)` to create a new message.
  */
-export const SInt32RulesSchema: GenMessage<SInt32Rules, {validType: SInt32RulesValid}> = /*@__PURE__*/
+export const SInt32RulesSchema: GenMessage<SInt32Rules, { validType: SInt32RulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 12);
 
 /**
@@ -2030,7 +2030,7 @@ export type SInt64RulesValid = SInt64Rules;
  * Describes the message buf.validate.SInt64Rules.
  * Use `create(SInt64RulesSchema)` to create a new message.
  */
-export const SInt64RulesSchema: GenMessage<SInt64Rules, {validType: SInt64RulesValid}> = /*@__PURE__*/
+export const SInt64RulesSchema: GenMessage<SInt64Rules, { validType: SInt64RulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 13);
 
 /**
@@ -2205,7 +2205,7 @@ export type Fixed32RulesValid = Fixed32Rules;
  * Describes the message buf.validate.Fixed32Rules.
  * Use `create(Fixed32RulesSchema)` to create a new message.
  */
-export const Fixed32RulesSchema: GenMessage<Fixed32Rules, {validType: Fixed32RulesValid}> = /*@__PURE__*/
+export const Fixed32RulesSchema: GenMessage<Fixed32Rules, { validType: Fixed32RulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 14);
 
 /**
@@ -2380,7 +2380,7 @@ export type Fixed64RulesValid = Fixed64Rules;
  * Describes the message buf.validate.Fixed64Rules.
  * Use `create(Fixed64RulesSchema)` to create a new message.
  */
-export const Fixed64RulesSchema: GenMessage<Fixed64Rules, {validType: Fixed64RulesValid}> = /*@__PURE__*/
+export const Fixed64RulesSchema: GenMessage<Fixed64Rules, { validType: Fixed64RulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 15);
 
 /**
@@ -2555,7 +2555,7 @@ export type SFixed32RulesValid = SFixed32Rules;
  * Describes the message buf.validate.SFixed32Rules.
  * Use `create(SFixed32RulesSchema)` to create a new message.
  */
-export const SFixed32RulesSchema: GenMessage<SFixed32Rules, {validType: SFixed32RulesValid}> = /*@__PURE__*/
+export const SFixed32RulesSchema: GenMessage<SFixed32Rules, { validType: SFixed32RulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 16);
 
 /**
@@ -2730,7 +2730,7 @@ export type SFixed64RulesValid = SFixed64Rules;
  * Describes the message buf.validate.SFixed64Rules.
  * Use `create(SFixed64RulesSchema)` to create a new message.
  */
-export const SFixed64RulesSchema: GenMessage<SFixed64Rules, {validType: SFixed64RulesValid}> = /*@__PURE__*/
+export const SFixed64RulesSchema: GenMessage<SFixed64Rules, { validType: SFixed64RulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 17);
 
 /**
@@ -2780,7 +2780,7 @@ export type BoolRulesValid = BoolRules;
  * Describes the message buf.validate.BoolRules.
  * Use `create(BoolRulesSchema)` to create a new message.
  */
-export const BoolRulesSchema: GenMessage<BoolRules, {validType: BoolRulesValid}> = /*@__PURE__*/
+export const BoolRulesSchema: GenMessage<BoolRules, { validType: BoolRulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 18);
 
 /**
@@ -3057,7 +3057,7 @@ export type StringRules = Message<"buf.validate.StringRules"> & {
      * - Each label can be 1 to 63 alphanumeric characters.
      * - A label can contain hyphens ("-"), but must not start or end with a hyphen.
      * - The right-most label must not be digits only.
-     * - The name can have a trailing dot—for example, "foo.example.com.".
+     * - The name can have a trailing dot-for example, "foo.example.com.".
      * - The name can be 253 characters at most, excluding the optional trailing dot.
      *
      * If the field value isn't a valid hostname, an error message will be generated.
@@ -3077,8 +3077,8 @@ export type StringRules = Message<"buf.validate.StringRules"> & {
     /**
      * `ip` specifies that the field value must be a valid IP (v4 or v6) address.
      *
-     * IPv4 addresses are expected in the dotted decimal format—for example, "192.168.5.21".
-     * IPv6 addresses are expected in their text representation—for example, "::1",
+     * IPv4 addresses are expected in the dotted decimal format-for example, "192.168.5.21".
+     * IPv6 addresses are expected in their text representation-for example, "::1",
      * or "2001:0DB8:ABCD:0012::0".
      *
      * Both formats are well-defined in the internet standard [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986).
@@ -3100,7 +3100,7 @@ export type StringRules = Message<"buf.validate.StringRules"> & {
     case: "ip";
   } | {
     /**
-     * `ipv4` specifies that the field value must be a valid IPv4 address—for
+     * `ipv4` specifies that the field value must be a valid IPv4 address-for
      * example "192.168.5.21". If the field value isn't a valid IPv4 address, an
      * error message will be generated.
      *
@@ -3117,7 +3117,7 @@ export type StringRules = Message<"buf.validate.StringRules"> & {
     case: "ipv4";
   } | {
     /**
-     * `ipv6` specifies that the field value must be a valid IPv6 address—for
+     * `ipv6` specifies that the field value must be a valid IPv6 address-for
      * example "::1", or "d7a:115c:a1e0:ab12:4843:cd96:626b:430b". If the field
      * value is not a valid IPv6 address, an error message will be generated.
      *
@@ -3155,7 +3155,7 @@ export type StringRules = Message<"buf.validate.StringRules"> & {
     case: "uri";
   } | {
     /**
-     * `uri_ref` specifies that the field value must be a valid URI Reference—either
+     * `uri_ref` specifies that the field value must be a valid URI Reference-either
      * a URI such as "https://example.com/foo/bar?baz=quux#frag", or a Relative
      * Reference such as "./foo/bar?query".
      *
@@ -3233,7 +3233,7 @@ export type StringRules = Message<"buf.validate.StringRules"> & {
   } | {
     /**
      * `ip_with_prefixlen` specifies that the field value must be a valid IP
-     * (v4 or v6) address with prefix length—for example, "192.168.5.21/16" or
+     * (v4 or v6) address with prefix length-for example, "192.168.5.21/16" or
      * "2001:0DB8:ABCD:0012::F1/64". If the field value isn't a valid IP with
      * prefix length, an error message will be generated.
      *
@@ -3251,7 +3251,7 @@ export type StringRules = Message<"buf.validate.StringRules"> & {
   } | {
     /**
      * `ipv4_with_prefixlen` specifies that the field value must be a valid
-     * IPv4 address with prefix length—for example, "192.168.5.21/16". If the
+     * IPv4 address with prefix length-for example, "192.168.5.21/16". If the
      * field value isn't a valid IPv4 address with prefix length, an error
      * message will be generated.
      *
@@ -3269,7 +3269,7 @@ export type StringRules = Message<"buf.validate.StringRules"> & {
   } | {
     /**
      * `ipv6_with_prefixlen` specifies that the field value must be a valid
-     * IPv6 address with prefix length—for example, "2001:0DB8:ABCD:0012::F1/64".
+     * IPv6 address with prefix length-for example, "2001:0DB8:ABCD:0012::F1/64".
      * If the field value is not a valid IPv6 address with prefix length,
      * an error message will be generated.
      *
@@ -3287,7 +3287,7 @@ export type StringRules = Message<"buf.validate.StringRules"> & {
   } | {
     /**
      * `ip_prefix` specifies that the field value must be a valid IP (v4 or v6)
-     * prefix—for example, "192.168.0.0/16" or "2001:0DB8:ABCD:0012::0/64".
+     * prefix-for example, "192.168.0.0/16" or "2001:0DB8:ABCD:0012::0/64".
      *
      * The prefix must have all zeros for the unmasked bits. For example,
      * "2001:0DB8:ABCD:0012::0/64" designates the left-most 64 bits for the
@@ -3332,7 +3332,7 @@ export type StringRules = Message<"buf.validate.StringRules"> & {
     case: "ipv4Prefix";
   } | {
     /**
-     * `ipv6_prefix` specifies that the field value must be a valid IPv6 prefix—for
+     * `ipv6_prefix` specifies that the field value must be a valid IPv6 prefix-for
      * example, "2001:0DB8:ABCD:0012::0/64".
      *
      * The prefix must have all zeros for the unmasked bits. For example,
@@ -3356,12 +3356,12 @@ export type StringRules = Message<"buf.validate.StringRules"> & {
   } | {
     /**
      * `host_and_port` specifies that the field value must be valid host/port
-     * pair—for example, "example.com:8080".
+     * pair-for example, "example.com:8080".
      *
      * The host can be one of:
-     * - An IPv4 address in dotted decimal format—for example, "192.168.5.21".
-     * - An IPv6 address enclosed in square brackets—for example, "[2001:0DB8:ABCD:0012::F1]".
-     * - A hostname—for example, "example.com".
+     * - An IPv4 address in dotted decimal format-for example, "192.168.5.21".
+     * - An IPv6 address enclosed in square brackets-for example, "[2001:0DB8:ABCD:0012::F1]".
+     * - A hostname-for example, "example.com".
      *
      * The port is separated by a colon. It must be non-empty, with a decimal number
      * in the range of 0-65535, inclusive.
@@ -3459,7 +3459,7 @@ export type StringRulesValid = StringRules;
  * Describes the message buf.validate.StringRules.
  * Use `create(StringRulesSchema)` to create a new message.
  */
-export const StringRulesSchema: GenMessage<StringRules, {validType: StringRulesValid}> = /*@__PURE__*/
+export const StringRulesSchema: GenMessage<StringRules, { validType: StringRulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 19);
 
 /**
@@ -3729,7 +3729,7 @@ export type BytesRulesValid = BytesRules;
  * Describes the message buf.validate.BytesRules.
  * Use `create(BytesRulesSchema)` to create a new message.
  */
-export const BytesRulesSchema: GenMessage<BytesRules, {validType: BytesRulesValid}> = /*@__PURE__*/
+export const BytesRulesSchema: GenMessage<BytesRules, { validType: BytesRulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 20);
 
 /**
@@ -3853,7 +3853,7 @@ export type EnumRulesValid = EnumRules;
  * Describes the message buf.validate.EnumRules.
  * Use `create(EnumRulesSchema)` to create a new message.
  */
-export const EnumRulesSchema: GenMessage<EnumRules, {validType: EnumRulesValid}> = /*@__PURE__*/
+export const EnumRulesSchema: GenMessage<EnumRules, { validType: EnumRulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 21);
 
 /**
@@ -3943,7 +3943,7 @@ export type RepeatedRulesValid = RepeatedRules;
  * Describes the message buf.validate.RepeatedRules.
  * Use `create(RepeatedRulesSchema)` to create a new message.
  */
-export const RepeatedRulesSchema: GenMessage<RepeatedRules, {validType: RepeatedRulesValid}> = /*@__PURE__*/
+export const RepeatedRulesSchema: GenMessage<RepeatedRules, { validType: RepeatedRulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 22);
 
 /**
@@ -4032,7 +4032,7 @@ export type MapRulesValid = MapRules;
  * Describes the message buf.validate.MapRules.
  * Use `create(MapRulesSchema)` to create a new message.
  */
-export const MapRulesSchema: GenMessage<MapRules, {validType: MapRulesValid}> = /*@__PURE__*/
+export const MapRulesSchema: GenMessage<MapRules, { validType: MapRulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 23);
 
 /**
@@ -4082,7 +4082,7 @@ export type AnyRulesValid = AnyRules;
  * Describes the message buf.validate.AnyRules.
  * Use `create(AnyRulesSchema)` to create a new message.
  */
-export const AnyRulesSchema: GenMessage<AnyRules, {validType: AnyRulesValid}> = /*@__PURE__*/
+export const AnyRulesSchema: GenMessage<AnyRules, { validType: AnyRulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 24);
 
 /**
@@ -4259,7 +4259,7 @@ export type DurationRulesValid = DurationRules;
  * Describes the message buf.validate.DurationRules.
  * Use `create(DurationRulesSchema)` to create a new message.
  */
-export const DurationRulesSchema: GenMessage<DurationRules, {validType: DurationRulesValid}> = /*@__PURE__*/
+export const DurationRulesSchema: GenMessage<DurationRules, { validType: DurationRulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 25);
 
 /**
@@ -4351,7 +4351,7 @@ export type FieldMaskRulesValid = FieldMaskRules;
  * Describes the message buf.validate.FieldMaskRules.
  * Use `create(FieldMaskRulesSchema)` to create a new message.
  */
-export const FieldMaskRulesSchema: GenMessage<FieldMaskRules, {validType: FieldMaskRulesValid}> = /*@__PURE__*/
+export const FieldMaskRulesSchema: GenMessage<FieldMaskRules, { validType: FieldMaskRulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 26);
 
 /**
@@ -4533,7 +4533,7 @@ export type TimestampRulesValid = TimestampRules;
  * Describes the message buf.validate.TimestampRules.
  * Use `create(TimestampRulesSchema)` to create a new message.
  */
-export const TimestampRulesSchema: GenMessage<TimestampRules, {validType: TimestampRulesValid}> = /*@__PURE__*/
+export const TimestampRulesSchema: GenMessage<TimestampRules, { validType: TimestampRulesValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 27);
 
 /**
@@ -4558,7 +4558,7 @@ export type ViolationsValid = Violations;
  * Describes the message buf.validate.Violations.
  * Use `create(ViolationsSchema)` to create a new message.
  */
-export const ViolationsSchema: GenMessage<Violations, {validType: ViolationsValid}> = /*@__PURE__*/
+export const ViolationsSchema: GenMessage<Violations, { validType: ViolationsValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 28);
 
 /**
@@ -4698,7 +4698,7 @@ export type ViolationValid = Violation;
  * Describes the message buf.validate.Violation.
  * Use `create(ViolationSchema)` to create a new message.
  */
-export const ViolationSchema: GenMessage<Violation, {validType: ViolationValid}> = /*@__PURE__*/
+export const ViolationSchema: GenMessage<Violation, { validType: ViolationValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 29);
 
 /**
@@ -4724,7 +4724,7 @@ export type FieldPathValid = FieldPath;
  * Describes the message buf.validate.FieldPath.
  * Use `create(FieldPathSchema)` to create a new message.
  */
-export const FieldPathSchema: GenMessage<FieldPath, {validType: FieldPathValid}> = /*@__PURE__*/
+export const FieldPathSchema: GenMessage<FieldPath, { validType: FieldPathValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 30);
 
 /**
@@ -4839,7 +4839,7 @@ export type FieldPathElementValid = FieldPathElement;
  * Describes the message buf.validate.FieldPathElement.
  * Use `create(FieldPathElementSchema)` to create a new message.
  */
-export const FieldPathElementSchema: GenMessage<FieldPathElement, {validType: FieldPathElementValid}> = /*@__PURE__*/
+export const FieldPathElementSchema: GenMessage<FieldPathElement, { validType: FieldPathElementValid }> = /*@__PURE__*/
   messageDesc(file_buf_validate_validate, 31);
 
 /**
@@ -5034,4 +5034,3 @@ export const field: GenExtension<FieldOptions, FieldRules> = /*@__PURE__*/
  */
 export const predefined: GenExtension<FieldOptions, PredefinedRules> = /*@__PURE__*/
   extDesc(file_buf_validate_validate, 3);
-

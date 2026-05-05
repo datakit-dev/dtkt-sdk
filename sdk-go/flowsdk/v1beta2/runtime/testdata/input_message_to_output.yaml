@@ -1,0 +1,12 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_message_to_output
+  description: "Message-typed input (proto Any) passed directly to output"
+  inputs:
+    - id: payload
+      message:
+        type: google.protobuf.Struct
+  outputs:
+    - id: result
+      value: "= inputs.payload.value"

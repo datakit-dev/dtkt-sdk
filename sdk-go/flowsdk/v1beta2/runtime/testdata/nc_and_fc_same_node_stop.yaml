@@ -1,0 +1,17 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: nc_and_fc_same_node_stop
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: doubled
+      value: "= inputs.x.value * 2"
+      flow_control:
+        stop_when: "= true"
+      node_control:
+        stop_when: "= true"
+  outputs:
+    - id: result
+      value: "= vars.doubled.value"

@@ -1,0 +1,21 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: nc_with_error_strategy_continue
+  description: "NC.terminate_when on one var with error_strategy CONTINUE; sibling var keeps running"
+  error_strategy: ERROR_STRATEGY_CONTINUE
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: doubled
+      value: "= inputs.x.value * 2"
+      node_control:
+        terminate_when: "= inputs.x.value >= 3"
+    - id: tripled
+      value: "= inputs.x.value * 3"
+  outputs:
+    - id: doubled_out
+      value: "= vars.doubled.value"
+    - id: tripled_out
+      value: "= vars.tripled.value"
