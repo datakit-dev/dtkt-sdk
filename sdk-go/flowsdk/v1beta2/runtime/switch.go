@@ -35,6 +35,7 @@ type switchHandler struct {
 	transforms  *transformPipeline
 	transformPS executor.PubSub
 	adapter     types.Adapter
+	cache       *cacheBackend
 }
 
 // evalSwitch evaluates the switch expression and returns the result value.
@@ -93,7 +94,7 @@ func (h *switchHandler) Run(ctx context.Context) error {
 
 	var evalCount uint64
 	for {
-		act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
+		act := h.cache.newActivation(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
 		vars, err := act.Resolve()
 		if errors.Is(err, errOperatorStopped) {
 			break
@@ -115,6 +116,13 @@ func (h *switchHandler) Run(ctx context.Context) error {
 			break
 		}
 
+		// cache:true producer post-capture: drain upstream events but
+		// skip eval/publish.
+		if h.cache.isCaptured() {
+			h.checkLifecycle(vars)
+			continue
+		}
+
 		resultExpr, err := h.evalSwitch(vars)
 		if err != nil {
 			return err
@@ -130,6 +138,7 @@ func (h *switchHandler) Run(ctx context.Context) error {
 		if err := publishNode(h.pubsub, h.topic, node); err != nil {
 			return err
 		}
+		h.cache.markCaptured()
 		h.checkLifecycle(vars)
 	}
 	return publishNode(h.pubsub, h.topic, flowv1beta2.RunSnapshot_VarNode_builder{
@@ -173,7 +182,7 @@ func (h *switchHandler) runWithTransforms(ctx context.Context) error {
 
 	g.Go(func() error {
 		for {
-			act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
+			act := h.cache.newActivation(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
 			vars, err := act.Resolve()
 			if errors.Is(err, errOperatorStopped) {
 				break
@@ -194,6 +203,11 @@ func (h *switchHandler) runWithTransforms(ctx context.Context) error {
 			if act.AnyEOF() {
 				break
 			}
+			// cache:true producer post-capture: drain upstream events
+			// and skip eval + transform pipeline publish.
+			if h.cache.isCaptured() {
+				continue
+			}
 			resultExpr, err := h.evalSwitch(vars)
 			if err != nil {
 				return err
@@ -201,6 +215,7 @@ func (h *switchHandler) runWithTransforms(ctx context.Context) error {
 			if err := h.transformPS.Publish(inputTopic, pubsub.NewMessage(resultExpr)); err != nil {
 				return err
 			}
+			h.cache.markCaptured()
 		}
 		return h.transformPS.Publish(inputTopic, pubsub.NewMessage(newEOFValue()))
 	})

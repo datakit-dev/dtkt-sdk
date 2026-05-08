@@ -19,23 +19,38 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-// wireEdges creates the per-node wiring (input subscriptions and output topic)
-// for every node in the graph by subscribing to source-node topics for each
-// downstream edge.
+// wireEdges creates the per-node wiring (input subscriptions and output
+// topic) for every node in the graph by subscribing to source-node
+// topics for each downstream edge. Edges whose source has cache:true
+// are subscribed the same way; the consumer-side recv applies
+// last-seen / non-blocking semantics on those refs (see
+// nodeRef.recvCached).
 func (e *Executor) wireEdges(ctx context.Context, graph *flowv1beta2.Graph) (map[string]*nodeWiring, error) {
 	wiring := make(map[string]*nodeWiring, len(graph.GetNodes()))
+	cached := make(map[string]bool, len(graph.GetNodes()))
 	for _, n := range graph.GetNodes() {
 		wiring[n.GetId()] = &nodeWiring{
 			inputs: make(map[string]<-chan *pubsub.Message),
 			topic:  e.topics.For(n.GetId()),
 		}
+		if isCachedProducer(n) {
+			cached[n.GetId()] = true
+		}
 	}
 	for _, edge := range graph.GetEdges() {
-		ch, err := e.pubsub.Subscribe(ctx, e.topics.For(edge.GetSource()))
+		source := edge.GetSource()
+		target := edge.GetTarget()
+		ch, err := e.pubsub.Subscribe(ctx, e.topics.For(source))
 		if err != nil {
-			return nil, fmt.Errorf("subscribing to %s: %w", edge.GetSource(), err)
+			return nil, fmt.Errorf("subscribing to %s: %w", source, err)
 		}
-		wiring[edge.GetTarget()].inputs[edge.GetSource()] = ch
+		wiring[target].inputs[source] = ch
+		if cached[source] {
+			if wiring[target].cachedSources == nil {
+				wiring[target].cachedSources = make(map[string]bool)
+			}
+			wiring[target].cachedSources[source] = true
+		}
 	}
 	return wiring, nil
 }
@@ -62,10 +77,11 @@ func buildCELEnvAndValidate(graph *flowv1beta2.Graph, resolved map[string]*rpc.C
 
 // runState holds per-execution infrastructure created by setupRunState.
 type runState struct {
-	genCtx      context.Context
-	handlerCtxs map[string]context.Context
-	performStop func()
-	cleanup     func() // must be deferred by caller
+	genCtx       context.Context
+	handlerCtxs  map[string]context.Context
+	gracefulStop func()
+	operatorStop func()
+	cleanup      func() // must be deferred by caller
 }
 
 // setupRunState creates the stop/suspend/resume infrastructure, per-node
@@ -79,33 +95,38 @@ func (e *Executor) setupRunState(
 	handlers map[string]executor.NodeHandler,
 	nodeProtos map[string]*flowv1beta2.Node,
 	inputNodeIDs []string,
+	wiring map[string]*nodeWiring,
 	handlerPub executor.PubSub,
 	strategy flowv1beta2.ErrorStrategy,
 ) (*runState, error) {
 	genCtx, genCancel := context.WithCancel(gCtx)
 
-	var stopOnce sync.Once
-	performStop := func() {
-		stopOnce.Do(func() {
+	// Interactions with no upstream edges have nothing to drain on the
+	// EOF cascade -- their handler's act.Resolve returns immediately
+	// with empty vars and they sit in promptAndWait forever. Even on
+	// graceful stop, these need an explicit stopCh.
+	upstreamlessInteractions := make(map[string]bool)
+	for id, np := range nodeProtos {
+		if np.WhichType() != flowv1beta2.Node_Interaction_case {
+			continue
+		}
+		if w := wiring[id]; w == nil || len(w.inputs) == 0 {
+			upstreamlessInteractions[id] = true
+		}
+	}
+
+	// stopCore implements the parts of stop that are always done,
+	// regardless of who initiated it: publish input EOFs, signal stopCh
+	// on suspended handlers and generators, and signal stopCh on
+	// upstreamless interactions (which can't drain via EOF cascade).
+	// Idempotent across repeated calls -- the EOF publish and
+	// requestStop are safe to repeat.
+	var coreOnce sync.Once
+	stopCore := func() {
+		coreOnce.Do(func() {
 			for _, id := range inputNodeIDs {
 				_ = e.pubsub.Publish(e.topics.InputFor(id), pubsub.NewMessage(newEOFValue()))
 			}
-			// Don't cancel genCtx anymore: generators implement
-			// selfStoppable now, so we signal their stopCh and they exit
-			// gracefully with PHASE_SUCCEEDED. Cancelling ctx would race
-			// with stopCh and could cause the generator to return ctx.Err
-			// without publishing its terminal phase.
-			//
-			// Signal stopCh on:
-			//   - suspended handlers (their waitForResume returns
-			//     suspendStopped → exit cleanly)
-			//   - generators (no input to drain; stopCh wins their select
-			//     and they publish PHASE_SUCCEEDED)
-			//
-			// Running non-generator handlers are NOT signaled here: stopCh
-			// wins over input in recv()'s select, and they have buffered
-			// input (from feedInput or upstream) that must drain naturally
-			// via the EOF cascade above.
 			e.mu.Lock()
 			for id := range e.suspendedNodes {
 				if sh, ok := e.handlers[id].(selfStoppable); ok {
@@ -114,8 +135,50 @@ func (e *Executor) setupRunState(
 				delete(e.suspendedNodes, id)
 			}
 			for id, h := range e.handlers {
-				if !isGenerator(e.nodeProtos[id]) {
+				np := e.nodeProtos[id]
+				isInteraction := np.WhichType() == flowv1beta2.Node_Interaction_case
+				if !isGenerator(np) && !(isInteraction && upstreamlessInteractions[id]) {
 					continue
+				}
+				if sh, ok := h.(selfStoppable); ok {
+					sh.requestStop()
+				}
+			}
+			e.mu.Unlock()
+		})
+	}
+
+	// gracefulStop is what flow_control.stop_when calls. It does the
+	// core stop steps (EOF cascade for inputs/var/action/stream/output;
+	// stopCh for generators/suspended/upstreamless interactions) and
+	// intentionally does NOT signal stopCh on interactions with
+	// upstream edges -- those drain via EOF cascade once their current
+	// iteration (which may be parked in promptAndWait awaiting an
+	// in-flight response) completes. This preserves the "drain buffered,
+	// then exit" contract that flow_control.stop_when implies.
+	gracefulStop := func() {
+		stopCore()
+	}
+
+	// operatorStop is what e.Stop() (the user-facing operator command)
+	// calls. It does the core stop steps AND additionally signals
+	// stopCh on every interaction handler -- including those with
+	// upstream edges -- so a parked promptAndWait unblocks immediately.
+	// Operator stop means "stop now, don't keep prompting"; without
+	// this an interaction parked waiting on user response would never
+	// exit (the EOF cascade can't reach it past act.Resolve).
+	var aggressiveOnce sync.Once
+	operatorStop := func() {
+		stopCore()
+		aggressiveOnce.Do(func() {
+			e.mu.Lock()
+			for id, h := range e.handlers {
+				np := e.nodeProtos[id]
+				if np.WhichType() != flowv1beta2.Node_Interaction_case {
+					continue
+				}
+				if upstreamlessInteractions[id] {
+					continue // already handled by stopCore
 				}
 				if sh, ok := h.(selfStoppable); ok {
 					sh.requestStop()
@@ -142,7 +205,7 @@ func (e *Executor) setupRunState(
 
 	// Store per-execution state on the Executor.
 	e.mu.Lock()
-	e.stopFn = performStop
+	e.stopFn = operatorStop
 	e.terminateFn = func() {
 		e.mu.Lock()
 		e.terminated = true
@@ -170,7 +233,7 @@ func (e *Executor) setupRunState(
 		}
 		if fc != nil && hasHolder {
 			holder.setFlowControlCallback(
-				makeFlowControlCallback(id, fc, performStop, e.Terminate, e.Suspend),
+				makeFlowControlCallback(id, fc, gracefulStop, e.Terminate, e.Suspend),
 			)
 		}
 
@@ -232,10 +295,11 @@ func (e *Executor) setupRunState(
 	}
 
 	return &runState{
-		genCtx:      genCtx,
-		handlerCtxs: handlerCtxMap,
-		performStop: performStop,
-		cleanup:     cleanup,
+		genCtx:       genCtx,
+		handlerCtxs:  handlerCtxMap,
+		gracefulStop: gracefulStop,
+		operatorStop: operatorStop,
+		cleanup:      cleanup,
 	}, nil
 }
 
@@ -316,10 +380,26 @@ func (e *Executor) buildInteractionHandlers(
 				return nil, fmt.Errorf("compiling when for %s: %w", n.GetId(), err)
 			}
 		}
-		nodeID := n.GetId()
+		// Compile per-input title/description CEL once. Programs run
+		// against activation vars at prompt time; resolved values are
+		// shipped as Interaction.Input clones on the
+		// InteractionRequestEvent so responders never see raw CEL.
+		formInputs, err := compileInteractionInputs(celEnv, inter.GetInputs())
+		if err != nil {
+			return nil, fmt.Errorf("compiling input CEL for %s: %w", n.GetId(), err)
+		}
+		nodeID := n.GetId()      // Format B (e.g. "interactions.confirm") - cross-category routing
+		bareID := inter.GetId()  // Format A (e.g. "confirm") - per-event protobuf id field contract
 		w := wiring[nodeID]
+		cb := &cacheBackend{
+			cacheDeps: cacheDeps{
+				cachedSources: w.cachedSources,
+				allCached:     w.hasOnlyCachedDeps(),
+			},
+		}
+		e.cacheBackends[nodeID] = cb
 		h := &interactionHandler{
-			id:          nodeID,
+			id:          bareID,
 			inputs:      w.inputs,
 			pubsub:      handlerPub,
 			topic:       w.topic,
@@ -329,10 +409,14 @@ func (e *Executor) buildInteractionHandlers(
 			transforms:  transforms,
 			transformPS: e.pubsub,
 			adapter:     celEnv.TypeAdapter(),
+			cache:       cb,
+			formInputs:  formInputs,
 		}
 		h.initSuspendable()
 		h.initStoppable()
-		interactionHandlers[nodeID] = h
+		// Keyed by bareID because incoming InteractionResponseEvent.id is the
+		// bare-id form per its protobuf pattern.
+		interactionHandlers[bareID] = h
 	}
 	return interactionHandlers, nil
 }
@@ -356,14 +440,15 @@ func (e *Executor) setupInputBridges(
 				return nil, fmt.Errorf("compiling transforms for input %s: %w", n.GetId(), err)
 			}
 			if tp != nil {
-				nodeID := n.GetId()
+				nodeID := n.GetId()         // Format B - topic routing
+				bareID := n.GetInput().GetId() // Format A - per-event protobuf id field contract
 				sink := func(_ context.Context, val *expr.Value, eof bool) error {
 					phase := flowv1beta2.RunSnapshot_PHASE_RUNNING
 					if eof {
 						phase = flowv1beta2.RunSnapshot_PHASE_SUCCEEDED
 					}
 					return publishNode(e.pubsub, e.topics.For(nodeID), flowv1beta2.RunSnapshot_InputNode_builder{
-						Id:     nodeID,
+						Id:     bareID,
 						Value:  val,
 						Closed: eof,
 						Phase:  phase,
@@ -392,8 +477,8 @@ func (e *Executor) setupInputBridges(
 			continue
 		}
 		inp := n.GetInput()
-		nodeID := n.GetId()
-		isConstant := inp.GetConstant()
+		nodeID := n.GetId()    // Format B - topic routing, handler map key
+		bareID := inp.GetId()  // Format A - per-event protobuf id field contract
 		throttle := rateToDuration(inp.GetThrottle())
 		defVal := inputTypeDefault(inp)
 		cache := inp.GetCache()
@@ -419,7 +504,7 @@ func (e *Executor) setupInputBridges(
 
 		// Notify external consumers that this input is ready for values.
 		if e.inputRequests != nil {
-			evt := flowv1beta2.InputRequestEvent_builder{Id: nodeID}.Build()
+			evt := flowv1beta2.InputRequestEvent_builder{Id: bareID}.Build()
 			select {
 			case e.inputRequests <- evt:
 			case <-ctx.Done():
@@ -427,23 +512,33 @@ func (e *Executor) setupInputBridges(
 			}
 		}
 
-		if hasResolution && !isConstant {
+		if hasResolution {
 			// Throttled/cached/default inputs use an inputHandler with a bridge goroutine.
 			rawCh := make(chan *expr.Value, 1)
 
-			var publish func(*expr.Value, bool) error
+			cb := &cacheBackend{
+				cacheCapture: cacheCapture{enabled: cache},
+			}
+			if cache {
+				e.cacheBackends[nodeID] = cb
+			}
+
+			// rawPublish is the actual delivery: to the transform input
+			// topic if the input has transforms, otherwise direct to the
+			// consumer-facing topic with a full InputNode message.
+			var rawPublish func(*expr.Value, bool) error
 			if topic, ok := inputTopics[nodeID]; ok {
-				publish = func(val *expr.Value, eof bool) error {
+				rawPublish = func(val *expr.Value, _ bool) error {
 					return e.pubsub.Publish(topic, pubsub.NewMessage(val))
 				}
 			} else {
-				publish = func(val *expr.Value, eof bool) error {
+				rawPublish = func(val *expr.Value, eof bool) error {
 					phase := flowv1beta2.RunSnapshot_PHASE_RUNNING
 					if eof {
 						phase = flowv1beta2.RunSnapshot_PHASE_SUCCEEDED
 					}
 					return publishNode(e.pubsub, e.topics.For(nodeID), flowv1beta2.RunSnapshot_InputNode_builder{
-						Id:     nodeID,
+						Id:     bareID,
 						Value:  val,
 						Closed: eof,
 						Phase:  phase,
@@ -451,8 +546,23 @@ func (e *Executor) setupInputBridges(
 				}
 			}
 
+			// publish wraps rawPublish with cache:true drain-and-skip.
+			// Identical for transform-pipeline and direct paths.
+			publish := func(val *expr.Value, eof bool) error {
+				if !eof && cb.isCaptured() {
+					return nil
+				}
+				if err := rawPublish(val, eof); err != nil {
+					return err
+				}
+				if !eof {
+					cb.markCaptured()
+				}
+				return nil
+			}
+
 			h := &inputHandler{
-				id:         nodeID,
+				id:         bareID,
 				raw:        rawCh,
 				publish:    publish,
 				throttle:   throttle,
@@ -486,7 +596,7 @@ func (e *Executor) setupInputBridges(
 				}
 			})
 		} else {
-			// Simple, constant, or transform-only inputs: bridge directly.
+			// Simple or transform-only inputs: bridge directly.
 			g.Go(func() error {
 				for {
 					select {
@@ -495,19 +605,15 @@ func (e *Executor) setupInputBridges(
 					case msg, ok := <-inputCh:
 						if !ok {
 							// Subscription closed; send EOF.
-							return e.publishInputEOF(nodeID, inputTopics)
+							return e.publishInputEOF(nodeID, bareID, inputTopics)
 						}
 						val := msg.Payload.(*expr.Value)
 						msg.Ack()
 						if isEOFValue(val) {
-							return e.publishInputEOF(nodeID, inputTopics)
+							return e.publishInputEOF(nodeID, bareID, inputTopics)
 						}
-						if err := e.publishInputValue(nodeID, val, inputTopics); err != nil {
+						if err := e.publishInputValue(nodeID, bareID, val, inputTopics); err != nil {
 							return err
-						}
-						if isConstant {
-							// Constant inputs: send EOF after first value.
-							return e.publishInputEOF(nodeID, inputTopics)
 						}
 					}
 				}
@@ -519,7 +625,9 @@ func (e *Executor) setupInputBridges(
 }
 
 // buildHandlers compiles and creates handlers for all non-input,
-// non-interaction, non-connection nodes in the graph.
+// non-interaction, non-connection nodes in the graph. registry collects
+// the per-node cacheBackend pointers so the executor can find them later
+// (e.g. for ClearCache).
 func buildHandlers(
 	graph *flowv1beta2.Graph,
 	celEnv shared.Env,
@@ -528,6 +636,7 @@ func buildHandlers(
 	wiring map[string]*nodeWiring,
 	handlerPub executor.PubSub,
 	directPub executor.PubSub,
+	registry map[string]*cacheBackend,
 ) (map[string]executor.NodeHandler, error) {
 	handlers := make(map[string]executor.NodeHandler, len(graph.GetNodes()))
 	for _, n := range graph.GetNodes() {
@@ -540,13 +649,55 @@ func buildHandlers(
 			return nil, fmt.Errorf("compiling node %s: %w", n.GetId(), err)
 		}
 		w := wiring[n.GetId()]
-		h, err := newHandler(compiled, n.GetId(), w.inputs, handlerPub, w.topic, directPub, celEnv.TypeAdapter())
+		cb := &cacheBackend{
+			cacheCapture: cacheCapture{enabled: isCachedProducer(n)},
+			cacheDeps: cacheDeps{
+				cachedSources: w.cachedSources,
+				allCached:     w.hasOnlyCachedDeps(),
+			},
+		}
+		registry[n.GetId()] = cb
+		// bareID (Format A) is the spec id stored in handler.id for use in
+		// protobuf event/snapshot fields whose validator is the bare-id
+		// pattern. n.GetId() is fully-qualified (Format B) and stays as the
+		// cross-category handler map key in `handlers` below.
+		h, err := newHandler(compiled, bareNodeID(n), w.inputs, handlerPub, w.topic, directPub, celEnv.TypeAdapter(), cb)
 		if err != nil {
 			return nil, fmt.Errorf("creating handler for node %s: %w", n.GetId(), err)
 		}
 		handlers[n.GetId()] = h
 	}
 	return handlers, nil
+}
+
+// bareNodeID returns the bare/simple node id (Format A) from a Node by
+// reading the id off the typed inner spec. The bare id is the form
+// required by the buf-validate pattern on every per-node id field in
+// state.proto / events.proto (`^[a-zA-Z][a-zA-Z0-9_]*$`).
+//
+// Use n.GetId() (Format B, e.g. "vars.x") for graph-level operations
+// (topic routing, cross-category handler map, edges) where category
+// disambiguation is required.
+func bareNodeID(n *flowv1beta2.Node) string {
+	switch n.WhichType() {
+	case flowv1beta2.Node_Connection_case:
+		return n.GetConnection().GetId()
+	case flowv1beta2.Node_Input_case:
+		return n.GetInput().GetId()
+	case flowv1beta2.Node_Generator_case:
+		return n.GetGenerator().GetId()
+	case flowv1beta2.Node_Var_case:
+		return n.GetVar().GetId()
+	case flowv1beta2.Node_Action_case:
+		return n.GetAction().GetId()
+	case flowv1beta2.Node_Stream_case:
+		return n.GetStream().GetId()
+	case flowv1beta2.Node_Interaction_case:
+		return n.GetInteraction().GetId()
+	case flowv1beta2.Node_Output_case:
+		return n.GetOutput().GetId()
+	}
+	return ""
 }
 
 // startInteractionDemux routes InteractionResponseEvents from the external

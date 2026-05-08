@@ -34,7 +34,8 @@ type unaryHandler struct {
 	env          shared.Env
 	whenProg     cel.Program
 	throttle     time.Duration
-	cache        cache.Cache      // non-nil when memoize is enabled
+	memoize      cache.Cache      // non-nil when memoize is enabled
+	cache        *cacheBackend    // cache: true delivery (consumer-side)
 	request      *compiledRequest // nil = use FirstInputValue
 	responseProg cel.Program      // nil = use raw response
 	retry        *compiledRetryStrategy
@@ -48,7 +49,7 @@ loop:
 		// An in-flight call from the previous iteration always completes
 		// naturally. Suspend never aborts an RPC mid-flight (we can't
 		// guarantee that's safe / idempotent on the server side).
-		act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan(), h.StopChan())
+		act := h.cache.newActivation(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan(), h.StopChan())
 		if h.throttle > 0 && evalCount > 0 {
 			select {
 			case <-ctx.Done():
@@ -87,6 +88,14 @@ loop:
 		}
 		if act.AnyEOF() {
 			break
+		}
+
+		// cache:true producer post-capture: drain upstream events and
+		// skip the RPC + publish. ClearCache resets the flag so the
+		// next event is consumed and re-emitted.
+		if h.cache.isCaptured() {
+			h.checkLifecycle(vars)
+			continue
 		}
 
 		if h.whenProg != nil {
@@ -136,6 +145,10 @@ loop:
 			if err := publishNode(h.pubsub, h.topic, node); err != nil {
 				return err
 			}
+			// CONTINUE published an error-derived value. For cache:true,
+			// that value IS the captured value -- mark captured so the
+			// next iteration drains-and-skips like any other capture.
+			h.cache.markCaptured()
 			// Lifecycle pipeline: retry's CONTINUE emits an error-derived
 			// value; NC/FC should still react to the iteration as if a
 			// normal value had been published.
@@ -194,6 +207,7 @@ loop:
 		if err := publishNode(h.pubsub, h.topic, node); err != nil {
 			return err
 		}
+		h.cache.markCaptured()
 		h.checkLifecycle(vars)
 	}
 
@@ -211,7 +225,7 @@ func (h *unaryHandler) callUnary(ctx context.Context, input *expr.Value) (proto.
 	if err != nil {
 		return nil, err
 	}
-	if h.cache == nil {
+	if h.memoize == nil {
 		return h.client.CallUnary(ctx, h.method, req)
 	}
 	hash, err := hashExprValue(input)
@@ -220,14 +234,14 @@ func (h *unaryHandler) callUnary(ctx context.Context, input *expr.Value) (proto.
 		return h.client.CallUnary(ctx, h.method, req)
 	}
 	key := fmt.Sprintf("%s:%016x", h.id, hash)
-	if cached, ok, err := h.cache.Get(ctx, key); err == nil && ok {
+	if cached, ok, err := h.memoize.Get(ctx, key); err == nil && ok {
 		return cached, nil
 	}
 	resp, err := h.client.CallUnary(ctx, h.method, req)
 	if err != nil {
 		return nil, err
 	}
-	_ = h.cache.Set(ctx, key, resp)
+	_ = h.memoize.Set(ctx, key, resp)
 	return resp, nil
 }
 

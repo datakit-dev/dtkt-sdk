@@ -6,10 +6,8 @@ import (
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
-	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 // timedFeedInput publishes values to the input's PubSub topic, then publishes
@@ -27,7 +25,9 @@ func timedFeedInput(ps executor.PubSub, nodeID string, closeAfter time.Duration,
 	}()
 }
 
-// Input cache: reuse last received value when throttle expires
+// Input cache: pushed value is delivered to consumers via the snapshot
+// (read inline). When the consumer has only the cached dep (oneShot),
+// it fires exactly once with the latest cached value.
 
 func TestGraph_Input_Cache(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
@@ -36,18 +36,14 @@ func TestGraph_Input_Cache(t *testing.T) {
 		ps := newPubSub()
 		defer ps.Close() //nolint:errcheck
 
-		// Feed one value; keep channel open for 50ms so the inputHandler can
-		// re-emit the cached value on subsequent throttle timeouts.
-		timedFeedInput(ps, "inputs.x", 80*time.Millisecond, int64(42))
+		feedInput(ps, "inputs.x", int64(42))
 		ctx := testContext(t)
 		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
 		require.NoError(t, err)
 
 		results := collectOutputs(ctx, ps, "outputs.result")
-		require.Len(t, results, 2, "expected 1 fresh + 1 cached output")
-		for _, r := range results {
-			assert.Equal(t, int64(42), r.GetValue().GetInt64Value())
-		}
+		require.Len(t, results, 1, "all-cached-deps consumer fires exactly once")
+		assert.Equal(t, int64(42), results[0].GetValue().GetInt64Value())
 	})
 }
 
@@ -75,7 +71,17 @@ func TestGraph_Input_TypeDefault(t *testing.T) {
 	})
 }
 
-// Cache takes priority over type default
+// Input cache + default: a pushed value updates the cached value
+// (default seeds the initial cached value; subsequent pushes replace
+// it). The all-cached consumer fires once per producer pulse, so we may
+// see 1 or 2 outputs depending on race between the default pre-pulse
+// drain and the bridge's emit:
+//   - If bridge emit lands first: 1 output (42, since cachedValues
+//     was already updated and the pre-pulse drained reads the new
+//     value).
+//   - If consumer drains pre-pulse first: 2 outputs (99 then 42).
+// In both cases, the LAST output is 42, demonstrating cache priority
+// over default.
 
 func TestGraph_Input_CachePriorityOverDefault(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
@@ -84,41 +90,15 @@ func TestGraph_Input_CachePriorityOverDefault(t *testing.T) {
 		ps := newPubSub()
 		defer ps.Close() //nolint:errcheck
 
-		// Feed value 42; subsequent timeouts should use cache (42), not default (99).
-		timedFeedInput(ps, "inputs.x", 80*time.Millisecond, int64(42))
+		feedInput(ps, "inputs.x", int64(42))
 		ctx := testContext(t)
 		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
 		require.NoError(t, err)
 
 		results := collectOutputs(ctx, ps, "outputs.result")
-		require.Len(t, results, 2, "expected 1 fresh + 1 cached output")
-		for _, r := range results {
-			assert.Equal(t, int64(42), r.GetValue().GetInt64Value(),
-				"cache should take priority over type default")
-		}
-	})
-}
-
-// Default throttle injection: cache without explicit throttle
-
-func TestGraph_Input_DefaultThrottleInjection(t *testing.T) {
-	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
-		graph := loadFlow(t, "input_default_throttle.yaml")
-
-		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
-
-		defaultThrottle := &flowv1beta2.Rate{Count: 1, Interval: durationpb.New(50 * time.Millisecond)}
-		timedFeedInput(ps, "inputs.x", 80*time.Millisecond, int64(42))
-		ctx := testContext(t)
-		err := NewExecutor(ps, testTopics, append([]Option{WithDefaultInputThrottle(defaultThrottle)}, extraOpts...)...).Execute(ctx, graph)
-		require.NoError(t, err)
-
-		results := collectOutputs(ctx, ps, "outputs.result")
-		require.Len(t, results, 2, "expected 1 fresh + 1 cached, proving default throttle was injected")
-		for _, r := range results {
-			assert.Equal(t, int64(42), r.GetValue().GetInt64Value())
-		}
+		require.NotEmpty(t, results, "all-cached consumer should fire at least once")
+		last := results[len(results)-1].GetValue().GetInt64Value()
+		assert.Equal(t, int64(42), last, "last value must be the pushed cache, demonstrating priority over default")
 	})
 }
 

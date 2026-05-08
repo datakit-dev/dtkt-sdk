@@ -1,0 +1,25 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_transform_references_graph
+  # Transform expressions may only reference `this` (the value flowing
+  # through the pipeline). The output's filter below references
+  # `interactions.confirmDiscard.value`, which is a graph-aware
+  # reference and is rejected by lint. The idiomatic alternative is to
+  # have the producer's main expression compose the graph state into
+  # the value, then transform `this`-fields downstream. See
+  # interaction_output_filter_idiomatic.yaml for the working pattern.
+  inputs:
+    - id: x
+      int64: {}
+  interactions:
+    - id: confirmDiscard
+      inputs:
+        - id: discard
+          title: "Discard?"
+          confirm: {}
+  outputs:
+    - id: result
+      value: "= inputs.x.value"
+      transforms:
+        - filter: "= !interactions.confirmDiscard.value"

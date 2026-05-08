@@ -27,6 +27,7 @@ type varHandler struct {
 	transforms  *transformPipeline
 	transformPS executor.PubSub
 	adapter     types.Adapter
+	cache       *cacheBackend
 }
 
 func (h *varHandler) Run(ctx context.Context) error {
@@ -36,7 +37,7 @@ func (h *varHandler) Run(ctx context.Context) error {
 
 	var evalCount uint64
 	for {
-		act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
+		act := h.cache.newActivation(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
 		vars, err := act.Resolve()
 		if errors.Is(err, errOperatorStopped) {
 			break
@@ -57,11 +58,18 @@ func (h *varHandler) Run(ctx context.Context) error {
 		if act.AnyEOF() {
 			break
 		}
+
+		// cache:true producer post-capture: drain upstream events but
+		// skip eval/publish. ClearCache resets the flag.
+		if h.cache.isCaptured() {
+			h.checkLifecycle(vars)
+			continue
+		}
+
 		result, err := evalCEL(h.program, vars)
 		if err != nil {
 			return fmt.Errorf("var %s eval: %w", h.id, err)
 		}
-
 		val, err := refValToExpr(result)
 		if err != nil {
 			return fmt.Errorf("var %s convert: %w", h.id, err)
@@ -77,6 +85,7 @@ func (h *varHandler) Run(ctx context.Context) error {
 		if err := publishNode(h.pubsub, h.topic, node); err != nil {
 			return err
 		}
+		h.cache.markCaptured()
 		h.checkLifecycle(vars)
 	}
 	return publishNode(h.pubsub, h.topic, flowv1beta2.RunSnapshot_VarNode_builder{
@@ -120,7 +129,7 @@ func (h *varHandler) runWithTransforms(ctx context.Context) error {
 
 	g.Go(func() error {
 		for {
-			act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
+			act := h.cache.newActivation(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
 			vars, err := act.Resolve()
 			if errors.Is(err, errOperatorStopped) {
 				break
@@ -141,6 +150,11 @@ func (h *varHandler) runWithTransforms(ctx context.Context) error {
 			if act.AnyEOF() {
 				break
 			}
+			// cache:true producer post-capture: drain upstream events
+			// and skip eval + transform pipeline publish.
+			if h.cache.isCaptured() {
+				continue
+			}
 			result, err := evalCEL(h.program, vars)
 			if err != nil {
 				return fmt.Errorf("var %s eval: %w", h.id, err)
@@ -152,6 +166,7 @@ func (h *varHandler) runWithTransforms(ctx context.Context) error {
 			if err := h.transformPS.Publish(inputTopic, pubsub.NewMessage(val)); err != nil {
 				return err
 			}
+			h.cache.markCaptured()
 		}
 		return h.transformPS.Publish(inputTopic, pubsub.NewMessage(newEOFValue()))
 	})

@@ -21,18 +21,19 @@ type clientStreamHandler struct {
 	lifecycleMixin
 	suspendableMixin
 	stoppableMixin
-	id                   string
-	method               protoreflect.FullName
-	inputs               map[string]<-chan *pubsub.Message
-	pubsub               executor.PubSub
-	topic                string
-	client               rpc.Client
-	env                  shared.Env
-	whenProg             cel.Program
-	throttle             time.Duration
-	request              *compiledRequest // nil = use FirstInputValue
-	responseProg         cel.Program      // nil = use raw response
-	retry                *compiledRetryStrategy
+	id           string
+	method       protoreflect.FullName
+	inputs       map[string]<-chan *pubsub.Message
+	pubsub       executor.PubSub
+	topic        string
+	client       rpc.Client
+	env          shared.Env
+	whenProg     cel.Program
+	throttle     time.Duration
+	request      *compiledRequest // nil = use FirstInputValue
+	responseProg cel.Program      // nil = use raw response
+	retry        *compiledRetryStrategy
+	cache        *cacheBackend
 }
 
 func (h *clientStreamHandler) Run(ctx context.Context) error {
@@ -121,7 +122,7 @@ func (h *clientStreamHandler) Run(ctx context.Context) error {
 				}
 			}
 
-			act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan(), h.StopChan())
+			act := h.cache.newActivation(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan(), h.StopChan())
 			vars, err := act.Resolve()
 			if errors.Is(err, errOperatorStopped) {
 				sendDone <- nil // graceful: close-send via defer, recv drains

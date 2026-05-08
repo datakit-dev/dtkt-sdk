@@ -17,16 +17,15 @@ const (
 
 // Lint diagnostic codes.
 const (
-	CodeInvalidCEL               = "invalid-cel"
-	CodeConstantDefaultExclusive = "constant-default-exclusive"
-	CodeOrphanedNode             = "orphaned-node"
-	CodeNoUpstream               = "no-upstream"
-	CodeUndeclaredConnection     = "undeclared-connection"
-	CodeMissingField             = "missing-field"
-	CodeUnknownField             = "unknown-field"
-	CodeTypeMismatch             = "type-mismatch"
-	CodeSchemaError              = "schema-error"
-	CodeProtoConflict            = "proto-conflict"
+	CodeInvalidCEL           = "invalid-cel"
+	CodeOrphanedNode         = "orphaned-node"
+	CodeNoUpstream           = "no-upstream"
+	CodeUndeclaredConnection = "undeclared-connection"
+	CodeMissingField         = "missing-field"
+	CodeUnknownField         = "unknown-field"
+	CodeTypeMismatch         = "type-mismatch"
+	CodeSchemaError          = "schema-error"
+	CodeProtoConflict        = "proto-conflict"
 )
 
 // LintDiagnostic represents a single lint finding with structured metadata.

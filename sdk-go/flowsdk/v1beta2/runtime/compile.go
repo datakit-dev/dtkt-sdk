@@ -59,7 +59,7 @@ type compiledCall struct {
 	request      *compiledRequest
 	responseProg cel.Program
 	retry        *compiledRetryStrategy
-	cache        cache.Cache // nil unless action with memoize
+	memoize      cache.Cache // nil unless action with memoize
 }
 
 type compiledOutput struct {
@@ -311,11 +311,11 @@ func compileAction(env shared.Env, node *flowv1beta2.Node, connectors map[string
 		}
 	}
 
-	var actionCache cache.Cache
+	var actionMemoize cache.Cache
 	if action.GetMemoize() {
-		actionCache = nodeCache
-		if actionCache == nil {
-			actionCache = cachememory.New()
+		actionMemoize = nodeCache
+		if actionMemoize == nil {
+			actionMemoize = cachememory.New()
 		}
 	}
 
@@ -351,7 +351,7 @@ func compileAction(env shared.Env, node *flowv1beta2.Node, connectors map[string
 		request:      reqTree,
 		responseProg: respProg,
 		retry:        retry,
-		cache:        actionCache,
+		memoize:      actionMemoize,
 	}, nil
 }
 

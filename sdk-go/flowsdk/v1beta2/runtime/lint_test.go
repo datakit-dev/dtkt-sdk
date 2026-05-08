@@ -42,6 +42,22 @@ func TestLint_InvalidTransformCEL(t *testing.T) {
 	assert.Contains(t, result.Error(), "vars.bad")
 }
 
+// TestLint_TransformReferencesGraphNode rejects transform expressions
+// that reference any graph-node category (inputs, vars, interactions,
+// etc.). Transforms see only `this`; graph-aware logic belongs in the
+// producer's main expression. Reproduces the user-reported pattern
+// where an output filter referenced interactions.confirmDiscard.value
+// and silently failed at eval time.
+func TestLint_TransformReferencesGraphNode(t *testing.T) {
+	graph := loadFlow(t, "lint_transform_references_graph.yaml")
+
+	result := Lint(graph)
+	require.NotEmpty(t, result.Diagnostics)
+	assert.Contains(t, result.Error(), "transforms[0].filter")
+	assert.Contains(t, result.Error(), "may only reference `this`")
+	assert.Contains(t, result.Error(), "interactions.confirmDiscard")
+}
+
 func TestLint_InvalidSwitchCEL(t *testing.T) {
 	graph := loadFlow(t, "lint_invalid_switch_cel.yaml")
 
@@ -57,14 +73,6 @@ func TestLint_MultipleErrors(t *testing.T) {
 	require.NotEmpty(t, result.Diagnostics)
 	assert.Contains(t, result.Error(), "vars.bad1")
 	assert.Contains(t, result.Error(), "outputs.bad2")
-}
-
-func TestLint_InputConstantAndDefaultMutuallyExclusive(t *testing.T) {
-	graph := loadFlow(t, "lint_constant_and_default.yaml")
-
-	result := Lint(graph)
-	require.NotEmpty(t, result.Diagnostics)
-	assert.Contains(t, result.Error(), "constant and default are mutually exclusive")
 }
 
 func TestLint_OrphanedNodeWarning(t *testing.T) {

@@ -1,0 +1,20 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: cache_var_fanout
+  inputs:
+    - id: tick
+      int64: {}
+    - id: const
+      int64: {}
+      cache: true
+  vars:
+    - id: a_plus_const
+      value: "= inputs.tick.value + inputs.const.value"
+    - id: a_times_const
+      value: "= inputs.tick.value * inputs.const.value"
+  outputs:
+    - id: sum
+      value: "= vars.a_plus_const.value"
+    - id: product
+      value: "= vars.a_times_const.value"

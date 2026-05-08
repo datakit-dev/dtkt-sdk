@@ -35,6 +35,7 @@ type bidiStreamHandler struct {
 	request      *compiledRequest // nil = use FirstInputValue
 	responseProg cel.Program      // nil = use raw response
 	retry        *compiledRetryStrategy
+	cache        *cacheBackend
 }
 
 func (h *bidiStreamHandler) Run(ctx context.Context) error {
@@ -122,7 +123,7 @@ func (h *bidiStreamHandler) Run(ctx context.Context) error {
 				}
 			}
 
-			act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan(), h.StopChan())
+			act := h.cache.newActivation(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan(), h.StopChan())
 			vars, err := act.Resolve()
 			if errors.Is(err, errOperatorStopped) {
 				return // exit send goroutine; defer stream.CloseSend() fires

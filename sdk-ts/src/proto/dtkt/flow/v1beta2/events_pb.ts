@@ -5,6 +5,8 @@
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_buf_validate_validate } from "../../../buf/validate/validate_pb";
+import type { Interaction_Input, Interaction_InputValid } from "./spec_pb";
+import { file_dtkt_flow_v1beta2_spec } from "./spec_pb";
 import type { Any } from "../../../google/protobuf/any_pb";
 import { file_google_protobuf_any } from "../../../google/protobuf/any_pb";
 import type { Message } from "@bufbuild/protobuf";
@@ -13,7 +15,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dtkt/flow/v1beta2/events.proto.
  */
 export const file_dtkt_flow_v1beta2_events: GenFile = /*@__PURE__*/
-  fileDesc("Ch5kdGt0L2Zsb3cvdjFiZXRhMi9ldmVudHMucHJvdG8SEWR0a3QuZmxvdy52MWJldGEyImgKCklucHV0RXZlbnQSLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIrCgV2YWx1ZRgCIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnlCBrpIA8gBASJCChFJbnB1dFJlcXVlc3RFdmVudBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokImkKC091dHB1dEV2ZW50Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSKwoFdmFsdWUYAiABKAsyFC5nb29nbGUucHJvdG9idWYuQW55Qga6SAPIAQEiZAoXSW50ZXJhY3Rpb25SZXF1ZXN0RXZlbnQSLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIaCgV0b2tlbhgCIAEoCUILukgIyAEBcgOwAQEioQEKGEludGVyYWN0aW9uUmVzcG9uc2VFdmVudBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokEhoKBXRva2VuGAIgASgJQgu6SAjIAQFyA7ABARIrCgV2YWx1ZRgDIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnlCBrpIA8gBARINCgVhY3RvchgEIAEoCSIPCg1TdG9wRmxvd0V2ZW50IhQKElRlcm1pbmF0ZUZsb3dFdmVudCISChBTdXNwZW5kRmxvd0V2ZW50IhEKD1Jlc3VtZUZsb3dFdmVudCI+Cg1TdG9wTm9kZUV2ZW50Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQiQwoSVGVybWluYXRlTm9kZUV2ZW50Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQiQQoQU3VzcGVuZE5vZGVFdmVudBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokInQKD1Jlc3VtZU5vZGVFdmVudBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokEigKBXZhbHVlGAIgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueUgAiAEBQggKBl92YWx1ZSIQCg5TdGFydEZsb3dFdmVudELYAQoXcHJvdG8uZHRrdC5mbG93LnYxYmV0YTJCC0V2ZW50c1Byb3RvUAFaSmdpdGh1Yi5jb20vZGF0YWtpdC1kZXYvZHRrdC1zZGsvc2RrLWdvL3Byb3RvL2R0a3QvZmxvdy92MWJldGEyO2Zsb3d2MWJldGEyogIDREZYqgIRRHRrdC5GbG93LlYxYmV0YTLKAhFEdGt0XEZsb3dcVjFiZXRhMuICHUR0a3RcRmxvd1xWMWJldGEyXEdQQk1ldGFkYXRh6gITRHRrdDo6Rmxvdzo6VjFiZXRhMmIGcHJvdG8z", [file_buf_validate_validate, file_google_protobuf_any]);
+  fileDesc("Ch5kdGt0L2Zsb3cvdjFiZXRhMi9ldmVudHMucHJvdG8SEWR0a3QuZmxvdy52MWJldGEyImgKCklucHV0RXZlbnQSLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIrCgV2YWx1ZRgCIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnlCBrpIA8gBASJCChFJbnB1dFJlcXVlc3RFdmVudBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokImkKC091dHB1dEV2ZW50Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSKwoFdmFsdWUYAiABKAsyFC5nb29nbGUucHJvdG9idWYuQW55Qga6SAPIAQEimgEKF0ludGVyYWN0aW9uUmVxdWVzdEV2ZW50Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSGgoFdG9rZW4YAiABKAlCC7pICMgBAXIDsAEBEjQKBmlucHV0cxgDIAMoCzIkLmR0a3QuZmxvdy52MWJldGEyLkludGVyYWN0aW9uLklucHV0IqEBChhJbnRlcmFjdGlvblJlc3BvbnNlRXZlbnQSLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIaCgV0b2tlbhgCIAEoCUILukgIyAEBcgOwAQESKwoFdmFsdWUYAyABKAsyFC5nb29nbGUucHJvdG9idWYuQW55Qga6SAPIAQESDQoFYWN0b3IYBCABKAkiDwoNU3RvcEZsb3dFdmVudCIUChJUZXJtaW5hdGVGbG93RXZlbnQiEgoQU3VzcGVuZEZsb3dFdmVudCIRCg9SZXN1bWVGbG93RXZlbnQiiQEKDVN0b3BOb2RlRXZlbnQSeAoCaWQYASABKAlCbLpIacgBAXJkMmJeKGNvbm5lY3Rpb25zfGlucHV0c3xnZW5lcmF0b3JzfHZhcnN8YWN0aW9uc3xzdHJlYW1zfGludGVyYWN0aW9uc3xvdXRwdXRzKVwuW2EtekEtWl1bYS16QS1aMC05X10qJCKOAQoSVGVybWluYXRlTm9kZUV2ZW50EngKAmlkGAEgASgJQmy6SGnIAQFyZDJiXihjb25uZWN0aW9uc3xpbnB1dHN8Z2VuZXJhdG9yc3x2YXJzfGFjdGlvbnN8c3RyZWFtc3xpbnRlcmFjdGlvbnN8b3V0cHV0cylcLlthLXpBLVpdW2EtekEtWjAtOV9dKiQijAEKEFN1c3BlbmROb2RlRXZlbnQSeAoCaWQYASABKAlCbLpIacgBAXJkMmJeKGNvbm5lY3Rpb25zfGlucHV0c3xnZW5lcmF0b3JzfHZhcnN8YWN0aW9uc3xzdHJlYW1zfGludGVyYWN0aW9uc3xvdXRwdXRzKVwuW2EtekEtWl1bYS16QS1aMC05X10qJCK/AQoPUmVzdW1lTm9kZUV2ZW50EngKAmlkGAEgASgJQmy6SGnIAQFyZDJiXihjb25uZWN0aW9uc3xpbnB1dHN8Z2VuZXJhdG9yc3x2YXJzfGFjdGlvbnN8c3RyZWFtc3xpbnRlcmFjdGlvbnN8b3V0cHV0cylcLlthLXpBLVpdW2EtekEtWjAtOV9dKiQSKAoFdmFsdWUYAiABKAsyFC5nb29nbGUucHJvdG9idWYuQW55SACIAQFCCAoGX3ZhbHVlIhAKDlN0YXJ0Rmxvd0V2ZW50QtgBChdwcm90by5kdGt0LmZsb3cudjFiZXRhMkILRXZlbnRzUHJvdG9QAVpKZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9mbG93L3YxYmV0YTI7Zmxvd3YxYmV0YTKiAgNERliqAhFEdGt0LkZsb3cuVjFiZXRhMsoCEUR0a3RcRmxvd1xWMWJldGEy4gIdRHRrdFxGbG93XFYxYmV0YTJcR1BCTWV0YWRhdGHqAhNEdGt0OjpGbG93OjpWMWJldGEyYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_flow_v1beta2_spec, file_google_protobuf_any]);
 
 /**
  * InputEvent is an externally-provided value for a specific input node.
@@ -173,6 +175,22 @@ export type InteractionRequestEvent = Message<"dtkt.flow.v1beta2.InteractionRequ
    * @generated from field: string token = 2;
    */
   token: string;
+
+  /**
+   * Resolved form inputs ready to render. The runtime has evaluated any
+   * CEL in title/description/element sub-fields against the current
+   * flow vars; receivers should treat these as plain literal strings
+   * and not re-evaluate. Mirrors Interaction.inputs from the spec but
+   * with all CEL substituted.
+   *
+   * Responders build forms from these directly; they do not need to
+   * look up the original Interaction spec. (The runtime is the only
+   * process that holds the live flow vars; resolving CEL anywhere else
+   * would race or be impossible.)
+   *
+   * @generated from field: repeated dtkt.flow.v1beta2.Interaction.Input inputs = 3;
+   */
+  inputs: Interaction_Input[];
 };
 
 /**
@@ -196,6 +214,22 @@ export type InteractionRequestEventValid = Message<"dtkt.flow.v1beta2.Interactio
    * @generated from field: string token = 2;
    */
   token: string;
+
+  /**
+   * Resolved form inputs ready to render. The runtime has evaluated any
+   * CEL in title/description/element sub-fields against the current
+   * flow vars; receivers should treat these as plain literal strings
+   * and not re-evaluate. Mirrors Interaction.inputs from the spec but
+   * with all CEL substituted.
+   *
+   * Responders build forms from these directly; they do not need to
+   * look up the original Interaction spec. (The runtime is the only
+   * process that holds the live flow vars; resolving CEL anywhere else
+   * would race or be impossible.)
+   *
+   * @generated from field: repeated dtkt.flow.v1beta2.Interaction.Input inputs = 3;
+   */
+  inputs: Interaction_InputValid[];
 };
 
 /**
@@ -417,7 +451,10 @@ export const ResumeFlowEventSchema: GenMessage<ResumeFlowEvent, {validType: Resu
  */
 export type StopNodeEvent = Message<"dtkt.flow.v1beta2.StopNodeEvent"> & {
   /**
-   * Node ID to stop.
+   * Fully-qualified node ID to stop (e.g. "vars.x", "actions.fetch").
+   * Operator commands target across categories, so the bare spec id alone
+   * is insufficient (two nodes in different categories may share a bare
+   * id). Pattern matches Graph.Node.id.
    *
    * @generated from field: string id = 1;
    */
@@ -448,7 +485,10 @@ export type StopNodeEvent = Message<"dtkt.flow.v1beta2.StopNodeEvent"> & {
  */
 export type StopNodeEventValid = Message<"dtkt.flow.v1beta2.StopNodeEvent"> & {
   /**
-   * Node ID to stop.
+   * Fully-qualified node ID to stop (e.g. "vars.x", "actions.fetch").
+   * Operator commands target across categories, so the bare spec id alone
+   * is insufficient (two nodes in different categories may share a bare
+   * id). Pattern matches Graph.Node.id.
    *
    * @generated from field: string id = 1;
    */
@@ -483,7 +523,8 @@ export const StopNodeEventSchema: GenMessage<StopNodeEvent, {validType: StopNode
  */
 export type TerminateNodeEvent = Message<"dtkt.flow.v1beta2.TerminateNodeEvent"> & {
   /**
-   * Node ID to terminate.
+   * Fully-qualified node ID to terminate. See StopNodeEvent.id for the
+   * rationale on Format B vs bare id.
    *
    * @generated from field: string id = 1;
    */
@@ -511,7 +552,8 @@ export type TerminateNodeEvent = Message<"dtkt.flow.v1beta2.TerminateNodeEvent">
  */
 export type TerminateNodeEventValid = Message<"dtkt.flow.v1beta2.TerminateNodeEvent"> & {
   /**
-   * Node ID to terminate.
+   * Fully-qualified node ID to terminate. See StopNodeEvent.id for the
+   * rationale on Format B vs bare id.
    *
    * @generated from field: string id = 1;
    */
@@ -541,7 +583,8 @@ export const TerminateNodeEventSchema: GenMessage<TerminateNodeEvent, {validType
  */
 export type SuspendNodeEvent = Message<"dtkt.flow.v1beta2.SuspendNodeEvent"> & {
   /**
-   * Node ID to suspend.
+   * Fully-qualified node ID to suspend. See StopNodeEvent.id for the
+   * rationale on Format B vs bare id.
    *
    * @generated from field: string id = 1;
    */
@@ -564,7 +607,8 @@ export type SuspendNodeEvent = Message<"dtkt.flow.v1beta2.SuspendNodeEvent"> & {
  */
 export type SuspendNodeEventValid = Message<"dtkt.flow.v1beta2.SuspendNodeEvent"> & {
   /**
-   * Node ID to suspend.
+   * Fully-qualified node ID to suspend. See StopNodeEvent.id for the
+   * rationale on Format B vs bare id.
    *
    * @generated from field: string id = 1;
    */
@@ -604,7 +648,8 @@ export const SuspendNodeEventSchema: GenMessage<SuspendNodeEvent, {validType: Su
  */
 export type ResumeNodeEvent = Message<"dtkt.flow.v1beta2.ResumeNodeEvent"> & {
   /**
-   * Node ID to resume.
+   * Fully-qualified node ID to resume. See StopNodeEvent.id for the
+   * rationale on Format B vs bare id.
    *
    * @generated from field: string id = 1;
    */
@@ -646,7 +691,8 @@ export type ResumeNodeEvent = Message<"dtkt.flow.v1beta2.ResumeNodeEvent"> & {
  */
 export type ResumeNodeEventValid = Message<"dtkt.flow.v1beta2.ResumeNodeEvent"> & {
   /**
-   * Node ID to resume.
+   * Fully-qualified node ID to resume. See StopNodeEvent.id for the
+   * rationale on Format B vs bare id.
    *
    * @generated from field: string id = 1;
    */

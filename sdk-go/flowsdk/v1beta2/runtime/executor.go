@@ -22,10 +22,23 @@ import (
 // the Terminate method (operator-initiated cancellation).
 var ErrTerminated = errors.New("flow terminated by operator")
 
-// nodeWiring holds the subscription channels and output topic for a single node.
+// nodeWiring holds the subscription channels and output topic for a
+// single node. cachedSources marks the subset of input source IDs whose
+// producer has cache: true on its spec; consumers subscribe via the
+// same pubsub channel as any other dep but apply non-blocking +
+// last-seen semantics for those refs (see nodeRef.recvCached).
 type nodeWiring struct {
-	inputs map[string]<-chan *pubsub.Message
-	topic  string
+	inputs        map[string]<-chan *pubsub.Message
+	cachedSources map[string]bool
+	topic         string
+}
+
+// hasOnlyCachedDeps reports whether every input dependency of this
+// node is a cached source. Such consumers iterate per producer message
+// (each cached emit drives one iteration) instead of per streaming
+// message; see nodeRef.recvCached.
+func (w *nodeWiring) hasOnlyCachedDeps() bool {
+	return len(w.cachedSources) > 0 && len(w.inputs) == len(w.cachedSources)
 }
 
 // selfSuspendable is implemented by generator handlers that manage their own
@@ -63,6 +76,11 @@ type Executor struct {
 
 	// Suspend/resume state, also protected by mu.
 	suspendedNodes map[string]bool // nodes in PHASE_SUSPENDED
+
+	// Cache delivery state. Set during Execute, nil otherwise. Per-node
+	// cacheBackend pointers; the executor uses this map for ClearCache
+	// lookup. Producer-side captured flag lives on the cacheBackend.
+	cacheBackends map[string]*cacheBackend
 }
 
 type Option func(*Executor)
@@ -378,6 +396,22 @@ func (e *Executor) ResumeNode(nodeID string, _ *expr.Value) {
 	delete(e.suspendedNodes, nodeID)
 }
 
+// ClearCache resets the captured flag on a cache:true producer so the
+// next upstream event will be processed and re-emitted. The current
+// cached value remains until the next emit replaces it -- consumers
+// reading inline see the prior value during the gap. No-op when the
+// flow is not running, the node is unknown, or the node does not have
+// cache:true on its spec.
+func (e *Executor) ClearCache(nodeID string) {
+	e.mu.Lock()
+	cb, ok := e.cacheBackends[nodeID]
+	e.mu.Unlock()
+	if !ok || cb == nil || !cb.enabled {
+		return
+	}
+	cb.clearCapture()
+}
+
 // clearRunState clears all per-execution state. Must be called with mu held.
 func (e *Executor) clearRunState() {
 	e.stopFn = nil
@@ -390,6 +424,7 @@ func (e *Executor) clearRunState() {
 	e.handlers = nil
 	e.suspendedNodes = nil
 	e.terminalNodes = nil
+	e.cacheBackends = nil
 }
 
 func (e *Executor) Execute(ctx context.Context, graph *flowv1beta2.Graph) error {
@@ -464,7 +499,15 @@ func (e *Executor) Execute(ctx context.Context, graph *flowv1beta2.Graph) error 
 		return err
 	}
 
-	handlers, err := buildHandlers(graph, celEnv, resolved, e.cache, wiring, handlerPub, e.pubsub)
+	// Cache delivery: registry of per-node cacheBackend pointers,
+	// populated by buildHandlers / setupInputBridges as they construct
+	// handlers. ClearCache looks up cacheBackends[nodeID] to reset the
+	// captured flag.
+	e.mu.Lock()
+	e.cacheBackends = make(map[string]*cacheBackend)
+	e.mu.Unlock()
+
+	handlers, err := buildHandlers(graph, celEnv, resolved, e.cache, wiring, handlerPub, e.pubsub, e.cacheBackends)
 	if err != nil {
 		return err
 	}
@@ -474,8 +517,12 @@ func (e *Executor) Execute(ctx context.Context, graph *flowv1beta2.Graph) error 
 	if err != nil {
 		return err
 	}
-	for id, h := range interactionHandlers {
-		handlers[id] = h
+	// interactionHandlers is keyed by the bare spec id (Format A) so the
+	// demux can look up by InteractionResponseEvent.id directly. Re-key into
+	// the cross-category handlers map by the fully-qualified node id
+	// (Format B) which is what every other operator-API path expects.
+	for _, h := range interactionHandlers {
+		handlers["interactions."+h.id] = h
 	}
 
 	// Setup input bridges: compile transforms, start pipelines, subscribe to
@@ -502,7 +549,7 @@ func (e *Executor) Execute(ctx context.Context, graph *flowv1beta2.Graph) error 
 	}
 
 	// Setup run state: contexts, stop/resume infrastructure, flow_control wiring.
-	rs, err := e.setupRunState(gCtx, runCancel, graph, celEnv, handlers, nodeProtos, inputNodeIDs, handlerPub, strategy)
+	rs, err := e.setupRunState(gCtx, runCancel, graph, celEnv, handlers, nodeProtos, inputNodeIDs, wiring, handlerPub, strategy)
 	if err != nil {
 		return err
 	}
@@ -519,7 +566,7 @@ func (e *Executor) Execute(ctx context.Context, graph *flowv1beta2.Graph) error 
 		gCtx:        gCtx,
 		genCtx:      rs.genCtx,
 		strategy:    strategy,
-		performStop: rs.performStop,
+		performStop: rs.operatorStop,
 	})
 
 	// Emit flow-level RUNNING event.
@@ -596,24 +643,28 @@ func (e *Executor) Execute(ctx context.Context, graph *flowv1beta2.Graph) error 
 }
 
 // publishInputValue publishes a value to the appropriate input destination.
-func (e *Executor) publishInputValue(nodeID string, val *expr.Value, inputTopics map[string]string) error {
+// nodeID is the fully-qualified node id (Format B, e.g. "inputs.x") used
+// for topic routing; bareID is the bare spec id (Format A, e.g. "x") used
+// in the InputNode protobuf id field whose validator pattern is bare-only.
+func (e *Executor) publishInputValue(nodeID, bareID string, val *expr.Value, inputTopics map[string]string) error {
 	if topic, ok := inputTopics[nodeID]; ok {
 		return e.pubsub.Publish(topic, pubsub.NewMessage(val))
 	}
 	return publishNode(e.pubsub, e.topics.For(nodeID), flowv1beta2.RunSnapshot_InputNode_builder{
-		Id:    nodeID,
+		Id:    bareID,
 		Value: val,
 		Phase: flowv1beta2.RunSnapshot_PHASE_RUNNING,
 	}.Build())
 }
 
 // publishInputEOF publishes an EOF to the appropriate input destination.
-func (e *Executor) publishInputEOF(nodeID string, inputTopics map[string]string) error {
+// See publishInputValue for the nodeID/bareID distinction.
+func (e *Executor) publishInputEOF(nodeID, bareID string, inputTopics map[string]string) error {
 	if topic, ok := inputTopics[nodeID]; ok {
 		return e.pubsub.Publish(topic, pubsub.NewMessage(newEOFValue()))
 	}
 	return publishNode(e.pubsub, e.topics.For(nodeID), flowv1beta2.RunSnapshot_InputNode_builder{
-		Id:     nodeID,
+		Id:     bareID,
 		Value:  newEOFValue(),
 		Closed: true,
 		Phase:  flowv1beta2.RunSnapshot_PHASE_SUCCEEDED,

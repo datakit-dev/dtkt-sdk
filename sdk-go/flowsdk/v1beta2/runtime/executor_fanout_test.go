@@ -22,8 +22,8 @@ func TestGraph_FanOut_TwoVars(t *testing.T) {
 		require.NoError(t, err)
 
 		byID := outputsByID(collectMultipleOutputs(ctx, pubsub, "outputs.even", "outputs.odd"))
-		assert.ElementsMatch(t, []int64{2, 4}, byID["outputs.even"])
-		assert.ElementsMatch(t, []int64{1, 3}, byID["outputs.odd"])
+		assert.ElementsMatch(t, []int64{2, 4}, byID["even"])
+		assert.ElementsMatch(t, []int64{1, 3}, byID["odd"])
 	})
 }
 
@@ -42,8 +42,8 @@ func TestGraph_FanOut_TwoOutputs(t *testing.T) {
 		require.NoError(t, err)
 
 		byID := outputsByID(collectMultipleOutputs(ctx, pubsub, "outputs.doubled", "outputs.tripled"))
-		assert.Equal(t, []int64{2, 4, 6}, byID["outputs.doubled"])
-		assert.Equal(t, []int64{3, 6, 9}, byID["outputs.tripled"])
+		assert.Equal(t, []int64{2, 4, 6}, byID["doubled"])
+		assert.Equal(t, []int64{3, 6, 9}, byID["tripled"])
 	})
 }
 
@@ -63,10 +63,10 @@ func TestGraph_FanOut_VarToThreeOutputs(t *testing.T) {
 		require.NoError(t, err)
 
 		byID := outputsByID(collectMultipleOutputs(ctx, pubsub, "outputs.raw", "outputs.doubled", "outputs.filtered"))
-		assert.Equal(t, []int64{101, 102, 105}, byID["outputs.raw"])
-		assert.Equal(t, []int64{202, 204, 210}, byID["outputs.doubled"])
+		assert.Equal(t, []int64{101, 102, 105}, byID["raw"])
+		assert.Equal(t, []int64{202, 204, 210}, byID["doubled"])
 		// Only 105 passes >103 filter
-		assert.Equal(t, []int64{105}, byID["outputs.filtered"])
+		assert.Equal(t, []int64{105}, byID["filtered"])
 	})
 }
 
@@ -88,8 +88,8 @@ func TestGraph_FanOut_ParallelChains(t *testing.T) {
 		require.NoError(t, err)
 
 		byID := outputsByID(collectMultipleOutputs(ctx, pubsub, "outputs.a", "outputs.b"))
-		assert.Equal(t, []int64{20, 40}, byID["outputs.a"])
-		assert.Equal(t, []int64{4, 5, 6}, byID["outputs.b"])
+		assert.Equal(t, []int64{20, 40}, byID["a"])
+		assert.Equal(t, []int64{4, 5, 6}, byID["b"])
 	})
 }
 
@@ -108,9 +108,9 @@ func TestGraph_FanOut_Wide(t *testing.T) {
 		require.NoError(t, err)
 
 		byID := outputsByID(collectMultipleOutputs(ctx, pubsub, "outputs.identity", "outputs.doubled", "outputs.squared", "outputs.negated"))
-		assert.Equal(t, []int64{3}, byID["outputs.identity"])
-		assert.Equal(t, []int64{6}, byID["outputs.doubled"])
-		assert.Equal(t, []int64{9}, byID["outputs.squared"])
-		assert.Equal(t, []int64{-3}, byID["outputs.negated"])
+		assert.Equal(t, []int64{3}, byID["identity"])
+		assert.Equal(t, []int64{6}, byID["doubled"])
+		assert.Equal(t, []int64{9}, byID["squared"])
+		assert.Equal(t, []int64{-3}, byID["negated"])
 	})
 }

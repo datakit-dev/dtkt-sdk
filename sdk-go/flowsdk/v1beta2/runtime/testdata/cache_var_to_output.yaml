@@ -1,0 +1,14 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: cache_var_to_output
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: doubled
+      value: "= inputs.x.value * 2"
+      cache: true
+  outputs:
+    - id: result
+      value: "= vars.doubled.value"

@@ -33,75 +33,6 @@ func (e *runtimeEnv) TypeProvider() types.Provider { return e.Env.CELTypeProvide
 func (e *runtimeEnv) Resolver() shared.Resolver    { return e.resolver }
 func (e *runtimeEnv) Vars() cel.Activation         { return nil }
 
-// nodeRef holds a reference to a subscription channel. recv() reads from the
-// channel, blocking until a message arrives. The result is cached so that
-// multiple accesses return the same value.
-type nodeRef struct {
-	ch         <-chan *pubsub.Message
-	ctx        context.Context
-	suspendCh  <-chan struct{} // optional: handler's suspend signal
-	stopCh     <-chan struct{} // optional: handler's graceful-stop signal
-	node       executor.StateNode
-	chanClosed bool // channel itself was closed (not EOF value)
-	consumed   bool
-}
-
-func (nr *nodeRef) recv() error {
-	if nr.consumed {
-		return nil
-	}
-	if nr.ch == nil {
-		return nil
-	}
-	for {
-		// Priority check: control signals (ctx cancel, operator suspend,
-		// operator stop) take precedence over input messages. Without this,
-		// Go's select randomization can pick a buffered input (e.g. an EOF
-		// marker) over an already-signaled suspendCh, causing the handler
-		// to exit naturally instead of suspending -- a race that masks
-		// suspend semantics. errOperatorSuspended/errOperatorStopped are
-		// returned WITHOUT consuming a message, so the next recv (after
-		// resume, for suspend) picks up the same buffered message.
-		//
-		// stopCh (StopNode -- per-node graceful stop) wins over input by
-		// design: StopNode means "exit at the next safe point", not
-		// "drain everything first". For drain-and-exit semantics, FC.stop
-		// uses input EOF cascade instead of stopCh.
-		select {
-		case <-nr.ctx.Done():
-			return nr.ctx.Err()
-		case <-nr.suspendCh:
-			return errOperatorSuspended
-		case <-nr.stopCh:
-			return errOperatorStopped
-		default:
-		}
-		select {
-		case <-nr.ctx.Done():
-			return nr.ctx.Err()
-		case <-nr.suspendCh:
-			return errOperatorSuspended
-		case <-nr.stopCh:
-			return errOperatorStopped
-		case msg, ok := <-nr.ch:
-			if !ok {
-				nr.chanClosed = true
-				nr.consumed = true
-				return nil
-			}
-			event := msg.Payload.(*flowv1beta2.RunSnapshot_FlowEvent)
-			if event.GetEventType() == flowv1beta2.RunSnapshot_FlowEvent_EVENT_TYPE_NODE_UPDATE {
-				msg.Ack()
-				continue // skip NODE_UPDATE events; wait for the next NODE_OUTPUT
-			}
-			msg.Ack()
-			nr.node = runtimeNodeFromEvent(event)
-			nr.consumed = true
-			return nil
-		}
-	}
-}
-
 // activation builds a CEL activation from subscription channel references and pre-set values.
 type activation struct {
 	refs    map[string]*nodeRef
@@ -131,11 +62,45 @@ func newActivationFromChannelsInterruptible(ctx context.Context, inputs map[stri
 	return a
 }
 
+// newActivationFromMixedDeps creates an activation where cached deps
+// are marked for last-seen / non-blocking-after-first recv semantics.
+// All deps subscribe via pubsub the same way; the difference is the
+// recv strategy on cached refs.
+//
+// `cachedSources` is the set of source IDs whose producer has
+// cache:true. `cachedMem` provides per-source last-seen state that
+// survives across activations on the same handler.
+func newActivationFromMixedDeps(
+	ctx context.Context,
+	inputs map[string]<-chan *pubsub.Message,
+	cachedSources map[string]bool,
+	allCached bool,
+	cachedMem map[string]*cachedRefState,
+	adapter types.Adapter,
+	suspendCh, stopCh <-chan struct{},
+) *activation {
+	a := newActivation(adapter)
+	for sourceID, ch := range inputs {
+		ref := &nodeRef{ch: ch, ctx: ctx, suspendCh: suspendCh, stopCh: stopCh}
+		if cachedSources[sourceID] {
+			ref.isCached = true
+			ref.allCached = allCached
+			ref.lastSeen = cachedMem[sourceID]
+		}
+		a.refs[sourceID] = ref
+	}
+	return a
+}
+
 func (a *activation) SetExtra(key string, value *expr.Value) {
 	a.extras[key] = value
 }
 
-// AnyEOF returns true if any resolved nodeRef received an EOF value or had its channel closed.
+// AnyEOF returns true if any resolved nodeRef has reached EOF: a
+// closed pubsub channel or an EOF value. Cached refs only report EOF
+// when allCached is true and the producer has terminated; mixed-deps
+// cached refs ignore producer EOF and keep using lastSeen so the
+// handler exits via its streaming deps.
 func (a *activation) AnyEOF() bool {
 	for _, nr := range a.refs {
 		if !nr.consumed {

@@ -1,0 +1,42 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: interaction_ticker_var_repro
+  # Reproduces dtkt-cli/hack/flows/tickerv2_interactive.yaml shape:
+  # generator -> var (with stop_when) + interaction (title CEL pulls
+  # from generator+var) -> output that combines vars + interaction
+  # response and filters via transforms. Used to chase a production
+  # "no such key: discard" CEL error that interaction_output_filter_idiomatic
+  # didn't reproduce because it lacked the var/generator wiring.
+  inputs:
+    - id: maxIters
+      uint64:
+        default: 5
+      cache: true
+  generators:
+    - id: tick
+      ticker:
+        interval: 0.05s
+  vars:
+    - id: evenOrOdd
+      value: |
+        = generators.tick.eval_count % 2 == 0 ? "even" : "odd"
+      flow_control:
+        stop_when: "= generators.tick.eval_count >= int(inputs.maxIters.value)"
+  interactions:
+    - id: confirmDiscard
+      inputs:
+        - id: discard
+          title: |
+            = string(generators.tick.value) + " is an " + vars.evenOrOdd.value + " number. Discard?"
+          confirm: {}
+  outputs:
+    - id: evenOrOdd
+      value: |
+        = {
+            "value": vars.evenOrOdd.value,
+            "discard": interactions.confirmDiscard.value.discard.value
+          }
+      transforms:
+        - filter: "= !this.value.discard"
+        - map: "= this.value.value"

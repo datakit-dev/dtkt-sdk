@@ -150,9 +150,6 @@ func lintNode(node *flowv1beta2.Node, resolvers map[string]shared.Resolver, env 
 	switch node.WhichType() {
 	case flowv1beta2.Node_Input_case:
 		inp := node.GetInput()
-		if inp.GetConstant() && inputTypeHasDefault(inp) {
-			diag("", "constant and default are mutually exclusive", CodeConstantDefaultExclusive)
-		}
 		appendWith(lintTransforms(inp.GetTransforms()))
 
 	case flowv1beta2.Node_Var_case:
@@ -341,37 +338,6 @@ func lintNodeConnection(node *flowv1beta2.Node, connections map[string]bool) *Li
 		}
 	}
 	return nil
-}
-
-// inputTypeHasDefault checks whether the Input's type variant has a default value set.
-func inputTypeHasDefault(inp *flowv1beta2.Input) bool {
-	switch inp.WhichType() {
-	case flowv1beta2.Input_Bool_case:
-		return inp.GetBool().HasDefault()
-	case flowv1beta2.Input_Bytes_case:
-		return inp.GetBytes().HasDefault()
-	case flowv1beta2.Input_Double_case:
-		return inp.GetDouble().HasDefault()
-	case flowv1beta2.Input_Float_case:
-		return inp.GetFloat().HasDefault()
-	case flowv1beta2.Input_Int64_case:
-		return inp.GetInt64().HasDefault()
-	case flowv1beta2.Input_Uint64_case:
-		return inp.GetUint64().HasDefault()
-	case flowv1beta2.Input_Int32_case:
-		return inp.GetInt32().HasDefault()
-	case flowv1beta2.Input_Uint32_case:
-		return inp.GetUint32().HasDefault()
-	case flowv1beta2.Input_String__case:
-		return inp.GetString().HasDefault()
-	case flowv1beta2.Input_List_case:
-		return inp.GetList().GetDefault() != nil
-	case flowv1beta2.Input_Map_case:
-		return inp.GetMap().GetDefault() != nil
-	case flowv1beta2.Input_Message_case:
-		return inp.GetMessage().GetDefault() != nil
-	}
-	return false
 }
 
 // lintRequestSchema validates a structpb.Value request tree against a proto

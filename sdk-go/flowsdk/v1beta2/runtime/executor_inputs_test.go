@@ -342,25 +342,6 @@ func TestGraph_Input_MixedTypes(t *testing.T) {
 	})
 }
 
-// Constant input -- only the first value is used
-
-func TestGraph_Input_Constant(t *testing.T) {
-	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
-		graph := loadFlow(t, "input_int64_constant.yaml")
-
-		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
-
-		// Feed 3 values -- only the first should be delivered.
-		feedInput(ps, "inputs.x", int64(10), int64(20), int64(30))
-		ctx := testContext(t)
-		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
-		require.NoError(t, err)
-
-		assert.Equal(t, []int64{10}, outputInt64s(collectOutputs(ctx, ps, "outputs.result")))
-	})
-}
-
 // InputRequestEvent emission
 
 func TestGraph_Input_RequestEventEmitted(t *testing.T) {
@@ -377,14 +358,16 @@ func TestGraph_Input_RequestEventEmitted(t *testing.T) {
 		err := NewExecutor(ps, testTopics, append([]Option{WithInputRequests(inputReqs)}, extraOpts...)...).Execute(ctx, graph)
 		require.NoError(t, err)
 
-		// Collect all emitted InputRequestEvents.
+		// Collect all emitted InputRequestEvents. The id field on
+		// InputRequestEvent is the bare spec id (Format A) per its
+		// validator pattern; category is implicit in the event type.
 		close(inputReqs)
 		var ids []string
 		for evt := range inputReqs {
 			ids = append(ids, evt.GetId())
 		}
 		sort.Strings(ids)
-		assert.Equal(t, []string{"inputs.a", "inputs.b"}, ids)
+		assert.Equal(t, []string{"a", "b"}, ids)
 	})
 }
 

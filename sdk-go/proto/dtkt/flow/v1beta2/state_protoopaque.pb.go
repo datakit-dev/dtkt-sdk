@@ -1802,6 +1802,7 @@ type RunSnapshot_InteractionNode struct {
 	xxx_hidden_Transforms *[]*RunSnapshot_Transform `protobuf:"bytes,7,rep,name=transforms,proto3"`
 	xxx_hidden_Phase      RunSnapshot_Phase         `protobuf:"varint,8,opt,name=phase,proto3,enum=dtkt.flow.v1beta2.RunSnapshot_Phase"`
 	xxx_hidden_Token      string                    `protobuf:"bytes,9,opt,name=token,proto3"`
+	xxx_hidden_Inputs     *[]*Interaction_Input     `protobuf:"bytes,10,rep,name=inputs,proto3"`
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache
 }
@@ -1896,6 +1897,15 @@ func (x *RunSnapshot_InteractionNode) GetToken() string {
 	return ""
 }
 
+func (x *RunSnapshot_InteractionNode) GetInputs() []*Interaction_Input {
+	if x != nil {
+		if x.xxx_hidden_Inputs != nil {
+			return *x.xxx_hidden_Inputs
+		}
+	}
+	return nil
+}
+
 func (x *RunSnapshot_InteractionNode) SetId(v string) {
 	x.xxx_hidden_Id = v
 }
@@ -1930,6 +1940,10 @@ func (x *RunSnapshot_InteractionNode) SetPhase(v RunSnapshot_Phase) {
 
 func (x *RunSnapshot_InteractionNode) SetToken(v string) {
 	x.xxx_hidden_Token = v
+}
+
+func (x *RunSnapshot_InteractionNode) SetInputs(v []*Interaction_Input) {
+	x.xxx_hidden_Inputs = &v
 }
 
 func (x *RunSnapshot_InteractionNode) HasValue() bool {
@@ -1989,6 +2003,15 @@ type RunSnapshot_InteractionNode_builder struct {
 	// Presence indicates the node is waiting for an InteractionResponseEvent.
 	// Cleared when a matching response is consumed.
 	Token string
+	// Resolved Interaction.Input messages for the outstanding request --
+	// CEL fields (title/description) pre-evaluated against the
+	// executor's flow vars so external responders (CLI, web UI) render
+	// literal strings without needing flow-var access. Mirrors
+	// InteractionRequestEvent.inputs; carried here so the snapshot
+	// (in-memory buffer + outbox) preserves the form definition across
+	// the runInteractionPrompts -> cache -> project -> wire round-trip
+	// and survives daemon restart for cross-restart reattach.
+	Inputs []*Interaction_Input
 }
 
 func (b0 RunSnapshot_InteractionNode_builder) Build() *RunSnapshot_InteractionNode {
@@ -2004,6 +2027,7 @@ func (b0 RunSnapshot_InteractionNode_builder) Build() *RunSnapshot_InteractionNo
 	x.xxx_hidden_Transforms = &b.Transforms
 	x.xxx_hidden_Phase = b.Phase
 	x.xxx_hidden_Token = b.Token
+	x.xxx_hidden_Inputs = &b.Inputs
 	return m0
 }
 
@@ -2673,8 +2697,8 @@ var File_dtkt_flow_v1beta2_state_proto protoreflect.FileDescriptor
 
 const file_dtkt_flow_v1beta2_state_proto_rawDesc = "" +
 	"\n" +
-	"\x1ddtkt/flow/v1beta2/state.proto\x12\x11dtkt.flow.v1beta2\x1a\x1bbuf/validate/validate.proto\x1a\x14cel/expr/value.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\"\x05\n" +
-	"\x03EOF\"\x92.\n" +
+	"\x1ddtkt/flow/v1beta2/state.proto\x12\x11dtkt.flow.v1beta2\x1a\x1bbuf/validate/validate.proto\x1a\x14cel/expr/value.proto\x1a\x1cdtkt/flow/v1beta2/spec.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\"\x05\n" +
+	"\x03EOF\"\xd0.\n" +
 	"\vRunSnapshot\x12<\n" +
 	"\x04flow\x18\x01 \x01(\v2(.dtkt.flow.v1beta2.RunSnapshot.FlowStateR\x04flow\x12B\n" +
 	"\x06inputs\x18\x02 \x03(\v2*.dtkt.flow.v1beta2.RunSnapshot.InputsEntryR\x06inputs\x12N\n" +
@@ -2770,7 +2794,7 @@ const file_dtkt_flow_v1beta2_state_proto_rawDesc = "" +
 	"transforms\x18\a \x03(\v2(.dtkt.flow.v1beta2.RunSnapshot.TransformR\n" +
 	"transforms\x12\x16\n" +
 	"\x06closed\x18\b \x01(\bR\x06closed\x12D\n" +
-	"\x05phase\x18\t \x01(\x0e2$.dtkt.flow.v1beta2.RunSnapshot.PhaseB\b\xbaH\x05\x82\x01\x02\x10\x01R\x05phase\x1a\xc9\x03\n" +
+	"\x05phase\x18\t \x01(\x0e2$.dtkt.flow.v1beta2.RunSnapshot.PhaseB\b\xbaH\x05\x82\x01\x02\x10\x01R\x05phase\x1a\x87\x04\n" +
 	"\x0fInteractionNode\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12&\n" +
 	"\bevent_id\x18\x02 \x01(\tB\v\xbaH\b\xd8\x01\x01r\x03\xb0\x01\x01R\aeventId\x12%\n" +
@@ -2783,7 +2807,9 @@ const file_dtkt_flow_v1beta2_state_proto_rawDesc = "" +
 	"transforms\x18\a \x03(\v2(.dtkt.flow.v1beta2.RunSnapshot.TransformR\n" +
 	"transforms\x12D\n" +
 	"\x05phase\x18\b \x01(\x0e2$.dtkt.flow.v1beta2.RunSnapshot.PhaseB\b\xbaH\x05\x82\x01\x02\x10\x01R\x05phase\x12!\n" +
-	"\x05token\x18\t \x01(\tB\v\xbaH\b\xd8\x01\x01r\x03\xb0\x01\x01R\x05token\x1a\xd2\x02\n" +
+	"\x05token\x18\t \x01(\tB\v\xbaH\b\xd8\x01\x01r\x03\xb0\x01\x01R\x05token\x12<\n" +
+	"\x06inputs\x18\n" +
+	" \x03(\v2$.dtkt.flow.v1beta2.Interaction.InputR\x06inputs\x1a\xd2\x02\n" +
 	"\tFlowState\x12D\n" +
 	"\x05phase\x18\x01 \x01(\x0e2$.dtkt.flow.v1beta2.RunSnapshot.PhaseB\b\xbaH\x05\x82\x01\x02\x10\x01R\x05phase\x12(\n" +
 	"\x05error\x18\x02 \x01(\v2\x12.google.rpc.StatusR\x05error\x129\n" +
@@ -2871,6 +2897,7 @@ var file_dtkt_flow_v1beta2_state_proto_goTypes = []any{
 	(*expr.Value)(nil),                   // 21: cel.expr.Value
 	(*status.Status)(nil),                // 22: google.rpc.Status
 	(*timestamppb.Timestamp)(nil),        // 23: google.protobuf.Timestamp
+	(*Interaction_Input)(nil),            // 24: dtkt.flow.v1beta2.Interaction.Input
 }
 var file_dtkt_flow_v1beta2_state_proto_depIdxs = []int32{
 	12, // 0: dtkt.flow.v1beta2.RunSnapshot.flow:type_name -> dtkt.flow.v1beta2.RunSnapshot.FlowState
@@ -2919,32 +2946,33 @@ var file_dtkt_flow_v1beta2_state_proto_depIdxs = []int32{
 	23, // 43: dtkt.flow.v1beta2.RunSnapshot.InteractionNode.event_time:type_name -> google.protobuf.Timestamp
 	4,  // 44: dtkt.flow.v1beta2.RunSnapshot.InteractionNode.transforms:type_name -> dtkt.flow.v1beta2.RunSnapshot.Transform
 	0,  // 45: dtkt.flow.v1beta2.RunSnapshot.InteractionNode.phase:type_name -> dtkt.flow.v1beta2.RunSnapshot.Phase
-	0,  // 46: dtkt.flow.v1beta2.RunSnapshot.FlowState.phase:type_name -> dtkt.flow.v1beta2.RunSnapshot.Phase
-	22, // 47: dtkt.flow.v1beta2.RunSnapshot.FlowState.error:type_name -> google.rpc.Status
-	23, // 48: dtkt.flow.v1beta2.RunSnapshot.FlowState.start_time:type_name -> google.protobuf.Timestamp
-	23, // 49: dtkt.flow.v1beta2.RunSnapshot.FlowState.stop_time:type_name -> google.protobuf.Timestamp
-	23, // 50: dtkt.flow.v1beta2.RunSnapshot.FlowState.event_time:type_name -> google.protobuf.Timestamp
-	1,  // 51: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.event_type:type_name -> dtkt.flow.v1beta2.RunSnapshot.FlowEvent.EventType
-	5,  // 52: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.input:type_name -> dtkt.flow.v1beta2.RunSnapshot.InputNode
-	6,  // 53: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.generator:type_name -> dtkt.flow.v1beta2.RunSnapshot.GeneratorNode
-	7,  // 54: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.var:type_name -> dtkt.flow.v1beta2.RunSnapshot.VarNode
-	8,  // 55: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.action:type_name -> dtkt.flow.v1beta2.RunSnapshot.ActionNode
-	9,  // 56: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.stream:type_name -> dtkt.flow.v1beta2.RunSnapshot.StreamNode
-	10, // 57: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.output:type_name -> dtkt.flow.v1beta2.RunSnapshot.OutputNode
-	11, // 58: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.interaction:type_name -> dtkt.flow.v1beta2.RunSnapshot.InteractionNode
-	12, // 59: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.flow:type_name -> dtkt.flow.v1beta2.RunSnapshot.FlowState
-	5,  // 60: dtkt.flow.v1beta2.RunSnapshot.InputsEntry.value:type_name -> dtkt.flow.v1beta2.RunSnapshot.InputNode
-	6,  // 61: dtkt.flow.v1beta2.RunSnapshot.GeneratorsEntry.value:type_name -> dtkt.flow.v1beta2.RunSnapshot.GeneratorNode
-	7,  // 62: dtkt.flow.v1beta2.RunSnapshot.VarsEntry.value:type_name -> dtkt.flow.v1beta2.RunSnapshot.VarNode
-	8,  // 63: dtkt.flow.v1beta2.RunSnapshot.ActionsEntry.value:type_name -> dtkt.flow.v1beta2.RunSnapshot.ActionNode
-	9,  // 64: dtkt.flow.v1beta2.RunSnapshot.StreamsEntry.value:type_name -> dtkt.flow.v1beta2.RunSnapshot.StreamNode
-	10, // 65: dtkt.flow.v1beta2.RunSnapshot.OutputsEntry.value:type_name -> dtkt.flow.v1beta2.RunSnapshot.OutputNode
-	11, // 66: dtkt.flow.v1beta2.RunSnapshot.InteractionsEntry.value:type_name -> dtkt.flow.v1beta2.RunSnapshot.InteractionNode
-	67, // [67:67] is the sub-list for method output_type
-	67, // [67:67] is the sub-list for method input_type
-	67, // [67:67] is the sub-list for extension type_name
-	67, // [67:67] is the sub-list for extension extendee
-	0,  // [0:67] is the sub-list for field type_name
+	24, // 46: dtkt.flow.v1beta2.RunSnapshot.InteractionNode.inputs:type_name -> dtkt.flow.v1beta2.Interaction.Input
+	0,  // 47: dtkt.flow.v1beta2.RunSnapshot.FlowState.phase:type_name -> dtkt.flow.v1beta2.RunSnapshot.Phase
+	22, // 48: dtkt.flow.v1beta2.RunSnapshot.FlowState.error:type_name -> google.rpc.Status
+	23, // 49: dtkt.flow.v1beta2.RunSnapshot.FlowState.start_time:type_name -> google.protobuf.Timestamp
+	23, // 50: dtkt.flow.v1beta2.RunSnapshot.FlowState.stop_time:type_name -> google.protobuf.Timestamp
+	23, // 51: dtkt.flow.v1beta2.RunSnapshot.FlowState.event_time:type_name -> google.protobuf.Timestamp
+	1,  // 52: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.event_type:type_name -> dtkt.flow.v1beta2.RunSnapshot.FlowEvent.EventType
+	5,  // 53: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.input:type_name -> dtkt.flow.v1beta2.RunSnapshot.InputNode
+	6,  // 54: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.generator:type_name -> dtkt.flow.v1beta2.RunSnapshot.GeneratorNode
+	7,  // 55: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.var:type_name -> dtkt.flow.v1beta2.RunSnapshot.VarNode
+	8,  // 56: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.action:type_name -> dtkt.flow.v1beta2.RunSnapshot.ActionNode
+	9,  // 57: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.stream:type_name -> dtkt.flow.v1beta2.RunSnapshot.StreamNode
+	10, // 58: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.output:type_name -> dtkt.flow.v1beta2.RunSnapshot.OutputNode
+	11, // 59: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.interaction:type_name -> dtkt.flow.v1beta2.RunSnapshot.InteractionNode
+	12, // 60: dtkt.flow.v1beta2.RunSnapshot.FlowEvent.flow:type_name -> dtkt.flow.v1beta2.RunSnapshot.FlowState
+	5,  // 61: dtkt.flow.v1beta2.RunSnapshot.InputsEntry.value:type_name -> dtkt.flow.v1beta2.RunSnapshot.InputNode
+	6,  // 62: dtkt.flow.v1beta2.RunSnapshot.GeneratorsEntry.value:type_name -> dtkt.flow.v1beta2.RunSnapshot.GeneratorNode
+	7,  // 63: dtkt.flow.v1beta2.RunSnapshot.VarsEntry.value:type_name -> dtkt.flow.v1beta2.RunSnapshot.VarNode
+	8,  // 64: dtkt.flow.v1beta2.RunSnapshot.ActionsEntry.value:type_name -> dtkt.flow.v1beta2.RunSnapshot.ActionNode
+	9,  // 65: dtkt.flow.v1beta2.RunSnapshot.StreamsEntry.value:type_name -> dtkt.flow.v1beta2.RunSnapshot.StreamNode
+	10, // 66: dtkt.flow.v1beta2.RunSnapshot.OutputsEntry.value:type_name -> dtkt.flow.v1beta2.RunSnapshot.OutputNode
+	11, // 67: dtkt.flow.v1beta2.RunSnapshot.InteractionsEntry.value:type_name -> dtkt.flow.v1beta2.RunSnapshot.InteractionNode
+	68, // [68:68] is the sub-list for method output_type
+	68, // [68:68] is the sub-list for method input_type
+	68, // [68:68] is the sub-list for extension type_name
+	68, // [68:68] is the sub-list for extension extendee
+	0,  // [0:68] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_flow_v1beta2_state_proto_init() }
@@ -2952,6 +2980,7 @@ func file_dtkt_flow_v1beta2_state_proto_init() {
 	if File_dtkt_flow_v1beta2_state_proto != nil {
 		return
 	}
+	file_dtkt_flow_v1beta2_spec_proto_init()
 	file_dtkt_flow_v1beta2_state_proto_msgTypes[11].OneofWrappers = []any{
 		(*runSnapshot_FlowEvent_Input)(nil),
 		(*runSnapshot_FlowEvent_Generator)(nil),

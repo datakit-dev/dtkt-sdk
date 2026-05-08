@@ -30,6 +30,7 @@ type outputHandler struct {
 	outputTopic string
 	throttle    time.Duration
 	adapter     types.Adapter
+	cache       *cacheBackend
 }
 
 func (h *outputHandler) Run(ctx context.Context) error {
@@ -53,7 +54,7 @@ loop:
 			}
 		}
 
-		act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
+		act := h.cache.newActivation(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
 		vars, err := act.Resolve()
 		if errors.Is(err, errOperatorStopped) {
 			break
@@ -167,7 +168,7 @@ func (h *outputHandler) runWithTransforms(ctx context.Context) error {
 				}
 			}
 
-			act := newActivationFromChannelsInterruptible(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
+			act := h.cache.newActivation(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
 			vars, err := act.Resolve()
 			if errors.Is(err, errOperatorStopped) {
 				break

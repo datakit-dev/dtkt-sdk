@@ -27,17 +27,17 @@ func TestGraph_Join_EvenOddSum(t *testing.T) {
 		byID := outputsByID(collectMultipleOutputs(ctx, pubsub, "outputs.evenNumbers", "outputs.oddNumbers", "outputs.evenSum", "outputs.oddSum"))
 
 		// evenNumbers: only even inputs pass the filter (duplicates preserved).
-		assert.Equal(t, []int64{2, 4, 6, 8, 8, 8, 10}, byID["outputs.evenNumbers"])
+		assert.Equal(t, []int64{2, 4, 6, 8, 8, 8, 10}, byID["evenNumbers"])
 
 		// oddNumbers: only odd inputs pass the filter (duplicates preserved).
-		assert.Equal(t, []int64{1, 3, 3, 3, 5, 7, 9}, byID["outputs.oddNumbers"])
+		assert.Equal(t, []int64{1, 3, 3, 3, 5, 7, 9}, byID["oddNumbers"])
 
 		// evenSum: scan accumulates even values -- 2, 6, 12, 20, 28, 36, 46.
-		assert.Equal(t, []int64{2, 6, 12, 20, 28, 36, 46}, byID["outputs.evenSum"])
+		assert.Equal(t, []int64{2, 6, 12, 20, 28, 36, 46}, byID["evenSum"])
 
 		// oddSum: reduce with event window (fires once on close).
-		require.Len(t, byID["outputs.oddSum"], 1)
-		assert.Equal(t, int64(31), byID["outputs.oddSum"][0])
+		require.Len(t, byID["oddSum"], 1)
+		assert.Equal(t, int64(31), byID["oddSum"][0])
 
 		// evenOddPairs: list-typed output [even, odd]. Each emission is a pair
 		// of the latest even and odd values.
@@ -136,8 +136,8 @@ func TestGraph_Join_OneInputTwoFilteredOutputs(t *testing.T) {
 		require.NoError(t, err)
 
 		byID := outputsByID(collectMultipleOutputs(ctx, pubsub, "outputs.small", "outputs.large"))
-		assert.ElementsMatch(t, []int64{3, 1}, byID["outputs.small"])
-		assert.ElementsMatch(t, []int64{70, 100}, byID["outputs.large"])
+		assert.ElementsMatch(t, []int64{3, 1}, byID["small"])
+		assert.ElementsMatch(t, []int64{70, 100}, byID["large"])
 	})
 }
 
@@ -158,7 +158,7 @@ func TestGraph_Join_SharedIntermediary(t *testing.T) {
 		require.NoError(t, err)
 
 		byID := outputsByID(collectMultipleOutputs(ctx, pubsub, "outputs.plusOne", "outputs.plusTen"))
-		assert.Equal(t, []int64{11, 21}, byID["outputs.plusOne"])
-		assert.Equal(t, []int64{20, 30}, byID["outputs.plusTen"])
+		assert.Equal(t, []int64{11, 21}, byID["plusOne"])
+		assert.Equal(t, []int64{20, 30}, byID["plusTen"])
 	})
 }

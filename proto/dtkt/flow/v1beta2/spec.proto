@@ -305,25 +305,28 @@ message Input {
     Message message = 14;
   }
 
-  // If true, reuse the last provided value when this input is re-requested
-  // within the same flow run.
+  // If true, the input does not stream values to consumers via PubSub.
+  // The latest pushed value is held in the snapshot and read inline by
+  // consumers on each activation. Consumers block until the first value
+  // is available (default value, nullable type, or first push). New
+  // pushes replace the cached value; consumers read the latest at their
+  // next iteration.
   bool cache = 20;
 
   // Bypasses PubSub entirely. The value is provided once and never changes
   // for the flow's lifetime. The input channel closes after the first value.
-  // Implicitly cached.
-  bool constant = 23;
 
   // Resolution throttle. Controls how often the input resolves a fresh
-  // value. The wait window per attempt is `interval` / `count`. If no value
-  // arrives within the window, the runtime falls back to the cached value
-  // (when `cache` is true), then to the type's default (when set), then
-  // sends a request event to the external client.
+  // value. The wait window per attempt is `interval` / `count`. If no
+  // value arrives within the window, the runtime falls back to the
+  // type's default (when set), then sends a request event to the
+  // external client.
   //
-  // If unset and either `cache` is true or the type has a default, the
-  // runtime applies a small default throttle so the fallback chain can
-  // fire. If unset and neither applies, the input blocks until a value
-  // arrives.
+  // If unset and the type has a default, the runtime applies a small
+  // default throttle so the fallback chain can fire. If unset and no
+  // default is set, the input blocks until a value arrives.
+  //
+  // No effect when `cache` is true (cached inputs do not stream).
   Rate throttle = 22;
 
   // An ordered pipeline of transforms applied to the input value.
@@ -339,7 +342,11 @@ message Var {
     (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
   ];
 
-  // If true, reuse the last evaluated value when this var is re-triggered.
+  // If true, the var's value is delivered to consumers via the snapshot
+  // (read inline) instead of via a PubSub stream. The var continues to
+  // evaluate on each upstream event, replacing the snapshot value. To
+  // freeze the value at first eval, compose with
+  // `node_control.stop_when: "= this.eval_count >= 1"`.
   bool cache = 2;
 
   // The evaluation type. Exactly one must be set.
@@ -389,7 +396,15 @@ message Action {
     MethodCall call = 4;
   }
 
-  // If true, the executor will cache the result of this action and return the cached value for subsequent calls.
+  // If true, the action's response is delivered to consumers via the
+  // snapshot (read inline) instead of via a PubSub stream. The action
+  // continues to invoke on each upstream event, replacing the snapshot
+  // value. To freeze the response after first success, compose with
+  // `node_control.stop_when`.
+  //
+  // Orthogonal to `memoize`: `cache` is a consumer-side delivery
+  // transform; `memoize` is producer-side request-hash dedup. They can
+  // be combined.
   bool cache = 10;
 
   // Throttle for RPC invocations. Limits how often upstream
@@ -545,33 +560,40 @@ message MethodCall {
 // optional transforms applied to the response.
 message Interaction {
   // ConfirmBinding holds a boolean response from a confirm element.
+  // The (dtkt.protoform.v1beta1.field) extension on `value` declares the
+  // form element kind so external responders (CLI, web UI, etc.) can
+  // discover it via GetFieldElement and render the right widget. Without
+  // it, GetInteractionBinding falls through to "unsupported element type".
   message ConfirmBinding {
     // The confirmed value.
-    bool value = 1;
+    bool value = 1 [
+      (dtkt.protoform.v1beta1.field).confirm.approve = "Approve",
+      (dtkt.protoform.v1beta1.field).confirm.decline = "Decline"
+    ];
   }
 
   // InputBinding holds a text response from an input element.
   message InputBinding {
     // The text value.
-    string value = 1;
+    string value = 1 [(dtkt.protoform.v1beta1.field).input = {}];
   }
 
   // FileBinding holds a binary response from a file element.
   message FileBinding {
     // The file contents.
-    bytes value = 1;
+    bytes value = 1 [(dtkt.protoform.v1beta1.field).file = {}];
   }
 
   // SelectBinding holds a single selection from a select element.
   message SelectBinding {
     // The selected value.
-    google.protobuf.Any value = 1;
+    google.protobuf.Any value = 1 [(dtkt.protoform.v1beta1.field).select = {}];
   }
 
   // MultiSelectBinding holds multiple selections from a multi-select element.
   message MultiSelectBinding {
     // The selected values.
-    repeated google.protobuf.Any value = 1;
+    repeated google.protobuf.Any value = 1 [(dtkt.protoform.v1beta1.field).multi_select = {}];
   }
 
   // Input defines a single form field within an interaction.

@@ -268,7 +268,18 @@ type InteractionRequestEvent struct {
 	// Interaction node ID that needs a response.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Single-use opaque UUIDv7 token. Must be echoed in InteractionResponseEvent.
-	Token         string `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
+	Token string `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
+	// Resolved form inputs ready to render. The runtime has evaluated any
+	// CEL in title/description/element sub-fields against the current
+	// flow vars; receivers should treat these as plain literal strings
+	// and not re-evaluate. Mirrors Interaction.inputs from the spec but
+	// with all CEL substituted.
+	//
+	// Responders build forms from these directly; they do not need to
+	// look up the original Interaction spec. (The runtime is the only
+	// process that holds the live flow vars; resolving CEL anywhere else
+	// would race or be impossible.)
+	Inputs        []*Interaction_Input `protobuf:"bytes,3,rep,name=inputs,proto3" json:"inputs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -312,12 +323,23 @@ func (x *InteractionRequestEvent) GetToken() string {
 	return ""
 }
 
+func (x *InteractionRequestEvent) GetInputs() []*Interaction_Input {
+	if x != nil {
+		return x.Inputs
+	}
+	return nil
+}
+
 func (x *InteractionRequestEvent) SetId(v string) {
 	x.Id = v
 }
 
 func (x *InteractionRequestEvent) SetToken(v string) {
 	x.Token = v
+}
+
+func (x *InteractionRequestEvent) SetInputs(v []*Interaction_Input) {
+	x.Inputs = v
 }
 
 type InteractionRequestEvent_builder struct {
@@ -327,6 +349,17 @@ type InteractionRequestEvent_builder struct {
 	Id string
 	// Single-use opaque UUIDv7 token. Must be echoed in InteractionResponseEvent.
 	Token string
+	// Resolved form inputs ready to render. The runtime has evaluated any
+	// CEL in title/description/element sub-fields against the current
+	// flow vars; receivers should treat these as plain literal strings
+	// and not re-evaluate. Mirrors Interaction.inputs from the spec but
+	// with all CEL substituted.
+	//
+	// Responders build forms from these directly; they do not need to
+	// look up the original Interaction spec. (The runtime is the only
+	// process that holds the live flow vars; resolving CEL anywhere else
+	// would race or be impossible.)
+	Inputs []*Interaction_Input
 }
 
 func (b0 InteractionRequestEvent_builder) Build() *InteractionRequestEvent {
@@ -335,6 +368,7 @@ func (b0 InteractionRequestEvent_builder) Build() *InteractionRequestEvent {
 	_, _ = b, x
 	x.Id = b.Id
 	x.Token = b.Token
+	x.Inputs = b.Inputs
 	return m0
 }
 
@@ -694,7 +728,10 @@ func (b0 ResumeFlowEvent_builder) Build() *ResumeFlowEvent {
 // own loops exit naturally.
 type StopNodeEvent struct {
 	state protoimpl.MessageState `protogen:"hybrid.v1"`
-	// Node ID to stop.
+	// Fully-qualified node ID to stop (e.g. "vars.x", "actions.fetch").
+	// Operator commands target across categories, so the bare spec id alone
+	// is insufficient (two nodes in different categories may share a bare
+	// id). Pattern matches Graph.Node.id.
 	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -739,7 +776,10 @@ func (x *StopNodeEvent) SetId(v string) {
 type StopNodeEvent_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Node ID to stop.
+	// Fully-qualified node ID to stop (e.g. "vars.x", "actions.fetch").
+	// Operator commands target across categories, so the bare spec id alone
+	// is insufficient (two nodes in different categories may share a bare
+	// id). Pattern matches Graph.Node.id.
 	Id string
 }
 
@@ -768,7 +808,8 @@ func (b0 StopNodeEvent_builder) Build() *StopNodeEvent {
 // terminal EOF marker on the cancelled node's topic and propagate cleanly.
 type TerminateNodeEvent struct {
 	state protoimpl.MessageState `protogen:"hybrid.v1"`
-	// Node ID to terminate.
+	// Fully-qualified node ID to terminate. See StopNodeEvent.id for the
+	// rationale on Format B vs bare id.
 	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -813,7 +854,8 @@ func (x *TerminateNodeEvent) SetId(v string) {
 type TerminateNodeEvent_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Node ID to terminate.
+	// Fully-qualified node ID to terminate. See StopNodeEvent.id for the
+	// rationale on Format B vs bare id.
 	Id string
 }
 
@@ -837,7 +879,8 @@ func (b0 TerminateNodeEvent_builder) Build() *TerminateNodeEvent {
 // ERRORED, CANCELLED), the command is a no-op.
 type SuspendNodeEvent struct {
 	state protoimpl.MessageState `protogen:"hybrid.v1"`
-	// Node ID to suspend.
+	// Fully-qualified node ID to suspend. See StopNodeEvent.id for the
+	// rationale on Format B vs bare id.
 	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -882,7 +925,8 @@ func (x *SuspendNodeEvent) SetId(v string) {
 type SuspendNodeEvent_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Node ID to suspend.
+	// Fully-qualified node ID to suspend. See StopNodeEvent.id for the
+	// rationale on Format B vs bare id.
 	Id string
 }
 
@@ -916,7 +960,8 @@ func (b0 SuspendNodeEvent_builder) Build() *SuspendNodeEvent {
 // works today. Tracked as Step N in flowsdk-v1beta2-cleanup-plan.md.
 type ResumeNodeEvent struct {
 	state protoimpl.MessageState `protogen:"hybrid.v1"`
-	// Node ID to resume.
+	// Fully-qualified node ID to resume. See StopNodeEvent.id for the
+	// rationale on Format B vs bare id.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Optional replacement value for the node's next evaluation.
 	// If present, replaces the pending input (e.g. corrected RPC request).
@@ -987,7 +1032,8 @@ func (x *ResumeNodeEvent) ClearValue() {
 type ResumeNodeEvent_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Node ID to resume.
+	// Fully-qualified node ID to resume. See StopNodeEvent.id for the
+	// rationale on Format B vs bare id.
 	Id string
 	// Optional replacement value for the node's next evaluation.
 	// If present, replaces the pending input (e.g. corrected RPC request).
@@ -1055,7 +1101,7 @@ var File_dtkt_flow_v1beta2_events_proto protoreflect.FileDescriptor
 
 const file_dtkt_flow_v1beta2_events_proto_rawDesc = "" +
 	"\n" +
-	"\x1edtkt/flow/v1beta2/events.proto\x12\x11dtkt.flow.v1beta2\x1a\x1bbuf/validate/validate.proto\x1a\x19google/protobuf/any.proto\"s\n" +
+	"\x1edtkt/flow/v1beta2/events.proto\x12\x11dtkt.flow.v1beta2\x1a\x1bbuf/validate/validate.proto\x1a\x1cdtkt/flow/v1beta2/spec.proto\x1a\x19google/protobuf/any.proto\"s\n" +
 	"\n" +
 	"InputEvent\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x122\n" +
@@ -1064,10 +1110,11 @@ const file_dtkt_flow_v1beta2_events_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\"t\n" +
 	"\vOutputEvent\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x122\n" +
-	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyB\x06\xbaH\x03\xc8\x01\x01R\x05value\"o\n" +
+	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyB\x06\xbaH\x03\xc8\x01\x01R\x05value\"\xad\x01\n" +
 	"\x17InteractionRequestEvent\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12!\n" +
-	"\x05token\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x05token\"\xba\x01\n" +
+	"\x05token\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x05token\x12<\n" +
+	"\x06inputs\x18\x03 \x03(\v2$.dtkt.flow.v1beta2.Interaction.InputR\x06inputs\"\xba\x01\n" +
 	"\x18InteractionResponseEvent\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12!\n" +
 	"\x05token\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x05token\x122\n" +
@@ -1076,15 +1123,15 @@ const file_dtkt_flow_v1beta2_events_proto_rawDesc = "" +
 	"\rStopFlowEvent\"\x14\n" +
 	"\x12TerminateFlowEvent\"\x12\n" +
 	"\x10SuspendFlowEvent\"\x11\n" +
-	"\x0fResumeFlowEvent\"B\n" +
-	"\rStopNodeEvent\x121\n" +
-	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\"G\n" +
-	"\x12TerminateNodeEvent\x121\n" +
-	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\"E\n" +
-	"\x10SuspendNodeEvent\x121\n" +
-	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\"\x7f\n" +
-	"\x0fResumeNodeEvent\x121\n" +
-	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12/\n" +
+	"\x0fResumeFlowEvent\"\x8d\x01\n" +
+	"\rStopNodeEvent\x12|\n" +
+	"\x02id\x18\x01 \x01(\tBl\xbaHi\xc8\x01\x01rd2b^(connections|inputs|generators|vars|actions|streams|interactions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]*$R\x02id\"\x92\x01\n" +
+	"\x12TerminateNodeEvent\x12|\n" +
+	"\x02id\x18\x01 \x01(\tBl\xbaHi\xc8\x01\x01rd2b^(connections|inputs|generators|vars|actions|streams|interactions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]*$R\x02id\"\x90\x01\n" +
+	"\x10SuspendNodeEvent\x12|\n" +
+	"\x02id\x18\x01 \x01(\tBl\xbaHi\xc8\x01\x01rd2b^(connections|inputs|generators|vars|actions|streams|interactions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]*$R\x02id\"\xca\x01\n" +
+	"\x0fResumeNodeEvent\x12|\n" +
+	"\x02id\x18\x01 \x01(\tBl\xbaHi\xc8\x01\x01rd2b^(connections|inputs|generators|vars|actions|streams|interactions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12/\n" +
 	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyH\x00R\x05value\x88\x01\x01B\b\n" +
 	"\x06_value\"\x10\n" +
 	"\x0eStartFlowEventB\xd8\x01\n" +
@@ -1107,17 +1154,19 @@ var file_dtkt_flow_v1beta2_events_proto_goTypes = []any{
 	(*ResumeNodeEvent)(nil),          // 12: dtkt.flow.v1beta2.ResumeNodeEvent
 	(*StartFlowEvent)(nil),           // 13: dtkt.flow.v1beta2.StartFlowEvent
 	(*anypb.Any)(nil),                // 14: google.protobuf.Any
+	(*Interaction_Input)(nil),        // 15: dtkt.flow.v1beta2.Interaction.Input
 }
 var file_dtkt_flow_v1beta2_events_proto_depIdxs = []int32{
 	14, // 0: dtkt.flow.v1beta2.InputEvent.value:type_name -> google.protobuf.Any
 	14, // 1: dtkt.flow.v1beta2.OutputEvent.value:type_name -> google.protobuf.Any
-	14, // 2: dtkt.flow.v1beta2.InteractionResponseEvent.value:type_name -> google.protobuf.Any
-	14, // 3: dtkt.flow.v1beta2.ResumeNodeEvent.value:type_name -> google.protobuf.Any
-	4,  // [4:4] is the sub-list for method output_type
-	4,  // [4:4] is the sub-list for method input_type
-	4,  // [4:4] is the sub-list for extension type_name
-	4,  // [4:4] is the sub-list for extension extendee
-	0,  // [0:4] is the sub-list for field type_name
+	15, // 2: dtkt.flow.v1beta2.InteractionRequestEvent.inputs:type_name -> dtkt.flow.v1beta2.Interaction.Input
+	14, // 3: dtkt.flow.v1beta2.InteractionResponseEvent.value:type_name -> google.protobuf.Any
+	14, // 4: dtkt.flow.v1beta2.ResumeNodeEvent.value:type_name -> google.protobuf.Any
+	5,  // [5:5] is the sub-list for method output_type
+	5,  // [5:5] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_flow_v1beta2_events_proto_init() }
@@ -1125,6 +1174,7 @@ func file_dtkt_flow_v1beta2_events_proto_init() {
 	if File_dtkt_flow_v1beta2_events_proto != nil {
 		return
 	}
+	file_dtkt_flow_v1beta2_spec_proto_init()
 	file_dtkt_flow_v1beta2_events_proto_msgTypes[12].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

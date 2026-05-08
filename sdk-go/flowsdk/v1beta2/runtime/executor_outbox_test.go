@@ -44,8 +44,10 @@ func TestGraph_Outbox_InputToVarToOutput(t *testing.T) {
 	require.NoError(t, err)
 	// The var's terminal event should be in the snapshot with SUCCEEDED phase
 	// and an EOF value (the computed values were emitted as separate events).
-	require.Contains(t, snap.GetVars(), "vars.double", "snapshot should contain vars.double")
-	varNode := snap.GetVars()["vars.double"]
+	// Snapshot map keys for vars are the bare spec id (Format A); category
+	// is implicit in the field name `vars`.
+	require.Contains(t, snap.GetVars(), "double", "snapshot should contain vars.double")
+	varNode := snap.GetVars()["double"]
 	assert.Equal(t, flowv1beta2.RunSnapshot_PHASE_SUCCEEDED, varNode.GetPhase())
 	assert.True(t, isEOFValue(varNode.GetValue()), "terminal var value should be EOF")
 	assert.Equal(t, uint64(2), varNode.GetEvalCount(), "var should have been evaluated twice (inputs 5, 10)")
@@ -75,13 +77,15 @@ func TestGraph_Outbox_Chain(t *testing.T) {
 	ctx = context.Background()
 	snap, err := store.SnapshotAt(ctx, uuid.Max)
 	require.NoError(t, err)
-	for _, varID := range []string{"vars.inc", "vars.sq"} {
+	// Snapshot map keys for vars are the bare spec id (Format A); category
+	// is implicit in the field name `vars`.
+	for _, varID := range []string{"inc", "sq"} {
 		require.Contains(t, snap.GetVars(), varID)
 		assert.Equal(t, flowv1beta2.RunSnapshot_PHASE_SUCCEEDED, snap.GetVars()[varID].GetPhase())
 		assert.True(t, isEOFValue(snap.GetVars()[varID].GetValue()), "%s terminal value should be EOF", varID)
 	}
-	assert.Equal(t, uint64(2), snap.GetVars()["vars.inc"].GetEvalCount())
-	assert.Equal(t, uint64(2), snap.GetVars()["vars.sq"].GetEvalCount())
+	assert.Equal(t, uint64(2), snap.GetVars()["inc"].GetEvalCount())
+	assert.Equal(t, uint64(2), snap.GetVars()["sq"].GetEvalCount())
 }
 
 func TestGraph_Outbox_RangeGenerator(t *testing.T) {
@@ -132,8 +136,9 @@ func TestGraph_Outbox_SnapshotCaptures(t *testing.T) {
 	ctx = context.Background()
 	snap, err := store.SnapshotAt(ctx, uuid.Max)
 	require.NoError(t, err)
-	require.Contains(t, snap.GetVars(), "vars.v")
-	varNode := snap.GetVars()["vars.v"]
+	// Snapshot map keys for vars are the bare spec id (Format A).
+	require.Contains(t, snap.GetVars(), "v")
+	varNode := snap.GetVars()["v"]
 	assert.Equal(t, flowv1beta2.RunSnapshot_PHASE_SUCCEEDED, varNode.GetPhase())
 	assert.True(t, isEOFValue(varNode.GetValue()), "terminal var value should be EOF")
 	assert.Equal(t, uint64(1), varNode.GetEvalCount(), "var should have been evaluated once (input 3)")

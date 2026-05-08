@@ -74,23 +74,29 @@ func nodeFactoryMap() map[any]nodeFactory {
 
 // publishTerminalPhase publishes an ERRORED phase with an EOF value and error
 // status for the given node. Downstream handlers will see the EOF and drain.
+//
+// The id placed in the StateNode protobuf is the bare spec id (Format A);
+// the validator pattern on every per-node id field requires this form.
+// `topic` carries the fully-qualified routing path independently.
 func publishTerminalPhase(pub pubsub.Publisher, topic string, node *flowv1beta2.Node, phase flowv1beta2.RunSnapshot_Phase, err error) error {
 	f, ok := nodeFactoryMap()[node.WhichType()]
 	if !ok {
 		return nil
 	}
-	return publishNode(pub, topic, f.buildTerminal(node.GetId(), phase, newEOFValue(), grpcStatusProto(err)))
+	return publishNode(pub, topic, f.buildTerminal(bareNodeID(node), phase, newEOFValue(), grpcStatusProto(err)))
 }
 
 // publishPhaseChange publishes a phase transition as a STATE event (no EOF,
 // no value). Downstream handlers skip STATE events, so this does not affect
 // the data pipeline. Phase observers (monitoring, tests) see the transition.
+//
+// See publishTerminalPhase for the id format note.
 func publishPhaseChange(pub pubsub.Publisher, topic string, node *flowv1beta2.Node, phase flowv1beta2.RunSnapshot_Phase, err error) error {
 	f, ok := nodeFactoryMap()[node.WhichType()]
 	if !ok {
 		return nil
 	}
-	return publishStateEvent(pub, topic, f.buildState(node.GetId(), phase, grpcStatusProto(err)))
+	return publishStateEvent(pub, topic, f.buildState(bareNodeID(node), phase, grpcStatusProto(err)))
 }
 
 // isGenerator returns true for node types that produce values without upstream inputs.

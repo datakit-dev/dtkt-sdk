@@ -3,9 +3,12 @@ package runtime
 import (
 	"context"
 	"fmt"
+	"sort"
+	"strings"
 
 	expr "cel.dev/expr"
 	"github.com/google/cel-go/cel"
+	"github.com/google/cel-go/common/ast"
 	"github.com/google/cel-go/common/types"
 	"golang.org/x/sync/errgroup"
 
@@ -15,6 +18,17 @@ import (
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
+
+// transformNodeCategories enumerates the top-level identifier prefixes that
+// reference graph nodes (e.g. `inputs.x`, `interactions.confirm`). Transform
+// expressions must NOT reference any of these -- they see only the per-value
+// `this` activation. Graph references belong in the producer node's main
+// expression; transforms operate as pure functions over the value stream.
+var transformNodeCategories = map[string]bool{
+	"connections": true, "inputs": true, "generators": true,
+	"vars": true, "actions": true, "streams": true,
+	"interactions": true, "outputs": true,
+}
 
 // pipelineSink is called for each value exiting the transform pipeline.
 // eof is true when the value is the EOF sentinel.
@@ -242,6 +256,69 @@ func runSink(ctx context.Context, in <-chan *pubsub.Message, sink pipelineSink) 
 	}
 }
 
+// transformExprNodeRefs returns the set of graph-node references
+// (e.g. "interactions.confirm", "vars.x") found in a single transform
+// CEL expression. Transform expressions are restricted to the per-value
+// `this` activation; references to any other node category are a lint
+// error. Returns an empty slice if the expression doesn't parse (the
+// CEL parser already reported the syntax error via the parseCEL path).
+func transformExprNodeRefs(expression string) []string {
+	src, ok := shared.IsValidExpr(expression)
+	if !ok {
+		return nil
+	}
+	parseEnv, err := cel.NewEnv()
+	if err != nil {
+		return nil
+	}
+	parsed, iss := parseEnv.Parse(src)
+	if iss != nil && iss.Err() != nil {
+		return nil
+	}
+	seen := make(map[string]struct{})
+	var refs []string
+	ast.PreOrderVisit(ast.NavigateAST(parsed.NativeRep()), ast.NewExprVisitor(func(node ast.Expr) {
+		if node.Kind() != ast.SelectKind {
+			return
+		}
+		sel := node.AsSelect()
+		if sel.Operand().Kind() != ast.IdentKind {
+			return
+		}
+		category := sel.Operand().AsIdent()
+		if !transformNodeCategories[category] {
+			return
+		}
+		ref := category + "." + sel.FieldName()
+		if _, dup := seen[ref]; dup {
+			return
+		}
+		seen[ref] = struct{}{}
+		refs = append(refs, ref)
+	}))
+	sort.Strings(refs)
+	return refs
+}
+
+// lintTransformExpr returns a diagnostic if the expression references
+// any graph node (transform expressions may only reference `this`).
+// Returns nil when the expression is clean or empty.
+func lintTransformExpr(expression, path string) *LintDiagnostic {
+	refs := transformExprNodeRefs(expression)
+	if len(refs) == 0 {
+		return nil
+	}
+	return &LintDiagnostic{
+		Severity: SeverityError,
+		Path:     path,
+		Message: fmt.Sprintf(
+			"transform expressions may only reference `this` (the value flowing through the pipeline); references to %s are not allowed. Move graph-aware logic to the producing node's main expression and have transforms filter or map over the resulting structure.",
+			strings.Join(refs, ", "),
+		),
+		Code: CodeInvalidCEL,
+	}
+}
+
 // lintTransforms validates all CEL expressions in a transform pipeline without
 // producing executable programs. Returns structured diagnostics for each issue.
 func lintTransforms(transforms []*flowv1beta2.Transform) []LintDiagnostic {
@@ -249,73 +326,101 @@ func lintTransforms(transforms []*flowv1beta2.Transform) []LintDiagnostic {
 	for i, t := range transforms {
 		switch t.WhichType() {
 		case flowv1beta2.Transform_Map_case:
+			path := fmt.Sprintf("transforms[%d].map", i)
 			if _, err := parseCEL(t.GetMap()); err != nil {
 				diags = append(diags, LintDiagnostic{
 					Severity: SeverityError,
-					Path:     fmt.Sprintf("transforms[%d].map", i),
+					Path:     path,
 					Message:  err.Error(),
 					Code:     CodeInvalidCEL,
 				})
 			}
+			if d := lintTransformExpr(t.GetMap(), path); d != nil {
+				diags = append(diags, *d)
+			}
 		case flowv1beta2.Transform_Filter_case:
+			path := fmt.Sprintf("transforms[%d].filter", i)
 			if _, err := parseCEL(t.GetFilter()); err != nil {
 				diags = append(diags, LintDiagnostic{
 					Severity: SeverityError,
-					Path:     fmt.Sprintf("transforms[%d].filter", i),
+					Path:     path,
 					Message:  err.Error(),
 					Code:     CodeInvalidCEL,
 				})
+			}
+			if d := lintTransformExpr(t.GetFilter(), path); d != nil {
+				diags = append(diags, *d)
 			}
 		case flowv1beta2.Transform_Flatten_case:
 			// no CEL to validate
 		case flowv1beta2.Transform_Reduce_case:
 			r := t.GetReduce()
+			initialPath := fmt.Sprintf("transforms[%d].reduce.initial", i)
 			if _, err := parseCEL(r.GetInitial()); err != nil {
 				diags = append(diags, LintDiagnostic{
 					Severity: SeverityError,
-					Path:     fmt.Sprintf("transforms[%d].reduce.initial", i),
+					Path:     initialPath,
 					Message:  err.Error(),
 					Code:     CodeInvalidCEL,
 				})
 			}
+			if d := lintTransformExpr(r.GetInitial(), initialPath); d != nil {
+				diags = append(diags, *d)
+			}
 			if r.GetAccumulator() != "" {
+				accPath := fmt.Sprintf("transforms[%d].reduce.accumulator", i)
 				if _, err := parseCEL(r.GetAccumulator()); err != nil {
 					diags = append(diags, LintDiagnostic{
 						Severity: SeverityError,
-						Path:     fmt.Sprintf("transforms[%d].reduce.accumulator", i),
+						Path:     accPath,
 						Message:  err.Error(),
 						Code:     CodeInvalidCEL,
 					})
 				}
+				if d := lintTransformExpr(r.GetAccumulator(), accPath); d != nil {
+					diags = append(diags, *d)
+				}
 			}
 			if gb := r.GetGroupBy(); gb != nil && gb.GetKey() != "" {
+				keyPath := fmt.Sprintf("transforms[%d].reduce.group_by.key", i)
 				if _, err := parseCEL(gb.GetKey()); err != nil {
 					diags = append(diags, LintDiagnostic{
 						Severity: SeverityError,
-						Path:     fmt.Sprintf("transforms[%d].reduce.group_by.key", i),
+						Path:     keyPath,
 						Message:  err.Error(),
 						Code:     CodeInvalidCEL,
 					})
+				}
+				if d := lintTransformExpr(gb.GetKey(), keyPath); d != nil {
+					diags = append(diags, *d)
 				}
 			}
 		case flowv1beta2.Transform_Scan_case:
 			s := t.GetScan()
+			initialPath := fmt.Sprintf("transforms[%d].scan.initial", i)
 			if _, err := parseCEL(s.GetInitial()); err != nil {
 				diags = append(diags, LintDiagnostic{
 					Severity: SeverityError,
-					Path:     fmt.Sprintf("transforms[%d].scan.initial", i),
+					Path:     initialPath,
 					Message:  err.Error(),
 					Code:     CodeInvalidCEL,
 				})
 			}
+			if d := lintTransformExpr(s.GetInitial(), initialPath); d != nil {
+				diags = append(diags, *d)
+			}
 			if s.GetAccumulator() != "" {
+				accPath := fmt.Sprintf("transforms[%d].scan.accumulator", i)
 				if _, err := parseCEL(s.GetAccumulator()); err != nil {
 					diags = append(diags, LintDiagnostic{
 						Severity: SeverityError,
-						Path:     fmt.Sprintf("transforms[%d].scan.accumulator", i),
+						Path:     accPath,
 						Message:  err.Error(),
 						Code:     CodeInvalidCEL,
 					})
+				}
+				if d := lintTransformExpr(s.GetAccumulator(), accPath); d != nil {
+					diags = append(diags, *d)
 				}
 			}
 		default:

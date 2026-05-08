@@ -1,0 +1,40 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: interaction_ticker_only_repro
+  # Bisection fixture between interaction_var_repro (passes) and
+  # interaction_ticker_var_repro (hangs). Removes the var so the
+  # interaction's only upstream is the ticker generator. If this
+  # hangs too, the bug is "ticker -> interaction multi-iter," not
+  # specific to the (ticker, var) pair on the interaction's deps.
+  inputs:
+    - id: maxIters
+      uint64:
+        default: 5
+      cache: true
+  generators:
+    - id: tick
+      ticker:
+        interval: 0.05s
+  vars:
+    - id: stopGate
+      value: "= 0"
+      flow_control:
+        stop_when: "= generators.tick.eval_count >= int(inputs.maxIters.value)"
+  interactions:
+    - id: confirmDiscard
+      inputs:
+        - id: discard
+          title: |
+            = "tick=" + string(generators.tick.value) + ". Discard?"
+          confirm: {}
+  outputs:
+    - id: tick
+      value: |
+        = {
+            "value": generators.tick.eval_count,
+            "discard": interactions.confirmDiscard.value.discard.value
+          }
+      transforms:
+        - filter: "= !this.value.discard"
+        - map: "= this.value.value"

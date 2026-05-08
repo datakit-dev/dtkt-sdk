@@ -1,0 +1,32 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: interaction_var_repro
+  # Same shape as interaction_ticker_var_repro but without a ticker
+  # generator -- input drives the var iteration directly. Used to
+  # bisect the multi-iteration hang to "ticker generator + interaction"
+  # vs "var-driven + interaction" topologies.
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: tag
+      value: |
+        = inputs.x.value % 2 == 0 ? "even" : "odd"
+  interactions:
+    - id: confirmDiscard
+      inputs:
+        - id: discard
+          title: |
+            = string(inputs.x.value) + " is " + vars.tag.value + ". Discard?"
+          confirm: {}
+  outputs:
+    - id: tag
+      value: |
+        = {
+            "value": vars.tag.value,
+            "discard": interactions.confirmDiscard.value.discard.value
+          }
+      transforms:
+        - filter: "= !this.value.discard"
+        - map: "= this.value.value"

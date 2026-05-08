@@ -1,0 +1,43 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: interaction_output_filter_idiomatic
+  # Idiomatic pattern for "filter the output stream based on an
+  # interaction's response". Graph-aware logic lives in the output's
+  # main expression -- it composes the value and the gate into a
+  # struct. Transforms then operate on `this` only: filter on the
+  # gate, then map to extract the kept value.
+  #
+  # This is the recommended replacement for flows that previously
+  # tried `transforms: [{filter: "= !interactions.X.value"}]` -- which
+  # is now rejected by lint (transform expressions may only reference
+  # `this`).
+  #
+  # CEL access path through an interaction's response is uniform:
+  #   interactions.<id>.value.<input_id>.<binding_field>
+  # because responses are always wrapped as a struct keyed by input id
+  # with the underlying binding preserved. For a confirm input the
+  # binding's bool is at `.value` -- so the gate read here is
+  # `interactions.confirmDiscard.value.discard.value`.
+  inputs:
+    - id: x
+      int64: {}
+  interactions:
+    - id: confirmDiscard
+      when: "= inputs.x.value > 0"
+      inputs:
+        - id: discard
+          title: "Discard?"
+          confirm: {}
+  outputs:
+    - id: result
+      # Compose the value with the interaction's gate into a struct
+      # so transforms can operate on `this` alone.
+      value: |
+        = {
+            "value": inputs.x.value,
+            "discard": interactions.confirmDiscard.value.discard.value
+          }
+      transforms:
+        - filter: "= !this.value.discard"
+        - map: "= this.value.value"

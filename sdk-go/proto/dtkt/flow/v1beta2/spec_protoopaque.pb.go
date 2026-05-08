@@ -745,7 +745,6 @@ type Input struct {
 	xxx_hidden_Id         string                 `protobuf:"bytes,1,opt,name=id,proto3"`
 	xxx_hidden_Type       isInput_Type           `protobuf_oneof:"type"`
 	xxx_hidden_Cache      bool                   `protobuf:"varint,20,opt,name=cache,proto3"`
-	xxx_hidden_Constant   bool                   `protobuf:"varint,23,opt,name=constant,proto3"`
 	xxx_hidden_Throttle   *Rate                  `protobuf:"bytes,22,opt,name=throttle,proto3"`
 	xxx_hidden_Transforms *[]*Transform          `protobuf:"bytes,21,rep,name=transforms,proto3"`
 	unknownFields         protoimpl.UnknownFields
@@ -899,13 +898,6 @@ func (x *Input) GetCache() bool {
 	return false
 }
 
-func (x *Input) GetConstant() bool {
-	if x != nil {
-		return x.xxx_hidden_Constant
-	}
-	return false
-}
-
 func (x *Input) GetThrottle() *Rate {
 	if x != nil {
 		return x.xxx_hidden_Throttle
@@ -1024,10 +1016,6 @@ func (x *Input) SetMessage(v *Message) {
 
 func (x *Input) SetCache(v bool) {
 	x.xxx_hidden_Cache = v
-}
-
-func (x *Input) SetConstant(v bool) {
-	x.xxx_hidden_Constant = v
 }
 
 func (x *Input) SetThrottle(v *Rate) {
@@ -1297,23 +1285,24 @@ type Input_builder struct {
 	Map     *Map
 	Message *Message
 	// -- end of xxx_hidden_Type
-	// If true, reuse the last provided value when this input is re-requested
-	// within the same flow run.
+	// If true, the input does not stream values to consumers via PubSub.
+	// The latest pushed value is held in the snapshot and read inline by
+	// consumers on each activation. Consumers block until the first value
+	// is available (default value, nullable type, or first push). New
+	// pushes replace the cached value; consumers read the latest at their
+	// next iteration.
 	Cache bool
-	// Bypasses PubSub entirely. The value is provided once and never changes
-	// for the flow's lifetime. The input channel closes after the first value.
-	// Implicitly cached.
-	Constant bool
 	// Resolution throttle. Controls how often the input resolves a fresh
-	// value. The wait window per attempt is `interval` / `count`. If no value
-	// arrives within the window, the runtime falls back to the cached value
-	// (when `cache` is true), then to the type's default (when set), then
-	// sends a request event to the external client.
+	// value. The wait window per attempt is `interval` / `count`. If no
+	// value arrives within the window, the runtime falls back to the
+	// type's default (when set), then sends a request event to the
+	// external client.
 	//
-	// If unset and either `cache` is true or the type has a default, the
-	// runtime applies a small default throttle so the fallback chain can
-	// fire. If unset and neither applies, the input blocks until a value
-	// arrives.
+	// If unset and the type has a default, the runtime applies a small
+	// default throttle so the fallback chain can fire. If unset and no
+	// default is set, the input blocks until a value arrives.
+	//
+	// No effect when `cache` is true (cached inputs do not stream).
 	Throttle *Rate
 	// An ordered pipeline of transforms applied to the input value.
 	// Each step receives `this.value` from the previous stage.
@@ -1362,7 +1351,6 @@ func (b0 Input_builder) Build() *Input {
 		x.xxx_hidden_Type = &input_Message{b.Message}
 	}
 	x.xxx_hidden_Cache = b.Cache
-	x.xxx_hidden_Constant = b.Constant
 	x.xxx_hidden_Throttle = b.Throttle
 	x.xxx_hidden_Transforms = &b.Transforms
 	return m0
@@ -1663,7 +1651,11 @@ type Var_builder struct {
 
 	// Unique identifier for this var within the flow.
 	Id string
-	// If true, reuse the last evaluated value when this var is re-triggered.
+	// If true, the var's value is delivered to consumers via the snapshot
+	// (read inline) instead of via a PubSub stream. The var continues to
+	// evaluate on each upstream event, replacing the snapshot value. To
+	// freeze the value at first eval, compose with
+	// `node_control.stop_when: "= this.eval_count >= 1"`.
 	Cache bool
 	// The evaluation type. Exactly one must be set.
 
@@ -1972,7 +1964,15 @@ type Action_builder struct {
 	// Unary method call configuration.
 	Call *MethodCall
 	// -- end of xxx_hidden_Type
-	// If true, the executor will cache the result of this action and return the cached value for subsequent calls.
+	// If true, the action's response is delivered to consumers via the
+	// snapshot (read inline) instead of via a PubSub stream. The action
+	// continues to invoke on each upstream event, replacing the snapshot
+	// value. To freeze the response after first success, compose with
+	// `node_control.stop_when`.
+	//
+	// Orthogonal to `memoize`: `cache` is a consumer-side delivery
+	// transform; `memoize` is producer-side request-hash dedup. They can
+	// be combined.
 	Cache bool
 	// Throttle for RPC invocations. Limits how often upstream
 	// subscription changes can trigger the action's method call.
@@ -3815,6 +3815,10 @@ func (*transform_Reduce_) isTransform_Type() {}
 func (*transform_Scan_) isTransform_Type() {}
 
 // ConfirmBinding holds a boolean response from a confirm element.
+// The (dtkt.protoform.v1beta1.field) extension on `value` declares the
+// form element kind so external responders (CLI, web UI, etc.) can
+// discover it via GetFieldElement and render the right widget. Without
+// it, GetInteractionBinding falls through to "unsupported element type".
 type Interaction_ConfirmBinding struct {
 	state            protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Value bool                   `protobuf:"varint,1,opt,name=value,proto3"`
@@ -5781,7 +5785,7 @@ const file_dtkt_flow_v1beta2_spec_proto_rawDesc = "" +
 	"\apackage\x18\x02 \x01(\v2%.dtkt.shared.v1beta1.Package.IdentityR\apackage\x12\x1a\n" +
 	"\bservices\x18\x03 \x03(\tR\bservices:\x1a\xbaH\x17\"\x15\n" +
 	"\apackage\n" +
-	"\bservices\x10\x01\"\xcc\x06\n" +
+	"\bservices\x10\x01\"\xc0\x06\n" +
 	"\x05Input\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12-\n" +
 	"\x04bool\x18\x03 \x01(\v2\x17.dtkt.flow.v1beta2.BoolH\x00R\x04bool\x120\n" +
@@ -5797,13 +5801,12 @@ const file_dtkt_flow_v1beta2_spec_proto_rawDesc = "" +
 	"\x04list\x18\f \x01(\v2\x17.dtkt.flow.v1beta2.ListH\x00R\x04list\x12*\n" +
 	"\x03map\x18\r \x01(\v2\x16.dtkt.flow.v1beta2.MapH\x00R\x03map\x126\n" +
 	"\amessage\x18\x0e \x01(\v2\x1a.dtkt.flow.v1beta2.MessageH\x00R\amessage\x12\x14\n" +
-	"\x05cache\x18\x14 \x01(\bR\x05cache\x12\x1a\n" +
-	"\bconstant\x18\x17 \x01(\bR\bconstant\x123\n" +
+	"\x05cache\x18\x14 \x01(\bR\x05cache\x123\n" +
 	"\bthrottle\x18\x16 \x01(\v2\x17.dtkt.flow.v1beta2.RateR\bthrottle\x12<\n" +
 	"\n" +
 	"transforms\x18\x15 \x03(\v2\x1c.dtkt.flow.v1beta2.TransformR\n" +
 	"transformsB\r\n" +
-	"\x04type\x12\x05\xbaH\x02\b\x01\"\x95\x03\n" +
+	"\x04type\x12\x05\xbaH\x02\b\x01J\x04\b\x17\x10\x18R\bconstant\"\x95\x03\n" +
 	"\x03Var\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12\x14\n" +
 	"\x05cache\x18\x02 \x01(\bR\x05cache\x12=\n" +
@@ -5856,7 +5859,7 @@ const file_dtkt_flow_v1beta2_spec_proto_rawDesc = "" +
 	"\x06method\x18\x02 \x01(\tB\x16\xbaH\x13\xc8\x01\x01r\x0e2\f[a-zA-Z._/]+R\x06method\x120\n" +
 	"\arequest\x18\x04 \x01(\v2\x16.google.protobuf.ValueR\arequest\x12.\n" +
 	"\bresponse\x18\x05 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
-	"2\b^\\s?=\\s?R\bresponse\"\x82\t\n" +
+	"2\b^\\s?=\\s?R\bresponse\"\xbc\t\n" +
 	"\vInteraction\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12&\n" +
 	"\x04when\x18\x04 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
@@ -5866,17 +5869,18 @@ const file_dtkt_flow_v1beta2_spec_proto_rawDesc = "" +
 	"transforms\x18\x02 \x03(\v2\x1c.dtkt.flow.v1beta2.TransformR\n" +
 	"transforms\x12A\n" +
 	"\fflow_control\x18\x05 \x01(\v2\x1e.dtkt.flow.v1beta2.FlowControlR\vflowControl\x12A\n" +
-	"\fnode_control\x18\x06 \x01(\v2\x1e.dtkt.flow.v1beta2.NodeControlR\vnodeControl\x1a&\n" +
-	"\x0eConfirmBinding\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\bR\x05value\x1a$\n" +
-	"\fInputBinding\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\tR\x05value\x1a#\n" +
-	"\vFileBinding\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\fR\x05value\x1a;\n" +
-	"\rSelectBinding\x12*\n" +
-	"\x05value\x18\x01 \x01(\v2\x14.google.protobuf.AnyR\x05value\x1a@\n" +
-	"\x12MultiSelectBinding\x12*\n" +
-	"\x05value\x18\x01 \x03(\v2\x14.google.protobuf.AnyR\x05value\x1a\xa3\x04\n" +
+	"\fnode_control\x18\x06 \x01(\v2\x1e.dtkt.flow.v1beta2.NodeControlR\vnodeControl\x1a@\n" +
+	"\x0eConfirmBinding\x12.\n" +
+	"\x05value\x18\x01 \x01(\bB\x18\x82\xb5\x18\x14\"\x12\n" +
+	"\aApprove\x12\aDeclineR\x05value\x1a,\n" +
+	"\fInputBinding\x12\x1c\n" +
+	"\x05value\x18\x01 \x01(\tB\x06\x82\xb5\x18\x02*\x00R\x05value\x1a+\n" +
+	"\vFileBinding\x12\x1c\n" +
+	"\x05value\x18\x01 \x01(\fB\x06\x82\xb5\x18\x022\x00R\x05value\x1aC\n" +
+	"\rSelectBinding\x122\n" +
+	"\x05value\x18\x01 \x01(\v2\x14.google.protobuf.AnyB\x06\x82\xb5\x18\x02:\x00R\x05value\x1aH\n" +
+	"\x12MultiSelectBinding\x122\n" +
+	"\x05value\x18\x01 \x03(\v2\x14.google.protobuf.AnyB\x06\x82\xb5\x18\x02B\x00R\x05value\x1a\xa3\x04\n" +
 	"\x05Input\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x123\n" +
 	"\x05title\x18\x02 \x01(\tB\x1d\xbaH\x1a\xc8\x01\x01r\x152\x13^\\s?(=)?\\s?[\\s\\S]*$R\x05title\x12A\n" +

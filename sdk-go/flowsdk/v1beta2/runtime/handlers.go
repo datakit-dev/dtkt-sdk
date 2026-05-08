@@ -72,12 +72,18 @@ var (
 // channels/pubsub. The compiled argument is one of the compiled* types from
 // compile.go. transformPS is the direct pubsub used for transform pipeline
 // internal communication. adapter is the CEL type adapter from the graph-level
-// shared.Env.
-func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Message, ps executor.PubSub, topic string, transformPS executor.PubSub, adapter types.Adapter) (executor.NodeHandler, error) {
+// shared.Env. cb is the cache backend, used by handlers that may be cache:true
+// producers (Var, Action); other handlers ignore it.
+//
+// id is the bare spec id (Format A, e.g. "x") used in every protobuf
+// event/snapshot field whose validator is the bare-id pattern. The
+// fully-qualified id (Format B) is supplied separately as `topic` for
+// pubsub routing; the handler does not see it directly.
+func newHandler(compiled any, id string, inputs map[string]<-chan *pubsub.Message, ps executor.PubSub, topic string, transformPS executor.PubSub, adapter types.Adapter, cb *cacheBackend) (executor.NodeHandler, error) {
 	switch c := compiled.(type) {
 	case *compiledVarSwitch:
 		h := &switchHandler{
-			id:          nodeID,
+			id:          id,
 			inputs:      inputs,
 			pubsub:      ps,
 			topic:       topic,
@@ -87,6 +93,7 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 			transforms:  c.transforms,
 			transformPS: transformPS,
 			adapter:     adapter,
+			cache:       cb,
 		}
 		h.initSuspendable()
 		h.initStoppable()
@@ -94,7 +101,7 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 
 	case *compiledVarValue:
 		h := &varHandler{
-			id:          nodeID,
+			id:          id,
 			inputs:      inputs,
 			pubsub:      ps,
 			topic:       topic,
@@ -102,6 +109,7 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 			transforms:  c.transforms,
 			transformPS: transformPS,
 			adapter:     adapter,
+			cache:       cb,
 		}
 		h.initSuspendable()
 		h.initStoppable()
@@ -109,7 +117,7 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 
 	case *compiledTicker:
 		h := &tickerHandler{
-			id:           nodeID,
+			id:           id,
 			pubsub:       ps,
 			topic:        topic,
 			interval:     c.interval,
@@ -123,7 +131,7 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 
 	case *compiledRange:
 		h := &rangeHandler{
-			id:        nodeID,
+			id:        id,
 			pubsub:    ps,
 			topic:     topic,
 			start:     c.start,
@@ -138,7 +146,7 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 
 	case *compiledCron:
 		h := &cronHandler{
-			id:           nodeID,
+			id:           id,
 			pubsub:       ps,
 			topic:        topic,
 			schedule:     c.schedule,
@@ -153,7 +161,7 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 		switch c.kind {
 		case rpc.MethodUnary:
 			h := &unaryHandler{
-				id:           nodeID,
+				id:           id,
 				method:       c.method,
 				inputs:       inputs,
 				pubsub:       ps,
@@ -162,7 +170,8 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 				env:          c.env,
 				whenProg:     c.whenProg,
 				throttle:     c.throttle,
-				cache:        c.cache,
+				memoize:      c.memoize,
+				cache:        cb,
 				request:      c.request,
 				responseProg: c.responseProg,
 				retry:        c.retry,
@@ -172,7 +181,7 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 			return h, nil
 		case rpc.MethodServerStream:
 			h := &serverStreamHandler{
-				id:           nodeID,
+				id:           id,
 				method:       c.method,
 				inputs:       inputs,
 				pubsub:       ps,
@@ -184,13 +193,14 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 				request:      c.request,
 				responseProg: c.responseProg,
 				retry:        c.retry,
+				cache:        cb,
 			}
 			h.initSuspendable()
 			h.initStoppable()
 			return h, nil
 		case rpc.MethodClientStream:
 			h := &clientStreamHandler{
-				id:           nodeID,
+				id:           id,
 				method:       c.method,
 				inputs:       inputs,
 				pubsub:       ps,
@@ -202,13 +212,14 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 				request:      c.request,
 				responseProg: c.responseProg,
 				retry:        c.retry,
+				cache:        cb,
 			}
 			h.initSuspendable()
 			h.initStoppable()
 			return h, nil
 		case rpc.MethodBidiStream:
 			h := &bidiStreamHandler{
-				id:           nodeID,
+				id:           id,
 				method:       c.method,
 				inputs:       inputs,
 				pubsub:       ps,
@@ -220,17 +231,18 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 				request:      c.request,
 				responseProg: c.responseProg,
 				retry:        c.retry,
+				cache:        cb,
 			}
 			h.initSuspendable()
 			h.initStoppable()
 			return h, nil
 		default:
-			return nil, fmt.Errorf("unsupported method kind for %q on node %s", c.method, nodeID)
+			return nil, fmt.Errorf("unsupported method kind for %q on node %s", c.method, id)
 		}
 
 	case *compiledOutput:
 		h := &outputHandler{
-			id:          nodeID,
+			id:          id,
 			inputs:      inputs,
 			program:     c.program,
 			transforms:  c.transforms,
@@ -239,12 +251,13 @@ func newHandler(compiled any, nodeID string, inputs map[string]<-chan *pubsub.Me
 			outputTopic: topic,
 			throttle:    c.throttle,
 			adapter:     adapter,
+			cache:       cb,
 		}
 		h.initSuspendable()
 		h.initStoppable()
 		return h, nil
 
 	default:
-		return nil, fmt.Errorf("unsupported compiled node type %T for node %s", compiled, nodeID)
+		return nil, fmt.Errorf("unsupported compiled node type %T for node %s", compiled, id)
 	}
 }

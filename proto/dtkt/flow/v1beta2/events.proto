@@ -3,6 +3,7 @@ syntax = "proto3";
 package dtkt.flow.v1beta2;
 
 import "buf/validate/validate.proto";
+import "dtkt/flow/v1beta2/spec.proto";
 import "google/protobuf/any.proto";
 
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2;flowv1beta2";
@@ -54,6 +55,18 @@ message InteractionRequestEvent {
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
+
+  // Resolved form inputs ready to render. The runtime has evaluated any
+  // CEL in title/description/element sub-fields against the current
+  // flow vars; receivers should treat these as plain literal strings
+  // and not re-evaluate. Mirrors Interaction.inputs from the spec but
+  // with all CEL substituted.
+  //
+  // Responders build forms from these directly; they do not need to
+  // look up the original Interaction spec. (The runtime is the only
+  // process that holds the live flow vars; resolving CEL anywhere else
+  // would race or be impossible.)
+  repeated dtkt.flow.v1beta2.Interaction.Input inputs = 3;
 }
 
 // InteractionResponseEvent is sent by the external source in response to an
@@ -148,10 +161,13 @@ message ResumeFlowEvent {}
 // stopped node's topic and propagate the EOF through the graph as their
 // own loops exit naturally.
 message StopNodeEvent {
-  // Node ID to stop.
+  // Fully-qualified node ID to stop (e.g. "vars.x", "actions.fetch").
+  // Operator commands target across categories, so the bare spec id alone
+  // is insufficient (two nodes in different categories may share a bare
+  // id). Pattern matches Graph.Node.id.
   string id = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+    (buf.validate.field).string.pattern = "^(connections|inputs|generators|vars|actions|streams|interactions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]*$"
   ];
 }
 
@@ -171,10 +187,11 @@ message StopNodeEvent {
 // is distinct from PHASE_ERRORED. Downstream dependents observe the
 // terminal EOF marker on the cancelled node's topic and propagate cleanly.
 message TerminateNodeEvent {
-  // Node ID to terminate.
+  // Fully-qualified node ID to terminate. See StopNodeEvent.id for the
+  // rationale on Format B vs bare id.
   string id = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+    (buf.validate.field).string.pattern = "^(connections|inputs|generators|vars|actions|streams|interactions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]*$"
   ];
 }
 
@@ -189,10 +206,11 @@ message TerminateNodeEvent {
 // Edge case: if the node is already in a terminal phase (SUCCEEDED, FAILED,
 // ERRORED, CANCELLED), the command is a no-op.
 message SuspendNodeEvent {
-  // Node ID to suspend.
+  // Fully-qualified node ID to suspend. See StopNodeEvent.id for the
+  // rationale on Format B vs bare id.
   string id = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+    (buf.validate.field).string.pattern = "^(connections|inputs|generators|vars|actions|streams|interactions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]*$"
   ];
 }
 
@@ -217,10 +235,11 @@ message SuspendNodeEvent {
 // is not yet implemented in the v1beta2 runtime; only PHASE_SUSPENDED resume
 // works today. Tracked as Step N in flowsdk-v1beta2-cleanup-plan.md.
 message ResumeNodeEvent {
-  // Node ID to resume.
+  // Fully-qualified node ID to resume. See StopNodeEvent.id for the
+  // rationale on Format B vs bare id.
   string id = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+    (buf.validate.field).string.pattern = "^(connections|inputs|generators|vars|actions|streams|interactions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]*$"
   ];
   // Optional replacement value for the node's next evaluation.
   // If present, replaces the pending input (e.g. corrected RPC request).

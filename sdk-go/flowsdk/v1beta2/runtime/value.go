@@ -132,13 +132,21 @@ func runtimeNodeFromEvent(event *flowv1beta2.RunSnapshot_FlowEvent) executor.Sta
 
 // publishNode publishes a StateNode wrapped in a FlowEvent{NODE_OUTPUT} to a topic.
 func publishNode(pub pubsub.Publisher, topic string, node executor.StateNode) error {
-	return pub.Publish(topic, pubsub.NewMessage(flowEventFromNode(flowv1beta2.RunSnapshot_FlowEvent_EVENT_TYPE_NODE_OUTPUT, node)))
+	evt := flowEventFromNode(flowv1beta2.RunSnapshot_FlowEvent_EVENT_TYPE_NODE_OUTPUT, node)
+	if err := validatePublishedEvent(evt); err != nil {
+		return err
+	}
+	return pub.Publish(topic, pubsub.NewMessage(evt))
 }
 
 // publishStateEvent publishes a StateNode wrapped in a FlowEvent{NODE_UPDATE} to a topic.
 // NODE_UPDATE events carry updated accumulator state without triggering downstream CEL evaluation.
 func publishStateEvent(pub pubsub.Publisher, topic string, node executor.StateNode) error {
-	return pub.Publish(topic, pubsub.NewMessage(flowEventFromNode(flowv1beta2.RunSnapshot_FlowEvent_EVENT_TYPE_NODE_UPDATE, node)))
+	evt := flowEventFromNode(flowv1beta2.RunSnapshot_FlowEvent_EVENT_TYPE_NODE_UPDATE, node)
+	if err := validatePublishedEvent(evt); err != nil {
+		return err
+	}
+	return pub.Publish(topic, pubsub.NewMessage(evt))
 }
 
 // publishFlowState publishes a FlowState wrapped in a FlowEvent{FLOW_UPDATE}
@@ -147,6 +155,9 @@ func publishFlowState(pub pubsub.Publisher, topic string, state *flowv1beta2.Run
 	evt := &flowv1beta2.RunSnapshot_FlowEvent{}
 	evt.SetEventType(flowv1beta2.RunSnapshot_FlowEvent_EVENT_TYPE_FLOW_UPDATE)
 	evt.SetFlow(state)
+	if err := validatePublishedEvent(evt); err != nil {
+		return err
+	}
 	return pub.Publish(topic, pubsub.NewMessage(evt))
 }
 

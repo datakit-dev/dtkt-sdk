@@ -4,6 +4,7 @@ package dtkt.flow.v1beta2;
 
 import "buf/validate/validate.proto";
 import "cel/expr/value.proto";
+import "dtkt/flow/v1beta2/spec.proto";
 import "google/protobuf/timestamp.proto";
 import "google/rpc/status.proto";
 
@@ -266,6 +267,15 @@ message RunSnapshot {
       (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
       (buf.validate.field).string.uuid = true
     ];
+    // Resolved Interaction.Input messages for the outstanding request --
+    // CEL fields (title/description) pre-evaluated against the
+    // executor's flow vars so external responders (CLI, web UI) render
+    // literal strings without needing flow-var access. Mirrors
+    // InteractionRequestEvent.inputs; carried here so the snapshot
+    // (in-memory buffer + outbox) preserves the form definition across
+    // the runInteractionPrompts -> cache -> project -> wire round-trip
+    // and survives daemon restart for cross-restart reattach.
+    repeated Interaction.Input inputs = 10;
   }
 
   // FlowState is the flow-level runtime state. Stored in both the snapshot
