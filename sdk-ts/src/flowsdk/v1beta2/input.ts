@@ -1,7 +1,7 @@
 import { create, type DescField, type DescMessage, fromJson, getOption, hasOption, type Message, type Registry } from "@bufbuild/protobuf";
 
 import { type Input, Input_BoolBindingSchema, Input_BytesBindingSchema, Input_DoubleBindingSchema, Input_FloatBindingSchema, Input_Int32BindingSchema, Input_Int64BindingSchema, Input_ListBindingSchema, Input_MapBindingSchema, Input_StringBindingSchema, Input_Uint32BindingSchema, Input_Uint64BindingSchema } from "../../proto/dtkt/flow/v1beta2/spec_pb";
-import { type FieldElement, field as fieldExt, FieldElementSchema } from "../../proto/dtkt/protoform/v1beta1/protoform_pb";
+import { field as fieldExt, type FieldElement, FieldElementSchema } from "../../proto/dtkt/protoform/v1beta1/protoform_pb";
 
 export type InputBindingResult = {
   /**
@@ -164,7 +164,7 @@ export function getInputBinding(input: Input, registry: Registry): InputBindingR
  * etc.); the input id overrides the element title since flow.Input
  * has no title field of its own.
  */
-function wrapperResult<T extends Message>(binding: T, schema: DescMessage, id: string): InputBindingResult {
+function wrapperResult(binding: Message, schema: DescMessage, id: string): InputBindingResult {
   const valueField: DescField | undefined = schema.field.value;
   let element: FieldElement;
   if (valueField && hasOption(valueField, fieldExt)) {

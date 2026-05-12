@@ -15,11 +15,14 @@ type (
 	Instance[I v1beta1.InstanceType] struct {
 		*middleware.Request
 		v1beta1.InstanceType
+
+		ctx    context.Context
+		cancel context.CancelFunc
 	}
 	NewInstanceFunc[C any, I v1beta1.InstanceType] func(context.Context, C) (I, error)
 )
 
-func NewInstance[C any, I v1beta1.InstanceType](ctx context.Context, intgr *Integration[C, I], req *basev1beta1.CheckConfigRequest) (*Instance[I], error) {
+func NewInstance[C any, I v1beta1.InstanceType](intgr *Integration[C, I], req *basev1beta1.CheckConfigRequest) (*Instance[I], error) {
 	value, err := common.UnwrapProtoAnyAs[C](req.GetConfigData())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("failed to unmarshal config: %w", err))
@@ -31,13 +34,24 @@ func NewInstance[C any, I v1beta1.InstanceType](ctx context.Context, intgr *Inte
 	}
 
 	mreq := middleware.NewRequest(req.Connection, req.ConfigHash, req.ConfigGen)
-	inst, err := intgr.newInstance(middleware.AddRequestToContext(ctx, mreq), value)
+
+	ctx, cancel := context.WithCancel(middleware.AddRequestToContext(context.Background(), mreq))
+	inst, err := intgr.newInstance(ctx, value)
 	if err != nil {
+		cancel()
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
 	return &Instance[I]{
 		Request:      mreq,
 		InstanceType: inst,
+
+		ctx:    ctx,
+		cancel: cancel,
 	}, nil
+}
+
+func (i *Instance[I]) Close() error {
+	i.cancel()
+	return i.InstanceType.Close()
 }

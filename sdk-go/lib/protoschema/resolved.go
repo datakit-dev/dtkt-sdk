@@ -10,11 +10,16 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
+func ResolvedJSONSchema(desc protoreflect.MessageDescriptor) (*jsonschema.Resolved, error) {
+	return ResolvedJSONSchemaWithOptions(desc, &jsonschema.ResolveOptions{})
+}
+
 func ResolvedJSONSchemaWithOptions(desc protoreflect.MessageDescriptor, opts *jsonschema.ResolveOptions) (*jsonschema.Resolved, error) {
 	gen := NewGenerator(
 		WithJSONNames(),
 		WithBundle(),
 	)
+
 	err := gen.Add(desc)
 	if err != nil {
 		return nil, err
@@ -67,8 +72,4 @@ func ResolvedJSONSchemaWithOptions(desc protoreflect.MessageDescriptor, opts *js
 	}
 
 	return schema.Resolve(opts)
-}
-
-func ResolvedJSONSchema(desc protoreflect.MessageDescriptor) (*jsonschema.Resolved, error) {
-	return ResolvedJSONSchemaWithOptions(desc, &jsonschema.ResolveOptions{})
 }

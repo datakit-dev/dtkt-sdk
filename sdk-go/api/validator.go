@@ -17,10 +17,10 @@ var getGlobalValidator = sync.OnceValues(func() (protovalidate.Validator, error)
 })
 
 type (
-	RequestValidator struct {
+	requestValidator struct {
 		resolver Resolver
 	}
-	RequestFieldValidator struct {
+	requestFieldValidator struct {
 		request proto.Message
 	}
 )
@@ -29,26 +29,34 @@ func GlobalValidator() (protovalidate.Validator, error) {
 	return getGlobalValidator()
 }
 
-func NewRequestValidator(resolver Resolver) *RequestValidator {
-	return &RequestValidator{
+func RequestValidator(resolver Resolver) *requestValidator {
+	return &requestValidator{
 		resolver: resolver,
 	}
 }
 
-func (f *RequestValidator) Validate(request proto.Message, opts ...protovalidate.ValidationOption) error {
+func RequestFieldValidator(request proto.Message) *requestFieldValidator {
+	return &requestFieldValidator{request: request}
+}
+
+func RequestValidatorOption(request proto.Message) protovalidate.ValidationOption {
+	return protovalidate.WithFilter(&requestFieldValidator{request: request})
+}
+
+func (f *requestValidator) Validate(request proto.Message, opts ...protovalidate.ValidationOption) error {
 	validator, err := f.resolver.GetValidator()
 	if err != nil {
 		return err
 	}
 
-	opts = append([]protovalidate.ValidationOption{
-		protovalidate.WithFilter(&RequestFieldValidator{request: request}),
-	}, opts...)
+	opts = append(opts,
+		protovalidate.WithFilter(&requestFieldValidator{request: request}),
+	)
 
 	return validator.Validate(request, opts...)
 }
 
-func (f *RequestFieldValidator) ShouldValidate(msg protoreflect.Message, desc protoreflect.Descriptor) bool {
+func (f *requestFieldValidator) ShouldValidate(msg protoreflect.Message, desc protoreflect.Descriptor) bool {
 	if opts, ok := desc.Options().(*descriptorpb.FieldOptions); ok && opts != nil {
 		if proto.HasExtension(opts, annotations.E_FieldBehavior) {
 			if ext, ok := proto.GetExtension(opts, annotations.E_FieldBehavior).([]annotations.FieldBehavior); ok && len(ext) > 0 {

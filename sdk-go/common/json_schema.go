@@ -28,7 +28,7 @@ type (
 		id             string
 		reflector      *jsonschema.Reflector
 		reflectorOpts  []func(*jsonschema.Reflector)
-		rawSchema      []byte
+		schemaBytes    []byte
 		jsonSchema     *jsonschema.Schema
 		protoSchema    *structpb.Struct
 		compiler       *compileschema.Compiler
@@ -43,7 +43,7 @@ type (
 		Bytes() []byte
 		String() string
 		setID(string)
-		setRawSchema([]byte)
+		setSchemaBytes([]byte)
 		setCallback(JSONSchemaCallbackFunc)
 		setCompiler(*compileschema.Compiler)
 		setReflector(*jsonschema.Reflector)
@@ -82,9 +82,9 @@ func NewJSONSchema[T any](value T, opts ...JSONSchemaOpt) (*JSONSchema[T], error
 		}
 	}
 
-	if s.rawSchema != nil {
+	if s.schemaBytes != nil {
 		var jsonSchema jsonschema.Schema
-		err := json.Unmarshal(s.rawSchema, &jsonSchema)
+		err := json.Unmarshal(s.schemaBytes, &jsonSchema)
 		if err != nil {
 			return nil, err
 		}
@@ -126,7 +126,7 @@ func NewJSONSchema[T any](value T, opts ...JSONSchemaOpt) (*JSONSchema[T], error
 		return nil, err
 	}
 
-	s.rawSchema = b
+	s.schemaBytes = b
 
 	protoSchema := new(structpb.Struct)
 	err = protojson.Unmarshal(b, protoSchema)
@@ -304,8 +304,8 @@ func (s *JSONSchema[T]) setID(id string) {
 	}
 }
 
-func (s *JSONSchema[T]) setRawSchema(raw []byte) {
-	s.rawSchema = raw
+func (s *JSONSchema[T]) setSchemaBytes(b []byte) {
+	s.schemaBytes = b
 }
 
 func (s *JSONSchema[T]) setReflector(r *jsonschema.Reflector) {
@@ -328,11 +328,11 @@ func (s *JSONSchema[T]) GetID() string {
 }
 
 func (s *JSONSchema[T]) Bytes() []byte {
-	return s.rawSchema
+	return s.schemaBytes
 }
 
 func (s *JSONSchema[T]) String() string {
-	return string(s.rawSchema)
+	return string(s.schemaBytes)
 }
 
 func (s *JSONSchema[T]) JSONSchema() *jsonschema.Schema {

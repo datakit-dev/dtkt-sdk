@@ -17,9 +17,9 @@ func WithJSONSchemaCallback(f JSONSchemaCallbackFunc) JSONSchemaOpt {
 	}
 }
 
-func WithRawSchema(raw []byte) JSONSchemaOpt {
+func WithJSONSchemaBytes(b []byte) JSONSchemaOpt {
 	return func(s JSONSchemaType) {
-		s.setRawSchema(raw)
+		s.setSchemaBytes(b)
 	}
 }
 

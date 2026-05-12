@@ -14,6 +14,7 @@ import (
 	"google.golang.org/protobuf/reflect/protoregistry"
 
 	// Well-known types
+	_ "cloud.google.com/go/longrunning/autogen/longrunningpb"
 	_ "google.golang.org/protobuf/types/known/anypb"
 	_ "google.golang.org/protobuf/types/known/durationpb"
 	_ "google.golang.org/protobuf/types/known/emptypb"

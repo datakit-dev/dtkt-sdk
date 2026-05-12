@@ -47,10 +47,10 @@ type Integration[C any, I v1beta1.InstanceType] struct {
 	spec   *sharedv1beta1.Package
 	config *v1beta1.TypeSchema[C]
 
-	types   *v1beta1.TypeRegistry
-	actions *v1beta1.ActionRegistry
-	events  *v1beta1.EventRegistry
-	sources *v1beta1.EventSourceRegistry
+	registry *v1beta1.TypeRegistry
+	actions  *v1beta1.ActionRegistry
+	events   *v1beta1.EventRegistry
+	sources  *v1beta1.EventSourceRegistry
 
 	services map[string]Service
 	handlers map[string]http.Handler
@@ -82,10 +82,10 @@ func New[C any, I v1beta1.InstanceType](
 	}
 
 	var (
-		ident   = common.GetPackageIdentity(spec)
-		name    resource.Name
-		types   *v1beta1.TypeRegistry
-		logOpts = []any{
+		ident    = common.GetPackageIdentity(spec)
+		name     resource.Name
+		registry *v1beta1.TypeRegistry
+		logOpts  = []any{
 			slog.String("package", ident.String()),
 			slog.String("network", addr.Network()),
 			slog.String("address", addr.String()),
@@ -99,26 +99,26 @@ func New[C any, I v1beta1.InstanceType](
 		}
 
 		name = resource.Deployment.MustGetName(env.GetVar(env.DeployName))
-		types = v1beta1.NewTypeRegistry(v1beta1.DefaultTypeSyncer(),
+		registry = v1beta1.NewTypeRegistry(v1beta1.DefaultTypeSyncer(),
 			addr.URL().JoinPath("schemas", name.String(), "types"),
+			// Experimental (not enabled until stable):
 			// v1beta1.WithRuntimeProtoGen(ident.ProtoPackage("integration")),
 		)
 
 		logOpts = append(logOpts, slog.String("deployment", name.String()))
 	} else {
 		name = resource.EmptyName()
-		types = v1beta1.NewTypeRegistry(v1beta1.DefaultTypeSyncer(),
-			addr.URL().JoinPath("/types"),
+		registry = v1beta1.NewTypeRegistry(v1beta1.DefaultTypeSyncer(),
+			addr.URL().JoinPath("types"),
+			// Experimental (not enabled until stable):
 			// v1beta1.WithRuntimeProtoGen(ident.ProtoPackage("integration")),
 		)
 	}
 
-	config, err := v1beta1.NewTypeSchemaFor[C](types, "Config")
+	config, err := v1beta1.NewTypeSchemaFor[C](registry, "Config")
 	if err != nil {
 		return nil, err
 	}
-
-	debugPath, debugHandler := env.Handler()
 
 	intgr := &Integration[C, I]{
 		log: log.NewLogger(
@@ -133,17 +133,20 @@ func New[C any, I v1beta1.InstanceType](
 		addr: addr,
 		conn: conn,
 
-		types:   types,
-		actions: &v1beta1.ActionRegistry{},
-		events:  &v1beta1.EventRegistry{},
-		sources: &v1beta1.EventSourceRegistry{},
+		registry: registry,
+		actions:  &v1beta1.ActionRegistry{},
+		events:   &v1beta1.EventRegistry{},
+		sources:  &v1beta1.EventSourceRegistry{},
 
-		handlers: map[string]http.Handler{
-			debugPath: debugHandler,
-		},
+		handlers: map[string]http.Handler{},
 		services: map[string]Service{},
 
 		newInstance: newInstance,
+	}
+
+	if env.GetVar(env.AppEnv) == "dev" {
+		debugPath, debugHandler := env.Handler()
+		intgr.handlers[debugPath] = debugHandler
 	}
 
 	// Register Integration as BaseService implementation
@@ -197,7 +200,7 @@ func (i *Integration[C, I]) ConfigSchema() *sharedv1beta1.TypeSchema {
 }
 
 func (i *Integration[C, I]) Types() *v1beta1.TypeRegistry {
-	return i.types
+	return i.registry
 }
 
 func (i *Integration[C, I]) Actions() *v1beta1.ActionRegistry {
@@ -337,7 +340,7 @@ func (i *Integration[C, I]) GetPackage(context.Context, *basev1beta1.GetPackageR
 func (i *Integration[C, I]) CheckConfig(ctx context.Context, req *basev1beta1.CheckConfigRequest) (*basev1beta1.CheckConfigResponse, error) {
 	inst, err := i.getInstance(middleware.NewRequest(req.Connection, req.ConfigHash, req.ConfigGen))
 	if err != nil {
-		inst, err = NewInstance(ctx, i, req)
+		inst, err = NewInstance(i, req)
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "new instance error: %s", err)
 		}
@@ -367,11 +370,11 @@ func (i *Integration[C, I]) CheckAuth(ctx context.Context, req *basev1beta1.Chec
 }
 
 func (i *Integration[C, I]) ListTypes(_ context.Context, req *basev1beta1.ListTypesRequest) (*basev1beta1.ListTypesResponse, error) {
-	return i.types.ListTypes(req)
+	return i.registry.ListTypes(req)
 }
 
 func (i *Integration[C, I]) GetType(_ context.Context, req *basev1beta1.GetTypeRequest) (*basev1beta1.GetTypeResponse, error) {
-	return i.types.GetType(req)
+	return i.registry.GetType(req)
 }
 
 func (i *Integration[C, I]) syncServiceTypes(svcName string) error {
@@ -392,7 +395,7 @@ func (i *Integration[C, I]) syncServiceTypes(svcName string) error {
 			return fmt.Errorf("method input: %q: %w", method.Input().FullName(), err)
 		}
 
-		_, err = v1beta1.NewTypeSchemaForProto(i.types, inputType.New().Interface())
+		_, err = v1beta1.NewTypeSchemaForProto(i.registry, inputType.New().Interface())
 		if err != nil {
 			return fmt.Errorf("method input: %q: %w", method.Input().FullName(), err)
 		}
@@ -402,7 +405,7 @@ func (i *Integration[C, I]) syncServiceTypes(svcName string) error {
 			return fmt.Errorf("method output: %q: %w", method.Output().FullName(), err)
 		}
 
-		_, err = v1beta1.NewTypeSchemaForProto(i.types, outputType.New().Interface())
+		_, err = v1beta1.NewTypeSchemaForProto(i.registry, outputType.New().Interface())
 		if err != nil {
 			return fmt.Errorf("method output: %q: %w", method.Output().FullName(), err)
 		}

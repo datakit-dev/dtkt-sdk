@@ -37,7 +37,7 @@ func ValidateMessage(env Env, msg protoreflect.Message) error {
 		return nil
 	}
 
-	validator, err := env.Resolver().GetValidator()
+	validator, err := env.Validator()
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func ValidateField(env Env, msg protoreflect.Message, field protoreflect.FieldDe
 		return nil
 	}
 
-	validator, err := env.Resolver().GetValidator()
+	validator, err := env.Validator()
 	if err != nil {
 		return err
 	}

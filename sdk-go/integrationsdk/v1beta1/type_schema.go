@@ -57,13 +57,13 @@ func NewTypeSchemaFor[T any](registry *TypeRegistry, typeName string) (_ *TypeSc
 
 	typeProto, isProto := any(value).(proto.Message)
 	if isProto {
-		rawSchema, err := NewProtoSchema(registry, typeProto.ProtoReflect().Descriptor())
+		rawSchema, err := generateProtoSchemaBytes(registry, typeProto.ProtoReflect().Descriptor())
 		if err != nil {
 			return nil, err
 		}
 
 		jsonOpts = append(jsonOpts,
-			common.WithRawSchema(rawSchema),
+			common.WithJSONSchemaBytes(rawSchema),
 		)
 
 		jsonSchema, err = common.JSONSchemaFor[T](jsonOpts...)

@@ -14,7 +14,7 @@ import (
 )
 
 func NewTypeSchemaForProto[T proto.Message](registry *TypeRegistry, typeProto T) (*TypeSchema[T], error) {
-	rawSchema, err := NewProtoSchema(registry, typeProto.ProtoReflect().Descriptor())
+	schemaBytes, err := generateProtoSchemaBytes(registry, typeProto.ProtoReflect().Descriptor())
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +22,7 @@ func NewTypeSchemaForProto[T proto.Message](registry *TypeRegistry, typeProto T)
 	name := string(typeProto.ProtoReflect().Descriptor().FullName())
 	opts := []common.JSONSchemaOpt{
 		common.WithSchemaCompiler(registry.compiler),
-		common.WithRawSchema(rawSchema),
+		common.WithJSONSchemaBytes(schemaBytes),
 		common.WithSchemaID(registry.baseUri.JoinPath(name + JSONSchemaFileExt).String()),
 	}
 
@@ -52,14 +52,13 @@ func NewTypeSchemaForProto[T proto.Message](registry *TypeRegistry, typeProto T)
 	}, nil
 }
 
-func NewProtoSchema(registry *TypeRegistry, desc protoreflect.MessageDescriptor) ([]byte, error) {
+func generateProtoSchemaBytes(registry *TypeRegistry, desc protoreflect.MessageDescriptor) (rawSchema []byte, err error) {
 	schemaGen := protoschema.NewGenerator(protoschema.WithJSONNames())
-	err := schemaGen.Add(desc)
+	err = schemaGen.Add(desc)
 	if err != nil {
 		return nil, err
 	}
 
-	var rawSchema []byte
 	for typeName, jsonSchema := range schemaGen.Generate() {
 		b, err := encoding.ToJSONV2(jsonSchema)
 		if err != nil {
@@ -77,6 +76,7 @@ func NewProtoSchema(registry *TypeRegistry, desc protoreflect.MessageDescriptor)
 			return nil, err
 		}
 
+		structSchema.Fields["$id"] = structpb.NewStringValue(registry.baseUri.JoinPath(string(typeName) + JSONSchemaFileExt).String())
 		err = registry.syncer.StoreType(
 			&sharedv1beta1.TypeSchema{
 				Uri:        registry.baseUri.JoinPath(string(typeName)).String(),
@@ -90,5 +90,5 @@ func NewProtoSchema(registry *TypeRegistry, desc protoreflect.MessageDescriptor)
 		}
 	}
 
-	return rawSchema, nil
+	return
 }
