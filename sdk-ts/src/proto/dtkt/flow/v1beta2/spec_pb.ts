@@ -15,15 +15,15 @@ import type { Any } from "../../../google/protobuf/any_pb";
 import { file_google_protobuf_any } from "../../../google/protobuf/any_pb";
 import type { Duration } from "../../../google/protobuf/duration_pb";
 import { file_google_protobuf_duration } from "../../../google/protobuf/duration_pb";
-import type { Value } from "../../../google/protobuf/struct_pb";
+import type { ListValue, Value } from "../../../google/protobuf/struct_pb";
 import { file_google_protobuf_struct } from "../../../google/protobuf/struct_pb";
-import type { Message } from "@bufbuild/protobuf";
+import type { JsonObject, Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file dtkt/flow/v1beta2/spec.proto.
  */
 export const file_dtkt_flow_v1beta2_spec: GenFile = /*@__PURE__*/
-  fileDesc("ChxkdGt0L2Zsb3cvdjFiZXRhMi9zcGVjLnByb3RvEhFkdGt0LmZsb3cudjFiZXRhMiLlAwoERmxvdxIUCgRuYW1lGAEgASgJQga6SAPIAQESEwoLZGVzY3JpcHRpb24YAiABKAkSMgoLY29ubmVjdGlvbnMYAyADKAsyHS5kdGt0LmZsb3cudjFiZXRhMi5Db25uZWN0aW9uEigKBmlucHV0cxgEIAMoCzIYLmR0a3QuZmxvdy52MWJldGEyLklucHV0EjAKCmdlbmVyYXRvcnMYBSADKAsyHC5kdGt0LmZsb3cudjFiZXRhMi5HZW5lcmF0b3ISJAoEdmFycxgGIAMoCzIWLmR0a3QuZmxvdy52MWJldGEyLlZhchIqCgdhY3Rpb25zGAcgAygLMhkuZHRrdC5mbG93LnYxYmV0YTIuQWN0aW9uEioKB3N0cmVhbXMYCCADKAsyGS5kdGt0LmZsb3cudjFiZXRhMi5TdHJlYW0SNAoMaW50ZXJhY3Rpb25zGAkgAygLMh4uZHRrdC5mbG93LnYxYmV0YTIuSW50ZXJhY3Rpb24SKgoHb3V0cHV0cxgKIAMoCzIZLmR0a3QuZmxvdy52MWJldGEyLk91dHB1dBJCCg5lcnJvcl9zdHJhdGVneRgLIAEoDjIgLmR0a3QuZmxvdy52MWJldGEyLkVycm9yU3RyYXRlZ3lCCLpIBYIBAhABIooBCgtGbG93Q29udHJvbBIlCglzdG9wX3doZW4YASABKAlCErpID9gBAXIKMgheXHM/PVxzPxIqCg50ZXJtaW5hdGVfd2hlbhgCIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EigKDHN1c3BlbmRfd2hlbhgDIAEoCUISukgP2AEBcgoyCF5ccz89XHM/IooBCgtOb2RlQ29udHJvbBIlCglzdG9wX3doZW4YASABKAlCErpID9gBAXIKMgheXHM/PVxzPxIqCg50ZXJtaW5hdGVfd2hlbhgCIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EigKDHN1c3BlbmRfd2hlbhgDIAEoCUISukgP2AEBcgoyCF5ccz89XHM/IqEBCgpDb25uZWN0aW9uEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSNgoHcGFja2FnZRgCIAEoCzIlLmR0a3Quc2hhcmVkLnYxYmV0YTEuUGFja2FnZS5JZGVudGl0eRIQCghzZXJ2aWNlcxgDIAMoCToaukgXIhUKB3BhY2thZ2UKCHNlcnZpY2VzEAEiyQUKBUlucHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSJwoEYm9vbBgDIAEoCzIXLmR0a3QuZmxvdy52MWJldGEyLkJvb2xIABIpCgVieXRlcxgEIAEoCzIYLmR0a3QuZmxvdy52MWJldGEyLkJ5dGVzSAASKwoGZG91YmxlGAUgASgLMhkuZHRrdC5mbG93LnYxYmV0YTIuRG91YmxlSAASKQoFZmxvYXQYBiABKAsyGC5kdGt0LmZsb3cudjFiZXRhMi5GbG9hdEgAEikKBWludDY0GAcgASgLMhguZHRrdC5mbG93LnYxYmV0YTIuSW50NjRIABIrCgZ1aW50NjQYCCABKAsyGS5kdGt0LmZsb3cudjFiZXRhMi5VaW50NjRIABIpCgVpbnQzMhgJIAEoCzIYLmR0a3QuZmxvdy52MWJldGEyLkludDMySAASKwoGdWludDMyGAogASgLMhkuZHRrdC5mbG93LnYxYmV0YTIuVWludDMySAASKwoGc3RyaW5nGAsgASgLMhkuZHRrdC5mbG93LnYxYmV0YTIuU3RyaW5nSAASJwoEbGlzdBgMIAEoCzIXLmR0a3QuZmxvdy52MWJldGEyLkxpc3RIABIlCgNtYXAYDSABKAsyFi5kdGt0LmZsb3cudjFiZXRhMi5NYXBIABItCgdtZXNzYWdlGA4gASgLMhouZHRrdC5mbG93LnYxYmV0YTIuTWVzc2FnZUgAEg0KBWNhY2hlGBQgASgIEikKCHRocm90dGxlGBYgASgLMhcuZHRrdC5mbG93LnYxYmV0YTIuUmF0ZRIwCgp0cmFuc2Zvcm1zGBUgAygLMhwuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtQg0KBHR5cGUSBbpIAggBSgQIFxAYUghjb25zdGFudCLVAgoDVmFyEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSDQoFY2FjaGUYAiABKAgSNgoFdmFsdWUYAyABKAlCJbpIInIgMgheXHM/PVxzP5ICEyA9IGlucHV0cy5mb28udmFsdWVIABIrCgZzd2l0Y2gYBCABKAsyGS5kdGt0LmZsb3cudjFiZXRhMi5Td2l0Y2hIABIwCgp0cmFuc2Zvcm1zGAUgAygLMhwuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtEjQKDGZsb3dfY29udHJvbBgGIAEoCzIeLmR0a3QuZmxvdy52MWJldGEyLkZsb3dDb250cm9sEjQKDG5vZGVfY29udHJvbBgHIAEoCzIeLmR0a3QuZmxvdy52MWJldGEyLk5vZGVDb250cm9sQg0KBHR5cGUSBbpIAggBIogDCgZBY3Rpb24SLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIgCgR3aGVuGAIgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8SLQoEY2FsbBgEIAEoCzIdLmR0a3QuZmxvdy52MWJldGEyLk1ldGhvZENhbGxIABINCgVjYWNoZRgKIAEoCBIpCgh0aHJvdHRsZRgMIAEoCzIXLmR0a3QuZmxvdy52MWJldGEyLlJhdGUSDwoHbWVtb2l6ZRgNIAEoCBI4Cg5yZXRyeV9zdHJhdGVneRgLIAEoCzIgLmR0a3QuZmxvdy52MWJldGEyLlJldHJ5U3RyYXRlZ3kSNAoMZmxvd19jb250cm9sGA4gASgLMh4uZHRrdC5mbG93LnYxYmV0YTIuRmxvd0NvbnRyb2wSNAoMbm9kZV9jb250cm9sGA8gASgLMh4uZHRrdC5mbG93LnYxYmV0YTIuTm9kZUNvbnRyb2xCDQoEdHlwZRIFukgCCAEiowIKBk91dHB1dBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokEiEKBXZhbHVlGAIgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8SKQoIdGhyb3R0bGUYBCABKAsyFy5kdGt0LmZsb3cudjFiZXRhMi5SYXRlEjAKCnRyYW5zZm9ybXMYAyADKAsyHC5kdGt0LmZsb3cudjFiZXRhMi5UcmFuc2Zvcm0SNAoMZmxvd19jb250cm9sGAUgASgLMh4uZHRrdC5mbG93LnYxYmV0YTIuRmxvd0NvbnRyb2wSNAoMbm9kZV9jb250cm9sGAYgASgLMh4uZHRrdC5mbG93LnYxYmV0YTIuTm9kZUNvbnRyb2wi6AIKBlN0cmVhbRItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokEiAKBHdoZW4YDCABKAlCErpID9gBAXIKMgheXHM/PVxzPxItCgRjYWxsGAIgASgLMh0uZHRrdC5mbG93LnYxYmV0YTIuTWV0aG9kQ2FsbEgAEikKCHRocm90dGxlGA8gASgLMhcuZHRrdC5mbG93LnYxYmV0YTIuUmF0ZRI4Cg5yZXRyeV9zdHJhdGVneRgOIAEoCzIgLmR0a3QuZmxvdy52MWJldGEyLlJldHJ5U3RyYXRlZ3kSNAoMZmxvd19jb250cm9sGBAgASgLMh4uZHRrdC5mbG93LnYxYmV0YTIuRmxvd0NvbnRyb2wSNAoMbm9kZV9jb250cm9sGBEgASgLMh4uZHRrdC5mbG93LnYxYmV0YTIuTm9kZUNvbnRyb2xCDQoEdHlwZRIFukgCCAEiugEKCk1ldGhvZENhbGwSNQoKY29ubmVjdGlvbhgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokEiYKBm1ldGhvZBgCIAEoCUIWukgTyAEBcg4yDFthLXpBLVouXy9dKxInCgdyZXF1ZXN0GAQgASgLMhYuZ29vZ2xlLnByb3RvYnVmLlZhbHVlEiQKCHJlc3BvbnNlGAUgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8inggKC0ludGVyYWN0aW9uEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSIAoEd2hlbhgEIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EjQKBmlucHV0cxgDIAMoCzIkLmR0a3QuZmxvdy52MWJldGEyLkludGVyYWN0aW9uLklucHV0EjAKCnRyYW5zZm9ybXMYAiADKAsyHC5kdGt0LmZsb3cudjFiZXRhMi5UcmFuc2Zvcm0SNAoMZmxvd19jb250cm9sGAUgASgLMh4uZHRrdC5mbG93LnYxYmV0YTIuRmxvd0NvbnRyb2wSNAoMbm9kZV9jb250cm9sGAYgASgLMh4uZHRrdC5mbG93LnYxYmV0YTIuTm9kZUNvbnRyb2waOQoOQ29uZmlybUJpbmRpbmcSJwoFdmFsdWUYASABKAhCGIK1GBQiEgoHQXBwcm92ZRIHRGVjbGluZRolCgxJbnB1dEJpbmRpbmcSFQoFdmFsdWUYASABKAlCBoK1GAIqABokCgtGaWxlQmluZGluZxIVCgV2YWx1ZRgBIAEoDEIGgrUYAjIAGjwKDVNlbGVjdEJpbmRpbmcSKwoFdmFsdWUYASABKAsyFC5nb29nbGUucHJvdG9idWYuQW55QgaCtRgCOgAaQQoSTXVsdGlTZWxlY3RCaW5kaW5nEisKBXZhbHVlGAEgAygLMhQuZ29vZ2xlLnByb3RvYnVmLkFueUIGgrUYAkIAGuADCgVJbnB1dBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokEiwKBXRpdGxlGAIgASgJQh26SBrIAQFyFTITXlxzPyg9KT9ccz9bXHNcU10qJBI0CgtkZXNjcmlwdGlvbhgDIAEoCUIaukgXchUyE15ccz8oPSk/XHM/W1xzXFNdKiRIAYgBARI5Cgdjb25maXJtGAQgASgLMiYuZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5Db25maXJtRWxlbWVudEgAEjUKBWlucHV0GAUgASgLMiQuZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5JbnB1dEVsZW1lbnRIABIzCgRmaWxlGAYgASgLMiMuZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5GaWxlRWxlbWVudEgAEjcKBnNlbGVjdBgHIAEoCzIlLmR0a3QucHJvdG9mb3JtLnYxYmV0YTEuU2VsZWN0RWxlbWVudEgAEkIKDG11bHRpX3NlbGVjdBgIIAEoCzIqLmR0a3QucHJvdG9mb3JtLnYxYmV0YTEuTXVsdGlTZWxlY3RFbGVtZW50SABCEAoHZWxlbWVudBIFukgCCAFCDgoMX2Rlc2NyaXB0aW9uIq8BCgdCYWNrb2ZmEjoKD2luaXRpYWxfYmFja29mZhgBIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIGukgDyAEBEhoKEmJhY2tvZmZfbXVsdGlwbGllchgCIAEoARIuCgttYXhfYmFja29mZhgDIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIcCgxtYXhfYXR0ZW1wdHMYBCABKA1CBrpIA8gBASKGAgoNUmV0cnlTdHJhdGVneRIgCgR3aGVuGAEgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8SKwoHYmFja29mZhgCIAEoCzIaLmR0a3QuZmxvdy52MWJldGEyLkJhY2tvZmYSJQoJc2tpcF93aGVuGAMgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8SKQoNY29udGludWVfd2hlbhgGIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EigKDHN1c3BlbmRfd2hlbhgEIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EioKDnRlcm1pbmF0ZV93aGVuGAUgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8izQEKBlN3aXRjaBIhCgV2YWx1ZRgBIAEoCUISukgPyAEBcgoyCF5ccz89XHM/EiwKBGNhc2UYAiADKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5Td2l0Y2guQ2FzZRIjCgdkZWZhdWx0GAMgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8aTQoEQ2FzZRIhCgV2YWx1ZRgBIAEoCUISukgPyAEBcgoyCF5ccz89XHM/EiIKBnJldHVybhgCIAEoCUISukgPyAEBcgoyCF5ccz89XHM/IlIKBFJhdGUSFQoFY291bnQYASABKA1CBrpIA8gBARIzCghpbnRlcnZhbBgCIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIGukgDyAEBIp4ECglHZW5lcmF0b3ISLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBI1CgZ0aWNrZXIYAiABKAsyIy5kdGt0LmZsb3cudjFiZXRhMi5HZW5lcmF0b3IuVGlja2VySAASMQoEY3JvbhgDIAEoCzIhLmR0a3QuZmxvdy52MWJldGEyLkdlbmVyYXRvci5Dcm9uSAASMwoFcmFuZ2UYBCABKAsyIi5kdGt0LmZsb3cudjFiZXRhMi5HZW5lcmF0b3IuUmFuZ2VIABqKAQoGVGlja2VyEjMKCGludGVydmFsGAEgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uQga6SAPIAQESKAoFZGVsYXkYAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SIQoFdmFsdWUYAyABKAlCErpID9gBAXIKMgheXHM/PVxzPxpFCgRDcm9uEhoKCmV4cHJlc3Npb24YASABKAlCBrpIA8gBARIhCgV2YWx1ZRgCIAEoCUISukgP2AEBcgoyCF5ccz89XHM/GmAKBVJhbmdlEg0KBXN0YXJ0GAEgASgDEhMKA2VuZBgCIAEoA0IGukgDyAEBEgwKBHN0ZXAYAyABKAMSJQoEcmF0ZRgEIAEoCzIXLmR0a3QuZmxvdy52MWJldGEyLlJhdGVCDQoEdHlwZRIFukgCCAEirAkKCVRyYW5zZm9ybRIeCgNtYXAYASABKAlCD7pIDHIKMgheXHM/PVxzP0gAEhEKB2ZsYXR0ZW4YAiABKAhIABIhCgZmaWx0ZXIYAyABKAlCD7pIDHIKMgheXHM/PVxzP0gAEjUKBnJlZHVjZRgEIAEoCzIjLmR0a3QuZmxvdy52MWJldGEyLlRyYW5zZm9ybS5SZWR1Y2VIABIxCgRzY2FuGAUgASgLMiEuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtLlNjYW5IABqvBQoHR3JvdXBCeRIfCgNrZXkYASABKAlCErpID9gBAXIKMgheXHM/PVxzPxI7CgZ3aW5kb3cYAiABKAsyKy5kdGt0LmZsb3cudjFiZXRhMi5UcmFuc2Zvcm0uR3JvdXBCeS5XaW5kb3caxQQKBldpbmRvdxJCCgVmaXhlZBgBIAEoCzIxLmR0a3QuZmxvdy52MWJldGEyLlRyYW5zZm9ybS5Hcm91cEJ5LldpbmRvdy5GaXhlZEgAEkYKB3NsaWRpbmcYAiABKAsyMy5kdGt0LmZsb3cudjFiZXRhMi5UcmFuc2Zvcm0uR3JvdXBCeS5XaW5kb3cuU2xpZGluZ0gAEkYKB3Nlc3Npb24YAyABKAsyMy5kdGt0LmZsb3cudjFiZXRhMi5UcmFuc2Zvcm0uR3JvdXBCeS5XaW5kb3cuU2Vzc2lvbkgAEkIKBWV2ZW50GAQgASgLMjEuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtLkdyb3VwQnkuV2luZG93LkV2ZW50SAAaOgoFRml4ZWQSMQoGbGVuZ3RoGAEgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uQga6SAPIAQEabgoHU2xpZGluZxIxCgZsZW5ndGgYASABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CBrpIA8gBARIwCgVzbGlkZRgCIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIGukgDyAEBGj0KB1Nlc3Npb24SMgoHdGltZW91dBgBIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIGukgDyAEBGikKBUV2ZW50EiAKBHdoZW4YASABKAlCErpID8gBAXIKMgheXHM/PVxzP0INCgR0eXBlEgW6SAIIARqOAQoGUmVkdWNlEiMKB2luaXRpYWwYASABKAlCErpID8gBAXIKMgheXHM/PVxzPxInCgthY2N1bXVsYXRvchgCIAEoCUISukgPyAEBcgoyCF5ccz89XHM/EjYKCGdyb3VwX2J5GAMgASgLMiQuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtLkdyb3VwQnkajAEKBFNjYW4SIwoHaW5pdGlhbBgBIAEoCUISukgPyAEBcgoyCF5ccz89XHM/EicKC2FjY3VtdWxhdG9yGAIgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8SNgoIZ3JvdXBfYnkYAyABKAsyJC5kdGt0LmZsb3cudjFiZXRhMi5UcmFuc2Zvcm0uR3JvdXBCeUINCgR0eXBlEgW6SAIIASqDAQoNRXJyb3JTdHJhdGVneRIeChpFUlJPUl9TVFJBVEVHWV9VTlNQRUNJRklFRBAAEhwKGEVSUk9SX1NUUkFURUdZX1RFUk1JTkFURRABEhcKE0VSUk9SX1NUUkFURUdZX1NUT1AQAhIbChdFUlJPUl9TVFJBVEVHWV9DT05USU5VRRADQtYBChdwcm90by5kdGt0LmZsb3cudjFiZXRhMkIJU3BlY1Byb3RvUAFaSmdpdGh1Yi5jb20vZGF0YWtpdC1kZXYvZHRrdC1zZGsvc2RrLWdvL3Byb3RvL2R0a3QvZmxvdy92MWJldGEyO2Zsb3d2MWJldGEyogIDREZYqgIRRHRrdC5GbG93LlYxYmV0YTLKAhFEdGt0XEZsb3dcVjFiZXRhMuICHUR0a3RcRmxvd1xWMWJldGEyXEdQQk1ldGFkYXRh6gITRHRrdDo6Rmxvdzo6VjFiZXRhMmIGcHJvdG8z", [file_buf_validate_validate, file_dtkt_flow_v1beta2_types, file_dtkt_protoform_v1beta1_protoform, file_dtkt_shared_v1beta1_messages, file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_struct]);
+  fileDesc("ChxkdGt0L2Zsb3cvdjFiZXRhMi9zcGVjLnByb3RvEhFkdGt0LmZsb3cudjFiZXRhMiLlAwoERmxvdxIUCgRuYW1lGAEgASgJQga6SAPIAQESEwoLZGVzY3JpcHRpb24YAiABKAkSMgoLY29ubmVjdGlvbnMYAyADKAsyHS5kdGt0LmZsb3cudjFiZXRhMi5Db25uZWN0aW9uEigKBmlucHV0cxgEIAMoCzIYLmR0a3QuZmxvdy52MWJldGEyLklucHV0EjAKCmdlbmVyYXRvcnMYBSADKAsyHC5kdGt0LmZsb3cudjFiZXRhMi5HZW5lcmF0b3ISJAoEdmFycxgGIAMoCzIWLmR0a3QuZmxvdy52MWJldGEyLlZhchIqCgdhY3Rpb25zGAcgAygLMhkuZHRrdC5mbG93LnYxYmV0YTIuQWN0aW9uEioKB3N0cmVhbXMYCCADKAsyGS5kdGt0LmZsb3cudjFiZXRhMi5TdHJlYW0SNAoMaW50ZXJhY3Rpb25zGAkgAygLMh4uZHRrdC5mbG93LnYxYmV0YTIuSW50ZXJhY3Rpb24SKgoHb3V0cHV0cxgKIAMoCzIZLmR0a3QuZmxvdy52MWJldGEyLk91dHB1dBJCCg5lcnJvcl9zdHJhdGVneRgLIAEoDjIgLmR0a3QuZmxvdy52MWJldGEyLkVycm9yU3RyYXRlZ3lCCLpIBYIBAhABIooBCgtGbG93Q29udHJvbBIlCglzdG9wX3doZW4YASABKAlCErpID9gBAXIKMgheXHM/PVxzPxIqCg50ZXJtaW5hdGVfd2hlbhgCIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EigKDHN1c3BlbmRfd2hlbhgDIAEoCUISukgP2AEBcgoyCF5ccz89XHM/IooBCgtOb2RlQ29udHJvbBIlCglzdG9wX3doZW4YASABKAlCErpID9gBAXIKMgheXHM/PVxzPxIqCg50ZXJtaW5hdGVfd2hlbhgCIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EigKDHN1c3BlbmRfd2hlbhgDIAEoCUISukgP2AEBcgoyCF5ccz89XHM/IqEBCgpDb25uZWN0aW9uEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSNgoHcGFja2FnZRgCIAEoCzIlLmR0a3Quc2hhcmVkLnYxYmV0YTEuUGFja2FnZS5JZGVudGl0eRIQCghzZXJ2aWNlcxgDIAMoCToaukgXIhUKB3BhY2thZ2UKCHNlcnZpY2VzEAEirgkKBUlucHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSJwoEYm9vbBgDIAEoCzIXLmR0a3QuZmxvdy52MWJldGEyLkJvb2xIABIpCgVieXRlcxgEIAEoCzIYLmR0a3QuZmxvdy52MWJldGEyLkJ5dGVzSAASKwoGZG91YmxlGAUgASgLMhkuZHRrdC5mbG93LnYxYmV0YTIuRG91YmxlSAASKQoFZmxvYXQYBiABKAsyGC5kdGt0LmZsb3cudjFiZXRhMi5GbG9hdEgAEikKBWludDY0GAcgASgLMhguZHRrdC5mbG93LnYxYmV0YTIuSW50NjRIABIrCgZ1aW50NjQYCCABKAsyGS5kdGt0LmZsb3cudjFiZXRhMi5VaW50NjRIABIpCgVpbnQzMhgJIAEoCzIYLmR0a3QuZmxvdy52MWJldGEyLkludDMySAASKwoGdWludDMyGAogASgLMhkuZHRrdC5mbG93LnYxYmV0YTIuVWludDMySAASKwoGc3RyaW5nGAsgASgLMhkuZHRrdC5mbG93LnYxYmV0YTIuU3RyaW5nSAASJwoEbGlzdBgMIAEoCzIXLmR0a3QuZmxvdy52MWJldGEyLkxpc3RIABIlCgNtYXAYDSABKAsyFi5kdGt0LmZsb3cudjFiZXRhMi5NYXBIABItCgdtZXNzYWdlGA4gASgLMhouZHRrdC5mbG93LnYxYmV0YTIuTWVzc2FnZUgAEg0KBWNhY2hlGBQgASgIEikKCHRocm90dGxlGBYgASgLMhcuZHRrdC5mbG93LnYxYmV0YTIuUmF0ZRIwCgp0cmFuc2Zvcm1zGBUgAygLMhwuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtGjEKC0Jvb2xCaW5kaW5nEiIKBXZhbHVlGAEgASgIQhOCtRgPIg0KBFRydWUSBUZhbHNlGicKDEJ5dGVzQmluZGluZxIXCgV2YWx1ZRgBIAEoDEIIgrUYBCoCCAEaJgoNRG91YmxlQmluZGluZxIVCgV2YWx1ZRgBIAEoAUIGgrUYAioAGiUKDEZsb2F0QmluZGluZxIVCgV2YWx1ZRgBIAEoAkIGgrUYAioAGiUKDEludDY0QmluZGluZxIVCgV2YWx1ZRgBIAEoA0IGgrUYAioAGiYKDVVpbnQ2NEJpbmRpbmcSFQoFdmFsdWUYASABKARCBoK1GAIqABolCgxJbnQzMkJpbmRpbmcSFQoFdmFsdWUYASABKAVCBoK1GAIqABomCg1VaW50MzJCaW5kaW5nEhUKBXZhbHVlGAEgASgNQgaCtRgCKgAaJgoNU3RyaW5nQmluZGluZxIVCgV2YWx1ZRgBIAEoCUIGgrUYAioAGkIKC0xpc3RCaW5kaW5nEjMKBXZhbHVlGAEgASgLMhouZ29vZ2xlLnByb3RvYnVmLkxpc3RWYWx1ZUIIgrUYBCoCCAEaPgoKTWFwQmluZGluZxIwCgV2YWx1ZRgBIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3RCCIK1GAQqAggBQg0KBHR5cGUSBbpIAggBItUCCgNWYXISLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBINCgVjYWNoZRgCIAEoCBI2CgV2YWx1ZRgDIAEoCUIlukgiciAyCF5ccz89XHM/kgITID0gaW5wdXRzLmZvby52YWx1ZUgAEisKBnN3aXRjaBgEIAEoCzIZLmR0a3QuZmxvdy52MWJldGEyLlN3aXRjaEgAEjAKCnRyYW5zZm9ybXMYBSADKAsyHC5kdGt0LmZsb3cudjFiZXRhMi5UcmFuc2Zvcm0SNAoMZmxvd19jb250cm9sGAYgASgLMh4uZHRrdC5mbG93LnYxYmV0YTIuRmxvd0NvbnRyb2wSNAoMbm9kZV9jb250cm9sGAcgASgLMh4uZHRrdC5mbG93LnYxYmV0YTIuTm9kZUNvbnRyb2xCDQoEdHlwZRIFukgCCAEiiAMKBkFjdGlvbhItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokEiAKBHdoZW4YAiABKAlCErpID9gBAXIKMgheXHM/PVxzPxItCgRjYWxsGAQgASgLMh0uZHRrdC5mbG93LnYxYmV0YTIuTWV0aG9kQ2FsbEgAEg0KBWNhY2hlGAogASgIEikKCHRocm90dGxlGAwgASgLMhcuZHRrdC5mbG93LnYxYmV0YTIuUmF0ZRIPCgdtZW1vaXplGA0gASgIEjgKDnJldHJ5X3N0cmF0ZWd5GAsgASgLMiAuZHRrdC5mbG93LnYxYmV0YTIuUmV0cnlTdHJhdGVneRI0CgxmbG93X2NvbnRyb2wYDiABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5GbG93Q29udHJvbBI0Cgxub2RlX2NvbnRyb2wYDyABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5Ob2RlQ29udHJvbEINCgR0eXBlEgW6SAIIASKjAgoGT3V0cHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSIQoFdmFsdWUYAiABKAlCErpID8gBAXIKMgheXHM/PVxzPxIpCgh0aHJvdHRsZRgEIAEoCzIXLmR0a3QuZmxvdy52MWJldGEyLlJhdGUSMAoKdHJhbnNmb3JtcxgDIAMoCzIcLmR0a3QuZmxvdy52MWJldGEyLlRyYW5zZm9ybRI0CgxmbG93X2NvbnRyb2wYBSABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5GbG93Q29udHJvbBI0Cgxub2RlX2NvbnRyb2wYBiABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5Ob2RlQ29udHJvbCLoAgoGU3RyZWFtEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSIAoEd2hlbhgMIAEoCUISukgP2AEBcgoyCF5ccz89XHM/Ei0KBGNhbGwYAiABKAsyHS5kdGt0LmZsb3cudjFiZXRhMi5NZXRob2RDYWxsSAASKQoIdGhyb3R0bGUYDyABKAsyFy5kdGt0LmZsb3cudjFiZXRhMi5SYXRlEjgKDnJldHJ5X3N0cmF0ZWd5GA4gASgLMiAuZHRrdC5mbG93LnYxYmV0YTIuUmV0cnlTdHJhdGVneRI0CgxmbG93X2NvbnRyb2wYECABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5GbG93Q29udHJvbBI0Cgxub2RlX2NvbnRyb2wYESABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5Ob2RlQ29udHJvbEINCgR0eXBlEgW6SAIIASK6AQoKTWV0aG9kQ2FsbBI1Cgpjb25uZWN0aW9uGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSJgoGbWV0aG9kGAIgASgJQha6SBPIAQFyDjIMW2EtekEtWi5fL10rEicKB3JlcXVlc3QYBCABKAsyFi5nb29nbGUucHJvdG9idWYuVmFsdWUSJAoIcmVzcG9uc2UYBSABKAlCErpID9gBAXIKMgheXHM/PVxzPyKeCAoLSW50ZXJhY3Rpb24SLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIgCgR3aGVuGAQgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8SNAoGaW5wdXRzGAMgAygLMiQuZHRrdC5mbG93LnYxYmV0YTIuSW50ZXJhY3Rpb24uSW5wdXQSMAoKdHJhbnNmb3JtcxgCIAMoCzIcLmR0a3QuZmxvdy52MWJldGEyLlRyYW5zZm9ybRI0CgxmbG93X2NvbnRyb2wYBSABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5GbG93Q29udHJvbBI0Cgxub2RlX2NvbnRyb2wYBiABKAsyHi5kdGt0LmZsb3cudjFiZXRhMi5Ob2RlQ29udHJvbBo5Cg5Db25maXJtQmluZGluZxInCgV2YWx1ZRgBIAEoCEIYgrUYFCISCgdBcHByb3ZlEgdEZWNsaW5lGiUKDElucHV0QmluZGluZxIVCgV2YWx1ZRgBIAEoCUIGgrUYAioAGiQKC0ZpbGVCaW5kaW5nEhUKBXZhbHVlGAEgASgMQgaCtRgCMgAaPAoNU2VsZWN0QmluZGluZxIrCgV2YWx1ZRgBIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnlCBoK1GAI6ABpBChJNdWx0aVNlbGVjdEJpbmRpbmcSKwoFdmFsdWUYASADKAsyFC5nb29nbGUucHJvdG9idWYuQW55QgaCtRgCQgAa4AMKBUlucHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSLAoFdGl0bGUYAiABKAlCHbpIGsgBAXIVMhNeXHM/KD0pP1xzP1tcc1xTXSokEjQKC2Rlc2NyaXB0aW9uGAMgASgJQhq6SBdyFTITXlxzPyg9KT9ccz9bXHNcU10qJEgBiAEBEjkKB2NvbmZpcm0YBCABKAsyJi5kdGt0LnByb3RvZm9ybS52MWJldGExLkNvbmZpcm1FbGVtZW50SAASNQoFaW5wdXQYBSABKAsyJC5kdGt0LnByb3RvZm9ybS52MWJldGExLklucHV0RWxlbWVudEgAEjMKBGZpbGUYBiABKAsyIy5kdGt0LnByb3RvZm9ybS52MWJldGExLkZpbGVFbGVtZW50SAASNwoGc2VsZWN0GAcgASgLMiUuZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5TZWxlY3RFbGVtZW50SAASQgoMbXVsdGlfc2VsZWN0GAggASgLMiouZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5NdWx0aVNlbGVjdEVsZW1lbnRIAEIQCgdlbGVtZW50EgW6SAIIAUIOCgxfZGVzY3JpcHRpb24irwEKB0JhY2tvZmYSOgoPaW5pdGlhbF9iYWNrb2ZmGAEgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uQga6SAPIAQESGgoSYmFja29mZl9tdWx0aXBsaWVyGAIgASgBEi4KC21heF9iYWNrb2ZmGAMgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEhwKDG1heF9hdHRlbXB0cxgEIAEoDUIGukgDyAEBIoYCCg1SZXRyeVN0cmF0ZWd5EiAKBHdoZW4YASABKAlCErpID9gBAXIKMgheXHM/PVxzPxIrCgdiYWNrb2ZmGAIgASgLMhouZHRrdC5mbG93LnYxYmV0YTIuQmFja29mZhIlCglza2lwX3doZW4YAyABKAlCErpID9gBAXIKMgheXHM/PVxzPxIpCg1jb250aW51ZV93aGVuGAYgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8SKAoMc3VzcGVuZF93aGVuGAQgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8SKgoOdGVybWluYXRlX3doZW4YBSABKAlCErpID9gBAXIKMgheXHM/PVxzPyLNAQoGU3dpdGNoEiEKBXZhbHVlGAEgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8SLAoEY2FzZRgCIAMoCzIeLmR0a3QuZmxvdy52MWJldGEyLlN3aXRjaC5DYXNlEiMKB2RlZmF1bHQYAyABKAlCErpID8gBAXIKMgheXHM/PVxzPxpNCgRDYXNlEiEKBXZhbHVlGAEgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8SIgoGcmV0dXJuGAIgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8iUgoEUmF0ZRIVCgVjb3VudBgBIAEoDUIGukgDyAEBEjMKCGludGVydmFsGAIgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uQga6SAPIAQEingQKCUdlbmVyYXRvchItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokEjUKBnRpY2tlchgCIAEoCzIjLmR0a3QuZmxvdy52MWJldGEyLkdlbmVyYXRvci5UaWNrZXJIABIxCgRjcm9uGAMgASgLMiEuZHRrdC5mbG93LnYxYmV0YTIuR2VuZXJhdG9yLkNyb25IABIzCgVyYW5nZRgEIAEoCzIiLmR0a3QuZmxvdy52MWJldGEyLkdlbmVyYXRvci5SYW5nZUgAGooBCgZUaWNrZXISMwoIaW50ZXJ2YWwYASABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CBrpIA8gBARIoCgVkZWxheRgCIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIhCgV2YWx1ZRgDIAEoCUISukgP2AEBcgoyCF5ccz89XHM/GkUKBENyb24SGgoKZXhwcmVzc2lvbhgBIAEoCUIGukgDyAEBEiEKBXZhbHVlGAIgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz8aYAoFUmFuZ2USDQoFc3RhcnQYASABKAMSEwoDZW5kGAIgASgDQga6SAPIAQESDAoEc3RlcBgDIAEoAxIlCgRyYXRlGAQgASgLMhcuZHRrdC5mbG93LnYxYmV0YTIuUmF0ZUINCgR0eXBlEgW6SAIIASKsCQoJVHJhbnNmb3JtEh4KA21hcBgBIAEoCUIPukgMcgoyCF5ccz89XHM/SAASEQoHZmxhdHRlbhgCIAEoCEgAEiEKBmZpbHRlchgDIAEoCUIPukgMcgoyCF5ccz89XHM/SAASNQoGcmVkdWNlGAQgASgLMiMuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtLlJlZHVjZUgAEjEKBHNjYW4YBSABKAsyIS5kdGt0LmZsb3cudjFiZXRhMi5UcmFuc2Zvcm0uU2NhbkgAGq8FCgdHcm91cEJ5Eh8KA2tleRgBIAEoCUISukgP2AEBcgoyCF5ccz89XHM/EjsKBndpbmRvdxgCIAEoCzIrLmR0a3QuZmxvdy52MWJldGEyLlRyYW5zZm9ybS5Hcm91cEJ5LldpbmRvdxrFBAoGV2luZG93EkIKBWZpeGVkGAEgASgLMjEuZHRrdC5mbG93LnYxYmV0YTIuVHJhbnNmb3JtLkdyb3VwQnkuV2luZG93LkZpeGVkSAASRgoHc2xpZGluZxgCIAEoCzIzLmR0a3QuZmxvdy52MWJldGEyLlRyYW5zZm9ybS5Hcm91cEJ5LldpbmRvdy5TbGlkaW5nSAASRgoHc2Vzc2lvbhgDIAEoCzIzLmR0a3QuZmxvdy52MWJldGEyLlRyYW5zZm9ybS5Hcm91cEJ5LldpbmRvdy5TZXNzaW9uSAASQgoFZXZlbnQYBCABKAsyMS5kdGt0LmZsb3cudjFiZXRhMi5UcmFuc2Zvcm0uR3JvdXBCeS5XaW5kb3cuRXZlbnRIABo6CgVGaXhlZBIxCgZsZW5ndGgYASABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CBrpIA8gBARpuCgdTbGlkaW5nEjEKBmxlbmd0aBgBIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIGukgDyAEBEjAKBXNsaWRlGAIgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uQga6SAPIAQEaPQoHU2Vzc2lvbhIyCgd0aW1lb3V0GAEgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uQga6SAPIAQEaKQoFRXZlbnQSIAoEd2hlbhgBIAEoCUISukgPyAEBcgoyCF5ccz89XHM/Qg0KBHR5cGUSBbpIAggBGo4BCgZSZWR1Y2USIwoHaW5pdGlhbBgBIAEoCUISukgPyAEBcgoyCF5ccz89XHM/EicKC2FjY3VtdWxhdG9yGAIgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8SNgoIZ3JvdXBfYnkYAyABKAsyJC5kdGt0LmZsb3cudjFiZXRhMi5UcmFuc2Zvcm0uR3JvdXBCeRqMAQoEU2NhbhIjCgdpbml0aWFsGAEgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8SJwoLYWNjdW11bGF0b3IYAiABKAlCErpID8gBAXIKMgheXHM/PVxzPxI2Cghncm91cF9ieRgDIAEoCzIkLmR0a3QuZmxvdy52MWJldGEyLlRyYW5zZm9ybS5Hcm91cEJ5Qg0KBHR5cGUSBbpIAggBKoMBCg1FcnJvclN0cmF0ZWd5Eh4KGkVSUk9SX1NUUkFURUdZX1VOU1BFQ0lGSUVEEAASHAoYRVJST1JfU1RSQVRFR1lfVEVSTUlOQVRFEAESFwoTRVJST1JfU1RSQVRFR1lfU1RPUBACEhsKF0VSUk9SX1NUUkFURUdZX0NPTlRJTlVFEANC1gEKF3Byb3RvLmR0a3QuZmxvdy52MWJldGEyQglTcGVjUHJvdG9QAVpKZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9mbG93L3YxYmV0YTI7Zmxvd3YxYmV0YTKiAgNERliqAhFEdGt0LkZsb3cuVjFiZXRhMsoCEUR0a3RcRmxvd1xWMWJldGEy4gIdRHRrdFxGbG93XFYxYmV0YTJcR1BCTWV0YWRhdGHqAhNEdGt0OjpGbG93OjpWMWJldGEyYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_flow_v1beta2_types, file_dtkt_protoform_v1beta1_protoform, file_dtkt_shared_v1beta1_messages, file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_struct]);
 
 /**
  * Flow defines a directed acyclic graph of nodes connected by data dependencies.
@@ -690,12 +690,12 @@ export type Input = Message<"dtkt.flow.v1beta2.Input"> & {
   } | { case: undefined; value?: undefined };
 
   /**
-   * If true, the input does not stream values to consumers via PubSub.
-   * The latest pushed value is held in the snapshot and read inline by
-   * consumers on each activation. Consumers block until the first value
-   * is available (default value, nullable type, or first push). New
-   * pushes replace the cached value; consumers read the latest at their
-   * next iteration.
+   * If true, the input captures the first resolved value (push, or the
+   * type-level default if the throttle window expires before a push
+   * arrives) and drains subsequent values until cleared. Downstream
+   * consumers see exactly the captured value. To refresh, send a
+   * ClearCacheNodeEvent targeting this input; the next resolved value
+   * then becomes the new captured value.
    *
    * @generated from field: bool cache = 20;
    */
@@ -712,7 +712,8 @@ export type Input = Message<"dtkt.flow.v1beta2.Input"> & {
    * default throttle so the fallback chain can fire. If unset and no
    * default is set, the input blocks until a value arrives.
    *
-   * No effect when `cache` is true (cached inputs do not stream).
+   * No effect after `cache: true` has captured: subsequent throttle
+   * ticks are drained without being delivered.
    *
    * @generated from field: dtkt.flow.v1beta2.Rate throttle = 22;
    */
@@ -820,12 +821,12 @@ export type InputValid = Message<"dtkt.flow.v1beta2.Input"> & {
   } | { case: undefined; value?: undefined };
 
   /**
-   * If true, the input does not stream values to consumers via PubSub.
-   * The latest pushed value is held in the snapshot and read inline by
-   * consumers on each activation. Consumers block until the first value
-   * is available (default value, nullable type, or first push). New
-   * pushes replace the cached value; consumers read the latest at their
-   * next iteration.
+   * If true, the input captures the first resolved value (push, or the
+   * type-level default if the throttle window expires before a push
+   * arrives) and drains subsequent values until cleared. Downstream
+   * consumers see exactly the captured value. To refresh, send a
+   * ClearCacheNodeEvent targeting this input; the next resolved value
+   * then becomes the new captured value.
    *
    * @generated from field: bool cache = 20;
    */
@@ -842,7 +843,8 @@ export type InputValid = Message<"dtkt.flow.v1beta2.Input"> & {
    * default throttle so the fallback chain can fire. If unset and no
    * default is set, the input blocks until a value arrives.
    *
-   * No effect when `cache` is true (cached inputs do not stream).
+   * No effect after `cache: true` has captured: subsequent throttle
+   * ticks are drained without being delivered.
    *
    * @generated from field: dtkt.flow.v1beta2.Rate throttle = 22;
    */
@@ -865,6 +867,247 @@ export const InputSchema: GenMessage<Input, {validType: InputValid}> = /*@__PURE
   messageDesc(file_dtkt_flow_v1beta2_spec, 4);
 
 /**
+ * BoolBinding holds a boolean value for a Bool-typed input.
+ * The (dtkt.protoform.v1beta1.field) extension on `value` declares the
+ * form element kind so external responders (CLI, web UI, etc.) can
+ * discover it via GetFieldElement and render the right widget --
+ * mirroring the Interaction.*Binding pattern. Without it,
+ * GetInputBinding falls through to "unsupported input type".
+ *
+ * @generated from message dtkt.flow.v1beta2.Input.BoolBinding
+ */
+export type Input_BoolBinding = Message<"dtkt.flow.v1beta2.Input.BoolBinding"> & {
+  /**
+   * @generated from field: bool value = 1;
+   */
+  value: boolean;
+};
+
+export type Input_BoolBindingValid = Input_BoolBinding;
+
+/**
+ * Describes the message dtkt.flow.v1beta2.Input.BoolBinding.
+ * Use `create(Input_BoolBindingSchema)` to create a new message.
+ */
+export const Input_BoolBindingSchema: GenMessage<Input_BoolBinding, {validType: Input_BoolBindingValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta2_spec, 4, 0);
+
+/**
+ * BytesBinding holds a byte array for a Bytes-typed input. Rendered as
+ * a multiline text widget because bytes payloads (base64, JSON, raw
+ * text) are routinely multi-line.
+ *
+ * @generated from message dtkt.flow.v1beta2.Input.BytesBinding
+ */
+export type Input_BytesBinding = Message<"dtkt.flow.v1beta2.Input.BytesBinding"> & {
+  /**
+   * @generated from field: bytes value = 1;
+   */
+  value: Uint8Array;
+};
+
+export type Input_BytesBindingValid = Input_BytesBinding;
+
+/**
+ * Describes the message dtkt.flow.v1beta2.Input.BytesBinding.
+ * Use `create(Input_BytesBindingSchema)` to create a new message.
+ */
+export const Input_BytesBindingSchema: GenMessage<Input_BytesBinding, {validType: Input_BytesBindingValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta2_spec, 4, 1);
+
+/**
+ * DoubleBinding holds a 64-bit float for a Double-typed input.
+ *
+ * @generated from message dtkt.flow.v1beta2.Input.DoubleBinding
+ */
+export type Input_DoubleBinding = Message<"dtkt.flow.v1beta2.Input.DoubleBinding"> & {
+  /**
+   * @generated from field: double value = 1;
+   */
+  value: number;
+};
+
+export type Input_DoubleBindingValid = Input_DoubleBinding;
+
+/**
+ * Describes the message dtkt.flow.v1beta2.Input.DoubleBinding.
+ * Use `create(Input_DoubleBindingSchema)` to create a new message.
+ */
+export const Input_DoubleBindingSchema: GenMessage<Input_DoubleBinding, {validType: Input_DoubleBindingValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta2_spec, 4, 2);
+
+/**
+ * FloatBinding holds a 32-bit float for a Float-typed input.
+ *
+ * @generated from message dtkt.flow.v1beta2.Input.FloatBinding
+ */
+export type Input_FloatBinding = Message<"dtkt.flow.v1beta2.Input.FloatBinding"> & {
+  /**
+   * @generated from field: float value = 1;
+   */
+  value: number;
+};
+
+export type Input_FloatBindingValid = Input_FloatBinding;
+
+/**
+ * Describes the message dtkt.flow.v1beta2.Input.FloatBinding.
+ * Use `create(Input_FloatBindingSchema)` to create a new message.
+ */
+export const Input_FloatBindingSchema: GenMessage<Input_FloatBinding, {validType: Input_FloatBindingValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta2_spec, 4, 3);
+
+/**
+ * Int64Binding holds a signed 64-bit int for an Int64-typed input.
+ *
+ * @generated from message dtkt.flow.v1beta2.Input.Int64Binding
+ */
+export type Input_Int64Binding = Message<"dtkt.flow.v1beta2.Input.Int64Binding"> & {
+  /**
+   * @generated from field: int64 value = 1;
+   */
+  value: bigint;
+};
+
+export type Input_Int64BindingValid = Input_Int64Binding;
+
+/**
+ * Describes the message dtkt.flow.v1beta2.Input.Int64Binding.
+ * Use `create(Input_Int64BindingSchema)` to create a new message.
+ */
+export const Input_Int64BindingSchema: GenMessage<Input_Int64Binding, {validType: Input_Int64BindingValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta2_spec, 4, 4);
+
+/**
+ * Uint64Binding holds an unsigned 64-bit int for a Uint64-typed input.
+ *
+ * @generated from message dtkt.flow.v1beta2.Input.Uint64Binding
+ */
+export type Input_Uint64Binding = Message<"dtkt.flow.v1beta2.Input.Uint64Binding"> & {
+  /**
+   * @generated from field: uint64 value = 1;
+   */
+  value: bigint;
+};
+
+export type Input_Uint64BindingValid = Input_Uint64Binding;
+
+/**
+ * Describes the message dtkt.flow.v1beta2.Input.Uint64Binding.
+ * Use `create(Input_Uint64BindingSchema)` to create a new message.
+ */
+export const Input_Uint64BindingSchema: GenMessage<Input_Uint64Binding, {validType: Input_Uint64BindingValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta2_spec, 4, 5);
+
+/**
+ * Int32Binding holds a signed 32-bit int for an Int32-typed input.
+ * The native int32 scalar gives protovalidate range checking for free.
+ *
+ * @generated from message dtkt.flow.v1beta2.Input.Int32Binding
+ */
+export type Input_Int32Binding = Message<"dtkt.flow.v1beta2.Input.Int32Binding"> & {
+  /**
+   * @generated from field: int32 value = 1;
+   */
+  value: number;
+};
+
+export type Input_Int32BindingValid = Input_Int32Binding;
+
+/**
+ * Describes the message dtkt.flow.v1beta2.Input.Int32Binding.
+ * Use `create(Input_Int32BindingSchema)` to create a new message.
+ */
+export const Input_Int32BindingSchema: GenMessage<Input_Int32Binding, {validType: Input_Int32BindingValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta2_spec, 4, 6);
+
+/**
+ * Uint32Binding holds an unsigned 32-bit int for a Uint32-typed input.
+ *
+ * @generated from message dtkt.flow.v1beta2.Input.Uint32Binding
+ */
+export type Input_Uint32Binding = Message<"dtkt.flow.v1beta2.Input.Uint32Binding"> & {
+  /**
+   * @generated from field: uint32 value = 1;
+   */
+  value: number;
+};
+
+export type Input_Uint32BindingValid = Input_Uint32Binding;
+
+/**
+ * Describes the message dtkt.flow.v1beta2.Input.Uint32Binding.
+ * Use `create(Input_Uint32BindingSchema)` to create a new message.
+ */
+export const Input_Uint32BindingSchema: GenMessage<Input_Uint32Binding, {validType: Input_Uint32BindingValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta2_spec, 4, 7);
+
+/**
+ * StringBinding holds a UTF-8 string for a String-typed input.
+ *
+ * @generated from message dtkt.flow.v1beta2.Input.StringBinding
+ */
+export type Input_StringBinding = Message<"dtkt.flow.v1beta2.Input.StringBinding"> & {
+  /**
+   * @generated from field: string value = 1;
+   */
+  value: string;
+};
+
+export type Input_StringBindingValid = Input_StringBinding;
+
+/**
+ * Describes the message dtkt.flow.v1beta2.Input.StringBinding.
+ * Use `create(Input_StringBindingSchema)` to create a new message.
+ */
+export const Input_StringBindingSchema: GenMessage<Input_StringBinding, {validType: Input_StringBindingValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta2_spec, 4, 8);
+
+/**
+ * ListBinding holds an ordered collection for a List-typed input.
+ * Rendered as multiline text because the user types a JSON array.
+ *
+ * @generated from message dtkt.flow.v1beta2.Input.ListBinding
+ */
+export type Input_ListBinding = Message<"dtkt.flow.v1beta2.Input.ListBinding"> & {
+  /**
+   * @generated from field: google.protobuf.ListValue value = 1;
+   */
+  value?: ListValue;
+};
+
+export type Input_ListBindingValid = Input_ListBinding;
+
+/**
+ * Describes the message dtkt.flow.v1beta2.Input.ListBinding.
+ * Use `create(Input_ListBindingSchema)` to create a new message.
+ */
+export const Input_ListBindingSchema: GenMessage<Input_ListBinding, {validType: Input_ListBindingValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta2_spec, 4, 9);
+
+/**
+ * MapBinding holds a key-value collection for a Map-typed input.
+ * Rendered as multiline text because the user types a JSON object.
+ *
+ * @generated from message dtkt.flow.v1beta2.Input.MapBinding
+ */
+export type Input_MapBinding = Message<"dtkt.flow.v1beta2.Input.MapBinding"> & {
+  /**
+   * @generated from field: google.protobuf.Struct value = 1;
+   */
+  value?: JsonObject;
+};
+
+export type Input_MapBindingValid = Input_MapBinding;
+
+/**
+ * Describes the message dtkt.flow.v1beta2.Input.MapBinding.
+ * Use `create(Input_MapBindingSchema)` to create a new message.
+ */
+export const Input_MapBindingSchema: GenMessage<Input_MapBinding, {validType: Input_MapBindingValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta2_spec, 4, 10);
+
+/**
  * Var declares an intermediate CEL variable or switch expression within the flow.
  *
  * @generated from message dtkt.flow.v1beta2.Var
@@ -878,11 +1121,16 @@ export type Var = Message<"dtkt.flow.v1beta2.Var"> & {
   id: string;
 
   /**
-   * If true, the var's value is delivered to consumers via the snapshot
-   * (read inline) instead of via a PubSub stream. The var continues to
-   * evaluate on each upstream event, replacing the snapshot value. To
-   * freeze the value at first eval, compose with
-   * `node_control.stop_when: "= this.eval_count >= 1"`.
+   * If true, the var captures its first value-to-consumers and drains
+   * subsequent upstream events without re-evaluating until cleared.
+   * To refresh, send a ClearCacheNodeEvent targeting this var; the
+   * next upstream event then drives a new evaluation.
+   *
+   * When `transforms` are also set, "first value-to-consumers" is the
+   * first value out of the transform pipeline (not the first input
+   * into it). The var may evaluate multiple times to keep feeding the
+   * pipeline until its first output emerges (e.g. when a filter
+   * transform rejects several inputs before one passes).
    *
    * @generated from field: bool cache = 2;
    */
@@ -949,11 +1197,16 @@ export type VarValid = Message<"dtkt.flow.v1beta2.Var"> & {
   id: string;
 
   /**
-   * If true, the var's value is delivered to consumers via the snapshot
-   * (read inline) instead of via a PubSub stream. The var continues to
-   * evaluate on each upstream event, replacing the snapshot value. To
-   * freeze the value at first eval, compose with
-   * `node_control.stop_when: "= this.eval_count >= 1"`.
+   * If true, the var captures its first value-to-consumers and drains
+   * subsequent upstream events without re-evaluating until cleared.
+   * To refresh, send a ClearCacheNodeEvent targeting this var; the
+   * next upstream event then drives a new evaluation.
+   *
+   * When `transforms` are also set, "first value-to-consumers" is the
+   * first value out of the transform pipeline (not the first input
+   * into it). The var may evaluate multiple times to keep feeding the
+   * pipeline until its first output emerges (e.g. when a filter
+   * transform rejects several inputs before one passes).
    *
    * @generated from field: bool cache = 2;
    */
@@ -1049,15 +1302,17 @@ export type Action = Message<"dtkt.flow.v1beta2.Action"> & {
   } | { case: undefined; value?: undefined };
 
   /**
-   * If true, the action's response is delivered to consumers via the
-   * snapshot (read inline) instead of via a PubSub stream. The action
-   * continues to invoke on each upstream event, replacing the snapshot
-   * value. To freeze the response after first success, compose with
-   * `node_control.stop_when`.
+   * If true, the action invokes the RPC on the first upstream event,
+   * publishes the result (or the retry strategy's Continue value if
+   * retry diverts the error), and drains subsequent upstream events
+   * without re-invoking until cleared. To refresh, send a
+   * ClearCacheNodeEvent targeting this action; the next upstream
+   * event then drives a new RPC.
    *
-   * Orthogonal to `memoize`: `cache` is a consumer-side delivery
-   * transform; `memoize` is producer-side request-hash dedup. They can
-   * be combined.
+   * Orthogonal to `memoize`: `cache` captures a single response across
+   * all subsequent inputs; `memoize` deduplicates by request hash so
+   * distinct requests still produce distinct responses. They can be
+   * combined.
    *
    * @generated from field: bool cache = 10;
    */
@@ -1142,15 +1397,17 @@ export type ActionValid = Message<"dtkt.flow.v1beta2.Action"> & {
   } | { case: undefined; value?: undefined };
 
   /**
-   * If true, the action's response is delivered to consumers via the
-   * snapshot (read inline) instead of via a PubSub stream. The action
-   * continues to invoke on each upstream event, replacing the snapshot
-   * value. To freeze the response after first success, compose with
-   * `node_control.stop_when`.
+   * If true, the action invokes the RPC on the first upstream event,
+   * publishes the result (or the retry strategy's Continue value if
+   * retry diverts the error), and drains subsequent upstream events
+   * without re-invoking until cleared. To refresh, send a
+   * ClearCacheNodeEvent targeting this action; the next upstream
+   * event then drives a new RPC.
    *
-   * Orthogonal to `memoize`: `cache` is a consumer-side delivery
-   * transform; `memoize` is producer-side request-hash dedup. They can
-   * be combined.
+   * Orthogonal to `memoize`: `cache` captures a single response across
+   * all subsequent inputs; `memoize` deduplicates by request hash so
+   * distinct requests still produce distinct responses. They can be
+   * combined.
    *
    * @generated from field: bool cache = 10;
    */

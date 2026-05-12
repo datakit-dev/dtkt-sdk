@@ -1050,6 +1050,78 @@ func (b0 ResumeNodeEvent_builder) Build() *ResumeNodeEvent {
 	return m0
 }
 
+// ClearCacheNodeEvent requests that a cache:true node reset its
+// capture flag so the next upstream event is processed and emitted.
+// Downstream consumers continue to observe the prior captured value
+// (via their per-consumer last-seen state) until the producer's next
+// emit replaces it on their pubsub channel.
+//
+// Applies only to nodes whose spec has `cache: true` (Input, Var,
+// Action). No-op on other node types or when the node has not yet
+// captured a value. Does not change the node's phase: a cache:true
+// producer stays in PHASE_RUNNING throughout the capture / drain /
+// clear cycle.
+type ClearCacheNodeEvent struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// Fully-qualified node ID whose cache to clear. See StopNodeEvent.id
+	// for the rationale on Format B vs bare id.
+	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ClearCacheNodeEvent) Reset() {
+	*x = ClearCacheNodeEvent{}
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ClearCacheNodeEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClearCacheNodeEvent) ProtoMessage() {}
+
+func (x *ClearCacheNodeEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *ClearCacheNodeEvent) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ClearCacheNodeEvent) SetId(v string) {
+	x.Id = v
+}
+
+type ClearCacheNodeEvent_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fully-qualified node ID whose cache to clear. See StopNodeEvent.id
+	// for the rationale on Format B vs bare id.
+	Id string
+}
+
+func (b0 ClearCacheNodeEvent_builder) Build() *ClearCacheNodeEvent {
+	m0 := &ClearCacheNodeEvent{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Id = b.Id
+	return m0
+}
+
 // StartFlowEvent requests the executor to begin executing the flow graph.
 // Sent by the client after connecting to StreamFlowRunEvents to ensure the
 // event stream is established before any outputs are produced. The flow must
@@ -1062,7 +1134,7 @@ type StartFlowEvent struct {
 
 func (x *StartFlowEvent) Reset() {
 	*x = StartFlowEvent{}
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[13]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1074,7 +1146,7 @@ func (x *StartFlowEvent) String() string {
 func (*StartFlowEvent) ProtoMessage() {}
 
 func (x *StartFlowEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[13]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1133,11 +1205,13 @@ const file_dtkt_flow_v1beta2_events_proto_rawDesc = "" +
 	"\x0fResumeNodeEvent\x12|\n" +
 	"\x02id\x18\x01 \x01(\tBl\xbaHi\xc8\x01\x01rd2b^(connections|inputs|generators|vars|actions|streams|interactions|outputs)\\.[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12/\n" +
 	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyH\x00R\x05value\x88\x01\x01B\b\n" +
-	"\x06_value\"\x10\n" +
+	"\x06_value\"_\n" +
+	"\x13ClearCacheNodeEvent\x12H\n" +
+	"\x02id\x18\x01 \x01(\tB8\xbaH5\xc8\x01\x01r02.^(inputs|vars|actions)\\.[a-zA-Z][a-zA-Z0-9_]*$R\x02id\"\x10\n" +
 	"\x0eStartFlowEventB\xd8\x01\n" +
 	"\x17proto.dtkt.flow.v1beta2B\vEventsProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2;flowv1beta2\xa2\x02\x03DFX\xaa\x02\x11Dtkt.Flow.V1beta2\xca\x02\x11Dtkt\\Flow\\V1beta2\xe2\x02\x1dDtkt\\Flow\\V1beta2\\GPBMetadata\xea\x02\x13Dtkt::Flow::V1beta2b\x06proto3"
 
-var file_dtkt_flow_v1beta2_events_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_dtkt_flow_v1beta2_events_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_dtkt_flow_v1beta2_events_proto_goTypes = []any{
 	(*InputEvent)(nil),               // 0: dtkt.flow.v1beta2.InputEvent
 	(*InputRequestEvent)(nil),        // 1: dtkt.flow.v1beta2.InputRequestEvent
@@ -1152,16 +1226,17 @@ var file_dtkt_flow_v1beta2_events_proto_goTypes = []any{
 	(*TerminateNodeEvent)(nil),       // 10: dtkt.flow.v1beta2.TerminateNodeEvent
 	(*SuspendNodeEvent)(nil),         // 11: dtkt.flow.v1beta2.SuspendNodeEvent
 	(*ResumeNodeEvent)(nil),          // 12: dtkt.flow.v1beta2.ResumeNodeEvent
-	(*StartFlowEvent)(nil),           // 13: dtkt.flow.v1beta2.StartFlowEvent
-	(*anypb.Any)(nil),                // 14: google.protobuf.Any
-	(*Interaction_Input)(nil),        // 15: dtkt.flow.v1beta2.Interaction.Input
+	(*ClearCacheNodeEvent)(nil),      // 13: dtkt.flow.v1beta2.ClearCacheNodeEvent
+	(*StartFlowEvent)(nil),           // 14: dtkt.flow.v1beta2.StartFlowEvent
+	(*anypb.Any)(nil),                // 15: google.protobuf.Any
+	(*Interaction_Input)(nil),        // 16: dtkt.flow.v1beta2.Interaction.Input
 }
 var file_dtkt_flow_v1beta2_events_proto_depIdxs = []int32{
-	14, // 0: dtkt.flow.v1beta2.InputEvent.value:type_name -> google.protobuf.Any
-	14, // 1: dtkt.flow.v1beta2.OutputEvent.value:type_name -> google.protobuf.Any
-	15, // 2: dtkt.flow.v1beta2.InteractionRequestEvent.inputs:type_name -> dtkt.flow.v1beta2.Interaction.Input
-	14, // 3: dtkt.flow.v1beta2.InteractionResponseEvent.value:type_name -> google.protobuf.Any
-	14, // 4: dtkt.flow.v1beta2.ResumeNodeEvent.value:type_name -> google.protobuf.Any
+	15, // 0: dtkt.flow.v1beta2.InputEvent.value:type_name -> google.protobuf.Any
+	15, // 1: dtkt.flow.v1beta2.OutputEvent.value:type_name -> google.protobuf.Any
+	16, // 2: dtkt.flow.v1beta2.InteractionRequestEvent.inputs:type_name -> dtkt.flow.v1beta2.Interaction.Input
+	15, // 3: dtkt.flow.v1beta2.InteractionResponseEvent.value:type_name -> google.protobuf.Any
+	15, // 4: dtkt.flow.v1beta2.ResumeNodeEvent.value:type_name -> google.protobuf.Any
 	5,  // [5:5] is the sub-list for method output_type
 	5,  // [5:5] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
@@ -1182,7 +1257,7 @@ func file_dtkt_flow_v1beta2_events_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_flow_v1beta2_events_proto_rawDesc), len(file_dtkt_flow_v1beta2_events_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

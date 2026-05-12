@@ -1,0 +1,16 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: cache_var_with_filter
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: filtered
+      value: "= inputs.x.value"
+      cache: true
+      transforms:
+        - filter: "= this.value > 10"
+  outputs:
+    - id: result
+      value: "= vars.filtered.value"

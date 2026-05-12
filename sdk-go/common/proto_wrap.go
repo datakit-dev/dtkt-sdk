@@ -14,6 +14,7 @@ import (
 	"github.com/jhump/protoreflect/v2/protoresolve"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -85,6 +86,39 @@ func IsWellKnownName[T ~string](name T) bool {
 
 func IsWellKnownWrapperName[T ~string](name T) bool {
 	return slices.Contains(protoWrapperNames, string(name))
+}
+
+// AsMessage converts a JSON-shaped value -- a proto Struct / ListValue,
+// a Go map / slice / scalar, or another proto.Message -- into a fresh
+// instance of msgType via a protojson round-trip. The Resolver in w
+// is threaded through both marshal and unmarshal so nested Any and
+// extension fields resolve via the same descriptor pool.
+//
+// Used wherever we need to lift a generic JSON-shape into a typed
+// proto: flow Input.Message defaults, dynamic connection configs,
+// the JSON-to-proto fallthrough in Wrap, and the typed-cast path in
+// UnwrapProtoAnyAs. Validation should run separately (this helper
+// only handles type construction).
+func (w ProtoOptions) AsMessage(value any, msgType protoreflect.MessageType) (proto.Message, error) {
+	b, err := encoding.ToJSONV2(value,
+		encoding.WithEncodeProtoJSONOptions(protojson.MarshalOptions{
+			Resolver: w.Resolver,
+		}),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	msg := msgType.New().Interface()
+	if err := encoding.FromJSONV2(b, msg,
+		encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
+			Resolver: w.Resolver,
+		}),
+	); err != nil {
+		return nil, err
+	}
+
+	return msg, nil
 }
 
 func (w ProtoOptions) UnwrapMap(from map[string]proto.Message) (to map[string]any, err error) {

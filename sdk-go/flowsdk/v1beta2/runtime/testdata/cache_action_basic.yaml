@@ -1,0 +1,17 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: cache_action_basic
+  inputs:
+    - id: x
+      int64: {}
+  actions:
+    - id: echo
+      call:
+        connection: echo
+        method: echo.Echo
+        request: "= inputs.x.value"
+      cache: true
+  outputs:
+    - id: result
+      value: "= actions.echo.value"

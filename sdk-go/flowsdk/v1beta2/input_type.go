@@ -675,22 +675,14 @@ func (t *inputMessage) HasDefault() bool {
 
 func (t *inputMessage) GetDefault() (any, error) {
 	if t.defaultValue == nil {
-		t.defaultValue = t.msgType.New().Interface()
-
 		if t.HasDefault() {
-			b, err := encoding.ToJSONV2(t.spec.GetDefault())
+			msg, err := t.options.AsMessage(t.spec.GetDefault(), t.msgType)
 			if err != nil {
 				return nil, err
 			}
-
-			err = encoding.FromJSONV2(b, t.defaultValue,
-				encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
-					Resolver: t.options.Resolver,
-				}),
-			)
-			if err != nil {
-				return nil, err
-			}
+			t.defaultValue = msg
+		} else {
+			t.defaultValue = t.msgType.New().Interface()
 		}
 
 		err := t.validator.Validate(t.defaultValue)
@@ -713,21 +705,8 @@ func (t *inputMessage) Validate(value any) (_ any, err error) {
 
 	msg, isProto := value.(proto.Message)
 	if !isProto || msg.ProtoReflect().Descriptor().FullName() != t.msgType.Descriptor().FullName() {
-		b, err := encoding.ToJSONV2(value,
-			encoding.WithEncodeProtoJSONOptions(protojson.MarshalOptions{
-				Resolver: t.options.Resolver,
-			}),
-		)
-		if err != nil {
-			return nil, err
-		}
-
-		msg = t.msgType.New().Interface()
-		err = encoding.FromJSONV2(b, msg,
-			encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
-				Resolver: t.options.Resolver,
-			}),
-		)
+		var err error
+		msg, err = t.options.AsMessage(value, t.msgType)
 		if err != nil {
 			return nil, err
 		}

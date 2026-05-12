@@ -431,7 +431,28 @@ func (e *Executor) setupInputBridges(
 	graph *flowv1beta2.Graph,
 	celEnv shared.Env,
 ) ([]string, error) {
-	// Compile input transforms and start pipelines before subscriptions.
+	// First pass: create the cacheBackend for every input so the
+	// transform-pipeline sinks (set up in the next pass) can capture it.
+	// For cache:true inputs with transforms, markCaptured must fire in
+	// the sink (post-transforms) so the cached value matches what
+	// consumers actually see.
+	inputCBs := make(map[string]*cacheBackend, len(graph.GetNodes()))
+	for _, n := range graph.GetNodes() {
+		if n.WhichType() != flowv1beta2.Node_Input_case {
+			continue
+		}
+		nodeID := n.GetId()
+		cache := n.GetInput().GetCache()
+		cb := &cacheBackend{cacheCapture: cacheCapture{enabled: cache}}
+		inputCBs[nodeID] = cb
+		if cache {
+			e.cacheBackends[nodeID] = cb
+		}
+	}
+
+	// Second pass: compile transforms and start pipelines. The sink
+	// publishes post-transform values to consumers AND, for cache:true
+	// inputs, marks captured on the first such publish.
 	inputTopics := make(map[string]string) // nodeID -> transform input topic
 	for _, n := range graph.GetNodes() {
 		if n.WhichType() == flowv1beta2.Node_Input_case {
@@ -440,19 +461,33 @@ func (e *Executor) setupInputBridges(
 				return nil, fmt.Errorf("compiling transforms for input %s: %w", n.GetId(), err)
 			}
 			if tp != nil {
-				nodeID := n.GetId()         // Format B - topic routing
+				nodeID := n.GetId()            // Format B - topic routing
 				bareID := n.GetInput().GetId() // Format A - per-event protobuf id field contract
+				cb := inputCBs[nodeID]
 				sink := func(_ context.Context, val *expr.Value, eof bool) error {
+					// cache:true: only the FIRST post-transform value
+					// reaches consumers. The bridge may have fed several
+					// inputs before captured flips; drop subsequent sink
+					// emissions silently so consumers see exactly one value.
+					if !eof && cb.isCaptured() {
+						return nil
+					}
 					phase := flowv1beta2.RunSnapshot_PHASE_RUNNING
 					if eof {
 						phase = flowv1beta2.RunSnapshot_PHASE_SUCCEEDED
 					}
-					return publishNode(e.pubsub, e.topics.For(nodeID), flowv1beta2.RunSnapshot_InputNode_builder{
+					if err := publishNode(e.pubsub, e.topics.For(nodeID), flowv1beta2.RunSnapshot_InputNode_builder{
 						Id:     bareID,
 						Value:  val,
 						Closed: eof,
 						Phase:  phase,
-					}.Build())
+					}.Build()); err != nil {
+						return err
+					}
+					if !eof {
+						cb.markCaptured()
+					}
+					return nil
 				}
 				topic, err := tp.Start(ctx, g, e.pubsub, e.topics.For(nodeID), sink, nil)
 				if err != nil {
@@ -516,18 +551,15 @@ func (e *Executor) setupInputBridges(
 			// Throttled/cached/default inputs use an inputHandler with a bridge goroutine.
 			rawCh := make(chan *expr.Value, 1)
 
-			cb := &cacheBackend{
-				cacheCapture: cacheCapture{enabled: cache},
-			}
-			if cache {
-				e.cacheBackends[nodeID] = cb
-			}
+			cb := inputCBs[nodeID]
+			hasTransforms := false
 
 			// rawPublish is the actual delivery: to the transform input
 			// topic if the input has transforms, otherwise direct to the
 			// consumer-facing topic with a full InputNode message.
 			var rawPublish func(*expr.Value, bool) error
 			if topic, ok := inputTopics[nodeID]; ok {
+				hasTransforms = true
 				rawPublish = func(val *expr.Value, _ bool) error {
 					return e.pubsub.Publish(topic, pubsub.NewMessage(val))
 				}
@@ -547,7 +579,10 @@ func (e *Executor) setupInputBridges(
 			}
 
 			// publish wraps rawPublish with cache:true drain-and-skip.
-			// Identical for transform-pipeline and direct paths.
+			// markCaptured fires here only when the input has no transforms
+			// (rawPublish goes directly to consumers). With transforms,
+			// the pipeline's sink owns markCaptured so the cached value
+			// matches what consumers actually see post-transforms.
 			publish := func(val *expr.Value, eof bool) error {
 				if !eof && cb.isCaptured() {
 					return nil
@@ -555,7 +590,7 @@ func (e *Executor) setupInputBridges(
 				if err := rawPublish(val, eof); err != nil {
 					return err
 				}
-				if !eof {
+				if !eof && !hasTransforms {
 					cb.markCaptured()
 				}
 				return nil

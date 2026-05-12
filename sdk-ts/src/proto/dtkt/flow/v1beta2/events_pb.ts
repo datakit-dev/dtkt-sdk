@@ -15,7 +15,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dtkt/flow/v1beta2/events.proto.
  */
 export const file_dtkt_flow_v1beta2_events: GenFile = /*@__PURE__*/
-  fileDesc("Ch5kdGt0L2Zsb3cvdjFiZXRhMi9ldmVudHMucHJvdG8SEWR0a3QuZmxvdy52MWJldGEyImgKCklucHV0RXZlbnQSLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIrCgV2YWx1ZRgCIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnlCBrpIA8gBASJCChFJbnB1dFJlcXVlc3RFdmVudBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokImkKC091dHB1dEV2ZW50Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSKwoFdmFsdWUYAiABKAsyFC5nb29nbGUucHJvdG9idWYuQW55Qga6SAPIAQEimgEKF0ludGVyYWN0aW9uUmVxdWVzdEV2ZW50Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSGgoFdG9rZW4YAiABKAlCC7pICMgBAXIDsAEBEjQKBmlucHV0cxgDIAMoCzIkLmR0a3QuZmxvdy52MWJldGEyLkludGVyYWN0aW9uLklucHV0IqEBChhJbnRlcmFjdGlvblJlc3BvbnNlRXZlbnQSLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIaCgV0b2tlbhgCIAEoCUILukgIyAEBcgOwAQESKwoFdmFsdWUYAyABKAsyFC5nb29nbGUucHJvdG9idWYuQW55Qga6SAPIAQESDQoFYWN0b3IYBCABKAkiDwoNU3RvcEZsb3dFdmVudCIUChJUZXJtaW5hdGVGbG93RXZlbnQiEgoQU3VzcGVuZEZsb3dFdmVudCIRCg9SZXN1bWVGbG93RXZlbnQiiQEKDVN0b3BOb2RlRXZlbnQSeAoCaWQYASABKAlCbLpIacgBAXJkMmJeKGNvbm5lY3Rpb25zfGlucHV0c3xnZW5lcmF0b3JzfHZhcnN8YWN0aW9uc3xzdHJlYW1zfGludGVyYWN0aW9uc3xvdXRwdXRzKVwuW2EtekEtWl1bYS16QS1aMC05X10qJCKOAQoSVGVybWluYXRlTm9kZUV2ZW50EngKAmlkGAEgASgJQmy6SGnIAQFyZDJiXihjb25uZWN0aW9uc3xpbnB1dHN8Z2VuZXJhdG9yc3x2YXJzfGFjdGlvbnN8c3RyZWFtc3xpbnRlcmFjdGlvbnN8b3V0cHV0cylcLlthLXpBLVpdW2EtekEtWjAtOV9dKiQijAEKEFN1c3BlbmROb2RlRXZlbnQSeAoCaWQYASABKAlCbLpIacgBAXJkMmJeKGNvbm5lY3Rpb25zfGlucHV0c3xnZW5lcmF0b3JzfHZhcnN8YWN0aW9uc3xzdHJlYW1zfGludGVyYWN0aW9uc3xvdXRwdXRzKVwuW2EtekEtWl1bYS16QS1aMC05X10qJCK/AQoPUmVzdW1lTm9kZUV2ZW50EngKAmlkGAEgASgJQmy6SGnIAQFyZDJiXihjb25uZWN0aW9uc3xpbnB1dHN8Z2VuZXJhdG9yc3x2YXJzfGFjdGlvbnN8c3RyZWFtc3xpbnRlcmFjdGlvbnN8b3V0cHV0cylcLlthLXpBLVpdW2EtekEtWjAtOV9dKiQSKAoFdmFsdWUYAiABKAsyFC5nb29nbGUucHJvdG9idWYuQW55SACIAQFCCAoGX3ZhbHVlIhAKDlN0YXJ0Rmxvd0V2ZW50QtgBChdwcm90by5kdGt0LmZsb3cudjFiZXRhMkILRXZlbnRzUHJvdG9QAVpKZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9mbG93L3YxYmV0YTI7Zmxvd3YxYmV0YTKiAgNERliqAhFEdGt0LkZsb3cuVjFiZXRhMsoCEUR0a3RcRmxvd1xWMWJldGEy4gIdRHRrdFxGbG93XFYxYmV0YTJcR1BCTWV0YWRhdGHqAhNEdGt0OjpGbG93OjpWMWJldGEyYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_flow_v1beta2_spec, file_google_protobuf_any]);
+  fileDesc("Ch5kdGt0L2Zsb3cvdjFiZXRhMi9ldmVudHMucHJvdG8SEWR0a3QuZmxvdy52MWJldGEyImgKCklucHV0RXZlbnQSLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIrCgV2YWx1ZRgCIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnlCBrpIA8gBASJCChFJbnB1dFJlcXVlc3RFdmVudBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokImkKC091dHB1dEV2ZW50Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSKwoFdmFsdWUYAiABKAsyFC5nb29nbGUucHJvdG9idWYuQW55Qga6SAPIAQEimgEKF0ludGVyYWN0aW9uUmVxdWVzdEV2ZW50Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSGgoFdG9rZW4YAiABKAlCC7pICMgBAXIDsAEBEjQKBmlucHV0cxgDIAMoCzIkLmR0a3QuZmxvdy52MWJldGEyLkludGVyYWN0aW9uLklucHV0IqEBChhJbnRlcmFjdGlvblJlc3BvbnNlRXZlbnQSLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIaCgV0b2tlbhgCIAEoCUILukgIyAEBcgOwAQESKwoFdmFsdWUYAyABKAsyFC5nb29nbGUucHJvdG9idWYuQW55Qga6SAPIAQESDQoFYWN0b3IYBCABKAkiDwoNU3RvcEZsb3dFdmVudCIUChJUZXJtaW5hdGVGbG93RXZlbnQiEgoQU3VzcGVuZEZsb3dFdmVudCIRCg9SZXN1bWVGbG93RXZlbnQiiQEKDVN0b3BOb2RlRXZlbnQSeAoCaWQYASABKAlCbLpIacgBAXJkMmJeKGNvbm5lY3Rpb25zfGlucHV0c3xnZW5lcmF0b3JzfHZhcnN8YWN0aW9uc3xzdHJlYW1zfGludGVyYWN0aW9uc3xvdXRwdXRzKVwuW2EtekEtWl1bYS16QS1aMC05X10qJCKOAQoSVGVybWluYXRlTm9kZUV2ZW50EngKAmlkGAEgASgJQmy6SGnIAQFyZDJiXihjb25uZWN0aW9uc3xpbnB1dHN8Z2VuZXJhdG9yc3x2YXJzfGFjdGlvbnN8c3RyZWFtc3xpbnRlcmFjdGlvbnN8b3V0cHV0cylcLlthLXpBLVpdW2EtekEtWjAtOV9dKiQijAEKEFN1c3BlbmROb2RlRXZlbnQSeAoCaWQYASABKAlCbLpIacgBAXJkMmJeKGNvbm5lY3Rpb25zfGlucHV0c3xnZW5lcmF0b3JzfHZhcnN8YWN0aW9uc3xzdHJlYW1zfGludGVyYWN0aW9uc3xvdXRwdXRzKVwuW2EtekEtWl1bYS16QS1aMC05X10qJCK/AQoPUmVzdW1lTm9kZUV2ZW50EngKAmlkGAEgASgJQmy6SGnIAQFyZDJiXihjb25uZWN0aW9uc3xpbnB1dHN8Z2VuZXJhdG9yc3x2YXJzfGFjdGlvbnN8c3RyZWFtc3xpbnRlcmFjdGlvbnN8b3V0cHV0cylcLlthLXpBLVpdW2EtekEtWjAtOV9dKiQSKAoFdmFsdWUYAiABKAsyFC5nb29nbGUucHJvdG9idWYuQW55SACIAQFCCAoGX3ZhbHVlIlsKE0NsZWFyQ2FjaGVOb2RlRXZlbnQSRAoCaWQYASABKAlCOLpINcgBAXIwMi5eKGlucHV0c3x2YXJzfGFjdGlvbnMpXC5bYS16QS1aXVthLXpBLVowLTlfXSokIhAKDlN0YXJ0Rmxvd0V2ZW50QtgBChdwcm90by5kdGt0LmZsb3cudjFiZXRhMkILRXZlbnRzUHJvdG9QAVpKZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9mbG93L3YxYmV0YTI7Zmxvd3YxYmV0YTKiAgNERliqAhFEdGt0LkZsb3cuVjFiZXRhMsoCEUR0a3RcRmxvd1xWMWJldGEy4gIdRHRrdFxGbG93XFYxYmV0YTJcR1BCTWV0YWRhdGHqAhNEdGt0OjpGbG93OjpWMWJldGEyYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_flow_v1beta2_spec, file_google_protobuf_any]);
 
 /**
  * InputEvent is an externally-provided value for a specific input node.
@@ -716,6 +716,63 @@ export const ResumeNodeEventSchema: GenMessage<ResumeNodeEvent, {validType: Resu
   messageDesc(file_dtkt_flow_v1beta2_events, 12);
 
 /**
+ * ClearCacheNodeEvent requests that a cache:true node reset its
+ * capture flag so the next upstream event is processed and emitted.
+ * Downstream consumers continue to observe the prior captured value
+ * (via their per-consumer last-seen state) until the producer's next
+ * emit replaces it on their pubsub channel.
+ *
+ * Applies only to nodes whose spec has `cache: true` (Input, Var,
+ * Action). No-op on other node types or when the node has not yet
+ * captured a value. Does not change the node's phase: a cache:true
+ * producer stays in PHASE_RUNNING throughout the capture / drain /
+ * clear cycle.
+ *
+ * @generated from message dtkt.flow.v1beta2.ClearCacheNodeEvent
+ */
+export type ClearCacheNodeEvent = Message<"dtkt.flow.v1beta2.ClearCacheNodeEvent"> & {
+  /**
+   * Fully-qualified node ID whose cache to clear. See StopNodeEvent.id
+   * for the rationale on Format B vs bare id.
+   *
+   * @generated from field: string id = 1;
+   */
+  id: string;
+};
+
+/**
+ * ClearCacheNodeEvent requests that a cache:true node reset its
+ * capture flag so the next upstream event is processed and emitted.
+ * Downstream consumers continue to observe the prior captured value
+ * (via their per-consumer last-seen state) until the producer's next
+ * emit replaces it on their pubsub channel.
+ *
+ * Applies only to nodes whose spec has `cache: true` (Input, Var,
+ * Action). No-op on other node types or when the node has not yet
+ * captured a value. Does not change the node's phase: a cache:true
+ * producer stays in PHASE_RUNNING throughout the capture / drain /
+ * clear cycle.
+ *
+ * @generated from message dtkt.flow.v1beta2.ClearCacheNodeEvent
+ */
+export type ClearCacheNodeEventValid = Message<"dtkt.flow.v1beta2.ClearCacheNodeEvent"> & {
+  /**
+   * Fully-qualified node ID whose cache to clear. See StopNodeEvent.id
+   * for the rationale on Format B vs bare id.
+   *
+   * @generated from field: string id = 1;
+   */
+  id: string;
+};
+
+/**
+ * Describes the message dtkt.flow.v1beta2.ClearCacheNodeEvent.
+ * Use `create(ClearCacheNodeEventSchema)` to create a new message.
+ */
+export const ClearCacheNodeEventSchema: GenMessage<ClearCacheNodeEvent, {validType: ClearCacheNodeEventValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta2_events, 13);
+
+/**
  * StartFlowEvent requests the executor to begin executing the flow graph.
  * Sent by the client after connecting to StreamFlowRunEvents to ensure the
  * event stream is established before any outputs are produced. The flow must
@@ -733,5 +790,5 @@ export type StartFlowEventValid = StartFlowEvent;
  * Use `create(StartFlowEventSchema)` to create a new message.
  */
 export const StartFlowEventSchema: GenMessage<StartFlowEvent, {validType: StartFlowEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_events, 13);
+  messageDesc(file_dtkt_flow_v1beta2_events, 14);
 

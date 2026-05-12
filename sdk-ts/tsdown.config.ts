@@ -3,6 +3,7 @@ import { defineConfig } from "tsdown";
 export default defineConfig({
   entry: [
     "src/cloud/*.ts",
+    "src/flowsdk/**/*.ts",
     "src/proto/**/*.ts",
     "src/protoformsdk/**/*.ts",
     "!**/*.test.ts",

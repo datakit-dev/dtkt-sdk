@@ -281,6 +281,74 @@ message Connection {
 
 // Input declares an external input to the flow, provided at runtime.
 message Input {
+  // BoolBinding holds a boolean value for a Bool-typed input.
+  // The (dtkt.protoform.v1beta1.field) extension on `value` declares the
+  // form element kind so external responders (CLI, web UI, etc.) can
+  // discover it via GetFieldElement and render the right widget --
+  // mirroring the Interaction.*Binding pattern. Without it,
+  // GetInputBinding falls through to "unsupported input type".
+  message BoolBinding {
+    bool value = 1 [
+      (dtkt.protoform.v1beta1.field).confirm.approve = "True",
+      (dtkt.protoform.v1beta1.field).confirm.decline = "False"
+    ];
+  }
+
+  // BytesBinding holds a byte array for a Bytes-typed input. Rendered as
+  // a multiline text widget because bytes payloads (base64, JSON, raw
+  // text) are routinely multi-line.
+  message BytesBinding {
+    bytes value = 1 [(dtkt.protoform.v1beta1.field).input = {multiline_text: true}];
+  }
+
+  // DoubleBinding holds a 64-bit float for a Double-typed input.
+  message DoubleBinding {
+    double value = 1 [(dtkt.protoform.v1beta1.field).input = {}];
+  }
+
+  // FloatBinding holds a 32-bit float for a Float-typed input.
+  message FloatBinding {
+    float value = 1 [(dtkt.protoform.v1beta1.field).input = {}];
+  }
+
+  // Int64Binding holds a signed 64-bit int for an Int64-typed input.
+  message Int64Binding {
+    int64 value = 1 [(dtkt.protoform.v1beta1.field).input = {}];
+  }
+
+  // Uint64Binding holds an unsigned 64-bit int for a Uint64-typed input.
+  message Uint64Binding {
+    uint64 value = 1 [(dtkt.protoform.v1beta1.field).input = {}];
+  }
+
+  // Int32Binding holds a signed 32-bit int for an Int32-typed input.
+  // The native int32 scalar gives protovalidate range checking for free.
+  message Int32Binding {
+    int32 value = 1 [(dtkt.protoform.v1beta1.field).input = {}];
+  }
+
+  // Uint32Binding holds an unsigned 32-bit int for a Uint32-typed input.
+  message Uint32Binding {
+    uint32 value = 1 [(dtkt.protoform.v1beta1.field).input = {}];
+  }
+
+  // StringBinding holds a UTF-8 string for a String-typed input.
+  message StringBinding {
+    string value = 1 [(dtkt.protoform.v1beta1.field).input = {}];
+  }
+
+  // ListBinding holds an ordered collection for a List-typed input.
+  // Rendered as multiline text because the user types a JSON array.
+  message ListBinding {
+    google.protobuf.ListValue value = 1 [(dtkt.protoform.v1beta1.field).input = {multiline_text: true}];
+  }
+
+  // MapBinding holds a key-value collection for a Map-typed input.
+  // Rendered as multiline text because the user types a JSON object.
+  message MapBinding {
+    google.protobuf.Struct value = 1 [(dtkt.protoform.v1beta1.field).input = {multiline_text: true}];
+  }
+
   // Unique identifier for this input within the flow.
   string id = 1 [
     (buf.validate.field).required = true,
@@ -305,16 +373,13 @@ message Input {
     Message message = 14;
   }
 
-  // If true, the input does not stream values to consumers via PubSub.
-  // The latest pushed value is held in the snapshot and read inline by
-  // consumers on each activation. Consumers block until the first value
-  // is available (default value, nullable type, or first push). New
-  // pushes replace the cached value; consumers read the latest at their
-  // next iteration.
+  // If true, the input captures the first resolved value (push, or the
+  // type-level default if the throttle window expires before a push
+  // arrives) and drains subsequent values until cleared. Downstream
+  // consumers see exactly the captured value. To refresh, send a
+  // ClearCacheNodeEvent targeting this input; the next resolved value
+  // then becomes the new captured value.
   bool cache = 20;
-
-  // Bypasses PubSub entirely. The value is provided once and never changes
-  // for the flow's lifetime. The input channel closes after the first value.
 
   // Resolution throttle. Controls how often the input resolves a fresh
   // value. The wait window per attempt is `interval` / `count`. If no
@@ -326,7 +391,8 @@ message Input {
   // default throttle so the fallback chain can fire. If unset and no
   // default is set, the input blocks until a value arrives.
   //
-  // No effect when `cache` is true (cached inputs do not stream).
+  // No effect after `cache: true` has captured: subsequent throttle
+  // ticks are drained without being delivered.
   Rate throttle = 22;
 
   // An ordered pipeline of transforms applied to the input value.
@@ -342,11 +408,16 @@ message Var {
     (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
   ];
 
-  // If true, the var's value is delivered to consumers via the snapshot
-  // (read inline) instead of via a PubSub stream. The var continues to
-  // evaluate on each upstream event, replacing the snapshot value. To
-  // freeze the value at first eval, compose with
-  // `node_control.stop_when: "= this.eval_count >= 1"`.
+  // If true, the var captures its first value-to-consumers and drains
+  // subsequent upstream events without re-evaluating until cleared.
+  // To refresh, send a ClearCacheNodeEvent targeting this var; the
+  // next upstream event then drives a new evaluation.
+  //
+  // When `transforms` are also set, "first value-to-consumers" is the
+  // first value out of the transform pipeline (not the first input
+  // into it). The var may evaluate multiple times to keep feeding the
+  // pipeline until its first output emerges (e.g. when a filter
+  // transform rejects several inputs before one passes).
   bool cache = 2;
 
   // The evaluation type. Exactly one must be set.
@@ -396,15 +467,17 @@ message Action {
     MethodCall call = 4;
   }
 
-  // If true, the action's response is delivered to consumers via the
-  // snapshot (read inline) instead of via a PubSub stream. The action
-  // continues to invoke on each upstream event, replacing the snapshot
-  // value. To freeze the response after first success, compose with
-  // `node_control.stop_when`.
+  // If true, the action invokes the RPC on the first upstream event,
+  // publishes the result (or the retry strategy's Continue value if
+  // retry diverts the error), and drains subsequent upstream events
+  // without re-invoking until cleared. To refresh, send a
+  // ClearCacheNodeEvent targeting this action; the next upstream
+  // event then drives a new RPC.
   //
-  // Orthogonal to `memoize`: `cache` is a consumer-side delivery
-  // transform; `memoize` is producer-side request-hash dedup. They can
-  // be combined.
+  // Orthogonal to `memoize`: `cache` captures a single response across
+  // all subsequent inputs; `memoize` deduplicates by request hash so
+  // distinct requests still produce distinct responses. They can be
+  // combined.
   bool cache = 10;
 
   // Throttle for RPC invocations. Limits how often upstream

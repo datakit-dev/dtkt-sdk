@@ -27,6 +27,7 @@
   "type": "module",
   "exports": {
     "./cloud/*": "./src/cloud/*.ts",
+    "./flowsdk/*": "./src/flowsdk/*.ts",
     "./proto/*": "./src/proto/*.ts",
     "./protoformsdk/*": "./src/protoformsdk/*.ts"
   },
@@ -88,6 +89,7 @@
     "devDependencies": {},
     "exports": {
       "./cloud/*": "./dist/cloud/*.mjs",
+      "./flowsdk/*": "./dist/flowsdk/*.mjs",
       "./proto/*": "./dist/proto/*.mjs",
       "./protoformsdk/*": "./dist/protoformsdk/*.mjs"
     },

@@ -247,6 +247,26 @@ message ResumeNodeEvent {
   optional google.protobuf.Any value = 2;
 }
 
+// ClearCacheNodeEvent requests that a cache:true node reset its
+// capture flag so the next upstream event is processed and emitted.
+// Downstream consumers continue to observe the prior captured value
+// (via their per-consumer last-seen state) until the producer's next
+// emit replaces it on their pubsub channel.
+//
+// Applies only to nodes whose spec has `cache: true` (Input, Var,
+// Action). No-op on other node types or when the node has not yet
+// captured a value. Does not change the node's phase: a cache:true
+// producer stays in PHASE_RUNNING throughout the capture / drain /
+// clear cycle.
+message ClearCacheNodeEvent {
+  // Fully-qualified node ID whose cache to clear. See StopNodeEvent.id
+  // for the rationale on Format B vs bare id.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^(inputs|vars|actions)\\.[a-zA-Z][a-zA-Z0-9_]*$"
+  ];
+}
+
 // StartFlowEvent requests the executor to begin executing the flow graph.
 // Sent by the client after connecting to StreamFlowRunEvents to ensure the
 // event stream is established before any outputs are produced. The flow must

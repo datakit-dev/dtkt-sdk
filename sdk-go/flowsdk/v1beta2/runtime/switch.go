@@ -154,17 +154,28 @@ func (h *switchHandler) runWithTransforms(ctx context.Context) error {
 
 	var sinkCount uint64
 	sink := func(_ context.Context, val *expr.Value, eof bool) error {
+		// cache:true: only the FIRST post-transform value reaches
+		// consumers. See var.go sink for rationale.
+		if !eof && h.cache.isCaptured() {
+			return nil
+		}
 		sinkCount++
 		phase := flowv1beta2.RunSnapshot_PHASE_RUNNING
 		if eof {
 			phase = flowv1beta2.RunSnapshot_PHASE_SUCCEEDED
 		}
-		return publishNode(h.pubsub, h.topic, flowv1beta2.RunSnapshot_VarNode_builder{
+		if err := publishNode(h.pubsub, h.topic, flowv1beta2.RunSnapshot_VarNode_builder{
 			Id:        h.id,
 			Value:     val,
 			EvalCount: sinkCount,
 			Phase:     phase,
-		}.Build())
+		}.Build()); err != nil {
+			return err
+		}
+		if !eof {
+			h.cache.markCaptured()
+		}
+		return nil
 	}
 	onState := newStateCallback(h.pubsub, h.topic, len(h.transforms.steps),
 		func(t []*flowv1beta2.RunSnapshot_Transform) executor.StateNode {
@@ -215,7 +226,8 @@ func (h *switchHandler) runWithTransforms(ctx context.Context) error {
 			if err := h.transformPS.Publish(inputTopic, pubsub.NewMessage(resultExpr)); err != nil {
 				return err
 			}
-			h.cache.markCaptured()
+			// markCaptured fires inside the sink (post-transforms) so the
+			// cached value matches what consumers actually see.
 		}
 		return h.transformPS.Publish(inputTopic, pubsub.NewMessage(newEOFValue()))
 	})
