@@ -34,8 +34,8 @@ tasks:
   generate:
     desc: Code generation
     cmds:
-      - task: go:generate
       - buf generate
+      - task: go:generate
 
   vhs-tapes:
     desc: Generate vhs tapes

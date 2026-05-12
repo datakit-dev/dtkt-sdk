@@ -78,7 +78,7 @@ The software in this repository may directly or indirectly depend on the followi
 - **github.com/santhosh-tekuri/jsonschema/v6** - [Apache-2.0](https://github.com/santhosh-tekuri/jsonschema/blob/v6.0.2/LICENSE)
 - **github.com/shoenig/go-m1cpu** - [MPL-2.0](https://github.com/shoenig/go-m1cpu/blob/v0.1.7/LICENSE)
 - **github.com/skeema/knownhosts** - [Apache-2.0](https://github.com/skeema/knownhosts/blob/v1.3.1/LICENSE)
-- **github.com/wk8/go-ordered-map/v2** - [Apache-2.0](https://github.com/wk8/go-ordered-map/blob/v2.1.8/LICENSE)
+- **github.com/pb33f/ordered-map/v2** - [Apache-2.0](https://github.com/wk8/go-ordered-map/blob/v2.1.8/LICENSE)
 - **github.com/xanzy/ssh-agent** - [Apache-2.0](https://github.com/xanzy/ssh-agent/blob/v0.3.3/LICENSE)
 - **github.com/zclconf/go-cty-yaml** - [Apache-2.0](https://github.com/zclconf/go-cty-yaml/blob/v1.1.0/LICENSE)
 - **github.com/zitadel/logging** - [Apache-2.0](https://github.com/zitadel/logging/blob/v0.6.2/LICENSE)

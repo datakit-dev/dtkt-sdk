@@ -8,7 +8,7 @@ import (
 
 var (
 	dtktTypePattern      = regexp.MustCompile(`^dtkt\.([^\.]+)\.([^\.]+)\.?(.*)`)
-	wellKnownTypePattern = regexp.MustCompile(`^(google|buf)\.(validate|protobuf|api|type|geo|rpc)\.`)
+	wellKnownTypePattern = regexp.MustCompile(`^(google|buf|cel)\.(validate|protobuf|api|type|geo|rpc|longrunning|expr)\.`)
 )
 
 const AnyTypeUrlPrefix = "type.googleapis.com/"

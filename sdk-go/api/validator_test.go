@@ -10,7 +10,7 @@ func TestRequestValidator(t *testing.T) {
 	request := &corev1.CreateConnectionRequest{
 		Connection: &corev1.Connection{},
 	}
-	validator := &RequestFieldValidator{request: request}
+	validator := &requestFieldValidator{request: request}
 
 	if validator.ShouldValidate(request.Connection.ProtoReflect(), request.Connection.ProtoReflect().Descriptor().Fields().ByName("name")) {
 		t.Error("expected name field to be skipped for validation on CreateConnectionRequest")
