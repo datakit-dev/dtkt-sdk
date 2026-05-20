@@ -171,7 +171,7 @@ func resolveRequestValue(req *compiledRequest, act *activation, vars map[string]
 // transformResponse evaluates the response CEL expression with this.response
 // bound to the raw RPC result. If responseProg is nil, falls back to
 // responseToExpr (current behavior).
-func transformResponse(responseProg cel.Program, resp proto.Message, adapter types.Adapter) (*expr.Value, error) {
+func transformResponse(responseProg cel.Program, resp proto.Message, env shared.Env) (*expr.Value, error) {
 	if responseProg == nil {
 		return responseToExpr(resp)
 	}
@@ -181,7 +181,7 @@ func transformResponse(responseProg cel.Program, resp proto.Message, adapter typ
 	}
 	result, err := evalCEL(responseProg, map[string]any{
 		"this": map[string]any{
-			"response": exprToRefVal(adapter, respVal),
+			"response": exprToRefVal(env, respVal),
 		},
 	})
 	if err != nil {

@@ -13,7 +13,7 @@ func TestConformance(t *testing.T) {
 		t.Helper()
 		return memory.New()
 	}, outboxtest.Options{
-		EventReader: func(t *testing.T, o outbox.Outbox) outbox.EventReader {
+		EventReader: func(t *testing.T, o outbox.Outbox) outboxtest.Reader {
 			t.Helper()
 			return o.(*memory.Store)
 		},

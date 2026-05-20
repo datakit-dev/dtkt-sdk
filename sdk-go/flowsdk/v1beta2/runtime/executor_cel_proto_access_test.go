@@ -30,7 +30,7 @@ func TestGraph_CEL_Map_TopLevelField(t *testing.T) {
 		graph := loadFlow(t, "cel_struct_subfield.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", map[string]any{
 			"name": "alice",
@@ -52,7 +52,7 @@ func TestGraph_CEL_Map_DeepNestedField(t *testing.T) {
 		graph := loadFlow(t, "cel_struct_nested.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", map[string]any{
 			"name": "alice",
@@ -77,7 +77,7 @@ func TestGraph_CEL_List_Index(t *testing.T) {
 		graph := loadFlow(t, "cel_list_index.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", []any{"a", "b", "c"})
 
@@ -96,7 +96,7 @@ func TestGraph_CEL_Struct_WithListOfStructs(t *testing.T) {
 		graph := loadFlow(t, "cel_struct_with_list.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", map[string]any{
 			"items": []any{
@@ -121,7 +121,7 @@ func TestGraph_CEL_Size_OfNestedList(t *testing.T) {
 		graph := loadFlow(t, "cel_size_nested.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", map[string]any{
 			"tags": []any{"a", "b", "c", "d"},
@@ -148,7 +148,7 @@ func TestGraph_CEL_StructpbStruct_Subfield(t *testing.T) {
 		require.NoError(t, err)
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", s)
 
@@ -175,7 +175,7 @@ func TestGraph_CEL_StructpbValue_Subfield(t *testing.T) {
 		v := structpb.NewStructValue(s)
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", v)
 
@@ -194,7 +194,7 @@ func TestGraph_CEL_Has_OptionalField(t *testing.T) {
 		graph := loadFlow(t, "cel_has_optional.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Two values: one with the nickname field set, one without.
 		feedInput(ps, "inputs.x",
@@ -220,7 +220,7 @@ func TestGraph_CEL_Numeric_GoIntStaysInt64(t *testing.T) {
 		graph := loadFlow(t, "cel_numeric_int.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", map[string]any{"count": int64(7)})
 
@@ -243,7 +243,7 @@ func TestGraph_CEL_Numeric_StructpbStaysDouble(t *testing.T) {
 		require.NoError(t, err)
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", s)
 
@@ -266,7 +266,7 @@ func TestGraph_CEL_MissingField_NoHas_Errors(t *testing.T) {
 		graph := loadFlow(t, "cel_missing_field.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", map[string]any{"name": "alice"})
 
@@ -284,7 +284,7 @@ func TestGraph_CEL_WKT_Timestamp_Comparison(t *testing.T) {
 		graph := loadFlow(t, "cel_wkt_timestamp.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		later := timestamppb.New(time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC))
 		earlier := timestamppb.New(time.Date(2010, 1, 1, 0, 0, 0, 0, time.UTC))
@@ -307,7 +307,7 @@ func TestGraph_CEL_WKT_Duration_Comparison(t *testing.T) {
 		graph := loadFlow(t, "cel_wkt_duration.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", durationpb.New(90*time.Second), durationpb.New(30*time.Second))
 
@@ -329,7 +329,7 @@ func TestGraph_CEL_Comprehension_All(t *testing.T) {
 		graph := loadFlow(t, "cel_comprehension_all.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x",
 			map[string]any{"items": []any{
@@ -359,7 +359,7 @@ func TestGraph_CEL_Comprehension_Exists(t *testing.T) {
 		graph := loadFlow(t, "cel_comprehension_exists.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x",
 			map[string]any{"items": []any{
@@ -388,7 +388,7 @@ func TestGraph_CEL_Comprehension_Filter(t *testing.T) {
 		graph := loadFlow(t, "cel_comprehension_filter.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", map[string]any{"items": []any{
 			map[string]any{"name": "a", "n": int64(1)},
@@ -414,7 +414,7 @@ func TestGraph_CEL_Comprehension_Map(t *testing.T) {
 		graph := loadFlow(t, "cel_comprehension_map.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", map[string]any{"items": []any{
 			map[string]any{"n": int64(10)},
@@ -443,7 +443,7 @@ func TestGraph_CEL_VarsNamespace_NestedField(t *testing.T) {
 		graph := loadFlow(t, "cel_var_namespace.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", "hi")
 
@@ -475,7 +475,7 @@ func TestGraph_CEL_TypedProto_Package_NestedAccess(t *testing.T) {
 		graph := loadFlow(t, "cel_package_access.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.trigger", int64(1))
 
@@ -507,7 +507,7 @@ func TestGraph_CEL_ActionResponse_PackageField(t *testing.T) {
 		graph := loadFlow(t, "cel_action_response_package.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(1))
 
@@ -533,7 +533,7 @@ func TestGraph_CEL_StreamsNamespace_TypedProto(t *testing.T) {
 		graph := loadFlow(t, "cel_stream_namespace.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.trigger", int64(1))
 
@@ -567,7 +567,7 @@ func TestGraph_CEL_ActionRequest_FromNestedInput(t *testing.T) {
 		opts := append(extraOpts, echoRequestCaptureOptions(t, &captured)...)
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", map[string]any{
 			"user": map[string]any{

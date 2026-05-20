@@ -14,7 +14,7 @@ func TestGraph_FanOut_TwoVars(t *testing.T) {
 		graph := loadFlow(t, "fanout_two_vars.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1, 2, 3, 4)
 		ctx := testContext(t)
@@ -34,7 +34,7 @@ func TestGraph_FanOut_TwoOutputs(t *testing.T) {
 		graph := loadFlow(t, "fanout_two_outputs.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1, 2, 3)
 		ctx := testContext(t)
@@ -54,7 +54,7 @@ func TestGraph_FanOut_VarToThreeOutputs(t *testing.T) {
 		graph := loadFlow(t, "fanout_var_to_three_outputs.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// x=1 → base=101, x=2 → base=102, x=5 → base=105
 		feedInput(pubsub, "inputs.x", 1, 2, 5)
@@ -77,7 +77,7 @@ func TestGraph_FanOut_ParallelChains(t *testing.T) {
 		graph := loadFlow(t, "fanout_parallel_chains.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// x=1,2,3,4,5
 		// Chain A (evens *10): 2→20, 4→40
@@ -100,7 +100,7 @@ func TestGraph_FanOut_Wide(t *testing.T) {
 		graph := loadFlow(t, "fanout_wide.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 3)
 		ctx := testContext(t)

@@ -14,7 +14,7 @@ func TestGraph_Scan_RunningTotal(t *testing.T) {
 		graph := loadFlow(t, "accum_scan_running_total.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 10, 20, 30)
 		ctx := testContext(t)
@@ -30,7 +30,7 @@ func TestGraph_Scan_RunningProduct(t *testing.T) {
 		graph := loadFlow(t, "accum_scan_running_product.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 2,3,4 → product: 2, 6, 24
 		feedInput(pubsub, "inputs.x", 2, 3, 4)
@@ -49,7 +49,7 @@ func TestGraph_Scan_NonZeroInitial(t *testing.T) {
 		graph := loadFlow(t, "accum_scan_nonzero_initial.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// start=100, +1=101, +2=103, +3=106
 		feedInput(pubsub, "inputs.x", 1, 2, 3)
@@ -68,7 +68,7 @@ func TestGraph_Reduce_EventWindow(t *testing.T) {
 		graph := loadFlow(t, "accum_reduce_event_window.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1, 2, 3, 4, 5)
 		ctx := testContext(t)
@@ -86,7 +86,7 @@ func TestGraph_Reduce_EventWindow_NonZeroInitial(t *testing.T) {
 		graph := loadFlow(t, "accum_reduce_event_nonzero.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// initial=50, +10+20 = 80
 		feedInput(pubsub, "inputs.x", 10, 20)
@@ -107,7 +107,7 @@ func TestGraph_Reduce_FixedWindow(t *testing.T) {
 		graph := loadFlow(t, "accum_reduce_fixed_window.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(pubsub, testTopics, extraOpts...).Execute(ctx, graph)
@@ -126,7 +126,7 @@ func TestGraph_Reduce_SlidingWindow(t *testing.T) {
 		graph := loadFlow(t, "accum_reduce_sliding_window.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(pubsub, testTopics, extraOpts...).Execute(ctx, graph)
@@ -145,7 +145,7 @@ func TestGraph_Reduce_SessionWindow(t *testing.T) {
 		graph := loadFlow(t, "accum_reduce_session_window.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(pubsub, testTopics, extraOpts...).Execute(ctx, graph)
@@ -164,7 +164,7 @@ func TestGraph_Reduce_GroupByKey(t *testing.T) {
 		graph := loadFlow(t, "accum_reduce_group_by_key.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 1..6: even=2+4+6=12, odd=1+3+5=9 → two results
 		feedInput(pubsub, "inputs.x", 1, 2, 3, 4, 5, 6)
@@ -189,7 +189,7 @@ func TestGraph_Reduce_SingleValue(t *testing.T) {
 		graph := loadFlow(t, "accum_reduce_single_value.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 42)
 		ctx := testContext(t)
@@ -205,7 +205,7 @@ func TestGraph_Reduce_EmptyInput(t *testing.T) {
 		graph := loadFlow(t, "accum_reduce_empty_input.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x")
 		ctx := testContext(t)
@@ -221,7 +221,7 @@ func TestGraph_Reduce_FilterThenReduce(t *testing.T) {
 		graph := loadFlow(t, "accum_reduce_filter_then_reduce.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1, 2, 3)
 		ctx := testContext(t)
@@ -239,7 +239,7 @@ func TestGraph_Scan_StringConcat(t *testing.T) {
 		graph := loadFlow(t, "accum_scan_string_concat.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.word", "hello", "world", "!")
 		ctx := testContext(t)
@@ -261,7 +261,7 @@ func TestGraph_Reduce_GroupBy_FixedWindow(t *testing.T) {
 		graph := loadFlow(t, "accum_reduce_group_by_fixed.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 1..6: even=(2+4+6)=12, odd=(1+3+5)=9
 		feedInput(pubsub, "inputs.x", 1, 2, 3, 4, 5, 6)
@@ -286,7 +286,7 @@ func TestGraph_Reduce_MultiValueNoWindow(t *testing.T) {
 		graph := loadFlow(t, "accum_reduce_multivalue_no_window.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 10, 20, 30, 40, 50)
 		ctx := testContext(t)

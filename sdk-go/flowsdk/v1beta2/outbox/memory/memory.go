@@ -10,7 +10,7 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/outbox"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -20,13 +20,9 @@ import (
 // on Commit.
 type Store struct {
 	mu           sync.Mutex
-	records      []record
+	records      []*pubsub.Message
 	state        *flowv1beta2.RunSnapshot
 	lastEventUID *uuid.UUID
-}
-
-type record struct {
-	msg *pubsub.Message
 }
 
 // New creates a new in-memory outbox store.
@@ -34,8 +30,15 @@ func New() *Store {
 	return &Store{}
 }
 
-// Begin opens a new transaction.
+// Begin opens a new transaction. The returned Tx is backed by the same memTx
+// as BeginStateful but exposed via the narrower interface.
 func (s *Store) Begin(_ context.Context) (outbox.Tx, error) {
+	return &memTx{store: s}, nil
+}
+
+// BeginStateful opens a new transaction with materialized-state writes.
+// Backed by the same memTx as Begin.
+func (s *Store) BeginStateful(_ context.Context) (outbox.StatefulTx, error) {
 	return &memTx{store: s}, nil
 }
 
@@ -52,11 +55,11 @@ func (s *Store) SnapshotAt(_ context.Context, uid uuid.UUID) (*flowv1beta2.RunSn
 	}
 
 	snap := &flowv1beta2.RunSnapshot{}
-	for _, r := range s.records {
-		if bytes.Compare(r.msg.UUID[:], uid[:]) > 0 {
+	for _, msg := range s.records {
+		if bytes.Compare(msg.UUID[:], uid[:]) > 0 {
 			break
 		}
-		if event, ok := r.msg.Payload.(*flowv1beta2.RunSnapshot_FlowEvent); ok {
+		if event, ok := msg.Payload.(*flowv1beta2.RunSnapshot_FlowEvent); ok {
 			outbox.ApplyFlowEvent(snap, event)
 		}
 	}
@@ -72,7 +75,7 @@ func (s *Store) ReadEvents(_ context.Context, afterUID uuid.UUID, limit int) ([]
 	startIdx := 0
 	if afterUID != (uuid.UUID{}) {
 		for i := range s.records {
-			if s.records[i].msg.UUID == afterUID {
+			if s.records[i].UUID == afterUID {
 				startIdx = i + 1
 				break
 			}
@@ -81,7 +84,7 @@ func (s *Store) ReadEvents(_ context.Context, afterUID uuid.UUID, limit int) ([]
 
 	var result []*pubsub.Message
 	for i := startIdx; i < len(s.records); i++ {
-		result = append(result, s.records[i].msg)
+		result = append(result, s.records[i])
 		if len(result) >= limit {
 			break
 		}
@@ -90,7 +93,7 @@ func (s *Store) ReadEvents(_ context.Context, afterUID uuid.UUID, limit int) ([]
 }
 
 // commit appends staged records to the store.
-func (s *Store) commit(staged []record, stagedState *flowv1beta2.RunSnapshot, stagedEventUID *uuid.UUID) {
+func (s *Store) commit(staged []*pubsub.Message, stagedState *flowv1beta2.RunSnapshot, stagedEventUID *uuid.UUID) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.records = append(s.records, staged...)
@@ -104,7 +107,7 @@ func (s *Store) commit(staged []record, stagedState *flowv1beta2.RunSnapshot, st
 // memTx is an in-memory transaction.
 type memTx struct {
 	store          *Store
-	staged         []record
+	staged         []*pubsub.Message
 	stagedState    *flowv1beta2.RunSnapshot
 	stagedEventUID *uuid.UUID
 	stateWritten   bool
@@ -166,9 +169,7 @@ func (ts *txStorage) Store(_ context.Context, msg *pubsub.Message) error {
 	if ts.tx.done {
 		return fmt.Errorf("transaction already completed")
 	}
-	ts.tx.staged = append(ts.tx.staged, record{
-		msg: msg,
-	})
+	ts.tx.staged = append(ts.tx.staged, msg)
 	return nil
 }
 
@@ -176,9 +177,7 @@ func (ts *txStorage) Store(_ context.Context, msg *pubsub.Message) error {
 func (s *Store) Store(_ context.Context, msg *pubsub.Message) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.records = append(s.records, record{
-		msg: msg,
-	})
+	s.records = append(s.records, msg)
 	return nil
 }
 
@@ -212,10 +211,13 @@ func cloneRunSnapshot(snap *flowv1beta2.RunSnapshot) *flowv1beta2.RunSnapshot {
 
 // Compile-time interface assertions.
 var (
-	_ outbox.Storage     = (*Store)(nil)
-	_ outbox.EventReader = (*Store)(nil)
-	_ outbox.TxBeginner  = (*Store)(nil)
-	_ outbox.Outbox      = (*Store)(nil)
-	_ outbox.Storage     = (*txStorage)(nil)
-	_ outbox.StateWriter = (*memStateWriter)(nil)
+	_ outbox.Storage            = (*Store)(nil)
+	_ outbox.EventReader        = (*Store)(nil)
+	_ outbox.SnapshotReader     = (*Store)(nil)
+	_ outbox.TxBeginner         = (*Store)(nil)
+	_ outbox.StatefulTxBeginner = (*Store)(nil)
+	_ outbox.Outbox             = (*Store)(nil)
+	_ outbox.StatefulOutbox     = (*Store)(nil)
+	_ outbox.Storage            = (*txStorage)(nil)
+	_ outbox.StateWriter        = (*memStateWriter)(nil)
 )

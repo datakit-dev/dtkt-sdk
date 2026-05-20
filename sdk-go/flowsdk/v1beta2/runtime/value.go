@@ -16,7 +16,7 @@ import (
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -45,16 +45,23 @@ func isEOFValue(v *expr.Value) bool {
 }
 
 // exprToRefVal converts a cel.expr.Value to a CEL ref.Val for use in CEL evaluation.
-// Delegates to cel.ProtoAsValue with the given adapter for proper custom type resolution.
-func exprToRefVal(adapter types.Adapter, v *expr.Value) ref.Val {
+// Routes through shared.ExprValueToNative (which uses env.Resolver() for Any
+// unmarshalling, recursively through Map/List) and then env.TypeAdapter().
+// NativeToValue (the canonical adapter entrypoint, which registers via the
+// resolver and applies proto/json field aliasing). This is the established
+// codebase pattern (used by exprToMessage on the request side and by v1beta1's
+// NativeToValue(liveMsg) path); cel.ProtoAsValue is NOT used here because its
+// hardcoded global-registry Any unmarshal cannot resolve runtime dynamicpb
+// connector types (U10).
+func exprToRefVal(env shared.Env, v *expr.Value) ref.Val {
 	if v == nil {
 		return types.NullValue
 	}
-	rv, err := cel.ProtoAsValue(adapter, v)
+	native, err := shared.ExprValueToNative(env, v)
 	if err != nil {
 		return types.NewErr("converting expr to ref.Val: %v", err)
 	}
-	return rv
+	return env.TypeAdapter().NativeToValue(native)
 }
 
 // refValToExpr converts a CEL ref.Val to a cel.expr.Value for wire serialization.

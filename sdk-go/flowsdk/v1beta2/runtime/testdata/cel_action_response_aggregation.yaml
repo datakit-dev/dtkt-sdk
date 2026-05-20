@@ -1,0 +1,19 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: cel_action_response_aggregation
+  description: "Action's call.response transform wraps the connector response in a LIST so the action's published value is a *expr.Value ListValue of Any-wrapped ObjectValues. A downstream output reads a nested element's field, exercising shared.ExprValueToNative's Map/List recursion at the consuming side."
+  inputs:
+    - id: x
+      string: {}
+  actions:
+    - id: run
+      call:
+        connection: echo
+        method: echo.Service.Echo
+        request:
+          payload: "= inputs.x.value"
+        response: "= [this.response, this.response]"
+  outputs:
+    - id: second
+      value: "= actions.run.value[1].payload"

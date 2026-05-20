@@ -9,11 +9,12 @@ import (
 	expr "cel.dev/expr"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/cache"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/cache"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/outbox"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/rpc"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 	"golang.org/x/sync/errgroup"
 )
@@ -55,12 +56,19 @@ type Executor struct {
 	topics               executor.Topics
 	connectors           rpc.ConnectorProvider
 	cache                cache.Cache
-	outbox               outbox.Outbox
+	outbox               outbox.StatefulOutbox
+	subscriber           *outbox.SubscriberAdapter
 	defaultInputThrottle *flowv1beta2.Rate
 	interactionPrompt    chan<- *flowv1beta2.InteractionRequestEvent
 	interactionResponse  <-chan *flowv1beta2.InteractionResponseEvent
 	inputRequests        chan<- *flowv1beta2.InputRequestEvent
 	errorStrategy        flowv1beta2.ErrorStrategy
+	// platformResolver is the SDK platform-types resolver (api.GlobalResolver()
+	// by default; overridable via WithPlatformResolver). It is the last member
+	// of the flow-global union built by buildCELEnv and carries platform/wkt
+	// types (wrappers, struct, Any, timestamp/duration, flow protos) that the
+	// declared connectors' descriptor closures do not necessarily include.
+	platformResolver shared.Resolver
 
 	// Per-execution state, protected by mu. Set during Execute, nil otherwise.
 	mu            sync.Mutex
@@ -81,6 +89,13 @@ type Executor struct {
 	// cacheBackend pointers; the executor uses this map for ClearCache
 	// lookup. Producer-side captured flag lives on the cacheBackend.
 	cacheBackends map[string]*cacheBackend
+
+	// terminalState is the flow-level terminal FlowState (phase + error +
+	// timings) the executor produces and publishes at the end of a run.
+	// Deliberately NOT cleared by clearRunState: it must remain readable
+	// via TerminalState after Execute returns (that is its only contract).
+	// Reset to nil at the start of each Execute for reuse safety.
+	terminalState *flowv1beta2.RunSnapshot_FlowState
 }
 
 type Option func(*Executor)
@@ -88,6 +103,21 @@ type Option func(*Executor)
 func WithConnectors(conns rpc.ConnectorProvider) Option {
 	return func(e *Executor) {
 		e.connectors = conns
+	}
+}
+
+// WithPlatformResolver overrides the platform-types resolver that forms
+// the last member of the flow-global type-resolution union (after the
+// run's declared connectors, in spec order). When unset, buildCELEnv
+// defaults to api.GlobalResolver() - the SDK's named platform-types
+// resolver (the same default v1beta1 uses in flowsdk/v1beta1/runtime/
+// env.go). Override for tests that need to isolate from the SDK's
+// global proto set, or for future per-runtime-boundary deployments
+// (e.g. a node running in its own pod that wants to scope the platform
+// layer to exactly the protos it needs).
+func WithPlatformResolver(r shared.Resolver) Option {
+	return func(e *Executor) {
+		e.platformResolver = r
 	}
 }
 
@@ -106,9 +136,20 @@ func WithCache(c cache.Cache) Option {
 	}
 }
 
-func WithOutbox(o outbox.Outbox) Option {
+func WithOutbox(o outbox.StatefulOutbox) Option {
 	return func(e *Executor) {
 		e.outbox = o
+	}
+}
+
+// WithSubscriber injects an externally-owned SubscriberAdapter that the
+// outbox relay will read from. Callers that want to nudge the poll loop
+// from outside the executor (e.g. an ent commit hook calling Wake) should
+// construct the adapter, pass it here, and retain a reference. When unset,
+// Execute creates its own adapter internally with a fixed poll interval.
+func WithSubscriber(s *outbox.SubscriberAdapter) Option {
+	return func(e *Executor) {
+		e.subscriber = s
 	}
 }
 
@@ -427,7 +468,27 @@ func (e *Executor) clearRunState() {
 	e.cacheBackends = nil
 }
 
+// TerminalState returns the flow-level terminal FlowState the executor
+// produced for the most recent run (phase, error, start/stop/event
+// times) - the same object published on the flow topic. The bool is
+// false until Execute has published the terminal (i.e. only valid after
+// Execute returns); callers must not rely on it mid-run.
+func (e *Executor) TerminalState() (*flowv1beta2.RunSnapshot_FlowState, bool) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	if e.terminalState == nil {
+		return nil, false
+	}
+	return e.terminalState, true
+}
+
 func (e *Executor) Execute(ctx context.Context, graph *flowv1beta2.Graph) error {
+	// Reset terminal state so TerminalState reports "not done" until this
+	// run publishes its own terminal (reuse safety; single-use in prod).
+	e.mu.Lock()
+	e.terminalState = nil
+	e.mu.Unlock()
+
 	// Wrap context so Terminate() can cancel execution independently.
 	runCtx, runCancel := context.WithCancel(ctx)
 	defer runCancel()
@@ -461,7 +522,11 @@ func (e *Executor) Execute(ctx context.Context, graph *flowv1beta2.Graph) error 
 		// cancellation. Its lifetime is controlled by CloseWhenDrained
 		// (normal) or the deferred relayCancel (early exit).
 		relayCtx, relayCancel := context.WithCancel(context.Background())
-		outboxSub = outbox.NewSubscriber(e.outbox, 10*time.Millisecond)
+		if e.subscriber != nil {
+			outboxSub = e.subscriber
+		} else {
+			outboxSub = outbox.NewSubscriber(e.outbox, 10*time.Millisecond)
+		}
 		relay := outbox.NewRelay(outboxSub, e.pubsub)
 		fwdDone = make(chan error, 1)
 		go func() {
@@ -494,7 +559,7 @@ func (e *Executor) Execute(ctx context.Context, graph *flowv1beta2.Graph) error 
 	}
 
 	// Build CEL environment and validate request schemas.
-	celEnv, err := buildCELEnvAndValidate(graph, resolved)
+	celEnv, err := buildCELEnvAndValidate(graph, resolved, e.platformResolver)
 	if err != nil {
 		return err
 	}
@@ -623,7 +688,11 @@ func (e *Executor) Execute(ctx context.Context, graph *flowv1beta2.Graph) error 
 	default:
 		terminalState.Phase = flowv1beta2.RunSnapshot_PHASE_SUCCEEDED
 	}
-	if pubErr := publishFlowState(handlerPub, e.topics.Flow(), terminalState.Build()); pubErr != nil && err == nil {
+	builtTerminal := terminalState.Build()
+	e.mu.Lock()
+	e.terminalState = builtTerminal
+	e.mu.Unlock()
+	if pubErr := publishFlowState(handlerPub, e.topics.Flow(), builtTerminal); pubErr != nil && err == nil {
 		err = pubErr
 	}
 

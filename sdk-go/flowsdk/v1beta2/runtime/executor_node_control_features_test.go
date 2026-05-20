@@ -26,7 +26,7 @@ func TestNodeControl_Var_Switch_StopWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_var_switch_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(5), int64(50), int64(150))
 
@@ -51,7 +51,7 @@ func TestNodeControl_Var_Transforms_StopWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_var_transforms_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(2), int64(4), int64(5), int64(6), int64(8))
 
@@ -82,7 +82,7 @@ func TestNodeControl_Action_Memoize_StopWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_action_memoize_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Repeat the same input -> first miss, second is a cache hit.
 		feedInput(ps, "inputs.msg", int64(1), int64(1), int64(3), int64(5))
@@ -120,7 +120,7 @@ func TestNodeControl_Action_Throttle_StopWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_action_throttle_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(1), int64(2))
 
@@ -150,7 +150,7 @@ func TestNodeControl_Stream_Throttle_StopWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_stream_throttle_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", "hello", "world")
 
@@ -192,7 +192,7 @@ func TestNodeControl_SuspendReentry(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_suspend_reentry.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(1), int64(2))
 		ctx := testContext(t)
@@ -238,7 +238,7 @@ func TestNodeControl_WithErrorStrategy_Continue(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_with_error_strategy_continue.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(1), int64(2), int64(3), int64(4), int64(5))
 
@@ -287,7 +287,7 @@ func TestNodeControl_StopOnSuspended(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_var_suspend.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(7))
 		ctx := testContext(t)

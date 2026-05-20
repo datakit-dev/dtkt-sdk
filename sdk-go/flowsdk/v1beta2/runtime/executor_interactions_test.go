@@ -30,7 +30,7 @@ func TestGraph_Interaction_Basic(t *testing.T) {
 		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 4)
 		response := make(chan *flowv1beta2.InteractionResponseEvent, 4)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Auto-respond to interaction prompts.
 		// Each prompt's id must be bare (Format A) per the protobuf
@@ -68,7 +68,7 @@ func TestGraph_Interaction_MultiplePrompts(t *testing.T) {
 		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 4)
 		response := make(chan *flowv1beta2.InteractionResponseEvent, 4)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Auto-respond with incrementing values.
 		var count int64
@@ -102,7 +102,7 @@ func TestGraph_Interaction_MissingOption(t *testing.T) {
 		graph := loadFlow(t, "interaction_missing_option.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
@@ -120,7 +120,7 @@ func TestGraph_Interaction_ResponseClose(t *testing.T) {
 		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 4)
 		response := make(chan *flowv1beta2.InteractionResponseEvent, 4)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Respond once, then close the response channel.
 		go func() {
@@ -153,7 +153,7 @@ func TestGraph_Interaction_Transforms(t *testing.T) {
 		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 4)
 		response := make(chan *flowv1beta2.InteractionResponseEvent, 4)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		go func() {
 			for p := range prompt {
@@ -195,7 +195,7 @@ func TestGraph_Interaction_FormElements_All(t *testing.T) {
 		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 4)
 		response := make(chan *flowv1beta2.InteractionResponseEvent, 4)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		var promptCount int
 		go func() {
@@ -238,7 +238,7 @@ func TestGraph_Interaction_FormInputs(t *testing.T) {
 		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 4)
 		response := make(chan *flowv1beta2.InteractionResponseEvent, 4)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		var promptCount int
 		go func() {
@@ -275,7 +275,7 @@ func TestGraph_Interaction_WrongTokenDropped(t *testing.T) {
 		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 4)
 		response := make(chan *flowv1beta2.InteractionResponseEvent, 4)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// First send a response with the wrong token (dropped), then send correct.
 		go func() {
@@ -303,11 +303,11 @@ func TestGraph_Interaction_WrongTokenDropped(t *testing.T) {
 	})
 }
 
-// buildInteractionStructResponse mirrors the CLI's production response
-// shape (see dtkt-cli/internal/flowio/io.go HandleInteraction): each
-// input's binding proto is converted to a JSON-friendly map (preserving
-// the binding's field shape) and wrapped as a struct keyed by input id,
-// then encoded as Any(google.protobuf.Struct).
+// buildInteractionStructResponse mirrors the canonical production
+// interaction-response shape: each input's binding proto is converted
+// to a JSON-friendly map (preserving the binding's field shape) and
+// wrapped as a struct keyed by input id, then encoded as
+// Any(google.protobuf.Struct).
 //
 // CEL access through this shape is uniform regardless of input count:
 //
@@ -339,11 +339,10 @@ func buildInteractionStructResponse(t *testing.T, bindings map[string]proto.Mess
 	return any
 }
 
-// TestGraph_Interaction_TickerVarRepro reproduces the
-// dtkt-cli/hack/flows/tickerv2_interactive.yaml topology that the
-// simpler interaction_output_filter_idiomatic fixture failed to
-// reproduce. Production logs showed a "no such key: discard" error
-// from the output's CEL eval despite the matching idiomatic test
+// TestGraph_Interaction_TickerVarRepro reproduces an interactive-ticker
+// topology that the simpler interaction_output_filter_idiomatic fixture
+// failed to reproduce. Production logs showed a "no such key: discard"
+// error from the output's CEL eval despite the matching idiomatic test
 // passing. Difference: this fixture introduces a generator + var
 // upstream of the interaction (title CEL references both), which
 // affects graph wiring and node-iteration cadence.
@@ -363,7 +362,7 @@ func TestGraph_Interaction_TickerVarRepro(t *testing.T) {
 		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 16)
 		response := make(chan *flowv1beta2.InteractionResponseEvent, 16)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		const maxIters uint64 = 5
 		var promptCount int
@@ -416,7 +415,7 @@ func TestGraph_Interaction_TickerVarRepro_DiscardAll(t *testing.T) {
 		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 16)
 		response := make(chan *flowv1beta2.InteractionResponseEvent, 16)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		const maxIters uint64 = 5
 		var promptCount int
@@ -461,7 +460,7 @@ func TestGraph_Interaction_TickerOnlyRepro(t *testing.T) {
 		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 16)
 		response := make(chan *flowv1beta2.InteractionResponseEvent, 16)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		const maxIters uint64 = 5
 		var promptCount int
@@ -506,7 +505,7 @@ func TestGraph_Interaction_VarRepro(t *testing.T) {
 		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 16)
 		response := make(chan *flowv1beta2.InteractionResponseEvent, 16)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		var promptCount int
 		go func() {
@@ -550,7 +549,7 @@ func TestGraph_Interaction_TickerVarRepro_Mixed(t *testing.T) {
 		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 16)
 		response := make(chan *flowv1beta2.InteractionResponseEvent, 16)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		const maxIters uint64 = 6
 		// Pattern: alternate F,T,F,T,F,T -- so iters 1/3/5 produce
@@ -626,7 +625,7 @@ func TestGraph_Interaction_OutputFilterIdiomatic(t *testing.T) {
 		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 4)
 		response := make(chan *flowv1beta2.InteractionResponseEvent, 4)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		var promptCount int
 		go func() {

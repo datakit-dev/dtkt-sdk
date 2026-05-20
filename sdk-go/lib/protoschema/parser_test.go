@@ -274,7 +274,7 @@ func TestParser_IntegerTypes(t *testing.T) {
 			// Convert map to jsonschema.Schema
 			b, _ := json.Marshal(tt.schema)
 			var schema jsonschema.Schema
-			//nolint:errcheck
+			//nolint:errcheck // input was just produced by json.Marshal of a test literal; round-trip cannot fail
 			json.Unmarshal(b, &schema)
 			actualType := parser.inferIntegerType(&schema)
 			if actualType != tt.expectedType {
@@ -318,7 +318,7 @@ func TestParser_NumberTypes(t *testing.T) {
 			// Convert map to jsonschema.Schema
 			b, _ := json.Marshal(schema)
 			var s jsonschema.Schema
-			//nolint:errcheck
+			//nolint:errcheck // input was just produced by json.Marshal of a test literal; round-trip cannot fail
 			json.Unmarshal(b, &s)
 			actualType := parser.inferNumberType(&s)
 			if actualType != tt.expectedType {

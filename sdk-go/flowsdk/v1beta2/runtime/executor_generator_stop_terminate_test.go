@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -76,7 +76,7 @@ func TestGenerator_StopNode_ProducesSucceeded(t *testing.T) {
 			parallelByDefault(t)
 			g := loadFlow(t, tc.yaml)
 			ps := newPubSub()
-			defer ps.Close() //nolint:errcheck
+			defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 			ctx := testContext(t)
 			ch, err := ps.Subscribe(ctx, testTopics.For(tc.generator))
@@ -115,7 +115,7 @@ func TestGenerator_TerminateNode_ProducesCancelledOnly(t *testing.T) {
 			parallelByDefault(t)
 			g := loadFlow(t, tc.yaml)
 			ps := newPubSub()
-			defer ps.Close() //nolint:errcheck
+			defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 			ctx := testContext(t)
 			ch, err := ps.Subscribe(ctx, testTopics.For(tc.generator))

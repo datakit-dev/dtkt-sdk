@@ -14,7 +14,7 @@ func TestGraph_Var_MapTransform(t *testing.T) {
 		graph := loadFlow(t, "var_map_x2.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 5, 10)
 		ctx := testContext(t)
@@ -30,7 +30,7 @@ func TestGraph_Var_FilterTransform(t *testing.T) {
 		graph := loadFlow(t, "var_filter_even.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1, 2, 3, 4)
 		ctx := testContext(t)
@@ -47,7 +47,7 @@ func TestGraph_Var_ScanTransform(t *testing.T) {
 		graph := loadFlow(t, "var_scan_sum.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1, 2, 3)
 		ctx := testContext(t)
@@ -64,7 +64,7 @@ func TestGraph_Var_FlattenTransform(t *testing.T) {
 		graph := loadFlow(t, "var_flatten.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 10, 20)
 		ctx := testContext(t)
@@ -83,7 +83,7 @@ func TestGraph_Var_DeepChain_MapAtEveryLevel(t *testing.T) {
 		graph := loadFlow(t, "var_deep_chain_3levels.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 5 -> +1=6 -> *2=12 -> +100=112
 		feedInput(pubsub, "inputs.x", 5)
@@ -101,7 +101,7 @@ func TestGraph_Var_DeepChain_FilterInMiddle(t *testing.T) {
 		graph := loadFlow(t, "var_deep_chain_filter_middle.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 1,2,3,4,5 -> even: 2,4 -> *10: 20,40
 		feedInput(pubsub, "inputs.x", 1, 2, 3, 4, 5)
@@ -119,7 +119,7 @@ func TestGraph_Var_DeepChain_ScanAtEnd(t *testing.T) {
 		graph := loadFlow(t, "var_deep_chain_scan_end.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 1..5 -> >2: 3,4,5 -> *2: 6,8,10 -> running sum: 6,14,24
 		feedInput(pubsub, "inputs.x", 1, 2, 3, 4, 5)
@@ -137,7 +137,7 @@ func TestGraph_Var_DeepChain_FlattenAcrossVars(t *testing.T) {
 		graph := loadFlow(t, "var_deep_chain_flatten_across.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 1->[1,10], 2->[2,20] -> flatten: 1,10,2,20 -> >=10: 10,20
 		feedInput(pubsub, "inputs.x", 1, 2)
@@ -157,7 +157,7 @@ func TestGraph_Var_Switch(t *testing.T) {
 		graph := loadFlow(t, "var_switch.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 5, 50, 500)
 		ctx := testContext(t)
@@ -178,7 +178,7 @@ func TestGraph_Var_SwitchWithTransforms(t *testing.T) {
 		graph := loadFlow(t, "var_switch_with_filter.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 5, 200, 50, 300)
 		ctx := testContext(t)
@@ -199,7 +199,7 @@ func TestGraph_Var_Passthrough(t *testing.T) {
 		graph := loadFlow(t, "input_var_output.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 7, 8, 9)
 		ctx := testContext(t)
@@ -217,7 +217,7 @@ func TestGraph_Var_StringMapFilter(t *testing.T) {
 		graph := loadFlow(t, "var_string_map_filter.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// "ab"->"ab_suffix"(9>8 yes), "x"->"x_suffix"(8=8 no), "hello"->"hello_suffix"(12>8 yes)
 		feedInput(pubsub, "inputs.name", "ab", "x", "hello")

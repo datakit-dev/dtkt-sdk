@@ -13,7 +13,7 @@ import (
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/rpc"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
@@ -97,7 +97,7 @@ func (h *bidiStreamHandler) Run(ctx context.Context) error {
 
 	// Feed input messages into the stream, applying the `when` guard.
 	go func() {
-		defer stream.CloseSend() //nolint:errcheck
+		defer stream.CloseSend() //nolint:errcheck // best-effort send-side half-close as the feeder goroutine exits; real stream errors surface on the concurrent Recv
 		var iterCount int
 		for {
 			// Pause the SEND side only. Recv (the other goroutine, below)
@@ -123,7 +123,7 @@ func (h *bidiStreamHandler) Run(ctx context.Context) error {
 				}
 			}
 
-			act := h.cache.newActivation(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan(), h.StopChan())
+			act := h.cache.newActivation(ctx, h.inputs, h.env, h.SuspendChan(), h.StopChan())
 			vars, err := act.Resolve()
 			if errors.Is(err, errOperatorStopped) {
 				return // exit send goroutine; defer stream.CloseSend() fires
@@ -175,7 +175,7 @@ func (h *bidiStreamHandler) Run(ctx context.Context) error {
 		if err != nil {
 			return fmt.Errorf("bidi-stream %s call %q: %w", h.id, h.method, err)
 		}
-		respExpr, err := transformResponse(h.responseProg, resp, h.env.TypeAdapter())
+		respExpr, err := transformResponse(h.responseProg, resp, h.env)
 		if err != nil {
 			return fmt.Errorf("bidi-stream %s response: %w", h.id, err)
 		}

@@ -104,24 +104,24 @@ func TestGetDefaultConfig(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Clean environment
 
-			//nolint:errcheck
+			//nolint:errcheck // os.Unsetenv only fails on an invalid name; these keys are constants
 			os.Unsetenv(env.AppEnv)
-			//nolint:errcheck
+			//nolint:errcheck // os.Unsetenv only fails on an invalid name; these keys are constants
 			os.Unsetenv(env.LogLevel)
-			//nolint:errcheck
+			//nolint:errcheck // os.Unsetenv only fails on an invalid name; these keys are constants
 			os.Unsetenv(env.LogFormat)
 
 			// Set test environment
 			if tt.appEnv != "" {
-				//nolint:errcheck
+				//nolint:errcheck // os.Setenv only fails on an invalid name; these keys are constants
 				os.Setenv(env.AppEnv, tt.appEnv)
 			}
 			if tt.logLevel != "" {
-				//nolint:errcheck
+				//nolint:errcheck // os.Setenv only fails on an invalid name; these keys are constants
 				os.Setenv(env.LogLevel, tt.logLevel)
 			}
 			if tt.logFormat != "" {
-				//nolint:errcheck
+				//nolint:errcheck // os.Setenv only fails on an invalid name; these keys are constants
 				os.Setenv(env.LogFormat, tt.logFormat)
 			}
 
@@ -137,11 +137,11 @@ func TestGetDefaultConfig(t *testing.T) {
 			assert.Empty(t, config.FilePath, "FilePath should be empty by default")
 
 			// Clean up
-			//nolint:errcheck
+			//nolint:errcheck // os.Unsetenv only fails on an invalid name; these keys are constants
 			os.Unsetenv(env.AppEnv)
-			//nolint:errcheck
+			//nolint:errcheck // os.Unsetenv only fails on an invalid name; these keys are constants
 			os.Unsetenv(env.LogLevel)
-			//nolint:errcheck
+			//nolint:errcheck // os.Unsetenv only fails on an invalid name; these keys are constants
 			os.Unsetenv(env.LogFormat)
 		})
 	}

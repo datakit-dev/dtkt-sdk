@@ -175,7 +175,7 @@ func TestMessage(t *testing.T) {
 					t.Fatalf("expected to be equal: %s != %s", ident.Get().Interface(), pkg.Identity)
 				}
 
-				pkg.ProtoReflect().Clear(field.FieldType.Descriptor())
+				pkg.ProtoReflect().Clear(field.Descriptor())
 
 				if msg.Get().Has(ident.Descriptor()) {
 					t.Fatalf("expected identity to be cleared, got: %s", ident.Get().Interface())

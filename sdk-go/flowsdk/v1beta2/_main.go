@@ -12,8 +12,8 @@ import (
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
 	dtktgraph "github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/graph"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
-	memorypubsub "github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub/memory"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
+	memorypubsub "github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub/memory"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/runtime"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )

@@ -62,9 +62,9 @@ func (t Type) DefaultAddress() (addr Address, err error) {
 		if err != nil {
 			return
 		}
-		//nolint:errcheck
+		//nolint:errcheck // temp file created only to reserve a unique name; close error is irrelevant
 		defer file.Close()
-		//nolint:errcheck
+		//nolint:errcheck // best-effort temp-file cleanup; a leftover temp file is not fatal
 		defer os.Remove(file.Name())
 
 		return Addr(t, file.Name()), nil

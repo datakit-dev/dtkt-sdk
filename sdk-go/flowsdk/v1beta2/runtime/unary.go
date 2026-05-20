@@ -13,9 +13,9 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/cache"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/cache"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/rpc"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
@@ -49,7 +49,7 @@ loop:
 		// An in-flight call from the previous iteration always completes
 		// naturally. Suspend never aborts an RPC mid-flight (we can't
 		// guarantee that's safe / idempotent on the server side).
-		act := h.cache.newActivation(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan(), h.StopChan())
+		act := h.cache.newActivation(ctx, h.inputs, h.env, h.SuspendChan(), h.StopChan())
 		if h.throttle > 0 && evalCount > 0 {
 			select {
 			case <-ctx.Done():
@@ -193,7 +193,7 @@ loop:
 			return fmt.Errorf("unary %s call %q: %w", h.id, h.method, err)
 		}
 
-		respExpr, err := transformResponse(h.responseProg, resp, h.env.TypeAdapter())
+		respExpr, err := transformResponse(h.responseProg, resp, h.env)
 		if err != nil {
 			return fmt.Errorf("unary %s response: %w", h.id, err)
 		}

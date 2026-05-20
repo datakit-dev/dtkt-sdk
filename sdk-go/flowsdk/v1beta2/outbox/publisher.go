@@ -1,6 +1,6 @@
 package outbox
 
-import "github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+import "github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 
 // PublisherAdapter wraps an outbox Storage as a pubsub.Publisher.
 // Each Publish call stores messages in the outbox via Storage.Store.

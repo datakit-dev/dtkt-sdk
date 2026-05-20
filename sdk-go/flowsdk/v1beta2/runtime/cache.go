@@ -4,9 +4,8 @@ import (
 	"context"
 	"sync/atomic"
 
-	"github.com/google/cel-go/common/types"
-
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -63,11 +62,11 @@ type cacheDeps struct {
 func (c *cacheDeps) newActivation(
 	ctx context.Context,
 	inputs map[string]<-chan *pubsub.Message,
-	adapter types.Adapter,
+	env shared.Env,
 	suspendCh, stopCh <-chan struct{},
 ) *activation {
 	if len(c.cachedSources) == 0 {
-		return newActivationFromChannelsInterruptible(ctx, inputs, adapter, suspendCh, stopCh)
+		return newActivationFromChannelsInterruptible(ctx, inputs, env, suspendCh, stopCh)
 	}
 	if c.cachedMem == nil {
 		c.cachedMem = make(map[string]*cachedRefState, len(c.cachedSources))
@@ -77,7 +76,7 @@ func (c *cacheDeps) newActivation(
 	}
 	return newActivationFromMixedDeps(
 		ctx, inputs, c.cachedSources, c.allCached, c.cachedMem,
-		adapter, suspendCh, stopCh)
+		env, suspendCh, stopCh)
 }
 
 // cacheBackend is a per-handler view onto cache:true semantics. It

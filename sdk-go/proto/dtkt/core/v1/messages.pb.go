@@ -1659,6 +1659,9 @@ type FlowRun struct {
 	State FlowRun_State `protobuf:"varint,3,opt,name=state,proto3,enum=dtkt.core.v1.FlowRun_State" json:"state,omitempty"`
 	// FlowRun metadata.
 	RunState *FlowRunMetadata `protobuf:"bytes,4,opt,name=run_state,json=runState,proto3" json:"run_state,omitempty"`
+	// Terminal error of the run; set when the run ends in an error state,
+	// unset otherwise. Mirrors the runtime's terminal FlowState error.
+	Error *status.Status `protobuf:"bytes,12,opt,name=error,proto3" json:"error,omitempty"`
 	// Name of flow resource to resolve spec.
 	Flow string `protobuf:"bytes,5,opt,name=flow,proto3" json:"flow,omitempty"`
 	// Checksum of flow spec must match flow when resolving spec (concurrency control).
@@ -1758,6 +1761,13 @@ func (x *FlowRun) GetRunState() *FlowRunMetadata {
 	return nil
 }
 
+func (x *FlowRun) GetError() *status.Status {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
 func (x *FlowRun) GetFlow() string {
 	if x != nil {
 		return x.Flow
@@ -1844,6 +1854,10 @@ func (x *FlowRun) SetRunState(v *FlowRunMetadata) {
 	x.RunState = v
 }
 
+func (x *FlowRun) SetError(v *status.Status) {
+	x.Error = v
+}
+
 func (x *FlowRun) SetFlow(v string) {
 	x.Flow = v
 }
@@ -1891,6 +1905,13 @@ func (x *FlowRun) HasRunState() bool {
 	return x.RunState != nil
 }
 
+func (x *FlowRun) HasError() bool {
+	if x == nil {
+		return false
+	}
+	return x.Error != nil
+}
+
 func (x *FlowRun) HasTimeout() bool {
 	if x == nil {
 		return false
@@ -1923,6 +1944,10 @@ func (x *FlowRun) ClearRunState() {
 	x.RunState = nil
 }
 
+func (x *FlowRun) ClearError() {
+	x.Error = nil
+}
+
 func (x *FlowRun) ClearTimeout() {
 	x.Timeout = nil
 }
@@ -1949,6 +1974,9 @@ type FlowRun_builder struct {
 	State FlowRun_State
 	// FlowRun metadata.
 	RunState *FlowRunMetadata
+	// Terminal error of the run; set when the run ends in an error state,
+	// unset otherwise. Mirrors the runtime's terminal FlowState error.
+	Error *status.Status
 	// Name of flow resource to resolve spec.
 	Flow string
 	// Checksum of flow spec must match flow when resolving spec (concurrency control).
@@ -2001,6 +2029,7 @@ func (b0 FlowRun_builder) Build() *FlowRun {
 	x.Uid = b.Uid
 	x.State = b.State
 	x.RunState = b.RunState
+	x.Error = b.Error
 	x.Flow = b.Flow
 	x.SpecEtag = b.SpecEtag
 	x.Connections = b.Connections
@@ -2655,7 +2684,11 @@ type ListFlowRunsRequest struct {
 	// Parent resource name: `organizations/{organization}` or `users/{user}`.
 	Parent *string `protobuf:"bytes,3,opt,name=parent,proto3,oneof" json:"parent,omitempty"`
 	// Filter expression.
-	Filter        *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	Filter *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy       *string `protobuf:"bytes,5,opt,name=order_by,json=orderBy,proto3,oneof" json:"order_by,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2713,6 +2746,13 @@ func (x *ListFlowRunsRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListFlowRunsRequest) GetOrderBy() string {
+	if x != nil && x.OrderBy != nil {
+		return *x.OrderBy
+	}
+	return ""
+}
+
 func (x *ListFlowRunsRequest) SetPageSize(v int32) {
 	x.PageSize = v
 }
@@ -2729,6 +2769,10 @@ func (x *ListFlowRunsRequest) SetFilter(v string) {
 	x.Filter = &v
 }
 
+func (x *ListFlowRunsRequest) SetOrderBy(v string) {
+	x.OrderBy = &v
+}
+
 func (x *ListFlowRunsRequest) HasParent() bool {
 	if x == nil {
 		return false
@@ -2743,12 +2787,23 @@ func (x *ListFlowRunsRequest) HasFilter() bool {
 	return x.Filter != nil
 }
 
+func (x *ListFlowRunsRequest) HasOrderBy() bool {
+	if x == nil {
+		return false
+	}
+	return x.OrderBy != nil
+}
+
 func (x *ListFlowRunsRequest) ClearParent() {
 	x.Parent = nil
 }
 
 func (x *ListFlowRunsRequest) ClearFilter() {
 	x.Filter = nil
+}
+
+func (x *ListFlowRunsRequest) ClearOrderBy() {
+	x.OrderBy = nil
 }
 
 type ListFlowRunsRequest_builder struct {
@@ -2762,6 +2817,10 @@ type ListFlowRunsRequest_builder struct {
 	Parent *string
 	// Filter expression.
 	Filter *string
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy *string
 }
 
 func (b0 ListFlowRunsRequest_builder) Build() *ListFlowRunsRequest {
@@ -2772,6 +2831,7 @@ func (b0 ListFlowRunsRequest_builder) Build() *ListFlowRunsRequest {
 	x.PageToken = b.PageToken
 	x.Parent = b.Parent
 	x.Filter = b.Filter
+	x.OrderBy = b.OrderBy
 	return m0
 }
 
@@ -9385,7 +9445,11 @@ type ListAutomationsRequest struct {
 	//
 	//	name:nightly
 	//	flow="users/foo/flows/etl"
-	Filter        *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	Filter *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy       *string `protobuf:"bytes,5,opt,name=order_by,json=orderBy,proto3,oneof" json:"order_by,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -9443,6 +9507,13 @@ func (x *ListAutomationsRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListAutomationsRequest) GetOrderBy() string {
+	if x != nil && x.OrderBy != nil {
+		return *x.OrderBy
+	}
+	return ""
+}
+
 func (x *ListAutomationsRequest) SetPageSize(v int32) {
 	x.PageSize = v
 }
@@ -9459,6 +9530,10 @@ func (x *ListAutomationsRequest) SetFilter(v string) {
 	x.Filter = &v
 }
 
+func (x *ListAutomationsRequest) SetOrderBy(v string) {
+	x.OrderBy = &v
+}
+
 func (x *ListAutomationsRequest) HasParent() bool {
 	if x == nil {
 		return false
@@ -9473,12 +9548,23 @@ func (x *ListAutomationsRequest) HasFilter() bool {
 	return x.Filter != nil
 }
 
+func (x *ListAutomationsRequest) HasOrderBy() bool {
+	if x == nil {
+		return false
+	}
+	return x.OrderBy != nil
+}
+
 func (x *ListAutomationsRequest) ClearParent() {
 	x.Parent = nil
 }
 
 func (x *ListAutomationsRequest) ClearFilter() {
 	x.Filter = nil
+}
+
+func (x *ListAutomationsRequest) ClearOrderBy() {
+	x.OrderBy = nil
 }
 
 type ListAutomationsRequest_builder struct {
@@ -9497,6 +9583,10 @@ type ListAutomationsRequest_builder struct {
 	//	name:nightly
 	//	flow="users/foo/flows/etl"
 	Filter *string
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy *string
 }
 
 func (b0 ListAutomationsRequest_builder) Build() *ListAutomationsRequest {
@@ -9507,6 +9597,7 @@ func (b0 ListAutomationsRequest_builder) Build() *ListAutomationsRequest {
 	x.PageToken = b.PageToken
 	x.Parent = b.Parent
 	x.Filter = b.Filter
+	x.OrderBy = b.OrderBy
 	return m0
 }
 
@@ -10339,7 +10430,11 @@ type ListConnectionsRequest struct {
 	//	name:email
 	//	deployment="users/foo/deployments/email-default"
 	//	integration="users/foo/integrations/email" AND name:prod
-	Filter        *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	Filter *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy       *string `protobuf:"bytes,5,opt,name=order_by,json=orderBy,proto3,oneof" json:"order_by,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -10397,6 +10492,13 @@ func (x *ListConnectionsRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListConnectionsRequest) GetOrderBy() string {
+	if x != nil && x.OrderBy != nil {
+		return *x.OrderBy
+	}
+	return ""
+}
+
 func (x *ListConnectionsRequest) SetPageSize(v int32) {
 	x.PageSize = v
 }
@@ -10413,6 +10515,10 @@ func (x *ListConnectionsRequest) SetFilter(v string) {
 	x.Filter = &v
 }
 
+func (x *ListConnectionsRequest) SetOrderBy(v string) {
+	x.OrderBy = &v
+}
+
 func (x *ListConnectionsRequest) HasParent() bool {
 	if x == nil {
 		return false
@@ -10427,12 +10533,23 @@ func (x *ListConnectionsRequest) HasFilter() bool {
 	return x.Filter != nil
 }
 
+func (x *ListConnectionsRequest) HasOrderBy() bool {
+	if x == nil {
+		return false
+	}
+	return x.OrderBy != nil
+}
+
 func (x *ListConnectionsRequest) ClearParent() {
 	x.Parent = nil
 }
 
 func (x *ListConnectionsRequest) ClearFilter() {
 	x.Filter = nil
+}
+
+func (x *ListConnectionsRequest) ClearOrderBy() {
+	x.OrderBy = nil
 }
 
 type ListConnectionsRequest_builder struct {
@@ -10454,6 +10571,10 @@ type ListConnectionsRequest_builder struct {
 	//	deployment="users/foo/deployments/email-default"
 	//	integration="users/foo/integrations/email" AND name:prod
 	Filter *string
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy *string
 }
 
 func (b0 ListConnectionsRequest_builder) Build() *ListConnectionsRequest {
@@ -10464,6 +10585,7 @@ func (b0 ListConnectionsRequest_builder) Build() *ListConnectionsRequest {
 	x.PageToken = b.PageToken
 	x.Parent = b.Parent
 	x.Filter = b.Filter
+	x.OrderBy = b.OrderBy
 	return m0
 }
 
@@ -11653,7 +11775,11 @@ type ListDeploymentsRequest struct {
 	//
 	//	name:email
 	//	integration="users/foo/integrations/email"
-	Filter        *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	Filter *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy       *string `protobuf:"bytes,5,opt,name=order_by,json=orderBy,proto3,oneof" json:"order_by,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -11711,6 +11837,13 @@ func (x *ListDeploymentsRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListDeploymentsRequest) GetOrderBy() string {
+	if x != nil && x.OrderBy != nil {
+		return *x.OrderBy
+	}
+	return ""
+}
+
 func (x *ListDeploymentsRequest) SetPageSize(v int32) {
 	x.PageSize = v
 }
@@ -11727,6 +11860,10 @@ func (x *ListDeploymentsRequest) SetFilter(v string) {
 	x.Filter = &v
 }
 
+func (x *ListDeploymentsRequest) SetOrderBy(v string) {
+	x.OrderBy = &v
+}
+
 func (x *ListDeploymentsRequest) HasParent() bool {
 	if x == nil {
 		return false
@@ -11741,12 +11878,23 @@ func (x *ListDeploymentsRequest) HasFilter() bool {
 	return x.Filter != nil
 }
 
+func (x *ListDeploymentsRequest) HasOrderBy() bool {
+	if x == nil {
+		return false
+	}
+	return x.OrderBy != nil
+}
+
 func (x *ListDeploymentsRequest) ClearParent() {
 	x.Parent = nil
 }
 
 func (x *ListDeploymentsRequest) ClearFilter() {
 	x.Filter = nil
+}
+
+func (x *ListDeploymentsRequest) ClearOrderBy() {
+	x.OrderBy = nil
 }
 
 type ListDeploymentsRequest_builder struct {
@@ -11766,6 +11914,10 @@ type ListDeploymentsRequest_builder struct {
 	//	name:email
 	//	integration="users/foo/integrations/email"
 	Filter *string
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy *string
 }
 
 func (b0 ListDeploymentsRequest_builder) Build() *ListDeploymentsRequest {
@@ -11776,6 +11928,7 @@ func (b0 ListDeploymentsRequest_builder) Build() *ListDeploymentsRequest {
 	x.PageToken = b.PageToken
 	x.Parent = b.Parent
 	x.Filter = b.Filter
+	x.OrderBy = b.OrderBy
 	return m0
 }
 
@@ -12295,7 +12448,11 @@ type ListFlowsRequest struct {
 	// Parent resource name: `organizations/{organization}` or `users/{user}`.
 	Parent *string `protobuf:"bytes,3,opt,name=parent,proto3,oneof" json:"parent,omitempty"`
 	// Filter expression.
-	Filter        *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	Filter *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy       *string `protobuf:"bytes,5,opt,name=order_by,json=orderBy,proto3,oneof" json:"order_by,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -12353,6 +12510,13 @@ func (x *ListFlowsRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListFlowsRequest) GetOrderBy() string {
+	if x != nil && x.OrderBy != nil {
+		return *x.OrderBy
+	}
+	return ""
+}
+
 func (x *ListFlowsRequest) SetPageSize(v int32) {
 	x.PageSize = v
 }
@@ -12369,6 +12533,10 @@ func (x *ListFlowsRequest) SetFilter(v string) {
 	x.Filter = &v
 }
 
+func (x *ListFlowsRequest) SetOrderBy(v string) {
+	x.OrderBy = &v
+}
+
 func (x *ListFlowsRequest) HasParent() bool {
 	if x == nil {
 		return false
@@ -12383,12 +12551,23 @@ func (x *ListFlowsRequest) HasFilter() bool {
 	return x.Filter != nil
 }
 
+func (x *ListFlowsRequest) HasOrderBy() bool {
+	if x == nil {
+		return false
+	}
+	return x.OrderBy != nil
+}
+
 func (x *ListFlowsRequest) ClearParent() {
 	x.Parent = nil
 }
 
 func (x *ListFlowsRequest) ClearFilter() {
 	x.Filter = nil
+}
+
+func (x *ListFlowsRequest) ClearOrderBy() {
+	x.OrderBy = nil
 }
 
 type ListFlowsRequest_builder struct {
@@ -12402,6 +12581,10 @@ type ListFlowsRequest_builder struct {
 	Parent *string
 	// Filter expression.
 	Filter *string
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy *string
 }
 
 func (b0 ListFlowsRequest_builder) Build() *ListFlowsRequest {
@@ -12412,6 +12595,7 @@ func (b0 ListFlowsRequest_builder) Build() *ListFlowsRequest {
 	x.PageToken = b.PageToken
 	x.Parent = b.Parent
 	x.Filter = b.Filter
+	x.OrderBy = b.OrderBy
 	return m0
 }
 
@@ -13069,7 +13253,11 @@ type ListIntegrationsRequest struct {
 	// Parent resource name: `organizations/{organization}` or `users/{user}`.
 	Parent *string `protobuf:"bytes,3,opt,name=parent,proto3,oneof" json:"parent,omitempty"`
 	// Filter expression.
-	Filter        *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	Filter *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy       *string `protobuf:"bytes,5,opt,name=order_by,json=orderBy,proto3,oneof" json:"order_by,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -13127,6 +13315,13 @@ func (x *ListIntegrationsRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListIntegrationsRequest) GetOrderBy() string {
+	if x != nil && x.OrderBy != nil {
+		return *x.OrderBy
+	}
+	return ""
+}
+
 func (x *ListIntegrationsRequest) SetPageSize(v int32) {
 	x.PageSize = v
 }
@@ -13143,6 +13338,10 @@ func (x *ListIntegrationsRequest) SetFilter(v string) {
 	x.Filter = &v
 }
 
+func (x *ListIntegrationsRequest) SetOrderBy(v string) {
+	x.OrderBy = &v
+}
+
 func (x *ListIntegrationsRequest) HasParent() bool {
 	if x == nil {
 		return false
@@ -13157,12 +13356,23 @@ func (x *ListIntegrationsRequest) HasFilter() bool {
 	return x.Filter != nil
 }
 
+func (x *ListIntegrationsRequest) HasOrderBy() bool {
+	if x == nil {
+		return false
+	}
+	return x.OrderBy != nil
+}
+
 func (x *ListIntegrationsRequest) ClearParent() {
 	x.Parent = nil
 }
 
 func (x *ListIntegrationsRequest) ClearFilter() {
 	x.Filter = nil
+}
+
+func (x *ListIntegrationsRequest) ClearOrderBy() {
+	x.OrderBy = nil
 }
 
 type ListIntegrationsRequest_builder struct {
@@ -13176,6 +13386,10 @@ type ListIntegrationsRequest_builder struct {
 	Parent *string
 	// Filter expression.
 	Filter *string
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy *string
 }
 
 func (b0 ListIntegrationsRequest_builder) Build() *ListIntegrationsRequest {
@@ -13186,6 +13400,7 @@ func (b0 ListIntegrationsRequest_builder) Build() *ListIntegrationsRequest {
 	x.PageToken = b.PageToken
 	x.Parent = b.Parent
 	x.Filter = b.Filter
+	x.OrderBy = b.OrderBy
 	return m0
 }
 
@@ -14210,7 +14425,11 @@ type ListTypesRequest struct {
 	// - Integration (aggregates deployments): e.g. "users/foo/integrations/bar"
 	Parent *string `protobuf:"bytes,3,opt,name=parent,proto3,oneof" json:"parent,omitempty"`
 	// Filter expression.
-	Filter        *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	Filter *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy       *string `protobuf:"bytes,5,opt,name=order_by,json=orderBy,proto3,oneof" json:"order_by,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -14268,6 +14487,13 @@ func (x *ListTypesRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListTypesRequest) GetOrderBy() string {
+	if x != nil && x.OrderBy != nil {
+		return *x.OrderBy
+	}
+	return ""
+}
+
 func (x *ListTypesRequest) SetPageSize(v int32) {
 	x.PageSize = v
 }
@@ -14284,6 +14510,10 @@ func (x *ListTypesRequest) SetFilter(v string) {
 	x.Filter = &v
 }
 
+func (x *ListTypesRequest) SetOrderBy(v string) {
+	x.OrderBy = &v
+}
+
 func (x *ListTypesRequest) HasParent() bool {
 	if x == nil {
 		return false
@@ -14298,12 +14528,23 @@ func (x *ListTypesRequest) HasFilter() bool {
 	return x.Filter != nil
 }
 
+func (x *ListTypesRequest) HasOrderBy() bool {
+	if x == nil {
+		return false
+	}
+	return x.OrderBy != nil
+}
+
 func (x *ListTypesRequest) ClearParent() {
 	x.Parent = nil
 }
 
 func (x *ListTypesRequest) ClearFilter() {
 	x.Filter = nil
+}
+
+func (x *ListTypesRequest) ClearOrderBy() {
+	x.OrderBy = nil
 }
 
 type ListTypesRequest_builder struct {
@@ -14322,6 +14563,10 @@ type ListTypesRequest_builder struct {
 	Parent *string
 	// Filter expression.
 	Filter *string
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy *string
 }
 
 func (b0 ListTypesRequest_builder) Build() *ListTypesRequest {
@@ -14332,6 +14577,7 @@ func (b0 ListTypesRequest_builder) Build() *ListTypesRequest {
 	x.PageToken = b.PageToken
 	x.Parent = b.Parent
 	x.Filter = b.Filter
+	x.OrderBy = b.OrderBy
 	return m0
 }
 
@@ -14698,7 +14944,11 @@ type ListServicesRequest struct {
 	// - Integration (aggregates deployments): e.g. "users/foo/integrations/bar"
 	Parent *string `protobuf:"bytes,3,opt,name=parent,proto3,oneof" json:"parent,omitempty"`
 	// Filter expression.
-	Filter        *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	Filter *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy       *string `protobuf:"bytes,5,opt,name=order_by,json=orderBy,proto3,oneof" json:"order_by,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -14756,6 +15006,13 @@ func (x *ListServicesRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListServicesRequest) GetOrderBy() string {
+	if x != nil && x.OrderBy != nil {
+		return *x.OrderBy
+	}
+	return ""
+}
+
 func (x *ListServicesRequest) SetPageSize(v int32) {
 	x.PageSize = v
 }
@@ -14772,6 +15029,10 @@ func (x *ListServicesRequest) SetFilter(v string) {
 	x.Filter = &v
 }
 
+func (x *ListServicesRequest) SetOrderBy(v string) {
+	x.OrderBy = &v
+}
+
 func (x *ListServicesRequest) HasParent() bool {
 	if x == nil {
 		return false
@@ -14786,12 +15047,23 @@ func (x *ListServicesRequest) HasFilter() bool {
 	return x.Filter != nil
 }
 
+func (x *ListServicesRequest) HasOrderBy() bool {
+	if x == nil {
+		return false
+	}
+	return x.OrderBy != nil
+}
+
 func (x *ListServicesRequest) ClearParent() {
 	x.Parent = nil
 }
 
 func (x *ListServicesRequest) ClearFilter() {
 	x.Filter = nil
+}
+
+func (x *ListServicesRequest) ClearOrderBy() {
+	x.OrderBy = nil
 }
 
 type ListServicesRequest_builder struct {
@@ -14810,6 +15082,10 @@ type ListServicesRequest_builder struct {
 	Parent *string
 	// Filter expression.
 	Filter *string
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy *string
 }
 
 func (b0 ListServicesRequest_builder) Build() *ListServicesRequest {
@@ -14820,6 +15096,7 @@ func (b0 ListServicesRequest_builder) Build() *ListServicesRequest {
 	x.PageToken = b.PageToken
 	x.Parent = b.Parent
 	x.Filter = b.Filter
+	x.OrderBy = b.OrderBy
 	return m0
 }
 
@@ -14908,7 +15185,11 @@ type ListMethodsRequest struct {
 	// - Integration (aggregates deployments): e.g. "users/foo/integrations/bar"
 	Parent *string `protobuf:"bytes,3,opt,name=parent,proto3,oneof" json:"parent,omitempty"`
 	// Filter expression.
-	Filter        *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	Filter *string `protobuf:"bytes,4,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy       *string `protobuf:"bytes,5,opt,name=order_by,json=orderBy,proto3,oneof" json:"order_by,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -14966,6 +15247,13 @@ func (x *ListMethodsRequest) GetFilter() string {
 	return ""
 }
 
+func (x *ListMethodsRequest) GetOrderBy() string {
+	if x != nil && x.OrderBy != nil {
+		return *x.OrderBy
+	}
+	return ""
+}
+
 func (x *ListMethodsRequest) SetPageSize(v int32) {
 	x.PageSize = v
 }
@@ -14982,6 +15270,10 @@ func (x *ListMethodsRequest) SetFilter(v string) {
 	x.Filter = &v
 }
 
+func (x *ListMethodsRequest) SetOrderBy(v string) {
+	x.OrderBy = &v
+}
+
 func (x *ListMethodsRequest) HasParent() bool {
 	if x == nil {
 		return false
@@ -14996,12 +15288,23 @@ func (x *ListMethodsRequest) HasFilter() bool {
 	return x.Filter != nil
 }
 
+func (x *ListMethodsRequest) HasOrderBy() bool {
+	if x == nil {
+		return false
+	}
+	return x.OrderBy != nil
+}
+
 func (x *ListMethodsRequest) ClearParent() {
 	x.Parent = nil
 }
 
 func (x *ListMethodsRequest) ClearFilter() {
 	x.Filter = nil
+}
+
+func (x *ListMethodsRequest) ClearOrderBy() {
+	x.OrderBy = nil
 }
 
 type ListMethodsRequest_builder struct {
@@ -15020,6 +15323,10 @@ type ListMethodsRequest_builder struct {
 	Parent *string
 	// Filter expression.
 	Filter *string
+	// AIP-132 order_by expression. Comma-separated list of fields, each
+	// optionally followed by `desc`. Default order is by `id` descending
+	// (newest-first by UUID v7).
+	OrderBy *string
 }
 
 func (b0 ListMethodsRequest_builder) Build() *ListMethodsRequest {
@@ -15030,6 +15337,7 @@ func (b0 ListMethodsRequest_builder) Build() *ListMethodsRequest {
 	x.PageToken = b.PageToken
 	x.Parent = b.Parent
 	x.Filter = b.Filter
+	x.OrderBy = b.OrderBy
 	return m0
 }
 
@@ -16250,13 +16558,14 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"createTime\x12F\n" +
 	"\vupdate_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\n" +
 	"updateTime:\\\xeaAY\n" +
-	"\x04Flow\x12)organizations/{organization}/flows/{flow}\x12\x19users/{user}/flows/{flow}*\x05flows2\x04flow\"\xcc\n" +
+	"\x04Flow\x12)organizations/{organization}/flows/{flow}\x12\x19users/{user}/flows/{flow}*\x05flows2\x04flow\"\xfb\n" +
 	"\n" +
 	"\aFlowRun\x12#\n" +
 	"\x04name\x18\x01 \x01(\tB\x0f\xe0A\b\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x04name\x12&\n" +
 	"\x03uid\x18\x02 \x01(\tB\x14\xe0A\x03\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01\x82\xb5\x18\x02\x18\x01R\x03uid\x12A\n" +
 	"\x05state\x18\x03 \x01(\x0e2\x1b.dtkt.core.v1.FlowRun.StateB\x0e\xe0A\x03\xbaH\b\xc8\x01\x01\x82\x01\x02\x10\x01R\x05state\x12E\n" +
-	"\trun_state\x18\x04 \x01(\v2\x1d.dtkt.core.v1.FlowRunMetadataB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\brunState\x12\x9a\x01\n" +
+	"\trun_state\x18\x04 \x01(\v2\x1d.dtkt.core.v1.FlowRunMetadataB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\brunState\x12-\n" +
+	"\x05error\x18\f \x01(\v2\x12.google.rpc.StatusB\x03\xe0A\x03R\x05error\x12\x9a\x01\n" +
 	"\x04flow\x18\x05 \x01(\tB\x85\x01\xfaA\x06\n" +
 	"\x04Flow\xbaH\x03\xc8\x01\x01\x82\xb5\x18r\n" +
 	"\x04Flow\x12\x0eSelect a flow.:Z\n" +
@@ -16322,15 +16631,17 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\brequests\x18\x02 \x03(\v2\".dtkt.core.v1.CreateFlowRunRequestB\b\xbaH\x05\x92\x01\x02\b\x02R\brequests:\x99\x01\xbaH\x95\x01\x1a\x92\x01\n" +
 	"\x1ebatch_create_flowruns.requests\x12!requests must use the same parent\x1aMsize(this.requests.filter(r, r.parent == this.parent)) == size(this.requests)\"X\n" +
 	"\x1bBatchCreateFlowRunsResponse\x129\n" +
-	"\bflowruns\x18\x01 \x03(\v2\x15.dtkt.core.v1.FlowRunB\x06\xbaH\x03\xc8\x01\x01R\bflowruns\"\xa1\x01\n" +
+	"\bflowruns\x18\x01 \x03(\v2\x15.dtkt.core.v1.FlowRunB\x06\xbaH\x03\xc8\x01\x01R\bflowruns\"\xce\x01\n" +
 	"\x13ListFlowRunsRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x1b\n" +
 	"\x06parent\x18\x03 \x01(\tH\x00R\x06parent\x88\x01\x01\x12\x1b\n" +
-	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01B\t\n" +
+	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01\x12\x1e\n" +
+	"\border_by\x18\x05 \x01(\tH\x02R\aorderBy\x88\x01\x01B\t\n" +
 	"\a_parentB\t\n" +
-	"\a_filter\"y\n" +
+	"\a_filterB\v\n" +
+	"\t_order_by\"y\n" +
 	"\x14ListFlowRunsResponse\x129\n" +
 	"\bflowruns\x18\x01 \x03(\v2\x15.dtkt.core.v1.FlowRunB\x06\xbaH\x03\xc8\x01\x01R\bflowruns\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\x96\x06\n" +
@@ -16691,15 +17002,17 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\brequests\x18\x02 \x03(\v2%.dtkt.core.v1.CreateAutomationRequestB\b\xbaH\x05\x92\x01\x02\b\x02R\brequests:\x9c\x01\xbaH\x98\x01\x1a\x95\x01\n" +
 	"!batch_create_automations.requests\x12!requests must use the same parent\x1aMsize(this.requests.filter(r, r.parent == this.parent)) == size(this.requests)\"d\n" +
 	"\x1eBatchCreateAutomationsResponse\x12B\n" +
-	"\vautomations\x18\x01 \x03(\v2\x18.dtkt.core.v1.AutomationB\x06\xbaH\x03\xc8\x01\x01R\vautomations\"\xa4\x01\n" +
+	"\vautomations\x18\x01 \x03(\v2\x18.dtkt.core.v1.AutomationB\x06\xbaH\x03\xc8\x01\x01R\vautomations\"\xd1\x01\n" +
 	"\x16ListAutomationsRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x1b\n" +
 	"\x06parent\x18\x03 \x01(\tH\x00R\x06parent\x88\x01\x01\x12\x1b\n" +
-	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01B\t\n" +
+	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01\x12\x1e\n" +
+	"\border_by\x18\x05 \x01(\tH\x02R\aorderBy\x88\x01\x01B\t\n" +
 	"\a_parentB\t\n" +
-	"\a_filter\"\x85\x01\n" +
+	"\a_filterB\v\n" +
+	"\t_order_by\"\x85\x01\n" +
 	"\x17ListAutomationsResponse\x12B\n" +
 	"\vautomations\x18\x01 \x03(\v2\x18.dtkt.core.v1.AutomationB\x06\xbaH\x03\xc8\x01\x01R\vautomations\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xec\x04\n" +
@@ -16742,15 +17055,17 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x127\n" +
 	"\x05event\x18\x02 \x01(\v2!.dtkt.core.v1.SendAutomationEventR\x05event\"d\n" +
 	"\x1eStreamAutomationEventsResponse\x12B\n" +
-	"\x05event\x18\x01 \x01(\v2$.dtkt.core.v1.ReceiveAutomationEventB\x06\xbaH\x03\xc8\x01\x01R\x05event\"\xa4\x01\n" +
+	"\x05event\x18\x01 \x01(\v2$.dtkt.core.v1.ReceiveAutomationEventB\x06\xbaH\x03\xc8\x01\x01R\x05event\"\xd1\x01\n" +
 	"\x16ListConnectionsRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x1b\n" +
 	"\x06parent\x18\x03 \x01(\tH\x00R\x06parent\x88\x01\x01\x12\x1b\n" +
-	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01B\t\n" +
+	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01\x12\x1e\n" +
+	"\border_by\x18\x05 \x01(\tH\x02R\aorderBy\x88\x01\x01B\t\n" +
 	"\a_parentB\t\n" +
-	"\a_filter\"}\n" +
+	"\a_filterB\v\n" +
+	"\t_order_by\"}\n" +
 	"\x17ListConnectionsResponse\x12:\n" +
 	"\vconnections\x18\x01 \x03(\v2\x18.dtkt.core.v1.ConnectionR\vconnections\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"2\n" +
@@ -16797,15 +17112,17 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\x15GetDescriptorsRequest\x12\x1e\n" +
 	"\x06parent\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06parent\"H\n" +
 	"\x16GetDescriptorsResponse\x12.\n" +
-	"\x04file\x18\x01 \x01(\v2\x12.dtkt.core.v1.FileB\x06\xbaH\x03\xc8\x01\x01R\x04file\"\xa4\x01\n" +
+	"\x04file\x18\x01 \x01(\v2\x12.dtkt.core.v1.FileB\x06\xbaH\x03\xc8\x01\x01R\x04file\"\xd1\x01\n" +
 	"\x16ListDeploymentsRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x1b\n" +
 	"\x06parent\x18\x03 \x01(\tH\x00R\x06parent\x88\x01\x01\x12\x1b\n" +
-	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01B\t\n" +
+	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01\x12\x1e\n" +
+	"\border_by\x18\x05 \x01(\tH\x02R\aorderBy\x88\x01\x01B\t\n" +
 	"\a_parentB\t\n" +
-	"\a_filter\"}\n" +
+	"\a_filterB\v\n" +
+	"\t_order_by\"}\n" +
 	"\x17ListDeploymentsResponse\x12:\n" +
 	"\vdeployments\x18\x01 \x03(\v2\x18.dtkt.core.v1.DeploymentR\vdeployments\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"2\n" +
@@ -16832,15 +17149,17 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\x0e_desired_state\"Q\n" +
 	"\x17DeleteDeploymentRequest\x12\x1a\n" +
 	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12\x1a\n" +
-	"\x04etag\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04etag\"\x9e\x01\n" +
+	"\x04etag\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04etag\"\xcb\x01\n" +
 	"\x10ListFlowsRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x1b\n" +
 	"\x06parent\x18\x03 \x01(\tH\x00R\x06parent\x88\x01\x01\x12\x1b\n" +
-	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01B\t\n" +
+	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01\x12\x1e\n" +
+	"\border_by\x18\x05 \x01(\tH\x02R\aorderBy\x88\x01\x01B\t\n" +
 	"\a_parentB\t\n" +
-	"\a_filter\"e\n" +
+	"\a_filterB\v\n" +
+	"\t_order_by\"e\n" +
 	"\x11ListFlowsResponse\x12(\n" +
 	"\x05flows\x18\x01 \x03(\v2\x12.dtkt.core.v1.FlowR\x05flows\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\",\n" +
@@ -16862,15 +17181,17 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\x04flow\x18\x01 \x01(\v2\x12.dtkt.core.v1.FlowB\x06\xbaH\x03\xc8\x01\x01R\x04flow\"/\n" +
 	"\x11DeleteFlowRequest\x12\x1a\n" +
 	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\"\x14\n" +
-	"\x12DeleteFlowResponse\"\xa5\x01\n" +
+	"\x12DeleteFlowResponse\"\xd2\x01\n" +
 	"\x17ListIntegrationsRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x1b\n" +
 	"\x06parent\x18\x03 \x01(\tH\x00R\x06parent\x88\x01\x01\x12\x1b\n" +
-	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01B\t\n" +
+	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01\x12\x1e\n" +
+	"\border_by\x18\x05 \x01(\tH\x02R\aorderBy\x88\x01\x01B\t\n" +
 	"\a_parentB\t\n" +
-	"\a_filter\"\x81\x01\n" +
+	"\a_filterB\v\n" +
+	"\t_order_by\"\x81\x01\n" +
 	"\x18ListIntegrationsResponse\x12=\n" +
 	"\fintegrations\x18\x01 \x03(\v2\x19.dtkt.core.v1.IntegrationR\fintegrations\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"3\n" +
@@ -16906,15 +17227,17 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\x0eGetTypeRequest\x12\x1a\n" +
 	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\"A\n" +
 	"\x0fGetTypeResponse\x12.\n" +
-	"\x04type\x18\x01 \x01(\v2\x12.dtkt.core.v1.TypeB\x06\xbaH\x03\xc8\x01\x01R\x04type\"\x9e\x01\n" +
+	"\x04type\x18\x01 \x01(\v2\x12.dtkt.core.v1.TypeB\x06\xbaH\x03\xc8\x01\x01R\x04type\"\xcb\x01\n" +
 	"\x10ListTypesRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x1b\n" +
 	"\x06parent\x18\x03 \x01(\tH\x00R\x06parent\x88\x01\x01\x12\x1b\n" +
-	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01B\t\n" +
+	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01\x12\x1e\n" +
+	"\border_by\x18\x05 \x01(\tH\x02R\aorderBy\x88\x01\x01B\t\n" +
 	"\a_parentB\t\n" +
-	"\a_filter\"e\n" +
+	"\a_filterB\v\n" +
+	"\t_order_by\"e\n" +
 	"\x11ListTypesResponse\x12(\n" +
 	"\x05types\x18\x01 \x03(\v2\x12.dtkt.core.v1.TypeR\x05types\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\".\n" +
@@ -16925,26 +17248,30 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	"\x11GetServiceRequest\x12\x1a\n" +
 	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\"M\n" +
 	"\x12GetServiceResponse\x127\n" +
-	"\aservice\x18\x01 \x01(\v2\x15.dtkt.core.v1.ServiceB\x06\xbaH\x03\xc8\x01\x01R\aservice\"\xa1\x01\n" +
+	"\aservice\x18\x01 \x01(\v2\x15.dtkt.core.v1.ServiceB\x06\xbaH\x03\xc8\x01\x01R\aservice\"\xce\x01\n" +
 	"\x13ListServicesRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x1b\n" +
 	"\x06parent\x18\x03 \x01(\tH\x00R\x06parent\x88\x01\x01\x12\x1b\n" +
-	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01B\t\n" +
+	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01\x12\x1e\n" +
+	"\border_by\x18\x05 \x01(\tH\x02R\aorderBy\x88\x01\x01B\t\n" +
 	"\a_parentB\t\n" +
-	"\a_filter\"q\n" +
+	"\a_filterB\v\n" +
+	"\t_order_by\"q\n" +
 	"\x14ListServicesResponse\x121\n" +
 	"\bservices\x18\x01 \x03(\v2\x15.dtkt.core.v1.ServiceR\bservices\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xa0\x01\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xcd\x01\n" +
 	"\x12ListMethodsRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x1b\n" +
 	"\x06parent\x18\x03 \x01(\tH\x00R\x06parent\x88\x01\x01\x12\x1b\n" +
-	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01B\t\n" +
+	"\x06filter\x18\x04 \x01(\tH\x01R\x06filter\x88\x01\x01\x12\x1e\n" +
+	"\border_by\x18\x05 \x01(\tH\x02R\aorderBy\x88\x01\x01B\t\n" +
 	"\a_parentB\t\n" +
-	"\a_filter\"m\n" +
+	"\a_filterB\v\n" +
+	"\t_order_by\"m\n" +
 	"\x13ListMethodsResponse\x12.\n" +
 	"\amethods\x18\x01 \x03(\v2\x14.dtkt.core.v1.MethodR\amethods\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageTokenB\xb7\x01\n" +
@@ -17113,33 +17440,33 @@ var file_dtkt_core_v1_messages_proto_goTypes = []any{
 	(*timestamppb.Timestamp)(nil),            // 157: google.protobuf.Timestamp
 	(*anypb.Any)(nil),                        // 158: google.protobuf.Any
 	(*durationpb.Duration)(nil),              // 159: google.protobuf.Duration
-	(*fieldmaskpb.FieldMask)(nil),            // 160: google.protobuf.FieldMask
-	(*v1beta2.InputEvent)(nil),               // 161: dtkt.flow.v1beta2.InputEvent
-	(*v1beta2.InteractionResponseEvent)(nil), // 162: dtkt.flow.v1beta2.InteractionResponseEvent
-	(*v1beta2.StopFlowEvent)(nil),            // 163: dtkt.flow.v1beta2.StopFlowEvent
-	(*v1beta2.TerminateFlowEvent)(nil),       // 164: dtkt.flow.v1beta2.TerminateFlowEvent
-	(*v1beta2.SuspendFlowEvent)(nil),         // 165: dtkt.flow.v1beta2.SuspendFlowEvent
-	(*v1beta2.ResumeFlowEvent)(nil),          // 166: dtkt.flow.v1beta2.ResumeFlowEvent
-	(*v1beta2.StopNodeEvent)(nil),            // 167: dtkt.flow.v1beta2.StopNodeEvent
-	(*v1beta2.TerminateNodeEvent)(nil),       // 168: dtkt.flow.v1beta2.TerminateNodeEvent
-	(*v1beta2.SuspendNodeEvent)(nil),         // 169: dtkt.flow.v1beta2.SuspendNodeEvent
-	(*v1beta2.ResumeNodeEvent)(nil),          // 170: dtkt.flow.v1beta2.ResumeNodeEvent
-	(*v1beta2.StartFlowEvent)(nil),           // 171: dtkt.flow.v1beta2.StartFlowEvent
-	(*v1beta2.OutputEvent)(nil),              // 172: dtkt.flow.v1beta2.OutputEvent
-	(*v1beta2.InputRequestEvent)(nil),        // 173: dtkt.flow.v1beta2.InputRequestEvent
-	(*v1beta2.InteractionRequestEvent)(nil),  // 174: dtkt.flow.v1beta2.InteractionRequestEvent
-	(*descriptorpb.FileDescriptorSet)(nil),   // 175: google.protobuf.FileDescriptorSet
-	(*v1beta1.TypeSchema)(nil),               // 176: dtkt.shared.v1beta1.TypeSchema
-	(*v1beta11.Runtime)(nil),                 // 177: dtkt.flow.v1beta1.Runtime
-	(*v1beta2.RunSnapshot)(nil),              // 178: dtkt.flow.v1beta2.RunSnapshot
-	(*v1beta11.Flow)(nil),                    // 179: dtkt.flow.v1beta1.Flow
-	(*v1beta2.Flow)(nil),                     // 180: dtkt.flow.v1beta2.Flow
-	(*v1beta11.Graph)(nil),                   // 181: dtkt.flow.v1beta1.Graph
-	(*v1beta2.Graph)(nil),                    // 182: dtkt.flow.v1beta2.Graph
-	(*v1beta1.Package)(nil),                  // 183: dtkt.shared.v1beta1.Package
-	(v1beta1.Runtime)(0),                     // 184: dtkt.shared.v1beta1.Runtime
-	(*v1beta1.Platform)(nil),                 // 185: dtkt.shared.v1beta1.Platform
-	(*status.Status)(nil),                    // 186: google.rpc.Status
+	(*status.Status)(nil),                    // 160: google.rpc.Status
+	(*fieldmaskpb.FieldMask)(nil),            // 161: google.protobuf.FieldMask
+	(*v1beta2.InputEvent)(nil),               // 162: dtkt.flow.v1beta2.InputEvent
+	(*v1beta2.InteractionResponseEvent)(nil), // 163: dtkt.flow.v1beta2.InteractionResponseEvent
+	(*v1beta2.StopFlowEvent)(nil),            // 164: dtkt.flow.v1beta2.StopFlowEvent
+	(*v1beta2.TerminateFlowEvent)(nil),       // 165: dtkt.flow.v1beta2.TerminateFlowEvent
+	(*v1beta2.SuspendFlowEvent)(nil),         // 166: dtkt.flow.v1beta2.SuspendFlowEvent
+	(*v1beta2.ResumeFlowEvent)(nil),          // 167: dtkt.flow.v1beta2.ResumeFlowEvent
+	(*v1beta2.StopNodeEvent)(nil),            // 168: dtkt.flow.v1beta2.StopNodeEvent
+	(*v1beta2.TerminateNodeEvent)(nil),       // 169: dtkt.flow.v1beta2.TerminateNodeEvent
+	(*v1beta2.SuspendNodeEvent)(nil),         // 170: dtkt.flow.v1beta2.SuspendNodeEvent
+	(*v1beta2.ResumeNodeEvent)(nil),          // 171: dtkt.flow.v1beta2.ResumeNodeEvent
+	(*v1beta2.StartFlowEvent)(nil),           // 172: dtkt.flow.v1beta2.StartFlowEvent
+	(*v1beta2.OutputEvent)(nil),              // 173: dtkt.flow.v1beta2.OutputEvent
+	(*v1beta2.InputRequestEvent)(nil),        // 174: dtkt.flow.v1beta2.InputRequestEvent
+	(*v1beta2.InteractionRequestEvent)(nil),  // 175: dtkt.flow.v1beta2.InteractionRequestEvent
+	(*descriptorpb.FileDescriptorSet)(nil),   // 176: google.protobuf.FileDescriptorSet
+	(*v1beta1.TypeSchema)(nil),               // 177: dtkt.shared.v1beta1.TypeSchema
+	(*v1beta11.Runtime)(nil),                 // 178: dtkt.flow.v1beta1.Runtime
+	(*v1beta2.RunSnapshot)(nil),              // 179: dtkt.flow.v1beta2.RunSnapshot
+	(*v1beta11.Flow)(nil),                    // 180: dtkt.flow.v1beta1.Flow
+	(*v1beta2.Flow)(nil),                     // 181: dtkt.flow.v1beta2.Flow
+	(*v1beta11.Graph)(nil),                   // 182: dtkt.flow.v1beta1.Graph
+	(*v1beta2.Graph)(nil),                    // 183: dtkt.flow.v1beta2.Graph
+	(*v1beta1.Package)(nil),                  // 184: dtkt.shared.v1beta1.Package
+	(v1beta1.Runtime)(0),                     // 185: dtkt.shared.v1beta1.Runtime
+	(*v1beta1.Platform)(nil),                 // 186: dtkt.shared.v1beta1.Platform
 	(*v1beta11.UserAction)(nil),              // 187: dtkt.flow.v1beta1.UserAction
 }
 var file_dtkt_core_v1_messages_proto_depIdxs = []int32{
@@ -17164,186 +17491,187 @@ var file_dtkt_core_v1_messages_proto_depIdxs = []int32{
 	157, // 18: dtkt.core.v1.Flow.update_time:type_name -> google.protobuf.Timestamp
 	2,   // 19: dtkt.core.v1.FlowRun.state:type_name -> dtkt.core.v1.FlowRun.State
 	45,  // 20: dtkt.core.v1.FlowRun.run_state:type_name -> dtkt.core.v1.FlowRunMetadata
-	136, // 21: dtkt.core.v1.FlowRun.connections:type_name -> dtkt.core.v1.FlowRun.ConnectionsEntry
-	137, // 22: dtkt.core.v1.FlowRun.inputs:type_name -> dtkt.core.v1.FlowRun.InputsEntry
-	159, // 23: dtkt.core.v1.FlowRun.timeout:type_name -> google.protobuf.Duration
-	157, // 24: dtkt.core.v1.FlowRun.create_time:type_name -> google.protobuf.Timestamp
-	157, // 25: dtkt.core.v1.FlowRun.update_time:type_name -> google.protobuf.Timestamp
-	14,  // 26: dtkt.core.v1.GetFlowRunResponse.flowrun:type_name -> dtkt.core.v1.FlowRun
-	14,  // 27: dtkt.core.v1.CreateFlowRunRequest.flowrun:type_name -> dtkt.core.v1.FlowRun
-	14,  // 28: dtkt.core.v1.CreateFlowRunResponse.flowrun:type_name -> dtkt.core.v1.FlowRun
-	14,  // 29: dtkt.core.v1.UpdateFlowRunRequest.flowrun:type_name -> dtkt.core.v1.FlowRun
-	160, // 30: dtkt.core.v1.UpdateFlowRunRequest.update_mask:type_name -> google.protobuf.FieldMask
-	2,   // 31: dtkt.core.v1.UpdateFlowRunRequest.desired_state:type_name -> dtkt.core.v1.FlowRun.State
-	17,  // 32: dtkt.core.v1.BatchCreateFlowRunsRequest.requests:type_name -> dtkt.core.v1.CreateFlowRunRequest
-	14,  // 33: dtkt.core.v1.BatchCreateFlowRunsResponse.flowruns:type_name -> dtkt.core.v1.FlowRun
-	14,  // 34: dtkt.core.v1.ListFlowRunsResponse.flowruns:type_name -> dtkt.core.v1.FlowRun
-	161, // 35: dtkt.core.v1.SendFlowRunEvent.input:type_name -> dtkt.flow.v1beta2.InputEvent
-	162, // 36: dtkt.core.v1.SendFlowRunEvent.interaction_response:type_name -> dtkt.flow.v1beta2.InteractionResponseEvent
-	163, // 37: dtkt.core.v1.SendFlowRunEvent.stop:type_name -> dtkt.flow.v1beta2.StopFlowEvent
-	164, // 38: dtkt.core.v1.SendFlowRunEvent.terminate:type_name -> dtkt.flow.v1beta2.TerminateFlowEvent
-	165, // 39: dtkt.core.v1.SendFlowRunEvent.suspend:type_name -> dtkt.flow.v1beta2.SuspendFlowEvent
-	166, // 40: dtkt.core.v1.SendFlowRunEvent.resume:type_name -> dtkt.flow.v1beta2.ResumeFlowEvent
-	167, // 41: dtkt.core.v1.SendFlowRunEvent.stop_node:type_name -> dtkt.flow.v1beta2.StopNodeEvent
-	168, // 42: dtkt.core.v1.SendFlowRunEvent.terminate_node:type_name -> dtkt.flow.v1beta2.TerminateNodeEvent
-	169, // 43: dtkt.core.v1.SendFlowRunEvent.suspend_node:type_name -> dtkt.flow.v1beta2.SuspendNodeEvent
-	170, // 44: dtkt.core.v1.SendFlowRunEvent.resume_node:type_name -> dtkt.flow.v1beta2.ResumeNodeEvent
-	171, // 45: dtkt.core.v1.SendFlowRunEvent.start:type_name -> dtkt.flow.v1beta2.StartFlowEvent
-	172, // 46: dtkt.core.v1.ReceiveFlowRunEvent.output:type_name -> dtkt.flow.v1beta2.OutputEvent
-	173, // 47: dtkt.core.v1.ReceiveFlowRunEvent.input_request:type_name -> dtkt.flow.v1beta2.InputRequestEvent
-	174, // 48: dtkt.core.v1.ReceiveFlowRunEvent.interaction_request:type_name -> dtkt.flow.v1beta2.InteractionRequestEvent
-	14,  // 49: dtkt.core.v1.ReceiveFlowRunEvent.flowrun:type_name -> dtkt.core.v1.FlowRun
-	25,  // 50: dtkt.core.v1.SendFlowRunEventRequest.event:type_name -> dtkt.core.v1.SendFlowRunEvent
-	26,  // 51: dtkt.core.v1.ReceiveFlowRunEventsResponse.event:type_name -> dtkt.core.v1.ReceiveFlowRunEvent
-	25,  // 52: dtkt.core.v1.StreamFlowRunEventsRequest.event:type_name -> dtkt.core.v1.SendFlowRunEvent
-	26,  // 53: dtkt.core.v1.StreamFlowRunEventsResponse.event:type_name -> dtkt.core.v1.ReceiveFlowRunEvent
-	8,   // 54: dtkt.core.v1.Connection.address:type_name -> dtkt.core.v1.Address
-	158, // 55: dtkt.core.v1.Connection.decrypted_config:type_name -> google.protobuf.Any
-	55,  // 56: dtkt.core.v1.Connection.encrypted_config:type_name -> dtkt.core.v1.EncryptedAny
-	158, // 57: dtkt.core.v1.Connection.decrypted_auth:type_name -> google.protobuf.Any
-	55,  // 58: dtkt.core.v1.Connection.encrypted_auth:type_name -> dtkt.core.v1.EncryptedAny
-	138, // 59: dtkt.core.v1.Connection.headers:type_name -> dtkt.core.v1.Connection.HeadersEntry
-	157, // 60: dtkt.core.v1.Connection.create_time:type_name -> google.protobuf.Timestamp
-	157, // 61: dtkt.core.v1.Connection.update_time:type_name -> google.protobuf.Timestamp
-	3,   // 62: dtkt.core.v1.Deployment.state:type_name -> dtkt.core.v1.Deployment.State
-	8,   // 63: dtkt.core.v1.Deployment.address:type_name -> dtkt.core.v1.Address
-	139, // 64: dtkt.core.v1.Deployment.env:type_name -> dtkt.core.v1.Deployment.EnvEntry
-	140, // 65: dtkt.core.v1.Deployment.ports:type_name -> dtkt.core.v1.Deployment.PortsEntry
-	141, // 66: dtkt.core.v1.Deployment.build:type_name -> dtkt.core.v1.Deployment.Build
-	142, // 67: dtkt.core.v1.Deployment.cloud:type_name -> dtkt.core.v1.Deployment.Cloud
-	39,  // 68: dtkt.core.v1.Deployment.config_schema:type_name -> dtkt.core.v1.TypeSchema
-	48,  // 69: dtkt.core.v1.Deployment.package_spec:type_name -> dtkt.core.v1.PackageSpecMetadata
-	143, // 70: dtkt.core.v1.Deployment.runtime:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata
-	157, // 71: dtkt.core.v1.Deployment.create_time:type_name -> google.protobuf.Timestamp
-	157, // 72: dtkt.core.v1.Deployment.update_time:type_name -> google.protobuf.Timestamp
-	48,  // 73: dtkt.core.v1.Integration.spec:type_name -> dtkt.core.v1.PackageSpecMetadata
-	157, // 74: dtkt.core.v1.Integration.create_time:type_name -> google.protobuf.Timestamp
-	157, // 75: dtkt.core.v1.Integration.update_time:type_name -> google.protobuf.Timestamp
-	175, // 76: dtkt.core.v1.File.protos:type_name -> google.protobuf.FileDescriptorSet
-	157, // 77: dtkt.core.v1.File.create_time:type_name -> google.protobuf.Timestamp
-	157, // 78: dtkt.core.v1.File.update_time:type_name -> google.protobuf.Timestamp
-	157, // 79: dtkt.core.v1.Service.create_time:type_name -> google.protobuf.Timestamp
-	157, // 80: dtkt.core.v1.Service.update_time:type_name -> google.protobuf.Timestamp
-	157, // 81: dtkt.core.v1.Method.create_time:type_name -> google.protobuf.Timestamp
-	157, // 82: dtkt.core.v1.Method.update_time:type_name -> google.protobuf.Timestamp
-	39,  // 83: dtkt.core.v1.Type.schema:type_name -> dtkt.core.v1.TypeSchema
-	157, // 84: dtkt.core.v1.Type.create_time:type_name -> google.protobuf.Timestamp
-	157, // 85: dtkt.core.v1.Type.update_time:type_name -> google.protobuf.Timestamp
-	176, // 86: dtkt.core.v1.TypeSchema.v1beta1:type_name -> dtkt.shared.v1beta1.TypeSchema
-	157, // 87: dtkt.core.v1.AutomationMetadata.start_time:type_name -> google.protobuf.Timestamp
-	157, // 88: dtkt.core.v1.AutomationMetadata.stop_time:type_name -> google.protobuf.Timestamp
-	157, // 89: dtkt.core.v1.FlowRunOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
-	157, // 90: dtkt.core.v1.FlowRunOperationMetadata.stop_time:type_name -> google.protobuf.Timestamp
-	157, // 91: dtkt.core.v1.DeploymentMetadata.start_time:type_name -> google.protobuf.Timestamp
-	157, // 92: dtkt.core.v1.DeploymentMetadata.stop_time:type_name -> google.protobuf.Timestamp
-	10,  // 93: dtkt.core.v1.FlowConnectionMetadata.context:type_name -> dtkt.core.v1.Context
-	177, // 94: dtkt.core.v1.FlowRuntimeMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Runtime
-	178, // 95: dtkt.core.v1.FlowRunMetadata.v1beta2:type_name -> dtkt.flow.v1beta2.RunSnapshot
-	179, // 96: dtkt.core.v1.FlowSpecMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Flow
-	180, // 97: dtkt.core.v1.FlowSpecMetadata.v1beta2:type_name -> dtkt.flow.v1beta2.Flow
-	181, // 98: dtkt.core.v1.FlowGraphMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Graph
-	182, // 99: dtkt.core.v1.FlowGraphMetadata.v1beta2:type_name -> dtkt.flow.v1beta2.Graph
-	183, // 100: dtkt.core.v1.PackageSpecMetadata.v1beta1:type_name -> dtkt.shared.v1beta1.Package
-	146, // 101: dtkt.core.v1.PackageBuildMetadata.runtime:type_name -> dtkt.core.v1.PackageBuildMetadata.Runtime
-	147, // 102: dtkt.core.v1.PackageBuildMetadata.platform:type_name -> dtkt.core.v1.PackageBuildMetadata.Platform
-	148, // 103: dtkt.core.v1.PackageBuildMetadata.env:type_name -> dtkt.core.v1.PackageBuildMetadata.EnvEntry
-	4,   // 104: dtkt.core.v1.BuildOperationMetadata.state:type_name -> dtkt.core.v1.BuildOperationMetadata.State
-	157, // 105: dtkt.core.v1.BuildOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
-	157, // 106: dtkt.core.v1.BuildOperationMetadata.finish_time:type_name -> google.protobuf.Timestamp
-	5,   // 107: dtkt.core.v1.RunOperationMetadata.state:type_name -> dtkt.core.v1.RunOperationMetadata.State
-	157, // 108: dtkt.core.v1.RunOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
-	157, // 109: dtkt.core.v1.RunOperationMetadata.stop_time:type_name -> google.protobuf.Timestamp
-	6,   // 110: dtkt.core.v1.SyncOperationMetadata.state:type_name -> dtkt.core.v1.SyncOperationMetadata.State
-	157, // 111: dtkt.core.v1.SyncOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
-	157, // 112: dtkt.core.v1.SyncOperationMetadata.stop_time:type_name -> google.protobuf.Timestamp
-	7,   // 113: dtkt.core.v1.DialMetadata.state:type_name -> dtkt.core.v1.DialMetadata.State
-	157, // 114: dtkt.core.v1.DialMetadata.time:type_name -> google.protobuf.Timestamp
-	149, // 115: dtkt.core.v1.BatchRunOperationMetadata.failed_requests:type_name -> dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry
-	11,  // 116: dtkt.core.v1.EncryptRequest.resource:type_name -> dtkt.core.v1.Resource
-	11,  // 117: dtkt.core.v1.EncryptResponse.resource:type_name -> dtkt.core.v1.Resource
-	11,  // 118: dtkt.core.v1.DecryptRequest.resource:type_name -> dtkt.core.v1.Resource
-	11,  // 119: dtkt.core.v1.DecryptResponse.resource:type_name -> dtkt.core.v1.Resource
-	12,  // 120: dtkt.core.v1.GetAutomationResponse.automation:type_name -> dtkt.core.v1.Automation
-	12,  // 121: dtkt.core.v1.CreateAutomationRequest.automation:type_name -> dtkt.core.v1.Automation
-	12,  // 122: dtkt.core.v1.CreateAutomationResponse.automation:type_name -> dtkt.core.v1.Automation
-	12,  // 123: dtkt.core.v1.UpdateAutomationRequest.automation:type_name -> dtkt.core.v1.Automation
-	160, // 124: dtkt.core.v1.UpdateAutomationRequest.update_mask:type_name -> google.protobuf.FieldMask
-	1,   // 125: dtkt.core.v1.UpdateAutomationRequest.desired_state:type_name -> dtkt.core.v1.Automation.State
-	62,  // 126: dtkt.core.v1.BatchCreateAutomationsRequest.requests:type_name -> dtkt.core.v1.CreateAutomationRequest
-	12,  // 127: dtkt.core.v1.BatchCreateAutomationsResponse.automations:type_name -> dtkt.core.v1.Automation
-	12,  // 128: dtkt.core.v1.ListAutomationsResponse.automations:type_name -> dtkt.core.v1.Automation
-	150, // 129: dtkt.core.v1.SendAutomationEvent.inputs_event:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent
-	151, // 130: dtkt.core.v1.SendAutomationEvent.user_response_event:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent
-	154, // 131: dtkt.core.v1.ReceiveAutomationEvent.outputs_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent
-	155, // 132: dtkt.core.v1.ReceiveAutomationEvent.user_request_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent
-	70,  // 133: dtkt.core.v1.SendAutomationEventRequest.event:type_name -> dtkt.core.v1.SendAutomationEvent
-	71,  // 134: dtkt.core.v1.ReceiveAutomationEventsResponse.event:type_name -> dtkt.core.v1.ReceiveAutomationEvent
-	70,  // 135: dtkt.core.v1.StreamAutomationEventsRequest.event:type_name -> dtkt.core.v1.SendAutomationEvent
-	71,  // 136: dtkt.core.v1.StreamAutomationEventsResponse.event:type_name -> dtkt.core.v1.ReceiveAutomationEvent
-	32,  // 137: dtkt.core.v1.ListConnectionsResponse.connections:type_name -> dtkt.core.v1.Connection
-	32,  // 138: dtkt.core.v1.GetConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
-	32,  // 139: dtkt.core.v1.CreateConnectionRequest.connection:type_name -> dtkt.core.v1.Connection
-	32,  // 140: dtkt.core.v1.CreateConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
-	32,  // 141: dtkt.core.v1.UpdateConnectionRequest.connection:type_name -> dtkt.core.v1.Connection
-	160, // 142: dtkt.core.v1.UpdateConnectionRequest.update_mask:type_name -> google.protobuf.FieldMask
-	32,  // 143: dtkt.core.v1.UpdateConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
-	53,  // 144: dtkt.core.v1.DialConnectionResponse.dial:type_name -> dtkt.core.v1.DialMetadata
-	35,  // 145: dtkt.core.v1.SyncDescriptorsResponse.file:type_name -> dtkt.core.v1.File
-	35,  // 146: dtkt.core.v1.GetDescriptorsResponse.file:type_name -> dtkt.core.v1.File
-	33,  // 147: dtkt.core.v1.ListDeploymentsResponse.deployments:type_name -> dtkt.core.v1.Deployment
-	33,  // 148: dtkt.core.v1.GetDeploymentResponse.deployment:type_name -> dtkt.core.v1.Deployment
-	33,  // 149: dtkt.core.v1.CreateDeploymentRequest.deployment:type_name -> dtkt.core.v1.Deployment
-	33,  // 150: dtkt.core.v1.UpdateDeploymentRequest.deployment:type_name -> dtkt.core.v1.Deployment
-	160, // 151: dtkt.core.v1.UpdateDeploymentRequest.update_mask:type_name -> google.protobuf.FieldMask
-	3,   // 152: dtkt.core.v1.UpdateDeploymentRequest.desired_state:type_name -> dtkt.core.v1.Deployment.State
-	13,  // 153: dtkt.core.v1.ListFlowsResponse.flows:type_name -> dtkt.core.v1.Flow
-	13,  // 154: dtkt.core.v1.GetFlowResponse.flow:type_name -> dtkt.core.v1.Flow
-	13,  // 155: dtkt.core.v1.CreateFlowRequest.flow:type_name -> dtkt.core.v1.Flow
-	13,  // 156: dtkt.core.v1.CreateFlowResponse.flow:type_name -> dtkt.core.v1.Flow
-	13,  // 157: dtkt.core.v1.UpdateFlowRequest.flow:type_name -> dtkt.core.v1.Flow
-	160, // 158: dtkt.core.v1.UpdateFlowRequest.update_mask:type_name -> google.protobuf.FieldMask
-	13,  // 159: dtkt.core.v1.UpdateFlowResponse.flow:type_name -> dtkt.core.v1.Flow
-	34,  // 160: dtkt.core.v1.ListIntegrationsResponse.integrations:type_name -> dtkt.core.v1.Integration
-	34,  // 161: dtkt.core.v1.GetIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
-	34,  // 162: dtkt.core.v1.CreateIntegrationRequest.integration:type_name -> dtkt.core.v1.Integration
-	34,  // 163: dtkt.core.v1.CreateIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
-	49,  // 164: dtkt.core.v1.BuildIntegrationRequest.build:type_name -> dtkt.core.v1.PackageBuildMetadata
-	34,  // 165: dtkt.core.v1.BuildIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
-	49,  // 166: dtkt.core.v1.BuildIntegrationResponse.build:type_name -> dtkt.core.v1.PackageBuildMetadata
-	34,  // 167: dtkt.core.v1.UpdateIntegrationRequest.integration:type_name -> dtkt.core.v1.Integration
-	160, // 168: dtkt.core.v1.UpdateIntegrationRequest.update_mask:type_name -> google.protobuf.FieldMask
-	34,  // 169: dtkt.core.v1.UpdateIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
-	38,  // 170: dtkt.core.v1.GetTypeResponse.type:type_name -> dtkt.core.v1.Type
-	38,  // 171: dtkt.core.v1.ListTypesResponse.types:type_name -> dtkt.core.v1.Type
-	37,  // 172: dtkt.core.v1.GetMethodResponse.method:type_name -> dtkt.core.v1.Method
-	36,  // 173: dtkt.core.v1.GetServiceResponse.service:type_name -> dtkt.core.v1.Service
-	36,  // 174: dtkt.core.v1.ListServicesResponse.services:type_name -> dtkt.core.v1.Service
-	37,  // 175: dtkt.core.v1.ListMethodsResponse.methods:type_name -> dtkt.core.v1.Method
-	43,  // 176: dtkt.core.v1.Automation.ConnectionsEntry.value:type_name -> dtkt.core.v1.FlowConnectionMetadata
-	158, // 177: dtkt.core.v1.Automation.InputsEntry.value:type_name -> google.protobuf.Any
-	43,  // 178: dtkt.core.v1.FlowRun.ConnectionsEntry.value:type_name -> dtkt.core.v1.FlowConnectionMetadata
-	158, // 179: dtkt.core.v1.FlowRun.InputsEntry.value:type_name -> google.protobuf.Any
-	49,  // 180: dtkt.core.v1.Deployment.Build.metadata:type_name -> dtkt.core.v1.PackageBuildMetadata
-	10,  // 181: dtkt.core.v1.Deployment.Build.context:type_name -> dtkt.core.v1.Context
-	10,  // 182: dtkt.core.v1.Deployment.Cloud.context:type_name -> dtkt.core.v1.Context
-	55,  // 183: dtkt.core.v1.Deployment.Cloud.config:type_name -> dtkt.core.v1.EncryptedAny
-	144, // 184: dtkt.core.v1.Deployment.RuntimeMetadata.native:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata.Native
-	145, // 185: dtkt.core.v1.Deployment.RuntimeMetadata.docker:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata.Docker
-	184, // 186: dtkt.core.v1.PackageBuildMetadata.Runtime.v1beta1:type_name -> dtkt.shared.v1beta1.Runtime
-	185, // 187: dtkt.core.v1.PackageBuildMetadata.Platform.v1beta1:type_name -> dtkt.shared.v1beta1.Platform
-	186, // 188: dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry.value:type_name -> google.rpc.Status
-	152, // 189: dtkt.core.v1.SendAutomationEvent.InputsEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry
-	153, // 190: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry
-	158, // 191: dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
-	158, // 192: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry.value:type_name -> google.protobuf.Any
-	156, // 193: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.values:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry
-	187, // 194: dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent.user_action:type_name -> dtkt.flow.v1beta1.UserAction
-	158, // 195: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
-	196, // [196:196] is the sub-list for method output_type
-	196, // [196:196] is the sub-list for method input_type
-	196, // [196:196] is the sub-list for extension type_name
-	196, // [196:196] is the sub-list for extension extendee
-	0,   // [0:196] is the sub-list for field type_name
+	160, // 21: dtkt.core.v1.FlowRun.error:type_name -> google.rpc.Status
+	136, // 22: dtkt.core.v1.FlowRun.connections:type_name -> dtkt.core.v1.FlowRun.ConnectionsEntry
+	137, // 23: dtkt.core.v1.FlowRun.inputs:type_name -> dtkt.core.v1.FlowRun.InputsEntry
+	159, // 24: dtkt.core.v1.FlowRun.timeout:type_name -> google.protobuf.Duration
+	157, // 25: dtkt.core.v1.FlowRun.create_time:type_name -> google.protobuf.Timestamp
+	157, // 26: dtkt.core.v1.FlowRun.update_time:type_name -> google.protobuf.Timestamp
+	14,  // 27: dtkt.core.v1.GetFlowRunResponse.flowrun:type_name -> dtkt.core.v1.FlowRun
+	14,  // 28: dtkt.core.v1.CreateFlowRunRequest.flowrun:type_name -> dtkt.core.v1.FlowRun
+	14,  // 29: dtkt.core.v1.CreateFlowRunResponse.flowrun:type_name -> dtkt.core.v1.FlowRun
+	14,  // 30: dtkt.core.v1.UpdateFlowRunRequest.flowrun:type_name -> dtkt.core.v1.FlowRun
+	161, // 31: dtkt.core.v1.UpdateFlowRunRequest.update_mask:type_name -> google.protobuf.FieldMask
+	2,   // 32: dtkt.core.v1.UpdateFlowRunRequest.desired_state:type_name -> dtkt.core.v1.FlowRun.State
+	17,  // 33: dtkt.core.v1.BatchCreateFlowRunsRequest.requests:type_name -> dtkt.core.v1.CreateFlowRunRequest
+	14,  // 34: dtkt.core.v1.BatchCreateFlowRunsResponse.flowruns:type_name -> dtkt.core.v1.FlowRun
+	14,  // 35: dtkt.core.v1.ListFlowRunsResponse.flowruns:type_name -> dtkt.core.v1.FlowRun
+	162, // 36: dtkt.core.v1.SendFlowRunEvent.input:type_name -> dtkt.flow.v1beta2.InputEvent
+	163, // 37: dtkt.core.v1.SendFlowRunEvent.interaction_response:type_name -> dtkt.flow.v1beta2.InteractionResponseEvent
+	164, // 38: dtkt.core.v1.SendFlowRunEvent.stop:type_name -> dtkt.flow.v1beta2.StopFlowEvent
+	165, // 39: dtkt.core.v1.SendFlowRunEvent.terminate:type_name -> dtkt.flow.v1beta2.TerminateFlowEvent
+	166, // 40: dtkt.core.v1.SendFlowRunEvent.suspend:type_name -> dtkt.flow.v1beta2.SuspendFlowEvent
+	167, // 41: dtkt.core.v1.SendFlowRunEvent.resume:type_name -> dtkt.flow.v1beta2.ResumeFlowEvent
+	168, // 42: dtkt.core.v1.SendFlowRunEvent.stop_node:type_name -> dtkt.flow.v1beta2.StopNodeEvent
+	169, // 43: dtkt.core.v1.SendFlowRunEvent.terminate_node:type_name -> dtkt.flow.v1beta2.TerminateNodeEvent
+	170, // 44: dtkt.core.v1.SendFlowRunEvent.suspend_node:type_name -> dtkt.flow.v1beta2.SuspendNodeEvent
+	171, // 45: dtkt.core.v1.SendFlowRunEvent.resume_node:type_name -> dtkt.flow.v1beta2.ResumeNodeEvent
+	172, // 46: dtkt.core.v1.SendFlowRunEvent.start:type_name -> dtkt.flow.v1beta2.StartFlowEvent
+	173, // 47: dtkt.core.v1.ReceiveFlowRunEvent.output:type_name -> dtkt.flow.v1beta2.OutputEvent
+	174, // 48: dtkt.core.v1.ReceiveFlowRunEvent.input_request:type_name -> dtkt.flow.v1beta2.InputRequestEvent
+	175, // 49: dtkt.core.v1.ReceiveFlowRunEvent.interaction_request:type_name -> dtkt.flow.v1beta2.InteractionRequestEvent
+	14,  // 50: dtkt.core.v1.ReceiveFlowRunEvent.flowrun:type_name -> dtkt.core.v1.FlowRun
+	25,  // 51: dtkt.core.v1.SendFlowRunEventRequest.event:type_name -> dtkt.core.v1.SendFlowRunEvent
+	26,  // 52: dtkt.core.v1.ReceiveFlowRunEventsResponse.event:type_name -> dtkt.core.v1.ReceiveFlowRunEvent
+	25,  // 53: dtkt.core.v1.StreamFlowRunEventsRequest.event:type_name -> dtkt.core.v1.SendFlowRunEvent
+	26,  // 54: dtkt.core.v1.StreamFlowRunEventsResponse.event:type_name -> dtkt.core.v1.ReceiveFlowRunEvent
+	8,   // 55: dtkt.core.v1.Connection.address:type_name -> dtkt.core.v1.Address
+	158, // 56: dtkt.core.v1.Connection.decrypted_config:type_name -> google.protobuf.Any
+	55,  // 57: dtkt.core.v1.Connection.encrypted_config:type_name -> dtkt.core.v1.EncryptedAny
+	158, // 58: dtkt.core.v1.Connection.decrypted_auth:type_name -> google.protobuf.Any
+	55,  // 59: dtkt.core.v1.Connection.encrypted_auth:type_name -> dtkt.core.v1.EncryptedAny
+	138, // 60: dtkt.core.v1.Connection.headers:type_name -> dtkt.core.v1.Connection.HeadersEntry
+	157, // 61: dtkt.core.v1.Connection.create_time:type_name -> google.protobuf.Timestamp
+	157, // 62: dtkt.core.v1.Connection.update_time:type_name -> google.protobuf.Timestamp
+	3,   // 63: dtkt.core.v1.Deployment.state:type_name -> dtkt.core.v1.Deployment.State
+	8,   // 64: dtkt.core.v1.Deployment.address:type_name -> dtkt.core.v1.Address
+	139, // 65: dtkt.core.v1.Deployment.env:type_name -> dtkt.core.v1.Deployment.EnvEntry
+	140, // 66: dtkt.core.v1.Deployment.ports:type_name -> dtkt.core.v1.Deployment.PortsEntry
+	141, // 67: dtkt.core.v1.Deployment.build:type_name -> dtkt.core.v1.Deployment.Build
+	142, // 68: dtkt.core.v1.Deployment.cloud:type_name -> dtkt.core.v1.Deployment.Cloud
+	39,  // 69: dtkt.core.v1.Deployment.config_schema:type_name -> dtkt.core.v1.TypeSchema
+	48,  // 70: dtkt.core.v1.Deployment.package_spec:type_name -> dtkt.core.v1.PackageSpecMetadata
+	143, // 71: dtkt.core.v1.Deployment.runtime:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata
+	157, // 72: dtkt.core.v1.Deployment.create_time:type_name -> google.protobuf.Timestamp
+	157, // 73: dtkt.core.v1.Deployment.update_time:type_name -> google.protobuf.Timestamp
+	48,  // 74: dtkt.core.v1.Integration.spec:type_name -> dtkt.core.v1.PackageSpecMetadata
+	157, // 75: dtkt.core.v1.Integration.create_time:type_name -> google.protobuf.Timestamp
+	157, // 76: dtkt.core.v1.Integration.update_time:type_name -> google.protobuf.Timestamp
+	176, // 77: dtkt.core.v1.File.protos:type_name -> google.protobuf.FileDescriptorSet
+	157, // 78: dtkt.core.v1.File.create_time:type_name -> google.protobuf.Timestamp
+	157, // 79: dtkt.core.v1.File.update_time:type_name -> google.protobuf.Timestamp
+	157, // 80: dtkt.core.v1.Service.create_time:type_name -> google.protobuf.Timestamp
+	157, // 81: dtkt.core.v1.Service.update_time:type_name -> google.protobuf.Timestamp
+	157, // 82: dtkt.core.v1.Method.create_time:type_name -> google.protobuf.Timestamp
+	157, // 83: dtkt.core.v1.Method.update_time:type_name -> google.protobuf.Timestamp
+	39,  // 84: dtkt.core.v1.Type.schema:type_name -> dtkt.core.v1.TypeSchema
+	157, // 85: dtkt.core.v1.Type.create_time:type_name -> google.protobuf.Timestamp
+	157, // 86: dtkt.core.v1.Type.update_time:type_name -> google.protobuf.Timestamp
+	177, // 87: dtkt.core.v1.TypeSchema.v1beta1:type_name -> dtkt.shared.v1beta1.TypeSchema
+	157, // 88: dtkt.core.v1.AutomationMetadata.start_time:type_name -> google.protobuf.Timestamp
+	157, // 89: dtkt.core.v1.AutomationMetadata.stop_time:type_name -> google.protobuf.Timestamp
+	157, // 90: dtkt.core.v1.FlowRunOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
+	157, // 91: dtkt.core.v1.FlowRunOperationMetadata.stop_time:type_name -> google.protobuf.Timestamp
+	157, // 92: dtkt.core.v1.DeploymentMetadata.start_time:type_name -> google.protobuf.Timestamp
+	157, // 93: dtkt.core.v1.DeploymentMetadata.stop_time:type_name -> google.protobuf.Timestamp
+	10,  // 94: dtkt.core.v1.FlowConnectionMetadata.context:type_name -> dtkt.core.v1.Context
+	178, // 95: dtkt.core.v1.FlowRuntimeMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Runtime
+	179, // 96: dtkt.core.v1.FlowRunMetadata.v1beta2:type_name -> dtkt.flow.v1beta2.RunSnapshot
+	180, // 97: dtkt.core.v1.FlowSpecMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Flow
+	181, // 98: dtkt.core.v1.FlowSpecMetadata.v1beta2:type_name -> dtkt.flow.v1beta2.Flow
+	182, // 99: dtkt.core.v1.FlowGraphMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Graph
+	183, // 100: dtkt.core.v1.FlowGraphMetadata.v1beta2:type_name -> dtkt.flow.v1beta2.Graph
+	184, // 101: dtkt.core.v1.PackageSpecMetadata.v1beta1:type_name -> dtkt.shared.v1beta1.Package
+	146, // 102: dtkt.core.v1.PackageBuildMetadata.runtime:type_name -> dtkt.core.v1.PackageBuildMetadata.Runtime
+	147, // 103: dtkt.core.v1.PackageBuildMetadata.platform:type_name -> dtkt.core.v1.PackageBuildMetadata.Platform
+	148, // 104: dtkt.core.v1.PackageBuildMetadata.env:type_name -> dtkt.core.v1.PackageBuildMetadata.EnvEntry
+	4,   // 105: dtkt.core.v1.BuildOperationMetadata.state:type_name -> dtkt.core.v1.BuildOperationMetadata.State
+	157, // 106: dtkt.core.v1.BuildOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
+	157, // 107: dtkt.core.v1.BuildOperationMetadata.finish_time:type_name -> google.protobuf.Timestamp
+	5,   // 108: dtkt.core.v1.RunOperationMetadata.state:type_name -> dtkt.core.v1.RunOperationMetadata.State
+	157, // 109: dtkt.core.v1.RunOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
+	157, // 110: dtkt.core.v1.RunOperationMetadata.stop_time:type_name -> google.protobuf.Timestamp
+	6,   // 111: dtkt.core.v1.SyncOperationMetadata.state:type_name -> dtkt.core.v1.SyncOperationMetadata.State
+	157, // 112: dtkt.core.v1.SyncOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
+	157, // 113: dtkt.core.v1.SyncOperationMetadata.stop_time:type_name -> google.protobuf.Timestamp
+	7,   // 114: dtkt.core.v1.DialMetadata.state:type_name -> dtkt.core.v1.DialMetadata.State
+	157, // 115: dtkt.core.v1.DialMetadata.time:type_name -> google.protobuf.Timestamp
+	149, // 116: dtkt.core.v1.BatchRunOperationMetadata.failed_requests:type_name -> dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry
+	11,  // 117: dtkt.core.v1.EncryptRequest.resource:type_name -> dtkt.core.v1.Resource
+	11,  // 118: dtkt.core.v1.EncryptResponse.resource:type_name -> dtkt.core.v1.Resource
+	11,  // 119: dtkt.core.v1.DecryptRequest.resource:type_name -> dtkt.core.v1.Resource
+	11,  // 120: dtkt.core.v1.DecryptResponse.resource:type_name -> dtkt.core.v1.Resource
+	12,  // 121: dtkt.core.v1.GetAutomationResponse.automation:type_name -> dtkt.core.v1.Automation
+	12,  // 122: dtkt.core.v1.CreateAutomationRequest.automation:type_name -> dtkt.core.v1.Automation
+	12,  // 123: dtkt.core.v1.CreateAutomationResponse.automation:type_name -> dtkt.core.v1.Automation
+	12,  // 124: dtkt.core.v1.UpdateAutomationRequest.automation:type_name -> dtkt.core.v1.Automation
+	161, // 125: dtkt.core.v1.UpdateAutomationRequest.update_mask:type_name -> google.protobuf.FieldMask
+	1,   // 126: dtkt.core.v1.UpdateAutomationRequest.desired_state:type_name -> dtkt.core.v1.Automation.State
+	62,  // 127: dtkt.core.v1.BatchCreateAutomationsRequest.requests:type_name -> dtkt.core.v1.CreateAutomationRequest
+	12,  // 128: dtkt.core.v1.BatchCreateAutomationsResponse.automations:type_name -> dtkt.core.v1.Automation
+	12,  // 129: dtkt.core.v1.ListAutomationsResponse.automations:type_name -> dtkt.core.v1.Automation
+	150, // 130: dtkt.core.v1.SendAutomationEvent.inputs_event:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent
+	151, // 131: dtkt.core.v1.SendAutomationEvent.user_response_event:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent
+	154, // 132: dtkt.core.v1.ReceiveAutomationEvent.outputs_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent
+	155, // 133: dtkt.core.v1.ReceiveAutomationEvent.user_request_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent
+	70,  // 134: dtkt.core.v1.SendAutomationEventRequest.event:type_name -> dtkt.core.v1.SendAutomationEvent
+	71,  // 135: dtkt.core.v1.ReceiveAutomationEventsResponse.event:type_name -> dtkt.core.v1.ReceiveAutomationEvent
+	70,  // 136: dtkt.core.v1.StreamAutomationEventsRequest.event:type_name -> dtkt.core.v1.SendAutomationEvent
+	71,  // 137: dtkt.core.v1.StreamAutomationEventsResponse.event:type_name -> dtkt.core.v1.ReceiveAutomationEvent
+	32,  // 138: dtkt.core.v1.ListConnectionsResponse.connections:type_name -> dtkt.core.v1.Connection
+	32,  // 139: dtkt.core.v1.GetConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
+	32,  // 140: dtkt.core.v1.CreateConnectionRequest.connection:type_name -> dtkt.core.v1.Connection
+	32,  // 141: dtkt.core.v1.CreateConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
+	32,  // 142: dtkt.core.v1.UpdateConnectionRequest.connection:type_name -> dtkt.core.v1.Connection
+	161, // 143: dtkt.core.v1.UpdateConnectionRequest.update_mask:type_name -> google.protobuf.FieldMask
+	32,  // 144: dtkt.core.v1.UpdateConnectionResponse.connection:type_name -> dtkt.core.v1.Connection
+	53,  // 145: dtkt.core.v1.DialConnectionResponse.dial:type_name -> dtkt.core.v1.DialMetadata
+	35,  // 146: dtkt.core.v1.SyncDescriptorsResponse.file:type_name -> dtkt.core.v1.File
+	35,  // 147: dtkt.core.v1.GetDescriptorsResponse.file:type_name -> dtkt.core.v1.File
+	33,  // 148: dtkt.core.v1.ListDeploymentsResponse.deployments:type_name -> dtkt.core.v1.Deployment
+	33,  // 149: dtkt.core.v1.GetDeploymentResponse.deployment:type_name -> dtkt.core.v1.Deployment
+	33,  // 150: dtkt.core.v1.CreateDeploymentRequest.deployment:type_name -> dtkt.core.v1.Deployment
+	33,  // 151: dtkt.core.v1.UpdateDeploymentRequest.deployment:type_name -> dtkt.core.v1.Deployment
+	161, // 152: dtkt.core.v1.UpdateDeploymentRequest.update_mask:type_name -> google.protobuf.FieldMask
+	3,   // 153: dtkt.core.v1.UpdateDeploymentRequest.desired_state:type_name -> dtkt.core.v1.Deployment.State
+	13,  // 154: dtkt.core.v1.ListFlowsResponse.flows:type_name -> dtkt.core.v1.Flow
+	13,  // 155: dtkt.core.v1.GetFlowResponse.flow:type_name -> dtkt.core.v1.Flow
+	13,  // 156: dtkt.core.v1.CreateFlowRequest.flow:type_name -> dtkt.core.v1.Flow
+	13,  // 157: dtkt.core.v1.CreateFlowResponse.flow:type_name -> dtkt.core.v1.Flow
+	13,  // 158: dtkt.core.v1.UpdateFlowRequest.flow:type_name -> dtkt.core.v1.Flow
+	161, // 159: dtkt.core.v1.UpdateFlowRequest.update_mask:type_name -> google.protobuf.FieldMask
+	13,  // 160: dtkt.core.v1.UpdateFlowResponse.flow:type_name -> dtkt.core.v1.Flow
+	34,  // 161: dtkt.core.v1.ListIntegrationsResponse.integrations:type_name -> dtkt.core.v1.Integration
+	34,  // 162: dtkt.core.v1.GetIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
+	34,  // 163: dtkt.core.v1.CreateIntegrationRequest.integration:type_name -> dtkt.core.v1.Integration
+	34,  // 164: dtkt.core.v1.CreateIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
+	49,  // 165: dtkt.core.v1.BuildIntegrationRequest.build:type_name -> dtkt.core.v1.PackageBuildMetadata
+	34,  // 166: dtkt.core.v1.BuildIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
+	49,  // 167: dtkt.core.v1.BuildIntegrationResponse.build:type_name -> dtkt.core.v1.PackageBuildMetadata
+	34,  // 168: dtkt.core.v1.UpdateIntegrationRequest.integration:type_name -> dtkt.core.v1.Integration
+	161, // 169: dtkt.core.v1.UpdateIntegrationRequest.update_mask:type_name -> google.protobuf.FieldMask
+	34,  // 170: dtkt.core.v1.UpdateIntegrationResponse.integration:type_name -> dtkt.core.v1.Integration
+	38,  // 171: dtkt.core.v1.GetTypeResponse.type:type_name -> dtkt.core.v1.Type
+	38,  // 172: dtkt.core.v1.ListTypesResponse.types:type_name -> dtkt.core.v1.Type
+	37,  // 173: dtkt.core.v1.GetMethodResponse.method:type_name -> dtkt.core.v1.Method
+	36,  // 174: dtkt.core.v1.GetServiceResponse.service:type_name -> dtkt.core.v1.Service
+	36,  // 175: dtkt.core.v1.ListServicesResponse.services:type_name -> dtkt.core.v1.Service
+	37,  // 176: dtkt.core.v1.ListMethodsResponse.methods:type_name -> dtkt.core.v1.Method
+	43,  // 177: dtkt.core.v1.Automation.ConnectionsEntry.value:type_name -> dtkt.core.v1.FlowConnectionMetadata
+	158, // 178: dtkt.core.v1.Automation.InputsEntry.value:type_name -> google.protobuf.Any
+	43,  // 179: dtkt.core.v1.FlowRun.ConnectionsEntry.value:type_name -> dtkt.core.v1.FlowConnectionMetadata
+	158, // 180: dtkt.core.v1.FlowRun.InputsEntry.value:type_name -> google.protobuf.Any
+	49,  // 181: dtkt.core.v1.Deployment.Build.metadata:type_name -> dtkt.core.v1.PackageBuildMetadata
+	10,  // 182: dtkt.core.v1.Deployment.Build.context:type_name -> dtkt.core.v1.Context
+	10,  // 183: dtkt.core.v1.Deployment.Cloud.context:type_name -> dtkt.core.v1.Context
+	55,  // 184: dtkt.core.v1.Deployment.Cloud.config:type_name -> dtkt.core.v1.EncryptedAny
+	144, // 185: dtkt.core.v1.Deployment.RuntimeMetadata.native:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata.Native
+	145, // 186: dtkt.core.v1.Deployment.RuntimeMetadata.docker:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata.Docker
+	185, // 187: dtkt.core.v1.PackageBuildMetadata.Runtime.v1beta1:type_name -> dtkt.shared.v1beta1.Runtime
+	186, // 188: dtkt.core.v1.PackageBuildMetadata.Platform.v1beta1:type_name -> dtkt.shared.v1beta1.Platform
+	160, // 189: dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry.value:type_name -> google.rpc.Status
+	152, // 190: dtkt.core.v1.SendAutomationEvent.InputsEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry
+	153, // 191: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry
+	158, // 192: dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
+	158, // 193: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry.value:type_name -> google.protobuf.Any
+	156, // 194: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.values:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry
+	187, // 195: dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent.user_action:type_name -> dtkt.flow.v1beta1.UserAction
+	158, // 196: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
+	197, // [197:197] is the sub-list for method output_type
+	197, // [197:197] is the sub-list for method input_type
+	197, // [197:197] is the sub-list for extension type_name
+	197, // [197:197] is the sub-list for extension extendee
+	0,   // [0:197] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_core_v1_messages_proto_init() }

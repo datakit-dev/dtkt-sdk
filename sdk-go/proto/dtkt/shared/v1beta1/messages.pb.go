@@ -1727,9 +1727,126 @@ func (b0 PageToken_builder) Build() *PageToken {
 	return m0
 }
 
-// TypeMeta identifies a resource's API version and kind, analogous to
-// Kubernetes' TypeMeta. It is intentionally small -- the spec payload is
-// handled separately.
+// PageCursor is the opaque page_token used by paginated List endpoints.
+// It encodes both the request parameters active when the token was
+// issued (so the server can return INVALID_ARGUMENT if the client
+// changes anything other than page_size mid-pagination, per AIP-158)
+// and the typed sort-key values from the last row of the previous
+// page (in order_by sequence, with the UUID v7 id as the trailing
+// stable tiebreaker).
+//
+// The same shape covers both the default sort (order_by empty,
+// values=[id]) and user-specified sort (values=[k1, k2, ..., id]) so
+// there is one cursor format per resource.
+type PageCursor struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// Active request parameters at token issuance. Server returns
+	// INVALID_ARGUMENT if any of these differ on the next request.
+	Parent  string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
+	Filter  string `protobuf:"bytes,2,opt,name=filter,proto3" json:"filter,omitempty"`
+	OrderBy string `protobuf:"bytes,3,opt,name=order_by,json=orderBy,proto3" json:"order_by,omitempty"`
+	// Typed values from the last row of the previous page. When
+	// order_by is empty this has a single entry: the UUID v7 id.
+	Values        []*PageCursor_CursorValue `protobuf:"bytes,4,rep,name=values,proto3" json:"values,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PageCursor) Reset() {
+	*x = PageCursor{}
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PageCursor) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PageCursor) ProtoMessage() {}
+
+func (x *PageCursor) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *PageCursor) GetParent() string {
+	if x != nil {
+		return x.Parent
+	}
+	return ""
+}
+
+func (x *PageCursor) GetFilter() string {
+	if x != nil {
+		return x.Filter
+	}
+	return ""
+}
+
+func (x *PageCursor) GetOrderBy() string {
+	if x != nil {
+		return x.OrderBy
+	}
+	return ""
+}
+
+func (x *PageCursor) GetValues() []*PageCursor_CursorValue {
+	if x != nil {
+		return x.Values
+	}
+	return nil
+}
+
+func (x *PageCursor) SetParent(v string) {
+	x.Parent = v
+}
+
+func (x *PageCursor) SetFilter(v string) {
+	x.Filter = v
+}
+
+func (x *PageCursor) SetOrderBy(v string) {
+	x.OrderBy = v
+}
+
+func (x *PageCursor) SetValues(v []*PageCursor_CursorValue) {
+	x.Values = v
+}
+
+type PageCursor_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Active request parameters at token issuance. Server returns
+	// INVALID_ARGUMENT if any of these differ on the next request.
+	Parent  string
+	Filter  string
+	OrderBy string
+	// Typed values from the last row of the previous page. When
+	// order_by is empty this has a single entry: the UUID v7 id.
+	Values []*PageCursor_CursorValue
+}
+
+func (b0 PageCursor_builder) Build() *PageCursor {
+	m0 := &PageCursor{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Parent = b.Parent
+	x.Filter = b.Filter
+	x.OrderBy = b.OrderBy
+	x.Values = b.Values
+	return m0
+}
+
+// TypeMeta identifies a resource's API version and kind. It is
+// intentionally small; the spec payload is handled separately.
 type TypeMeta struct {
 	state         protoimpl.MessageState `protogen:"hybrid.v1"`
 	ApiVersion    string                 `protobuf:"bytes,1,opt,name=api_version,json=apiVersion,proto3" json:"api_version,omitempty"`
@@ -1740,7 +1857,7 @@ type TypeMeta struct {
 
 func (x *TypeMeta) Reset() {
 	*x = TypeMeta{}
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[15]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1752,7 +1869,7 @@ func (x *TypeMeta) String() string {
 func (*TypeMeta) ProtoMessage() {}
 
 func (x *TypeMeta) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[15]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1811,7 +1928,7 @@ type Package_Identity struct {
 
 func (x *Package_Identity) Reset() {
 	*x = Package_Identity{}
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[16]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1823,7 +1940,7 @@ func (x *Package_Identity) String() string {
 func (*Package_Identity) ProtoMessage() {}
 
 func (x *Package_Identity) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[16]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1887,7 +2004,7 @@ type Package_BuildConfig struct {
 
 func (x *Package_BuildConfig) Reset() {
 	*x = Package_BuildConfig{}
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[17]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1899,7 +2016,7 @@ func (x *Package_BuildConfig) String() string {
 func (*Package_BuildConfig) ProtoMessage() {}
 
 func (x *Package_BuildConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[17]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2047,7 +2164,7 @@ func (b0 Package_BuildConfig_builder) Build() *Package_BuildConfig {
 type case_Package_BuildConfig_Artifact protoreflect.FieldNumber
 
 func (x case_Package_BuildConfig_Artifact) String() string {
-	md := file_dtkt_shared_v1beta1_messages_proto_msgTypes[17].Descriptor()
+	md := file_dtkt_shared_v1beta1_messages_proto_msgTypes[18].Descriptor()
 	if x == 0 {
 		return "not set"
 	}
@@ -2082,7 +2199,7 @@ type Package_DeployConfig struct {
 
 func (x *Package_DeployConfig) Reset() {
 	*x = Package_DeployConfig{}
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[18]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2094,7 +2211,7 @@ func (x *Package_DeployConfig) String() string {
 func (*Package_DeployConfig) ProtoMessage() {}
 
 func (x *Package_DeployConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[18]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2153,7 +2270,7 @@ type Package_BuildConfig_BinaryArtifact struct {
 
 func (x *Package_BuildConfig_BinaryArtifact) Reset() {
 	*x = Package_BuildConfig_BinaryArtifact{}
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[20]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2165,7 +2282,7 @@ func (x *Package_BuildConfig_BinaryArtifact) String() string {
 func (*Package_BuildConfig_BinaryArtifact) ProtoMessage() {}
 
 func (x *Package_BuildConfig_BinaryArtifact) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[20]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2196,7 +2313,7 @@ type Package_BuildConfig_ImageArtifact struct {
 
 func (x *Package_BuildConfig_ImageArtifact) Reset() {
 	*x = Package_BuildConfig_ImageArtifact{}
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[21]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2208,7 +2325,7 @@ func (x *Package_BuildConfig_ImageArtifact) String() string {
 func (*Package_BuildConfig_ImageArtifact) ProtoMessage() {}
 
 func (x *Package_BuildConfig_ImageArtifact) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[21]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2243,7 +2360,7 @@ type Package_DeployConfig_Port struct {
 
 func (x *Package_DeployConfig_Port) Reset() {
 	*x = Package_DeployConfig_Port{}
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[23]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2255,7 +2372,7 @@ func (x *Package_DeployConfig_Port) String() string {
 func (*Package_DeployConfig_Port) ProtoMessage() {}
 
 func (x *Package_DeployConfig_Port) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[23]
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2329,6 +2446,392 @@ func (b0 Package_DeployConfig_Port_builder) Build() *Package_DeployConfig_Port {
 	x.Port = b.Port
 	return m0
 }
+
+type PageCursor_CursorValue struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// Types that are valid to be assigned to V:
+	//
+	//	*PageCursor_CursorValue_S
+	//	*PageCursor_CursorValue_I
+	//	*PageCursor_CursorValue_F
+	//	*PageCursor_CursorValue_B
+	//	*PageCursor_CursorValue_Bytes
+	//	*PageCursor_CursorValue_T
+	//	*PageCursor_CursorValue_Uuid
+	V             isPageCursor_CursorValue_V `protobuf_oneof:"v"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PageCursor_CursorValue) Reset() {
+	*x = PageCursor_CursorValue{}
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PageCursor_CursorValue) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PageCursor_CursorValue) ProtoMessage() {}
+
+func (x *PageCursor_CursorValue) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_shared_v1beta1_messages_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *PageCursor_CursorValue) GetV() isPageCursor_CursorValue_V {
+	if x != nil {
+		return x.V
+	}
+	return nil
+}
+
+func (x *PageCursor_CursorValue) GetS() string {
+	if x != nil {
+		if x, ok := x.V.(*PageCursor_CursorValue_S); ok {
+			return x.S
+		}
+	}
+	return ""
+}
+
+func (x *PageCursor_CursorValue) GetI() int64 {
+	if x != nil {
+		if x, ok := x.V.(*PageCursor_CursorValue_I); ok {
+			return x.I
+		}
+	}
+	return 0
+}
+
+func (x *PageCursor_CursorValue) GetF() float64 {
+	if x != nil {
+		if x, ok := x.V.(*PageCursor_CursorValue_F); ok {
+			return x.F
+		}
+	}
+	return 0
+}
+
+func (x *PageCursor_CursorValue) GetB() bool {
+	if x != nil {
+		if x, ok := x.V.(*PageCursor_CursorValue_B); ok {
+			return x.B
+		}
+	}
+	return false
+}
+
+func (x *PageCursor_CursorValue) GetBytes() []byte {
+	if x != nil {
+		if x, ok := x.V.(*PageCursor_CursorValue_Bytes); ok {
+			return x.Bytes
+		}
+	}
+	return nil
+}
+
+func (x *PageCursor_CursorValue) GetT() *timestamppb.Timestamp {
+	if x != nil {
+		if x, ok := x.V.(*PageCursor_CursorValue_T); ok {
+			return x.T
+		}
+	}
+	return nil
+}
+
+func (x *PageCursor_CursorValue) GetUuid() string {
+	if x != nil {
+		if x, ok := x.V.(*PageCursor_CursorValue_Uuid); ok {
+			return x.Uuid
+		}
+	}
+	return ""
+}
+
+func (x *PageCursor_CursorValue) SetS(v string) {
+	x.V = &PageCursor_CursorValue_S{v}
+}
+
+func (x *PageCursor_CursorValue) SetI(v int64) {
+	x.V = &PageCursor_CursorValue_I{v}
+}
+
+func (x *PageCursor_CursorValue) SetF(v float64) {
+	x.V = &PageCursor_CursorValue_F{v}
+}
+
+func (x *PageCursor_CursorValue) SetB(v bool) {
+	x.V = &PageCursor_CursorValue_B{v}
+}
+
+func (x *PageCursor_CursorValue) SetBytes(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.V = &PageCursor_CursorValue_Bytes{v}
+}
+
+func (x *PageCursor_CursorValue) SetT(v *timestamppb.Timestamp) {
+	if v == nil {
+		x.V = nil
+		return
+	}
+	x.V = &PageCursor_CursorValue_T{v}
+}
+
+func (x *PageCursor_CursorValue) SetUuid(v string) {
+	x.V = &PageCursor_CursorValue_Uuid{v}
+}
+
+func (x *PageCursor_CursorValue) HasV() bool {
+	if x == nil {
+		return false
+	}
+	return x.V != nil
+}
+
+func (x *PageCursor_CursorValue) HasS() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.V.(*PageCursor_CursorValue_S)
+	return ok
+}
+
+func (x *PageCursor_CursorValue) HasI() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.V.(*PageCursor_CursorValue_I)
+	return ok
+}
+
+func (x *PageCursor_CursorValue) HasF() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.V.(*PageCursor_CursorValue_F)
+	return ok
+}
+
+func (x *PageCursor_CursorValue) HasB() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.V.(*PageCursor_CursorValue_B)
+	return ok
+}
+
+func (x *PageCursor_CursorValue) HasBytes() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.V.(*PageCursor_CursorValue_Bytes)
+	return ok
+}
+
+func (x *PageCursor_CursorValue) HasT() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.V.(*PageCursor_CursorValue_T)
+	return ok
+}
+
+func (x *PageCursor_CursorValue) HasUuid() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.V.(*PageCursor_CursorValue_Uuid)
+	return ok
+}
+
+func (x *PageCursor_CursorValue) ClearV() {
+	x.V = nil
+}
+
+func (x *PageCursor_CursorValue) ClearS() {
+	if _, ok := x.V.(*PageCursor_CursorValue_S); ok {
+		x.V = nil
+	}
+}
+
+func (x *PageCursor_CursorValue) ClearI() {
+	if _, ok := x.V.(*PageCursor_CursorValue_I); ok {
+		x.V = nil
+	}
+}
+
+func (x *PageCursor_CursorValue) ClearF() {
+	if _, ok := x.V.(*PageCursor_CursorValue_F); ok {
+		x.V = nil
+	}
+}
+
+func (x *PageCursor_CursorValue) ClearB() {
+	if _, ok := x.V.(*PageCursor_CursorValue_B); ok {
+		x.V = nil
+	}
+}
+
+func (x *PageCursor_CursorValue) ClearBytes() {
+	if _, ok := x.V.(*PageCursor_CursorValue_Bytes); ok {
+		x.V = nil
+	}
+}
+
+func (x *PageCursor_CursorValue) ClearT() {
+	if _, ok := x.V.(*PageCursor_CursorValue_T); ok {
+		x.V = nil
+	}
+}
+
+func (x *PageCursor_CursorValue) ClearUuid() {
+	if _, ok := x.V.(*PageCursor_CursorValue_Uuid); ok {
+		x.V = nil
+	}
+}
+
+const PageCursor_CursorValue_V_not_set_case case_PageCursor_CursorValue_V = 0
+const PageCursor_CursorValue_S_case case_PageCursor_CursorValue_V = 1
+const PageCursor_CursorValue_I_case case_PageCursor_CursorValue_V = 2
+const PageCursor_CursorValue_F_case case_PageCursor_CursorValue_V = 3
+const PageCursor_CursorValue_B_case case_PageCursor_CursorValue_V = 4
+const PageCursor_CursorValue_Bytes_case case_PageCursor_CursorValue_V = 5
+const PageCursor_CursorValue_T_case case_PageCursor_CursorValue_V = 6
+const PageCursor_CursorValue_Uuid_case case_PageCursor_CursorValue_V = 7
+
+func (x *PageCursor_CursorValue) WhichV() case_PageCursor_CursorValue_V {
+	if x == nil {
+		return PageCursor_CursorValue_V_not_set_case
+	}
+	switch x.V.(type) {
+	case *PageCursor_CursorValue_S:
+		return PageCursor_CursorValue_S_case
+	case *PageCursor_CursorValue_I:
+		return PageCursor_CursorValue_I_case
+	case *PageCursor_CursorValue_F:
+		return PageCursor_CursorValue_F_case
+	case *PageCursor_CursorValue_B:
+		return PageCursor_CursorValue_B_case
+	case *PageCursor_CursorValue_Bytes:
+		return PageCursor_CursorValue_Bytes_case
+	case *PageCursor_CursorValue_T:
+		return PageCursor_CursorValue_T_case
+	case *PageCursor_CursorValue_Uuid:
+		return PageCursor_CursorValue_Uuid_case
+	default:
+		return PageCursor_CursorValue_V_not_set_case
+	}
+}
+
+type PageCursor_CursorValue_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof V:
+	S     *string
+	I     *int64
+	F     *float64
+	B     *bool
+	Bytes []byte
+	T     *timestamppb.Timestamp
+	Uuid  *string
+	// -- end of V
+}
+
+func (b0 PageCursor_CursorValue_builder) Build() *PageCursor_CursorValue {
+	m0 := &PageCursor_CursorValue{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.S != nil {
+		x.V = &PageCursor_CursorValue_S{*b.S}
+	}
+	if b.I != nil {
+		x.V = &PageCursor_CursorValue_I{*b.I}
+	}
+	if b.F != nil {
+		x.V = &PageCursor_CursorValue_F{*b.F}
+	}
+	if b.B != nil {
+		x.V = &PageCursor_CursorValue_B{*b.B}
+	}
+	if b.Bytes != nil {
+		x.V = &PageCursor_CursorValue_Bytes{b.Bytes}
+	}
+	if b.T != nil {
+		x.V = &PageCursor_CursorValue_T{b.T}
+	}
+	if b.Uuid != nil {
+		x.V = &PageCursor_CursorValue_Uuid{*b.Uuid}
+	}
+	return m0
+}
+
+type case_PageCursor_CursorValue_V protoreflect.FieldNumber
+
+func (x case_PageCursor_CursorValue_V) String() string {
+	md := file_dtkt_shared_v1beta1_messages_proto_msgTypes[29].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
+type isPageCursor_CursorValue_V interface {
+	isPageCursor_CursorValue_V()
+}
+
+type PageCursor_CursorValue_S struct {
+	S string `protobuf:"bytes,1,opt,name=s,proto3,oneof"`
+}
+
+type PageCursor_CursorValue_I struct {
+	I int64 `protobuf:"varint,2,opt,name=i,proto3,oneof"`
+}
+
+type PageCursor_CursorValue_F struct {
+	F float64 `protobuf:"fixed64,3,opt,name=f,proto3,oneof"`
+}
+
+type PageCursor_CursorValue_B struct {
+	B bool `protobuf:"varint,4,opt,name=b,proto3,oneof"`
+}
+
+type PageCursor_CursorValue_Bytes struct {
+	Bytes []byte `protobuf:"bytes,5,opt,name=bytes,proto3,oneof"`
+}
+
+type PageCursor_CursorValue_T struct {
+	T *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=t,proto3,oneof"`
+}
+
+type PageCursor_CursorValue_Uuid struct {
+	Uuid string `protobuf:"bytes,7,opt,name=uuid,proto3,oneof"`
+}
+
+func (*PageCursor_CursorValue_S) isPageCursor_CursorValue_V() {}
+
+func (*PageCursor_CursorValue_I) isPageCursor_CursorValue_V() {}
+
+func (*PageCursor_CursorValue_F) isPageCursor_CursorValue_V() {}
+
+func (*PageCursor_CursorValue_B) isPageCursor_CursorValue_V() {}
+
+func (*PageCursor_CursorValue_Bytes) isPageCursor_CursorValue_V() {}
+
+func (*PageCursor_CursorValue_T) isPageCursor_CursorValue_V() {}
+
+func (*PageCursor_CursorValue_Uuid) isPageCursor_CursorValue_V() {}
 
 var File_dtkt_shared_v1beta1_messages_proto protoreflect.FileDescriptor
 
@@ -2459,14 +2962,29 @@ const file_dtkt_shared_v1beta1_messages_proto_rawDesc = "" +
 	"expires_in\x18\x05 \x01(\x03R\texpiresIn\"[\n" +
 	"\tPageToken\x12\x16\n" +
 	"\x02id\x18\x01 \x01(\x03B\x06\xbaH\x03\xc8\x01\x01R\x02id\x126\n" +
-	"\x04time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01R\x04time\"O\n" +
+	"\x04time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01R\x04time\"\xcb\x02\n" +
+	"\n" +
+	"PageCursor\x12\x16\n" +
+	"\x06parent\x18\x01 \x01(\tR\x06parent\x12\x16\n" +
+	"\x06filter\x18\x02 \x01(\tR\x06filter\x12\x19\n" +
+	"\border_by\x18\x03 \x01(\tR\aorderBy\x12C\n" +
+	"\x06values\x18\x04 \x03(\v2+.dtkt.shared.v1beta1.PageCursor.CursorValueR\x06values\x1a\xac\x01\n" +
+	"\vCursorValue\x12\x0e\n" +
+	"\x01s\x18\x01 \x01(\tH\x00R\x01s\x12\x0e\n" +
+	"\x01i\x18\x02 \x01(\x03H\x00R\x01i\x12\x0e\n" +
+	"\x01f\x18\x03 \x01(\x01H\x00R\x01f\x12\x0e\n" +
+	"\x01b\x18\x04 \x01(\bH\x00R\x01b\x12\x16\n" +
+	"\x05bytes\x18\x05 \x01(\fH\x00R\x05bytes\x12*\n" +
+	"\x01t\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\x01t\x12\x14\n" +
+	"\x04uuid\x18\a \x01(\tH\x00R\x04uuidB\x03\n" +
+	"\x01v\"O\n" +
 	"\bTypeMeta\x12'\n" +
 	"\vapi_version\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\n" +
 	"apiVersion\x12\x1a\n" +
 	"\x04kind\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04kindB\xe8\x01\n" +
 	"\x19proto.dtkt.shared.v1beta1B\rMessagesProtoP\x01ZNgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1;sharedv1beta1\xa2\x02\x03DSX\xaa\x02\x13Dtkt.Shared.V1beta1\xca\x02\x13Dtkt\\Shared\\V1beta1\xe2\x02\x1fDtkt\\Shared\\V1beta1\\GPBMetadata\xea\x02\x15Dtkt::Shared::V1beta1b\x06proto3"
 
-var file_dtkt_shared_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
+var file_dtkt_shared_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
 var file_dtkt_shared_v1beta1_messages_proto_goTypes = []any{
 	(*Package)(nil),                            // 0: dtkt.shared.v1beta1.Package
 	(*Platform)(nil),                           // 1: dtkt.shared.v1beta1.Platform
@@ -2483,72 +3001,76 @@ var file_dtkt_shared_v1beta1_messages_proto_goTypes = []any{
 	(*OAuthRefreshRequest)(nil),                // 12: dtkt.shared.v1beta1.OAuthRefreshRequest
 	(*OAuthToken)(nil),                         // 13: dtkt.shared.v1beta1.OAuthToken
 	(*PageToken)(nil),                          // 14: dtkt.shared.v1beta1.PageToken
-	(*TypeMeta)(nil),                           // 15: dtkt.shared.v1beta1.TypeMeta
-	(*Package_Identity)(nil),                   // 16: dtkt.shared.v1beta1.Package.Identity
-	(*Package_BuildConfig)(nil),                // 17: dtkt.shared.v1beta1.Package.BuildConfig
-	(*Package_DeployConfig)(nil),               // 18: dtkt.shared.v1beta1.Package.DeployConfig
-	nil,                                        // 19: dtkt.shared.v1beta1.Package.BuildConfig.EnvEntry
-	(*Package_BuildConfig_BinaryArtifact)(nil), // 20: dtkt.shared.v1beta1.Package.BuildConfig.BinaryArtifact
-	(*Package_BuildConfig_ImageArtifact)(nil),  // 21: dtkt.shared.v1beta1.Package.BuildConfig.ImageArtifact
-	nil,                               // 22: dtkt.shared.v1beta1.Package.DeployConfig.EnvEntry
-	(*Package_DeployConfig_Port)(nil), // 23: dtkt.shared.v1beta1.Package.DeployConfig.Port
-	nil,                               // 24: dtkt.shared.v1beta1.AnyMap.ValuesEntry
-	nil,                               // 25: dtkt.shared.v1beta1.OAuthConfig.ParamsEntry
-	nil,                               // 26: dtkt.shared.v1beta1.OAuthCodeRequest.ParamsEntry
-	nil,                               // 27: dtkt.shared.v1beta1.OAuthTokenRequest.ParamsEntry
-	(PackageType)(0),                  // 28: dtkt.shared.v1beta1.PackageType
-	(Runtime)(0),                      // 29: dtkt.shared.v1beta1.Runtime
-	(OS)(0),                           // 30: dtkt.shared.v1beta1.OS
-	(Arch)(0),                         // 31: dtkt.shared.v1beta1.Arch
-	(*v1beta1.FieldElement)(nil),      // 32: dtkt.protoform.v1beta1.FieldElement
-	(*anypb.Any)(nil),                 // 33: google.protobuf.Any
-	(*structpb.Struct)(nil),           // 34: google.protobuf.Struct
-	(*timestamppb.Timestamp)(nil),     // 35: google.protobuf.Timestamp
-	(JSONType)(0),                     // 36: dtkt.shared.v1beta1.JSONType
-	(GeoType)(0),                      // 37: dtkt.shared.v1beta1.GeoType
-	(AuthStyle)(0),                    // 38: dtkt.shared.v1beta1.AuthStyle
-	(CodeChallengeMethod)(0),          // 39: dtkt.shared.v1beta1.CodeChallengeMethod
+	(*PageCursor)(nil),                         // 15: dtkt.shared.v1beta1.PageCursor
+	(*TypeMeta)(nil),                           // 16: dtkt.shared.v1beta1.TypeMeta
+	(*Package_Identity)(nil),                   // 17: dtkt.shared.v1beta1.Package.Identity
+	(*Package_BuildConfig)(nil),                // 18: dtkt.shared.v1beta1.Package.BuildConfig
+	(*Package_DeployConfig)(nil),               // 19: dtkt.shared.v1beta1.Package.DeployConfig
+	nil,                                        // 20: dtkt.shared.v1beta1.Package.BuildConfig.EnvEntry
+	(*Package_BuildConfig_BinaryArtifact)(nil), // 21: dtkt.shared.v1beta1.Package.BuildConfig.BinaryArtifact
+	(*Package_BuildConfig_ImageArtifact)(nil),  // 22: dtkt.shared.v1beta1.Package.BuildConfig.ImageArtifact
+	nil,                               // 23: dtkt.shared.v1beta1.Package.DeployConfig.EnvEntry
+	(*Package_DeployConfig_Port)(nil), // 24: dtkt.shared.v1beta1.Package.DeployConfig.Port
+	nil,                               // 25: dtkt.shared.v1beta1.AnyMap.ValuesEntry
+	nil,                               // 26: dtkt.shared.v1beta1.OAuthConfig.ParamsEntry
+	nil,                               // 27: dtkt.shared.v1beta1.OAuthCodeRequest.ParamsEntry
+	nil,                               // 28: dtkt.shared.v1beta1.OAuthTokenRequest.ParamsEntry
+	(*PageCursor_CursorValue)(nil),    // 29: dtkt.shared.v1beta1.PageCursor.CursorValue
+	(PackageType)(0),                  // 30: dtkt.shared.v1beta1.PackageType
+	(Runtime)(0),                      // 31: dtkt.shared.v1beta1.Runtime
+	(OS)(0),                           // 32: dtkt.shared.v1beta1.OS
+	(Arch)(0),                         // 33: dtkt.shared.v1beta1.Arch
+	(*v1beta1.FieldElement)(nil),      // 34: dtkt.protoform.v1beta1.FieldElement
+	(*anypb.Any)(nil),                 // 35: google.protobuf.Any
+	(*structpb.Struct)(nil),           // 36: google.protobuf.Struct
+	(*timestamppb.Timestamp)(nil),     // 37: google.protobuf.Timestamp
+	(JSONType)(0),                     // 38: dtkt.shared.v1beta1.JSONType
+	(GeoType)(0),                      // 39: dtkt.shared.v1beta1.GeoType
+	(AuthStyle)(0),                    // 40: dtkt.shared.v1beta1.AuthStyle
+	(CodeChallengeMethod)(0),          // 41: dtkt.shared.v1beta1.CodeChallengeMethod
 }
 var file_dtkt_shared_v1beta1_messages_proto_depIdxs = []int32{
-	16, // 0: dtkt.shared.v1beta1.Package.identity:type_name -> dtkt.shared.v1beta1.Package.Identity
-	28, // 1: dtkt.shared.v1beta1.Package.type:type_name -> dtkt.shared.v1beta1.PackageType
-	29, // 2: dtkt.shared.v1beta1.Package.runtimes:type_name -> dtkt.shared.v1beta1.Runtime
+	17, // 0: dtkt.shared.v1beta1.Package.identity:type_name -> dtkt.shared.v1beta1.Package.Identity
+	30, // 1: dtkt.shared.v1beta1.Package.type:type_name -> dtkt.shared.v1beta1.PackageType
+	31, // 2: dtkt.shared.v1beta1.Package.runtimes:type_name -> dtkt.shared.v1beta1.Runtime
 	1,  // 3: dtkt.shared.v1beta1.Package.platforms:type_name -> dtkt.shared.v1beta1.Platform
-	17, // 4: dtkt.shared.v1beta1.Package.build:type_name -> dtkt.shared.v1beta1.Package.BuildConfig
-	18, // 5: dtkt.shared.v1beta1.Package.deploy:type_name -> dtkt.shared.v1beta1.Package.DeployConfig
-	30, // 6: dtkt.shared.v1beta1.Platform.os:type_name -> dtkt.shared.v1beta1.OS
-	31, // 7: dtkt.shared.v1beta1.Platform.arch:type_name -> dtkt.shared.v1beta1.Arch
+	18, // 4: dtkt.shared.v1beta1.Package.build:type_name -> dtkt.shared.v1beta1.Package.BuildConfig
+	19, // 5: dtkt.shared.v1beta1.Package.deploy:type_name -> dtkt.shared.v1beta1.Package.DeployConfig
+	32, // 6: dtkt.shared.v1beta1.Platform.os:type_name -> dtkt.shared.v1beta1.OS
+	33, // 7: dtkt.shared.v1beta1.Platform.arch:type_name -> dtkt.shared.v1beta1.Arch
 	7,  // 8: dtkt.shared.v1beta1.Field.type:type_name -> dtkt.shared.v1beta1.DataType
 	2,  // 9: dtkt.shared.v1beta1.Field.fields:type_name -> dtkt.shared.v1beta1.Field
-	32, // 10: dtkt.shared.v1beta1.Field.element:type_name -> dtkt.protoform.v1beta1.FieldElement
+	34, // 10: dtkt.shared.v1beta1.Field.element:type_name -> dtkt.protoform.v1beta1.FieldElement
 	2,  // 11: dtkt.shared.v1beta1.Param.field:type_name -> dtkt.shared.v1beta1.Field
-	33, // 12: dtkt.shared.v1beta1.Param.value:type_name -> google.protobuf.Any
-	24, // 13: dtkt.shared.v1beta1.AnyMap.values:type_name -> dtkt.shared.v1beta1.AnyMap.ValuesEntry
-	34, // 14: dtkt.shared.v1beta1.TypeSchema.json_schema:type_name -> google.protobuf.Struct
-	35, // 15: dtkt.shared.v1beta1.TypeSchema.mod_time:type_name -> google.protobuf.Timestamp
-	36, // 16: dtkt.shared.v1beta1.DataType.json_type:type_name -> dtkt.shared.v1beta1.JSONType
-	37, // 17: dtkt.shared.v1beta1.DataType.geo_type:type_name -> dtkt.shared.v1beta1.GeoType
-	34, // 18: dtkt.shared.v1beta1.DataType.metadata:type_name -> google.protobuf.Struct
+	35, // 12: dtkt.shared.v1beta1.Param.value:type_name -> google.protobuf.Any
+	25, // 13: dtkt.shared.v1beta1.AnyMap.values:type_name -> dtkt.shared.v1beta1.AnyMap.ValuesEntry
+	36, // 14: dtkt.shared.v1beta1.TypeSchema.json_schema:type_name -> google.protobuf.Struct
+	37, // 15: dtkt.shared.v1beta1.TypeSchema.mod_time:type_name -> google.protobuf.Timestamp
+	38, // 16: dtkt.shared.v1beta1.DataType.json_type:type_name -> dtkt.shared.v1beta1.JSONType
+	39, // 17: dtkt.shared.v1beta1.DataType.geo_type:type_name -> dtkt.shared.v1beta1.GeoType
+	36, // 18: dtkt.shared.v1beta1.DataType.metadata:type_name -> google.protobuf.Struct
 	9,  // 19: dtkt.shared.v1beta1.OAuthConfig.endpoint:type_name -> dtkt.shared.v1beta1.OAuthEndpoint
-	38, // 20: dtkt.shared.v1beta1.OAuthConfig.auth_style:type_name -> dtkt.shared.v1beta1.AuthStyle
-	25, // 21: dtkt.shared.v1beta1.OAuthConfig.params:type_name -> dtkt.shared.v1beta1.OAuthConfig.ParamsEntry
-	39, // 22: dtkt.shared.v1beta1.OAuthCodeRequest.code_challenge_method:type_name -> dtkt.shared.v1beta1.CodeChallengeMethod
-	26, // 23: dtkt.shared.v1beta1.OAuthCodeRequest.params:type_name -> dtkt.shared.v1beta1.OAuthCodeRequest.ParamsEntry
-	27, // 24: dtkt.shared.v1beta1.OAuthTokenRequest.params:type_name -> dtkt.shared.v1beta1.OAuthTokenRequest.ParamsEntry
+	40, // 20: dtkt.shared.v1beta1.OAuthConfig.auth_style:type_name -> dtkt.shared.v1beta1.AuthStyle
+	26, // 21: dtkt.shared.v1beta1.OAuthConfig.params:type_name -> dtkt.shared.v1beta1.OAuthConfig.ParamsEntry
+	41, // 22: dtkt.shared.v1beta1.OAuthCodeRequest.code_challenge_method:type_name -> dtkt.shared.v1beta1.CodeChallengeMethod
+	27, // 23: dtkt.shared.v1beta1.OAuthCodeRequest.params:type_name -> dtkt.shared.v1beta1.OAuthCodeRequest.ParamsEntry
+	28, // 24: dtkt.shared.v1beta1.OAuthTokenRequest.params:type_name -> dtkt.shared.v1beta1.OAuthTokenRequest.ParamsEntry
 	13, // 25: dtkt.shared.v1beta1.OAuthRefreshRequest.token:type_name -> dtkt.shared.v1beta1.OAuthToken
-	35, // 26: dtkt.shared.v1beta1.OAuthToken.expiry:type_name -> google.protobuf.Timestamp
-	35, // 27: dtkt.shared.v1beta1.PageToken.time:type_name -> google.protobuf.Timestamp
-	19, // 28: dtkt.shared.v1beta1.Package.BuildConfig.env:type_name -> dtkt.shared.v1beta1.Package.BuildConfig.EnvEntry
-	20, // 29: dtkt.shared.v1beta1.Package.BuildConfig.binary:type_name -> dtkt.shared.v1beta1.Package.BuildConfig.BinaryArtifact
-	21, // 30: dtkt.shared.v1beta1.Package.BuildConfig.image:type_name -> dtkt.shared.v1beta1.Package.BuildConfig.ImageArtifact
-	22, // 31: dtkt.shared.v1beta1.Package.DeployConfig.env:type_name -> dtkt.shared.v1beta1.Package.DeployConfig.EnvEntry
-	23, // 32: dtkt.shared.v1beta1.Package.DeployConfig.ports:type_name -> dtkt.shared.v1beta1.Package.DeployConfig.Port
-	33, // 33: dtkt.shared.v1beta1.AnyMap.ValuesEntry.value:type_name -> google.protobuf.Any
-	34, // [34:34] is the sub-list for method output_type
-	34, // [34:34] is the sub-list for method input_type
-	34, // [34:34] is the sub-list for extension type_name
-	34, // [34:34] is the sub-list for extension extendee
-	0,  // [0:34] is the sub-list for field type_name
+	37, // 26: dtkt.shared.v1beta1.OAuthToken.expiry:type_name -> google.protobuf.Timestamp
+	37, // 27: dtkt.shared.v1beta1.PageToken.time:type_name -> google.protobuf.Timestamp
+	29, // 28: dtkt.shared.v1beta1.PageCursor.values:type_name -> dtkt.shared.v1beta1.PageCursor.CursorValue
+	20, // 29: dtkt.shared.v1beta1.Package.BuildConfig.env:type_name -> dtkt.shared.v1beta1.Package.BuildConfig.EnvEntry
+	21, // 30: dtkt.shared.v1beta1.Package.BuildConfig.binary:type_name -> dtkt.shared.v1beta1.Package.BuildConfig.BinaryArtifact
+	22, // 31: dtkt.shared.v1beta1.Package.BuildConfig.image:type_name -> dtkt.shared.v1beta1.Package.BuildConfig.ImageArtifact
+	23, // 32: dtkt.shared.v1beta1.Package.DeployConfig.env:type_name -> dtkt.shared.v1beta1.Package.DeployConfig.EnvEntry
+	24, // 33: dtkt.shared.v1beta1.Package.DeployConfig.ports:type_name -> dtkt.shared.v1beta1.Package.DeployConfig.Port
+	35, // 34: dtkt.shared.v1beta1.AnyMap.ValuesEntry.value:type_name -> google.protobuf.Any
+	37, // 35: dtkt.shared.v1beta1.PageCursor.CursorValue.t:type_name -> google.protobuf.Timestamp
+	36, // [36:36] is the sub-list for method output_type
+	36, // [36:36] is the sub-list for method input_type
+	36, // [36:36] is the sub-list for extension type_name
+	36, // [36:36] is the sub-list for extension extendee
+	0,  // [0:36] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_shared_v1beta1_messages_proto_init() }
@@ -2558,9 +3080,18 @@ func file_dtkt_shared_v1beta1_messages_proto_init() {
 	}
 	file_dtkt_shared_v1beta1_enums_proto_init()
 	file_dtkt_shared_v1beta1_messages_proto_msgTypes[9].OneofWrappers = []any{}
-	file_dtkt_shared_v1beta1_messages_proto_msgTypes[17].OneofWrappers = []any{
+	file_dtkt_shared_v1beta1_messages_proto_msgTypes[18].OneofWrappers = []any{
 		(*Package_BuildConfig_Binary)(nil),
 		(*Package_BuildConfig_Image)(nil),
+	}
+	file_dtkt_shared_v1beta1_messages_proto_msgTypes[29].OneofWrappers = []any{
+		(*PageCursor_CursorValue_S)(nil),
+		(*PageCursor_CursorValue_I)(nil),
+		(*PageCursor_CursorValue_F)(nil),
+		(*PageCursor_CursorValue_B)(nil),
+		(*PageCursor_CursorValue_Bytes)(nil),
+		(*PageCursor_CursorValue_T)(nil),
+		(*PageCursor_CursorValue_Uuid)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -2568,7 +3099,7 @@ func file_dtkt_shared_v1beta1_messages_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_shared_v1beta1_messages_proto_rawDesc), len(file_dtkt_shared_v1beta1_messages_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   28,
+			NumMessages:   30,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

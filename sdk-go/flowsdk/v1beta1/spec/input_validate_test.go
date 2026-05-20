@@ -41,6 +41,10 @@ func TestInputValidator(t *testing.T) {
 			value: wrapperspb.Bool(true),
 		},
 		{
+			// Unknown message types are synthesised as permissive
+			// {type: object} schemas, so a JSON-roundtrippable value
+			// (here an empty Struct) is accepted. Strict known-type
+			// matching is not part of the contract.
 			input: &flowv1beta1.Input{
 				Id: "testMessage",
 				Type: &flowv1beta1.Input_Message{
@@ -51,6 +55,21 @@ func TestInputValidator(t *testing.T) {
 			},
 			expectTypeName: "test.v1.Config",
 			value:          &structpb.Struct{},
+		},
+		{
+			// A non-object value for a message-typed input still
+			// fails: the JSON roundtrip can't fit a scalar into a
+			// message-shaped target.
+			input: &flowv1beta1.Input{
+				Id: "testMessageNonObject",
+				Type: &flowv1beta1.Input_Message{
+					Message: &flowv1beta1.Message{
+						Type: "test.v1.Config",
+					},
+				},
+			},
+			expectTypeName: "test.v1.Config",
+			value:          int64(42),
 			expectValueErr: true,
 		},
 		{

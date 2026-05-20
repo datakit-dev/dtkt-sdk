@@ -5,17 +5,18 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"sort"
 	"sync"
 
 	expr "cel.dev/expr"
 	"github.com/google/cel-go/cel"
 
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/cache"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/cache"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/rpc"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -55,11 +56,15 @@ func (e *Executor) wireEdges(ctx context.Context, graph *flowv1beta2.Graph) (map
 	return wiring, nil
 }
 
-// buildCELEnvAndValidate builds the shared CEL environment with connection
-// resolver types registered, then validates request trees against proto
-// schemas.
-func buildCELEnvAndValidate(graph *flowv1beta2.Graph, resolved map[string]*rpc.Connector) (shared.Env, error) {
-	celEnv, err := buildCELEnv(resolved)
+// buildCELEnvAndValidate builds the flow-global shared.Env (one union
+// resolver: spec-ordered connectors + platform), then validates request
+// trees against proto schemas. `platform` is the SDK platform-types
+// resolver (typically api.GlobalResolver() via Executor's
+// WithPlatformResolver Option; nil falls through to that default inside
+// buildCELEnv).
+func buildCELEnvAndValidate(graph *flowv1beta2.Graph, resolved map[string]*rpc.Connector, platform shared.Resolver) (shared.Env, error) {
+	ordered := orderedConnectorsFromGraph(graph, resolved)
+	celEnv, err := buildCELEnv(ordered, platform)
 	if err != nil {
 		return nil, fmt.Errorf("building CEL environment: %w", err)
 	}
@@ -73,6 +78,45 @@ func buildCELEnvAndValidate(graph *flowv1beta2.Graph, resolved map[string]*rpc.C
 		}
 	}
 	return celEnv, nil
+}
+
+// orderedConnectorsFromGraph returns the resolved connectors in the
+// flow-spec declared order, by iterating the graph's Connection nodes
+// (which the graph builder preserves in spec order). Connections that
+// appear in the graph but have no resolved entry are skipped (the lint
+// path surfaces those separately); connections in `resolved` that have
+// no graph node (unusual but possible if an action references a
+// connection not declared via a Connection node) are appended at the
+// end in deterministic name order so they still participate.
+func orderedConnectorsFromGraph(graph *flowv1beta2.Graph, resolved map[string]*rpc.Connector) []*rpc.Connector {
+	out := make([]*rpc.Connector, 0, len(resolved))
+	seen := make(map[string]struct{}, len(resolved))
+	for _, n := range graph.GetNodes() {
+		if n.WhichType() != flowv1beta2.Node_Connection_case {
+			continue
+		}
+		id := n.GetConnection().GetId()
+		if c, ok := resolved[id]; ok {
+			out = append(out, c)
+			seen[id] = struct{}{}
+		}
+	}
+	if len(out) == len(resolved) {
+		return out
+	}
+	// Append any resolved-but-not-in-graph connectors in deterministic
+	// (sorted) order so flow runs are repeatable.
+	extras := make([]string, 0, len(resolved)-len(seen))
+	for id := range resolved {
+		if _, ok := seen[id]; !ok {
+			extras = append(extras, id)
+		}
+	}
+	sort.Strings(extras)
+	for _, id := range extras {
+		out = append(out, resolved[id])
+	}
+	return out
 }
 
 // runState holds per-execution infrastructure created by setupRunState.
@@ -137,7 +181,7 @@ func (e *Executor) setupRunState(
 			for id, h := range e.handlers {
 				np := e.nodeProtos[id]
 				isInteraction := np.WhichType() == flowv1beta2.Node_Interaction_case
-				if !isGenerator(np) && !(isInteraction && upstreamlessInteractions[id]) {
+				if !isGenerator(np) && (!isInteraction || !upstreamlessInteractions[id]) {
 					continue
 				}
 				if sh, ok := h.(selfStoppable); ok {
@@ -388,8 +432,8 @@ func (e *Executor) buildInteractionHandlers(
 		if err != nil {
 			return nil, fmt.Errorf("compiling input CEL for %s: %w", n.GetId(), err)
 		}
-		nodeID := n.GetId()      // Format B (e.g. "interactions.confirm") - cross-category routing
-		bareID := inter.GetId()  // Format A (e.g. "confirm") - per-event protobuf id field contract
+		nodeID := n.GetId()     // Format B (e.g. "interactions.confirm") - cross-category routing
+		bareID := inter.GetId() // Format A (e.g. "confirm") - per-event protobuf id field contract
 		w := wiring[nodeID]
 		cb := &cacheBackend{
 			cacheDeps: cacheDeps{
@@ -408,7 +452,7 @@ func (e *Executor) buildInteractionHandlers(
 			whenProg:    whenProg,
 			transforms:  transforms,
 			transformPS: e.pubsub,
-			adapter:     celEnv.TypeAdapter(),
+			env:         celEnv,
 			cache:       cb,
 			formInputs:  formInputs,
 		}
@@ -512,8 +556,8 @@ func (e *Executor) setupInputBridges(
 			continue
 		}
 		inp := n.GetInput()
-		nodeID := n.GetId()    // Format B - topic routing, handler map key
-		bareID := inp.GetId()  // Format A - per-event protobuf id field contract
+		nodeID := n.GetId()   // Format B - topic routing, handler map key
+		bareID := inp.GetId() // Format A - per-event protobuf id field contract
 		throttle := rateToDuration(inp.GetThrottle())
 		defVal := inputTypeDefault(inp)
 		cache := inp.GetCache()
@@ -696,7 +740,7 @@ func buildHandlers(
 		// protobuf event/snapshot fields whose validator is the bare-id
 		// pattern. n.GetId() is fully-qualified (Format B) and stays as the
 		// cross-category handler map key in `handlers` below.
-		h, err := newHandler(compiled, bareNodeID(n), w.inputs, handlerPub, w.topic, directPub, celEnv.TypeAdapter(), cb)
+		h, err := newHandler(compiled, bareNodeID(n), w.inputs, handlerPub, w.topic, directPub, celEnv, cb)
 		if err != nil {
 			return nil, fmt.Errorf("creating handler for node %s: %w", n.GetId(), err)
 		}
@@ -764,14 +808,14 @@ func startInteractionDemux(
 				h, found := handlers[evt.GetId()]
 				if !found {
 					slog.Warn("dropping interaction response for unknown node",
-						"node", evt.GetId())
+						slog.String("node", evt.GetId()))
 					continue
 				}
 				val := &expr.Value{Kind: &expr.Value_ObjectValue{ObjectValue: evt.GetValue()}}
 				if !h.TryDeliver(evt.GetToken(), val) {
 					slog.Warn("dropping interaction response with invalid token",
-						"node", evt.GetId(),
-						"got", evt.GetToken())
+						slog.String("node", evt.GetId()),
+						slog.String("got", evt.GetToken()))
 				}
 			}
 		}

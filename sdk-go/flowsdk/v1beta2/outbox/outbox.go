@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -15,26 +15,26 @@ type Storage interface {
 	Store(ctx context.Context, msg *pubsub.Message) error
 }
 
-// EventReader reads from the event log: reconstruct state at a point in time,
-// or paginate through raw events for client replay.
+// EventReader paginates the event log for cursor-based replay.
 type EventReader interface {
-	// SnapshotAt reconstructs state at a point in time by applying events up to uid.
-	// Returns a RunSnapshot message with typed node maps populated from FlowEvents.
-	// Used for history viewing (local) and checkpoint loading (cloud).
-	SnapshotAt(ctx context.Context, uid uuid.UUID) (*flowv1beta2.RunSnapshot, error)
-
 	// ReadEvents returns events after the given UID, ordered chronologically
 	// (by UUIDv7). Returns at most limit events. Used for cursor-based replay
 	// when clients provide after_event_id.
 	ReadEvents(ctx context.Context, afterUID uuid.UUID, limit int) ([]*pubsub.Message, error)
 }
 
+// SnapshotReader reconstructs a flow runtime snapshot at a point in time by
+// applying events up to a UID. The return type is flow-specific so this
+// contract is separate from EventReader - resource outboxes don't implement it.
+type SnapshotReader interface {
+	// SnapshotAt reconstructs state at a point in time by applying events up to uid.
+	// Used for history viewing (local) and checkpoint loading (cloud).
+	SnapshotAt(ctx context.Context, uid uuid.UUID) (*flowv1beta2.RunSnapshot, error)
+}
+
 // StateWriter writes the materialized RunSnapshot and last-event cursor
-// within the same transaction that stores the FlowEvent. This is the
-// core of the outbox pattern: event + state written atomically.
-//
-// Implementations that don't track persistent state (e.g. in-memory)
-// may return a no-op writer from Tx.StateWriter().
+// within the same transaction that stores the FlowEvent. The core of the
+// outbox pattern: event + state written atomically.
 type StateWriter interface {
 	// WriteState persists the materialized snapshot and the UID of the
 	// event that produced it. Called once per event in the same tx as
@@ -42,30 +42,50 @@ type StateWriter interface {
 	WriteState(ctx context.Context, snap *flowv1beta2.RunSnapshot, eventUID uuid.UUID) error
 }
 
-// Tx represents a transaction that can atomically commit state + outbox writes.
+// Tx is the minimal transactional contract. Backends that don't materialize a
+// snapshot alongside the event log (e.g. resource events) implement this.
 type Tx interface {
 	// Storage returns an outbox Storage bound to this transaction.
 	Storage() Storage
-	// StateWriter returns a writer for the materialized RunSnapshot.
-	// The returned writer must operate within this transaction so that
-	// event storage and state updates commit atomically.
-	StateWriter() StateWriter
 	Commit() error
 	Rollback() error
 }
 
-// TxBeginner opens new transactions.
+// StatefulTx extends Tx with materialized-state writes. Used by the flow
+// runtime to keep snapshot + event log committed atomically.
+type StatefulTx interface {
+	Tx
+	// StateWriter returns a writer for the materialized RunSnapshot. The
+	// returned writer must operate within this transaction so that event
+	// storage and state updates commit atomically.
+	StateWriter() StateWriter
+}
+
+// TxBeginner opens plain transactions.
 type TxBeginner interface {
 	Begin(ctx context.Context) (Tx, error)
 }
 
-// Outbox combines TxBeginner, Storage, and EventReader for outbox backends
-// that support transactional writes and event reads. All backends (memory, ent)
-// implement this interface.
+// StatefulTxBeginner opens transactions that include materialized-state writes.
+type StatefulTxBeginner interface {
+	BeginStateful(ctx context.Context) (StatefulTx, error)
+}
+
+// Outbox is the generic resource-event contract. Backends that just persist
+// events for forwarding (no materialized state) implement this.
 type Outbox interface {
 	TxBeginner
 	Storage
 	EventReader
+}
+
+// StatefulOutbox is the flow runtime's contract: stateful tx + snapshot reads
+// alongside the event log.
+type StatefulOutbox interface {
+	StatefulTxBeginner
+	Storage
+	EventReader
+	SnapshotReader
 }
 
 // ApplyFlowEvent dispatches a FlowEvent into the appropriate field on snap.

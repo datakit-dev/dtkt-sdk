@@ -273,9 +273,43 @@ message PageToken {
   google.protobuf.Timestamp time = 2 [(buf.validate.field).required = true];
 }
 
-// TypeMeta identifies a resource's API version and kind, analogous to
-// Kubernetes' TypeMeta. It is intentionally small -- the spec payload is
-// handled separately.
+// PageCursor is the opaque page_token used by paginated List endpoints.
+// It encodes both the request parameters active when the token was
+// issued (so the server can return INVALID_ARGUMENT if the client
+// changes anything other than page_size mid-pagination, per AIP-158)
+// and the typed sort-key values from the last row of the previous
+// page (in order_by sequence, with the UUID v7 id as the trailing
+// stable tiebreaker).
+//
+// The same shape covers both the default sort (order_by empty,
+// values=[id]) and user-specified sort (values=[k1, k2, ..., id]) so
+// there is one cursor format per resource.
+message PageCursor {
+  // Active request parameters at token issuance. Server returns
+  // INVALID_ARGUMENT if any of these differ on the next request.
+  string parent = 1;
+  string filter = 2;
+  string order_by = 3;
+
+  // Typed values from the last row of the previous page. When
+  // order_by is empty this has a single entry: the UUID v7 id.
+  repeated CursorValue values = 4;
+
+  message CursorValue {
+    oneof v {
+      string s = 1;
+      int64 i = 2;
+      double f = 3;
+      bool b = 4;
+      bytes bytes = 5;
+      google.protobuf.Timestamp t = 6;
+      string uuid = 7;
+    }
+  }
+}
+
+// TypeMeta identifies a resource's API version and kind. It is
+// intentionally small; the spec payload is handled separately.
 message TypeMeta {
   string api_version = 1 [(buf.validate.field).required = true];
   string kind = 2 [(buf.validate.field).required = true];

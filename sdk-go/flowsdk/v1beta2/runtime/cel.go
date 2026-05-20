@@ -12,12 +12,13 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/api"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/rpc"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 )
 
 // runtimeEnv wraps a *cel.Env and shared.Resolver to implement shared.Env.
@@ -28,23 +29,23 @@ type runtimeEnv struct {
 	resolver shared.Resolver
 }
 
-func (e *runtimeEnv) TypeAdapter() types.Adapter   { return e.Env.CELTypeAdapter() }
-func (e *runtimeEnv) TypeProvider() types.Provider { return e.Env.CELTypeProvider() }
+func (e *runtimeEnv) TypeAdapter() types.Adapter   { return e.CELTypeAdapter() }
+func (e *runtimeEnv) TypeProvider() types.Provider { return e.CELTypeProvider() }
 func (e *runtimeEnv) Resolver() shared.Resolver    { return e.resolver }
 func (e *runtimeEnv) Vars() cel.Activation         { return nil }
 
 // activation builds a CEL activation from subscription channel references and pre-set values.
 type activation struct {
-	refs    map[string]*nodeRef
-	extras  map[string]*expr.Value
-	adapter types.Adapter
+	refs   map[string]*nodeRef
+	extras map[string]*expr.Value
+	env    shared.Env
 }
 
-func newActivation(adapter types.Adapter) *activation {
+func newActivation(env shared.Env) *activation {
 	return &activation{
-		refs:    make(map[string]*nodeRef),
-		extras:  make(map[string]*expr.Value),
-		adapter: adapter,
+		refs:   make(map[string]*nodeRef),
+		extras: make(map[string]*expr.Value),
+		env:    env,
 	}
 }
 
@@ -54,8 +55,8 @@ func newActivation(adapter types.Adapter) *activation {
 // activation after resume to pick up where it left off. When stopCh fires,
 // recv returns errOperatorStopped without consuming a message; the caller
 // exits cleanly (no resume).
-func newActivationFromChannelsInterruptible(ctx context.Context, inputs map[string]<-chan *pubsub.Message, adapter types.Adapter, suspendCh, stopCh <-chan struct{}) *activation {
-	a := newActivation(adapter)
+func newActivationFromChannelsInterruptible(ctx context.Context, inputs map[string]<-chan *pubsub.Message, env shared.Env, suspendCh, stopCh <-chan struct{}) *activation {
+	a := newActivation(env)
 	for nodeID, ch := range inputs {
 		a.refs[nodeID] = &nodeRef{ch: ch, ctx: ctx, suspendCh: suspendCh, stopCh: stopCh}
 	}
@@ -76,10 +77,10 @@ func newActivationFromMixedDeps(
 	cachedSources map[string]bool,
 	allCached bool,
 	cachedMem map[string]*cachedRefState,
-	adapter types.Adapter,
+	env shared.Env,
 	suspendCh, stopCh <-chan struct{},
 ) *activation {
-	a := newActivation(adapter)
+	a := newActivation(env)
 	for sourceID, ch := range inputs {
 		ref := &nodeRef{ch: ch, ctx: ctx, suspendCh: suspendCh, stopCh: stopCh}
 		if cachedSources[sourceID] {
@@ -151,24 +152,24 @@ func (a *activation) Resolve() (map[string]any, error) {
 		if nr.chanClosed || nr.node == nil {
 			nsMap[name] = types.NullValue
 		} else {
-			nsMap[name] = nodeToMap(a.adapter, nr.node)
+			nsMap[name] = nodeToMap(a.env, nr.node)
 		}
 	}
 	for k, v := range a.extras {
-		vars[k] = exprToRefVal(a.adapter, v)
+		vars[k] = exprToRefVal(a.env, v)
 	}
 	return vars, nil
 }
 
 // nodeToMap converts a StateNode to a map[string]any for CEL evaluation.
 // The value field is unwrapped from *expr.Value to a native ref.Val.
-func nodeToMap(adapter types.Adapter, node executor.StateNode) map[string]any {
+func nodeToMap(env shared.Env, node executor.StateNode) map[string]any {
 	eof := isEOFValue(node.GetValue())
 	var value ref.Val
 	if eof {
 		value = types.NullValue
 	} else {
-		value = exprToRefVal(adapter, node.GetValue())
+		value = exprToRefVal(env, node.GetValue())
 	}
 
 	m := map[string]any{"value": value}
@@ -224,70 +225,49 @@ func celEnvOptions() []cel.EnvOption {
 	}
 }
 
-// buildCELEnv creates a shared.Env with connection resolver types registered.
-// When connectors have CELResolver implementations, their proto file descriptors
-// are registered via common.CELTypes for full struct/field type resolution.
-// Falls back to basic cel.Types registration when no resolvers are available.
-// Uses common.NewCELEnv to include the standard extension set (URL validation,
-// encoders, string v4, list, proto, enum).
-func buildCELEnv(connectors map[string]*rpc.Connector) (shared.Env, error) {
+// buildCELEnv creates the flow-global shared.Env. ONE union resolver
+// (spec-ordered connectors + platform) backs both the cel-go type
+// universe (CustomTypeProvider/Adapter, populated by common.NewCELTypes
+// via the resolver's RangeFiles) AND runtimeEnv.resolver (consulted by
+// shared.ExprValueToNative at runtime for Any unmarshalling). Per-action
+// handler envs share this same resolver, so every converter/decoder in
+// the run uses one explicit type universe. See flowUnionResolver
+// (resolver.go) for the rationale.
+//
+// orderedConnectors is the list of resolved connectors in flow-spec
+// declared order (caller orders via graph traversal). platform is the
+// SDK's platform-types resolver - api.GlobalResolver() by default,
+// overridable via Executor's WithPlatformResolver Option. If platform
+// is nil, defaults to api.GlobalResolver() so call sites that pre-date
+// the option still work.
+func buildCELEnv(orderedConnectors []*rpc.Connector, platform shared.Resolver) (shared.Env, error) {
+	if platform == nil {
+		platform = api.GlobalResolver()
+	}
 	opts := celEnvOptions()
 
-	// Collect the first available resolver for the runtimeEnv wrapper.
-	var firstResolver shared.Resolver
-	var celTypes *common.CELTypes
-	for _, conn := range connectors {
-		if firstResolver == nil {
-			firstResolver = conn.Resolver
-		}
-		cr, ok := conn.Resolver.(common.CELResolver)
-		if !ok {
-			continue
-		}
-		if celTypes == nil {
-			var err error
-			celTypes, err = common.NewCELTypes(cr)
-			if err != nil {
-				return nil, fmt.Errorf("building CEL types: %w", err)
-			}
-		} else {
-			cr.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
-				_ = celTypes.RegisterDescriptor(fd)
-				return true
-			})
-		}
-	}
+	flowResolver := newFlowUnionResolver(orderedConnectors, platform)
 
-	if celTypes != nil {
-		// Register our own flow proto types so RunSnapshot nodes are known.
-		_ = celTypes.RegisterDescriptor(
-			(&flowv1beta2.RunSnapshot_InputNode{}).ProtoReflect().Descriptor().ParentFile(),
-		)
-		opts = append(opts,
-			cel.CustomTypeProvider(celTypes),
-			cel.CustomTypeAdapter(celTypes),
-			cel.Container("dtkt"),
-		)
-	} else {
-		// No connection resolvers; register only built-in types.
-		opts = append(opts,
-			cel.Types(
-				&flowv1beta2.RunSnapshot_InputNode{},
-				&flowv1beta2.RunSnapshot_GeneratorNode{},
-				&flowv1beta2.RunSnapshot_VarNode{},
-				&flowv1beta2.RunSnapshot_ActionNode{},
-				&flowv1beta2.RunSnapshot_StreamNode{},
-				&flowv1beta2.RunSnapshot_OutputNode{},
-				&flowv1beta2.RunSnapshot_InteractionNode{},
-			),
-		)
+	celTypes, err := common.NewCELTypes(flowResolver)
+	if err != nil {
+		return nil, fmt.Errorf("building CEL types: %w", err)
 	}
+	// Ensure flow's own RunSnapshot proto file is registered (covered by the
+	// platform resolver's RangeFiles in production - belt-and-suspenders).
+	_ = celTypes.RegisterDescriptor(
+		(&flowv1beta2.RunSnapshot_InputNode{}).ProtoReflect().Descriptor().ParentFile(),
+	)
+	opts = append(opts,
+		cel.CustomTypeProvider(celTypes),
+		cel.CustomTypeAdapter(celTypes),
+		cel.Container("dtkt"),
+	)
 
 	env, err := common.NewCELEnv(opts...)
 	if err != nil {
 		return nil, err
 	}
-	return &runtimeEnv{Env: env, resolver: firstResolver}, nil
+	return &runtimeEnv{Env: env, resolver: flowResolver}, nil
 }
 
 // parseCEL validates a CEL expression string (syntax + type check) without

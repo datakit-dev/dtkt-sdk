@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -17,11 +17,11 @@ func timedFeedInput(ps executor.PubSub, nodeID string, closeAfter time.Duration,
 	topic := testTopics.InputFor(nodeID)
 	for _, v := range values {
 		val, _ := nativeToExpr(v)
-		ps.Publish(topic, pubsub.NewMessage(val)) //nolint:errcheck
+		ps.Publish(topic, pubsub.NewMessage(val)) //nolint:errcheck // test fixture feed to in-memory pubsub; a real failure surfaces as a downstream assertion
 	}
 	go func() {
 		time.Sleep(closeAfter)
-		ps.Publish(topic, pubsub.NewMessage(newEOFValue())) //nolint:errcheck
+		ps.Publish(topic, pubsub.NewMessage(newEOFValue())) //nolint:errcheck // test fixture feed to in-memory pubsub; a real failure surfaces as a downstream assertion
 	}()
 }
 
@@ -34,7 +34,7 @@ func TestGraph_Input_Cache(t *testing.T) {
 		graph := loadFlow(t, "input_cache.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(42))
 		ctx := testContext(t)
@@ -54,7 +54,7 @@ func TestGraph_Input_TypeDefault(t *testing.T) {
 		graph := loadFlow(t, "input_type_default.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Feed no values; the inputHandler should fall back to default=99 on every
 		// throttle timeout.
@@ -88,7 +88,7 @@ func TestGraph_Input_CachePriorityOverDefault(t *testing.T) {
 		graph := loadFlow(t, "input_cache_over_default.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(42))
 		ctx := testContext(t)
@@ -101,6 +101,3 @@ func TestGraph_Input_CachePriorityOverDefault(t *testing.T) {
 		assert.Equal(t, int64(42), last, "last value must be the pushed cache, demonstrating priority over default")
 	})
 }
-
-// intPtr returns a pointer to the given int64 value for use in proto optional fields.
-func intPtr(v int64) *int64 { return &v }

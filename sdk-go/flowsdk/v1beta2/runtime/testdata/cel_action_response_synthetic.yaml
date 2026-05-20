@@ -1,0 +1,18 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: cel_action_response_synthetic
+  description: "Action returns a synthetic (non-global-registry) typed message; output reads a field. Hermetic U10 repro: fails with 'proto: not found' until exprToRefVal resolves Any via the connector resolver."
+  inputs:
+    - id: x
+      string: {}
+  actions:
+    - id: run
+      call:
+        connection: echo
+        method: echo.Service.Echo
+        request:
+          payload: "= inputs.x.value"
+  outputs:
+    - id: payload
+      value: "= actions.run.value.payload"

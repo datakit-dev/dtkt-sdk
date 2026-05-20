@@ -17,7 +17,7 @@ func TestGraph_Transform_Flatten(t *testing.T) {
 		graph := loadFlow(t, "transform_flatten.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 1 → [1,10], 2 → [2,20] → flattened: 1,10,2,20
 		feedInput(pubsub, "inputs.x", 1, 2)
@@ -34,7 +34,7 @@ func TestGraph_Transform_FlattenPassthrough(t *testing.T) {
 		graph := loadFlow(t, "transform_flatten_passthrough.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1, 2, 3)
 		ctx := testContext(t)
@@ -50,7 +50,7 @@ func TestGraph_Transform_DeepFlatten(t *testing.T) {
 		graph := loadFlow(t, "transform_deep_flatten.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Input 10: [[10,11],[12,13]] → [10,11],[12,13] → 10,11,12,13
 		feedInput(pubsub, "inputs.x", 10)
@@ -78,7 +78,7 @@ func TestGraph_Transform_DeepFlatten_StreamedInputs(t *testing.T) {
 		nested2 := listVal(listVal(listVal(int64Val(3), int64Val(4))))
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", nested1, nested2)
 		ctx := testContext(t)
@@ -96,7 +96,7 @@ func TestGraph_Transform_FilterThenMap(t *testing.T) {
 		graph := loadFlow(t, "transform_filter_then_map.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1, 2, 3, 4, 5, 6)
 		ctx := testContext(t)
@@ -112,7 +112,7 @@ func TestGraph_Transform_MapThenFilter(t *testing.T) {
 		graph := loadFlow(t, "transform_map_then_filter.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1, 2, 3, 4, 5)
 		ctx := testContext(t)
@@ -128,7 +128,7 @@ func TestGraph_Transform_MapThenFlattenThenFilter(t *testing.T) {
 		graph := loadFlow(t, "transform_map_flatten_filter.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 1→[1,10], 2→[2,20] → flattened: 1,10,2,20 → >5: 10,20
 		feedInput(pubsub, "inputs.x", 1, 2)
@@ -145,7 +145,7 @@ func TestGraph_Transform_FilterMapReduce(t *testing.T) {
 		graph := loadFlow(t, "transform_filter_map_scan.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 1..6 → even: 2,4,6 → doubled: 4,8,12 → running sum: 4,12,24
 		feedInput(pubsub, "inputs.x", 1, 2, 3, 4, 5, 6)
@@ -162,7 +162,7 @@ func TestGraph_Transform_MapFlattenReduce(t *testing.T) {
 		graph := loadFlow(t, "transform_map_flatten_scan.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 10→[10,11], 20→[20,21] → flattened: 10,11,20,21 → running sum: 10,21,41,62
 		feedInput(pubsub, "inputs.x", 10, 20)
@@ -181,7 +181,7 @@ func TestGraph_Transform_AcrossNodes(t *testing.T) {
 		graph := loadFlow(t, "transform_across_nodes.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 1,2,3,4,5 → +1: 2,3,4,5,6 → >3: 4,5,6 → *10: 40,50,60
 		feedInput(pubsub, "inputs.x", 1, 2, 3, 4, 5)
@@ -198,7 +198,7 @@ func TestGraph_Transform_AcrossNodes_FlattenInMiddle(t *testing.T) {
 		graph := loadFlow(t, "transform_across_nodes_flatten_middle.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 1→[1,100], 2→[2,200] → flatten: 1,100,2,200 → >=100: 100,200
 		feedInput(pubsub, "inputs.x", 1, 2)
@@ -217,7 +217,7 @@ func TestGraph_Transform_OnInput_FullChain(t *testing.T) {
 		graph := loadFlow(t, "transform_input_full_chain.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 1..5 → +1: 2,3,4,5,6 → even: 2,4,6 → running sum: 2,6,12
 		feedInput(pubsub, "inputs.x", 1, 2, 3, 4, 5)
@@ -234,7 +234,7 @@ func TestGraph_Transform_OnVar_FullChain(t *testing.T) {
 		graph := loadFlow(t, "transform_var_full_chain.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 1,2,3 → >1: 2,3 → [2,4],[3,6] → 2,4,3,6 → running sum: 2,6,9,15
 		feedInput(pubsub, "inputs.x", 1, 2, 3)
@@ -251,7 +251,7 @@ func TestGraph_Transform_OnOutput_FullChain(t *testing.T) {
 		graph := loadFlow(t, "transform_output_full_chain.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 1..5 → >2: 3,4,5 → *10: 30,40,50 → sum on EOF: 120
 		feedInput(pubsub, "inputs.x", 1, 2, 3, 4, 5)
@@ -272,7 +272,7 @@ func TestGraph_Transform_FilterRejectsAll(t *testing.T) {
 		graph := loadFlow(t, "transform_filter_rejects_all.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1, 2, 3)
 		ctx := testContext(t)
@@ -288,7 +288,7 @@ func TestGraph_Transform_FilterAcceptsAll(t *testing.T) {
 		graph := loadFlow(t, "transform_filter_accepts_all.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1, 2, 3)
 		ctx := testContext(t)
@@ -306,7 +306,7 @@ func TestGraph_Transform_StringMap(t *testing.T) {
 		graph := loadFlow(t, "transform_string_map.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.name", "hello", "world")
 		ctx := testContext(t)
@@ -325,7 +325,7 @@ func TestGraph_Transform_StringFilter(t *testing.T) {
 		graph := loadFlow(t, "transform_string_filter.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.name", "hi", "hello", "yo", "world")
 		ctx := testContext(t)
@@ -346,7 +346,7 @@ func TestGraph_Transform_DoubleMapFilter(t *testing.T) {
 		graph := loadFlow(t, "transform_double_map_filter.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 1.0*2.5=2.5, 2.0*2.5=5.0, 3.0*2.5=7.5, 4.0*2.5=10.0 → >5.0: 7.5, 10.0
 		feedInput(pubsub, "inputs.x", 1.0, 2.0, 3.0, 4.0)
@@ -368,7 +368,7 @@ func TestGraph_Transform_Flatten_ScalarPassthrough(t *testing.T) {
 		graph := loadFlow(t, "transform_flatten_scalar_passthrough.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 5, 10, 15)
 		ctx := testContext(t)
@@ -386,7 +386,7 @@ func TestGraph_Transform_Map_Int64ToString(t *testing.T) {
 		graph := loadFlow(t, "transform_map_int64_to_string.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 42, 100)
 		ctx := testContext(t)
@@ -404,7 +404,7 @@ func TestGraph_Transform_Map_EvalError(t *testing.T) {
 		graph := loadFlow(t, "transform_map_eval_error.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1)
 		ctx := testContext(t)
@@ -421,7 +421,7 @@ func TestGraph_Transform_ContextCancel(t *testing.T) {
 		graph := loadFlow(t, "transform_context_cancel.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx, cancel := context.WithTimeout(testContext(t), 50*time.Millisecond)
 		defer cancel()
@@ -447,7 +447,7 @@ func TestGraph_Transform_InputThenVar_ChainedReduces(t *testing.T) {
 		graph := loadFlow(t, "transform_input_var_chained_reduces.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 2, 3, 5)
 		ctx := testContext(t)

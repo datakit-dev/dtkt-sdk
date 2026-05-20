@@ -12,7 +12,6 @@ var _ shared.ExecNode = (*Action)(nil)
 type Action struct {
 	ExecNodeCloser
 	node *flowv1beta1.Action
-	eval shared.Program
 }
 
 func NewAction(env shared.Env, node *flowv1beta1.Action, visitor shared.NodeVisitFunc) (*Action, error) {

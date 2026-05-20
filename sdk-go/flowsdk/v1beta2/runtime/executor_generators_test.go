@@ -15,7 +15,7 @@ func TestGraph_Generator_Range(t *testing.T) {
 		graph := loadFlow(t, "gen_range.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(pubsub, testTopics, extraOpts...).Execute(ctx, graph)
@@ -30,7 +30,7 @@ func TestGraph_Generator_RangeWithStep(t *testing.T) {
 		graph := loadFlow(t, "gen_range_step.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(pubsub, testTopics, extraOpts...).Execute(ctx, graph)
@@ -46,7 +46,7 @@ func TestGraph_Generator_RangeWithRate(t *testing.T) {
 		graph := loadFlow(t, "gen_range_rate.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 5 values at 5 per 100ms = 20ms apart. Should take ~80ms (first emits immediately).
 		start := time.Now()
@@ -68,7 +68,7 @@ func TestGraph_Generator_Ticker(t *testing.T) {
 		graph := loadFlow(t, "gen_ticker.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(pubsub, testTopics, extraOpts...).Execute(ctx, graph)
@@ -88,7 +88,7 @@ func TestGraph_Generator_TickerWithValueExpr(t *testing.T) {
 		graph := loadFlow(t, "gen_ticker_value_expr.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(pubsub, testTopics, extraOpts...).Execute(ctx, graph)
@@ -108,7 +108,7 @@ func TestGraph_Generator_TickerDelay(t *testing.T) {
 		graph := loadFlow(t, "gen_ticker_delay.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		start := time.Now()
@@ -131,7 +131,7 @@ func TestGraph_Generator_RangeToVar(t *testing.T) {
 		graph := loadFlow(t, "gen_range_to_var.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(pubsub, testTopics, extraOpts...).Execute(ctx, graph)
@@ -149,7 +149,7 @@ func TestGraph_Generator_Cron(t *testing.T) {
 		graph := loadFlow(t, "gen_cron.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
@@ -166,7 +166,7 @@ func TestGraph_Generator_CronWithValueExpr(t *testing.T) {
 		graph := loadFlow(t, "gen_cron_value_expr.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
@@ -185,7 +185,7 @@ func TestGraph_Generator_CronInvalidExpression(t *testing.T) {
 		graph := loadFlow(t, "gen_cron_invalid.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)

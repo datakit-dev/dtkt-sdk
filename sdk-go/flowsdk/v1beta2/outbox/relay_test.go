@@ -7,15 +7,15 @@ import (
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/outbox"
 	outboxmem "github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/outbox/memory"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub/memory"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub/memory"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
 func TestRelay_ForwardsToCorrectTopic(t *testing.T) {
 	store := outboxmem.New()
 	ps := memory.New()
-	defer func() { _ = ps.Close() }()
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -67,7 +67,7 @@ func TestRelay_ForwardsToCorrectTopic(t *testing.T) {
 func TestRelay_DropsMessagesWithoutTopic(t *testing.T) {
 	store := outboxmem.New()
 	ps := memory.New()
-	defer func() { _ = ps.Close() }()
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -118,7 +118,7 @@ func TestRelay_DropsMessagesWithoutTopic(t *testing.T) {
 func TestRelay_MultipleTopics(t *testing.T) {
 	store := outboxmem.New()
 	ps := memory.New()
-	defer func() { _ = ps.Close() }()
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -182,7 +182,7 @@ func TestRelay_MultipleTopics(t *testing.T) {
 func TestRelay_StopsOnChannelClose(t *testing.T) {
 	store := outboxmem.New()
 	ps := memory.New()
-	defer func() { _ = ps.Close() }()
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -230,7 +230,7 @@ func TestRelay_StopsOnChannelClose(t *testing.T) {
 func TestRelay_PreservesOrdering(t *testing.T) {
 	store := outboxmem.New()
 	ps := memory.New(memory.WithPersistent())
-	defer func() { _ = ps.Close() }()
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

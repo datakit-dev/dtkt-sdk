@@ -46,7 +46,7 @@ The codegen layer:
 
 The published packages:
 
-- **[sdk-go/](sdk-go/)** - Published Go module `github.com/datakit-dev/dtkt-sdk/sdk-go`. `sdk-go/proto/` and `sdk-go/cloud/graph/generated.go` are generated; everything else is hand-written: `cloud/` (GraphQL client wrapper + genqlient output), `flowsdk/`, `integrationsdk/`, `protoformsdk/`, `protostoresdk/`, `middleware/`, `network/`, `encoding/`, `lib/`, `resource/`, `uri/`, `util/`, `common/`, `api/`. genqlient is invoked via `go tool genqlient` from [sdk-go/generate.go](sdk-go/generate.go).
+- **[sdk-go/](sdk-go/)** - Published Go module `github.com/datakit-dev/dtkt-sdk/sdk-go`. `sdk-go/proto/` and `sdk-go/cloud/graph/generated.go` are generated; everything else is hand-written: `cloud/` (GraphQL client wrapper + genqlient output), `flowsdk/`, `integrationsdk/`, `protoformsdk/`, `protostoresdk/`, `pubsub/` (publish/subscribe interface + memory backend + middleware/forwarder; cross-cutting primitive, not flow-specific), `cache/` (key/value cache interface + memory backend; cross-cutting), `middleware/`, `network/`, `encoding/`, `lib/`, `resource/`, `uri/`, `util/`, `common/`, `api/`. genqlient is invoked via `go tool genqlient` from [sdk-go/generate.go](sdk-go/generate.go).
 - **[sdk-ts/](sdk-ts/)** - Published npm package `@dtkt/sdk`. `src/proto/` and `src/graphql/generated.ts` are generated; `src/cloud/`, `src/integrationsdk/`, `src/protoformsdk/` are hand-written. Built with `tsdown` to ESM. Public exports are limited via `package.json#exports` to `./cloud/*`, `./proto/*`, and `./protoformsdk/*` - `integrationsdk` is internal.
 
 ## Codegen

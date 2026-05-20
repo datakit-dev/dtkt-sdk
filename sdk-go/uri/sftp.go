@@ -104,7 +104,7 @@ func (fs *SFTPFileSystem) ReadFile(name string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	//nolint:errcheck
+	//nolint:errcheck // sftp file opened read-only and fully read; close error cannot affect the read bytes
 	defer file.Close()
 	return io.ReadAll(file)
 }

@@ -9,8 +9,8 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/cache"
-	cachememory "github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/cache/memory"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/cache"
+	cachememory "github.com/datakit-dev/dtkt-sdk/sdk-go/cache/memory"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/rpc"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
@@ -66,13 +66,6 @@ type compiledOutput struct {
 	program    cel.Program
 	transforms *transformPipeline
 	throttle   time.Duration
-}
-
-// connRuntimeEnv creates a per-connection shared.Env by combining the compiled
-// *cel.Env from the graph-level shared.Env with a connection-specific resolver.
-func connRuntimeEnv(graphEnv shared.Env, resolver shared.Resolver) shared.Env {
-	re := graphEnv.(*runtimeEnv)
-	return &runtimeEnv{Env: re.Env, resolver: resolver}
 }
 
 // rateToDuration converts a proto Rate to a time.Duration per event.
@@ -272,7 +265,7 @@ func compileStream(env shared.Env, node *flowv1beta2.Node, connectors map[string
 			method:       methodName,
 			kind:         kind,
 			client:       conn.Client,
-			env:          connRuntimeEnv(env, conn.Resolver),
+			env:          env,
 			whenProg:     whenProg,
 			throttle:     rateToDuration(stream.GetThrottle()),
 			request:      reqTree,
@@ -345,7 +338,7 @@ func compileAction(env shared.Env, node *flowv1beta2.Node, connectors map[string
 		method:       methodName,
 		kind:         kind,
 		client:       conn.Client,
-		env:          connRuntimeEnv(env, conn.Resolver),
+		env:          env,
 		whenProg:     whenProg,
 		throttle:     rateToDuration(action.GetThrottle()),
 		request:      reqTree,

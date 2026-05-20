@@ -19,7 +19,7 @@ func TestFlowControl_Range_StopWhen(t *testing.T) {
 		graph := loadFlow(t, "fc_range_stop.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
@@ -39,7 +39,7 @@ func TestFlowControl_Ticker_StopWhen(t *testing.T) {
 		graph := loadFlow(t, "fc_ticker_stop.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
@@ -59,7 +59,7 @@ func TestFlowControl_Var_StopWhen(t *testing.T) {
 		graph := loadFlow(t, "fc_var_stop.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Feed values 1..5. stop_when triggers at inputs.x.value >= 3, but stop
 		// is graceful -- all buffered inputs (1..5) are processed and drained.
@@ -83,7 +83,7 @@ func TestFlowControl_Action_StopWhen(t *testing.T) {
 		graph := loadFlow(t, "fc_action_stop.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(42), int64(99))
 
@@ -109,7 +109,7 @@ func TestFlowControl_Output_StopWhen(t *testing.T) {
 		graph := loadFlow(t, "fc_output_stop.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(10), int64(20), int64(30))
 
@@ -135,7 +135,7 @@ func TestFlowControl_Range_TerminateWhen(t *testing.T) {
 		graph := loadFlow(t, "fc_range_terminate.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
@@ -157,7 +157,7 @@ func TestFlowControl_TerminatePriority(t *testing.T) {
 		graph := loadFlow(t, "fc_terminate_priority.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
@@ -179,7 +179,7 @@ func TestFlowControl_Ticker_StopWhen_Input(t *testing.T) {
 		graph := loadFlow(t, "fc_ticker_stop_input.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
@@ -211,7 +211,7 @@ func TestFlowControl_Var_TerminateWhen(t *testing.T) {
 		graph := loadFlow(t, "fc_var_terminate.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(1), int64(2), int64(3), int64(4), int64(5))
 
@@ -241,7 +241,7 @@ func TestFlowControl_Action_TerminateWhen(t *testing.T) {
 		graph := loadFlow(t, "fc_action_terminate.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(42))
 
@@ -268,7 +268,7 @@ func TestFlowControl_Stream_StopWhen(t *testing.T) {
 		graph := loadFlow(t, "fc_stream_stop.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", "hello", "world")
 
@@ -297,7 +297,7 @@ func TestFlowControl_Stream_TerminateWhen(t *testing.T) {
 		graph := loadFlow(t, "fc_stream_terminate.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", "hello")
 
@@ -325,7 +325,7 @@ func TestFlowControl_Interaction_StopWhen(t *testing.T) {
 		promptCh := make(chan *flowv1beta2.InteractionRequestEvent, 4)
 		responseCh := make(chan *flowv1beta2.InteractionResponseEvent, 4)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Auto-respond to interaction prompts.
 		go func() {
@@ -364,7 +364,7 @@ func TestFlowControl_Interaction_TerminateWhen(t *testing.T) {
 		promptCh := make(chan *flowv1beta2.InteractionRequestEvent, 4)
 		responseCh := make(chan *flowv1beta2.InteractionResponseEvent, 4)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Auto-respond to interaction prompts.
 		go func() {
@@ -400,7 +400,7 @@ func TestFlowControl_Output_SuspendWhen(t *testing.T) {
 		graph := loadFlow(t, "fc_output_suspend.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Multiple inputs queued so a "lying" suspend would emit more values.
 		feedInput(ps, "inputs.x", int64(42), int64(43), int64(44))
@@ -439,7 +439,7 @@ func TestFlowControl_Var_SuspendWhen(t *testing.T) {
 		graph := loadFlow(t, "fc_var_suspend.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(1), int64(2), int64(3), int64(4), int64(5))
 		ctx := testContext(t)
@@ -474,7 +474,7 @@ func TestFlowControl_Action_SuspendWhen(t *testing.T) {
 		graph := loadFlow(t, "fc_action_suspend.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(42), int64(99), int64(7))
 		ctx := testContext(t)
@@ -510,7 +510,7 @@ func TestFlowControl_Stream_SuspendWhen(t *testing.T) {
 		graph := loadFlow(t, "fc_stream_suspend.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", "hello", "world", "again")
 		ctx := testContext(t)
@@ -548,7 +548,7 @@ func TestFlowControl_Interaction_SuspendWhen(t *testing.T) {
 		promptCh := make(chan *flowv1beta2.InteractionRequestEvent, 4)
 		responseCh := make(chan *flowv1beta2.InteractionResponseEvent, 4)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Auto-respond to interaction prompts.
 		go func() {
@@ -596,7 +596,7 @@ func TestFlowControl_Ticker_Var_StopWhen_Input(t *testing.T) {
 		graph := loadFlow(t, "fc_ticker_var_stop_input.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)

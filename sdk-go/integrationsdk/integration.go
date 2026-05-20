@@ -168,7 +168,7 @@ func NewFS[C any, I v1beta1.InstanceType](
 	if err != nil {
 		return nil, err
 	}
-	//nolint:errcheck
+	//nolint:errcheck // spec file opened read-only and fully read below; close error cannot affect the parsed spec
 	defer reader.Close()
 
 	spec, err := ReadSpec(encoding.YAML, reader)

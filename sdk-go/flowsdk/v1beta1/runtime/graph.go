@@ -122,7 +122,7 @@ func (g *Graph) Build() (err error) {
 }
 
 func (g *Graph) computePreds() error {
-	preds, err := g.Graph.PredecessorMap()
+	preds, err := g.PredecessorMap()
 	if err != nil {
 		return err
 	}

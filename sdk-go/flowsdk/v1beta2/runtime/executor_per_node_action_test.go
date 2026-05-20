@@ -10,7 +10,7 @@ import (
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -112,7 +112,6 @@ type nodeTestRig struct {
 	ps            executor.PubSub
 	ctx           context.Context
 	doneCh        chan error
-	cancel        func() // signals interaction responder to exit (no-op otherwise)
 	responderDone chan struct{}
 	promptCh      chan *flowv1beta2.InteractionRequestEvent
 }
@@ -182,30 +181,6 @@ func (r *nodeTestRig) suspendedNodeSet() map[string]bool {
 		out[id] = true
 	}
 	return out
-}
-
-// countNodeOutputsOver subscribes to a topic and returns the count of
-// EVENT_TYPE_NODE_OUTPUT messages received within the given window.
-// Used as the witness assertion: "this topic produced N values during
-// the suspend window."
-func countNodeOutputsOver(t *testing.T, ps executor.PubSub, ctx context.Context, topic string, window time.Duration) int {
-	t.Helper()
-	ch, err := ps.Subscribe(ctx, testTopics.For(topic))
-	require.NoError(t, err)
-	count := 0
-	deadline := time.After(window)
-	for {
-		select {
-		case msg := <-ch:
-			evt := msg.Payload.(*flowv1beta2.RunSnapshot_FlowEvent)
-			msg.Ack()
-			if evt.GetEventType() == flowv1beta2.RunSnapshot_FlowEvent_EVENT_TYPE_NODE_OUTPUT {
-				count++
-			}
-		case <-deadline:
-			return count
-		}
-	}
 }
 
 // waitForPhaseOnChan reads from a pre-subscribed channel and waits

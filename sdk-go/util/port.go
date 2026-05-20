@@ -32,7 +32,7 @@ func IsPortFree(host, port string) bool {
 	if err == nil {
 		lis, err := net.ListenTCP("tcp", addr)
 		if err == nil {
-			//nolint:errcheck
+			//nolint:errcheck // probe listener opened only to test port availability; immediately discarded
 			lis.Close()
 			return true
 		}

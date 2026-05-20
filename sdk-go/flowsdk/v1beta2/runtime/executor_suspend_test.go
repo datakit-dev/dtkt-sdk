@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -24,7 +24,7 @@ func TestCommand_SuspendNode_Generator(t *testing.T) {
 		graph := loadFlow(t, "gen_rate_limited.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 
@@ -62,7 +62,7 @@ func TestCommand_SuspendNode_Resume_Generator(t *testing.T) {
 		graph := loadFlow(t, "gen_rate_limited.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 
@@ -110,7 +110,7 @@ func TestCommand_Suspend_ThenTerminate(t *testing.T) {
 		graph := loadFlow(t, "gen_rate_limited.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		exec := NewExecutor(ps, testTopics, extraOpts...)
@@ -139,7 +139,7 @@ func TestCommand_Suspend_ThenStop(t *testing.T) {
 		graph := loadFlow(t, "gen_rate_limited.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		flowCh, err := ps.Subscribe(ctx, testTopics.Flow())
@@ -196,7 +196,7 @@ func TestCommand_Suspend_ThenStop(t *testing.T) {
 
 func TestCommand_SuspendNode_NotRunning(t *testing.T) {
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 	exec := NewExecutor(ps, testTopics)
 	exec.SuspendNode("nonexistent") // should not panic
 }
@@ -205,7 +205,7 @@ func TestCommand_SuspendNode_NotRunning(t *testing.T) {
 
 func TestCommand_ResumeNode_NotSuspended(t *testing.T) {
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 	exec := NewExecutor(ps, testTopics)
 	exec.ResumeNode("nonexistent", nil) // should not panic
 }
@@ -217,7 +217,7 @@ func TestCommand_Suspend_Idempotent(t *testing.T) {
 		graph := loadFlow(t, "gen_rate_limited.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		exec := NewExecutor(ps, testTopics, extraOpts...)
@@ -247,7 +247,7 @@ func TestCommand_SuspendNode_HangingAction(t *testing.T) {
 		graph := loadFlow(t, "action_hang.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 42)
 		ctx := testContext(t)
@@ -289,7 +289,7 @@ func TestCommand_RetrySuspend_Resume(t *testing.T) {
 		graph := loadFlow(t, "action_retry_suspend.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 99)
 		ctx := testContext(t)
@@ -332,7 +332,7 @@ func TestCommand_RetrySuspend_ThenTerminate(t *testing.T) {
 		graph := loadFlow(t, "action_retry_suspend.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 99)
 		ctx := testContext(t)
@@ -366,7 +366,7 @@ func TestCommand_Suspend_WithErrorStrategy_Stop(t *testing.T) {
 		graph := loadFlow(t, "gen_two_paths_rate_limited.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		gen1Ch, err := ps.Subscribe(ctx, testTopics.For("generators.gen1"))
@@ -407,7 +407,7 @@ func TestCommand_Suspend_Resume_All(t *testing.T) {
 		graph := loadFlow(t, "gen_rate_limited.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 
@@ -457,7 +457,7 @@ func TestCommand_Suspend_Resume_OutputContinuity(t *testing.T) {
 		graph := loadFlow(t, "gen_rate_limited.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 
@@ -548,7 +548,7 @@ func runManyCyclesPreservesSequence(t *testing.T, extraOpts []Option) {
 		graph := loadFlow(t, "gen_rate_limited.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 
@@ -699,7 +699,7 @@ func TestCommand_Suspend_Resume_DoesNotHang_ServerStream(t *testing.T) {
 		graph := loadFlow(t, "stream_server_stream.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Feed input that asks for 5 responses.
 		feedInput(ps, "inputs.count", int64(5))
@@ -734,7 +734,7 @@ func TestCommand_Suspend_Resume_DoesNotHang_ClientStream(t *testing.T) {
 		graph := loadFlow(t, "stream_client_stream.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Feed several values; the client stream collects them.
 		feedInput(ps, "inputs.msg", int64(1), int64(2), int64(3))
@@ -767,7 +767,7 @@ func TestCommand_Suspend_Resume_DoesNotHang_Cron(t *testing.T) {
 		graph := loadFlow(t, "gen_cron.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		exec := NewExecutor(ps, testTopics, extraOpts...)
@@ -806,7 +806,7 @@ func TestCommand_Suspend_Resume_DoesNotHang_Interaction(t *testing.T) {
 		graph := loadFlow(t, "interaction_basic.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Channel for prompts; auto-responder will deliver values back
 		// via the executor's interaction routing.
@@ -898,7 +898,7 @@ func runHandlerSuspendResumeSequenceWith(
 	graph := loadFlow(t, fixture)
 
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	ctx := testContext(t)
 
@@ -1080,7 +1080,7 @@ func runSingleNodeSuspendIsolationTest(t *testing.T, tc singleNodeSuspendIsolati
 	graph := loadFlow(t, tc.fixture)
 
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	ctx := testContext(t)
 
@@ -1238,12 +1238,12 @@ func TestCommand_SuspendNode_Input(t *testing.T) {
 		graph := loadFlow(t, "action_unary_echo.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Feed a value with no EOF so the flow stays alive.
 		topic := testTopics.InputFor("inputs.msg")
 		val, _ := nativeToExpr(42)
-		ps.Publish(topic, pubsub.NewMessage(val)) //nolint:errcheck
+		ps.Publish(topic, pubsub.NewMessage(val)) //nolint:errcheck // test fixture feed to in-memory pubsub; a real failure surfaces as a downstream assertion
 
 		ctx := testContext(t)
 
@@ -1270,7 +1270,7 @@ func TestCommand_SuspendNode_Input(t *testing.T) {
 		// flow through, proving the suspend didn't pause the input.
 		exec.SuspendNode("inputs.msg")
 		val2, _ := nativeToExpr(99)
-		ps.Publish(topic, pubsub.NewMessage(val2)) //nolint:errcheck
+		ps.Publish(topic, pubsub.NewMessage(val2)) //nolint:errcheck // test fixture feed to in-memory pubsub; a real failure surfaces as a downstream assertion
 
 		second := waitForOutputValue(t, outputCh, 1*time.Second)
 		assert.Equal(t, int64(99), second.GetInt64Value(),

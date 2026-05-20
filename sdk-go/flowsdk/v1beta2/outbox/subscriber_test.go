@@ -7,7 +7,7 @@ import (
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/outbox"
 	outboxmem "github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/outbox/memory"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -323,5 +323,99 @@ func TestSubscriberAdapter_CancelDuringNackSleep(t *testing.T) {
 		}
 	case <-time.After(2 * time.Second):
 		t.Fatal("timed out waiting for channel close")
+	}
+}
+
+// TestSubscriberAdapter_WakeShortCircuitsPollInterval verifies that calling
+// Wake delivers a freshly-stored message faster than the poll interval would.
+// We use a 1s poll interval so the test fails fast if Wake is broken.
+func TestSubscriberAdapter_WakeShortCircuitsPollInterval(t *testing.T) {
+	store := outboxmem.New()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	sub := outbox.NewSubscriber(store, 1*time.Second)
+	ch, err := sub.Subscribe(ctx, "t")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Let the poll loop enter its idle wait (start of poll select).
+	time.Sleep(50 * time.Millisecond)
+
+	// Write a message and wake the loop immediately.
+	if err := store.Store(ctx, pubsub.NewMessage(testNode("n1"))); err != nil {
+		t.Fatal(err)
+	}
+	sub.Wake()
+
+	// Delivery should happen well before the 1s poll interval elapses.
+	select {
+	case msg := <-ch:
+		if got := msg.Payload.(*flowv1beta2.RunSnapshot_VarNode).GetId(); got != "n1" {
+			t.Errorf("node ID = %q, want %q", got, "n1")
+		}
+		msg.Ack()
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("Wake did not deliver before timeout; poll loop likely not selecting on nudge channel")
+	}
+}
+
+// TestSubscriberAdapter_WakeIsNonBlocking verifies that Wake never blocks
+// the caller, even when no Subscribe has been called yet (so the nudge
+// channel has no receiver).
+func TestSubscriberAdapter_WakeIsNonBlocking(t *testing.T) {
+	store := outboxmem.New()
+	sub := outbox.NewSubscriber(store, 100*time.Millisecond)
+
+	// Hammer Wake without ever Subscribing. The first call buffers into the
+	// size-1 channel; subsequent calls hit the non-blocking default. Each
+	// call must return quickly.
+	done := make(chan struct{})
+	go func() {
+		for range 100 {
+			sub.Wake()
+		}
+		close(done)
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(1 * time.Second):
+		t.Fatal("Wake blocked; non-blocking send is broken")
+	}
+}
+
+// TestSubscriberAdapter_WakeBeforeSubscribeNotLost verifies that a Wake
+// queued before Subscribe is consumed once the poll loop reaches its
+// first idle wait. The channel is buffered to size 1 specifically for
+// this case.
+func TestSubscriberAdapter_WakeBeforeSubscribeNotLost(t *testing.T) {
+	store := outboxmem.New()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	sub := outbox.NewSubscriber(store, 1*time.Second)
+
+	// Wake before any Subscribe.
+	sub.Wake()
+
+	// Now store and subscribe.
+	if err := store.Store(ctx, pubsub.NewMessage(testNode("n1"))); err != nil {
+		t.Fatal(err)
+	}
+	ch, err := sub.Subscribe(ctx, "t")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// The first ReadEvents finds the row and delivers without needing
+	// the nudge -- but if it didn't, the buffered nudge would still
+	// short-circuit the 1s wait. Either way, delivery must happen fast.
+	select {
+	case msg := <-ch:
+		msg.Ack()
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("delivery did not happen within 500ms")
 	}
 }

@@ -27,7 +27,7 @@ func TestFlowControl_Var_SuspendWhen_MidStream(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "fc_var_suspend_midstream.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		varCh, err := ps.Subscribe(ctx, testTopics.For("vars.doubled"))
@@ -81,7 +81,7 @@ func TestNodeControl_Output_SuspendWhen_MidStream(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_output_suspend_midstream.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		outCh, err := ps.Subscribe(ctx, testTopics.For("outputs.result"))

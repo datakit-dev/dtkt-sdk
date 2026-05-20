@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -20,7 +20,7 @@ func TestCommand_Stop_Generator(t *testing.T) {
 		graph := loadFlow(t, "gen_long_running.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 
@@ -57,7 +57,7 @@ func TestCommand_Stop_Input(t *testing.T) {
 		graph := loadFlow(t, "action_unary_echo.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 
@@ -70,7 +70,7 @@ func TestCommand_Stop_Input(t *testing.T) {
 		// Feed a value but no EOF -- the flow would block waiting for more input.
 		topic := testTopics.InputFor("inputs.msg")
 		val, _ := nativeToExpr(42)
-		ps.Publish(topic, pubsub.NewMessage(val)) //nolint:errcheck
+		ps.Publish(topic, pubsub.NewMessage(val)) //nolint:errcheck // test fixture feed to in-memory pubsub; a real failure surfaces as a downstream assertion
 
 		done := make(chan error, 1)
 		go func() {
@@ -112,7 +112,7 @@ func TestCommand_Stop_Idempotent(t *testing.T) {
 		graph := loadFlow(t, "gen_long_running.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		exec := NewExecutor(ps, testTopics, extraOpts...)
@@ -136,7 +136,7 @@ func TestCommand_Stop_Idempotent(t *testing.T) {
 
 func TestCommand_Stop_NotRunning(t *testing.T) {
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 	exec := NewExecutor(ps, testTopics)
 	exec.Stop() // should not panic
 }
@@ -150,7 +150,7 @@ func TestCommand_Terminate_Generator(t *testing.T) {
 		graph := loadFlow(t, "gen_long_running.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		exec := NewExecutor(ps, testTopics, extraOpts...)
@@ -176,7 +176,7 @@ func TestCommand_Terminate_HangingAction(t *testing.T) {
 		graph := loadFlow(t, "action_hang.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 42)
 
@@ -204,7 +204,7 @@ func TestCommand_Terminate_Idempotent(t *testing.T) {
 		graph := loadFlow(t, "gen_long_running.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		exec := NewExecutor(ps, testTopics, extraOpts...)
@@ -227,7 +227,7 @@ func TestCommand_Terminate_Idempotent(t *testing.T) {
 
 func TestCommand_Terminate_NotRunning(t *testing.T) {
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 	exec := NewExecutor(ps, testTopics)
 	exec.Terminate() // should not panic
 }
@@ -241,7 +241,7 @@ func TestCommand_StopNode_Generator(t *testing.T) {
 		graph := loadFlow(t, "gen_two_paths.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 
@@ -280,7 +280,7 @@ func TestCommand_StopNode_Input(t *testing.T) {
 		graph := loadFlow(t, "action_unary_echo.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 
@@ -293,7 +293,7 @@ func TestCommand_StopNode_Input(t *testing.T) {
 		// Feed a value but no EOF.
 		topic := testTopics.InputFor("inputs.msg")
 		val, _ := nativeToExpr(42)
-		ps.Publish(topic, pubsub.NewMessage(val)) //nolint:errcheck
+		ps.Publish(topic, pubsub.NewMessage(val)) //nolint:errcheck // test fixture feed to in-memory pubsub; a real failure surfaces as a downstream assertion
 
 		exec := NewExecutor(ps, testTopics, append(mockRPCOptions(), extraOpts...)...)
 
@@ -326,7 +326,7 @@ func TestCommand_StopNode_Input(t *testing.T) {
 
 func TestCommand_StopNode_UnknownNode(t *testing.T) {
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 	exec := NewExecutor(ps, testTopics)
 	exec.StopNode("nonexistent") // should not panic
 }
@@ -340,7 +340,7 @@ func TestCommand_TerminateNode_Action(t *testing.T) {
 		graph := loadFlow(t, "action_hang.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 42)
 
@@ -381,7 +381,7 @@ func TestCommand_TerminateNode_Action(t *testing.T) {
 
 func TestCommand_TerminateNode_UnknownNode(t *testing.T) {
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 	exec := NewExecutor(ps, testTopics)
 	exec.TerminateNode("nonexistent") // should not panic
 }
@@ -399,7 +399,7 @@ func TestCommand_Stop_WithErrorStrategy(t *testing.T) {
 		graph := loadFlow(t, "action_error_internal.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 99)
 
@@ -438,7 +438,7 @@ func TestCommand_Terminate_OverridesStop(t *testing.T) {
 		graph := loadFlow(t, "gen_long_running.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		exec := NewExecutor(ps, testTopics, extraOpts...)

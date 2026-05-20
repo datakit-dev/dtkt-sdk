@@ -9,13 +9,12 @@ import (
 	expr "cel.dev/expr"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/ast"
-	"github.com/google/cel-go/common/types"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -49,7 +48,7 @@ type transformStep struct {
 	flatten       bool             // true for flatten transforms
 	reduce        *accumulateState // non-nil for reduce transforms (emit on EOF only)
 	scan          *accumulateState // non-nil for scan transforms (emit every intermediate)
-	adapter       types.Adapter
+	env           shared.Env
 }
 
 // accumulateState is shared between reduce and scan.
@@ -58,7 +57,7 @@ type accumulateState struct {
 	accumulator *expr.Value
 	lastAcc     *expr.Value // most recently updated accumulator (nil until first accumulation)
 	seen        bool        // true once at least one value has been accumulated
-	adapter     types.Adapter
+	env         shared.Env
 
 	// GroupBy fields (nil when ungrouped).
 	keyProgram cel.Program
@@ -179,7 +178,7 @@ func emitOnEOF(step *transformStep, pub pubsub.Publisher, outTopic string) error
 // applyStep applies a single transform step to a value, returning zero or more outputs.
 func applyStep(step *transformStep, val *expr.Value) ([]*expr.Value, error) {
 	if step.mapProgram != nil {
-		rv := exprToRefVal(step.adapter, val)
+		rv := exprToRefVal(step.env, val)
 		result, err := evalCEL(step.mapProgram, map[string]any{
 			"this": map[string]any{"value": rv},
 		})
@@ -194,7 +193,7 @@ func applyStep(step *transformStep, val *expr.Value) ([]*expr.Value, error) {
 	}
 
 	if step.filterProgram != nil {
-		rv := exprToRefVal(step.adapter, val)
+		rv := exprToRefVal(step.env, val)
 		result, err := evalCEL(step.filterProgram, map[string]any{
 			"this": map[string]any{"value": rv},
 		})
@@ -443,10 +442,9 @@ func compileTransforms(env shared.Env, transforms []*flowv1beta2.Transform) (*tr
 	}
 
 	steps := make([]transformStep, 0, len(transforms))
-	adapter := env.TypeAdapter()
 	for i, t := range transforms {
 		var step transformStep
-		step.adapter = adapter
+		step.env = env
 		switch t.WhichType() {
 		case flowv1beta2.Transform_Map_case:
 			prog, err := compileCEL(env, t.GetMap())
@@ -516,7 +514,7 @@ func compileAccumulate(env shared.Env, initial, accumulator string) (*accumulate
 	}
 	state := &accumulateState{
 		accumulator: initVal,
-		adapter:     env.TypeAdapter(),
+		env:         env,
 	}
 	if accumulator != "" {
 		accProg, err := compileCEL(env, accumulator)
@@ -532,7 +530,7 @@ func compileAccumulate(env shared.Env, initial, accumulator string) (*accumulate
 func (a *accumulateState) accumulate(value *expr.Value) error {
 	// If grouped, route to the per-key accumulator.
 	if a.groups != nil {
-		rv := exprToRefVal(a.adapter, value)
+		rv := exprToRefVal(a.env, value)
 		keyResult, err := evalCEL(a.keyProgram, map[string]any{
 			"this": map[string]any{"value": rv},
 		})
@@ -561,8 +559,8 @@ func (a *accumulateState) accumulate(value *expr.Value) error {
 
 // accumulateValue runs the accumulator CEL on a single value (no grouping logic).
 func (a *accumulateState) accumulateValue(value *expr.Value) error {
-	rv := exprToRefVal(a.adapter, value)
-	accRV := exprToRefVal(a.adapter, a.accumulator)
+	rv := exprToRefVal(a.env, value)
+	accRV := exprToRefVal(a.env, a.accumulator)
 	result, err := evalCEL(a.accProgram, map[string]any{
 		"this": map[string]any{
 			"value":       rv,

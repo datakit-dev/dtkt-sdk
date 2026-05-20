@@ -85,7 +85,7 @@ func TestPerNode_TerminateOnTerminal_NoOp(t *testing.T) {
 	parallelByDefault(t)
 	g := loadFlow(t, "input_int64_to_output.yaml")
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	feedInput(ps, "inputs.x", int64(42))
 	ctx := testContext(t)

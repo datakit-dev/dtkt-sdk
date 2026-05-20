@@ -8,11 +8,11 @@ import (
 
 	expr "cel.dev/expr"
 	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/common/types"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -34,7 +34,7 @@ type switchHandler struct {
 	defaultProg cel.Program
 	transforms  *transformPipeline
 	transformPS executor.PubSub
-	adapter     types.Adapter
+	env         shared.Env
 	cache       *cacheBackend
 }
 
@@ -49,7 +49,7 @@ func (h *switchHandler) evalSwitch(vars map[string]any) (*expr.Value, error) {
 		return nil, fmt.Errorf("switch %s value convert: %w", h.id, err)
 	}
 
-	thisMap := map[string]any{"value": exprToRefVal(h.adapter, switchExpr)}
+	thisMap := map[string]any{"value": exprToRefVal(h.env, switchExpr)}
 	caseVars := maps.Clone(vars)
 	caseVars["this"] = thisMap
 
@@ -94,7 +94,7 @@ func (h *switchHandler) Run(ctx context.Context) error {
 
 	var evalCount uint64
 	for {
-		act := h.cache.newActivation(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
+		act := h.cache.newActivation(ctx, h.inputs, h.env, h.SuspendChan(), h.StopChan())
 		vars, err := act.Resolve()
 		if errors.Is(err, errOperatorStopped) {
 			break
@@ -193,7 +193,7 @@ func (h *switchHandler) runWithTransforms(ctx context.Context) error {
 
 	g.Go(func() error {
 		for {
-			act := h.cache.newActivation(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
+			act := h.cache.newActivation(ctx, h.inputs, h.env, h.SuspendChan(), h.StopChan())
 			vars, err := act.Resolve()
 			if errors.Is(err, errOperatorStopped) {
 				break

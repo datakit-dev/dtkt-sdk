@@ -117,7 +117,7 @@ func Exists(ctx context.Context, uri *url.URL) (bool, error) {
 		}
 		defer func() {
 			if sftpFS, ok := fs.(*SFTPFileSystem); ok {
-				//nolint:errcheck
+				//nolint:errcheck // deferred filesystem cleanup; close error has no recovery path at teardown
 				sftpFS.Close()
 			}
 		}()
@@ -284,7 +284,7 @@ func GetChecksum(ctx context.Context, uriStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	//nolint:errcheck
+	//nolint:errcheck // reader consumed for checksum; close error cannot affect the computed hash
 	defer reader.Close()
 
 	return util.HashSHA256Reader(reader)

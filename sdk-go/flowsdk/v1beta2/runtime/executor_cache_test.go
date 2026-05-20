@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -20,7 +20,7 @@ func TestCache_Var_DeliversInline(t *testing.T) {
 		graph := loadFlow(t, "cache_var_to_output.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(7))
 		ctx := testContext(t)
@@ -42,7 +42,7 @@ func TestCache_Var_DrainAndSkip(t *testing.T) {
 		graph := loadFlow(t, "cache_var_to_output.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Feed three values: var should capture only the first (5*2=10),
 		// drain the next two without re-emitting.
@@ -103,7 +103,7 @@ func TestCache_FanOut_MultipleConsumers(t *testing.T) {
 		graph := loadFlow(t, "cache_var_fanout.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.const", int64(10))
 		feedInput(ps, "inputs.tick", int64(1), int64(2), int64(3))
@@ -131,7 +131,7 @@ func TestCache_Var_FilterTransform_CapturesFirstPassing(t *testing.T) {
 		graph := loadFlow(t, "cache_var_with_filter.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Filter is `this.value > 10`. First two values (3, 7) are
 		// dropped; 42 is the first to pass. With the post-transform
@@ -160,7 +160,7 @@ func TestCache_Input_MapTransform_CapturesPostMap(t *testing.T) {
 		graph := loadFlow(t, "cache_input_with_map.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Map is `this.value * 100`. First input is 7 -> 700 post-map.
 		// Subsequent pushes are drained.
@@ -185,7 +185,7 @@ func TestCache_MixedDeps_StreamingDrivesIteration(t *testing.T) {
 		graph := loadFlow(t, "cache_var_mixed_deps.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// const is cached:true; the consumer's lastSeen captures the first
 		// push. tick is streaming; each push drives one iteration.
@@ -211,7 +211,7 @@ func TestCache_Action_DrainAndSkip(t *testing.T) {
 		graph := loadFlow(t, "cache_action_basic.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Three values: action.echo should call the RPC on the first
 		// (echo back 11), drain the next two without re-emitting.
@@ -256,7 +256,7 @@ func TestCache_ClearCache_ResetsCaptureFlag(t *testing.T) {
 		graph := loadFlow(t, "cache_var_to_output.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		varCh, err := ps.Subscribe(ctx, testTopics.For("vars.doubled"))
@@ -302,7 +302,7 @@ func TestCache_NoClearCache_DrainsSubsequentEvents(t *testing.T) {
 		graph := loadFlow(t, "cache_var_to_output.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Two values upfront; the second must be drained-and-skipped.
 		feedInput(ps, "inputs.x", int64(5), int64(7))
@@ -328,7 +328,7 @@ func TestCache_ClearCache_UnknownNode_NoOp(t *testing.T) {
 	graph := loadFlow(t, "cache_var_to_output.yaml")
 
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	exec := NewExecutor(ps, testTopics)
 	// Pre-Execute: cacheBackends is nil; ClearCache must not panic.

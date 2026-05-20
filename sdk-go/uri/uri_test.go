@@ -110,7 +110,7 @@ func TestNewURIReader_Git(t *testing.T) {
 			reader, err := NewReader(ctx, uri)
 			if tt.expectError {
 				if err == nil && reader != nil {
-					//nolint:errcheck
+					//nolint:errcheck // closing the unexpectedly-non-nil reader before failing the test; close result is irrelevant to the assertion
 					reader.Close()
 					t.Error("Expected error but got none")
 				}
@@ -125,7 +125,7 @@ func TestNewURIReader_Git(t *testing.T) {
 				}
 
 				require.NotNil(t, reader)
-				//nolint:errcheck
+				//nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 				defer reader.Close()
 
 				// Try to read some content

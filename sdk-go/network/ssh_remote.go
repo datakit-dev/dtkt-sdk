@@ -284,7 +284,7 @@ func (u *SSHRemoteURI) loadSSHConfig() error {
 	if err != nil {
 		return err
 	}
-	//nolint:errcheck
+	//nolint:errcheck // opened read-only and consumed; close error cannot affect the read result
 	defer f.Close()
 
 	cfg, err := ssh_config.Decode(f)
@@ -554,7 +554,7 @@ func (u *SSHRemoteURI) tofuHostKeyCallback() (ssh.HostKeyCallback, error) {
 	// If file doesn't exist, create it
 	if _, err := os.Stat(tofuFile); os.IsNotExist(err) {
 		if f, err := os.OpenFile(tofuFile, os.O_CREATE|os.O_WRONLY, 0600); err == nil {
-			//nolint:errcheck
+			//nolint:errcheck // freshly created empty file; nothing was written, so close cannot lose data
 			f.Close()
 		}
 	}
@@ -613,7 +613,7 @@ func (u *SSHRemoteURI) addToKnownHosts(file, hostname string, key ssh.PublicKey)
 	if err != nil {
 		return err
 	}
-	//nolint:errcheck
+	//nolint:errcheck // write result is captured via the explicit WriteString error check below; deferred close adds no further signal
 	defer f.Close()
 
 	line := knownhosts.Line([]string{hostname}, key)

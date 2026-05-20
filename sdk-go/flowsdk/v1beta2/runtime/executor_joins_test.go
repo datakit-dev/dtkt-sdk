@@ -14,7 +14,7 @@ func TestGraph_Join_EvenOddSum(t *testing.T) {
 		graph := loadFlow(t, "join_even_odd_sum.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Inputs with duplicates to exercise filter deduplication behavior.
 		feedInput(pubsub, "inputs.number", 1, 2, 3, 3, 3, 4, 5, 6, 7, 8, 8, 8, 9, 10)
@@ -62,7 +62,7 @@ func TestGraph_Join_Diamond(t *testing.T) {
 		graph := loadFlow(t, "join_diamond.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// x=10 → left=20, right=30 → combined=50
 		feedInput(pubsub, "inputs.x", 10)
@@ -82,7 +82,7 @@ func TestGraph_Join_DiamondMultipleValues(t *testing.T) {
 		graph := loadFlow(t, "join_diamond_multiple.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// x=5 → doubled=10, negated=-5 → sum=5
 		// x=10 → doubled=20, negated=-10 → sum=10
@@ -102,7 +102,7 @@ func TestGraph_Join_TwoInputs(t *testing.T) {
 		graph := loadFlow(t, "join_two_inputs.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.a", int64(7))
 		feedInput(pubsub, "inputs.b", int64(6))
@@ -127,7 +127,7 @@ func TestGraph_Join_OneInputTwoFilteredOutputs(t *testing.T) {
 		graph := loadFlow(t, "join_fan_in.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 3,7,1,10 → small: 3,1 → large: 70,100
 		feedInput(pubsub, "inputs.x", 3, 7, 1, 10)
@@ -148,7 +148,7 @@ func TestGraph_Join_SharedIntermediary(t *testing.T) {
 		graph := loadFlow(t, "join_shared_intermediary.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// x=5 → shared=10 → plusOne=11, plusTen=20
 		// x=10 → shared=20 → plusOne=21, plusTen=30

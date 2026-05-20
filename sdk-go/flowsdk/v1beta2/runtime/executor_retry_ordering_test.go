@@ -26,7 +26,7 @@ func TestRetryStrategy_FiresBeforeNodeControl_Action(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "retry_before_nc_action.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(99))
 		ctx := testContext(t)
@@ -54,7 +54,7 @@ func TestRetryStrategy_FiresBeforeNodeControl_Stream(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "retry_before_nc_stream.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(99))
 		ctx := testContext(t)
@@ -80,7 +80,7 @@ func TestRetryStrategy_FiresBeforeFlowControl_Action(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "retry_before_fc_action.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(99))
 		ctx := testContext(t)
@@ -114,7 +114,7 @@ func TestRetryStrategy_FiresBeforeFlowControl_Stream(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "retry_before_fc_stream.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(99))
 		ctx := testContext(t)
@@ -147,7 +147,7 @@ func TestRetryStrategy_StopPromotesSuspend_NodeControl(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "retry_suspend_nc_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(99))
 		ctx := testContext(t)
@@ -182,7 +182,7 @@ func TestRetryStrategy_StopPromotesSuspend_FlowControl(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "retry_suspend_fc_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(99))
 		ctx := testContext(t)
@@ -215,7 +215,7 @@ func TestRetryStrategy_TerminateBlocksSuspend(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "retry_terminate_nc_suspend.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(99))
 		ctx := testContext(t)
@@ -267,7 +267,7 @@ func TestRetryStrategy_SkipReachesCheckLifecycle(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "retry_skip_nc_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(1), int64(2), int64(3))
 		ctx := testContext(t)
@@ -296,7 +296,7 @@ func TestRetryStrategy_ContinueReachesCheckLifecycle(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "retry_continue_nc_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(1), int64(2), int64(3))
 		ctx := testContext(t)
@@ -326,7 +326,7 @@ func TestRetryStrategy_DoesNotFire_NodeControlStillFires(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "retry_inactive_nc_active.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(42))
 		ctx := testContext(t)

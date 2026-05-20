@@ -19,8 +19,8 @@ import (
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/graph"
 	outboxmem "github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/outbox/memory"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
-	memorypubsub "github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub/memory"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
+	memorypubsub "github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub/memory"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -32,7 +32,7 @@ func loadFlow(t *testing.T, name string) *flowv1beta2.Graph {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck // fixture opened read-only and fully read below; close error cannot affect the parsed result
 	spec, err := flowsdkv1beta2.ReadSpec(encoding.YAML, f)
 	if err != nil {
 		t.Fatal(err)
@@ -57,9 +57,9 @@ func feedInput(ps executor.PubSub, nodeID string, values ...any) {
 	topic := testTopics.InputFor(nodeID)
 	for _, v := range values {
 		val, _ := nativeToExpr(v)
-		ps.Publish(topic, pubsub.NewMessage(val)) //nolint:errcheck
+		ps.Publish(topic, pubsub.NewMessage(val)) //nolint:errcheck // test fixture feed to in-memory pubsub; a real failure surfaces as a downstream assertion
 	}
-	ps.Publish(topic, pubsub.NewMessage(newEOFValue())) //nolint:errcheck
+	ps.Publish(topic, pubsub.NewMessage(newEOFValue())) //nolint:errcheck // test fixture feed to in-memory pubsub; a real failure surfaces as a downstream assertion
 }
 
 // sendInput publishes a single value to an input's PubSub topic without
@@ -69,7 +69,7 @@ func feedInput(ps executor.PubSub, nodeID string, values ...any) {
 func sendInput(ps executor.PubSub, nodeID string, value any) {
 	topic := testTopics.InputFor(nodeID)
 	val, _ := nativeToExpr(value)
-	ps.Publish(topic, pubsub.NewMessage(val)) //nolint:errcheck
+	ps.Publish(topic, pubsub.NewMessage(val)) //nolint:errcheck // test fixture feed to in-memory pubsub; a real failure surfaces as a downstream assertion
 }
 
 // testContext returns a context with a 10-second timeout that fails the test on expiry.

@@ -7,15 +7,20 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 )
 
 // SubscriberAdapter reads events from an EventReader and delivers them as a
 // pubsub.Subscriber. It polls for new events using cursor-based pagination
 // and advances the cursor on ack.
+//
+// pollInterval acts as a backstop. Producers that know when a new event has
+// been written can call Wake to short-circuit the idle wait without waiting
+// for the next tick (e.g. an ent hook on FlowEvent OnCommit).
 type SubscriberAdapter struct {
 	reader       EventReader
 	pollInterval time.Duration
+	nudgeCh      chan struct{}
 	mu           sync.Mutex
 	cancel       context.CancelFunc
 	draining     bool
@@ -31,6 +36,17 @@ func NewSubscriber(r EventReader, pollInterval time.Duration) *SubscriberAdapter
 	return &SubscriberAdapter{
 		reader:       r,
 		pollInterval: pollInterval,
+		nudgeCh:      make(chan struct{}, 1),
+	}
+}
+
+// Wake nudges the polling loop to re-read the EventReader immediately rather
+// than waiting for the next poll tick. Non-blocking and coalescing: redundant
+// calls while a wake is already pending are dropped.
+func (sa *SubscriberAdapter) Wake() {
+	select {
+	case sa.nudgeCh <- struct{}{}:
+	default:
 	}
 }
 
@@ -65,6 +81,8 @@ func (sa *SubscriberAdapter) poll(ctx context.Context, out chan<- *pubsub.Messag
 			select {
 			case <-ctx.Done():
 				return
+			case <-sa.nudgeCh:
+				continue
 			case <-time.After(sa.pollInterval):
 				continue
 			}

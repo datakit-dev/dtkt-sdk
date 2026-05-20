@@ -123,7 +123,7 @@ func (c *SSHConnector) DialContext(ctx context.Context) (net.Conn, error) {
 		// so we need to close it if it does
 		go func() {
 			if res := <-resultCh; res.conn != nil {
-				//nolint:errcheck
+				//nolint:errcheck // context already cancelled; this late connection is unused and only being discarded
 				res.conn.Close()
 			}
 		}()

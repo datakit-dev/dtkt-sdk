@@ -103,7 +103,11 @@ func TestIntegrationInstance(t *testing.T) {
 		t.Fatalf("server failed to start: %v", err)
 	}
 
-	client, err := network.DialGRPCClientUsing(intgr.conn,
+	// Dial through a fresh connector at the same address. Sharing
+	// intgr.conn between the server's Bind() goroutine and this test's
+	// DialGRPC races on the connector's single opts.close slot (both
+	// methods write it unsynchronized).
+	client, err := network.DialGRPCClient(intgr.conn.Address().(network.Address),
 		basev1beta1.NewBaseServiceClient,
 	)
 	if err != nil {
@@ -189,7 +193,8 @@ func TestIntegrationInstanceProto(t *testing.T) {
 		t.Fatalf("server failed to start: %v", err)
 	}
 
-	client, err := network.DialGRPCClientUsing(intgr.conn,
+	// Fresh connector for the client side; see TestIntegrationInstance.
+	client, err := network.DialGRPCClient(intgr.conn.Address().(network.Address),
 		basev1beta1.NewBaseServiceClient,
 	)
 	if err != nil {

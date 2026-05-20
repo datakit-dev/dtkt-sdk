@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -438,12 +438,12 @@ func TestStateWriter_CommitPersistsState(t *testing.T) {
 	s := New()
 	ctx := context.Background()
 
-	tx, err := s.Begin(ctx)
+	tx, err := s.BeginStateful(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	eventUID := uuid.New()
+	eventUID := uuid.Must(uuid.NewV7())
 	snap := &flowv1beta2.RunSnapshot{
 		Vars: map[string]*flowv1beta2.RunSnapshot_VarNode{
 			"n1": {Id: "n1"},
@@ -477,12 +477,12 @@ func TestStateWriter_RollbackDoesNotPersistState(t *testing.T) {
 	s := New()
 	ctx := context.Background()
 
-	tx, err := s.Begin(ctx)
+	tx, err := s.BeginStateful(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	eventUID := uuid.New()
+	eventUID := uuid.Must(uuid.NewV7())
 	snap := &flowv1beta2.RunSnapshot{
 		Vars: map[string]*flowv1beta2.RunSnapshot_VarNode{
 			"n1": {Id: "n1"},
@@ -508,12 +508,12 @@ func TestStateWriter_ClonesStateOnWrite(t *testing.T) {
 	s := New()
 	ctx := context.Background()
 
-	tx, err := s.Begin(ctx)
+	tx, err := s.BeginStateful(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	eventUID := uuid.New()
+	eventUID := uuid.Must(uuid.NewV7())
 	snap := &flowv1beta2.RunSnapshot{
 		Vars: map[string]*flowv1beta2.RunSnapshot_VarNode{
 			"n1": {Id: "n1"},

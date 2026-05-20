@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -114,7 +114,7 @@ func TestPhase_InputNode(t *testing.T) {
 		graph := loadFlow(t, "input_int64_to_output.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", 42, 99)
 		ctx := testContext(t)
@@ -137,7 +137,7 @@ func TestPhase_OutputNode(t *testing.T) {
 		graph := loadFlow(t, "input_int64_to_output.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", 42, 99)
 		ctx := testContext(t)
@@ -160,7 +160,7 @@ func TestPhase_VarNode(t *testing.T) {
 		graph := loadFlow(t, "input_var_output.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", 7, 8)
 		ctx := testContext(t)
@@ -183,7 +183,7 @@ func TestPhase_GeneratorNode(t *testing.T) {
 		graph := loadFlow(t, "gen_range_step.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 
@@ -206,7 +206,7 @@ func TestPhase_ActionNode(t *testing.T) {
 		graph := loadFlow(t, "action_unary_echo.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 42)
 		ctx := testContext(t)
@@ -229,7 +229,7 @@ func TestPhase_StreamNode_ServerStream(t *testing.T) {
 		graph := loadFlow(t, "stream_server_stream.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.count", 1)
 		ctx := testContext(t)
@@ -253,7 +253,7 @@ func TestPhase_EmptyInput(t *testing.T) {
 		graph := loadFlow(t, "input_int64_to_output.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// No values, just EOF.
 		feedInput(ps, "inputs.x")

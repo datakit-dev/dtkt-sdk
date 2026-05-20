@@ -145,17 +145,17 @@ func (s *Server[C, I]) Serve() error {
 
 	if s.intgr.conn.Address().Network() == network.Socket.String() {
 		// Close socket before bind to ensure new socket file
-		//nolint:errcheck
+		//nolint:errcheck // stale socket may not exist; the Bind below is the authoritative check
 		os.Remove(s.intgr.conn.Address().String())
 	}
-	//nolint:errcheck
+	//nolint:errcheck // server-shutdown teardown; no recovery path if the conn close fails
 	defer s.intgr.conn.Close()
 
 	lis, err := s.intgr.conn.Bind(ctx)
 	if err != nil {
 		return err
 	}
-	//nolint:errcheck
+	//nolint:errcheck // server-shutdown teardown; no recovery path if the listener close fails
 	defer lis.Close()
 
 	pidFile := env.GetVar(env.PIDFile)
@@ -165,7 +165,7 @@ func (s *Server[C, I]) Serve() error {
 			return err
 		}
 
-		//nolint:errcheck
+		//nolint:errcheck // pid lock is released on process exit regardless; unlock error is moot
 		defer pid.Unlock()
 	}
 

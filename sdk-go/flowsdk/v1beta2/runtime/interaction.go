@@ -8,14 +8,13 @@ import (
 
 	expr "cel.dev/expr"
 	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/common/types"
 	"github.com/google/uuid"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -43,7 +42,7 @@ type interactionHandler struct {
 	whenProg    cel.Program
 	transforms  *transformPipeline
 	transformPS executor.PubSub
-	adapter     types.Adapter
+	env         shared.Env
 	cache       *cacheBackend
 
 	// formInputs is the spec's Interaction.Input list paired with any
@@ -170,7 +169,7 @@ func (h *interactionHandler) Run(ctx context.Context) error {
 		// Pause point: between iterations only. An in-flight prompt
 		// completes naturally - we don't cancel a prompt the operator
 		// is already responding to.
-		act := h.cache.newActivation(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
+		act := h.cache.newActivation(ctx, h.inputs, h.env, h.SuspendChan(), h.StopChan())
 		vars, err := act.Resolve()
 		if errors.Is(err, errOperatorStopped) {
 			break
@@ -274,7 +273,7 @@ func (h *interactionHandler) runWithTransforms(ctx context.Context) error {
 
 	g.Go(func() error {
 		for {
-			act := h.cache.newActivation(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
+			act := h.cache.newActivation(ctx, h.inputs, h.env, h.SuspendChan(), h.StopChan())
 			vars, err := act.Resolve()
 			if errors.Is(err, errOperatorStopped) {
 				break

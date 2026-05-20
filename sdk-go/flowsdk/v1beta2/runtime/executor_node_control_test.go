@@ -29,7 +29,7 @@ func TestNodeControl_Var_StopWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_var_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(1), int64(2), int64(3), int64(4), int64(5))
 
@@ -52,7 +52,7 @@ func TestNodeControl_Action_StopWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_action_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(42), int64(99))
 
@@ -77,7 +77,7 @@ func TestNodeControl_Stream_StopWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_stream_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", "hello", "world")
 
@@ -100,7 +100,7 @@ func TestNodeControl_Output_StopWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_output_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(10), int64(20), int64(30))
 
@@ -123,7 +123,7 @@ func TestNodeControl_Interaction_StopWhen(t *testing.T) {
 		promptCh := make(chan *flowv1beta2.InteractionRequestEvent, 4)
 		responseCh := make(chan *flowv1beta2.InteractionResponseEvent, 4)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		go func() {
 			for p := range promptCh {
@@ -159,7 +159,7 @@ func TestNodeControl_Var_TerminateWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_var_terminate.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(1), int64(2), int64(3), int64(4), int64(5))
 
@@ -182,7 +182,7 @@ func TestNodeControl_Action_TerminateWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_action_terminate.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(42))
 
@@ -203,7 +203,7 @@ func TestNodeControl_Stream_TerminateWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_stream_terminate.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", "hello")
 
@@ -224,7 +224,7 @@ func TestNodeControl_Output_TerminateWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_output_terminate.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(10), int64(20), int64(30))
 
@@ -250,7 +250,7 @@ func TestNodeControl_Interaction_TerminateWhen(t *testing.T) {
 		promptCh := make(chan *flowv1beta2.InteractionRequestEvent, 4)
 		responseCh := make(chan *flowv1beta2.InteractionResponseEvent, 4)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		go func() {
 			for p := range promptCh {
@@ -283,7 +283,7 @@ func TestNodeControl_Var_SuspendWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_var_suspend.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Feed multiple inputs so the handler has work to do AFTER the
 		// suspend fires; a buggy "lying" suspend that publishes
@@ -317,7 +317,7 @@ func TestNodeControl_Action_SuspendWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_action_suspend.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Multiple inputs queued so a "lying" suspend would emit more values.
 		feedInput(ps, "inputs.msg", int64(42), int64(99), int64(7))
@@ -347,7 +347,7 @@ func TestNodeControl_Stream_SuspendWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_stream_suspend.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", "hello", "world", "again")
 		ctx := testContext(t)
@@ -376,7 +376,7 @@ func TestNodeControl_Output_SuspendWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_output_suspend.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(42), int64(43), int64(44))
 		ctx := testContext(t)
@@ -407,7 +407,7 @@ func TestNodeControl_Interaction_SuspendWhen(t *testing.T) {
 		promptCh := make(chan *flowv1beta2.InteractionRequestEvent, 4)
 		responseCh := make(chan *flowv1beta2.InteractionResponseEvent, 4)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		go func() {
 			for p := range promptCh {
@@ -467,7 +467,7 @@ func TestNodeControl_Var_SuspendThenResume(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_var_suspend.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(7))
 		ctx := testContext(t)
@@ -494,7 +494,7 @@ func TestNodeControl_Action_SuspendThenResume(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_action_suspend.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", int64(42))
 		ctx := testContext(t)
@@ -522,7 +522,7 @@ func TestNodeControl_Stream_SuspendThenResume(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_stream_suspend.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", "hello")
 		ctx := testContext(t)
@@ -550,7 +550,7 @@ func TestNodeControl_Output_SuspendThenResume(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_output_suspend.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(42))
 		ctx := testContext(t)
@@ -580,7 +580,7 @@ func TestNodeControl_Interaction_SuspendThenResume(t *testing.T) {
 		promptCh := make(chan *flowv1beta2.InteractionRequestEvent, 4)
 		responseCh := make(chan *flowv1beta2.InteractionResponseEvent, 4)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		go func() {
 			for p := range promptCh {
@@ -626,7 +626,7 @@ func TestNodeControl_TerminatePriority(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_terminate_priority.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(1))
 		ctx := testContext(t)
@@ -656,7 +656,7 @@ func TestNodeControl_SuspendOverStop(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_suspend_over_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(1))
 		ctx := testContext(t)
@@ -698,7 +698,7 @@ func TestNodeControl_AndFlowControl_SameNode_Stop(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_and_fc_same_node_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		varCh, err := ps.Subscribe(ctx, testTopics.For("vars.doubled"))
@@ -729,7 +729,7 @@ func TestNodeControl_AndFlowControl_SameNode_Terminate(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_and_fc_same_node_terminate.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		// Subscribe to the var topic to observe PHASE_CANCELLED, which
@@ -770,7 +770,7 @@ func TestNodeControl_OverridesFlowControl_SameNode(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_overrides_fc_same_node.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(1))
 		ctx := testContext(t)
@@ -809,7 +809,7 @@ func TestNodeControl_VsFlowControl_Scope(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_vs_fc_scope.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(1), int64(2), int64(3), int64(4), int64(5))
 
@@ -858,7 +858,7 @@ func TestNodeControl_EdgeInference(t *testing.T) {
 		// Re-build per subtest because graph mutation isn't safe to share.
 		g := loadFlow(t, "nc_edge_inference.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", int64(1), int64(2), int64(3), int64(4), int64(5))
 
@@ -890,7 +890,7 @@ func TestNodeControl_Var_StopWhen_PublishesPhaseStopping(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_var_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		varCh, err := ps.Subscribe(ctx, testTopics.For("vars.doubled"))
@@ -912,7 +912,7 @@ func TestNodeControl_Action_StopWhen_PublishesPhaseStopping(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_action_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		actionCh, err := ps.Subscribe(ctx, testTopics.For("actions.call"))
@@ -935,7 +935,7 @@ func TestNodeControl_Stream_StopWhen_PublishesPhaseStopping(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_stream_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		streamCh, err := ps.Subscribe(ctx, testTopics.For("streams.echo"))
@@ -958,7 +958,7 @@ func TestNodeControl_Output_StopWhen_PublishesPhaseStopping(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_output_stop.yaml")
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		outCh, err := ps.Subscribe(ctx, testTopics.For("outputs.result"))
@@ -983,7 +983,7 @@ func TestNodeControl_Interaction_StopWhen_PublishesPhaseStopping(t *testing.T) {
 		promptCh := make(chan *flowv1beta2.InteractionRequestEvent, 4)
 		responseCh := make(chan *flowv1beta2.InteractionResponseEvent, 4)
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		go func() {
 			for p := range promptCh {

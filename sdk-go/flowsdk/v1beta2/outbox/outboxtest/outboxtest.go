@@ -8,18 +8,26 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/outbox"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
 // Factory creates a fresh Outbox instance for each test.
 type Factory func(t *testing.T) outbox.Outbox
 
+// Reader is the union of EventReader and SnapshotReader. The conformance
+// suite exercises both; backends that support either should expose both
+// (memory and entstore do).
+type Reader interface {
+	outbox.EventReader
+	outbox.SnapshotReader
+}
+
 // Options configures which conformance tests to run.
 type Options struct {
-	// EventReader returns an EventReader for the same backend.
+	// EventReader returns the Reader for the same backend instance.
 	// If non-nil, SnapshotAt and ReadEvents tests are included.
-	EventReader func(t *testing.T, o outbox.Outbox) outbox.EventReader
+	EventReader func(t *testing.T, o outbox.Outbox) Reader
 
 	// SingleWriter skips tests that require concurrent write transactions
 	// (e.g. SQLite only supports one writer at a time).

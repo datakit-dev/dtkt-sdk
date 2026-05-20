@@ -19,7 +19,7 @@ func TestGraph_Action_RetryBackoff_Success(t *testing.T) {
 		graph := loadFlow(t, "action_retry_backoff.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 42)
 		ctx := testContext(t)
@@ -39,7 +39,7 @@ func TestGraph_Action_RetrySkip(t *testing.T) {
 		graph := loadFlow(t, "action_retry_skip.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 99)
 		ctx := testContext(t)
@@ -58,7 +58,7 @@ func TestGraph_Action_RetryTerminate(t *testing.T) {
 		graph := loadFlow(t, "action_retry_terminate.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 99)
 		ctx := testContext(t)
@@ -77,7 +77,7 @@ func TestGraph_Action_RetryExhausted(t *testing.T) {
 		graph := loadFlow(t, "action_retry_exhaust.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 99)
 		ctx := testContext(t)
@@ -94,7 +94,7 @@ func TestGraph_Action_RetryNoBackoff_Skip(t *testing.T) {
 		graph := loadFlow(t, "action_retry_no_backoff_skip.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 99)
 		ctx := testContext(t)
@@ -113,7 +113,7 @@ func TestGraph_Action_RetryWhenNoMatch(t *testing.T) {
 		graph := loadFlow(t, "action_retry_when_no_match.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 99)
 		ctx := testContext(t)
@@ -131,7 +131,7 @@ func TestGraph_Action_RetryWhenMatch(t *testing.T) {
 		graph := loadFlow(t, "action_retry_when_match.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 42)
 		ctx := testContext(t)
@@ -159,7 +159,7 @@ func TestGraph_Action_RetrySuspend(t *testing.T) {
 		graph := loadFlow(t, "action_retry_suspend.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 99)
 		ctx := testContext(t)
@@ -196,7 +196,7 @@ func TestGraph_Stream_RetrySkip(t *testing.T) {
 		graph := loadFlow(t, "stream_retry_skip.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 99)
 		ctx := testContext(t)
@@ -215,7 +215,7 @@ func TestGraph_Stream_RetryTerminate(t *testing.T) {
 		graph := loadFlow(t, "stream_retry_terminate.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 99)
 		ctx := testContext(t)
@@ -235,7 +235,7 @@ func TestGraph_Stream_RetryContinue(t *testing.T) {
 		graph := loadFlow(t, "stream_retry_continue.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 99)
 		ctx := testContext(t)
@@ -256,7 +256,7 @@ func TestGraph_Stream_RetrySuspend(t *testing.T) {
 		graph := loadFlow(t, "stream_retry_suspend.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 99)
 		ctx := testContext(t)
@@ -289,7 +289,7 @@ func TestGraph_Stream_RetryBackoff_Success(t *testing.T) {
 		graph := loadFlow(t, "stream_retry_backoff.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 42)
 		ctx := testContext(t)
@@ -310,7 +310,7 @@ func TestGraph_Action_RetryMultiEscalation_Skip(t *testing.T) {
 		graph := loadFlow(t, "action_retry_multi_escalation.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 99)
 		ctx := testContext(t)
@@ -330,7 +330,7 @@ func TestGraph_Action_RetryMultiEscalation_Terminate(t *testing.T) {
 		graph := loadFlow(t, "action_retry_multi_escalation_terminate.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 99)
 		ctx := testContext(t)
@@ -350,7 +350,7 @@ func TestGraph_Action_NoRetryStrategy(t *testing.T) {
 		graph := loadFlow(t, "action_unary_echo.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 42)
 		ctx := testContext(t)
@@ -410,7 +410,7 @@ func TestGraph_Action_RetryContinue(t *testing.T) {
 		graph := loadFlow(t, "action_retry_continue.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 99)
 		ctx := testContext(t)
@@ -431,7 +431,7 @@ func TestGraph_Action_RetryContinue_NoMatch(t *testing.T) {
 		graph := loadFlow(t, "action_retry_continue_no_match.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 99)
 		ctx := testContext(t)
@@ -451,7 +451,7 @@ func TestGraph_Action_RetryContinue_MultiPath(t *testing.T) {
 		graph := loadFlow(t, "action_retry_continue_multi.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.fail_input", 99)
 		feedInput(ps, "inputs.ok_input", 42)
@@ -479,7 +479,7 @@ func TestGraph_Action_RetryContinue_NodePhase(t *testing.T) {
 		graph := loadFlow(t, "action_retry_continue.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 99)
 

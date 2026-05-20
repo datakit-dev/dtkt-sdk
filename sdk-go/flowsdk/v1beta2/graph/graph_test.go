@@ -2,6 +2,7 @@ package graph
 
 import (
 	"testing"
+	"time"
 
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 	"github.com/stretchr/testify/assert"
@@ -98,6 +99,53 @@ func TestBuild_ReduceGroupByEdgeInference(t *testing.T) {
 	edges := edgeSet(g)
 	// The window's "when" expression references inputs.x, so vars.grouped should have an edge from inputs.x
 	assert.Contains(t, edges, "inputs.x->vars.grouped")
+}
+
+// TestBuild_TerminatesOnTrickyCELExprs guards that edge inference only
+// *parses* CEL and never evaluates or loops: a var value using `/`, `dyn()`,
+// or list-index must not make Build hang or error (these are valid
+// expressions; runtime errors like div-by-zero are the executor's concern,
+// not the graph builder's). Originally added while chasing a `dtkt flow2
+// create` hang that LOOKED CEL-correlated; that turned out to be unrelated
+// daemon state degradation (Build is fast on all of these). Kept as
+// defensive coverage for the parse-only contract. Each case runs in a
+// goroutine so a regression fails cleanly instead of wedging the package.
+func TestBuild_TerminatesOnTrickyCELExprs(t *testing.T) {
+	exprs := map[string]string{
+		"div_by_zero_literal": "= generators.tick.value / 0",
+		"dyn_div_dyn":         "= dyn(generators.tick.value) / dyn(0)",
+		"list_index":          "= [\"only-one\"][int(generators.tick.eval_count)]",
+		"dyn_div_input":       "= dyn(1) / dyn(inputs.maxIters.value)",
+	}
+	for name, expr := range exprs {
+		t.Run(name, func(t *testing.T) {
+			flow := &flowv1beta2.Flow{
+				Inputs: []*flowv1beta2.Input{
+					{Id: "maxIters", Type: &flowv1beta2.Input_Uint64{Uint64: &flowv1beta2.Uint64{}}},
+				},
+				Generators: []*flowv1beta2.Generator{
+					{Id: "tick", Type: &flowv1beta2.Generator_Ticker_{Ticker: &flowv1beta2.Generator_Ticker{}}},
+				},
+				Vars: []*flowv1beta2.Var{
+					{Id: "boom", Type: &flowv1beta2.Var_Value{Value: expr}},
+				},
+				Outputs: []*flowv1beta2.Output{
+					{Id: "boom", Value: "= vars.boom.value"},
+				},
+			}
+
+			done := make(chan struct{})
+			go func() {
+				_, _ = Build(flow)
+				close(done)
+			}()
+			select {
+			case <-done:
+			case <-time.After(5 * time.Second):
+				t.Fatalf("Build hung on var value %q -- edge inference must parse-only, never evaluate/loop", expr)
+			}
+		})
+	}
 }
 
 func TestBuild_DuplicateNodeID(t *testing.T) {

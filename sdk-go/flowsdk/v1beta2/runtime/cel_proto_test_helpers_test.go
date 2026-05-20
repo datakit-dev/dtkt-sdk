@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"google.golang.org/protobuf/proto"
@@ -81,6 +82,20 @@ func (r *flowResolver) FindMessageByName(name protoreflect.FullName) (protorefle
 		}
 	}
 	return protoregistry.GlobalTypes.FindMessageByName(name)
+}
+
+// FindMessageByURL strips the type-URL prefix (e.g. "type.googleapis.com/")
+// and dispatches to FindMessageByName. Required for anypb.UnmarshalNew to
+// resolve embedded synthetic types via the connector resolver - the path
+// the U10 fix relies on. Without this override the embedded mock client's
+// FindMessageByURL would fall through to the global registry, where
+// synthetic types are absent.
+func (r *flowResolver) FindMessageByURL(url string) (protoreflect.MessageType, error) {
+	name := url
+	if i := strings.LastIndex(url, "/"); i >= 0 {
+		name = url[i+1:]
+	}
+	return r.FindMessageByName(protoreflect.FullName(name))
 }
 
 // syntheticFileSpec describes a proto file to build at test time. The

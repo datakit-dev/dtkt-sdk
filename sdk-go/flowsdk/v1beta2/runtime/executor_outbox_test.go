@@ -12,7 +12,7 @@ import (
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/outbox"
 	outboxmem "github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/outbox/memory"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -21,7 +21,7 @@ func TestGraph_Outbox_InputToVarToOutput(t *testing.T) {
 	graph := loadFlow(t, "outbox_input_var_output.yaml")
 
 	ps := newPubSub()
-	defer func() { _ = ps.Close() }()
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	store := outboxmem.New()
 	feedInput(ps, "inputs.x", 5, 10)
@@ -60,7 +60,7 @@ func TestGraph_Outbox_Chain(t *testing.T) {
 	graph := loadFlow(t, "outbox_chain.yaml")
 
 	ps := newPubSub()
-	defer func() { _ = ps.Close() }()
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	store := outboxmem.New()
 	feedInput(ps, "inputs.n", 2, 4)
@@ -94,7 +94,7 @@ func TestGraph_Outbox_RangeGenerator(t *testing.T) {
 	graph := loadFlow(t, "outbox_range_generator.yaml")
 
 	ps := newPubSub()
-	defer func() { _ = ps.Close() }()
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	store := outboxmem.New()
 	ctx := testContext(t)
@@ -118,7 +118,7 @@ func TestGraph_Outbox_SnapshotCaptures(t *testing.T) {
 	graph := loadFlow(t, "outbox_snapshot.yaml")
 
 	ps := newPubSub()
-	defer func() { _ = ps.Close() }()
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	store := outboxmem.New()
 	feedInput(ps, "inputs.x", 3)
@@ -148,7 +148,7 @@ func TestGraph_Outbox_SnapshotCaptures(t *testing.T) {
 
 type failingTxBeginner struct{}
 
-func (f *failingTxBeginner) Begin(ctx context.Context) (outbox.Tx, error) {
+func (f *failingTxBeginner) BeginStateful(ctx context.Context) (outbox.StatefulTx, error) {
 	return nil, errors.New("begin failed")
 }
 
@@ -172,7 +172,7 @@ type failingCommitBeginner struct {
 	storage outbox.Storage
 }
 
-func (f *failingCommitBeginner) Begin(ctx context.Context) (outbox.Tx, error) {
+func (f *failingCommitBeginner) BeginStateful(ctx context.Context) (outbox.StatefulTx, error) {
 	return &failingCommitTx{storage: f.storage}, nil
 }
 
@@ -192,7 +192,7 @@ func (f *failingStore) Store(ctx context.Context, msg *pubsub.Message) error {
 
 type failingStoreBeginner struct{}
 
-func (f *failingStoreBeginner) Begin(ctx context.Context) (outbox.Tx, error) {
+func (f *failingStoreBeginner) BeginStateful(ctx context.Context) (outbox.StatefulTx, error) {
 	return &failingStoreTx{}, nil
 }
 
@@ -247,7 +247,7 @@ func TestTxPublisher_Close(t *testing.T) {
 func TestOutboxPubSub_Subscribe(t *testing.T) {
 	parallelByDefault(t)
 	ps := newPubSub()
-	defer func() { _ = ps.Close() }()
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	ops := &outboxPubSub{pub: ps, sub: ps}
 	ctx, cancel := context.WithCancel(context.Background())

@@ -12,7 +12,7 @@ import (
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/rpc"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
@@ -69,7 +69,7 @@ loop:
 			}
 		}
 
-		act := h.cache.newActivation(ctx, h.inputs, h.env.TypeAdapter(), h.SuspendChan(), h.StopChan())
+		act := h.cache.newActivation(ctx, h.inputs, h.env, h.SuspendChan(), h.StopChan())
 		vars, err := act.Resolve()
 		if errors.Is(err, errOperatorStopped) {
 			break
@@ -125,7 +125,7 @@ loop:
 				if recvErr != nil {
 					return recvErr
 				}
-				respExpr, respErr := transformResponse(h.responseProg, resp, h.env.TypeAdapter())
+				respExpr, respErr := transformResponse(h.responseProg, resp, h.env)
 				if respErr != nil {
 					return fmt.Errorf("server-stream %s response: %w", h.id, respErr)
 				}

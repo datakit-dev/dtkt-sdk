@@ -8,11 +8,11 @@ import (
 
 	expr "cel.dev/expr"
 	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/common/types"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -29,7 +29,7 @@ type outputHandler struct {
 	pubsub      executor.PubSub
 	outputTopic string
 	throttle    time.Duration
-	adapter     types.Adapter
+	env         shared.Env
 	cache       *cacheBackend
 }
 
@@ -54,7 +54,7 @@ loop:
 			}
 		}
 
-		act := h.cache.newActivation(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
+		act := h.cache.newActivation(ctx, h.inputs, h.env, h.SuspendChan(), h.StopChan())
 		vars, err := act.Resolve()
 		if errors.Is(err, errOperatorStopped) {
 			break
@@ -168,7 +168,7 @@ func (h *outputHandler) runWithTransforms(ctx context.Context) error {
 				}
 			}
 
-			act := h.cache.newActivation(ctx, h.inputs, h.adapter, h.SuspendChan(), h.StopChan())
+			act := h.cache.newActivation(ctx, h.inputs, h.env, h.SuspendChan(), h.StopChan())
 			vars, err := act.Resolve()
 			if errors.Is(err, errOperatorStopped) {
 				break

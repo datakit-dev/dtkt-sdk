@@ -14,7 +14,7 @@ func TestGraph_InputToOutput(t *testing.T) {
 		graph := loadFlow(t, "input_int64_to_output.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 42)
 		ctx := testContext(t)
@@ -32,7 +32,7 @@ func TestGraph_InputToOutput_MultipleValues(t *testing.T) {
 		graph := loadFlow(t, "input_int64_to_output.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1, 2, 3)
 		ctx := testContext(t)
@@ -48,7 +48,7 @@ func TestGraph_InputToVarToOutput(t *testing.T) {
 		graph := loadFlow(t, "input_var_output.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 7, 8)
 		ctx := testContext(t)
@@ -64,7 +64,7 @@ func TestGraph_EmptyInput(t *testing.T) {
 		graph := loadFlow(t, "input_int64_to_output.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x")
 		ctx := testContext(t)

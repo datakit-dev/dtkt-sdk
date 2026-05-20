@@ -15,7 +15,7 @@ func TestGraph_Stream_UnaryEcho(t *testing.T) {
 		graph := loadFlow(t, "stream_unary_echo.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", "hello")
 		ctx := testContext(t)
@@ -35,7 +35,7 @@ func TestGraph_Stream_ServerStream(t *testing.T) {
 		graph := loadFlow(t, "stream_server_stream.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// random.Numbers mock emits N int64s in [0, 100). count=3 means 3
 		// emissions in order from the server stream.
@@ -61,7 +61,7 @@ func TestGraph_Stream_WithMapTransform(t *testing.T) {
 		graph := loadFlow(t, "stream_map_transform.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 5)
 		ctx := testContext(t)
@@ -80,7 +80,7 @@ func TestGraph_Stream_WithFilterTransform(t *testing.T) {
 		graph := loadFlow(t, "stream_filter_transform.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1, 5, 2, 7)
 		ctx := testContext(t)
@@ -97,7 +97,7 @@ func TestGraph_Stream_WithTransformChain(t *testing.T) {
 		graph := loadFlow(t, "stream_transform_chain.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Values 1..6, echo returns each → var: filter evens: 2,4,6 → *10: 20,40,60 → running sum: 20,60,120
 		feedInput(pubsub, "inputs.x", 1, 2, 3, 4, 5, 6)
@@ -116,7 +116,7 @@ func TestGraph_Stream_BidiEcho(t *testing.T) {
 		graph := loadFlow(t, "stream_bidi_echo.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 10, 20, 30)
 		ctx := testContext(t)
@@ -135,7 +135,7 @@ func TestGraph_Stream_ClientStream(t *testing.T) {
 		graph := loadFlow(t, "stream_client_stream.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 1, 2, 3)
 		ctx := testContext(t)
@@ -156,7 +156,7 @@ func TestGraph_Stream_ToVar(t *testing.T) {
 		graph := loadFlow(t, "stream_to_var.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 3, 7)
 		ctx := testContext(t)
@@ -175,7 +175,7 @@ func TestGraph_Stream_BidiWhen(t *testing.T) {
 		graph := loadFlow(t, "stream_bidi_when.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Feed 3 values: 2 (skip), 10 (fire), 1 (skip)
 		feedInput(pubsub, "inputs.x", 2, 10, 1)
@@ -196,7 +196,7 @@ func TestGraph_Stream_ServerStreamWhen(t *testing.T) {
 		graph := loadFlow(t, "stream_server_when.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Feed 3 values: 3 (skip), 8 (fire), 1 (skip)
 		feedInput(pubsub, "inputs.x", 3, 8, 1)
@@ -217,7 +217,7 @@ func TestGraph_Stream_BidiThrottle(t *testing.T) {
 		graph := loadFlow(t, "stream_bidi_throttle.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 5 values at 5 per 500ms = 100ms apart. Should take ~400ms (first fires immediately).
 		start := time.Now()
@@ -243,7 +243,7 @@ func TestGraph_Stream_Error_Aborted(t *testing.T) {
 		graph := loadFlow(t, "stream_aborted.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 1)
 		ctx := testContext(t)
@@ -260,7 +260,7 @@ func TestGraph_Stream_Error_Empty(t *testing.T) {
 		graph := loadFlow(t, "stream_empty.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 1)
 		ctx := testContext(t)
@@ -278,7 +278,7 @@ func TestGraph_Stream_Error_Idle_Terminate(t *testing.T) {
 		graph := loadFlow(t, "stream_idle.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 1)
 		ctx := testContext(t)
@@ -304,7 +304,7 @@ func TestGraph_Stream_Error_BidiDeadline(t *testing.T) {
 		graph := loadFlow(t, "stream_bidi_deadline.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 1)
 		ctx := testContext(t)
@@ -320,7 +320,7 @@ func TestGraph_Stream_Error_ClientStreamInvalid(t *testing.T) {
 		graph := loadFlow(t, "stream_client_invalid.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 1, 2, 3)
 		ctx := testContext(t)

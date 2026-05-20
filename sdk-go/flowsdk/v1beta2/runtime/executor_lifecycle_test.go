@@ -22,7 +22,7 @@ func TestErrorStrategy_Terminate_ActionError(t *testing.T) {
 		graph := loadFlow(t, "action_error_internal.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 99)
 
@@ -50,7 +50,7 @@ func TestErrorStrategy_Terminate_RetryTerminateError(t *testing.T) {
 		graph := loadFlow(t, "action_retry_terminate.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 99)
 
@@ -72,7 +72,7 @@ func TestErrorStrategy_Stop_ActionError(t *testing.T) {
 		graph := loadFlow(t, "action_error_internal.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 99)
 
@@ -110,7 +110,7 @@ func TestErrorStrategy_Stop_MultiPath(t *testing.T) {
 		graph := loadFlow(t, "stop_multi_path.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Feed both inputs. ok_input will be processed by the healthy action.
 		feedInput(ps, "inputs.fail_input", 99)
@@ -145,7 +145,7 @@ func TestErrorStrategy_Stop_Generator(t *testing.T) {
 		graph := loadFlow(t, "stop_generator_action.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		actionCh, err := ps.Subscribe(ctx, testTopics.For("actions.call"))
@@ -179,7 +179,7 @@ func TestErrorStrategy_Stop_TerminateErrorOverrides(t *testing.T) {
 		graph := loadFlow(t, "stop_terminate_error.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 99)
 
@@ -204,7 +204,7 @@ func TestErrorStrategy_Stop_NodePhase(t *testing.T) {
 		graph := loadFlow(t, "action_error_internal.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 99)
 
@@ -238,7 +238,7 @@ func TestErrorStrategy_Continue_ActionError(t *testing.T) {
 		graph := loadFlow(t, "action_error_internal.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 99)
 
@@ -272,7 +272,7 @@ func TestErrorStrategy_Continue_MultiPath(t *testing.T) {
 		graph := loadFlow(t, "stop_multi_path.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.fail_input", 99)
 		feedInput(ps, "inputs.ok_input", 42)
@@ -301,7 +301,7 @@ func TestErrorStrategy_Continue_NodePhase(t *testing.T) {
 		graph := loadFlow(t, "action_error_internal.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 99)
 
@@ -328,7 +328,7 @@ func TestErrorStrategy_Continue_TerminateErrorOverrides(t *testing.T) {
 		graph := loadFlow(t, "stop_terminate_error.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.msg", 99)
 
@@ -354,7 +354,7 @@ func TestErrorStrategy_Continue_GeneratorContinues(t *testing.T) {
 		graph := loadFlow(t, "continue_gen_and_error.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Feed the failing input.
 		feedInput(ps, "inputs.fail_input", 99)
@@ -383,7 +383,7 @@ func TestErrorStrategy_Continue_MultipleErrors(t *testing.T) {
 		graph := loadFlow(t, "continue_gen_and_error.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.fail_input", 99)
 
@@ -416,7 +416,7 @@ func TestErrorStrategy_Continue_MultipleErrors(t *testing.T) {
 func TestErrorStrategy_FromSpec_Decodes(t *testing.T) {
 	f, err := os.Open("testdata/error_strategy_continue.yaml")
 	require.NoError(t, err)
-	defer f.Close()
+	defer f.Close() //nolint:errcheck // fixture opened read-only and fully read below; close error cannot affect the parsed result
 	spec, err := flowsdkv1beta2.ReadSpec(encoding.YAML, f)
 	require.NoError(t, err)
 	require.Equal(t,
@@ -435,7 +435,7 @@ func TestErrorStrategy_Continue_FromSpec(t *testing.T) {
 		graph := loadFlow(t, "error_strategy_continue.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.fail_input", 99)
 

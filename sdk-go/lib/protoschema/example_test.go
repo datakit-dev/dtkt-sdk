@@ -61,7 +61,7 @@ func Example_basicUsage() {
 
 	// Unmarshal back
 	msg2 := dynamicpb.NewMessage(md)
-	//nolint:errcheck
+	//nolint:errcheck // data was just produced by a successful Marshal of the same message; round-trip cannot fail here
 	proto.Unmarshal(data, msg2)
 
 	fmt.Printf("Name: %s\n", msg2.Get(md.Fields().ByName("name")).String())

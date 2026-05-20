@@ -3,11 +3,10 @@ package runtime
 import (
 	"fmt"
 
-	"github.com/google/cel-go/common/types"
-
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/rpc"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 )
 
 // Compile-time interface assertions.
@@ -79,7 +78,7 @@ var (
 // event/snapshot field whose validator is the bare-id pattern. The
 // fully-qualified id (Format B) is supplied separately as `topic` for
 // pubsub routing; the handler does not see it directly.
-func newHandler(compiled any, id string, inputs map[string]<-chan *pubsub.Message, ps executor.PubSub, topic string, transformPS executor.PubSub, adapter types.Adapter, cb *cacheBackend) (executor.NodeHandler, error) {
+func newHandler(compiled any, id string, inputs map[string]<-chan *pubsub.Message, ps executor.PubSub, topic string, transformPS executor.PubSub, env shared.Env, cb *cacheBackend) (executor.NodeHandler, error) {
 	switch c := compiled.(type) {
 	case *compiledVarSwitch:
 		h := &switchHandler{
@@ -92,7 +91,7 @@ func newHandler(compiled any, id string, inputs map[string]<-chan *pubsub.Messag
 			defaultProg: c.defaultProg,
 			transforms:  c.transforms,
 			transformPS: transformPS,
-			adapter:     adapter,
+			env:         env,
 			cache:       cb,
 		}
 		h.initSuspendable()
@@ -108,7 +107,7 @@ func newHandler(compiled any, id string, inputs map[string]<-chan *pubsub.Messag
 			program:     c.program,
 			transforms:  c.transforms,
 			transformPS: transformPS,
-			adapter:     adapter,
+			env:         env,
 			cache:       cb,
 		}
 		h.initSuspendable()
@@ -250,7 +249,7 @@ func newHandler(compiled any, id string, inputs map[string]<-chan *pubsub.Messag
 			pubsub:      ps,
 			outputTopic: topic,
 			throttle:    c.throttle,
-			adapter:     adapter,
+			env:         env,
 			cache:       cb,
 		}
 		h.initSuspendable()

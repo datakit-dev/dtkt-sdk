@@ -206,7 +206,7 @@ func (a Address) IsAvailable() bool {
 	if err != nil {
 		return true
 	}
-	//nolint:errcheck
+	//nolint:errcheck // probe dial opened only to test reachability; immediately discarded
 	conn.Close()
 
 	return false

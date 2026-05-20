@@ -15,7 +15,7 @@ func TestGraph_Output_MapTransform(t *testing.T) {
 		graph := loadFlow(t, "output_map.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1, 2, 3)
 		ctx := testContext(t)
@@ -31,7 +31,7 @@ func TestGraph_Output_FilterTransform(t *testing.T) {
 		graph := loadFlow(t, "output_filter.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1, 2, 3, 4, 5)
 		ctx := testContext(t)
@@ -48,7 +48,7 @@ func TestGraph_Output_ReduceTransform(t *testing.T) {
 		graph := loadFlow(t, "output_reduce.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 10, 20, 30)
 		ctx := testContext(t)
@@ -70,7 +70,7 @@ func TestGraph_Output_ScanTransform(t *testing.T) {
 		graph := loadFlow(t, "output_scan.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 10, 20, 30)
 		ctx := testContext(t)
@@ -89,7 +89,7 @@ func TestGraph_Output_Throttle(t *testing.T) {
 		graph := loadFlow(t, "output_throttle.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 5 values at 5 per 500ms = 100ms apart. Should take ~400ms (first fires immediately).
 		start := time.Now()

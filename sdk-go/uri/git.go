@@ -105,7 +105,7 @@ func (gfs *GitFileSystem) Stat(name string) (stdfs.FileInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	//nolint:errcheck
+	//nolint:errcheck // file opened read-only for Stat; close error cannot affect the stat result
 	defer file.Close()
 
 	return file.Stat()

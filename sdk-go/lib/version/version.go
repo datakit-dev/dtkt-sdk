@@ -66,7 +66,7 @@ func GetVersionInfo() VersionInfo {
 		vi.Checksum = "<unknown>"
 	}
 
-	//nolint:errcheck
+	//nolint:errcheck // binary opened read-only for checksum; close error cannot affect the computed hash
 	defer f.Close()
 
 	checksum, err := util.HashSHA256Reader(f)

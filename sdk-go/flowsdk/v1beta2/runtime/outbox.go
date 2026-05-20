@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/outbox"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -18,7 +18,7 @@ import (
 // StateWriter after each event, keeping the materialized state in sync.
 type txPublisher struct {
 	mu         sync.Mutex
-	txBeginner outbox.TxBeginner
+	txBeginner outbox.StatefulTxBeginner
 	snap       *flowv1beta2.RunSnapshot
 }
 
@@ -38,7 +38,7 @@ func (tp *txPublisher) Publish(topic string, messages ...*pubsub.Message) error 
 	if len(messages) > 0 {
 		ctx = messages[0].Context()
 	}
-	tx, err := tp.txBeginner.Begin(ctx)
+	tx, err := tp.txBeginner.BeginStateful(ctx)
 	if err != nil {
 		return fmt.Errorf("begin outbox tx: %w", err)
 	}

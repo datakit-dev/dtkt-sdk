@@ -43,7 +43,7 @@ func FetchDebugInfo(ctx context.Context, baseUrl *url.URL) (*DebugInfo, error) {
 		return nil, err
 	}
 
-	//nolint:errcheck
+	//nolint:errcheck // response body fully read into DebugInfo below; deferred close has no recovery path
 	defer resp.Body.Close()
 
 	var info DebugInfo

@@ -18,11 +18,11 @@ func TestNewLogger(t *testing.T) {
 		defer slog.SetDefault(oldDefault)
 
 		// Clear environment variables
-		//nolint:errcheck
+		//nolint:errcheck // os.Unsetenv only fails on an invalid name; these keys are constants
 		os.Unsetenv("DTKT_APP_ENV")
-		//nolint:errcheck
+		//nolint:errcheck // os.Unsetenv only fails on an invalid name; these keys are constants
 		os.Unsetenv("DTKT_LOG_LEVEL")
-		//nolint:errcheck
+		//nolint:errcheck // os.Unsetenv only fails on an invalid name; these keys are constants
 		os.Unsetenv("DTKT_LOG_FORMAT")
 
 		logger := NewLogger()
@@ -568,7 +568,7 @@ func TestLoggerConcurrentWrites(t *testing.T) {
 		WithFormat(FormatJSON),
 		WithSlogDefault(false),
 	)
-	//nolint:errcheck
+	//nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 	defer CloseLogger(logger)
 
 	ctx := NewCtx(t.Context(), logger)

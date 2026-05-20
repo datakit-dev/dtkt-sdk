@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	outboxmem "github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/outbox/memory"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/pubsub"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 )
 
@@ -48,7 +48,7 @@ func TestFlowState_Success(t *testing.T) {
 		graph := loadFlow(t, "outbox_input_var_output.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		flowCh, err := ps.Subscribe(ctx, testTopics.Flow())
@@ -90,7 +90,7 @@ func TestFlowState_Error(t *testing.T) {
 		graph := loadFlow(t, "action_error_internal.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		flowCh, err := ps.Subscribe(ctx, testTopics.Flow())
@@ -117,7 +117,7 @@ func TestFlowState_Terminate(t *testing.T) {
 		graph := loadFlow(t, "gen_long_running.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
 		flowCh, err := ps.Subscribe(ctx, testTopics.Flow())
@@ -172,7 +172,7 @@ func TestFlowState_Outbox_Snapshot(t *testing.T) {
 	graph := loadFlow(t, "outbox_input_var_output.yaml")
 
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	store := outboxmem.New()
 	feedInput(ps, "inputs.x", 5)
@@ -198,7 +198,7 @@ func TestFlowState_Outbox_ErrorSnapshot(t *testing.T) {
 	graph := loadFlow(t, "action_error_internal.yaml")
 
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	store := outboxmem.New()
 	feedInput(ps, "inputs.msg", 99)
@@ -222,7 +222,7 @@ func TestFlowState_Outbox_Events(t *testing.T) {
 	graph := loadFlow(t, "outbox_input_var_output.yaml")
 
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	store := outboxmem.New()
 	feedInput(ps, "inputs.x", 5)
@@ -257,7 +257,7 @@ func TestFlowState_DirectPubSub(t *testing.T) {
 	graph := loadFlow(t, "outbox_input_var_output.yaml")
 
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	ctx := testContext(t)
 	flowCh, err := ps.Subscribe(ctx, testTopics.Flow())
@@ -283,7 +283,7 @@ func TestFlowState_ContextCancelled(t *testing.T) {
 	graph := loadFlow(t, "gen_truly_endless.yaml")
 
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	outerCtx := testContext(t)
 	flowCh, err := ps.Subscribe(outerCtx, testTopics.Flow())

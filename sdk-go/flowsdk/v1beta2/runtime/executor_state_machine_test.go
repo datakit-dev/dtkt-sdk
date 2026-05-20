@@ -90,7 +90,7 @@ func TestStateMachine_SuspendNode_OnTerminal_DuringRun(t *testing.T) {
 	parallelByDefault(t)
 	g := loadFlow(t, "input_int64_to_output.yaml")
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	feedInput(ps, "inputs.x", int64(42))
 	ctx := testContext(t)
@@ -138,7 +138,7 @@ func TestStateMachine_ResumeNode_OnNeverSuspended_IsNoOp(t *testing.T) {
 	parallelByDefault(t)
 	g := loadFlow(t, "input_int64_to_output.yaml")
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	feedInput(ps, "inputs.x", int64(42))
 	ctx := testContext(t)
@@ -160,7 +160,7 @@ func TestStateMachine_StopNode_OnUnknownNode_IsNoOp(t *testing.T) {
 	parallelByDefault(t)
 	g := loadFlow(t, "input_int64_to_output.yaml")
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	feedInput(ps, "inputs.x", int64(42))
 	ctx := testContext(t)
@@ -211,7 +211,7 @@ func TestStateMachine_OperatorSuspend_OnPending(t *testing.T) {
 	parallelByDefault(t)
 	g := loadFlow(t, "nc_var_stop.yaml") // simple input -> var -> output, no NC firing without input
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	ctx := testContext(t)
 	varCh, err := ps.Subscribe(ctx, testTopics.For("vars.doubled"))
@@ -240,7 +240,7 @@ func TestStateMachine_OperatorStop_OnPending(t *testing.T) {
 	parallelByDefault(t)
 	g := loadFlow(t, "nc_var_stop.yaml")
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	ctx := testContext(t)
 	varCh, err := ps.Subscribe(ctx, testTopics.For("vars.doubled"))
@@ -267,7 +267,7 @@ func TestStateMachine_OperatorTerminate_OnPending(t *testing.T) {
 	parallelByDefault(t)
 	g := loadFlow(t, "nc_var_stop.yaml")
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	ctx := testContext(t)
 	varCh, err := ps.Subscribe(ctx, testTopics.For("vars.doubled"))
@@ -301,7 +301,7 @@ func TestStateMachine_TerminalNodesFlag_SetOnHandlerExit(t *testing.T) {
 	parallelByDefault(t)
 	g := loadFlow(t, "state_machine_terminal_probe.yaml")
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	feedInput(ps, "inputs.x", int64(42))
 	ctx := testContext(t)

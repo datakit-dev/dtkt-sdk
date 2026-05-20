@@ -18,7 +18,7 @@ func TestGraph_Action_UnaryEcho(t *testing.T) {
 		graph := loadFlow(t, "action_unary_echo.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", 42)
 		ctx := testContext(t)
@@ -38,7 +38,7 @@ func TestGraph_Action_MultipleValues(t *testing.T) {
 		graph := loadFlow(t, "action_multiple_values.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 10, 20, 30)
 		ctx := testContext(t)
@@ -56,7 +56,7 @@ func TestGraph_Action_WithMapTransform(t *testing.T) {
 		graph := loadFlow(t, "action_map_transform.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 3, 7)
 		ctx := testContext(t)
@@ -73,7 +73,7 @@ func TestGraph_Action_WithFilterTransform(t *testing.T) {
 		graph := loadFlow(t, "action_filter_transform.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 1, 8, 3, 10)
 		ctx := testContext(t)
@@ -91,7 +91,7 @@ func TestGraph_Action_WithTransformChain(t *testing.T) {
 		graph := loadFlow(t, "action_transform_chain.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 1,2,3,4 → echo → var: filter evens: 2,4 → *5: 10,20 → running sum: 10,30
 		feedInput(pubsub, "inputs.x", 1, 2, 3, 4)
@@ -110,7 +110,7 @@ func TestGraph_Action_ToVar(t *testing.T) {
 		graph := loadFlow(t, "action_to_var.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.x", 4, 9)
 		ctx := testContext(t)
@@ -129,7 +129,7 @@ func TestGraph_Action_StringEcho(t *testing.T) {
 		graph := loadFlow(t, "action_string_echo.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(pubsub, "inputs.msg", "hello", "world")
 		ctx := testContext(t)
@@ -150,7 +150,7 @@ func TestGraph_Action_When(t *testing.T) {
 		graph := loadFlow(t, "action_when.yaml")
 
 		pubsub := newPubSub()
-		defer pubsub.Close() //nolint:errcheck
+		defer pubsub.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Feed 3 values: 2 (skip), 10 (fire), 1 (skip)
 		feedInput(pubsub, "inputs.x", 2, 10, 1)
@@ -171,7 +171,7 @@ func TestGraph_Action_Throttle(t *testing.T) {
 		graph := loadFlow(t, "action_throttle.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 5 values at 5 per 500ms = 100ms apart. Should take ~400ms (first fires immediately).
 		start := time.Now()
@@ -202,7 +202,7 @@ func TestGraph_Action_MemoizeSameInput(t *testing.T) {
 		graph := loadFlow(t, "action_memoize.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// Send 42 three times -- only one RPC should fire.
 		feedInput(ps, "inputs.x", 42, 42, 42)
@@ -228,7 +228,7 @@ func TestGraph_Action_MemoizeDifferentInputs(t *testing.T) {
 		graph := loadFlow(t, "action_memoize.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		// 1, 2, 1, 3, 2 -- three unique values, so 3 RPCs.
 		feedInput(ps, "inputs.x", 1, 2, 1, 3, 2)
@@ -250,7 +250,7 @@ func TestGraph_Action_ResponseProjection(t *testing.T) {
 		graph := loadFlow(t, "action_response_projection.yaml")
 
 		ps := newPubSub()
-		defer ps.Close() //nolint:errcheck
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		feedInput(ps, "inputs.x", 5, 7)
 		ctx := testContext(t)

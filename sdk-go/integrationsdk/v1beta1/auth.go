@@ -59,7 +59,7 @@ func OAuthTokenFromProto(proto *sharedv1beta1.OAuthToken) *oauth2.Token {
 	}
 
 	expiresIn := proto.GetExpiresIn()
-	if expiresIn == 0 {
+	if expiresIn <= 0 {
 		expiresIn = int64(time.Until(proto.GetExpiry().AsTime()))
 	}
 
@@ -68,6 +68,6 @@ func OAuthTokenFromProto(proto *sharedv1beta1.OAuthToken) *oauth2.Token {
 		TokenType:    proto.GetTokenType(),
 		RefreshToken: proto.GetRefreshToken(),
 		Expiry:       proto.GetExpiry().AsTime(),
-		ExpiresIn:    proto.GetExpiresIn(),
+		ExpiresIn:    expiresIn,
 	}
 }

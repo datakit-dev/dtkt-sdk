@@ -34,7 +34,7 @@ func TestNodeControl_SuspendResume_NoHangAfterSuccess(t *testing.T) {
 	parallelByDefault(t)
 	g := loadFlow(t, "nc_output_suspend.yaml")
 	ps := newPubSub()
-	defer ps.Close() //nolint:errcheck
+	defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 	feedInput(ps, "inputs.x", int64(7))
 	ctx := testContext(t)

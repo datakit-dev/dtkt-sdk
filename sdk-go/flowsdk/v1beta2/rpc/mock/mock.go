@@ -186,11 +186,15 @@ func (c *Client) CallClientStream(ctx context.Context, name protoreflect.FullNam
 	resultCh := make(chan clientStreamResult, 1)
 	go func() {
 		recv := func() (proto.Message, error) {
-			msg, ok := <-sendCh
-			if !ok {
-				return nil, io.EOF
+			select {
+			case msg, ok := <-sendCh:
+				if !ok {
+					return nil, io.EOF
+				}
+				return msg, nil
+			case <-ctx.Done():
+				return nil, ctx.Err()
 			}
-			return msg, nil
 		}
 		resp, err := fn(ctx, recv)
 		resultCh <- clientStreamResult{resp, err}
@@ -276,8 +280,12 @@ func (s *clientStream) SendMsg(msg proto.Message) error {
 
 func (s *clientStream) CloseAndReceive() (proto.Message, error) {
 	close(s.sendCh)
-	r := <-s.resultCh
-	return r.resp, r.err
+	select {
+	case r := <-s.resultCh:
+		return r.resp, r.err
+	case <-s.ctx.Done():
+		return nil, s.ctx.Err()
+	}
 }
 
 type bidiStream struct {

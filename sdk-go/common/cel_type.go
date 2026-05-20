@@ -49,10 +49,7 @@ func NewCELTypes(resolver CELResolver) (*CELTypes, error) {
 
 	resolver.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
 		err = registry.RegisterDescriptor(fd)
-		if err != nil {
-			return false
-		}
-		return true
+		return err == nil
 	})
 	if err != nil {
 		return nil, err

@@ -1200,13 +1200,19 @@ func TestInputMessageTypes(t *testing.T) {
 					t.Error("expected nullable")
 				}
 
-				// Test validation with nil
+				// Nullable messages with nil input yield a typed-empty
+				// instance (NOT nil) so downstream CEL/RPC consumers
+				// always have a concrete message to traverse without
+				// null guards.
 				result, err := inputType.Validate(nil)
 				if err != nil {
 					t.Errorf("validation failed: %v", err)
 				}
-				if result != nil {
-					t.Errorf("expected nil, got %v", result)
+				s, ok := result.(*structpb.Struct)
+				if !ok {
+					t.Errorf("expected *structpb.Struct, got %T", result)
+				} else if len(s.GetFields()) != 0 {
+					t.Errorf("expected empty Struct, got %v", s)
 				}
 			},
 		},

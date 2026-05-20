@@ -1,0 +1,24 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: cel_action_response_multi_connector
+  description: "Two synthetic connectors each returning their own typed message; a single output expression combines responses from BOTH. Verifies the flow-global union resolver: per-connection scoping would fail because the output handler's env can only know one connector's resolver."
+  inputs:
+    - id: x
+      string: {}
+  actions:
+    - id: runA
+      call:
+        connection: echoa
+        method: echoa.Service.Call
+        request:
+          payload: "= inputs.x.value"
+    - id: runB
+      call:
+        connection: echob
+        method: echob.Service.Call
+        request:
+          payload: "= inputs.x.value"
+  outputs:
+    - id: combined
+      value: '= actions.runA.value.payload + ":" + actions.runB.value.payload'

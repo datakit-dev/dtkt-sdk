@@ -267,11 +267,11 @@ func newScalarInputType(input *flowv1beta1.Input) (InputType, error) {
 			InputDefault: input.GetUint32(),
 			hasDefault:   input.GetUint32().Default != nil,
 		}, nil
-	} else if input.GetString_() != nil {
+	} else if input.GetString() != nil {
 		return &inputScalar[string]{
 			InputNode:    input,
-			InputDefault: input.GetString_(),
-			hasDefault:   input.GetString_().Default != nil,
+			InputDefault: input.GetString(),
+			hasDefault:   input.GetString().Default != nil,
 		}, nil
 	}
 	return nil, fmt.Errorf("inputs.%s: unknown type", input.GetId())
