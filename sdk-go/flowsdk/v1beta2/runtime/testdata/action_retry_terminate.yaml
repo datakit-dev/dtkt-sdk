@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_retry_terminate
+  description: >-
+    Action with terminate_when=code-13 (Internal). The RPC `error.Internal`
+    returns code 13; terminate_when matches and the flow returns a
+    TerminateError immediately (no further inputs processed). Guards that
+    terminate_when short-circuits backoff retries and surfaces a typed
+    TerminateError that callers can detect via errors.As.
   inputs:
     - id: msg
       int64: {}

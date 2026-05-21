@@ -47,7 +47,7 @@ export class ScalarField extends BaseField {
 export function parseScalarValue(scalar: ScalarType, str: string, longAsString = true): ScalarValue {
   switch (scalar) {
     case ScalarType.BOOL:
-      return Boolean(str);
+      return str === "true";
     case ScalarType.BYTES:
       return byteEncoder.encode(str);
     case ScalarType.STRING:

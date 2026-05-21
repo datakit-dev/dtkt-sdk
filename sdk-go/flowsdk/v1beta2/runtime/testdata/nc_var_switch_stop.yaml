@@ -2,7 +2,9 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_var_switch_stop
-  description: "NC.stop_when on a Var that uses switch (not value) -- exercises switchHandler path"
+  description: >-
+    NC.stop_when on a Var that uses switch (not value) -- exercises
+    switchHandler path
   inputs:
     - id: x
       int64: {}

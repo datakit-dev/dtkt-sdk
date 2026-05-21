@@ -2,6 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: reduce_single_value
+  description: >-
+    Reduce without a window, single input: feeding 42 yields 42 (initial=0 + 42
+    = 42), emitted on stream EOF. Guards that the boundary case of exactly one
+    input value flows through a no-window reduce correctly.
   inputs:
     - id: x
       int64: {}

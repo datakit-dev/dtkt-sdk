@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_deep_flatten_streamed
-  description: "Three flatten steps on list input to unwrap nested lists"
+  description: >-
+    Input declared as list-of-lists with three flatten transform steps. Each
+    flatten peels one level of nesting. Used to verify that a single input
+    event carrying deeply nested lists fans out into individual scalar emits
+    downstream. Guards stacked-flatten semantics: N flatten:true steps peel N
+    nesting levels.
   inputs:
     - id: x
       list:

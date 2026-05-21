@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: var_switch
-  description: "Var with switch expression categorizing values as big/medium/small"
+  description: >-
+    Var declared in switch form: case > 100 -> "big", case > 10 -> "medium",
+    default "small". Feeding 5, 50, 500 yields ["small", "medium", "big"].
+    Guards switch-form var: cases evaluate in declaration order, default is the
+    fallthrough, and the var emits the matched return string.
   inputs:
     - id: x
       int64: {}

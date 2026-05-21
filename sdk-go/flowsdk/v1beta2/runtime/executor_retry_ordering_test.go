@@ -315,6 +315,17 @@ func TestRetryStrategy_ContinueReachesCheckLifecycle(t *testing.T) {
 		assertPhaseOrder(t, phases,
 			flowv1beta2.RunSnapshot_PHASE_STOPPING,
 			flowv1beta2.RunSnapshot_PHASE_SUCCEEDED)
+
+		// The value continue_when emits (the converted error.message) is
+		// the load-bearing observable for "continue_when fired". Without
+		// this assertion, a regression that published the wrong value (or
+		// nothing) and still ran NC.stop would pass the phase-order check.
+		// The action calls error.NotFound (mock returns "resource not found").
+		results := collectOutputs(ctx, ps, "outputs.result")
+		require.GreaterOrEqual(t, len(results), 1,
+			"continue_when must publish at least one converted value before NC.stop fires")
+		assert.Equal(t, "resource not found", results[0].GetValue().GetStringValue(),
+			"continue_when's converted value (error.message from error.NotFound) must surface as the action's emitted value")
 	})
 }
 

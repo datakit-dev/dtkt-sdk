@@ -1,0 +1,27 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_noderef_action_value_unknown
+  description: >-
+    Output references `actions.run.value.bogus_field`, where `bogus_field` is
+    not on the test.TestResponse descriptor that the action returns. With a
+    resolver, lint must report CodeUnknownField naming both `bogus_field` and
+    `test.TestResponse`. Without a resolver the same fixture passes
+    (zero-false-positives-without-ground-truth guard).
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: x
+      string: {}
+  actions:
+    - id: run
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request:
+          name: "= inputs.x.value"
+  outputs:
+    - id: bad
+      value: "= actions.run.value.bogus_field"

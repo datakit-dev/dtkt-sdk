@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_stream_suspend
+  description: >-
+    Stream node with flow_control.suspend_when=true. After the first RPC the
+    stream enters PHASE_SUSPENDED; the test feeds three inputs but verifies no
+    further RPCs fire while suspended, then Terminate unblocks the executor.
+    Guards that suspend on a stream parks the handler with subsequent queued
+    inputs left unconsumed.
   inputs:
     - id: msg
       string: {}

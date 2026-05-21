@@ -2,7 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: even_odd_sum
-  description: "Fan-out + filter + reduce + event window for even/odd"
+  description: >-
+    Multi-pattern fixture: an int64 input fans out to evenNumbers/oddNumbers
+    vars (filtered by parity); the flow then declares FIVE outputs at once --
+    raw even stream, raw odd stream, paired [even, odd] tuples, running
+    even-sum via scan, and final odd-sum via reduce gated on the odd var's
+    stream close. Guards that the runtime supports many heterogeneous outputs
+    from one upstream split without coupling their behavior.
   inputs:
     - id: number
       int64: {}

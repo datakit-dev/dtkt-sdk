@@ -1,0 +1,31 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fc_stream_suspend_resume_stop
+  description: >-
+    Stream (echo.Echo mock RPC) with two flow_control conditions evaluated
+    in sequence on the same handler: suspend_when at inputs.msg.value==3
+    (CEL-triggered park), then operator Resume(), then stop_when at
+    inputs.msg.value>=6 (graceful drain). Parallel to
+    fc_output_suspend_resume_stop.yaml but for the stream handler. Used by
+    TestFlowControl_Stream_SuspendResumeStop to verify Resume actually wakes
+    a handler parked by flow_control.suspend_when, and that a later
+    flow_control condition still fires on the resumed handler. Echo returns
+    the request value, so feeding [1, 2, 3, 4, 5, 6] yields outputs
+    [1, 2, 3, 4, 5, 6] with a suspend boundary between 3 and 4 and a
+    graceful stop after 6.
+  inputs:
+    - id: msg
+      int64: {}
+  streams:
+    - id: echo
+      call:
+        connection: echo
+        method: echo.Echo
+        request: "= inputs.msg.value"
+      flow_control:
+        suspend_when: "= inputs.msg.value == 3"
+        stop_when: "= inputs.msg.value >= 6"
+  outputs:
+    - id: result
+      value: "= streams.echo.value"

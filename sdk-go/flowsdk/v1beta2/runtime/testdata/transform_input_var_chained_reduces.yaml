@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_input_var_chained_reduces
-  description: "Reduce on input node (sum), then scan on downstream var (product of sums)"
+  description: >-
+    Input has a reduce transform (sum, initial=0) that emits a single total at
+    EOF; downstream var has a scan transform (product, initial=1) over the
+    single value. Feeding 2, 3, 5: input reduce -> 10 (single emit). Var scan:
+    1 * 10 = 10. Guards that reduce's terminal emit feeds correctly into a
+    downstream scan stage.
   inputs:
     - id: x
       int64: {}

@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fanout_two_vars
-  description: "One input fans out to even and odd vars"
+  description: >-
+    Same input fans out to two vars with complementary filters (even/odd), each
+    feeding its own output. Feeding 1, 2, 3, 4 yields even=[2, 4] and odd=[1,
+    3]. Guards that filter-based partitioning into two parallel vars correctly
+    routes each value to the right consumer with no double-emission or value
+    loss.
   inputs:
     - id: x
       int64: {}

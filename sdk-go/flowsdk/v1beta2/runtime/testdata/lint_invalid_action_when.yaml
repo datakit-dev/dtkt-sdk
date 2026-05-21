@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_invalid_action_when
+  description: >-
+    Action whose `when` guard expression is syntactically invalid CEL
+    (`+++invalid`). Lint must report a CodeInvalidCEL diagnostic on actions.bad
+    mentioning `when`. Guards that CEL syntax errors in `when` guards are
+    caught at lint time rather than surfacing only at runtime.
   actions:
     - id: bad
       when: "= +++invalid"

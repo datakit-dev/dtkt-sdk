@@ -2,6 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_valid_connection
+  description: >-
+    Connection declared via the `services` oneof branch (lists `some.Service`);
+    action references it cleanly. Lint must produce zero diagnostics. Guards
+    the services-branch validation path of the connection oneof.
   connections:
     - id: myconn
       services:

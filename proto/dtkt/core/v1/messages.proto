@@ -554,17 +554,22 @@ message SendFlowRunEvent {
 }
 
 // ReceiveFlowRunEvent represents an event received from a flowrun (executor -> client).
+//
+// Every variant is a LEAN DELTA: the event carries what just changed,
+// not a snapshot of the full resource. Consumers maintain client-side
+// state by applying these deltas; cold reads of full resources go via
+// GetFlowRun.
 message ReceiveFlowRunEvent {
   oneof event {
     option (buf.validate.oneof).required = true;
-    // An output node produced a value.
+    // An output node produced a value (with lifecycle metadata).
     dtkt.flow.v1beta2.OutputEvent output = 1;
     // The executor is soliciting input for a specific input node.
     dtkt.flow.v1beta2.InputRequestEvent input_request = 2;
     // An interaction node needs external input (with token).
     dtkt.flow.v1beta2.InteractionRequestEvent interaction_request = 3;
-    // FlowRun state change (phase transitions, terminal states).
-    FlowRun flowrun = 4;
+    // Flow-level state change (phase transitions, terminal states).
+    dtkt.flow.v1beta2.FlowStateEvent flow_state = 4;
   }
 }
 

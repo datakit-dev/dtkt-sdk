@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_aborted
+  description: >-
+    Stream calls error.StreamAborted, a method that returns Aborted (code 10)
+    after the connection opens. With no retry strategy, the error propagates
+    and the flow surfaces it. Guards that a streaming RPC abort is bubbled up
+    cleanly rather than being silently swallowed.
   inputs:
     - id: msg
       int64: {}

@@ -1,0 +1,28 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_response_unknown_field
+  description: >-
+    Action's `call.response` transform references
+    `this.response.bogus_field_xyz`, a field not on the test.TestResponse
+    descriptor. With a resolver, lint must report a CodeUnknownField diagnostic
+    naming the bogus field on `response`. Without a resolver the fixture also
+    passes a separate WithoutResolver guard.
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: x
+      string: {}
+  actions:
+    - id: run
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request:
+          name: "= inputs.x.value"
+        response: "= this.response.bogus_field_xyz"
+  outputs:
+    - id: result
+      value: "= actions.run.value"

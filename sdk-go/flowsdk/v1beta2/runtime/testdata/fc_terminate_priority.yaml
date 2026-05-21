@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_terminate_priority
+  description: >-
+    Output has BOTH stop_when (eval_count >= 5) and terminate_when (eval_count
+    >= 3) -- terminate triggers earlier. Result: [1, 2, 3] and the flow returns
+    ErrTerminated. Guards that when both stop and terminate are declared and
+    both could fire, terminate's first-triggering wins (and stop_when never
+    gets a chance because terminate cancels the context first).
   generators:
     - id: seq
       range:

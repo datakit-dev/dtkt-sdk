@@ -2,7 +2,16 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_var_transforms_stop
-  description: "NC.stop_when on a Var with a transform pipeline (filter→map)"
+  description: >-
+    Var carries a filter (evens) + map (*10) transform pipeline and
+    node_control.stop_when=inputs.x.value>=5. Exposes Gap 2:
+    varHandler.runWithTransforms doesn't call checkLifecycle, so NC.stop_when
+    may never fire on the transforms code path even when the predicate holds.
+    Feeding 2, 4, 5, 6, 8: filter keeps [2, 4, 6, 8], map yields
+    [20, 40, 60, 80]; NC must stop the var gracefully at the trigger (input 5
+    itself is filtered out, but 6 triggers stop since 6>=5). Output is a prefix
+    of [20, 40, 60, 80]. Guards that NC stop coexists with transforms -- the
+    stop point is observed after transforms run (stop-fired bound is len < 4).
   inputs:
     - id: x
       int64: {}

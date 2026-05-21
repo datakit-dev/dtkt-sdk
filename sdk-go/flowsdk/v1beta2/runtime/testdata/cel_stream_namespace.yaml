@@ -2,7 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_stream_namespace
-  description: "Server-stream yields typed Package messages; output reads nested fields per element"
+  description: >-
+    Server stream `pkg.Stream` yields a sequence of typed Package messages; two
+    outputs read `identity.name` and `identity.version` once per emitted
+    element. The mock yields three Packages (alpha/beta/gamma); each output
+    collects all three values. Guards that CEL access on streams.<id>.value
+    works per-emission and that nested message-field access works for streaming
+    results just as it does for unary.
   inputs:
     - id: trigger
       int64: {}

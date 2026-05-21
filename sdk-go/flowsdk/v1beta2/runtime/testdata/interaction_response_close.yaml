@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: interaction_response_close
+  description: >-
+    Same shape as interaction_basic, but the test feeds 2 inputs and the
+    response channel is closed after answering the FIRST one. The second prompt
+    sees response-channel-closed (treated as EOF). Result: one output (42) from
+    the first response; the second never emits. Guards that closing the
+    response channel terminates the interaction handler cleanly without
+    dropping the already-answered prompt's value.
   inputs:
     - id: x
       int64: {}

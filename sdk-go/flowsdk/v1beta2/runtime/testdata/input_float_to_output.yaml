@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_float_to_output
-  description: "Float input passed directly to output"
+  description: >-
+    Float32 input passed straight to output (emerges as DoubleValue on the
+    wire). Feeding float32(1.5) and float32(2.5) emits approximately 1.5 and
+    2.5 (test allows a small delta for float-to-double conversion). Guards that
+    float32 inputs upcast cleanly to double for transport.
   inputs:
     - id: x
       float: {}

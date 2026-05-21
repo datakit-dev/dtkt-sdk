@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_vs_fc_scope
+  description: >-
+    Two parallel branches share one input: `doubled` has
+    node_control.terminate_when at x>=3; `tripled` is unaffected. Feeding 1..5:
+    `doubled_out` is a prefix of [2, 4, 6, 8, 10] (NC cancels its node
+    mid-stream), `tripled_out` is the full [3, 6, 9, 12, 15]. Guards NC scope:
+    terminating one node must NOT affect a sibling branch.
   inputs:
     - id: x
       int64: {}

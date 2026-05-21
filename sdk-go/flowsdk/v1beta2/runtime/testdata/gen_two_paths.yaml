@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: gen_two_paths
+  description: >-
+    Two independent range generators 1..1,000,000 each feeding its own output.
+    Used by TestCommand_StopNode_Generator: the test waits for gen1 to start,
+    issues StopNode on gen1, and asserts gen1's terminal phase is
+    PHASE_SUCCEEDED (proving node-scoped Stop targeted only that node and
+    didn't tear down the flow). Guards that node-scoped lifecycle commands
+    can be issued mid-run against a specific generator.
   generators:
     - id: gen1
       range:

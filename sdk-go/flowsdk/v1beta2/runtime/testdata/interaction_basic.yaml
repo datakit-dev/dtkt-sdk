@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: interaction_basic
+  description: >-
+    Interaction node gated by `when: inputs.x.value > 0`; the runtime emits an
+    InteractionRequestEvent prompt when triggered, the test auto-responds with
+    int64(100). Feeding 1 yields one output of 100. Baseline interaction test:
+    guards that prompts are emitted with bare ids (Format A) and tokens, and
+    that the response value is routed back to the interaction's `.value` for
+    downstream consumers.
   inputs:
     - id: x
       int64: {}

@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_uint64_to_output
-  description: "Uint64 input passed directly to output"
+  description: >-
+    Uint64 input passed straight to an output. Feeding uint64(999) and
+    uint64(0) emits Uint64Values 999 and 0. Guards that uint64 inputs preserve
+    the unsigned wire kind through to the output (distinct from int64's signed
+    kind).
   inputs:
     - id: x
       uint64: {}

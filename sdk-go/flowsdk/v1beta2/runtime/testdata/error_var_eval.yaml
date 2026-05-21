@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: var_eval_error
-  description: "CEL expression that fails at runtime (division by zero)"
+  description: >-
+    Var has a CEL expression that compiles cleanly but fails at evaluation time
+    (`inputs.x.value / 0` divides by zero). The executor returns an error
+    containing 'division by zero' when the input is fed. Guards that runtime
+    evaluation errors in vars propagate up as flow errors rather than crashing
+    the runtime or silently emitting bad values.
   inputs:
     - id: x
       int64: {}

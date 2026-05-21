@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_map_int64_to_string
-  description: "Map converts int64 to string using string()"
+  description: >-
+    Var transform converts int64 to string via CEL's `string()` coercion.
+    Feeding 42, 100 yields ["42", "100"]. Guards that map's output type can
+    differ from its input type and that downstream consumers see the new type.
   inputs:
     - id: x
       int64: {}

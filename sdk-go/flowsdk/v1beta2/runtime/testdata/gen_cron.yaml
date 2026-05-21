@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: gen_cron
+  description: >-
+    Cron generator firing every second (`@every 1s`) feeds an output with
+    stop_when at eval_count >= 2. The default value of a cron tick is its
+    monotonic count. Result: exactly [1, 2]. Guards that the cron schedule
+    parser accepts the `@every` shortcut and that the generator emits at the
+    configured rate (with stop bounding the run to keep the test under 3
+    seconds).
   generators:
     - id: cron
       cron:

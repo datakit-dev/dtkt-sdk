@@ -362,6 +362,59 @@ func buildLintCELEnv(resolvers map[string]shared.Resolver) (*cel.Env, error) {
 	return common.NewCELEnv(opts...)
 }
 
+// buildLintResponseEnv creates a *cel.Env where `this.response` is typed as
+// the given method's response message (instead of `dyn`). The runtime binds
+// `this` as `{"response": <msg>}` (a map) so the env mirrors that shape:
+// `this: map<string, md.Output()>`. With that typing, CEL's own Check phase
+// rejects unknown field accesses on `this.response.<chain>`. Only the
+// resolver for this specific connection is consulted; the env is not shared
+// across calls because each call has its own response type.
+//
+// The slight overpermission `this.bogus` (also typed as md.Output()) is
+// accepted: the runtime only binds the "response" key, so any other key
+// would be nil at eval time. A future tighter check could declare a
+// synthetic proto wrapper, but the map shape is simpler and matches the
+// runtime binding exactly.
+func buildLintResponseEnv(resolver shared.Resolver, md protoreflect.MethodDescriptor) (*cel.Env, error) {
+	outDesc := md.Output()
+	thisType := cel.MapType(cel.StringType, cel.ObjectType(string(outDesc.FullName())))
+
+	// Mirror celEnvOptions, but override `this` to the typed response message.
+	// The other variables stay `map(string, dyn)` because lint expressions can
+	// still reference `inputs.x.value` etc. inside a response expr.
+	mapType := cel.MapType(cel.StringType, cel.DynType)
+	opts := []cel.EnvOption{
+		cel.Variable("this", thisType),
+		cel.Variable("inputs", mapType),
+		cel.Variable("generators", mapType),
+		cel.Variable("vars", mapType),
+		cel.Variable("actions", mapType),
+		cel.Variable("streams", mapType),
+		cel.Variable("interactions", mapType),
+		cel.Variable("outputs", mapType),
+		cel.Variable("connections", mapType),
+		cel.Function("now",
+			cel.SingletonFunctionBinding(func(...ref.Val) ref.Val {
+				return types.Timestamp{Time: time.Now()}
+			}),
+			cel.Overload("now", nil, cel.TimestampType),
+		),
+	}
+
+	// Register the connector's proto files so CEL knows about every type
+	// reachable from `this.response.*` (nested messages, enums, etc.).
+	var fileDescs []any
+	resolver.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
+		fileDescs = append(fileDescs, fd)
+		return true
+	})
+	if len(fileDescs) > 0 {
+		opts = append(opts, cel.TypeDescs(fileDescs...), cel.Container("dtkt"))
+	}
+
+	return common.NewCELEnv(opts...)
+}
+
 // checkCELOutputType compiles a CEL expression using the provided environment
 // and returns its checked output type. Returns nil if compilation fails or
 // the type is dynamic/unresolvable (i.e. type checking cannot be performed).

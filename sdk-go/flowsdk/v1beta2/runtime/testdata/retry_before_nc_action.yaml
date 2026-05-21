@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: retry_before_nc_action
+  description: >-
+    Action calls error.PermissionDenied (gRPC code 7);
+    retry_strategy.suspend_when fires (matches code 7) and the iteration's
+    starting intent becomes SUSPEND. NC.terminate_when=true then promotes that
+    to TERMINATE (terminate > suspend in the lifecycle validity matrix). Action
+    topic publishes PHASE_CANCELLED; flow returns nil (per-node scope). Guards
+    that NC.terminate promotes retry.suspend instead of being shadowed by it.
   inputs:
     - id: msg
       int64: {}

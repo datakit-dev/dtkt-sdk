@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_var_namespace
-  description: "Var produces a struct, output reads a subfield from the vars namespace"
+  description: >-
+    Var constructs a struct from a string input (`{original, shouted}` where
+    shouted = input + '!'); output reads the `shouted` subfield from the var's
+    value via the `vars.<id>.value` namespace. Feeding 'hi' yields 'hi!'.
+    Guards that struct construction in a var works and downstream consumers can
+    navigate into struct-valued vars.
   inputs:
     - id: x
       string: {}

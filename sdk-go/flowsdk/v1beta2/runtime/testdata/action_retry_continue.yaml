@@ -2,6 +2,15 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_retry_continue
+  description: >-
+    Action with continue_when: when the RPC fails with code 5 (NotFound),
+    continue_when evaluates `this.error.message` and that string becomes the
+    action's emitted value -- converting the error into a
+    value-on-the-happy-path. The output produces 'resource not found' and the
+    action node reaches PHASE_SUCCEEDED. Guards that continue_when can rewrite
+    an error into a downstream value, with the node treating that emission as a
+    normal success (used by both the error-to-value test and the node-phase
+    test).
   inputs:
     - id: msg
       int64: {}

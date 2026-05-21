@@ -1,0 +1,26 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_request_toplevel_cel_wrong_type
+  description: >-
+    Action's request is a single top-level CEL expression constructing the
+    wrong proto type: `= test.TestNested{...}` for a method that expects
+    test.TestRequest. Lint must report a CodeTypeMismatch diagnostic naming
+    both proto types. Guards the top-level-CEL identity check (the only schema
+    check when the request itself is one expression).
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: x
+      string: {}
+  actions:
+    - id: run
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request: "= test.TestNested{value: 'x'}"
+  outputs:
+    - id: result
+      value: "= actions.run.value"

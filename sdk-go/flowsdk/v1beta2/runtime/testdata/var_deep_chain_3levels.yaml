@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: var_deep_chain_3levels
-  description: "Three-level var chain: +1, *2, +100"
+  description: >-
+    Three vars chained: step1 = +1, step2 = *2, step3 = +100. Each var has a
+    map transform. Feeding 5 yields 112 (((5+1)*2)+100). Guards that
+    var-to-var chaining propagates per-emit values through each transform
+    pipeline in declaration order.
   inputs:
     - id: x
       int64: {}

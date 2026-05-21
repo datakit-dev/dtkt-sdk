@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: retry_suspend_fc_stop
+  description: >-
+    Action errors with code 7; retry_strategy.suspend_when matches (intent:
+    SUSPEND); FC.stop_when=true promotes to STOP flow-wide. Flow drains
+    gracefully; Execute returns nil. Guards FC's stop > suspend promotion
+    across the lifecycle pipeline.
   inputs:
     - id: msg
       int64: {}

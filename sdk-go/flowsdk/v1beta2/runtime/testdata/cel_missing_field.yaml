@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_missing_field
-  description: "Access a non-existent subfield without has() - expected to error"
+  description: >-
+    Output dereferences a non-existent subfield (`nonexistent_field`) on a
+    struct input WITHOUT guarding it with `has()`. CEL is expected to error at
+    runtime with 'no such key'. Guards that missing-field access on dynamic
+    map-like inputs surfaces a clear error rather than silently emitting null
+    or panicking.
   inputs:
     - id: x
       string: {}

@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_memoize
+  description: >-
+    Echo action with memoize enabled: the RPC is invoked once per unique
+    request value; repeated inputs reuse the cached response. The output still
+    fires for every input (the cache only deduplicates the RPC, not the
+    per-input emission). Two tests share this fixture: one feeds 42 three times
+    (1 RPC, 3 outputs); the other feeds 1, 2, 1, 3, 2 (3 unique values -> 3
+    RPCs, 5 outputs).
   inputs:
     - id: x
       int64: {}

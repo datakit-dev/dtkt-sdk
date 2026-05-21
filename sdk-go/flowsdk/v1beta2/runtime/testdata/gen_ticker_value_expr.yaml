@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: gen_ticker_value_expr
+  description: >-
+    Ticker generator with a per-tick `value: '= this.count * 100'` expression,
+    bounded by stop_when at eval_count >= 5. Result: [100, 200, 300, 400, 500].
+    Guards that the ticker's `value` CEL expression is evaluated per tick with
+    `this.count` reflecting the monotonic emission number.
   generators:
     - id: tick
       ticker:

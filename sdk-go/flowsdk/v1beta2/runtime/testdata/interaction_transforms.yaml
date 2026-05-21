@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: interaction_transforms
+  description: >-
+    Interaction node with a map transform on its response (*10). Auto-responder
+    replies with int64(5); the transform multiplies and the output emits 50.
+    Guards that transforms attached to an interaction node apply to its
+    response value (similar shape to var/output transforms but on the
+    interaction's own emission).
   inputs:
     - id: x
       int64: {}

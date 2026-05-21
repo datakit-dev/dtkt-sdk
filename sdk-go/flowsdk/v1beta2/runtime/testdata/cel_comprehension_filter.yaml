@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_comprehension_filter
-  description: "filter() macro projecting a sublist of names where n > 1"
+  description: >-
+    Input carries `items` list of {name, n} structs. Output chains CEL
+    `filter()` (keep n > 1) with `map()` (project name) to produce a list of
+    names. Feeding {a:1, b:2, c:3} yields ['b', 'c']. Guards that chained
+    comprehension macros over a nested list correctly produce a projected
+    sublist (rather than collapsing or losing element types).
   inputs:
     - id: x
       string: {}

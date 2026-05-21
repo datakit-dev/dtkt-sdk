@@ -2,7 +2,18 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_deep_flatten
-  description: "Map to nested list, flatten twice for deep flattening"
+  description: >-
+    Var transform: map x -> nested 2x2 list `[[x, x+1], [x+2, x+3]]`, then
+    flatten twice. Feeding 10: map -> `[[10,11],[12,13]]`, first flatten ->
+    `[10,11], [12,13]` (one level peeled), second flatten -> `[10, 11, 12,
+    13]`. Guards that stacked flatten:true steps fully flatten a nested
+    list (a non-flattening or partially-flattening impl leaves nested
+    lists in the output). NOTE: this fixture does NOT independently prove
+    flatten is single-level-per-step -- a hypothetical deep/recursive
+    flatten would yield the same final [10,11,12,13]. The single-level
+    contract (spec: flatten "emits each element individually") is the
+    documented behavior; per-step single-level peeling is only observable
+    via intermediate state, not this final-output assertion.
   inputs:
     - id: x
       int64: {}

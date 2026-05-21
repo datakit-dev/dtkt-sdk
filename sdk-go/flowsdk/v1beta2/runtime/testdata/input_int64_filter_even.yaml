@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_int64_filter_even
-  description: "Int64 input with filter transform keeping even values"
+  description: >-
+    Int64 input with a filter transform that keeps only even values. Feeding 1,
+    2, 3, 4, 5, 6 yields [2, 4, 6]. Guards that input-level filters drop odd
+    values before they reach downstream consumers.
   inputs:
     - id: x
       int64: {}

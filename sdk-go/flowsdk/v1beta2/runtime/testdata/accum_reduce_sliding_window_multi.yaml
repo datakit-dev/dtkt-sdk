@@ -1,0 +1,38 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: reduce_sliding_window_multi
+  description: >-
+    Range generator emits 1..6 spaced 50ms apart; a sliding window of
+    length=200ms sliding every 100ms. Multiple windows overlap, so a
+    correctly-implemented sliding-window reduce emits multiple results
+    (one per window close) as the slide advances. Companion to
+    accum_reduce_sliding_window.yaml which has all values in a single
+    active window (vacuous against Gap 1). Tests Gap 1: the runtime
+    ignores window config and emits a single sum=21 at EOF. Used by
+    TestGraph_Reduce_SlidingWindow_MultiEmission. Non-vacuous bound:
+    at least 2 emissions (any number > 1 disproves the "always one"
+    EOF-only behavior).
+  generators:
+    - id: seq
+      range:
+        start: 1
+        end: 6
+        rate:
+          count: 1
+          interval: "0.05s"
+  vars:
+    - id: sliding
+      value: "= generators.seq.value"
+      transforms:
+        - reduce:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+            group_by:
+              window:
+                sliding:
+                  length: "0.2s"
+                  slide: "0.1s"
+  outputs:
+    - id: result
+      value: "= vars.sliding.value"

@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_schema_valid
+  description: >-
+    Action's request literal sets every well-typed field on test.TestRequest:
+    string `name`, int `count`, bool `active`, repeated string `tags`, and a
+    nested TestNested submessage. With a resolver providing the descriptor,
+    lint must produce zero diagnostics. Guards the full schema-validation happy
+    path.
   connections:
     - id: myconn
       services:

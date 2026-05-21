@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: interaction_form_elements
+  description: >-
+    Interaction with one of every advanced form element: single select (with
+    options sourced from an RPC method_name), multi-select, and file upload.
+    Feeding 1 triggers the prompt; auto-responder replies with int64(11).
+    Guards that the runtime accepts the full form-element oneof set without
+    crashing and routes the response through to the output.
   inputs:
     - id: x
       int64: {}

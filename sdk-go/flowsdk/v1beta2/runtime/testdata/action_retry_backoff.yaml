@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_retry_backoff
+  description: >-
+    Action with backoff retry: the RPC `error.UnavailableThenOK` fails once
+    with Unavailable then succeeds. With max_attempts=3 and a 1ms initial
+    backoff, the second attempt succeeds and the original input value is
+    echoed. Guards that backoff retry actually retries on transient errors and
+    forwards the eventual success.
   inputs:
     - id: msg
       int64: {}

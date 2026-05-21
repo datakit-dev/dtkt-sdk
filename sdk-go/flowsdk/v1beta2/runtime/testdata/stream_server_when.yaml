@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_server_when
+  description: >-
+    Stream node wraps a unary RPC (echo.Echo) gated by `when: x > 5` -- the
+    handler only invokes the RPC for inputs above 5; below-threshold inputs
+    are dropped. Guards the `when` gate on a stream node (where the
+    underlying method is unary). Sibling stream_bidi_when covers the bidi
+    case.
   inputs:
     - id: x
       int64: {}

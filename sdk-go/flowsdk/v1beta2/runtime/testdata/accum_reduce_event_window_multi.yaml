@@ -1,0 +1,35 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: reduce_event_window_multi
+  description: >-
+    Range generator emits 1..6; reduce groups by an event-window with
+    `when: this.value % 3 == 0` -- the window closes every third value.
+    Expected emissions: [1+2+3=6, 4+5+6=15] -- two distinct emissions
+    triggered by the CEL gate. Companion to accum_reduce_event_window.yaml
+    which uses `when: inputs.x.closed` (only true at EOF, vacuous against
+    Gap 1). Tests Gap 1's event-window code path:
+    `compileTransforms` (transform.go:466-482) reads only gb.GetKey() and
+    never extracts the window subtree; graph.go:303 reads the `when` CEL
+    for edge inference but that read doesn't drive runtime emission.
+    Used by TestGraph_Reduce_EventWindow_MultiEmission. Without windowing,
+    the runtime emits a single sum=21 at EOF.
+  generators:
+    - id: seq
+      range:
+        start: 1
+        end: 6
+  vars:
+    - id: gated
+      value: "= generators.seq.value"
+      transforms:
+        - reduce:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+            group_by:
+              window:
+                event:
+                  when: "= this.value % 3 == 0"
+  outputs:
+    - id: result
+      value: "= vars.gated.value"

@@ -2,6 +2,14 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: gen_long_running
+  description: >-
+    Range generator 1..1,000,000 with no rate limit and no stop_when. Intended
+    as a 'never finishes naturally' fixture for tests that exercise external
+    lifecycle commands (Terminate, Suspend, idempotent Terminate, etc.) -- the
+    test issues a command before the range completes, then verifies the flow
+    responds to the command rather than running to natural completion. NOTE: a
+    tight range can race to completion under load; use gen_truly_endless for
+    fail-safe ctx-cancel tests.
   generators:
     - id: seq
       range:

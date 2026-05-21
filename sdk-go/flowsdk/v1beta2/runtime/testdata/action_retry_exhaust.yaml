@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_retry_exhaust
+  description: >-
+    Action with backoff but no skip/terminate/continue: the RPC
+    `error.Internal` always fails, backoff exhausts after 2 attempts and the
+    last error propagates as the flow's error ('internal server error'). Guards
+    that backoff retry without an escalation rule surfaces the original error
+    after running out of attempts.
   inputs:
     - id: msg
       int64: {}

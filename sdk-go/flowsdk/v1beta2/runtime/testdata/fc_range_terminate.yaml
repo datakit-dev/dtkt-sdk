@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_range_terminate
+  description: >-
+    Range generator 1..100 with terminate_when on the output's eval_count >= 3.
+    Result: [1, 2, 3] published before Terminate() cancels the context; the
+    flow exits with ErrTerminated. Guards that terminate_when's triggering
+    iteration's value is published (the output handler publishes BEFORE calling
+    Terminate) and the flow promptly returns the typed sentinel.
   generators:
     - id: seq
       range:

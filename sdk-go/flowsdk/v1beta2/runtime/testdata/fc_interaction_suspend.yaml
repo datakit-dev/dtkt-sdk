@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_interaction_suspend
+  description: >-
+    Interaction node guarded by `when: inputs.x.value > 0` with
+    flow_control.suspend_when=true. After the first interaction completes the
+    node enters PHASE_SUSPENDED; the test feeds three inputs and verifies that
+    no further interactions fire while suspended. Terminate then unblocks the
+    executor. Guards that suspend on an interaction parks the handler with
+    subsequent queued inputs left unprocessed.
   inputs:
     - id: x
       int64: {}

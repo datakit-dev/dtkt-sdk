@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_output_suspend
+  description: >-
+    Output with flow_control.suspend_when=true. After the first emission the
+    output enters PHASE_SUSPENDED; the test feeds three inputs to ensure
+    additional ones are queued and verifies the output stops emitting.
+    Terminate then unblocks the executor. Guards that suspend on an output
+    parks the handler with subsequent queued inputs left unconsumed (not a
+    lying suspend that keeps publishing).
   inputs:
     - id: x
       int64: {}

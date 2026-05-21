@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_flatten
-  description: "Map producing a list, then flatten to individual elements"
+  description: >-
+    Var transform: map each input x into [x, x*10], then flatten the resulting
+    list. Feeding 1, 2: post-map [[1,10], [2,20]], post-flatten [1, 10, 2, 20]
+    (4 emits from 2 inputs). Guards flatten:true on list-producing maps -- one
+    input fans out to multiple downstream emits.
   inputs:
     - id: x
       int64: {}

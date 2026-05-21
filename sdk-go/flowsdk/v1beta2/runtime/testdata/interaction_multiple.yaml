@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: interaction_multiple
+  description: >-
+    Same shape as interaction_basic, but feeds three positive inputs (1, 2, 3)
+    which trigger three separate prompts. The test's auto-responder replies
+    with incrementing values 10, 20, 30. Guards that one interaction node
+    correctly emits one prompt per upstream input event and each response
+    routes to the right downstream emission.
   inputs:
     - id: x
       int64: {}

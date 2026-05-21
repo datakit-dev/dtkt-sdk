@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_retry_when_no_match
+  description: >-
+    Action with `when` guard requiring code==14 (Unavailable), backoff
+    configured, but the RPC `error.NotFound` returns code 5. Because the guard
+    does not match, the retry strategy never activates and the first error
+    propagates immediately ('resource not found'). Guards that `when` correctly
+    gates the WHOLE strategy: when it returns false, backoff and other
+    escalation rules are bypassed entirely.
   inputs:
     - id: msg
       int64: {}

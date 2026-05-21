@@ -1,0 +1,29 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_noderef_request_chain
+  description: >-
+    Two chained actions: `producer` returns test.TestResponse; `consumer`'s
+    request field reads `actions.producer.value.bogus_field`. Lint must report
+    CodeUnknownField on `bogus_field`. Guards that node-ref chain validation
+    runs on request-side CEL, not just output values.
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: x
+      string: {}
+  actions:
+    - id: producer
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request:
+          name: "= inputs.x.value"
+    - id: consumer
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request:
+          name: "= actions.producer.value.bogus_field"

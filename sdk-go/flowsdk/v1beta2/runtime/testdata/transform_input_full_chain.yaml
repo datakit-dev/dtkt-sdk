@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_input_full_chain
-  description: "Input with map, filter, scan pipeline"
+  description: >-
+    Transforms declared on an input (not a var/output): map +1, filter evens,
+    scan running sum. Feeding 1..5: post-map [2, 3, 4, 5, 6], post-filter [2,
+    4, 6], scan emits [2, 6, 12]. Guards that the same transform pipeline that
+    works on var/output also works on an input declaration.
   inputs:
     - id: x
       int64: {}

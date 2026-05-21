@@ -2,6 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_invalid_var_cel
+  description: >-
+    Var's `value` expression is syntactically invalid CEL (`+++invalid`). Lint
+    must report a CodeInvalidCEL diagnostic on vars.bad. Guards that bad CEL in
+    a var's main value field is caught at lint time.
   vars:
     - id: bad
       value: "= +++invalid"

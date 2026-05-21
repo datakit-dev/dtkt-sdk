@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: outbox_snapshot
+  description: >-
+    Input -> var (x * 10) -> output. Feeding 3 yields output 30; after run
+    completes, SnapshotAt reconstructs state from outbox events and must
+    include `vars.v` with PHASE_SUCCEEDED and EvalCount==1. Guards that the
+    outbox forwarder writes per-node terminal state durably so SnapshotAt can
+    recover it post-run.
   inputs:
     - id: x
       int64: {}

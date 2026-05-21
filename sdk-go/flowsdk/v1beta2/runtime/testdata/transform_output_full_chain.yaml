@@ -2,7 +2,15 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_output_full_chain
-  description: "Output with filter, map, reduce(event window) pipeline"
+  description: >-
+    Output transform chain: filter > 2, map *10, reduce running sum. Feeding
+    1..5: filter keeps [3, 4, 5], map [30, 40, 50], reduce sums to 120. The
+    load-bearing guard is the three-stage filter->map->reduce pipeline
+    composed at the OUTPUT stage (Output.transforms). The reduce's
+    `window.event.when: inputs.x.closed` gate coincides with stream EOF, so
+    the event-window aspect is NOT independently verified (Gap 1: runtime
+    ignores group_by.window; emission is EOF-driven). See
+    accum_reduce_event_window_multi.yaml for non-vacuous event gating.
   inputs:
     - id: x
       int64: {}

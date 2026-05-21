@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_filter_transform
+  description: >-
+    Action -> var with a filter transform -> output. The var keeps only values
+    > 5. Feeding 1, 8, 3, 10 emits 8, 10. Guards that a filter transform on a
+    downstream var correctly drops items below the threshold and forwards only
+    matching values.
   inputs:
     - id: x
       int64: {}

@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_filter_transform
+  description: >-
+    Stream echoes input; downstream var applies a filter (value > 3) so only
+    values above the threshold reach the output. Guards filter semantics on
+    stream-sourced vars: dropped values do not advance downstream, but the
+    stream itself is uninterrupted.
   inputs:
     - id: x
       int64: {}

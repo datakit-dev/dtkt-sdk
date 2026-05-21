@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -47,6 +48,13 @@ func TestNodeControl_Var_Switch_StopWhen(t *testing.T) {
 // pipeline (filter→map). Exercises runWithTransforms path. The transform
 // goroutines run in their own errgroup; NC.stop must let the transform
 // pipeline drain in-flight items.
+//
+// Spec contract: NC.stop_when fires per-iteration via checkLifecycle.
+// stop_when triggers at inputs.x.value>=5. The values fed are
+// [2, 4, 5, 6, 8]; 5 is filtered out (odd), 6 is the first input that
+// both passes the filter AND satisfies stop_when. After 6 publishes,
+// the var must stop -- so 8 must NOT surface. Full-natural-drain would
+// be [20, 40, 60, 80] (4 outputs). Stop-fired bound is `len < 4`.
 func TestNodeControl_Var_Transforms_StopWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_var_transforms_stop.yaml")
@@ -61,14 +69,148 @@ func TestNodeControl_Var_Transforms_StopWhen(t *testing.T) {
 
 		results := outputInt64s(collectOutputs(ctx, ps, "outputs.result"))
 		// Filter keeps even values: [2,4,6,8]; map ×10 → [20,40,60,80].
-		// stop_when fires on input>=5; the filter consumed 5 (filtered out),
-		// then 6 passes filter and triggers stop (since 6 >= 5). Subsequent
-		// values may or may not pass through depending on scheduling.
-		// Assert results are a prefix of the full-drain expectation.
+		// stop_when triggers when inputs.x.value>=5 lands -- i.e. by the
+		// time we publish the value derived from input 6 (which is the
+		// first post-filter input where the predicate holds). After that
+		// trigger, the var must NOT publish 80 (the post-transform value
+		// for input 8). Natural drain (NC broken) produces 4 outputs.
 		full := []int64{20, 40, 60, 80}
 		require.GreaterOrEqual(t, len(results), 2,
 			"expected at least the early values to pass through")
-		require.LessOrEqual(t, len(results), len(full))
+		require.Less(t, len(results), len(full),
+			"NC.stop_when must stop the var before the full drain "+
+				"surfaces; if len==4, NC.stop never fired (likely Gap 2: "+
+				"runWithTransforms skips checkLifecycle).")
+		assert.Equal(t, full[:len(results)], results)
+	})
+}
+
+// nc_output_transforms_stop: parallel to nc_var_transforms_stop but for the
+// Output handler. Exposes Gap 2: outputHandler.runWithTransforms
+// (output.go:131) doesn't call checkLifecycle, so NC.stop_when may never
+// fire when transforms are configured. Spec contract: NC.stop_when must
+// fire per-iteration regardless of which Run path the handler took.
+//
+// With transforms+NC working: filter keeps [2, 4, 6, 8] from [2, 4, 5, 6, 8];
+// map ×10 → [20, 40, 60, 80]; NC.stop_when fires when input 6 lands (first
+// post-filter trigger). Stop-fired bound is len < 4 (full natural drain).
+func TestNodeControl_Output_Transforms_StopWhen(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		g := loadFlow(t, "nc_output_transforms_stop.yaml")
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
+
+		feedInput(ps, "inputs.x", int64(2), int64(4), int64(5), int64(6), int64(8))
+
+		ctx := testContext(t)
+		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, g)
+		require.NoError(t, err)
+
+		results := outputInt64s(collectOutputs(ctx, ps, "outputs.result"))
+		full := []int64{20, 40, 60, 80}
+		require.GreaterOrEqual(t, len(results), 2,
+			"expected at least the early values to pass through")
+		require.Less(t, len(results), len(full),
+			"NC.stop_when must stop the output before the full drain "+
+				"surfaces; if len==4, NC.stop never fired (Gap 2: "+
+				"outputHandler.runWithTransforms skips checkLifecycle).")
+		assert.Equal(t, full[:len(results)], results)
+	})
+}
+
+// nc_switch_transforms_stop: parallel to nc_var_transforms_stop but for the
+// switch oneof variant of Var (which routes through switchHandler.Run, not
+// the value-variant code path). Exposes Gap 2:
+// switchHandler.runWithTransforms (switch.go:152) doesn't call
+// checkLifecycle, so NC.stop_when may never fire when transforms are also
+// configured on the switch var.
+//
+// The switch passes through the input value via `default: "= this.value"`
+// (no case branches). transforms then filter/map. Sequence parallels
+// nc_var_transforms_stop: full drain would be [20, 40, 60, 80]; stop-fired
+// bound is len < 4.
+func TestNodeControl_Switch_Transforms_StopWhen(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		g := loadFlow(t, "nc_switch_transforms_stop.yaml")
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
+
+		feedInput(ps, "inputs.x", int64(2), int64(4), int64(5), int64(6), int64(8))
+
+		ctx := testContext(t)
+		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, g)
+		require.NoError(t, err)
+
+		results := outputInt64s(collectOutputs(ctx, ps, "outputs.result"))
+		full := []int64{20, 40, 60, 80}
+		require.GreaterOrEqual(t, len(results), 2,
+			"expected at least the early values to pass through")
+		require.Less(t, len(results), len(full),
+			"NC.stop_when must stop the switch var before the full drain "+
+				"surfaces; if len==4, NC.stop never fired (Gap 2: "+
+				"switchHandler.runWithTransforms skips checkLifecycle).")
+		assert.Equal(t, full[:len(results)], results)
+	})
+}
+
+// nc_interaction_transforms_stop: parallel to nc_var_transforms_stop but for
+// the Interaction handler. Exposes Gap 2:
+// interactionHandler.runWithTransforms (interaction.go:243) doesn't call
+// checkLifecycle, so NC.stop_when may never fire when transforms are
+// configured. The auto-responder echoes back the input value (1:1 prompt
+// to response), so the interaction's value stream equals the input stream.
+// Transforms then filter/map the response values. Full drain would be
+// [20, 40, 60, 80] (after filter+map from [2,4,5,6,8]); stop-fired bound is
+// len < 4.
+func TestNodeControl_Interaction_Transforms_StopWhen(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		g := loadFlow(t, "nc_interaction_transforms_stop.yaml")
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
+
+		// Echo responder: response value = original input fed at the same
+		// position. Inputs are sent in order, so the Nth prompt corresponds
+		// to the Nth input value.
+		inputs := []int64{2, 4, 5, 6, 8}
+		promptCh := make(chan *flowv1beta2.InteractionRequestEvent, len(inputs))
+		responseCh := make(chan *flowv1beta2.InteractionResponseEvent, len(inputs))
+
+		go func() {
+			idx := 0
+			for p := range promptCh {
+				if idx >= len(inputs) {
+					// Extra prompts past the input list -- shouldn't
+					// happen if NC.stop fires, but guard against a
+					// regression that floods the responder.
+					return
+				}
+				anyVal, _ := common.WrapProtoAny(inputs[idx])
+				responseCh <- &flowv1beta2.InteractionResponseEvent{
+					Id:    p.GetId(),
+					Token: p.GetToken(),
+					Value: anyVal,
+				}
+				idx++
+			}
+		}()
+
+		feedInput(ps, "inputs.x", int64(2), int64(4), int64(5), int64(6), int64(8))
+
+		ctx := testContext(t)
+		opts := append([]Option{WithInteractions(promptCh, responseCh)}, extraOpts...)
+		err := NewExecutor(ps, testTopics, opts...).Execute(ctx, g)
+		require.NoError(t, err)
+
+		close(promptCh)
+
+		results := outputInt64s(collectOutputs(ctx, ps, "outputs.result"))
+		full := []int64{20, 40, 60, 80}
+		require.GreaterOrEqual(t, len(results), 2,
+			"expected at least the early values to pass through")
+		require.Less(t, len(results), len(full),
+			"NC.stop_when must stop the interaction before the full drain "+
+				"surfaces; if len==4, NC.stop never fired (Gap 2: "+
+				"interactionHandler.runWithTransforms skips checkLifecycle).")
 		assert.Equal(t, full[:len(results)], results)
 	})
 }
@@ -240,13 +382,26 @@ func TestNodeControl_WithErrorStrategy_Continue(t *testing.T) {
 		ps := newPubSub()
 		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
+		ctx := testContext(t)
+		// Subscribe to doubled's topic BEFORE feeding so PHASE_CANCELLED
+		// from NC.terminate isn't missed. Without this, the loose
+		// LessOrEqual(fullDoubled) bound matches natural drain -- broken
+		// NC.terminate would still pass.
+		doubledCh, err := ps.Subscribe(ctx, testTopics.For("vars.doubled"))
+		require.NoError(t, err)
+
 		feedInput(ps, "inputs.x", int64(1), int64(2), int64(3), int64(4), int64(5))
 
-		ctx := testContext(t)
-		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, g)
+		err = NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, g)
 		// Flow exits naturally; CONTINUE only matters for ERRORED nodes,
 		// and NC.terminate is not an error.
 		require.NoError(t, err)
+
+		// Spec contract: per-node NC.terminate fires on doubled; verify
+		// PHASE_CANCELLED landed on the var topic (load-bearing check
+		// that NC.terminate actually fired).
+		require.True(t, waitForPhase(ctx, doubledCh, flowv1beta2.RunSnapshot_PHASE_CANCELLED),
+			"NC.terminate_when on doubled must publish PHASE_CANCELLED")
 
 		doubled := outputInt64s(collectOutputs(ctx, ps, "outputs.doubled_out"))
 		tripled := outputInt64s(collectOutputs(ctx, ps, "outputs.tripled_out"))

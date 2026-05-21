@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_list_index
-  description: "Access list element by index"
+  description: >-
+    Input value is a list; output reads element at index [1]. Feeding ['a',
+    'b', 'c'] emits 'b'. Guards that CEL list indexing on an input value works
+    and that the indexed element's type (string) is preserved through to the
+    output.
   inputs:
     - id: x
       string: {}

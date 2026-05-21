@@ -2,10 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: suspend_resume_unary
-  description: |
-    Range generator -> unary action (echo) -> output. Verifies the unary
-    action handler preserves its input sequence across suspend/resume.
-    The mock 'echo' connection returns the input unchanged.
+  description: >-
+    Range generator -> unary action (echo) -> output. Verifies the unary action
+    handler preserves its input sequence across suspend/resume. The mock 'echo'
+    connection returns the input unchanged.
   generators:
     - id: seq
       range:

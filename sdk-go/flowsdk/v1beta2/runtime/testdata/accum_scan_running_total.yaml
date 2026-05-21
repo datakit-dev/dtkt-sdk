@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: scan_running_total
+  description: >-
+    Scan computing running sum, with the transform attached directly to an
+    output node (rather than to an intermediate var). Feeding 10, 20, 30 yields
+    10, 30, 60. Guards that transforms run correctly when declared on an output
+    node and that an output can both consume an input and apply a transform in
+    one step.
   inputs:
     - id: x
       int64: {}

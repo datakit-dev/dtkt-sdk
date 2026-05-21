@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_interaction_suspend
+  description: >-
+    Interaction node fires once (when=true), then
+    node_control.suspend_when=true parks its handler until ResumeNode. Guards
+    that NC suspend on an interaction holds prompts/responses through the pause
+    cycle without losing the in-flight token.
   inputs:
     - id: x
       int64: {}

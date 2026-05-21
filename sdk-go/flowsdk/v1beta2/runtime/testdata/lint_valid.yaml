@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_valid
+  description: >-
+    Minimal input -> var (* 2) -> output chain with well-formed CEL throughout.
+    Lint must produce zero diagnostics. Used as the canonical clean baseline
+    and as the carrier for proto-conflict tests that need a valid graph plus
+    resolvers.
   inputs:
     - id: x
       int64: {}

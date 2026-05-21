@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_retry_terminate
+  description: >-
+    Stream calls error.StreamInternal (code 13); retry_strategy.terminate_when
+    matches and surfaces a *TerminateError (a distinct type from operator
+    ErrTerminated). Guards the terminate branch on a streaming RPC: matched
+    errors are escalated to flow-wide cancellation as TerminateError, not
+    retried.
   inputs:
     - id: msg
       int64: {}

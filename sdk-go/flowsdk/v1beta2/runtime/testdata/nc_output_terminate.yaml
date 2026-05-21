@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_output_terminate
+  description: >-
+    Output carries node_control.terminate_when=true so the output's context is
+    cancelled after the first publish. Flow returns nil. Output is a prefix of
+    inputs in input order. Guards that NC terminate on an output cancels only
+    that output handler.
   inputs:
     - id: x
       int64: {}

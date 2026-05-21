@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fanout_two_outputs
-  description: "One input feeds two outputs directly"
+  description: >-
+    One input feeds two outputs directly (no intermediate vars), each applying
+    its own map transform. Feeding 1, 2, 3 yields doubled=[2, 4, 6] and
+    tripled=[3, 6, 9]. Guards that the same input can drive multiple output
+    nodes simultaneously and each output's transform pipeline operates
+    independently.
   inputs:
     - id: x
       int64: {}

@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cache_var_fanout
+  description: >-
+    One cached input (`const`) feeds two independent downstream vars (sum and
+    product), each driving its own output. Feeding const=10 once and tick=1, 2,
+    3 yields sum=[11, 12, 13] and product=[10, 20, 30] -- both consumers see
+    the same cached const on every iteration. Guards that a single cache:true
+    source serves multiple downstream consumers without re-firing the producer.
   inputs:
     - id: tick
       int64: {}

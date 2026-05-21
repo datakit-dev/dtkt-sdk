@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: var_deep_chain_scan_end
-  description: "Three-level var chain ending with scan accumulator"
+  description: >-
+    Three-var chain: `filtered` filters > 2, `doubled` maps *2, `total` scans
+    running sum. Feeding 1..5: filtered keeps [3, 4, 5], doubled [6, 8, 10],
+    total emits [6, 14, 24]. Guards scan as the terminal stage of a multi-var
+    chain: scan's state is per-var (independent), and each emit advances
+    accumulator.
   inputs:
     - id: x
       int64: {}

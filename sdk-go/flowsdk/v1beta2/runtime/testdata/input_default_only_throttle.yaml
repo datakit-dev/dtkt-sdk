@@ -1,0 +1,23 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: input_default_only_throttle
+  description: >-
+    Int64 input with default=99 and NO explicit throttle and NO cache --
+    exercises the runtime's default-throttle fallback
+    (executor_setup.go:568-574 injects minInputThrottle 10ms when cache
+    OR default is set but no throttle is declared). Sister fixture to
+    input_default_throttle.yaml, which covers the cache branch of the
+    same conditional. Used by
+    TestGraph_Input_DefaultOnlyThrottleFallback: the test feeds no
+    values, holds the input subscription open for 130ms, and asserts the
+    handler emits the default value on the injected throttle pulses. If
+    the fallback didn't inject, throttle would stay at zero, the input
+    would never re-emit, and zero outputs would surface.
+  inputs:
+    - id: x
+      int64:
+        default: 99
+  outputs:
+    - id: result
+      value: "= inputs.x.value"

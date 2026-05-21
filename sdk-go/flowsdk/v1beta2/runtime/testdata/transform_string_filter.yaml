@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_string_filter
-  description: "Filter strings by length > 3"
+  description: >-
+    Var filter on string input using CEL's `size()` (`size(this.value) > 3`).
+    Feeding ["hi", "hello", "yo", "world"]: "hi" (2) and "yo" (2) drop;
+    "hello" (5) and "world" (5) pass. Guards filter semantics on string-typed
+    values with size-based predicates.
   inputs:
     - id: name
       string: {}

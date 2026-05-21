@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: var_scan_sum
-  description: "Var with scan transform accumulating a running sum"
+  description: >-
+    Single-var scan (initial 0, accumulator = accumulator + value) emits
+    running sum. Feeding 1..3 yields [1, 3, 6]. Guards scan semantics on a
+    var: one emit per input carrying the accumulated total.
   inputs:
     - id: x
       int64: {}

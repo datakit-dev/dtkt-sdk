@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: var_flatten
-  description: "Var with map-to-list then flatten transform"
+  description: >-
+    Single-var transform: map x -> [x, x+1] then flatten. Feeding 10, 20: map
+    -> [[10,11], [20,21]], flatten -> [10, 11, 20, 21]. Guards the simplest
+    map-then-flatten fan-out -- N inputs produce 2N emits.
   inputs:
     - id: x
       int64: {}

@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: scan_string_concat
+  description: >-
+    Scan over string inputs: starts from empty, appends each word plus a
+    trailing space. Feeding 'hello', 'world', '!' yields 'hello ', 'hello world
+    ', 'hello world ! '. Guards that scan operates on non-numeric value types
+    and that string concatenation works in the accumulator expression.
   inputs:
     - id: word
       string: {}

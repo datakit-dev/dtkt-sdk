@@ -1,0 +1,34 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: reduce_group_by_session_multi
+  description: >-
+    GroupBy key (even/odd) + session window (100ms timeout). Int64 input
+    fed by the test in two bursts separated by a 250ms gap. A correctly-
+    implemented session window with per-key partitioning closes each
+    key's session after 100ms of idle and emits sum-per-(key, session).
+    Burst 1 (immediate): [1, 2, 3] -> odd-session-1=1+3=4, even-session-1=2.
+    Burst 2 (after 250ms gap): [4, 5, 6] -> odd-session-2=5,
+    even-session-2=4+6=10. Total 4 emissions [4, 2, 5, 10]. Companion to
+    accum_reduce_session_window_multi.yaml without per-key partitioning.
+    Tests Gap 1's key+session-window combined code path. Used by
+    TestGraph_Reduce_GroupBy_SessionWindow_MultiEmission. Without
+    windowing: 2 per-key emissions at EOF [9 odd, 12 even].
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: grouped
+      value: "= inputs.x.value"
+      transforms:
+        - reduce:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+            group_by:
+              key: '= this.value % 2 == 0 ? "even" : "odd"'
+              window:
+                session:
+                  timeout: "0.1s"
+  outputs:
+    - id: result
+      value: "= vars.grouped.value"

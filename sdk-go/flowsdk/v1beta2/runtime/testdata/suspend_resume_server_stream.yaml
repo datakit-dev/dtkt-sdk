@@ -2,13 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: suspend_resume_server_stream
-  description: |
+  description: >-
     Range generator -> server stream -> output. The server stream
-    'random.Numbers' returns N random ints per request; for our purposes
-    we feed values one-by-one and observe the stream stays alive across
-    suspend cycles. Sequence is NOT 1:1 (each request -> N responses)
-    so per-node isolation tests assert "stream survives" rather than
-    "exact sequence preservation".
+    'random.Numbers' returns N random ints per request; for our purposes we
+    feed values one-by-one and observe the stream stays alive across suspend
+    cycles. Sequence is NOT 1:1 (each request -> N responses) so per-node
+    isolation tests assert "stream survives" rather than "exact sequence
+    preservation".
   generators:
     - id: seq
       range:

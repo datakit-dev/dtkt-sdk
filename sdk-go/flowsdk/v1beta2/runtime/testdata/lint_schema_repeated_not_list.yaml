@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_schema_repeated_not_list
+  description: >-
+    Request sets `tags: not_a_list` -- scalar value for a repeated field. Lint
+    must report a CodeTypeMismatch diagnostic mentioning `tags` and `repeated`.
+    Guards that lint distinguishes repeated fields from scalars when validating
+    YAML literals.
   connections:
     - id: myconn
       services:

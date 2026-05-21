@@ -1,0 +1,27 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_response_valid_field
+  description: >-
+    Action `response` transform references `this.response.payload`, which is a
+    real field on test.TestResponse. With a resolver, lint must produce zero
+    diagnostics. Guards the response-side happy path so the unknown-field test
+    isn't catching everything by accident.
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: x
+      string: {}
+  actions:
+    - id: run
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request:
+          name: "= inputs.x.value"
+        response: "= this.response.payload"
+  outputs:
+    - id: result
+      value: "= actions.run.value"

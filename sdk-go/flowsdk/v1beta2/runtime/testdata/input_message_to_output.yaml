@@ -2,7 +2,14 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_message_to_output
-  description: "Message-typed input (proto Any) passed directly to output"
+  description: >-
+    Input declared with `message: { type: google.protobuf.Struct }` -- the spec
+    carries a fully-qualified proto type name; the fed value is a
+    structpb.Struct matching that type. CEL accesses the struct's fields
+    transparently. Feeding {name: 'alice', age: 42} produces one output with
+    the same key/value pairs. Guards the `Input.message` oneof branch
+    end-to-end -- spec-declared proto type registration + structpb conversion +
+    output emission.
   inputs:
     - id: payload
       message:

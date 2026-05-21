@@ -5,17 +5,25 @@
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_buf_validate_validate } from "../../../buf/validate/validate_pb";
+import type { Value, ValueValid } from "../../../cel/expr/value_pb";
+import { file_cel_expr_value } from "../../../cel/expr/value_pb";
 import type { Interaction_Input, Interaction_InputValid } from "./spec_pb";
 import { file_dtkt_flow_v1beta2_spec } from "./spec_pb";
+import type { RunSnapshot_Phase } from "./state_pb";
+import { file_dtkt_flow_v1beta2_state } from "./state_pb";
 import type { Any } from "../../../google/protobuf/any_pb";
 import { file_google_protobuf_any } from "../../../google/protobuf/any_pb";
+import type { Timestamp } from "../../../google/protobuf/timestamp_pb";
+import { file_google_protobuf_timestamp } from "../../../google/protobuf/timestamp_pb";
+import type { Status, StatusValid } from "../../../google/rpc/status_pb";
+import { file_google_rpc_status } from "../../../google/rpc/status_pb";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file dtkt/flow/v1beta2/events.proto.
  */
 export const file_dtkt_flow_v1beta2_events: GenFile = /*@__PURE__*/
-  fileDesc("Ch5kdGt0L2Zsb3cvdjFiZXRhMi9ldmVudHMucHJvdG8SEWR0a3QuZmxvdy52MWJldGEyImgKCklucHV0RXZlbnQSLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIrCgV2YWx1ZRgCIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnlCBrpIA8gBASJCChFJbnB1dFJlcXVlc3RFdmVudBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokImkKC091dHB1dEV2ZW50Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSKwoFdmFsdWUYAiABKAsyFC5nb29nbGUucHJvdG9idWYuQW55Qga6SAPIAQEimgEKF0ludGVyYWN0aW9uUmVxdWVzdEV2ZW50Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSGgoFdG9rZW4YAiABKAlCC7pICMgBAXIDsAEBEjQKBmlucHV0cxgDIAMoCzIkLmR0a3QuZmxvdy52MWJldGEyLkludGVyYWN0aW9uLklucHV0IqEBChhJbnRlcmFjdGlvblJlc3BvbnNlRXZlbnQSLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIaCgV0b2tlbhgCIAEoCUILukgIyAEBcgOwAQESKwoFdmFsdWUYAyABKAsyFC5nb29nbGUucHJvdG9idWYuQW55Qga6SAPIAQESDQoFYWN0b3IYBCABKAkiDwoNU3RvcEZsb3dFdmVudCIUChJUZXJtaW5hdGVGbG93RXZlbnQiEgoQU3VzcGVuZEZsb3dFdmVudCIRCg9SZXN1bWVGbG93RXZlbnQiiQEKDVN0b3BOb2RlRXZlbnQSeAoCaWQYASABKAlCbLpIacgBAXJkMmJeKGNvbm5lY3Rpb25zfGlucHV0c3xnZW5lcmF0b3JzfHZhcnN8YWN0aW9uc3xzdHJlYW1zfGludGVyYWN0aW9uc3xvdXRwdXRzKVwuW2EtekEtWl1bYS16QS1aMC05X10qJCKOAQoSVGVybWluYXRlTm9kZUV2ZW50EngKAmlkGAEgASgJQmy6SGnIAQFyZDJiXihjb25uZWN0aW9uc3xpbnB1dHN8Z2VuZXJhdG9yc3x2YXJzfGFjdGlvbnN8c3RyZWFtc3xpbnRlcmFjdGlvbnN8b3V0cHV0cylcLlthLXpBLVpdW2EtekEtWjAtOV9dKiQijAEKEFN1c3BlbmROb2RlRXZlbnQSeAoCaWQYASABKAlCbLpIacgBAXJkMmJeKGNvbm5lY3Rpb25zfGlucHV0c3xnZW5lcmF0b3JzfHZhcnN8YWN0aW9uc3xzdHJlYW1zfGludGVyYWN0aW9uc3xvdXRwdXRzKVwuW2EtekEtWl1bYS16QS1aMC05X10qJCK/AQoPUmVzdW1lTm9kZUV2ZW50EngKAmlkGAEgASgJQmy6SGnIAQFyZDJiXihjb25uZWN0aW9uc3xpbnB1dHN8Z2VuZXJhdG9yc3x2YXJzfGFjdGlvbnN8c3RyZWFtc3xpbnRlcmFjdGlvbnN8b3V0cHV0cylcLlthLXpBLVpdW2EtekEtWjAtOV9dKiQSKAoFdmFsdWUYAiABKAsyFC5nb29nbGUucHJvdG9idWYuQW55SACIAQFCCAoGX3ZhbHVlIlsKE0NsZWFyQ2FjaGVOb2RlRXZlbnQSRAoCaWQYASABKAlCOLpINcgBAXIwMi5eKGlucHV0c3x2YXJzfGFjdGlvbnMpXC5bYS16QS1aXVthLXpBLVowLTlfXSokIhAKDlN0YXJ0Rmxvd0V2ZW50QtgBChdwcm90by5kdGt0LmZsb3cudjFiZXRhMkILRXZlbnRzUHJvdG9QAVpKZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9mbG93L3YxYmV0YTI7Zmxvd3YxYmV0YTKiAgNERliqAhFEdGt0LkZsb3cuVjFiZXRhMsoCEUR0a3RcRmxvd1xWMWJldGEy4gIdRHRrdFxGbG93XFYxYmV0YTJcR1BCTWV0YWRhdGHqAhNEdGt0OjpGbG93OjpWMWJldGEyYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_flow_v1beta2_spec, file_google_protobuf_any]);
+  fileDesc("Ch5kdGt0L2Zsb3cvdjFiZXRhMi9ldmVudHMucHJvdG8SEWR0a3QuZmxvdy52MWJldGEyImgKCklucHV0RXZlbnQSLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10qJBIrCgV2YWx1ZRgCIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnlCBrpIA8gBASJCChFJbnB1dFJlcXVlc3RFdmVudBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokIpICCgtPdXRwdXRFdmVudBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokEh4KBXZhbHVlGAIgASgLMg8uY2VsLmV4cHIuVmFsdWUSIQoFZXJyb3IYAyABKAsyEi5nb29nbGUucnBjLlN0YXR1cxIuCgpldmVudF90aW1lGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBISCgpldmFsX2NvdW50GAUgASgEEg4KBmNsb3NlZBgGIAEoCBI9CgVwaGFzZRgHIAEoDjIkLmR0a3QuZmxvdy52MWJldGEyLlJ1blNuYXBzaG90LlBoYXNlQgi6SAWCAQIQASKBAgoORmxvd1N0YXRlRXZlbnQSPQoFcGhhc2UYASABKA4yJC5kdGt0LmZsb3cudjFiZXRhMi5SdW5TbmFwc2hvdC5QaGFzZUIIukgFggECEAESIQoFZXJyb3IYAiABKAsyEi5nb29nbGUucnBjLlN0YXR1cxIuCgpzdGFydF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBItCglzdG9wX3RpbWUYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCmV2ZW50X3RpbWUYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIpoBChdJbnRlcmFjdGlvblJlcXVlc3RFdmVudBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSokEhoKBXRva2VuGAIgASgJQgu6SAjIAQFyA7ABARI0CgZpbnB1dHMYAyADKAsyJC5kdGt0LmZsb3cudjFiZXRhMi5JbnRlcmFjdGlvbi5JbnB1dCKhAQoYSW50ZXJhY3Rpb25SZXNwb25zZUV2ZW50Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKiQSGgoFdG9rZW4YAiABKAlCC7pICMgBAXIDsAEBEisKBXZhbHVlGAMgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueUIGukgDyAEBEg0KBWFjdG9yGAQgASgJIg8KDVN0b3BGbG93RXZlbnQiFAoSVGVybWluYXRlRmxvd0V2ZW50IhIKEFN1c3BlbmRGbG93RXZlbnQiEQoPUmVzdW1lRmxvd0V2ZW50IokBCg1TdG9wTm9kZUV2ZW50EngKAmlkGAEgASgJQmy6SGnIAQFyZDJiXihjb25uZWN0aW9uc3xpbnB1dHN8Z2VuZXJhdG9yc3x2YXJzfGFjdGlvbnN8c3RyZWFtc3xpbnRlcmFjdGlvbnN8b3V0cHV0cylcLlthLXpBLVpdW2EtekEtWjAtOV9dKiQijgEKElRlcm1pbmF0ZU5vZGVFdmVudBJ4CgJpZBgBIAEoCUJsukhpyAEBcmQyYl4oY29ubmVjdGlvbnN8aW5wdXRzfGdlbmVyYXRvcnN8dmFyc3xhY3Rpb25zfHN0cmVhbXN8aW50ZXJhY3Rpb25zfG91dHB1dHMpXC5bYS16QS1aXVthLXpBLVowLTlfXSokIowBChBTdXNwZW5kTm9kZUV2ZW50EngKAmlkGAEgASgJQmy6SGnIAQFyZDJiXihjb25uZWN0aW9uc3xpbnB1dHN8Z2VuZXJhdG9yc3x2YXJzfGFjdGlvbnN8c3RyZWFtc3xpbnRlcmFjdGlvbnN8b3V0cHV0cylcLlthLXpBLVpdW2EtekEtWjAtOV9dKiQivwEKD1Jlc3VtZU5vZGVFdmVudBJ4CgJpZBgBIAEoCUJsukhpyAEBcmQyYl4oY29ubmVjdGlvbnN8aW5wdXRzfGdlbmVyYXRvcnN8dmFyc3xhY3Rpb25zfHN0cmVhbXN8aW50ZXJhY3Rpb25zfG91dHB1dHMpXC5bYS16QS1aXVthLXpBLVowLTlfXSokEigKBXZhbHVlGAIgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueUgAiAEBQggKBl92YWx1ZSJbChNDbGVhckNhY2hlTm9kZUV2ZW50EkQKAmlkGAEgASgJQji6SDXIAQFyMDIuXihpbnB1dHN8dmFyc3xhY3Rpb25zKVwuW2EtekEtWl1bYS16QS1aMC05X10qJCIQCg5TdGFydEZsb3dFdmVudELYAQoXcHJvdG8uZHRrdC5mbG93LnYxYmV0YTJCC0V2ZW50c1Byb3RvUAFaSmdpdGh1Yi5jb20vZGF0YWtpdC1kZXYvZHRrdC1zZGsvc2RrLWdvL3Byb3RvL2R0a3QvZmxvdy92MWJldGEyO2Zsb3d2MWJldGEyogIDREZYqgIRRHRrdC5GbG93LlYxYmV0YTLKAhFEdGt0XEZsb3dcVjFiZXRhMuICHUR0a3RcRmxvd1xWMWJldGEyXEdQQk1ldGFkYXRh6gITRHRrdDo6Rmxvdzo6VjFiZXRhMmIGcHJvdG8z", [file_buf_validate_validate, file_cel_expr_value, file_dtkt_flow_v1beta2_spec, file_dtkt_flow_v1beta2_state, file_google_protobuf_any, file_google_protobuf_timestamp, file_google_rpc_status]);
 
 /**
  * InputEvent is an externally-provided value for a specific input node.
@@ -108,6 +116,18 @@ export const InputRequestEventSchema: GenMessage<InputRequestEvent, {validType: 
 /**
  * OutputEvent is a result emitted by a specific output node.
  *
+ * Carries the lean per-event delta: the value the node just produced
+ * plus its lifecycle metadata (eval_count, phase, error, closed) so
+ * consumers can render node state without a separate snapshot fetch.
+ * Mirrors RunSnapshot.OutputNode minus the internal-only `transforms`
+ * accumulator and the wire-envelope `event_id`.
+ *
+ * `value` is a cel.expr.Value, matching the internal OutputNode.value
+ * shape. The CEL spec value handles all CEL kinds natively (primitives,
+ * list, map, typed object via object_value Any with type_url); no
+ * lossy intermediate conversion. Clients using cel-spec libraries
+ * decode it the same way they handle any other CEL value.
+ *
  * @generated from message dtkt.flow.v1beta2.OutputEvent
  */
 export type OutputEvent = Message<"dtkt.flow.v1beta2.OutputEvent"> & {
@@ -119,15 +139,62 @@ export type OutputEvent = Message<"dtkt.flow.v1beta2.OutputEvent"> & {
   id: string;
 
   /**
-   * The output value, serialized as a protobuf Any.
+   * The output value (CEL spec value; lossless across all CEL kinds).
    *
-   * @generated from field: google.protobuf.Any value = 2;
+   * @generated from field: cel.expr.Value value = 2;
    */
-  value?: Any;
+  value?: Value;
+
+  /**
+   * Error status if the node encountered a failure on this evaluation.
+   *
+   * @generated from field: google.rpc.Status error = 3;
+   */
+  error?: Status;
+
+  /**
+   * Timestamp of this event.
+   *
+   * @generated from field: google.protobuf.Timestamp event_time = 4;
+   */
+  eventTime?: Timestamp;
+
+  /**
+   * Number of times this output has been evaluated (including this one).
+   *
+   * @generated from field: uint64 eval_count = 5;
+   */
+  evalCount: bigint;
+
+  /**
+   * Whether the output has been closed (no further events expected).
+   *
+   * @generated from field: bool closed = 6;
+   */
+  closed: boolean;
+
+  /**
+   * Current lifecycle phase of this node.
+   *
+   * @generated from field: dtkt.flow.v1beta2.RunSnapshot.Phase phase = 7;
+   */
+  phase: RunSnapshot_Phase;
 };
 
 /**
  * OutputEvent is a result emitted by a specific output node.
+ *
+ * Carries the lean per-event delta: the value the node just produced
+ * plus its lifecycle metadata (eval_count, phase, error, closed) so
+ * consumers can render node state without a separate snapshot fetch.
+ * Mirrors RunSnapshot.OutputNode minus the internal-only `transforms`
+ * accumulator and the wire-envelope `event_id`.
+ *
+ * `value` is a cel.expr.Value, matching the internal OutputNode.value
+ * shape. The CEL spec value handles all CEL kinds natively (primitives,
+ * list, map, typed object via object_value Any with type_url); no
+ * lossy intermediate conversion. Clients using cel-spec libraries
+ * decode it the same way they handle any other CEL value.
  *
  * @generated from message dtkt.flow.v1beta2.OutputEvent
  */
@@ -140,11 +207,46 @@ export type OutputEventValid = Message<"dtkt.flow.v1beta2.OutputEvent"> & {
   id: string;
 
   /**
-   * The output value, serialized as a protobuf Any.
+   * The output value (CEL spec value; lossless across all CEL kinds).
    *
-   * @generated from field: google.protobuf.Any value = 2;
+   * @generated from field: cel.expr.Value value = 2;
    */
-  value: Any;
+  value?: ValueValid;
+
+  /**
+   * Error status if the node encountered a failure on this evaluation.
+   *
+   * @generated from field: google.rpc.Status error = 3;
+   */
+  error?: StatusValid;
+
+  /**
+   * Timestamp of this event.
+   *
+   * @generated from field: google.protobuf.Timestamp event_time = 4;
+   */
+  eventTime?: Timestamp;
+
+  /**
+   * Number of times this output has been evaluated (including this one).
+   *
+   * @generated from field: uint64 eval_count = 5;
+   */
+  evalCount: bigint;
+
+  /**
+   * Whether the output has been closed (no further events expected).
+   *
+   * @generated from field: bool closed = 6;
+   */
+  closed: boolean;
+
+  /**
+   * Current lifecycle phase of this node.
+   *
+   * @generated from field: dtkt.flow.v1beta2.RunSnapshot.Phase phase = 7;
+   */
+  phase: RunSnapshot_Phase;
 };
 
 /**
@@ -153,6 +255,71 @@ export type OutputEventValid = Message<"dtkt.flow.v1beta2.OutputEvent"> & {
  */
 export const OutputEventSchema: GenMessage<OutputEvent, {validType: OutputEventValid}> = /*@__PURE__*/
   messageDesc(file_dtkt_flow_v1beta2_events, 2);
+
+/**
+ * FlowStateEvent is a flow-level state-change delta emitted by the
+ * executor on every flow-level phase transition (PENDING -> RUNNING,
+ * RUNNING -> SUCCEEDED/FAILED/ERRORED/CANCELLED, etc.).
+ *
+ * Replaces the previous "ship the full FlowRun resource on every state
+ * change" passthrough. Consumers maintain client-side state by applying
+ * these deltas; the cold GetFlowRun remains authoritative for full-
+ * resource queries.
+ *
+ * Run identity (name/uid/flow/connections/inputs/timeout/etc.) is NOT
+ * on the event because it is invariant per run and known to the client
+ * from the subscription scope or an initial GetFlowRun. Mirrors the
+ * internal RunSnapshot.FlowState minus the `event_id` (wire envelope
+ * already carries the cursor).
+ *
+ * @generated from message dtkt.flow.v1beta2.FlowStateEvent
+ */
+export type FlowStateEvent = Message<"dtkt.flow.v1beta2.FlowStateEvent"> & {
+  /**
+   * The new flow-level phase.
+   *
+   * @generated from field: dtkt.flow.v1beta2.RunSnapshot.Phase phase = 1;
+   */
+  phase: RunSnapshot_Phase;
+
+  /**
+   * Error status when the flow fails or errors. Populated only on
+   * PHASE_FAILED or PHASE_ERRORED transitions.
+   *
+   * @generated from field: google.rpc.Status error = 2;
+   */
+  error?: Status;
+
+  /**
+   * Timestamp when execution started (set when PENDING -> RUNNING).
+   *
+   * @generated from field: google.protobuf.Timestamp start_time = 3;
+   */
+  startTime?: Timestamp;
+
+  /**
+   * Timestamp when execution ended (set on any terminal phase).
+   *
+   * @generated from field: google.protobuf.Timestamp stop_time = 4;
+   */
+  stopTime?: Timestamp;
+
+  /**
+   * Timestamp of this state change event.
+   *
+   * @generated from field: google.protobuf.Timestamp event_time = 5;
+   */
+  eventTime?: Timestamp;
+};
+
+export type FlowStateEventValid = FlowStateEvent;
+
+/**
+ * Describes the message dtkt.flow.v1beta2.FlowStateEvent.
+ * Use `create(FlowStateEventSchema)` to create a new message.
+ */
+export const FlowStateEventSchema: GenMessage<FlowStateEvent, {validType: FlowStateEventValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta2_events, 3);
 
 /**
  * InteractionRequestEvent is emitted by the executor when an interaction node
@@ -237,7 +404,7 @@ export type InteractionRequestEventValid = Message<"dtkt.flow.v1beta2.Interactio
  * Use `create(InteractionRequestEventSchema)` to create a new message.
  */
 export const InteractionRequestEventSchema: GenMessage<InteractionRequestEvent, {validType: InteractionRequestEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_events, 3);
+  messageDesc(file_dtkt_flow_v1beta2_events, 4);
 
 /**
  * InteractionResponseEvent is sent by the external source in response to an
@@ -262,7 +429,12 @@ export type InteractionResponseEvent = Message<"dtkt.flow.v1beta2.InteractionRes
   token: string;
 
   /**
-   * The response value, serialized as a protobuf Any.
+   * The response value: an Interaction.Response (one typed binding per form
+   * input, keyed by input id), serialized as a protobuf Any. The runtime
+   * exposes it to CEL as `interactions.<id>.value.<input_id>.value`. Typed
+   * bindings (not a generic google.protobuf.Struct) keep every declared field
+   * present, so the access path is robust to how a responder serializes
+   * implicit-presence fields.
    *
    * @generated from field: google.protobuf.Any value = 3;
    */
@@ -301,7 +473,12 @@ export type InteractionResponseEventValid = Message<"dtkt.flow.v1beta2.Interacti
   token: string;
 
   /**
-   * The response value, serialized as a protobuf Any.
+   * The response value: an Interaction.Response (one typed binding per form
+   * input, keyed by input id), serialized as a protobuf Any. The runtime
+   * exposes it to CEL as `interactions.<id>.value.<input_id>.value`. Typed
+   * bindings (not a generic google.protobuf.Struct) keep every declared field
+   * present, so the access path is robust to how a responder serializes
+   * implicit-presence fields.
    *
    * @generated from field: google.protobuf.Any value = 3;
    */
@@ -322,7 +499,7 @@ export type InteractionResponseEventValid = Message<"dtkt.flow.v1beta2.Interacti
  * Use `create(InteractionResponseEventSchema)` to create a new message.
  */
 export const InteractionResponseEventSchema: GenMessage<InteractionResponseEvent, {validType: InteractionResponseEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_events, 4);
+  messageDesc(file_dtkt_flow_v1beta2_events, 5);
 
 /**
  * StopFlowEvent requests a graceful shutdown of the entire flow.
@@ -343,7 +520,7 @@ export type StopFlowEventValid = StopFlowEvent;
  * Use `create(StopFlowEventSchema)` to create a new message.
  */
 export const StopFlowEventSchema: GenMessage<StopFlowEvent, {validType: StopFlowEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_events, 5);
+  messageDesc(file_dtkt_flow_v1beta2_events, 6);
 
 /**
  * TerminateFlowEvent requests an immediate hard cancellation of the flow.
@@ -364,7 +541,7 @@ export type TerminateFlowEventValid = TerminateFlowEvent;
  * Use `create(TerminateFlowEventSchema)` to create a new message.
  */
 export const TerminateFlowEventSchema: GenMessage<TerminateFlowEvent, {validType: TerminateFlowEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_events, 6);
+  messageDesc(file_dtkt_flow_v1beta2_events, 7);
 
 /**
  * SuspendFlowEvent requests suspension of the entire flow.
@@ -388,7 +565,7 @@ export type SuspendFlowEventValid = SuspendFlowEvent;
  * Use `create(SuspendFlowEventSchema)` to create a new message.
  */
 export const SuspendFlowEventSchema: GenMessage<SuspendFlowEvent, {validType: SuspendFlowEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_events, 7);
+  messageDesc(file_dtkt_flow_v1beta2_events, 8);
 
 /**
  * ResumeFlowEvent requests resumption of a suspended or errored flow.
@@ -425,7 +602,7 @@ export type ResumeFlowEventValid = ResumeFlowEvent;
  * Use `create(ResumeFlowEventSchema)` to create a new message.
  */
 export const ResumeFlowEventSchema: GenMessage<ResumeFlowEvent, {validType: ResumeFlowEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_events, 8);
+  messageDesc(file_dtkt_flow_v1beta2_events, 9);
 
 /**
  * StopNodeEvent requests a graceful shutdown of a specific node. The node
@@ -500,7 +677,7 @@ export type StopNodeEventValid = Message<"dtkt.flow.v1beta2.StopNodeEvent"> & {
  * Use `create(StopNodeEventSchema)` to create a new message.
  */
 export const StopNodeEventSchema: GenMessage<StopNodeEvent, {validType: StopNodeEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_events, 9);
+  messageDesc(file_dtkt_flow_v1beta2_events, 10);
 
 /**
  * TerminateNodeEvent requests immediate cancellation of a specific node.
@@ -565,7 +742,7 @@ export type TerminateNodeEventValid = Message<"dtkt.flow.v1beta2.TerminateNodeEv
  * Use `create(TerminateNodeEventSchema)` to create a new message.
  */
 export const TerminateNodeEventSchema: GenMessage<TerminateNodeEvent, {validType: TerminateNodeEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_events, 10);
+  messageDesc(file_dtkt_flow_v1beta2_events, 11);
 
 /**
  * SuspendNodeEvent requests suspension of a specific node.
@@ -620,7 +797,7 @@ export type SuspendNodeEventValid = Message<"dtkt.flow.v1beta2.SuspendNodeEvent"
  * Use `create(SuspendNodeEventSchema)` to create a new message.
  */
 export const SuspendNodeEventSchema: GenMessage<SuspendNodeEvent, {validType: SuspendNodeEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_events, 11);
+  messageDesc(file_dtkt_flow_v1beta2_events, 12);
 
 /**
  * ResumeNodeEvent requests resumption of a specific suspended or errored
@@ -713,7 +890,7 @@ export type ResumeNodeEventValid = Message<"dtkt.flow.v1beta2.ResumeNodeEvent"> 
  * Use `create(ResumeNodeEventSchema)` to create a new message.
  */
 export const ResumeNodeEventSchema: GenMessage<ResumeNodeEvent, {validType: ResumeNodeEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_events, 12);
+  messageDesc(file_dtkt_flow_v1beta2_events, 13);
 
 /**
  * ClearCacheNodeEvent requests that a cache:true node reset its
@@ -770,7 +947,7 @@ export type ClearCacheNodeEventValid = Message<"dtkt.flow.v1beta2.ClearCacheNode
  * Use `create(ClearCacheNodeEventSchema)` to create a new message.
  */
 export const ClearCacheNodeEventSchema: GenMessage<ClearCacheNodeEvent, {validType: ClearCacheNodeEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_events, 13);
+  messageDesc(file_dtkt_flow_v1beta2_events, 14);
 
 /**
  * StartFlowEvent requests the executor to begin executing the flow graph.
@@ -790,5 +967,5 @@ export type StartFlowEventValid = StartFlowEvent;
  * Use `create(StartFlowEventSchema)` to create a new message.
  */
 export const StartFlowEventSchema: GenMessage<StartFlowEvent, {validType: StartFlowEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta2_events, 14);
+  messageDesc(file_dtkt_flow_v1beta2_events, 15);
 

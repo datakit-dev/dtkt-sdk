@@ -2,7 +2,14 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_action_request_from_input
-  description: "Action's request tree references CEL paths into a nested input value"
+  description: >-
+    String input carries a nested structure (`{user: {name, age, address:
+    {city}}}`). The action's request tree pulls each request field via a CEL
+    path drilling into that nested input. The mock connector captures the
+    request; the test asserts the populated scalar fields (name='alice',
+    age=30, city='SF'). Guards that nested-path access in request leaves
+    materializes a correctly-typed request proto, not flattened maps or
+    stringified values.
   inputs:
     - id: x
       string: {}

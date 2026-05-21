@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_retry_multi_escalation
+  description: >-
+    Action declares BOTH skip_when (code-5) AND terminate_when (code-13). The
+    RPC `error.NotFound` returns code 5, so skip_when fires and the item is
+    silently dropped (no error). Guards that when multiple escalation rules are
+    declared, the runtime evaluates each independently and applies the one that
+    matches the actual error code -- here skip takes effect because the error
+    is NotFound, not Internal.
   inputs:
     - id: msg
       int64: {}

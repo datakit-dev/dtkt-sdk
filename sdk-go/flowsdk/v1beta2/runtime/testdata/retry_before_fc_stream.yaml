@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: retry_before_fc_stream
+  description: >-
+    Stream calls error.StreamPermissionDenied (gRPC code 7);
+    retry_strategy.suspend_when fires (intent: SUSPEND); FC.terminate_when=true
+    promotes to flow-wide TERMINATE. Execute returns ErrTerminated; flow
+    terminal state is PHASE_CANCELLED. Stream-side counterpart to
+    retry_before_fc_action.
   inputs:
     - id: msg
       int64: {}

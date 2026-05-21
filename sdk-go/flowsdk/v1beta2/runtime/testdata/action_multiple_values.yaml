@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_multiple_values
+  description: >-
+    Same shape as the basic echo action, but exercised with a sequence of input
+    values (10, 20, 30) to verify the action node fires once per input and
+    emits one output per call -- guarding against accidental batching or value
+    coalescing in the action -> output edge.
   inputs:
     - id: x
       int64: {}

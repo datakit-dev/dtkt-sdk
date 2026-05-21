@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_no_methods
-  description: "Action node without RPC client"
+  description: >-
+    Action declares a call to `echo.Echo` but the test runs the executor
+    without any connectors registered (no WithConnectors option). The runtime
+    fails with a 'no connector' error rather than crashing. Guards that the
+    absence of any RPC clients is reported as a clear configuration error at
+    startup, not a nil-pointer panic mid-call.
   inputs:
     - id: x
       int64: {}

@@ -394,12 +394,23 @@ func TestGraph_Input_Message(t *testing.T) {
 
 		results := collectOutputs(ctx, ps, "outputs.result")
 		require.Len(t, results, 1)
+		// Spec contract: a message-typed input flows through to the output
+		// preserving ALL struct fields. The original test only checked
+		// `name`; a regression that dropped `age` (or any other field)
+		// would have slipped through.
 		fields := results[0].GetValue().GetMapValue().GetEntries()
-		got := make(map[string]string, len(fields))
+		got := make(map[string]*expr.Value, len(fields))
 		for _, e := range fields {
-			got[e.GetKey().GetStringValue()] = e.GetValue().GetStringValue()
+			got[e.GetKey().GetStringValue()] = e.GetValue()
 		}
-		assert.Equal(t, "alice", got["name"])
+		require.Contains(t, got, "name", "name field must be present in output")
+		require.Contains(t, got, "age", "age field must be present in output")
+		assert.Equal(t, "alice", got["name"].GetStringValue(),
+			"name field must round-trip unchanged")
+		// structpb encodes all JSON numbers as double, so age=42 surfaces
+		// as a DoubleValue downstream.
+		assert.Equal(t, float64(42), got["age"].GetDoubleValue(),
+			"age field must round-trip (structpb numbers surface as doubles)")
 	})
 }
 

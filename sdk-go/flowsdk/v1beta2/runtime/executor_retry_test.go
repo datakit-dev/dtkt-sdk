@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cenkalti/backoff/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -368,7 +369,10 @@ func TestGraph_Action_NoRetryStrategy(t *testing.T) {
 
 // Unit test: backoffDelay computation.
 
-func TestBackoffDelay(t *testing.T) {
+// The delay schedule is now produced by cenkalti via newExponential.
+// With jitter unset (RandomizationFactor 0) it must reproduce the exact
+// sequence the prior hand-rolled backoffDelay returned.
+func TestRetryBackOff_Sequence(t *testing.T) {
 	b := flowv1beta2.Backoff_builder{
 		InitialBackoff:    durationpb.New(100 * time.Millisecond),
 		BackoffMultiplier: 2.0,
@@ -376,29 +380,66 @@ func TestBackoffDelay(t *testing.T) {
 		MaxAttempts:       5,
 	}.Build()
 
-	// attempt 1: 100ms * 2^0 = 100ms
-	assert.Equal(t, 100*time.Millisecond, backoffDelay(b, 1))
-	// attempt 2: 100ms * 2^1 = 200ms
-	assert.Equal(t, 200*time.Millisecond, backoffDelay(b, 2))
-	// attempt 3: 100ms * 2^2 = 400ms
-	assert.Equal(t, 400*time.Millisecond, backoffDelay(b, 3))
-	// attempt 4: 100ms * 2^3 = 800ms, capped at 500ms
-	assert.Equal(t, 500*time.Millisecond, backoffDelay(b, 4))
+	bo := newExponential(b)
+	assert.Equal(t, 100*time.Millisecond, bo.NextBackOff()) // 100 * 2^0
+	assert.Equal(t, 200*time.Millisecond, bo.NextBackOff()) // 100 * 2^1
+	assert.Equal(t, 400*time.Millisecond, bo.NextBackOff()) // 100 * 2^2
+	assert.Equal(t, 500*time.Millisecond, bo.NextBackOff()) // 800 capped at 500
 }
 
-func TestBackoffDelay_DefaultMultiplier(t *testing.T) {
+func TestRetryBackOff_DefaultMultiplier(t *testing.T) {
 	b := flowv1beta2.Backoff_builder{
 		InitialBackoff: durationpb.New(50 * time.Millisecond),
 		MaxAttempts:    3,
 	}.Build()
 
 	// multiplier defaults to 2 when < 1
-	assert.Equal(t, 50*time.Millisecond, backoffDelay(b, 1))
-	assert.Equal(t, 100*time.Millisecond, backoffDelay(b, 2))
+	bo := newExponential(b)
+	assert.Equal(t, 50*time.Millisecond, bo.NextBackOff())
+	assert.Equal(t, 100*time.Millisecond, bo.NextBackOff())
 }
 
-func TestBackoffDelay_NilBackoff(t *testing.T) {
-	assert.Equal(t, time.Duration(0), backoffDelay(nil, 1))
+// nil backoff => single attempt, no retry: the budget is spent before
+// the first NextBackOff returns a real delay.
+func TestRetryBackOff_NilNoRetry(t *testing.T) {
+	assert.Equal(t, backoff.Stop, newRetryBackOff(nil).NextBackOff())
+}
+
+// max_attempts is the total attempt count: WithMaxRetries yields
+// (max_attempts-1) real delays, then Stop.
+func TestRetryBackOff_MaxAttemptsBudget(t *testing.T) {
+	b := flowv1beta2.Backoff_builder{
+		InitialBackoff: durationpb.New(1 * time.Millisecond),
+		MaxAttempts:    3, // 3 total attempts => 2 retry delays, then Stop
+	}.Build()
+
+	bo := newRetryBackOff(b)
+	assert.NotEqual(t, backoff.Stop, bo.NextBackOff())
+	assert.NotEqual(t, backoff.Stop, bo.NextBackOff())
+	assert.Equal(t, backoff.Stop, bo.NextBackOff())
+}
+
+// Jitter (the new field) randomizes each delay within +/- jitter of the
+// nominal value. With jitter 0.5 the first delay (nominal 100ms) lands
+// in [50ms, 150ms] and actually varies across samples.
+func TestRetryBackOff_Jitter(t *testing.T) {
+	b := flowv1beta2.Backoff_builder{
+		InitialBackoff:    durationpb.New(100 * time.Millisecond),
+		BackoffMultiplier: 2.0,
+		MaxAttempts:       5,
+		Jitter:            0.5,
+	}.Build()
+
+	varied := false
+	for range 50 {
+		d := newExponential(b).NextBackOff()
+		require.GreaterOrEqual(t, d, 50*time.Millisecond)
+		require.LessOrEqual(t, d, 150*time.Millisecond)
+		if d != 100*time.Millisecond {
+			varied = true
+		}
+	}
+	assert.True(t, varied, "jitter should randomize the delay")
 }
 
 // --- continue_when ---

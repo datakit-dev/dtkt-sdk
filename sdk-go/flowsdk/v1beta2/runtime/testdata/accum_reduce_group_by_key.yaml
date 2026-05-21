@@ -2,6 +2,16 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: reduce_group_by_key
+  description: >-
+    GroupBy KEY reduce (spec: Transform.Reduce.group_by.key). int64 inputs
+    bucketed by even/odd parity; feeding 1..6 yields two per-key sums:
+    even=2+4+6=12, odd=1+3+5=9. The load-bearing guard is per-key
+    partitioning -- group_by.key IS implemented (a broken key would emit a
+    single sum of 21, not two results). The `window.event.when:
+    inputs.x.closed` gate coincides with stream EOF, so the event-window
+    aspect is NOT independently verified here (Gap 1: runtime ignores
+    group_by.window). See accum_reduce_group_by_event_multi.yaml for
+    non-vacuous key+event-window gating.
   inputs:
     - id: x
       int64: {}

@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_action_throttle_stop
-  description: "NC.stop_when on a throttled Action; verifies throttle wait honors stopCh"
+  description: >-
+    Action with throttle (count=1 per 1s) and node_control.stop_when=true. The
+    throttle limiter holds the second invocation for a full second; NC stop
+    must wake the throttle wait so the handler exits at its next safe point
+    instead of blocking for the full interval. Guards that throttle wait
+    selects on stopCh.
   inputs:
     - id: msg
       int64: {}

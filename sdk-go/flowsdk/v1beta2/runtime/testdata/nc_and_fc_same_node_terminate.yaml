@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_and_fc_same_node_terminate
+  description: >-
+    Var declares both flow_control.terminate_when=true and
+    node_control.terminate_when=true. NC fires first per ordering contract:
+    TerminateNode publishes PHASE_CANCELLED on the var topic before FC's runCtx
+    cancel surfaces ErrTerminated. Execute returns ErrTerminated; var topic
+    must contain PHASE_CANCELLED. Guards NC-then-FC ordering for terminate
+    branches.
   inputs:
     - id: x
       int64: {}

@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_bool_filter_true
-  description: "Bool input with filter transform keeping only true values"
+  description: >-
+    Bool input with a filter transform keeping only true values. Feeding true,
+    false, true, false yields exactly 2 true outputs. Guards that input-level
+    filtering works on bool-typed values.
   inputs:
     - id: x
       bool: {}

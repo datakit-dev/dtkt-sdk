@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stop_generator_action
+  description: >-
+    A range generator producing 1..100 feeds an action that always errors
+    (error.Internal). Used by the lifecycle suite to exercise STOP-strategy
+    graceful drain: when the action errors, the executor signals stop, drains
+    in-flight generator events, then returns the error rather than terminating
+    immediately. Guards that STOP cancels the long-running generator promptly
+    and the flow exits cleanly with the underlying error.
   generators:
     - id: gen
       range:

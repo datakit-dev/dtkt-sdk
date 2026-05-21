@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_retry_skip
+  description: >-
+    Action with skip_when=code-5 (NotFound). The RPC `error.NotFound` returns
+    code 5; skip_when matches, the item is dropped silently, no error is
+    propagated and no output is produced. Guards that skip_when consumes the
+    input without surfacing an error and without emitting a downstream value.
   inputs:
     - id: msg
       int64: {}

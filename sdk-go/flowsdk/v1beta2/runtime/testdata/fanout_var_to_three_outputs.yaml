@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fanout_var_to_three_outputs
-  description: "Input to var to three outputs with different transforms"
+  description: >-
+    Input -> intermediate var (adds 100) -> three outputs, each applying its
+    own transform: raw (no transform), doubled (*2), filtered (>103). Feeding
+    1, 2, 5 yields raw=[101, 102, 105], doubled=[202, 204, 210], filtered=[105]
+    (only 105 passes >103). Guards that one intermediate var can drive multiple
+    consumers, each with its own per-output transform pipeline.
   inputs:
     - id: x
       int64: {}

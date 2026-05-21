@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_bidi_deadline
+  description: >-
+    Bidi stream calls error.BidiDeadline -- a mock method (mock_rpc_test.go)
+    that accepts one recv and then synthesizes a DeadlineExceeded (code 4)
+    error. No actual deadline timer is involved; the mock returns the error
+    code unconditionally after the first message. Guards that a bidi RPC
+    returning DeadlineExceeded surfaces a clean error containing "deadline
+    exceeded" rather than hanging the handler or producing partial output.
   inputs:
     - id: msg
       int64: {}

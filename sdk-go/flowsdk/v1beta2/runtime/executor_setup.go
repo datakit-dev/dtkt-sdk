@@ -811,7 +811,7 @@ func startInteractionDemux(
 						slog.String("node", evt.GetId()))
 					continue
 				}
-				val := &expr.Value{Kind: &expr.Value_ObjectValue{ObjectValue: evt.GetValue()}}
+				val := h.responseValue(evt.GetValue())
 				if !h.TryDeliver(evt.GetToken(), val) {
 					slog.Warn("dropping interaction response with invalid token",
 						slog.String("node", evt.GetId()),

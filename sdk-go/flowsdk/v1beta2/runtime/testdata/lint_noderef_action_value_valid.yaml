@@ -1,0 +1,29 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_noderef_action_value_valid
+  description: >-
+    Two outputs reach into the action's response correctly:
+    `actions.run.value.payload` (top-level field) and
+    `actions.run.value.nested.value` (nested submessage field). With a
+    resolver, lint must produce zero diagnostics. Happy-path guard for the
+    node-ref selector chain walker.
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: x
+      string: {}
+  actions:
+    - id: run
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request:
+          name: "= inputs.x.value"
+  outputs:
+    - id: good
+      value: "= actions.run.value.payload"
+    - id: good_nested
+      value: "= actions.run.value.nested.value"

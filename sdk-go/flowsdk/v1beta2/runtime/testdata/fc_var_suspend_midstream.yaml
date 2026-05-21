@@ -2,11 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_var_suspend_midstream
-  description: |
-    Range generator emits 1..10. Var doubles each value with FC.suspend_when
-    that fires when the third value (6) lands. Tests that suspend pauses
-    the flow mid-stream while values are still queued, and resume drains
-    the remaining values cleanly.
+  description: >-
+    Range generator emits 1..10 paced at 1ms intervals; var doubles each value
+    with suspend_when triggered when the generator's value reaches 3. The test
+    asserts that suspend pauses the flow mid-stream (more values queued behind
+    the trigger), then resumes and drains the rest. Guards that suspend works
+    in the middle of an active stream rather than only at the leading edge.
   generators:
     - id: seq
       range:

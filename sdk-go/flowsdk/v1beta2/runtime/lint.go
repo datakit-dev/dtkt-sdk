@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/google/cel-go/cel"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -55,6 +56,14 @@ func Lint(graph *flowv1beta2.Graph, resolvers ...map[string]shared.Resolver) *Li
 			diags = append(diags, *d)
 		}
 	}
+
+	// P14: node-ref selector chain validation. Walks every CEL expression's
+	// AST, finds `<category>.<id>.<chain>` patterns, validates the wrapper
+	// field against the per-category whitelist and (for `.value`) walks the
+	// remaining chain against the resolved proto descriptor. Only runs when
+	// resolvers are available -- emits nothing on the conns-absent path.
+	// See lintNodeRefChains for the full validation contract.
+	diags = append(diags, lintNodeRefChains(graph, resolverMap, celEnv)...)
 
 	// Warn for orphaned nodes (no consumers) that don't have side effects.
 	consumed := make(map[string]bool, len(graph.GetEdges()))
@@ -292,7 +301,7 @@ func lintMethodCall(call *flowv1beta2.MethodCall, resolvers map[string]shared.Re
 		})
 	}
 	if call.GetRequest() != nil {
-		diags = append(diags, lintRequestTree(call.GetRequest(), "request")...)
+		diags = append(diags, lintRequestTree(call.GetRequest(), "request", env)...)
 	}
 	if resp := call.GetResponse(); resp != "" {
 		if _, err := parseCEL(resp); err != nil {
@@ -302,6 +311,8 @@ func lintMethodCall(call *flowv1beta2.MethodCall, resolvers map[string]shared.Re
 				Message:  err.Error(),
 				Code:     CodeInvalidCEL,
 			})
+		} else if resolvers != nil && call.GetConnection() != "" && call.GetMethod() != "" {
+			diags = append(diags, lintResponseSchema(call, resolvers, resp)...)
 		}
 	}
 
@@ -312,6 +323,53 @@ func lintMethodCall(call *flowv1beta2.MethodCall, resolvers map[string]shared.Re
 	}
 
 	return diags
+}
+
+// lintResponseSchema type-checks a `call.response` CEL expression against the
+// method's response message descriptor. When the resolver yields the method
+// descriptor, it builds a response-typed env (where `this` is `md.Output()`)
+// and asks CEL to Compile the expression; CEL's own type checker rejects
+// unknown field accesses on `this.response`. This is the symmetric analogue
+// of the existing request-tree descriptor walk, but uses CEL native typing
+// (one expression, one input context) rather than a hand-rolled walker.
+//
+// Only emits when the method + response type resolve; the conns-absent path
+// is unchanged so most lint invocations see no new behavior.
+func lintResponseSchema(call *flowv1beta2.MethodCall, resolvers map[string]shared.Resolver, expression string) []LintDiagnostic {
+	resolver, ok := resolvers[call.GetConnection()]
+	if !ok {
+		return nil
+	}
+	md, err := resolver.FindMethodByName(protoreflect.FullName(call.GetMethod()))
+	if err != nil {
+		return nil
+	}
+	src, ok := shared.IsValidExpr(expression)
+	if !ok {
+		return nil
+	}
+	env, err := buildLintResponseEnv(resolver, md)
+	if err != nil {
+		return nil
+	}
+	_, issues := env.Compile(src)
+	if issues == nil || issues.Err() == nil {
+		return nil
+	}
+	msg := issues.Err().Error()
+	code := CodeTypeMismatch
+	// CEL's "undefined field" wording surfaces unknown-field accesses;
+	// classify it accordingly so consumers can distinguish from generic
+	// type mismatches. (Falls back to CodeTypeMismatch otherwise.)
+	if strings.Contains(msg, "undefined field") || strings.Contains(msg, "no such field") {
+		code = CodeUnknownField
+	}
+	return []LintDiagnostic{{
+		Severity: SeverityError,
+		Path:     "response",
+		Message:  fmt.Sprintf("response: %s", msg),
+		Code:     code,
+	}}
 }
 
 // lintNodeConnection validates that action/stream call.connection references a
@@ -380,6 +438,20 @@ func lintRequestSchema(v *structpb.Value, md protoreflect.MessageDescriptor, pat
 							Severity: SeverityError,
 							Path:     path,
 							Message:  fmt.Sprintf("CEL expression returns %s, expected message %s", cel.FormatCELType(outType), md.FullName()),
+							Code:     CodeTypeMismatch,
+						}}
+					}
+					// Identity check when CEL inferred a concrete struct type:
+					// the expression must return the SAME proto message as the
+					// field, not just any struct. Catches `request: "= someOtherProtoCtor()"`
+					// where the kind is right but the type is wrong. `MapKind` is
+					// the loose case (CEL's map(string,dyn) is the default for
+					// unknown shapes) - cannot identity-check.
+					if kind == cel.StructKind && outType.TypeName() != string(md.FullName()) {
+						return []LintDiagnostic{{
+							Severity: SeverityError,
+							Path:     path,
+							Message:  fmt.Sprintf("CEL expression returns %s, expected message %s", outType.TypeName(), md.FullName()),
 							Code:     CodeTypeMismatch,
 						}}
 					}
@@ -456,7 +528,7 @@ func lintFieldValue(v *structpb.Value, fd protoreflect.FieldDescriptor, path str
 							Code:     CodeTypeMismatch,
 						}}
 					}
-					if !fd.IsList() && !fd.IsMap() && !isCELTypeCompatibleWithProtoKind(kind, fd.Kind()) {
+					if !fd.IsList() && !fd.IsMap() && !isCELTypeCompatibleWithProtoField(kind, fd) {
 						return []LintDiagnostic{{
 							Severity: SeverityError,
 							Path:     path,
@@ -523,7 +595,7 @@ func lintScalarFieldValue(v *structpb.Value, fd protoreflect.FieldDescriptor, pa
 			if env != nil {
 				outType := checkCELOutputType(env, sv.StringValue)
 				if outType != nil && outType.Kind() != cel.NullTypeKind {
-					if !isCELTypeCompatibleWithProtoKind(outType.Kind(), fd.Kind()) {
+					if !isCELTypeCompatibleWithProtoField(outType.Kind(), fd) {
 						return []LintDiagnostic{{
 							Severity: SeverityError,
 							Path:     path,
@@ -541,7 +613,7 @@ func lintScalarFieldValue(v *structpb.Value, fd protoreflect.FieldDescriptor, pa
 
 	switch v.GetKind().(type) {
 	case *structpb.Value_StringValue:
-		if !isStringCompatibleKind(kind) {
+		if !isCELTypeCompatibleWithProtoField(cel.StringKind, fd) {
 			return []LintDiagnostic{{
 				Severity: SeverityError,
 				Path:     path,
@@ -551,7 +623,7 @@ func lintScalarFieldValue(v *structpb.Value, fd protoreflect.FieldDescriptor, pa
 		}
 
 	case *structpb.Value_NumberValue:
-		if !isNumberCompatibleKind(kind) {
+		if !isCELTypeCompatibleWithProtoField(cel.DoubleKind, fd) {
 			return []LintDiagnostic{{
 				Severity: SeverityError,
 				Path:     path,
@@ -561,7 +633,7 @@ func lintScalarFieldValue(v *structpb.Value, fd protoreflect.FieldDescriptor, pa
 		}
 
 	case *structpb.Value_BoolValue:
-		if kind != protoreflect.BoolKind {
+		if !isCELTypeCompatibleWithProtoField(cel.BoolKind, fd) {
 			return []LintDiagnostic{{
 				Severity: SeverityError,
 				Path:     path,
@@ -571,7 +643,7 @@ func lintScalarFieldValue(v *structpb.Value, fd protoreflect.FieldDescriptor, pa
 		}
 
 	case *structpb.Value_StructValue:
-		if kind != protoreflect.MessageKind && kind != protoreflect.GroupKind {
+		if !isCELTypeCompatibleWithProtoField(cel.StructKind, fd) {
 			return []LintDiagnostic{{
 				Severity: SeverityError,
 				Path:     path,
@@ -579,7 +651,15 @@ func lintScalarFieldValue(v *structpb.Value, fd protoreflect.FieldDescriptor, pa
 				Code:     CodeTypeMismatch,
 			}}
 		}
-		return lintRequestSchema(v, fd.Message(), path, env)
+		// Only recurse into a nested-message lint when the field is a concrete
+		// proto message (not a dynamic WKT wrapper). google.protobuf.Value /
+		// Struct / ListValue accept arbitrary content -- we cannot lint their
+		// fields against a fixed schema.
+		if kind == protoreflect.MessageKind || kind == protoreflect.GroupKind {
+			if !isDynamicWKT(fd) {
+				return lintRequestSchema(v, fd.Message(), path, env)
+			}
+		}
 
 	case *structpb.Value_ListValue:
 		return []LintDiagnostic{{
@@ -647,8 +727,68 @@ func valueKindName(v *structpb.Value) string {
 	return "unknown"
 }
 
+// isDynamicWKT reports whether a MessageKind field points at a well-known
+// dynamic-type wrapper (Value/Struct/ListValue) whose internal shape is not
+// a fixed schema the lint can recurse into.
+func isDynamicWKT(fd protoreflect.FieldDescriptor) bool {
+	if fd.Kind() != protoreflect.MessageKind && fd.Kind() != protoreflect.GroupKind {
+		return false
+	}
+	switch fd.Message().FullName() {
+	case "google.protobuf.Value", "google.protobuf.Struct", "google.protobuf.ListValue":
+		return true
+	}
+	return false
+}
+
+// isCELTypeCompatibleWithProtoField checks whether a CEL type kind is compatible
+// with a proto field for assignment purposes. Takes the FieldDescriptor (rather
+// than just the Kind) so it can recognize well-known dynamic-type wrappers
+// (google.protobuf.Value/Struct/ListValue, BoolValue/StringValue/Int64Value/etc.)
+// which accept any compatible CEL type even though they are MessageKind.
+func isCELTypeCompatibleWithProtoField(celKind cel.Kind, fd protoreflect.FieldDescriptor) bool {
+	protoKind := fd.Kind()
+	// Well-known wrappers are MessageKind on the wire but semantically accept
+	// scalars (and Value/Struct/ListValue accept arbitrary CEL types).
+	if protoKind == protoreflect.MessageKind {
+		switch fd.Message().FullName() {
+		case "google.protobuf.Value":
+			// Dynamic JSON-value: accepts null/bool/number/string/struct/list.
+			return true
+		case "google.protobuf.Struct":
+			return celKind == cel.MapKind || celKind == cel.StructKind || celKind == cel.NullTypeKind
+		case "google.protobuf.ListValue":
+			return celKind == cel.ListKind || celKind == cel.NullTypeKind
+		case "google.protobuf.BoolValue":
+			return celKind == cel.BoolKind || celKind == cel.NullTypeKind
+		case "google.protobuf.StringValue":
+			return celKind == cel.StringKind || celKind == cel.NullTypeKind
+		case "google.protobuf.BytesValue":
+			return celKind == cel.BytesKind || celKind == cel.StringKind || celKind == cel.NullTypeKind
+		case "google.protobuf.Int32Value", "google.protobuf.Int64Value",
+			"google.protobuf.UInt32Value", "google.protobuf.UInt64Value",
+			"google.protobuf.FloatValue", "google.protobuf.DoubleValue":
+			return celKind == cel.IntKind || celKind == cel.UintKind || celKind == cel.DoubleKind || celKind == cel.NullTypeKind
+		case "google.protobuf.Duration", "google.protobuf.Timestamp":
+			// Proto JSON encodes Duration as "1.5s" / Timestamp as RFC3339
+			// strings; YAML callers and CEL expressions write the string form.
+			return celKind == cel.StringKind || celKind == cel.NullTypeKind
+		case "google.protobuf.Empty":
+			return celKind == cel.NullTypeKind || celKind == cel.StructKind
+		case "google.protobuf.Any":
+			// Any can hold an arbitrary typed proto; the lint cannot
+			// statically prove the inner type matches, so accept anything
+			// and rely on runtime unmarshal errors.
+			return true
+		}
+	}
+	return isCELTypeCompatibleWithProtoKind(celKind, protoKind)
+}
+
 // isCELTypeCompatibleWithProtoKind checks whether a CEL type kind is compatible
-// with a proto field kind for assignment purposes.
+// with a proto field kind for assignment purposes. Does not know about
+// well-known wrappers -- callers that have the FieldDescriptor should prefer
+// isCELTypeCompatibleWithProtoField.
 func isCELTypeCompatibleWithProtoKind(celKind cel.Kind, protoKind protoreflect.Kind) bool {
 	switch celKind {
 	case cel.BoolKind:

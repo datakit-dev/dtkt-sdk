@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_valid_connection_package
+  description: >-
+    Connection declared via the `package` oneof branch (`my_pkg@1.0.0`); action
+    references it cleanly. Lint must produce zero diagnostics. Guards the
+    package-branch of the Connection oneof so neither branch regresses the
+    other.
   connections:
     - id: myconn
       package:

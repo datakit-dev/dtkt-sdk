@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fanout_wide
-  description: "Single input to many outputs"
+  description: >-
+    Single input feeds four outputs: identity (no transform), doubled (*2),
+    squared (n*n), negated (*-1). Feeding 3 yields 3, 6, 9, -3 respectively.
+    Guards that wide fan-out (one source -> many consumers) works without any
+    consumer interfering with another's transform pipeline and that each output
+    receives its derived value cleanly.
   inputs:
     - id: x
       int64: {}

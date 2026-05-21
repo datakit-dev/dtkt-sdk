@@ -1,0 +1,39 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: interaction_zero_binding
+  description: >-
+    Regression fixture for a zero-valued interaction binding. A blank text
+    input is an InputBinding{value:""} (the proto3 zero). The output reads
+    `interactions.ask.value.note.value`; with the typed-binding response wire
+    shape (Interaction.Response, one typed Any per input), that field is always
+    present, so the access resolves to "" and the run completes -- it cannot
+    regress to the "no such key: value" error a generic-Struct encoding could
+    produce by dropping zero-valued fields. The interaction's title CEL
+    references the ticker so it is gated one-prompt-per-tick (mirrors
+    interaction_ticker_only_repro), and a var stop_when bounds the run to
+    maxIters iterations.
+  inputs:
+    - id: maxIters
+      uint64:
+        default: 3
+      cache: true
+  generators:
+    - id: tick
+      ticker:
+        interval: 0.05s
+  vars:
+    - id: gate
+      value: "= 0"
+      flow_control:
+        stop_when: "= generators.tick.eval_count >= int(inputs.maxIters.value)"
+  interactions:
+    - id: ask
+      inputs:
+        - id: note
+          title: |
+            = "tick " + string(generators.tick.value) + ": note?"
+          input: {}
+  outputs:
+    - id: echo
+      value: "= interactions.ask.value.note.value"

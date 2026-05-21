@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: gen_ticker
+  description: >-
+    Ticker generator firing every 50ms, with stop_when at eval_count >= 5. The
+    ticker's default value is its monotonic eval_count. Result: [1, 2, 3, 4,
+    5]. Guards that a ticker without an explicit value expression emits the
+    count and that the stop_when guard correctly bounds the run.
   generators:
     - id: tick
       ticker:

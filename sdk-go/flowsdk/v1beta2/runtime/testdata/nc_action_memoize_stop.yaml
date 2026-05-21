@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_action_memoize_stop
-  description: "NC.stop_when on an Action with memoize cache enabled"
+  description: >-
+    Action with memoize:true and node_control.stop_when=inputs.msg.value>=3.
+    memoize caches each result per-input request key; NC stops the action
+    gracefully at the trigger value. Guards that NC stop coexists with memoize
+    -- the action handler exits cleanly at the next safe point, and the memoize
+    cache doesn't prevent the stop signal.
   inputs:
     - id: msg
       int64: {}

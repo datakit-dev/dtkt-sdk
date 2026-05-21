@@ -10,9 +10,12 @@ package flowv1beta2
 
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
+	expr "cel.dev/expr"
+	status "google.golang.org/genproto/googleapis/rpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	anypb "google.golang.org/protobuf/types/known/anypb"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	unsafe "unsafe"
 )
@@ -174,12 +177,34 @@ func (b0 InputRequestEvent_builder) Build() *InputRequestEvent {
 }
 
 // OutputEvent is a result emitted by a specific output node.
+//
+// Carries the lean per-event delta: the value the node just produced
+// plus its lifecycle metadata (eval_count, phase, error, closed) so
+// consumers can render node state without a separate snapshot fetch.
+// Mirrors RunSnapshot.OutputNode minus the internal-only `transforms`
+// accumulator and the wire-envelope `event_id`.
+//
+// `value` is a cel.expr.Value, matching the internal OutputNode.value
+// shape. The CEL spec value handles all CEL kinds natively (primitives,
+// list, map, typed object via object_value Any with type_url); no
+// lossy intermediate conversion. Clients using cel-spec libraries
+// decode it the same way they handle any other CEL value.
 type OutputEvent struct {
 	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Output node ID that produced the value.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// The output value, serialized as a protobuf Any.
-	Value         *anypb.Any `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+	// The output value (CEL spec value; lossless across all CEL kinds).
+	Value *expr.Value `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+	// Error status if the node encountered a failure on this evaluation.
+	Error *status.Status `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`
+	// Timestamp of this event.
+	EventTime *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=event_time,json=eventTime,proto3" json:"event_time,omitempty"`
+	// Number of times this output has been evaluated (including this one).
+	EvalCount uint64 `protobuf:"varint,5,opt,name=eval_count,json=evalCount,proto3" json:"eval_count,omitempty"`
+	// Whether the output has been closed (no further events expected).
+	Closed bool `protobuf:"varint,6,opt,name=closed,proto3" json:"closed,omitempty"`
+	// Current lifecycle phase of this node.
+	Phase         RunSnapshot_Phase `protobuf:"varint,7,opt,name=phase,proto3,enum=dtkt.flow.v1beta2.RunSnapshot_Phase" json:"phase,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -216,19 +241,74 @@ func (x *OutputEvent) GetId() string {
 	return ""
 }
 
-func (x *OutputEvent) GetValue() *anypb.Any {
+func (x *OutputEvent) GetValue() *expr.Value {
 	if x != nil {
 		return x.Value
 	}
 	return nil
 }
 
+func (x *OutputEvent) GetError() *status.Status {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+func (x *OutputEvent) GetEventTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EventTime
+	}
+	return nil
+}
+
+func (x *OutputEvent) GetEvalCount() uint64 {
+	if x != nil {
+		return x.EvalCount
+	}
+	return 0
+}
+
+func (x *OutputEvent) GetClosed() bool {
+	if x != nil {
+		return x.Closed
+	}
+	return false
+}
+
+func (x *OutputEvent) GetPhase() RunSnapshot_Phase {
+	if x != nil {
+		return x.Phase
+	}
+	return RunSnapshot_PHASE_UNSPECIFIED
+}
+
 func (x *OutputEvent) SetId(v string) {
 	x.Id = v
 }
 
-func (x *OutputEvent) SetValue(v *anypb.Any) {
+func (x *OutputEvent) SetValue(v *expr.Value) {
 	x.Value = v
+}
+
+func (x *OutputEvent) SetError(v *status.Status) {
+	x.Error = v
+}
+
+func (x *OutputEvent) SetEventTime(v *timestamppb.Timestamp) {
+	x.EventTime = v
+}
+
+func (x *OutputEvent) SetEvalCount(v uint64) {
+	x.EvalCount = v
+}
+
+func (x *OutputEvent) SetClosed(v bool) {
+	x.Closed = v
+}
+
+func (x *OutputEvent) SetPhase(v RunSnapshot_Phase) {
+	x.Phase = v
 }
 
 func (x *OutputEvent) HasValue() bool {
@@ -238,8 +318,30 @@ func (x *OutputEvent) HasValue() bool {
 	return x.Value != nil
 }
 
+func (x *OutputEvent) HasError() bool {
+	if x == nil {
+		return false
+	}
+	return x.Error != nil
+}
+
+func (x *OutputEvent) HasEventTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.EventTime != nil
+}
+
 func (x *OutputEvent) ClearValue() {
 	x.Value = nil
+}
+
+func (x *OutputEvent) ClearError() {
+	x.Error = nil
+}
+
+func (x *OutputEvent) ClearEventTime() {
+	x.EventTime = nil
 }
 
 type OutputEvent_builder struct {
@@ -247,8 +349,18 @@ type OutputEvent_builder struct {
 
 	// Output node ID that produced the value.
 	Id string
-	// The output value, serialized as a protobuf Any.
-	Value *anypb.Any
+	// The output value (CEL spec value; lossless across all CEL kinds).
+	Value *expr.Value
+	// Error status if the node encountered a failure on this evaluation.
+	Error *status.Status
+	// Timestamp of this event.
+	EventTime *timestamppb.Timestamp
+	// Number of times this output has been evaluated (including this one).
+	EvalCount uint64
+	// Whether the output has been closed (no further events expected).
+	Closed bool
+	// Current lifecycle phase of this node.
+	Phase RunSnapshot_Phase
 }
 
 func (b0 OutputEvent_builder) Build() *OutputEvent {
@@ -257,6 +369,194 @@ func (b0 OutputEvent_builder) Build() *OutputEvent {
 	_, _ = b, x
 	x.Id = b.Id
 	x.Value = b.Value
+	x.Error = b.Error
+	x.EventTime = b.EventTime
+	x.EvalCount = b.EvalCount
+	x.Closed = b.Closed
+	x.Phase = b.Phase
+	return m0
+}
+
+// FlowStateEvent is a flow-level state-change delta emitted by the
+// executor on every flow-level phase transition (PENDING -> RUNNING,
+// RUNNING -> SUCCEEDED/FAILED/ERRORED/CANCELLED, etc.).
+//
+// Replaces the previous "ship the full FlowRun resource on every state
+// change" passthrough. Consumers maintain client-side state by applying
+// these deltas; the cold GetFlowRun remains authoritative for full-
+// resource queries.
+//
+// Run identity (name/uid/flow/connections/inputs/timeout/etc.) is NOT
+// on the event because it is invariant per run and known to the client
+// from the subscription scope or an initial GetFlowRun. Mirrors the
+// internal RunSnapshot.FlowState minus the `event_id` (wire envelope
+// already carries the cursor).
+type FlowStateEvent struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// The new flow-level phase.
+	Phase RunSnapshot_Phase `protobuf:"varint,1,opt,name=phase,proto3,enum=dtkt.flow.v1beta2.RunSnapshot_Phase" json:"phase,omitempty"`
+	// Error status when the flow fails or errors. Populated only on
+	// PHASE_FAILED or PHASE_ERRORED transitions.
+	Error *status.Status `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	// Timestamp when execution started (set when PENDING -> RUNNING).
+	StartTime *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	// Timestamp when execution ended (set on any terminal phase).
+	StopTime *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=stop_time,json=stopTime,proto3" json:"stop_time,omitempty"`
+	// Timestamp of this state change event.
+	EventTime     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=event_time,json=eventTime,proto3" json:"event_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FlowStateEvent) Reset() {
+	*x = FlowStateEvent{}
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FlowStateEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlowStateEvent) ProtoMessage() {}
+
+func (x *FlowStateEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *FlowStateEvent) GetPhase() RunSnapshot_Phase {
+	if x != nil {
+		return x.Phase
+	}
+	return RunSnapshot_PHASE_UNSPECIFIED
+}
+
+func (x *FlowStateEvent) GetError() *status.Status {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+func (x *FlowStateEvent) GetStartTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartTime
+	}
+	return nil
+}
+
+func (x *FlowStateEvent) GetStopTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StopTime
+	}
+	return nil
+}
+
+func (x *FlowStateEvent) GetEventTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EventTime
+	}
+	return nil
+}
+
+func (x *FlowStateEvent) SetPhase(v RunSnapshot_Phase) {
+	x.Phase = v
+}
+
+func (x *FlowStateEvent) SetError(v *status.Status) {
+	x.Error = v
+}
+
+func (x *FlowStateEvent) SetStartTime(v *timestamppb.Timestamp) {
+	x.StartTime = v
+}
+
+func (x *FlowStateEvent) SetStopTime(v *timestamppb.Timestamp) {
+	x.StopTime = v
+}
+
+func (x *FlowStateEvent) SetEventTime(v *timestamppb.Timestamp) {
+	x.EventTime = v
+}
+
+func (x *FlowStateEvent) HasError() bool {
+	if x == nil {
+		return false
+	}
+	return x.Error != nil
+}
+
+func (x *FlowStateEvent) HasStartTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.StartTime != nil
+}
+
+func (x *FlowStateEvent) HasStopTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.StopTime != nil
+}
+
+func (x *FlowStateEvent) HasEventTime() bool {
+	if x == nil {
+		return false
+	}
+	return x.EventTime != nil
+}
+
+func (x *FlowStateEvent) ClearError() {
+	x.Error = nil
+}
+
+func (x *FlowStateEvent) ClearStartTime() {
+	x.StartTime = nil
+}
+
+func (x *FlowStateEvent) ClearStopTime() {
+	x.StopTime = nil
+}
+
+func (x *FlowStateEvent) ClearEventTime() {
+	x.EventTime = nil
+}
+
+type FlowStateEvent_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The new flow-level phase.
+	Phase RunSnapshot_Phase
+	// Error status when the flow fails or errors. Populated only on
+	// PHASE_FAILED or PHASE_ERRORED transitions.
+	Error *status.Status
+	// Timestamp when execution started (set when PENDING -> RUNNING).
+	StartTime *timestamppb.Timestamp
+	// Timestamp when execution ended (set on any terminal phase).
+	StopTime *timestamppb.Timestamp
+	// Timestamp of this state change event.
+	EventTime *timestamppb.Timestamp
+}
+
+func (b0 FlowStateEvent_builder) Build() *FlowStateEvent {
+	m0 := &FlowStateEvent{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Phase = b.Phase
+	x.Error = b.Error
+	x.StartTime = b.StartTime
+	x.StopTime = b.StopTime
+	x.EventTime = b.EventTime
 	return m0
 }
 
@@ -286,7 +586,7 @@ type InteractionRequestEvent struct {
 
 func (x *InteractionRequestEvent) Reset() {
 	*x = InteractionRequestEvent{}
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[3]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -298,7 +598,7 @@ func (x *InteractionRequestEvent) String() string {
 func (*InteractionRequestEvent) ProtoMessage() {}
 
 func (x *InteractionRequestEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[3]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -381,7 +681,12 @@ type InteractionResponseEvent struct {
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Token from the corresponding InteractionRequestEvent. Must match exactly.
 	Token string `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
-	// The response value, serialized as a protobuf Any.
+	// The response value: an Interaction.Response (one typed binding per form
+	// input, keyed by input id), serialized as a protobuf Any. The runtime
+	// exposes it to CEL as `interactions.<id>.value.<input_id>.value`. Typed
+	// bindings (not a generic google.protobuf.Struct) keep every declared field
+	// present, so the access path is robust to how a responder serializes
+	// implicit-presence fields.
 	Value *anypb.Any `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
 	// Actor is the resource name of the entity providing the response
 	// (e.g. "users/bob", "agents/claude"). Stamped by the service layer
@@ -393,7 +698,7 @@ type InteractionResponseEvent struct {
 
 func (x *InteractionResponseEvent) Reset() {
 	*x = InteractionResponseEvent{}
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[4]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -405,7 +710,7 @@ func (x *InteractionResponseEvent) String() string {
 func (*InteractionResponseEvent) ProtoMessage() {}
 
 func (x *InteractionResponseEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[4]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -478,7 +783,12 @@ type InteractionResponseEvent_builder struct {
 	Id string
 	// Token from the corresponding InteractionRequestEvent. Must match exactly.
 	Token string
-	// The response value, serialized as a protobuf Any.
+	// The response value: an Interaction.Response (one typed binding per form
+	// input, keyed by input id), serialized as a protobuf Any. The runtime
+	// exposes it to CEL as `interactions.<id>.value.<input_id>.value`. Typed
+	// bindings (not a generic google.protobuf.Struct) keep every declared field
+	// present, so the access path is robust to how a responder serializes
+	// implicit-presence fields.
 	Value *anypb.Any
 	// Actor is the resource name of the entity providing the response
 	// (e.g. "users/bob", "agents/claude"). Stamped by the service layer
@@ -510,7 +820,7 @@ type StopFlowEvent struct {
 
 func (x *StopFlowEvent) Reset() {
 	*x = StopFlowEvent{}
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[5]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -522,7 +832,7 @@ func (x *StopFlowEvent) String() string {
 func (*StopFlowEvent) ProtoMessage() {}
 
 func (x *StopFlowEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[5]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -558,7 +868,7 @@ type TerminateFlowEvent struct {
 
 func (x *TerminateFlowEvent) Reset() {
 	*x = TerminateFlowEvent{}
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[6]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -570,7 +880,7 @@ func (x *TerminateFlowEvent) String() string {
 func (*TerminateFlowEvent) ProtoMessage() {}
 
 func (x *TerminateFlowEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[6]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -609,7 +919,7 @@ type SuspendFlowEvent struct {
 
 func (x *SuspendFlowEvent) Reset() {
 	*x = SuspendFlowEvent{}
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[7]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -621,7 +931,7 @@ func (x *SuspendFlowEvent) String() string {
 func (*SuspendFlowEvent) ProtoMessage() {}
 
 func (x *SuspendFlowEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[7]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -673,7 +983,7 @@ type ResumeFlowEvent struct {
 
 func (x *ResumeFlowEvent) Reset() {
 	*x = ResumeFlowEvent{}
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[8]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -685,7 +995,7 @@ func (x *ResumeFlowEvent) String() string {
 func (*ResumeFlowEvent) ProtoMessage() {}
 
 func (x *ResumeFlowEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[8]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -739,7 +1049,7 @@ type StopNodeEvent struct {
 
 func (x *StopNodeEvent) Reset() {
 	*x = StopNodeEvent{}
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[9]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -751,7 +1061,7 @@ func (x *StopNodeEvent) String() string {
 func (*StopNodeEvent) ProtoMessage() {}
 
 func (x *StopNodeEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[9]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -817,7 +1127,7 @@ type TerminateNodeEvent struct {
 
 func (x *TerminateNodeEvent) Reset() {
 	*x = TerminateNodeEvent{}
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[10]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -829,7 +1139,7 @@ func (x *TerminateNodeEvent) String() string {
 func (*TerminateNodeEvent) ProtoMessage() {}
 
 func (x *TerminateNodeEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[10]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -888,7 +1198,7 @@ type SuspendNodeEvent struct {
 
 func (x *SuspendNodeEvent) Reset() {
 	*x = SuspendNodeEvent{}
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[11]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -900,7 +1210,7 @@ func (x *SuspendNodeEvent) String() string {
 func (*SuspendNodeEvent) ProtoMessage() {}
 
 func (x *SuspendNodeEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[11]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -973,7 +1283,7 @@ type ResumeNodeEvent struct {
 
 func (x *ResumeNodeEvent) Reset() {
 	*x = ResumeNodeEvent{}
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[12]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -985,7 +1295,7 @@ func (x *ResumeNodeEvent) String() string {
 func (*ResumeNodeEvent) ProtoMessage() {}
 
 func (x *ResumeNodeEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[12]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1072,7 +1382,7 @@ type ClearCacheNodeEvent struct {
 
 func (x *ClearCacheNodeEvent) Reset() {
 	*x = ClearCacheNodeEvent{}
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[13]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1084,7 +1394,7 @@ func (x *ClearCacheNodeEvent) String() string {
 func (*ClearCacheNodeEvent) ProtoMessage() {}
 
 func (x *ClearCacheNodeEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[13]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1134,7 +1444,7 @@ type StartFlowEvent struct {
 
 func (x *StartFlowEvent) Reset() {
 	*x = StartFlowEvent{}
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[14]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1146,7 +1456,7 @@ func (x *StartFlowEvent) String() string {
 func (*StartFlowEvent) ProtoMessage() {}
 
 func (x *StartFlowEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[14]
+	mi := &file_dtkt_flow_v1beta2_events_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1173,16 +1483,31 @@ var File_dtkt_flow_v1beta2_events_proto protoreflect.FileDescriptor
 
 const file_dtkt_flow_v1beta2_events_proto_rawDesc = "" +
 	"\n" +
-	"\x1edtkt/flow/v1beta2/events.proto\x12\x11dtkt.flow.v1beta2\x1a\x1bbuf/validate/validate.proto\x1a\x1cdtkt/flow/v1beta2/spec.proto\x1a\x19google/protobuf/any.proto\"s\n" +
+	"\x1edtkt/flow/v1beta2/events.proto\x12\x11dtkt.flow.v1beta2\x1a\x1bbuf/validate/validate.proto\x1a\x14cel/expr/value.proto\x1a\x1cdtkt/flow/v1beta2/spec.proto\x1a\x1ddtkt/flow/v1beta2/state.proto\x1a\x19google/protobuf/any.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\"s\n" +
 	"\n" +
 	"InputEvent\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x122\n" +
 	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyB\x06\xbaH\x03\xc8\x01\x01R\x05value\"F\n" +
 	"\x11InputRequestEvent\x121\n" +
-	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\"t\n" +
+	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\"\xc9\x02\n" +
 	"\vOutputEvent\x121\n" +
-	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x122\n" +
-	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyB\x06\xbaH\x03\xc8\x01\x01R\x05value\"\xad\x01\n" +
+	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12%\n" +
+	"\x05value\x18\x02 \x01(\v2\x0f.cel.expr.ValueR\x05value\x12(\n" +
+	"\x05error\x18\x03 \x01(\v2\x12.google.rpc.StatusR\x05error\x129\n" +
+	"\n" +
+	"event_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\teventTime\x12\x1d\n" +
+	"\n" +
+	"eval_count\x18\x05 \x01(\x04R\tevalCount\x12\x16\n" +
+	"\x06closed\x18\x06 \x01(\bR\x06closed\x12D\n" +
+	"\x05phase\x18\a \x01(\x0e2$.dtkt.flow.v1beta2.RunSnapshot.PhaseB\b\xbaH\x05\x82\x01\x02\x10\x01R\x05phase\"\xaf\x02\n" +
+	"\x0eFlowStateEvent\x12D\n" +
+	"\x05phase\x18\x01 \x01(\x0e2$.dtkt.flow.v1beta2.RunSnapshot.PhaseB\b\xbaH\x05\x82\x01\x02\x10\x01R\x05phase\x12(\n" +
+	"\x05error\x18\x02 \x01(\v2\x12.google.rpc.StatusR\x05error\x129\n" +
+	"\n" +
+	"start_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x127\n" +
+	"\tstop_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\bstopTime\x129\n" +
+	"\n" +
+	"event_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\teventTime\"\xad\x01\n" +
 	"\x17InteractionRequestEvent\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12!\n" +
 	"\x05token\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x05token\x12<\n" +
@@ -1211,37 +1536,50 @@ const file_dtkt_flow_v1beta2_events_proto_rawDesc = "" +
 	"\x0eStartFlowEventB\xd8\x01\n" +
 	"\x17proto.dtkt.flow.v1beta2B\vEventsProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2;flowv1beta2\xa2\x02\x03DFX\xaa\x02\x11Dtkt.Flow.V1beta2\xca\x02\x11Dtkt\\Flow\\V1beta2\xe2\x02\x1dDtkt\\Flow\\V1beta2\\GPBMetadata\xea\x02\x13Dtkt::Flow::V1beta2b\x06proto3"
 
-var file_dtkt_flow_v1beta2_events_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_dtkt_flow_v1beta2_events_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_dtkt_flow_v1beta2_events_proto_goTypes = []any{
 	(*InputEvent)(nil),               // 0: dtkt.flow.v1beta2.InputEvent
 	(*InputRequestEvent)(nil),        // 1: dtkt.flow.v1beta2.InputRequestEvent
 	(*OutputEvent)(nil),              // 2: dtkt.flow.v1beta2.OutputEvent
-	(*InteractionRequestEvent)(nil),  // 3: dtkt.flow.v1beta2.InteractionRequestEvent
-	(*InteractionResponseEvent)(nil), // 4: dtkt.flow.v1beta2.InteractionResponseEvent
-	(*StopFlowEvent)(nil),            // 5: dtkt.flow.v1beta2.StopFlowEvent
-	(*TerminateFlowEvent)(nil),       // 6: dtkt.flow.v1beta2.TerminateFlowEvent
-	(*SuspendFlowEvent)(nil),         // 7: dtkt.flow.v1beta2.SuspendFlowEvent
-	(*ResumeFlowEvent)(nil),          // 8: dtkt.flow.v1beta2.ResumeFlowEvent
-	(*StopNodeEvent)(nil),            // 9: dtkt.flow.v1beta2.StopNodeEvent
-	(*TerminateNodeEvent)(nil),       // 10: dtkt.flow.v1beta2.TerminateNodeEvent
-	(*SuspendNodeEvent)(nil),         // 11: dtkt.flow.v1beta2.SuspendNodeEvent
-	(*ResumeNodeEvent)(nil),          // 12: dtkt.flow.v1beta2.ResumeNodeEvent
-	(*ClearCacheNodeEvent)(nil),      // 13: dtkt.flow.v1beta2.ClearCacheNodeEvent
-	(*StartFlowEvent)(nil),           // 14: dtkt.flow.v1beta2.StartFlowEvent
-	(*anypb.Any)(nil),                // 15: google.protobuf.Any
-	(*Interaction_Input)(nil),        // 16: dtkt.flow.v1beta2.Interaction.Input
+	(*FlowStateEvent)(nil),           // 3: dtkt.flow.v1beta2.FlowStateEvent
+	(*InteractionRequestEvent)(nil),  // 4: dtkt.flow.v1beta2.InteractionRequestEvent
+	(*InteractionResponseEvent)(nil), // 5: dtkt.flow.v1beta2.InteractionResponseEvent
+	(*StopFlowEvent)(nil),            // 6: dtkt.flow.v1beta2.StopFlowEvent
+	(*TerminateFlowEvent)(nil),       // 7: dtkt.flow.v1beta2.TerminateFlowEvent
+	(*SuspendFlowEvent)(nil),         // 8: dtkt.flow.v1beta2.SuspendFlowEvent
+	(*ResumeFlowEvent)(nil),          // 9: dtkt.flow.v1beta2.ResumeFlowEvent
+	(*StopNodeEvent)(nil),            // 10: dtkt.flow.v1beta2.StopNodeEvent
+	(*TerminateNodeEvent)(nil),       // 11: dtkt.flow.v1beta2.TerminateNodeEvent
+	(*SuspendNodeEvent)(nil),         // 12: dtkt.flow.v1beta2.SuspendNodeEvent
+	(*ResumeNodeEvent)(nil),          // 13: dtkt.flow.v1beta2.ResumeNodeEvent
+	(*ClearCacheNodeEvent)(nil),      // 14: dtkt.flow.v1beta2.ClearCacheNodeEvent
+	(*StartFlowEvent)(nil),           // 15: dtkt.flow.v1beta2.StartFlowEvent
+	(*anypb.Any)(nil),                // 16: google.protobuf.Any
+	(*expr.Value)(nil),               // 17: cel.expr.Value
+	(*status.Status)(nil),            // 18: google.rpc.Status
+	(*timestamppb.Timestamp)(nil),    // 19: google.protobuf.Timestamp
+	(RunSnapshot_Phase)(0),           // 20: dtkt.flow.v1beta2.RunSnapshot.Phase
+	(*Interaction_Input)(nil),        // 21: dtkt.flow.v1beta2.Interaction.Input
 }
 var file_dtkt_flow_v1beta2_events_proto_depIdxs = []int32{
-	15, // 0: dtkt.flow.v1beta2.InputEvent.value:type_name -> google.protobuf.Any
-	15, // 1: dtkt.flow.v1beta2.OutputEvent.value:type_name -> google.protobuf.Any
-	16, // 2: dtkt.flow.v1beta2.InteractionRequestEvent.inputs:type_name -> dtkt.flow.v1beta2.Interaction.Input
-	15, // 3: dtkt.flow.v1beta2.InteractionResponseEvent.value:type_name -> google.protobuf.Any
-	15, // 4: dtkt.flow.v1beta2.ResumeNodeEvent.value:type_name -> google.protobuf.Any
-	5,  // [5:5] is the sub-list for method output_type
-	5,  // [5:5] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	16, // 0: dtkt.flow.v1beta2.InputEvent.value:type_name -> google.protobuf.Any
+	17, // 1: dtkt.flow.v1beta2.OutputEvent.value:type_name -> cel.expr.Value
+	18, // 2: dtkt.flow.v1beta2.OutputEvent.error:type_name -> google.rpc.Status
+	19, // 3: dtkt.flow.v1beta2.OutputEvent.event_time:type_name -> google.protobuf.Timestamp
+	20, // 4: dtkt.flow.v1beta2.OutputEvent.phase:type_name -> dtkt.flow.v1beta2.RunSnapshot.Phase
+	20, // 5: dtkt.flow.v1beta2.FlowStateEvent.phase:type_name -> dtkt.flow.v1beta2.RunSnapshot.Phase
+	18, // 6: dtkt.flow.v1beta2.FlowStateEvent.error:type_name -> google.rpc.Status
+	19, // 7: dtkt.flow.v1beta2.FlowStateEvent.start_time:type_name -> google.protobuf.Timestamp
+	19, // 8: dtkt.flow.v1beta2.FlowStateEvent.stop_time:type_name -> google.protobuf.Timestamp
+	19, // 9: dtkt.flow.v1beta2.FlowStateEvent.event_time:type_name -> google.protobuf.Timestamp
+	21, // 10: dtkt.flow.v1beta2.InteractionRequestEvent.inputs:type_name -> dtkt.flow.v1beta2.Interaction.Input
+	16, // 11: dtkt.flow.v1beta2.InteractionResponseEvent.value:type_name -> google.protobuf.Any
+	16, // 12: dtkt.flow.v1beta2.ResumeNodeEvent.value:type_name -> google.protobuf.Any
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_flow_v1beta2_events_proto_init() }
@@ -1250,14 +1588,15 @@ func file_dtkt_flow_v1beta2_events_proto_init() {
 		return
 	}
 	file_dtkt_flow_v1beta2_spec_proto_init()
-	file_dtkt_flow_v1beta2_events_proto_msgTypes[12].OneofWrappers = []any{}
+	file_dtkt_flow_v1beta2_state_proto_init()
+	file_dtkt_flow_v1beta2_events_proto_msgTypes[13].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_flow_v1beta2_events_proto_rawDesc), len(file_dtkt_flow_v1beta2_events_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   15,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

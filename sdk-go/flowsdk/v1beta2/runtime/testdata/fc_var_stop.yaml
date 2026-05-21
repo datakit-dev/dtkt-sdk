@@ -2,14 +2,28 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_var_stop
-  inputs:
-    - id: x
-      int64: {}
+  description: >-
+    Range generator 1..100 feeds a var that doubles each value;
+    flow_control.stop_when on the var triggers when the input value reaches
+    5. Without FC.stop firing, the generator would emit 100 values and
+    the test would hit testContext's 10s budget. With FC.stop firing, the
+    generator gets stopCh via gracefulStop -> stopCore, the flow drains in
+    bounded steps, and Execute returns nil promptly. Guards that FC.stop_when
+    on a var actually fires (vs the previous finite-input fixture where
+    natural drain == graceful drain was indistinguishable on the wire).
+  generators:
+    - id: seq
+      range:
+        start: 1
+        end: 100
+        rate:
+          count: 100
+          interval: "1s"
   vars:
     - id: doubled
-      value: "= inputs.x.value * 2"
+      value: "= generators.seq.value * 2"
       flow_control:
-        stop_when: "= inputs.x.value >= 3"
+        stop_when: "= generators.seq.value >= 5"
   outputs:
     - id: result
       value: "= vars.doubled.value"

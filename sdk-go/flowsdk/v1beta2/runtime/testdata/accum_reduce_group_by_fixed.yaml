@@ -2,6 +2,15 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: reduce_group_by_fixed
+  description: >-
+    GroupBy KEY (even/odd parity) + fixed window. Feeding 1..6 yields two
+    per-key sums: even=2+4+6=12, odd=1+3+5=9. The load-bearing guard is
+    per-key partitioning -- group_by.key IS implemented (a broken key would
+    emit a single sum of 21, not two results). The 100ms fixed window holds
+    all values in one bucket, and the runtime ignores group_by.window anyway
+    (Gap 1, transform.go:466-482), so the window layer is NOT independently
+    verified here. Non-vacuous key+window coverage that catches the gap:
+    accum_reduce_group_by_fixed_multi.yaml.
   inputs:
     - id: x
       int64: {}

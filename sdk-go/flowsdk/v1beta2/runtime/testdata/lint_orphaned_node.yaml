@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_orphaned_node
+  description: >-
+    Var `unused` reads inputs.x.value but has no downstream consumer (no
+    output, var, or action references it). Lint must report a CodeOrphanedNode
+    warning naming vars.unused. Guards against unintentional dead nodes that
+    compute but are never read.
   inputs:
     - id: x
       int64: {}

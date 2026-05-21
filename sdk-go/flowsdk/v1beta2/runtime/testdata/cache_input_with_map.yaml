@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cache_input_with_map
+  description: >-
+    Input with cache:true AND a map transform: the first input passes through
+    the transform and gets captured as `raw * 100`; subsequent inputs are
+    drained without re-publishing. Feeding 7, 8, 9 yields exactly one output
+    (700). Guards that input-level caching captures the POST-transform value
+    rather than the raw input -- mismatched ordering would let the raw value
+    leak through and break downstream invariants.
   inputs:
     - id: x
       int64: {}

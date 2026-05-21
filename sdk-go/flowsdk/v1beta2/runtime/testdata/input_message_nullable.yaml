@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_message_nullable
-  description: "Message-typed input with nullable: true; explicit null fed"
+  description: >-
+    Message-typed input with nullable: true; an explicit null is fed. The CEL
+    output surfaces as a NullValue downstream. Guards that nullable:true on a
+    message input distinguishes a real null from an unset/absent value and
+    propagates the null through to consumers (rather than coercing it to a
+    zero-valued message).
   inputs:
     - id: payload
       message:

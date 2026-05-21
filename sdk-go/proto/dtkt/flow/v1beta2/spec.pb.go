@@ -112,8 +112,16 @@ func (x ErrorStrategy) Number() protoreflect.EnumNumber {
 //	streams.<id>.request_count     Number of requests sent
 //	streams.<id>.response_count    Number of responses received
 //
-//	interactions.<id>.value        Last received value (per this node's subscription)
-//	interactions.<id>.submitted    Interaction form has been submitted
+//	interactions.<id>.value                    Response: map keyed by form input id (Interaction.Response)
+//	interactions.<id>.value.<input_id>          One input's typed binding (ConfirmBinding/InputBinding/...)
+//	interactions.<id>.value.<input_id>.value    That input's submitted value (bool/string/bytes/...)
+//	interactions.<id>.submitted                 Interaction form has been submitted
+//
+//	Note the two levels: unlike an input (whose value is unwrapped to a single
+//	typed scalar/message), an interaction's value is a map of typed bindings --
+//	one per form input. The input id selects the binding; `.value` reads its
+//	submitted value. A binding may carry sibling fields beyond `value` (e.g.
+//	agent-supplied metadata), reachable as `.<input_id>.<field>`.
 //
 //	outputs.<id>.value             Last received value (per this node's subscription)
 //	outputs.<id>.eval_count        Number of evaluations
@@ -2987,7 +2995,12 @@ type Backoff struct {
 	MaxBackoff *durationpb.Duration `protobuf:"bytes,3,opt,name=max_backoff,json=maxBackoff,proto3" json:"max_backoff,omitempty"`
 	// Maximum number of retry attempts before escalating to the
 	// RetryStrategy's skip/suspend/terminate path.
-	MaxAttempts   uint32 `protobuf:"varint,4,opt,name=max_attempts,json=maxAttempts,proto3" json:"max_attempts,omitempty"`
+	MaxAttempts uint32 `protobuf:"varint,4,opt,name=max_attempts,json=maxAttempts,proto3" json:"max_attempts,omitempty"`
+	// Jitter as a fraction in [0, 1]: each delay is randomized to within
+	// +/- jitter of its computed value (0 = deterministic). Spreads
+	// retries when many callers back off against the same failing
+	// dependency at once, avoiding synchronized retry storms.
+	Jitter        float64 `protobuf:"fixed64,5,opt,name=jitter,proto3" json:"jitter,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3045,6 +3058,13 @@ func (x *Backoff) GetMaxAttempts() uint32 {
 	return 0
 }
 
+func (x *Backoff) GetJitter() float64 {
+	if x != nil {
+		return x.Jitter
+	}
+	return 0
+}
+
 func (x *Backoff) SetInitialBackoff(v *durationpb.Duration) {
 	x.InitialBackoff = v
 }
@@ -3059,6 +3079,10 @@ func (x *Backoff) SetMaxBackoff(v *durationpb.Duration) {
 
 func (x *Backoff) SetMaxAttempts(v uint32) {
 	x.MaxAttempts = v
+}
+
+func (x *Backoff) SetJitter(v float64) {
+	x.Jitter = v
 }
 
 func (x *Backoff) HasInitialBackoff() bool {
@@ -3096,6 +3120,11 @@ type Backoff_builder struct {
 	// Maximum number of retry attempts before escalating to the
 	// RetryStrategy's skip/suspend/terminate path.
 	MaxAttempts uint32
+	// Jitter as a fraction in [0, 1]: each delay is randomized to within
+	// +/- jitter of its computed value (0 = deterministic). Spreads
+	// retries when many callers back off against the same failing
+	// dependency at once, avoiding synchronized retry storms.
+	Jitter float64
 }
 
 func (b0 Backoff_builder) Build() *Backoff {
@@ -3106,6 +3135,7 @@ func (b0 Backoff_builder) Build() *Backoff {
 	x.BackoffMultiplier = b.BackoffMultiplier
 	x.MaxBackoff = b.MaxBackoff
 	x.MaxAttempts = b.MaxAttempts
+	x.Jitter = b.Jitter
 	return m0
 }
 
@@ -5060,6 +5090,80 @@ func (b0 Interaction_MultiSelectBinding_builder) Build() *Interaction_MultiSelec
 	return m0
 }
 
+// Response is an actor's reply to an InteractionRequestEvent: one typed
+// binding per form input, keyed by input id. This is what
+// InteractionResponseEvent.value wraps, and what the runtime exposes to CEL
+// as `interactions.<id>.value` -- the input id selects a binding, and
+// `.value` reads its submitted value.
+//
+// Typed bindings (vs an earlier generic google.protobuf.Struct encoding)
+// guarantee every declared field is always present: `value` at its proto
+// zero plus any future per-binding metadata. So the CEL access path
+// `interactions.<id>.value.<input_id>.value` never hits a missing key,
+// regardless of how a responder serializes implicit-presence fields.
+type Interaction_Response struct {
+	state protoimpl.MessageState `protogen:"hybrid.v1"`
+	// Submitted binding per form input id. Each Any wraps the input's
+	// *Binding message (ConfirmBinding / InputBinding / FileBinding /
+	// SelectBinding / MultiSelectBinding).
+	Bindings      map[string]*anypb.Any `protobuf:"bytes,1,rep,name=bindings,proto3" json:"bindings,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Interaction_Response) Reset() {
+	*x = Interaction_Response{}
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Interaction_Response) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Interaction_Response) ProtoMessage() {}
+
+func (x *Interaction_Response) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *Interaction_Response) GetBindings() map[string]*anypb.Any {
+	if x != nil {
+		return x.Bindings
+	}
+	return nil
+}
+
+func (x *Interaction_Response) SetBindings(v map[string]*anypb.Any) {
+	x.Bindings = v
+}
+
+type Interaction_Response_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Submitted binding per form input id. Each Any wraps the input's
+	// *Binding message (ConfirmBinding / InputBinding / FileBinding /
+	// SelectBinding / MultiSelectBinding).
+	Bindings map[string]*anypb.Any
+}
+
+func (b0 Interaction_Response_builder) Build() *Interaction_Response {
+	m0 := &Interaction_Response{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.Bindings = b.Bindings
+	return m0
+}
+
 // Input defines a single form field within an interaction.
 type Interaction_Input struct {
 	state protoimpl.MessageState `protogen:"hybrid.v1"`
@@ -5085,7 +5189,7 @@ type Interaction_Input struct {
 
 func (x *Interaction_Input) Reset() {
 	*x = Interaction_Input{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[33]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5097,7 +5201,7 @@ func (x *Interaction_Input) String() string {
 func (*Interaction_Input) ProtoMessage() {}
 
 func (x *Interaction_Input) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[33]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5405,7 +5509,7 @@ func (b0 Interaction_Input_builder) Build() *Interaction_Input {
 type case_Interaction_Input_Element protoreflect.FieldNumber
 
 func (x case_Interaction_Input_Element) String() string {
-	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[33].Descriptor()
+	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[34].Descriptor()
 	if x == 0 {
 		return "not set"
 	}
@@ -5464,7 +5568,7 @@ type Switch_Case struct {
 
 func (x *Switch_Case) Reset() {
 	*x = Switch_Case{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[34]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5476,7 +5580,7 @@ func (x *Switch_Case) String() string {
 func (*Switch_Case) ProtoMessage() {}
 
 func (x *Switch_Case) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[34]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5543,7 +5647,7 @@ type Generator_Ticker struct {
 
 func (x *Generator_Ticker) Reset() {
 	*x = Generator_Ticker{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[35]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5555,7 +5659,7 @@ func (x *Generator_Ticker) String() string {
 func (*Generator_Ticker) ProtoMessage() {}
 
 func (x *Generator_Ticker) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[35]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5660,7 +5764,7 @@ type Generator_Cron struct {
 
 func (x *Generator_Cron) Reset() {
 	*x = Generator_Cron{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[36]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5672,7 +5776,7 @@ func (x *Generator_Cron) String() string {
 func (*Generator_Cron) ProtoMessage() {}
 
 func (x *Generator_Cron) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[36]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5727,7 +5831,8 @@ func (b0 Generator_Cron_builder) Build() *Generator_Cron {
 	return m0
 }
 
-// Range emits a bounded sequence of values. Both start and end are inclusive.\n  // For example, start=1 end=3 step=1 emits [1, 2, 3].
+// Range emits a bounded sequence of values. Both start and end are
+// inclusive. For example, start=1 end=3 step=1 emits [1, 2, 3].
 type Generator_Range struct {
 	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Starting value (inclusive). Defaults to 0.
@@ -5745,7 +5850,7 @@ type Generator_Range struct {
 
 func (x *Generator_Range) Reset() {
 	*x = Generator_Range{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[37]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5757,7 +5862,7 @@ func (x *Generator_Range) String() string {
 func (*Generator_Range) ProtoMessage() {}
 
 func (x *Generator_Range) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[37]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5862,7 +5967,7 @@ type Transform_GroupBy struct {
 
 func (x *Transform_GroupBy) Reset() {
 	*x = Transform_GroupBy{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[38]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5874,7 +5979,7 @@ func (x *Transform_GroupBy) String() string {
 func (*Transform_GroupBy) ProtoMessage() {}
 
 func (x *Transform_GroupBy) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[38]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5953,7 +6058,7 @@ type Transform_Reduce struct {
 
 func (x *Transform_Reduce) Reset() {
 	*x = Transform_Reduce{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[39]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5965,7 +6070,7 @@ func (x *Transform_Reduce) String() string {
 func (*Transform_Reduce) ProtoMessage() {}
 
 func (x *Transform_Reduce) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[39]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6058,7 +6163,7 @@ type Transform_Scan struct {
 
 func (x *Transform_Scan) Reset() {
 	*x = Transform_Scan{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[40]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6070,7 +6175,7 @@ func (x *Transform_Scan) String() string {
 func (*Transform_Scan) ProtoMessage() {}
 
 func (x *Transform_Scan) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[40]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6165,7 +6270,7 @@ type Transform_GroupBy_Window struct {
 
 func (x *Transform_GroupBy_Window) Reset() {
 	*x = Transform_GroupBy_Window{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[41]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6177,7 +6282,7 @@ func (x *Transform_GroupBy_Window) String() string {
 func (*Transform_GroupBy_Window) ProtoMessage() {}
 
 func (x *Transform_GroupBy_Window) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[41]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6393,7 +6498,7 @@ func (b0 Transform_GroupBy_Window_builder) Build() *Transform_GroupBy_Window {
 type case_Transform_GroupBy_Window_Type protoreflect.FieldNumber
 
 func (x case_Transform_GroupBy_Window_Type) String() string {
-	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[41].Descriptor()
+	md := file_dtkt_flow_v1beta2_spec_proto_msgTypes[43].Descriptor()
 	if x == 0 {
 		return "not set"
 	}
@@ -6443,7 +6548,7 @@ type Transform_GroupBy_Window_Fixed struct {
 
 func (x *Transform_GroupBy_Window_Fixed) Reset() {
 	*x = Transform_GroupBy_Window_Fixed{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[42]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6455,7 +6560,7 @@ func (x *Transform_GroupBy_Window_Fixed) String() string {
 func (*Transform_GroupBy_Window_Fixed) ProtoMessage() {}
 
 func (x *Transform_GroupBy_Window_Fixed) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[42]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6516,7 +6621,7 @@ type Transform_GroupBy_Window_Sliding struct {
 
 func (x *Transform_GroupBy_Window_Sliding) Reset() {
 	*x = Transform_GroupBy_Window_Sliding{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[43]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6528,7 +6633,7 @@ func (x *Transform_GroupBy_Window_Sliding) String() string {
 func (*Transform_GroupBy_Window_Sliding) ProtoMessage() {}
 
 func (x *Transform_GroupBy_Window_Sliding) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[43]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6612,7 +6717,7 @@ type Transform_GroupBy_Window_Session struct {
 
 func (x *Transform_GroupBy_Window_Session) Reset() {
 	*x = Transform_GroupBy_Window_Session{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[44]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6624,7 +6729,7 @@ func (x *Transform_GroupBy_Window_Session) String() string {
 func (*Transform_GroupBy_Window_Session) ProtoMessage() {}
 
 func (x *Transform_GroupBy_Window_Session) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[44]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6684,7 +6789,7 @@ type Transform_GroupBy_Window_Event struct {
 
 func (x *Transform_GroupBy_Window_Event) Reset() {
 	*x = Transform_GroupBy_Window_Event{}
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[45]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6696,7 +6801,7 @@ func (x *Transform_GroupBy_Window_Event) String() string {
 func (*Transform_GroupBy_Window_Event) ProtoMessage() {}
 
 func (x *Transform_GroupBy_Window_Event) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[45]
+	mi := &file_dtkt_flow_v1beta2_spec_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6872,7 +6977,8 @@ const file_dtkt_flow_v1beta2_spec_proto_rawDesc = "" +
 	"\x06method\x18\x02 \x01(\tB\x16\xbaH\x13\xc8\x01\x01r\x0e2\f[a-zA-Z._/]+R\x06method\x120\n" +
 	"\arequest\x18\x04 \x01(\v2\x16.google.protobuf.ValueR\arequest\x12.\n" +
 	"\bresponse\x18\x05 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
-	"2\b^\\s?=\\s?R\bresponse\"\xbc\t\n" +
+	"2\b^\\s?=\\s?R\bresponse\"\xef\n" +
+	"\n" +
 	"\vInteraction\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x12&\n" +
 	"\x04when\x18\x04 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
@@ -6893,7 +6999,12 @@ const file_dtkt_flow_v1beta2_spec_proto_rawDesc = "" +
 	"\rSelectBinding\x122\n" +
 	"\x05value\x18\x01 \x01(\v2\x14.google.protobuf.AnyB\x06\x82\xb5\x18\x02:\x00R\x05value\x1aH\n" +
 	"\x12MultiSelectBinding\x122\n" +
-	"\x05value\x18\x01 \x03(\v2\x14.google.protobuf.AnyB\x06\x82\xb5\x18\x02B\x00R\x05value\x1a\xa3\x04\n" +
+	"\x05value\x18\x01 \x03(\v2\x14.google.protobuf.AnyB\x06\x82\xb5\x18\x02B\x00R\x05value\x1a\xb0\x01\n" +
+	"\bResponse\x12Q\n" +
+	"\bbindings\x18\x01 \x03(\v25.dtkt.flow.v1beta2.Interaction.Response.BindingsEntryR\bbindings\x1aQ\n" +
+	"\rBindingsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12*\n" +
+	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyR\x05value:\x028\x01\x1a\xa3\x04\n" +
 	"\x05Input\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]*$R\x02id\x123\n" +
 	"\x05title\x18\x02 \x01(\tB\x1d\xbaH\x1a\xc8\x01\x01r\x152\x13^\\s?(=)?\\s?[\\s\\S]*$R\x05title\x12A\n" +
@@ -6904,13 +7015,14 @@ const file_dtkt_flow_v1beta2_spec_proto_rawDesc = "" +
 	"\x06select\x18\a \x01(\v2%.dtkt.protoform.v1beta1.SelectElementH\x00R\x06select\x12O\n" +
 	"\fmulti_select\x18\b \x01(\v2*.dtkt.protoform.v1beta1.MultiSelectElementH\x00R\vmultiSelectB\x10\n" +
 	"\aelement\x12\x05\xbaH\x02\b\x01B\x0e\n" +
-	"\f_description\"\xeb\x01\n" +
+	"\f_description\"\x9c\x02\n" +
 	"\aBackoff\x12J\n" +
 	"\x0finitial_backoff\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\x06\xbaH\x03\xc8\x01\x01R\x0einitialBackoff\x12-\n" +
 	"\x12backoff_multiplier\x18\x02 \x01(\x01R\x11backoffMultiplier\x12:\n" +
 	"\vmax_backoff\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\n" +
 	"maxBackoff\x12)\n" +
-	"\fmax_attempts\x18\x04 \x01(\rB\x06\xbaH\x03\xc8\x01\x01R\vmaxAttempts\"\xc9\x02\n" +
+	"\fmax_attempts\x18\x04 \x01(\rB\x06\xbaH\x03\xc8\x01\x01R\vmaxAttempts\x12/\n" +
+	"\x06jitter\x18\x05 \x01(\x01B\x17\xbaH\x14\x12\x12\x19\x00\x00\x00\x00\x00\x00\xf0?)\x00\x00\x00\x00\x00\x00\x00\x00R\x06jitter\"\xc9\x02\n" +
 	"\rRetryStrategy\x12&\n" +
 	"\x04when\x18\x01 \x01(\tB\x12\xbaH\x0f\xd8\x01\x01r\n" +
 	"2\b^\\s?=\\s?R\x04when\x124\n" +
@@ -7009,7 +7121,7 @@ const file_dtkt_flow_v1beta2_spec_proto_rawDesc = "" +
 	"\x17proto.dtkt.flow.v1beta2B\tSpecProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2;flowv1beta2\xa2\x02\x03DFX\xaa\x02\x11Dtkt.Flow.V1beta2\xca\x02\x11Dtkt\\Flow\\V1beta2\xe2\x02\x1dDtkt\\Flow\\V1beta2\\GPBMetadata\xea\x02\x13Dtkt::Flow::V1beta2b\x06proto3"
 
 var file_dtkt_flow_v1beta2_spec_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_dtkt_flow_v1beta2_spec_proto_msgTypes = make([]protoimpl.MessageInfo, 46)
+var file_dtkt_flow_v1beta2_spec_proto_msgTypes = make([]protoimpl.MessageInfo, 48)
 var file_dtkt_flow_v1beta2_spec_proto_goTypes = []any{
 	(ErrorStrategy)(0),                       // 0: dtkt.flow.v1beta2.ErrorStrategy
 	(*Flow)(nil),                             // 1: dtkt.flow.v1beta2.Flow
@@ -7045,42 +7157,44 @@ var file_dtkt_flow_v1beta2_spec_proto_goTypes = []any{
 	(*Interaction_FileBinding)(nil),          // 31: dtkt.flow.v1beta2.Interaction.FileBinding
 	(*Interaction_SelectBinding)(nil),        // 32: dtkt.flow.v1beta2.Interaction.SelectBinding
 	(*Interaction_MultiSelectBinding)(nil),   // 33: dtkt.flow.v1beta2.Interaction.MultiSelectBinding
-	(*Interaction_Input)(nil),                // 34: dtkt.flow.v1beta2.Interaction.Input
-	(*Switch_Case)(nil),                      // 35: dtkt.flow.v1beta2.Switch.Case
-	(*Generator_Ticker)(nil),                 // 36: dtkt.flow.v1beta2.Generator.Ticker
-	(*Generator_Cron)(nil),                   // 37: dtkt.flow.v1beta2.Generator.Cron
-	(*Generator_Range)(nil),                  // 38: dtkt.flow.v1beta2.Generator.Range
-	(*Transform_GroupBy)(nil),                // 39: dtkt.flow.v1beta2.Transform.GroupBy
-	(*Transform_Reduce)(nil),                 // 40: dtkt.flow.v1beta2.Transform.Reduce
-	(*Transform_Scan)(nil),                   // 41: dtkt.flow.v1beta2.Transform.Scan
-	(*Transform_GroupBy_Window)(nil),         // 42: dtkt.flow.v1beta2.Transform.GroupBy.Window
-	(*Transform_GroupBy_Window_Fixed)(nil),   // 43: dtkt.flow.v1beta2.Transform.GroupBy.Window.Fixed
-	(*Transform_GroupBy_Window_Sliding)(nil), // 44: dtkt.flow.v1beta2.Transform.GroupBy.Window.Sliding
-	(*Transform_GroupBy_Window_Session)(nil), // 45: dtkt.flow.v1beta2.Transform.GroupBy.Window.Session
-	(*Transform_GroupBy_Window_Event)(nil),   // 46: dtkt.flow.v1beta2.Transform.GroupBy.Window.Event
-	(*v1beta1.Package_Identity)(nil),         // 47: dtkt.shared.v1beta1.Package.Identity
-	(*Bool)(nil),                             // 48: dtkt.flow.v1beta2.Bool
-	(*Bytes)(nil),                            // 49: dtkt.flow.v1beta2.Bytes
-	(*Double)(nil),                           // 50: dtkt.flow.v1beta2.Double
-	(*Float)(nil),                            // 51: dtkt.flow.v1beta2.Float
-	(*Int64)(nil),                            // 52: dtkt.flow.v1beta2.Int64
-	(*Uint64)(nil),                           // 53: dtkt.flow.v1beta2.Uint64
-	(*Int32)(nil),                            // 54: dtkt.flow.v1beta2.Int32
-	(*Uint32)(nil),                           // 55: dtkt.flow.v1beta2.Uint32
-	(*String)(nil),                           // 56: dtkt.flow.v1beta2.String
-	(*List)(nil),                             // 57: dtkt.flow.v1beta2.List
-	(*Map)(nil),                              // 58: dtkt.flow.v1beta2.Map
-	(*Message)(nil),                          // 59: dtkt.flow.v1beta2.Message
-	(*structpb.Value)(nil),                   // 60: google.protobuf.Value
-	(*durationpb.Duration)(nil),              // 61: google.protobuf.Duration
-	(*structpb.ListValue)(nil),               // 62: google.protobuf.ListValue
-	(*structpb.Struct)(nil),                  // 63: google.protobuf.Struct
-	(*anypb.Any)(nil),                        // 64: google.protobuf.Any
-	(*v1beta11.ConfirmElement)(nil),          // 65: dtkt.protoform.v1beta1.ConfirmElement
-	(*v1beta11.InputElement)(nil),            // 66: dtkt.protoform.v1beta1.InputElement
-	(*v1beta11.FileElement)(nil),             // 67: dtkt.protoform.v1beta1.FileElement
-	(*v1beta11.SelectElement)(nil),           // 68: dtkt.protoform.v1beta1.SelectElement
-	(*v1beta11.MultiSelectElement)(nil),      // 69: dtkt.protoform.v1beta1.MultiSelectElement
+	(*Interaction_Response)(nil),             // 34: dtkt.flow.v1beta2.Interaction.Response
+	(*Interaction_Input)(nil),                // 35: dtkt.flow.v1beta2.Interaction.Input
+	nil,                                      // 36: dtkt.flow.v1beta2.Interaction.Response.BindingsEntry
+	(*Switch_Case)(nil),                      // 37: dtkt.flow.v1beta2.Switch.Case
+	(*Generator_Ticker)(nil),                 // 38: dtkt.flow.v1beta2.Generator.Ticker
+	(*Generator_Cron)(nil),                   // 39: dtkt.flow.v1beta2.Generator.Cron
+	(*Generator_Range)(nil),                  // 40: dtkt.flow.v1beta2.Generator.Range
+	(*Transform_GroupBy)(nil),                // 41: dtkt.flow.v1beta2.Transform.GroupBy
+	(*Transform_Reduce)(nil),                 // 42: dtkt.flow.v1beta2.Transform.Reduce
+	(*Transform_Scan)(nil),                   // 43: dtkt.flow.v1beta2.Transform.Scan
+	(*Transform_GroupBy_Window)(nil),         // 44: dtkt.flow.v1beta2.Transform.GroupBy.Window
+	(*Transform_GroupBy_Window_Fixed)(nil),   // 45: dtkt.flow.v1beta2.Transform.GroupBy.Window.Fixed
+	(*Transform_GroupBy_Window_Sliding)(nil), // 46: dtkt.flow.v1beta2.Transform.GroupBy.Window.Sliding
+	(*Transform_GroupBy_Window_Session)(nil), // 47: dtkt.flow.v1beta2.Transform.GroupBy.Window.Session
+	(*Transform_GroupBy_Window_Event)(nil),   // 48: dtkt.flow.v1beta2.Transform.GroupBy.Window.Event
+	(*v1beta1.Package_Identity)(nil),         // 49: dtkt.shared.v1beta1.Package.Identity
+	(*Bool)(nil),                             // 50: dtkt.flow.v1beta2.Bool
+	(*Bytes)(nil),                            // 51: dtkt.flow.v1beta2.Bytes
+	(*Double)(nil),                           // 52: dtkt.flow.v1beta2.Double
+	(*Float)(nil),                            // 53: dtkt.flow.v1beta2.Float
+	(*Int64)(nil),                            // 54: dtkt.flow.v1beta2.Int64
+	(*Uint64)(nil),                           // 55: dtkt.flow.v1beta2.Uint64
+	(*Int32)(nil),                            // 56: dtkt.flow.v1beta2.Int32
+	(*Uint32)(nil),                           // 57: dtkt.flow.v1beta2.Uint32
+	(*String)(nil),                           // 58: dtkt.flow.v1beta2.String
+	(*List)(nil),                             // 59: dtkt.flow.v1beta2.List
+	(*Map)(nil),                              // 60: dtkt.flow.v1beta2.Map
+	(*Message)(nil),                          // 61: dtkt.flow.v1beta2.Message
+	(*structpb.Value)(nil),                   // 62: google.protobuf.Value
+	(*durationpb.Duration)(nil),              // 63: google.protobuf.Duration
+	(*structpb.ListValue)(nil),               // 64: google.protobuf.ListValue
+	(*structpb.Struct)(nil),                  // 65: google.protobuf.Struct
+	(*anypb.Any)(nil),                        // 66: google.protobuf.Any
+	(*v1beta11.ConfirmElement)(nil),          // 67: dtkt.protoform.v1beta1.ConfirmElement
+	(*v1beta11.InputElement)(nil),            // 68: dtkt.protoform.v1beta1.InputElement
+	(*v1beta11.FileElement)(nil),             // 69: dtkt.protoform.v1beta1.FileElement
+	(*v1beta11.SelectElement)(nil),           // 70: dtkt.protoform.v1beta1.SelectElement
+	(*v1beta11.MultiSelectElement)(nil),      // 71: dtkt.protoform.v1beta1.MultiSelectElement
 }
 var file_dtkt_flow_v1beta2_spec_proto_depIdxs = []int32{
 	4,  // 0: dtkt.flow.v1beta2.Flow.connections:type_name -> dtkt.flow.v1beta2.Connection
@@ -7092,19 +7206,19 @@ var file_dtkt_flow_v1beta2_spec_proto_depIdxs = []int32{
 	11, // 6: dtkt.flow.v1beta2.Flow.interactions:type_name -> dtkt.flow.v1beta2.Interaction
 	8,  // 7: dtkt.flow.v1beta2.Flow.outputs:type_name -> dtkt.flow.v1beta2.Output
 	0,  // 8: dtkt.flow.v1beta2.Flow.error_strategy:type_name -> dtkt.flow.v1beta2.ErrorStrategy
-	47, // 9: dtkt.flow.v1beta2.Connection.package:type_name -> dtkt.shared.v1beta1.Package.Identity
-	48, // 10: dtkt.flow.v1beta2.Input.bool:type_name -> dtkt.flow.v1beta2.Bool
-	49, // 11: dtkt.flow.v1beta2.Input.bytes:type_name -> dtkt.flow.v1beta2.Bytes
-	50, // 12: dtkt.flow.v1beta2.Input.double:type_name -> dtkt.flow.v1beta2.Double
-	51, // 13: dtkt.flow.v1beta2.Input.float:type_name -> dtkt.flow.v1beta2.Float
-	52, // 14: dtkt.flow.v1beta2.Input.int64:type_name -> dtkt.flow.v1beta2.Int64
-	53, // 15: dtkt.flow.v1beta2.Input.uint64:type_name -> dtkt.flow.v1beta2.Uint64
-	54, // 16: dtkt.flow.v1beta2.Input.int32:type_name -> dtkt.flow.v1beta2.Int32
-	55, // 17: dtkt.flow.v1beta2.Input.uint32:type_name -> dtkt.flow.v1beta2.Uint32
-	56, // 18: dtkt.flow.v1beta2.Input.string:type_name -> dtkt.flow.v1beta2.String
-	57, // 19: dtkt.flow.v1beta2.Input.list:type_name -> dtkt.flow.v1beta2.List
-	58, // 20: dtkt.flow.v1beta2.Input.map:type_name -> dtkt.flow.v1beta2.Map
-	59, // 21: dtkt.flow.v1beta2.Input.message:type_name -> dtkt.flow.v1beta2.Message
+	49, // 9: dtkt.flow.v1beta2.Connection.package:type_name -> dtkt.shared.v1beta1.Package.Identity
+	50, // 10: dtkt.flow.v1beta2.Input.bool:type_name -> dtkt.flow.v1beta2.Bool
+	51, // 11: dtkt.flow.v1beta2.Input.bytes:type_name -> dtkt.flow.v1beta2.Bytes
+	52, // 12: dtkt.flow.v1beta2.Input.double:type_name -> dtkt.flow.v1beta2.Double
+	53, // 13: dtkt.flow.v1beta2.Input.float:type_name -> dtkt.flow.v1beta2.Float
+	54, // 14: dtkt.flow.v1beta2.Input.int64:type_name -> dtkt.flow.v1beta2.Int64
+	55, // 15: dtkt.flow.v1beta2.Input.uint64:type_name -> dtkt.flow.v1beta2.Uint64
+	56, // 16: dtkt.flow.v1beta2.Input.int32:type_name -> dtkt.flow.v1beta2.Int32
+	57, // 17: dtkt.flow.v1beta2.Input.uint32:type_name -> dtkt.flow.v1beta2.Uint32
+	58, // 18: dtkt.flow.v1beta2.Input.string:type_name -> dtkt.flow.v1beta2.String
+	59, // 19: dtkt.flow.v1beta2.Input.list:type_name -> dtkt.flow.v1beta2.List
+	60, // 20: dtkt.flow.v1beta2.Input.map:type_name -> dtkt.flow.v1beta2.Map
+	61, // 21: dtkt.flow.v1beta2.Input.message:type_name -> dtkt.flow.v1beta2.Message
 	15, // 22: dtkt.flow.v1beta2.Input.throttle:type_name -> dtkt.flow.v1beta2.Rate
 	17, // 23: dtkt.flow.v1beta2.Input.transforms:type_name -> dtkt.flow.v1beta2.Transform
 	14, // 24: dtkt.flow.v1beta2.Var.switch:type_name -> dtkt.flow.v1beta2.Switch
@@ -7125,49 +7239,51 @@ var file_dtkt_flow_v1beta2_spec_proto_depIdxs = []int32{
 	13, // 39: dtkt.flow.v1beta2.Stream.retry_strategy:type_name -> dtkt.flow.v1beta2.RetryStrategy
 	2,  // 40: dtkt.flow.v1beta2.Stream.flow_control:type_name -> dtkt.flow.v1beta2.FlowControl
 	3,  // 41: dtkt.flow.v1beta2.Stream.node_control:type_name -> dtkt.flow.v1beta2.NodeControl
-	60, // 42: dtkt.flow.v1beta2.MethodCall.request:type_name -> google.protobuf.Value
-	34, // 43: dtkt.flow.v1beta2.Interaction.inputs:type_name -> dtkt.flow.v1beta2.Interaction.Input
+	62, // 42: dtkt.flow.v1beta2.MethodCall.request:type_name -> google.protobuf.Value
+	35, // 43: dtkt.flow.v1beta2.Interaction.inputs:type_name -> dtkt.flow.v1beta2.Interaction.Input
 	17, // 44: dtkt.flow.v1beta2.Interaction.transforms:type_name -> dtkt.flow.v1beta2.Transform
 	2,  // 45: dtkt.flow.v1beta2.Interaction.flow_control:type_name -> dtkt.flow.v1beta2.FlowControl
 	3,  // 46: dtkt.flow.v1beta2.Interaction.node_control:type_name -> dtkt.flow.v1beta2.NodeControl
-	61, // 47: dtkt.flow.v1beta2.Backoff.initial_backoff:type_name -> google.protobuf.Duration
-	61, // 48: dtkt.flow.v1beta2.Backoff.max_backoff:type_name -> google.protobuf.Duration
+	63, // 47: dtkt.flow.v1beta2.Backoff.initial_backoff:type_name -> google.protobuf.Duration
+	63, // 48: dtkt.flow.v1beta2.Backoff.max_backoff:type_name -> google.protobuf.Duration
 	12, // 49: dtkt.flow.v1beta2.RetryStrategy.backoff:type_name -> dtkt.flow.v1beta2.Backoff
-	35, // 50: dtkt.flow.v1beta2.Switch.case:type_name -> dtkt.flow.v1beta2.Switch.Case
-	61, // 51: dtkt.flow.v1beta2.Rate.interval:type_name -> google.protobuf.Duration
-	36, // 52: dtkt.flow.v1beta2.Generator.ticker:type_name -> dtkt.flow.v1beta2.Generator.Ticker
-	37, // 53: dtkt.flow.v1beta2.Generator.cron:type_name -> dtkt.flow.v1beta2.Generator.Cron
-	38, // 54: dtkt.flow.v1beta2.Generator.range:type_name -> dtkt.flow.v1beta2.Generator.Range
-	40, // 55: dtkt.flow.v1beta2.Transform.reduce:type_name -> dtkt.flow.v1beta2.Transform.Reduce
-	41, // 56: dtkt.flow.v1beta2.Transform.scan:type_name -> dtkt.flow.v1beta2.Transform.Scan
-	62, // 57: dtkt.flow.v1beta2.Input.ListBinding.value:type_name -> google.protobuf.ListValue
-	63, // 58: dtkt.flow.v1beta2.Input.MapBinding.value:type_name -> google.protobuf.Struct
-	64, // 59: dtkt.flow.v1beta2.Interaction.SelectBinding.value:type_name -> google.protobuf.Any
-	64, // 60: dtkt.flow.v1beta2.Interaction.MultiSelectBinding.value:type_name -> google.protobuf.Any
-	65, // 61: dtkt.flow.v1beta2.Interaction.Input.confirm:type_name -> dtkt.protoform.v1beta1.ConfirmElement
-	66, // 62: dtkt.flow.v1beta2.Interaction.Input.input:type_name -> dtkt.protoform.v1beta1.InputElement
-	67, // 63: dtkt.flow.v1beta2.Interaction.Input.file:type_name -> dtkt.protoform.v1beta1.FileElement
-	68, // 64: dtkt.flow.v1beta2.Interaction.Input.select:type_name -> dtkt.protoform.v1beta1.SelectElement
-	69, // 65: dtkt.flow.v1beta2.Interaction.Input.multi_select:type_name -> dtkt.protoform.v1beta1.MultiSelectElement
-	61, // 66: dtkt.flow.v1beta2.Generator.Ticker.interval:type_name -> google.protobuf.Duration
-	61, // 67: dtkt.flow.v1beta2.Generator.Ticker.delay:type_name -> google.protobuf.Duration
-	15, // 68: dtkt.flow.v1beta2.Generator.Range.rate:type_name -> dtkt.flow.v1beta2.Rate
-	42, // 69: dtkt.flow.v1beta2.Transform.GroupBy.window:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window
-	39, // 70: dtkt.flow.v1beta2.Transform.Reduce.group_by:type_name -> dtkt.flow.v1beta2.Transform.GroupBy
-	39, // 71: dtkt.flow.v1beta2.Transform.Scan.group_by:type_name -> dtkt.flow.v1beta2.Transform.GroupBy
-	43, // 72: dtkt.flow.v1beta2.Transform.GroupBy.Window.fixed:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window.Fixed
-	44, // 73: dtkt.flow.v1beta2.Transform.GroupBy.Window.sliding:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window.Sliding
-	45, // 74: dtkt.flow.v1beta2.Transform.GroupBy.Window.session:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window.Session
-	46, // 75: dtkt.flow.v1beta2.Transform.GroupBy.Window.event:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window.Event
-	61, // 76: dtkt.flow.v1beta2.Transform.GroupBy.Window.Fixed.length:type_name -> google.protobuf.Duration
-	61, // 77: dtkt.flow.v1beta2.Transform.GroupBy.Window.Sliding.length:type_name -> google.protobuf.Duration
-	61, // 78: dtkt.flow.v1beta2.Transform.GroupBy.Window.Sliding.slide:type_name -> google.protobuf.Duration
-	61, // 79: dtkt.flow.v1beta2.Transform.GroupBy.Window.Session.timeout:type_name -> google.protobuf.Duration
-	80, // [80:80] is the sub-list for method output_type
-	80, // [80:80] is the sub-list for method input_type
-	80, // [80:80] is the sub-list for extension type_name
-	80, // [80:80] is the sub-list for extension extendee
-	0,  // [0:80] is the sub-list for field type_name
+	37, // 50: dtkt.flow.v1beta2.Switch.case:type_name -> dtkt.flow.v1beta2.Switch.Case
+	63, // 51: dtkt.flow.v1beta2.Rate.interval:type_name -> google.protobuf.Duration
+	38, // 52: dtkt.flow.v1beta2.Generator.ticker:type_name -> dtkt.flow.v1beta2.Generator.Ticker
+	39, // 53: dtkt.flow.v1beta2.Generator.cron:type_name -> dtkt.flow.v1beta2.Generator.Cron
+	40, // 54: dtkt.flow.v1beta2.Generator.range:type_name -> dtkt.flow.v1beta2.Generator.Range
+	42, // 55: dtkt.flow.v1beta2.Transform.reduce:type_name -> dtkt.flow.v1beta2.Transform.Reduce
+	43, // 56: dtkt.flow.v1beta2.Transform.scan:type_name -> dtkt.flow.v1beta2.Transform.Scan
+	64, // 57: dtkt.flow.v1beta2.Input.ListBinding.value:type_name -> google.protobuf.ListValue
+	65, // 58: dtkt.flow.v1beta2.Input.MapBinding.value:type_name -> google.protobuf.Struct
+	66, // 59: dtkt.flow.v1beta2.Interaction.SelectBinding.value:type_name -> google.protobuf.Any
+	66, // 60: dtkt.flow.v1beta2.Interaction.MultiSelectBinding.value:type_name -> google.protobuf.Any
+	36, // 61: dtkt.flow.v1beta2.Interaction.Response.bindings:type_name -> dtkt.flow.v1beta2.Interaction.Response.BindingsEntry
+	67, // 62: dtkt.flow.v1beta2.Interaction.Input.confirm:type_name -> dtkt.protoform.v1beta1.ConfirmElement
+	68, // 63: dtkt.flow.v1beta2.Interaction.Input.input:type_name -> dtkt.protoform.v1beta1.InputElement
+	69, // 64: dtkt.flow.v1beta2.Interaction.Input.file:type_name -> dtkt.protoform.v1beta1.FileElement
+	70, // 65: dtkt.flow.v1beta2.Interaction.Input.select:type_name -> dtkt.protoform.v1beta1.SelectElement
+	71, // 66: dtkt.flow.v1beta2.Interaction.Input.multi_select:type_name -> dtkt.protoform.v1beta1.MultiSelectElement
+	66, // 67: dtkt.flow.v1beta2.Interaction.Response.BindingsEntry.value:type_name -> google.protobuf.Any
+	63, // 68: dtkt.flow.v1beta2.Generator.Ticker.interval:type_name -> google.protobuf.Duration
+	63, // 69: dtkt.flow.v1beta2.Generator.Ticker.delay:type_name -> google.protobuf.Duration
+	15, // 70: dtkt.flow.v1beta2.Generator.Range.rate:type_name -> dtkt.flow.v1beta2.Rate
+	44, // 71: dtkt.flow.v1beta2.Transform.GroupBy.window:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window
+	41, // 72: dtkt.flow.v1beta2.Transform.Reduce.group_by:type_name -> dtkt.flow.v1beta2.Transform.GroupBy
+	41, // 73: dtkt.flow.v1beta2.Transform.Scan.group_by:type_name -> dtkt.flow.v1beta2.Transform.GroupBy
+	45, // 74: dtkt.flow.v1beta2.Transform.GroupBy.Window.fixed:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window.Fixed
+	46, // 75: dtkt.flow.v1beta2.Transform.GroupBy.Window.sliding:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window.Sliding
+	47, // 76: dtkt.flow.v1beta2.Transform.GroupBy.Window.session:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window.Session
+	48, // 77: dtkt.flow.v1beta2.Transform.GroupBy.Window.event:type_name -> dtkt.flow.v1beta2.Transform.GroupBy.Window.Event
+	63, // 78: dtkt.flow.v1beta2.Transform.GroupBy.Window.Fixed.length:type_name -> google.protobuf.Duration
+	63, // 79: dtkt.flow.v1beta2.Transform.GroupBy.Window.Sliding.length:type_name -> google.protobuf.Duration
+	63, // 80: dtkt.flow.v1beta2.Transform.GroupBy.Window.Sliding.slide:type_name -> google.protobuf.Duration
+	63, // 81: dtkt.flow.v1beta2.Transform.GroupBy.Window.Session.timeout:type_name -> google.protobuf.Duration
+	82, // [82:82] is the sub-list for method output_type
+	82, // [82:82] is the sub-list for method input_type
+	82, // [82:82] is the sub-list for extension type_name
+	82, // [82:82] is the sub-list for extension extendee
+	0,  // [0:82] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_flow_v1beta2_spec_proto_init() }
@@ -7212,14 +7328,14 @@ func file_dtkt_flow_v1beta2_spec_proto_init() {
 		(*Transform_Reduce_)(nil),
 		(*Transform_Scan_)(nil),
 	}
-	file_dtkt_flow_v1beta2_spec_proto_msgTypes[33].OneofWrappers = []any{
+	file_dtkt_flow_v1beta2_spec_proto_msgTypes[34].OneofWrappers = []any{
 		(*Interaction_Input_Confirm)(nil),
 		(*Interaction_Input_Input)(nil),
 		(*Interaction_Input_File)(nil),
 		(*Interaction_Input_Select)(nil),
 		(*Interaction_Input_MultiSelect)(nil),
 	}
-	file_dtkt_flow_v1beta2_spec_proto_msgTypes[41].OneofWrappers = []any{
+	file_dtkt_flow_v1beta2_spec_proto_msgTypes[43].OneofWrappers = []any{
 		(*Transform_GroupBy_Window_Fixed_)(nil),
 		(*Transform_GroupBy_Window_Sliding_)(nil),
 		(*Transform_GroupBy_Window_Session_)(nil),
@@ -7231,7 +7347,7 @@ func file_dtkt_flow_v1beta2_spec_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_flow_v1beta2_spec_proto_rawDesc), len(file_dtkt_flow_v1beta2_spec_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   46,
+			NumMessages:   48,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

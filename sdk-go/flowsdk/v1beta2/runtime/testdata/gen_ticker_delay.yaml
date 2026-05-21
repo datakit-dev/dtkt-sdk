@@ -2,10 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: gen_ticker_delay
-  description: |
-    Ticker generator with an initial delay before the first emission.
-    Verifies that no value is emitted before `delay` elapses, then ticks
-    fire at `interval` until stop_when reaches the cap.
+  description: >-
+    Ticker generator with a 50ms initial `delay` plus a 50ms `interval` between
+    ticks, bounded by stop_when at eval_count >= 2. The test asserts elapsed
+    time is >= 80ms (delay + 1 interval) and that exactly 2 results land.
+    Guards that the `delay` field is honored as an offset before the FIRST tick
+    (not just the interval between subsequent ticks).
   generators:
     - id: tick
       ticker:

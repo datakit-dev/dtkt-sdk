@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: reduce_filter_then_reduce
+  description: >-
+    Two-stage pipeline: filter passes only int64 values > 1000, then reduce
+    sums them. Feeding 1, 2, 3 (all fail the filter) yields no output -- the
+    downstream reduce sees nothing and emits nothing on EOF. Guards that a
+    filtered-empty stream propagates correctly through a chained reduce instead
+    of emitting the initial value alone.
   inputs:
     - id: x
       int64: {}

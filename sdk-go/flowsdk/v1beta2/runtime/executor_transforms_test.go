@@ -140,7 +140,7 @@ func TestGraph_Transform_MapThenFlattenThenFilter(t *testing.T) {
 	})
 }
 
-func TestGraph_Transform_FilterMapReduce(t *testing.T) {
+func TestGraph_Transform_FilterMapScan(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		graph := loadFlow(t, "transform_filter_map_scan.yaml")
 
@@ -157,7 +157,7 @@ func TestGraph_Transform_FilterMapReduce(t *testing.T) {
 	})
 }
 
-func TestGraph_Transform_MapFlattenReduce(t *testing.T) {
+func TestGraph_Transform_MapFlattenScan(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		graph := loadFlow(t, "transform_map_flatten_scan.yaml")
 
@@ -442,7 +442,7 @@ func TestGraph_Transform_ContextCancel(t *testing.T) {
 
 // Phase 5.5: Chained reduces across node types
 
-func TestGraph_Transform_InputThenVar_ChainedReduces(t *testing.T) {
+func TestGraph_Transform_InputReduce_VarScan(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		graph := loadFlow(t, "transform_input_var_chained_reduces.yaml")
 

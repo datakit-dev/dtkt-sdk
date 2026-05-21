@@ -2,6 +2,14 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_action_suspend
+  description: >-
+    Action with flow_control.suspend_when=true (always true): after the first
+    RPC, the action node reaches PHASE_SUSPENDED and the handler parks. The
+    test subscribes to the action's topic to observe the phase change, verifies
+    no further outputs are emitted, then issues Terminate to unblock the
+    executor (flow returns ErrTerminated). Guards that suspend is a real
+    handler park (not just a phase publication) -- additional queued inputs are
+    NOT processed.
   inputs:
     - id: msg
       int64: {}

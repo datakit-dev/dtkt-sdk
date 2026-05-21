@@ -1,0 +1,31 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_noderef_var_chain
+  description: >-
+    Action emits test.TestResponse; var `passthrough = actions.run.value`
+    carries it forward; downstream output references
+    `vars.passthrough.value.bogus_field`. Lint must resolve the var's type
+    transitively through to the action's response descriptor and report
+    CodeUnknownField. Guards transitive type-walking across var-passthrough
+    chains.
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: x
+      string: {}
+  actions:
+    - id: run
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request:
+          name: "= inputs.x.value"
+  vars:
+    - id: passthrough
+      value: "= actions.run.value"
+  outputs:
+    - id: bad_through_var
+      value: "= vars.passthrough.value.bogus_field"

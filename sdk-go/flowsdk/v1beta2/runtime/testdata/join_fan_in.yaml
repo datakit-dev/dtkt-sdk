@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: join_fan_in
-  description: "Fan-in: two vars with filter feed separate outputs"
+  description: >-
+    Partition pattern (despite the name): input fans out to two filtering vars
+    -- `small` keeps <=5, `large` keeps >5 and maps *10. Each var feeds its own
+    output. Guards that complementary filters route every input to exactly one
+    branch (no double-counting) and that the large branch's two-step transform
+    pipeline (filter then map) runs in order.
   inputs:
     - id: x
       int64: {}

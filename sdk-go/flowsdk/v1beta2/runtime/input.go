@@ -147,6 +147,25 @@ func inputTypeDefault(inp *flowv1beta2.Input) *expr.Value {
 				return v
 			}
 		}
+	case flowv1beta2.Input_List_case:
+		l := inp.GetList()
+		if l.HasDefault() {
+			// Input.List.default is google.protobuf.ListValue. Same Any-
+			// wrap pattern as Message; the CEL adapter unwraps the WKT
+			// to a native CEL list.
+			if v, err := protoToExpr(l.GetDefault()); err == nil {
+				return v
+			}
+		}
+	case flowv1beta2.Input_Map_case:
+		m := inp.GetMap()
+		if m.HasDefault() {
+			// Input.Map.default is google.protobuf.Struct (same WKT the
+			// Message arm wraps). The CEL adapter unwraps it to a map.
+			if v, err := protoToExpr(m.GetDefault()); err == nil {
+				return v
+			}
+		}
 	}
 	return nil
 }

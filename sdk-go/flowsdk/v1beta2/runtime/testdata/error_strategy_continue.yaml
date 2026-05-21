@@ -2,6 +2,14 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: error_strategy_continue
+  description: >-
+    Flow-level error_strategy = CONTINUE: one action always fails (calls
+    error.Internal), one always succeeds (echoes a range generator). Under
+    CONTINUE the failing path's errors don't terminate the flow -- the
+    ok_action keeps running until its inputs complete. Guards that
+    ERROR_STRATEGY_CONTINUE lets healthy paths run to completion alongside
+    failing ones, in contrast to TERMINATE (where the first error aborts
+    everything).
   error_strategy: ERROR_STRATEGY_CONTINUE
   inputs:
     - id: fail_input

@@ -2,6 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_side_effect_not_orphaned
+  description: >-
+    Trivial input -> output flow with no intermediate vars. Lint must produce
+    zero diagnostics. Guards that nodes that are themselves terminal (an output
+    is a side-effect, not an orphan) are not flagged as orphaned.
   inputs:
     - id: x
       int64: {}

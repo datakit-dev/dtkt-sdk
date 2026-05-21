@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_overrides_fc_same_node
+  description: >-
+    Var declares NC.terminate_when=true alongside FC.suspend_when=true
+    (different branches, same node). NC fires first: TerminateNode publishes
+    PHASE_CANCELLED on the var topic before FC's flow-wide suspend can race
+    with it. Downstream behavior depends on whether output sees FC.suspend or
+    EOF first; the invariant verified is just NC's per-node PHASE_CANCELLED
+    landing first.
   inputs:
     - id: x
       int64: {}

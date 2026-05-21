@@ -1,0 +1,27 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_noderef_stream_value_unknown
+  description: >-
+    Output references `streams.tick.value.bogus_field`, where the stream emits
+    test.TestResponse. Lint must report CodeUnknownField naming `bogus_field`
+    and `test.TestResponse`. Guards that streams share the action's
+    callTypeInfo path so the node-ref selector chain walker covers stream
+    nodes, not just actions.
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: x
+      string: {}
+  streams:
+    - id: tick
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request:
+          name: "= inputs.x.value"
+  outputs:
+    - id: bad
+      value: "= streams.tick.value.bogus_field"

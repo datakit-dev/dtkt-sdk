@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_cache
+  description: >-
+    Int64 input with cache:true and throttle 1/50ms. The pushed value is
+    captured into the cache; the all-cached-deps output fires exactly once with
+    that value. Feeding 42 emits [42]. Guards that input-level caching makes
+    the value available to consumers exactly once via the snapshot path (rather
+    than forwarding each throttle pulse).
   inputs:
     - id: x
       int64: {}

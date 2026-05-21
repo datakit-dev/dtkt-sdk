@@ -2,7 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_numeric_int
-  description: "Numeric subfield from a Go-int-valued struct -> int64 output"
+  description: >-
+    Output reads a numeric `count` subfield from a struct input. Two tests
+    reuse this fixture: (1) feed a Go map with int64 value 7 -> output emits
+    int64 7; (2) feed a structpb.Struct with the same logical value -> output
+    emits double 7.0 (since structpb wraps all numbers as doubles). Guards that
+    the wire-side type of a numeric subfield is preserved per source type,
+    rather than being collapsed into one unified numeric type.
   inputs:
     - id: x
       string: {}

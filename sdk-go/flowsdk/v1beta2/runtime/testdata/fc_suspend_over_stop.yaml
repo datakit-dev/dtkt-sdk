@@ -1,0 +1,34 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fc_suspend_over_stop
+  description: >-
+    Var with BOTH flow_control.suspend_when and flow_control.stop_when
+    matching simultaneously on the same input value. Exercises the
+    same-iteration priority contract documented at
+    checkLifecycleControl in flow_control.go ("Priority: terminate >
+    suspend > stop"): when both fire, suspend wins and the handler
+    parks rather than draining. suspend_when matches value==5;
+    stop_when matches value>=5. Used by
+    TestFlowControl_SuspendOverStop_Priority. Feeding [5, 6]: value 5
+    fires both -> suspend wins, handler enters PHASE_SUSPENDED;
+    operator Resume; value 6 fires only stop (not suspend) ->
+    gracefulStop, value 6 publishes, drain and exit cleanly. The test
+    verifies (a) PHASE_SUSPENDED reached on iter 1 (proves suspend
+    won, not stop), (b) Execute does NOT return during suspend, (c)
+    after Resume the handler processes value 6 then exits cleanly with
+    nil error (proves stop_when still works after a same-iteration
+    co-fire with suspend, and that the runtime correctly distinguishes
+    iter 1's "both fired" from iter 2's "only stop fired").
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: passthrough
+      value: "= inputs.x.value"
+      flow_control:
+        suspend_when: "= inputs.x.value == 5"
+        stop_when: "= inputs.x.value >= 5"
+  outputs:
+    - id: result
+      value: "= vars.passthrough.value"

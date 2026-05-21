@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_stream_throttle_stop
-  description: "NC.stop_when on a throttled Stream; verifies throttle wait honors stopCh"
+  description: >-
+    Stream with throttle (count=1 per 1s) and node_control.stop_when=true. NC
+    stop must wake the throttle wait so the stream handler exits at its next
+    safe point rather than blocking for the full interval. Stream-side
+    counterpart to nc_action_throttle_stop.
   inputs:
     - id: msg
       string: {}

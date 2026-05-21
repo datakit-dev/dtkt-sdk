@@ -2,6 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_to_var
+  description: >-
+    Action feeds a var whose map transform triples the value. Feeding 4, 9
+    emits 12, 27. Guards that an action's output flows into a downstream var
+    node and that the var's transform applies per emission.
   inputs:
     - id: x
       int64: {}

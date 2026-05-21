@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_missing_method
-  description: "Action referencing a non-existent method"
+  description: >-
+    Action references the method `nonexistent.DoSomething` which is not
+    registered with any connector. The runtime fails at handler construction
+    with a 'not found' error before any input flows. Guards that missing-method
+    references are reported with a clear error rather than silently no-oping or
+    panicking at first input.
   inputs:
     - id: x
       int64: {}

@@ -2,6 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_string_echo
+  description: >-
+    Echo action with string-typed inputs (rather than int64). Feeding 'hello',
+    'world' echoes them through unchanged. Guards that action request/response
+    handling works with non-numeric scalar types, not just numeric ones.
   inputs:
     - id: msg
       string: {}

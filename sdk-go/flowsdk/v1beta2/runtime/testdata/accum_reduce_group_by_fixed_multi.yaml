@@ -1,0 +1,39 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: reduce_group_by_fixed_multi
+  description: >-
+    GroupBy key (even/odd) + fixed window (150ms) with timing that spans
+    two windows. Range emits 1..6 spaced 50ms apart. Expected per-(key,
+    window) emissions: window 1 [0, 150ms) holds values 1, 2, 3 ->
+    odd_sum=1+3=4, even_sum=2; window 2 [150, 300ms) holds 4, 5, 6 ->
+    odd_sum=5, even_sum=4+6=10. Total: 4 emissions [4, 2, 5, 10] (order
+    depends on emission ordering within a window close). Companion to
+    accum_reduce_group_by_fixed.yaml which has all values in one window
+    (vacuous against Gap 1: 2 per-key emissions are produced regardless
+    of whether the window layer is honored). Tests Gap 1's
+    key+fixed-window combined code path. Used by
+    TestGraph_Reduce_GroupBy_FixedWindow_MultiEmission.
+  generators:
+    - id: seq
+      range:
+        start: 1
+        end: 6
+        rate:
+          count: 1
+          interval: "0.05s"
+  vars:
+    - id: grouped
+      value: "= generators.seq.value"
+      transforms:
+        - reduce:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+            group_by:
+              key: '= this.value % 2 == 0 ? "even" : "odd"'
+              window:
+                fixed:
+                  length: "0.15s"
+  outputs:
+    - id: result
+      value: "= vars.grouped.value"

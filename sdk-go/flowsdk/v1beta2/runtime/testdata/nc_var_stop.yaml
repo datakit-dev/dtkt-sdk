@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_var_stop
+  description: >-
+    Var doubles input; node_control.stop_when fires per-var at x>=3 (graceful
+    per-node). Feeding 1..5 yields a non-empty prefix of [2, 4, 6, 8, 10] --
+    the trigger value 6 is included (publish happens before checkLifecycle),
+    but buffered inputs after may not surface. Flow returns nil because NC
+    stops the node, not the flow. Guards that node_control.stop_when on a var
+    halts only that handler and leaves the flow exit clean.
   inputs:
     - id: x
       int64: {}

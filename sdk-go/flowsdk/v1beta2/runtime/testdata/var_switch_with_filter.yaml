@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: var_switch_with_filter
-  description: "Var with switch expression and filter keeping only 'big' values"
+  description: >-
+    Var in switch form (case > 100 -> "big", default "small") plus a transform
+    pipeline that filters for the literal "big". Feeding 5, 200, 50, 300:
+    switch emits ["small", "big", "small", "big"], filter keeps ["big",
+    "big"]. Guards that transforms run on top of switch output and that
+    switch+transforms compose on a single var.
   inputs:
     - id: x
       int64: {}

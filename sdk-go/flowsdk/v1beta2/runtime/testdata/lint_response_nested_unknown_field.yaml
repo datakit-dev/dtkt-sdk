@@ -1,0 +1,28 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_response_nested_unknown_field
+  description: >-
+    Action `response` transform references `this.response.nested.bogus` --
+    `nested` is a real TestNested submessage but `bogus` isn't a field on it.
+    Lint must report a CodeUnknownField diagnostic. Guards that response-side
+    validation descends through valid submessages and still catches typos at
+    the leaf.
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: x
+      string: {}
+  actions:
+    - id: run
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request:
+          name: "= inputs.x.value"
+        response: "= this.response.nested.bogus"
+  outputs:
+    - id: result
+      value: "= actions.run.value"

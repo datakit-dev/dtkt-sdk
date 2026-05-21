@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_string_to_output
-  description: "String input passed directly to output"
+  description: >-
+    String input passed straight to output, including an empty string. Feeding
+    'hello', '', 'world' emits StringValues with the empty string preserved.
+    Guards that empty strings flow through correctly (a common edge case where
+    'empty == null' bugs would drop the middle value).
   inputs:
     - id: x
       string: {}

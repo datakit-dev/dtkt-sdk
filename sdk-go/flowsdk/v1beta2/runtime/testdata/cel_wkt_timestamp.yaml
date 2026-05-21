@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_wkt_timestamp
-  description: "Compare a google.protobuf.Timestamp input against a CEL timestamp literal"
+  description: >-
+    Input is a google.protobuf.Timestamp; output compares it to the CEL literal
+    `timestamp('2020-01-01T00:00:00Z')`. Feeding 2025-01-01 yields true;
+    feeding 2010-01-01 yields false. Guards that the well-known Timestamp type
+    is recognized by CEL with both the input value and the literal converting
+    to the same comparable type.
   inputs:
     - id: x
       string: {}

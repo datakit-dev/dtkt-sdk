@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cache_action_basic
+  description: >-
+    Action with cache:true: the first upstream input triggers the RPC and
+    publishes the response; subsequent inputs are drained without re-invoking
+    the RPC or re-publishing. Feeding 11, 22, 33 yields exactly one output
+    (11). Guards that cache:true on an action captures the first response and
+    downstream consumers see that single value while later inputs flow through
+    silently.
   inputs:
     - id: x
       int64: {}

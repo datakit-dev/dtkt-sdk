@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_retry_when_match
+  description: >-
+    Action with `when` guard requiring code==14 (Unavailable). The RPC
+    `error.UnavailableThenOK` returns code 14 once then OK; the guard matches,
+    the strategy activates, backoff kicks in and the retry succeeds. Guards
+    that `when` enables the retry strategy when its condition matches (the
+    success-after-retry path), distinguishing it from the no-match variant
+    where the same backoff would NOT have run.
   inputs:
     - id: msg
       int64: {}

@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_invalid_transform_cel
+  description: >-
+    Var has a valid value expression but its transform map step is
+    syntactically invalid CEL (`+++nope`). Lint must report a CodeInvalidCEL
+    diagnostic referring to vars.bad. Guards that transform-stage CEL is
+    linted, not just the main `value` expression.
   vars:
     - id: bad
       value: "= 1"

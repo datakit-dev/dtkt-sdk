@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_struct_subfield
-  description: "Access top-level subfield of a structured input value"
+  description: >-
+    Output reads the `name` subfield off a struct input. Three tests reuse this
+    fixture: (1) Go map input -> 'alice'; (2) structpb.Struct input -> 'bob';
+    (3) structpb.Value wrapping a Struct -> 'carol'. Guards that one CEL
+    expression handles all three input encodings of the same logical struct --
+    raw Go map, structpb.Struct, and a Value wrapping a Struct.
   inputs:
     - id: x
       string: {}

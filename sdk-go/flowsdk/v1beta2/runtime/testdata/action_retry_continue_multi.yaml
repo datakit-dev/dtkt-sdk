@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_retry_continue_multi
+  description: >-
+    Two independent paths in one flow: a failing path (fail_input ->
+    fail_action calling error.Internal with continue_when converting code-13 to
+    the error message) and a healthy path (ok_input -> ok_action echoing). Each
+    path produces its own output. Guards that continue_when's error-to-value
+    rewrite on one branch does NOT disturb concurrent successful branches --
+    the flow yields both 'internal server error' (fail) and 42 (ok).
   inputs:
     - id: fail_input
       int64: {}

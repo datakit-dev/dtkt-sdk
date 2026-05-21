@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_throttle
+  description: >-
+    Action rate-limited to 5 invocations per 500ms (one every 100ms after the
+    first burst). Feeding 5 values yields all 5 outputs but the elapsed time
+    should be at least 300ms (4 inter-call gaps). Guards that the throttle
+    pacing actually delays subsequent invocations rather than passing all
+    values through immediately.
   inputs:
     - id: x
       int64: {}

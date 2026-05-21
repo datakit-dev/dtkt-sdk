@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: join_diamond_multiple
-  description: "Diamond with doubled and negated vars"
+  description: >-
+    Diamond topology with doubled (*2) and negated (*-1) vars converging at a
+    sum output. For input n the sum is n*2 + (-n) = n. Guards that two derived
+    vars join correctly at the output even when one path produces negative
+    values (covers edge cases that an all-positive flow would miss).
   inputs:
     - id: x
       int64: {}

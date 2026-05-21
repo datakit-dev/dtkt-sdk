@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_flatten_scalar_passthrough
-  description: "Flatten on scalar value passes through unchanged"
+  description: >-
+    Var transform is `flatten: true` applied to scalar int64 values (not
+    lists). Feeding 5, 10, 15 yields [5, 10, 15] -- flatten on a non-list is a
+    no-op, not an error. Guards that flatten is robust to scalar inputs and
+    doesn't crash or wrap them.
   inputs:
     - id: x
       int64: {}

@@ -4,10 +4,13 @@ import (
 	"testing"
 	"time"
 
+	expr "cel.dev/expr"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/pubsub"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // --- flow_control: stop_when (literal constants) ---
@@ -51,8 +54,19 @@ func TestFlowControl_Ticker_StopWhen(t *testing.T) {
 	})
 }
 
-// Var with stop_when stops the flow when the condition is met.
-// stop is graceful: all buffered inputs are drained before shutdown.
+// Var with stop_when on a generator-sourced flow. The range generator
+// emits up to 100 values; FC.stop_when on the var fires when the
+// generator's value reaches 5. Without FC.stop firing, the generator
+// would run to 100 and the test would hit testContext.
+//
+// Spec contract: FC.stop_when on the var triggers gracefulStop, which
+// signals stopCh on the generator (executor_setup.go:181-190). The
+// generator exits at its next safe point; the var drains any in-flight
+// values; the flow exits with nil within bounded time.
+//
+// Fixture is generator-sourced because with the previous finite-input
+// fixture, natural drain produced the same outputs as graceful stop --
+// the test passed whether FC.stop fired or not (vacuous-test pattern).
 
 func TestFlowControl_Var_StopWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
@@ -61,22 +75,41 @@ func TestFlowControl_Var_StopWhen(t *testing.T) {
 		ps := newPubSub()
 		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
-		// Feed values 1..5. stop_when triggers at inputs.x.value >= 3, but stop
-		// is graceful -- all buffered inputs (1..5) are processed and drained.
-		feedInput(ps, "inputs.x", int64(1), int64(2), int64(3), int64(4), int64(5))
-
 		ctx := testContext(t)
+		start := time.Now()
 		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
+		elapsed := time.Since(start)
 		require.NoError(t, err)
 
+		// Without FC.stop firing, the flow would run for the full
+		// 100-element range. Promptly returning proves the stop
+		// path engaged.
+		assert.Less(t, elapsed, 2*time.Second,
+			"FC.stop_when must terminate the generator promptly; running >2s indicates stop never fired")
+
 		results := outputInt64s(collectOutputs(ctx, ps, "outputs.result"))
-		// All 5 inputs are processed (doubled): 2, 4, 6, 8, 10.
-		assert.Equal(t, []int64{2, 4, 6, 8, 10}, results)
+		// stop_when triggers at generators.seq.value>=5. With graceful
+		// drain, the trigger value's emission (10) plus in-flight earlier
+		// emissions surface. Upper bound is loose because publish->stopCh
+		// has the same race as fc_var_terminate (publish then
+		// checkLifecycle). Lower bound enforces that at least the trigger
+		// value's doubled emission lands.
+		require.GreaterOrEqual(t, len(results), 1,
+			"trigger value's emission must surface before stop fires")
+		require.Less(t, len(results), 50,
+			"FC.stop_when must bound the run well below the 100-element range; "+
+				"len near full range indicates stop didn't fire")
+		// Each emit must be 2*N for some sequential N starting at 1.
+		for i, v := range results {
+			assert.Equal(t, int64((i+1)*2), v,
+				"result[%d] must equal 2*(i+1) -- generator + double", i)
+		}
 	})
 }
 
-// Action with stop_when (always true) stops after the first call.
-// stop is graceful: all buffered inputs are drained.
+// Action with stop_when on a generator-sourced flow. Redesigned from the
+// previous finite-input fixture which was vacuous. With a generator,
+// FC.stop firing is the only way the flow exits in bounded time.
 
 func TestFlowControl_Action_StopWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
@@ -85,24 +118,32 @@ func TestFlowControl_Action_StopWhen(t *testing.T) {
 		ps := newPubSub()
 		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
-		feedInput(ps, "inputs.msg", int64(42), int64(99))
-
 		ctx := testContext(t)
 		opts := append(mockRPCOptions(), extraOpts...)
+		start := time.Now()
 		err := NewExecutor(ps, testTopics, opts...).Execute(ctx, graph)
+		elapsed := time.Since(start)
 		require.NoError(t, err)
 
+		assert.Less(t, elapsed, 2*time.Second,
+			"FC.stop_when must terminate promptly; >2s means stop never fired")
+
 		results := collectOutputs(ctx, ps, "outputs.result")
-		// stop_when is always true, but stop is graceful -- both buffered
-		// inputs (42, 99) are processed. Exact outputs: [42, 99].
-		require.Len(t, results, 2)
-		assert.Equal(t, int64(42), results[0].GetValue().GetInt64Value())
-		assert.Equal(t, int64(99), results[1].GetValue().GetInt64Value())
+		require.GreaterOrEqual(t, len(results), 1,
+			"trigger value's emission must surface")
+		require.Less(t, len(results), 50,
+			"FC.stop_when must bound the run well below the 100-element range (stop never fired)")
+		for i, r := range results {
+			assert.Equal(t, int64(i+1), r.GetValue().GetInt64Value(),
+				"result[%d] must equal i+1 (echoed generator value)", i)
+		}
 	})
 }
 
-// Output with stop_when (always true) stops after the first output.
-// stop is graceful: all buffered inputs are drained.
+// Output with stop_when on a generator-sourced flow. Redesigned from the
+// previous finite-input fixture which was vacuous (natural drain ==
+// graceful drain on the wire). With a generator, FC.stop firing is the
+// only way the flow exits in bounded time.
 
 func TestFlowControl_Output_StopWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
@@ -111,16 +152,25 @@ func TestFlowControl_Output_StopWhen(t *testing.T) {
 		ps := newPubSub()
 		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
-		feedInput(ps, "inputs.x", int64(10), int64(20), int64(30))
-
 		ctx := testContext(t)
+		start := time.Now()
 		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, graph)
+		elapsed := time.Since(start)
 		require.NoError(t, err)
 
+		assert.Less(t, elapsed, 2*time.Second,
+			"FC.stop_when must terminate promptly; >2s means stop never fired")
+
 		results := outputInt64s(collectOutputs(ctx, ps, "outputs.result"))
-		// stop_when is always true, but stop is graceful -- all 3 buffered
-		// inputs are processed. Exact outputs: [10, 20, 30].
-		assert.Equal(t, []int64{10, 20, 30}, results)
+		// Trigger at gen value >= 5. At least one output (trigger value) must
+		// surface; far below the 100-element range bound.
+		require.GreaterOrEqual(t, len(results), 1,
+			"trigger value's emission must surface")
+		require.Less(t, len(results), 50,
+			"FC.stop_when must bound the run well below the 100-element range (stop never fired)")
+		for i, v := range results {
+			assert.Equal(t, int64(i+1), v, "result[%d] must equal i+1 (generator value)", i)
+		}
 	})
 }
 
@@ -260,8 +310,9 @@ func TestFlowControl_Action_TerminateWhen(t *testing.T) {
 
 // --- flow_control: stop_when on stream ---
 
-// Stream with stop_when (always true) stops after all buffered inputs.
-// stop is graceful: both buffered inputs are processed.
+// Stream with stop_when on a generator-sourced flow. Redesigned from the
+// previous finite-input fixture which was vacuous. With a generator,
+// FC.stop firing is the only way the flow exits in bounded time.
 
 func TestFlowControl_Stream_StopWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
@@ -270,19 +321,25 @@ func TestFlowControl_Stream_StopWhen(t *testing.T) {
 		ps := newPubSub()
 		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
-		feedInput(ps, "inputs.msg", "hello", "world")
-
 		ctx := testContext(t)
 		opts := append(mockRPCOptions(), extraOpts...)
+		start := time.Now()
 		err := NewExecutor(ps, testTopics, opts...).Execute(ctx, graph)
+		elapsed := time.Since(start)
 		require.NoError(t, err)
 
+		assert.Less(t, elapsed, 2*time.Second,
+			"FC.stop_when must terminate promptly; >2s means stop never fired")
+
 		results := collectOutputs(ctx, ps, "outputs.result")
-		// stop_when is always true, but stop is graceful -- both buffered
-		// inputs are processed. Exactly 2 results.
-		require.Len(t, results, 2)
-		assert.Equal(t, "hello", results[0].GetValue().GetStringValue())
-		assert.Equal(t, "world", results[1].GetValue().GetStringValue())
+		require.GreaterOrEqual(t, len(results), 1,
+			"trigger value's emission must surface")
+		require.Less(t, len(results), 50,
+			"FC.stop_when must bound the run well below the 100-element range (stop never fired)")
+		for i, r := range results {
+			assert.Equal(t, int64(i+1), r.GetValue().GetInt64Value(),
+				"result[%d] must equal i+1 (echoed generator value)", i)
+		}
 	})
 }
 
@@ -316,7 +373,9 @@ func TestFlowControl_Stream_TerminateWhen(t *testing.T) {
 
 // --- flow_control: stop_when on interaction ---
 
-// Interaction with stop_when (always true) stops after draining buffered inputs.
+// Interaction with stop_when on a generator-sourced flow. Redesigned from
+// the previous finite-input fixture which was vacuous. With a generator,
+// FC.stop firing is the only way the flow exits in bounded time.
 
 func TestFlowControl_Interaction_StopWhen(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
@@ -336,18 +395,27 @@ func TestFlowControl_Interaction_StopWhen(t *testing.T) {
 			close(responseCh)
 		}()
 
-		feedInput(ps, "inputs.x", int64(1), int64(2))
 		ctx := testContext(t)
+		start := time.Now()
 		err := NewExecutor(ps, testTopics, append([]Option{WithInteractions(promptCh, responseCh)}, extraOpts...)...).Execute(ctx, graph)
+		elapsed := time.Since(start)
 		close(promptCh) // Unblock auto-respond goroutine.
 		require.NoError(t, err)
 
+		assert.Less(t, elapsed, 2*time.Second,
+			"FC.stop_when must terminate promptly; >2s means stop never fired")
+
 		results := collectOutputs(ctx, ps, "outputs.result")
-		// stop_when is always true, but stop is graceful -- both buffered
-		// inputs are processed. Exactly 2 results, both 100.
-		require.Len(t, results, 2)
-		assert.Equal(t, int64(100), results[0].GetValue().GetInt64Value())
-		assert.Equal(t, int64(100), results[1].GetValue().GetInt64Value())
+		// At least one prompt+response must surface; far below the
+		// 100-element range bound.
+		require.GreaterOrEqual(t, len(results), 1,
+			"trigger value's emission must surface")
+		require.Less(t, len(results), 50,
+			"FC.stop_when must bound the run well below the 100-element range (stop never fired)")
+		for i, r := range results {
+			assert.Equal(t, int64(100), r.GetValue().GetInt64Value(),
+				"result[%d] must equal 100 (auto-responder)", i)
+		}
 	})
 }
 
@@ -581,6 +649,454 @@ func TestFlowControl_Interaction_SuspendWhen(t *testing.T) {
 		close(promptCh) // Unblock auto-respond goroutine.
 		execErr := requireExecuteReturnsBy(t, done, 500*time.Millisecond)
 		assert.ErrorIs(t, execErr, ErrTerminated)
+	})
+}
+
+// --- flow_control: output with suspend_when then stop_when (CEL-suspend + operator-resume + CEL-stop) ---
+
+// Output with two flow_control conditions evaluated in sequence on the same
+// handler. The ticker drives eval_count; suspend_when==3 parks the handler
+// via the FC callback (e.Suspend()), the test calls exec.Resume(), and then
+// stop_when>=6 fires a gracefulStop that drains the flow cleanly.
+//
+// This covers a gap left by TestFlowControl_Output_SuspendWhen and friends:
+// those tests terminate immediately after observing PHASE_SUSPENDED and never
+// prove that Resume() actually unparks a handler that was suspended via a CEL
+// expression (as opposed to operator-driven exec.Suspend()). It also proves
+// that a later flow_control condition on the same node continues to fire
+// after the resume.
+//
+// Expected outputs.result sequence: [1, 2, 3, 4, 5, 6].
+
+func TestFlowControl_Output_SuspendResumeStop(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "fc_output_suspend_resume_stop.yaml")
+
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
+
+		ctx := testContext(t)
+
+		// Subscribe BEFORE Execute starts so we capture every event from
+		// the first tick onwards. The output topic carries both
+		// NODE_OUTPUT events (the emitted values) and NODE_STATE events
+		// (phase transitions including PHASE_SUSPENDED).
+		outCh, err := ps.Subscribe(ctx, testTopics.For("outputs.result"))
+		require.NoError(t, err)
+
+		exec := NewExecutor(ps, testTopics, extraOpts...)
+		done := make(chan error, 1)
+		go func() {
+			done <- exec.Execute(ctx, graph)
+		}()
+
+		// The output handler publishes the tick value, then calls
+		// checkLifecycle (output.go:103-106) which may fire suspend_when
+		// after the third emission. We expect values 1, 2, 3 to land,
+		// then the handler to park.
+
+		// First three values arrive before suspend_when fires.
+		for i, want := range []int64{1, 2, 3} {
+			got := readNextInt64Output(t, outCh, 2*time.Second)
+			require.Equalf(t, want, got, "pre-suspend value %d: got %d, want %d", i, got, want)
+		}
+
+		// After the third emit, suspend_when (eval_count==3) fires and
+		// parks the whole flow. No further NODE_OUTPUT must arrive until
+		// we Resume. 200ms is a comfortable margin above the 50ms tick
+		// interval -- if Resume is broken or the handler isn't actually
+		// parked, we'd see tick 4 land here.
+		assertNoOutputDuring(t, outCh, 200*time.Millisecond)
+
+		// Resume. This is the path no existing FC suspend test exercises:
+		// the handler was parked by the FC callback, and we're proving
+		// the operator Resume() wakes it.
+		exec.Resume()
+
+		// Ticks 4, 5, 6 must land. Value 6 is emitted before stop_when
+		// fires (checkLifecycle runs after the publish), so all six
+		// values surface in the [1..6] sequence.
+		for i, want := range []int64{4, 5, 6} {
+			got := readNextInt64Output(t, outCh, 2*time.Second)
+			require.Equalf(t, want, got, "post-resume value %d: got %d, want %d", i, got, want)
+		}
+
+		// stop_when (eval_count>=6) calls gracefulStop, which cascades
+		// EOF through the flow. Execute must return nil (clean drain),
+		// not ErrTerminated.
+		execErr := requireExecuteReturnsBy(t, done, 2*time.Second)
+		require.NoError(t, execErr,
+			"stop_when on output must trigger a clean drain (gracefulStop), "+
+				"not a terminate; if this returns ErrTerminated the FC stop "+
+				"callback is wired to e.Terminate instead of gracefulStop")
+	})
+}
+
+// readNextInt64Output is the shared reader for the suspend/resume/stop
+// tests. It pulls the next NODE_OUTPUT event off the subscribed topic
+// (skipping phase-only events), unwraps the typed node's value to int64,
+// and fails the test on timeout, closed-stream, or EOF. Works against any
+// handler topic (vars.*, actions.*, streams.*, interactions.*, outputs.*)
+// via runtimeNodeFromEvent + the shared StateNode.GetValue() interface.
+//
+// Subscribe to the handler's OWN topic, not a downstream output's topic,
+// to avoid races where e.Suspend() publishes a PHASE_SUSPENDED to the
+// downstream node before the upstream's data events have been forwarded
+// through the outbox relay.
+//
+// Two value forms are handled: raw `Value_Int64Value` (vars/actions/
+// streams whose CEL returns the input value directly) and `ObjectValue`
+// wrapping a `wrapperspb.Int64Value` Any (interactions, where the
+// response value is delivered as an Any via WrapProtoAny on the
+// responder side). Downstream consumers see both forms transparently
+// because CEL eval unwraps Any; this helper does the same so tests can
+// subscribe directly to the producing handler's topic.
+func readNextInt64Output(t *testing.T, ch <-chan *pubsub.Message, budget time.Duration) int64 {
+	t.Helper()
+	deadline := time.After(budget)
+	for {
+		select {
+		case <-deadline:
+			t.Fatalf("timed out waiting for next NODE_OUTPUT within %v", budget)
+		case msg := <-ch:
+			evt := msg.Payload.(*flowv1beta2.RunSnapshot_FlowEvent)
+			msg.Ack()
+			if evt.GetEventType() != flowv1beta2.RunSnapshot_FlowEvent_EVENT_TYPE_NODE_OUTPUT {
+				continue
+			}
+			node := runtimeNodeFromEvent(evt)
+			if node == nil || isEOFValue(node.GetValue()) {
+				t.Fatalf("topic closed before sequence drained (saw EOF/closed mid-test)")
+			}
+			v := node.GetValue()
+			if i := v.GetInt64Value(); i != 0 || v.GetKind() != nil {
+				if _, ok := v.GetKind().(*expr.Value_Int64Value); ok {
+					return i
+				}
+			}
+			if obj := v.GetObjectValue(); obj != nil {
+				var wrap wrapperspb.Int64Value
+				if err := obj.UnmarshalTo(&wrap); err == nil {
+					return wrap.GetValue()
+				}
+				t.Fatalf("NODE_OUTPUT value is an Any but not Int64Value: %v", obj.GetTypeUrl())
+			}
+			t.Fatalf("NODE_OUTPUT value is neither Int64Value nor Any{Int64Value}: %v", v)
+			return 0
+		}
+	}
+}
+
+// --- flow_control: var with suspend_when then stop_when (CEL-suspend + operator-resume + CEL-stop) ---
+
+// Var with two flow_control conditions evaluated in sequence on the same
+// handler. Parallel to TestFlowControl_Output_SuspendResumeStop: the
+// existing TestFlowControl_Var_SuspendWhen terminates after observing
+// PHASE_SUSPENDED and never proves Resume() unparks a CEL-suspended var.
+// This test does. Expected outputs.result sequence: [1, 2, 3, 4, 5, 6].
+
+func TestFlowControl_Var_SuspendResumeStop(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "fc_var_suspend_resume_stop.yaml")
+
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
+
+		ctx := testContext(t)
+
+		// Subscribe to the VAR's own topic (where its data events publish).
+		// Subscribing to outputs.result would race in outbox mode: when the
+		// var's checkLifecycle fires e.Suspend(), publishSuspendedPhase
+		// commits a PHASE_SUSPENDED to outputs.result via the outbox; the
+		// relay may forward that phase event before the var's earlier data
+		// events have been forwarded to the output handler for processing.
+		outCh, err := ps.Subscribe(ctx, testTopics.For("vars.passthrough"))
+		require.NoError(t, err)
+
+		feedInput(ps, "inputs.x", int64(1), int64(2), int64(3), int64(4), int64(5), int64(6))
+
+		exec := NewExecutor(ps, testTopics, extraOpts...)
+		done := make(chan error, 1)
+		go func() {
+			done <- exec.Execute(ctx, graph)
+		}()
+
+		// First three values land before suspend_when (inputs.x.value==3) fires.
+		for i, want := range []int64{1, 2, 3} {
+			got := readNextInt64Output(t, outCh, 2*time.Second)
+			require.Equalf(t, want, got, "pre-suspend value %d: got %d, want %d", i, got, want)
+		}
+
+		// Handler parks after the third emit. No further NODE_OUTPUT must
+		// land until we Resume. 200ms is comfortable margin -- if Resume
+		// is broken or the handler isn't parked, input 4 would surface.
+		assertNoOutputDuring(t, outCh, 200*time.Millisecond)
+
+		exec.Resume()
+
+		// 4, 5, 6 land post-resume. stop_when fires after 6 publishes.
+		for i, want := range []int64{4, 5, 6} {
+			got := readNextInt64Output(t, outCh, 2*time.Second)
+			require.Equalf(t, want, got, "post-resume value %d: got %d, want %d", i, got, want)
+		}
+
+		execErr := requireExecuteReturnsBy(t, done, 2*time.Second)
+		require.NoError(t, execErr,
+			"stop_when on var must trigger a clean drain (gracefulStop), "+
+				"not a terminate")
+	})
+}
+
+// --- flow_control: action with suspend_when then stop_when ---
+
+// Action equivalent of TestFlowControl_Var_SuspendResumeStop. echo.Echo is
+// a registered unary that returns the request value unchanged, so feeding
+// [1..6] yields outputs [1..6] with the same suspend/resume/stop boundaries.
+
+func TestFlowControl_Action_SuspendResumeStop(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "fc_action_suspend_resume_stop.yaml")
+
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
+
+		ctx := testContext(t)
+		// Subscribe to the ACTION's own topic. See var test for the
+		// rationale -- avoids the outbox-relay race against
+		// publishSuspendedPhase on downstream output handlers.
+		outCh, err := ps.Subscribe(ctx, testTopics.For("actions.call"))
+		require.NoError(t, err)
+
+		feedInput(ps, "inputs.msg", int64(1), int64(2), int64(3), int64(4), int64(5), int64(6))
+
+		opts := append(mockRPCOptions(), extraOpts...)
+		exec := NewExecutor(ps, testTopics, opts...)
+		done := make(chan error, 1)
+		go func() {
+			done <- exec.Execute(ctx, graph)
+		}()
+
+		for i, want := range []int64{1, 2, 3} {
+			got := readNextInt64Output(t, outCh, 2*time.Second)
+			require.Equalf(t, want, got, "pre-suspend value %d: got %d, want %d", i, got, want)
+		}
+
+		assertNoOutputDuring(t, outCh, 200*time.Millisecond)
+
+		exec.Resume()
+
+		for i, want := range []int64{4, 5, 6} {
+			got := readNextInt64Output(t, outCh, 2*time.Second)
+			require.Equalf(t, want, got, "post-resume value %d: got %d, want %d", i, got, want)
+		}
+
+		execErr := requireExecuteReturnsBy(t, done, 2*time.Second)
+		require.NoError(t, execErr,
+			"stop_when on action must trigger a clean drain (gracefulStop), "+
+				"not a terminate")
+	})
+}
+
+// --- flow_control: stream with suspend_when then stop_when ---
+
+// Stream equivalent of TestFlowControl_Var_SuspendResumeStop. Uses
+// echo.Echo (the unary echo wrapped as a stream node, same pattern as
+// fc_stream_stop.yaml and fc_stream_suspend.yaml).
+
+func TestFlowControl_Stream_SuspendResumeStop(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "fc_stream_suspend_resume_stop.yaml")
+
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
+
+		ctx := testContext(t)
+		// Subscribe to the STREAM's own topic. See var test for the
+		// rationale -- avoids the outbox-relay race against
+		// publishSuspendedPhase on downstream output handlers.
+		outCh, err := ps.Subscribe(ctx, testTopics.For("streams.echo"))
+		require.NoError(t, err)
+
+		feedInput(ps, "inputs.msg", int64(1), int64(2), int64(3), int64(4), int64(5), int64(6))
+
+		opts := append(mockRPCOptions(), extraOpts...)
+		exec := NewExecutor(ps, testTopics, opts...)
+		done := make(chan error, 1)
+		go func() {
+			done <- exec.Execute(ctx, graph)
+		}()
+
+		for i, want := range []int64{1, 2, 3} {
+			got := readNextInt64Output(t, outCh, 2*time.Second)
+			require.Equalf(t, want, got, "pre-suspend value %d: got %d, want %d", i, got, want)
+		}
+
+		assertNoOutputDuring(t, outCh, 200*time.Millisecond)
+
+		exec.Resume()
+
+		for i, want := range []int64{4, 5, 6} {
+			got := readNextInt64Output(t, outCh, 2*time.Second)
+			require.Equalf(t, want, got, "post-resume value %d: got %d, want %d", i, got, want)
+		}
+
+		execErr := requireExecuteReturnsBy(t, done, 2*time.Second)
+		require.NoError(t, execErr,
+			"stop_when on stream must trigger a clean drain (gracefulStop), "+
+				"not a terminate")
+	})
+}
+
+// --- flow_control: interaction with suspend_when then stop_when ---
+
+// Interaction equivalent of TestFlowControl_Var_SuspendResumeStop. The
+// auto-responder echoes back the original input value 1:1, so feeding
+// [1..6] yields interaction responses [1..6] and outputs [1..6]. Suspend
+// fires AFTER the response for value 3 has been delivered and published,
+// since checkLifecycle runs after the publish (interaction.go:234).
+
+func TestFlowControl_Interaction_SuspendResumeStop(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "fc_interaction_suspend_resume_stop.yaml")
+
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
+
+		// Echo responder: response value = original input fed at the same
+		// position. Inputs are sent in order, so the Nth prompt's response
+		// is the Nth input value.
+		inputs := []int64{1, 2, 3, 4, 5, 6}
+		promptCh := make(chan *flowv1beta2.InteractionRequestEvent, len(inputs))
+		responseCh := make(chan *flowv1beta2.InteractionResponseEvent, len(inputs))
+
+		go func() {
+			idx := 0
+			for p := range promptCh {
+				if idx >= len(inputs) {
+					return
+				}
+				anyVal, _ := common.WrapProtoAny(inputs[idx])
+				responseCh <- &flowv1beta2.InteractionResponseEvent{
+					Id:    p.GetId(),
+					Token: p.GetToken(),
+					Value: anyVal,
+				}
+				idx++
+			}
+		}()
+
+		ctx := testContext(t)
+		// Subscribe to the INTERACTION's own topic. See var test for the
+		// rationale -- avoids the outbox-relay race against
+		// publishSuspendedPhase on downstream output handlers.
+		outCh, err := ps.Subscribe(ctx, testTopics.For("interactions.confirm"))
+		require.NoError(t, err)
+
+		feedInput(ps, "inputs.x", int64(1), int64(2), int64(3), int64(4), int64(5), int64(6))
+
+		opts := append([]Option{WithInteractions(promptCh, responseCh)}, extraOpts...)
+		exec := NewExecutor(ps, testTopics, opts...)
+		done := make(chan error, 1)
+		go func() {
+			done <- exec.Execute(ctx, graph)
+		}()
+
+		for i, want := range []int64{1, 2, 3} {
+			got := readNextInt64Output(t, outCh, 2*time.Second)
+			require.Equalf(t, want, got, "pre-suspend value %d: got %d, want %d", i, got, want)
+		}
+
+		assertNoOutputDuring(t, outCh, 200*time.Millisecond)
+
+		exec.Resume()
+
+		for i, want := range []int64{4, 5, 6} {
+			got := readNextInt64Output(t, outCh, 2*time.Second)
+			require.Equalf(t, want, got, "post-resume value %d: got %d, want %d", i, got, want)
+		}
+
+		execErr := requireExecuteReturnsBy(t, done, 2*time.Second)
+		require.NoError(t, execErr,
+			"stop_when on interaction must trigger a clean drain (gracefulStop), "+
+				"not a terminate")
+
+		close(promptCh)
+	})
+}
+
+// --- flow_control: same-iteration suspend-vs-stop priority ---
+
+// FlowControl priority contract (checkLifecycleControl in flow_control.go):
+//   terminate > suspend > stop
+//
+// Test: feed an input value that satisfies BOTH suspend_when and stop_when
+// on the same iteration. If suspend wins (correct), the handler parks. If
+// stop wins (regression), the handler drains and Execute returns.
+//
+// Discriminator: PHASE_SUSPENDED must land for the var before Execute
+// returns. Then a SECOND input that satisfies ONLY stop_when (not
+// suspend_when) is fed after Resume to confirm stop_when still works on
+// its own and the run completes cleanly.
+
+func TestFlowControl_SuspendOverStop_Priority(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "fc_suspend_over_stop.yaml")
+
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
+
+		ctx := testContext(t)
+
+		// Subscribe to the var's own topic before Execute starts.
+		varCh, err := ps.Subscribe(ctx, testTopics.For("vars.passthrough"))
+		require.NoError(t, err)
+
+		// Value 5 fires both suspend_when (==5) and stop_when (>=5).
+		// Value 6 fires only stop_when. The contract: iteration on
+		// value 5 must park (suspend wins), iteration on value 6 must
+		// stop. If stop won on value 5 we'd never see PHASE_SUSPENDED
+		// and Execute would return without our Resume.
+		feedInput(ps, "inputs.x", int64(5), int64(6))
+
+		exec := NewExecutor(ps, testTopics, extraOpts...)
+		done := make(chan error, 1)
+		go func() {
+			done <- exec.Execute(ctx, graph)
+		}()
+
+		// Value 5 must publish before checkLifecycle fires.
+		got := readNextInt64Output(t, varCh, 2*time.Second)
+		require.Equal(t, int64(5), got,
+			"value 5 must publish before suspend_when fires (publish-then-checkLifecycle order)")
+
+		// Suspend wins over stop on the same iteration -> handler
+		// reaches PHASE_SUSPENDED. If stop won instead, the var would
+		// drain and we'd see PHASE_SUCCEEDED here (and Execute would
+		// return nil immediately).
+		requirePhaseWithin(t, varCh, flowv1beta2.RunSnapshot_PHASE_SUSPENDED, 1*time.Second)
+
+		// Execute must NOT have returned yet -- suspend parks the flow,
+		// it does not terminate it. A regression where stop wins would
+		// have closed Execute by now.
+		select {
+		case err := <-done:
+			t.Fatalf("Execute returned during suspend; suspend_when priority over stop_when must keep the flow alive. err=%v", err)
+		default:
+		}
+
+		exec.Resume()
+
+		// Value 6 publishes, then stop_when (only) fires -> graceful
+		// stop -> handler drains and exits.
+		got = readNextInt64Output(t, varCh, 2*time.Second)
+		require.Equal(t, int64(6), got,
+			"value 6 must publish after Resume before stop_when fires")
+
+		execErr := requireExecuteReturnsBy(t, done, 2*time.Second)
+		require.NoError(t, execErr,
+			"after stop_when fires on iter 2 (without a co-firing suspend), gracefulStop "+
+				"must drain the flow cleanly; if this returns non-nil, stop_when's drain "+
+				"path is broken once a prior suspend has been resumed")
 	})
 }
 

@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cache_var_with_filter
+  description: >-
+    Var with cache:true AND a filter transform (>10): capture must happen AFTER
+    the filter so values that fail the filter do not lock in as the captured
+    value. Feeding 3, 7, 42, 99 -> 3 and 7 are filtered out; 42 is the first to
+    pass and gets captured; 99 is drained. Output emits exactly 42. Guards that
+    cache capture is post-transform: a pre-transform bug would let 3 lock in,
+    leaving the consumer starved.
   inputs:
     - id: x
       int64: {}

@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: outbox_chain
+  description: >-
+    Two-step var chain: vars.inc = n + 1; vars.sq = inc * inc; output emits sq.
+    Feeding 2, 4 yields [9, 25] ((2+1)^2, (4+1)^2). Used in outbox tests to
+    verify that a multi-step var chain produces durable outbox entries for
+    each intermediate var (not just terminal outputs); snapshot captures both
+    `inc` and `sq` in PHASE_SUCCEEDED. Guards outbox capture across an
+    intermediate var hop.
   inputs:
     - id: "n"
       int64: {}

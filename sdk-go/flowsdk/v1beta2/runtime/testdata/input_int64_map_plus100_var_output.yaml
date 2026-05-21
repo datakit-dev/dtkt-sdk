@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_int64_map_plus100_var_output
-  description: "Int64 input with map +100 transform, passed through a var to output"
+  description: >-
+    Int64 input with a +100 map transform feeds a passthrough var, which feeds
+    the output. Feeding 1, 2 yields [101, 102]. Guards that input-level
+    transforms apply BEFORE the var sees the value (rather than the var seeing
+    the raw input).
   inputs:
     - id: x
       int64: {}

@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_map_then_filter
-  description: "Double then filter > 5"
+  description: >-
+    Var transform chain: map *2 then filter > 5. Feeding 1..5: post-map [2, 4,
+    6, 8, 10], post-filter [6, 8, 10] (drops 2 and 4). Guards map-then-filter
+    ordering: filter applies to the post-map values, not the original inputs.
   inputs:
     - id: x
       int64: {}

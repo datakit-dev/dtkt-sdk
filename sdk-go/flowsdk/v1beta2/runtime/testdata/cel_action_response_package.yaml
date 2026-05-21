@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_action_response_package
-  description: "Action returns a Package; outputs read nested fields from the response"
+  description: >-
+    Action calls an RPC that returns a typed Package proto; three outputs read
+    `identity.name`, `identity.version`, and `type` off the response. The mock
+    returns a fixed Package and the test asserts each value matches. Guards
+    that CEL field access on a typed action response correctly resolves nested
+    message fields and enum scalars in one flow.
   inputs:
     - id: x
       int64: {}

@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_message_transforms
-  description: "Message-typed input through a transform pipeline (filter)"
+  description: >-
+    Message-typed input (google.protobuf.Struct) with a filter transform that
+    keeps only `priority == 'high'` records. Feeding two structs (low and high
+    priority) yields one output (the high one). Guards that input-level
+    transforms can dereference into struct fields (this.value.priority) and
+    filter accordingly.
   inputs:
     - id: payload
       message:

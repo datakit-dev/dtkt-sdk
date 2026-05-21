@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_server_stream
+  description: >-
+    Stream wraps a server-streaming RPC (random.Numbers) that emits N values
+    for a single request. Feeding count=N yields N values on the output. Guards
+    that the runtime drains all server-side emissions before treating the RPC
+    as complete -- the per-input fan-out is N:1, not 1:1.
   inputs:
     - id: count
       int64: {}

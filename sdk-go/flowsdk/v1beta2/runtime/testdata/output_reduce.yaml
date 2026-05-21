@@ -2,7 +2,15 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: output_reduce
-  description: "Output with reduce and event window"
+  description: >-
+    Output-stage reduce transform: accumulator sums values (initial=0); feeding
+    10, 20, 30 emits a single total 60 at end-of-stream. The load-bearing guard
+    is reduce-at-the-OUTPUT-node (one emit carrying the full sum, vs scan's
+    per-step emits). The `group_by.window.event.when: inputs.x.closed` gate is
+    NOT independently verified: per Gap 1 the runtime ignores group_by.window
+    and emission is EOF-driven, and here the event-window `when` coincides with
+    stream EOF, so the single emit would occur identically without the window.
+    See accum_reduce_event_window_multi.yaml for non-vacuous event gating.
   inputs:
     - id: x
       int64: {}

@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: mixed_string_int64_inputs
-  description: "Two inputs of different types (string and int64) to separate outputs"
+  description: >-
+    Two inputs of different scalar types (string name, int64 count) each
+    feeding its own output. Feeding name='alice' and count=5 yields 'alice' on
+    outputs.name and 5 on outputs.count. Guards that heterogeneous-typed inputs
+    flow through to their respective outputs without typing collisions.
   inputs:
     - id: name
       string: {}

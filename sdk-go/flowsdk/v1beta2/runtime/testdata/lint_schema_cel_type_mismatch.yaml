@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_schema_cel_type_mismatch
+  description: >-
+    Request fields with CEL expressions whose return types do not match the
+    descriptor: `name = 42` (CEL int -> string field) and `count = true` (CEL
+    bool -> int field). Lint must report two CodeTypeMismatch diagnostics
+    citing `CEL expression returns int` and `CEL expression returns bool`.
+    Guards CEL-return-type checking against the proto schema.
   connections:
     - id: myconn
       services:

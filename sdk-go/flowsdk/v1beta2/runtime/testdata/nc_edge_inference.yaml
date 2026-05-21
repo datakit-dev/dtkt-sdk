@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_edge_inference
+  description: >-
+    vars.counter is a passthrough of inputs.x; vars.gated has a constant value
+    but its NC.stop_when references vars.counter. The runtime must infer the
+    `vars.counter -> vars.gated` edge from the NC expression -- without that
+    inference, vars.gated wouldn't subscribe to vars.counter and stop_when
+    would never become true. Guards that node_control expressions contribute
+    to edge collection.
   inputs:
     - id: x
       int64: {}

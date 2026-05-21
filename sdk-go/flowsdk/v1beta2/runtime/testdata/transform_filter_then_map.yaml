@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_filter_then_map
-  description: "Filter evens then double"
+  description: >-
+    Var transform chain: filter evens, then map *2. Feeding 1..6: filter keeps
+    [2, 4, 6], map yields [4, 8, 12]. Guards filter-then-map ordering: filter
+    drops first, map only sees what survived.
   inputs:
     - id: x
       int64: {}

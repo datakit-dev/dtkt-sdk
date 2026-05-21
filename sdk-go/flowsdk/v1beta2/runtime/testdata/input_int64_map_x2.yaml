@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_int64_map_x2
-  description: "Int64 input with map transform doubling each value"
+  description: >-
+    Int64 input with a map transform doubling each value. Feeding 1, 2, 3
+    yields [2, 4, 6]. Guards that input-level transforms (attached directly to
+    the input rather than a downstream var) run per emission and forward to the
+    output cleanly.
   inputs:
     - id: x
       int64: {}

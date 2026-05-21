@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_filter_map_scan
-  description: "Filter evens, double, running sum via scan"
+  description: >-
+    Var transform chain: filter evens -> map *2 -> scan running sum (initial
+    0). Feeding 1..6: filter keeps [2,4,6], map yields [4,8,12], scan emits [4,
+    12, 24]. Guards three-stage transform composition where scan reads the
+    post-map values (not the post-filter values directly).
   inputs:
     - id: x
       int64: {}

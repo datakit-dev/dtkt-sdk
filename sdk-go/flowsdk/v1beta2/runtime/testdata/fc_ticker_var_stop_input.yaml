@@ -2,10 +2,15 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_ticker_var_stop_input
-  description: |
-    Ticker with stop_when on a var node that references both the generator
-    and an input. The var subscribes to the generator via its value expression,
-    and the stop_when expression references the input.
+  description: >-
+    Ticker drives a var whose value computes 'even'/'odd' from the tick count;
+    stop_when on the VAR references both the generator's eval_count AND an
+    input-provided max iterations (default 10). Three outputs collect tick
+    values, even/odd labels, and a paired [count, label] list. Used by the
+    flow-control test that mirrors the public ticker example: stop fires when
+    tick count reaches maxIters and the flow exits cleanly. Guards that
+    flow_control on a var can reference both generator and input refs in the
+    same expression.
   inputs:
     - id: maxIters
       uint64:

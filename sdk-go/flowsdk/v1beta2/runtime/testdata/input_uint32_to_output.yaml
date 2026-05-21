@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_uint32_to_output
-  description: "Uint32 input passed directly to output"
+  description: >-
+    Uint32 input passed straight to an output. Feeding uint32(42) emits
+    Uint64Value 42. Guards that uint32 inputs upcast to uint64 on the wire (the
+    wire format unifies unsigned integers as Uint64Value).
   inputs:
     - id: x
       uint32: {}

@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_ticker_stop_input
+  description: >-
+    Ticker generator with stop_when referencing an INPUT's value (default 10).
+    Without explicitly feeding the input, the default value seeds the flow and
+    stop triggers at eval_count >= 10. Result: exactly 10 ticks. Guards that an
+    input's declared default is available to flow_control expressions on other
+    nodes (without needing an explicit feed) and that input refs work in
+    stop_when expressions.
   inputs:
     - id: maxIters
       uint64:

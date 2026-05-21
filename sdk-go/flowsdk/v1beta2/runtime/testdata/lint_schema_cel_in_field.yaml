@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_schema_cel_in_field
+  description: >-
+    Request fields supplied as CEL expressions instead of literals: `name =
+    inputs.x.value`, `count = size(inputs.x.value)`, repeated `tags` with a CEL
+    element. With a resolver, lint must produce zero diagnostics. Guards that
+    CEL-typed values that match descriptor field types are accepted.
   connections:
     - id: myconn
       services:

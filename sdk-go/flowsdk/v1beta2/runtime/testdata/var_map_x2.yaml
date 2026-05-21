@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: var_map_x2
-  description: "Var with map transform doubling each value"
+  description: >-
+    Single-var map (`= this.value * 2`) doubles each input. Feeding 5, 10
+    yields [10, 20]. Guards the minimal map case -- baseline that map applies
+    to every input.
   inputs:
     - id: x
       int64: {}

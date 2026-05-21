@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_int64_to_output
-  description: "Int64 input passed directly to output"
+  description: >-
+    Int64 input passed straight to an output with no transforms. Feeding 42,
+    -1, 0 yields [42, -1, 0]. Baseline test that pins the int64 input -> output
+    passthrough; guards that signed values (positive, negative, zero) survive
+    the wire-format roundtrip with the Int64Value oneof preserved.
   inputs:
     - id: x
       int64: {}

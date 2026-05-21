@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: retry_terminate_nc_suspend
+  description: >-
+    Action's call errors with code 13 (Internal); retry_strategy.terminate_when
+    matches (intent: TERMINATE). NC.suspend_when=true cannot promote (suspend <
+    terminate). Terminate wins: Execute returns a *TerminateError (flow-scope,
+    NOT per-node) and NC.suspend's PHASE_SUSPENDED must NOT appear on the
+    action topic. Guards that retry.terminate is sticky and is NOT downgraded
+    by a same-iteration NC.suspend.
   inputs:
     - id: msg
       int64: {}

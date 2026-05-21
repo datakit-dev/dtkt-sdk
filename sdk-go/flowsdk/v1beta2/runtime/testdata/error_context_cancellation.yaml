@@ -2,7 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: context_cancellation
-  description: "Ticker for context cancellation test"
+  description: >-
+    Ticker generator emitting every 50ms, with an output that forwards each
+    tick. The runtime is run under a context that is cancelled after 150ms. The
+    test asserts (1) Execute returns cleanly (no error) shortly after cancel,
+    and (2) the number of emitted ticks is bounded by the cancellation window.
+    Guards that context cancellation propagates through the ticker handler so a
+    long-running flow shuts down promptly rather than running forever.
   generators:
     - id: tick
       ticker:

@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_filter_accepts_all
-  description: "Filter accepts all values"
+  description: >-
+    Var transform is `filter: = true` -- accepts every input. Feeding 1..3
+    yields [1, 2, 3] unchanged. Guards the trivial-true filter boundary: no
+    values are silently dropped when the predicate is always true.
   inputs:
     - id: x
       int64: {}

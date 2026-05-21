@@ -1,0 +1,29 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_noderef_bare_value
+  description: >-
+    Two outputs reference the action via short chains that don't continue past
+    the wrapper: `actions.run.value` (full payload) and
+    `actions.run.eval_count` (valid non-value wrapper). Lint must produce zero
+    diagnostics. Double false-positive guard: walker must not emit on short
+    chains and must accept non-`value` wrappers in the whitelist.
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: x
+      string: {}
+  actions:
+    - id: run
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request:
+          name: "= inputs.x.value"
+  outputs:
+    - id: bare_value
+      value: "= actions.run.value"
+    - id: bare_eval_count
+      value: "= actions.run.eval_count"

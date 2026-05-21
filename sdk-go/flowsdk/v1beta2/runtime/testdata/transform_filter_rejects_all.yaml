@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_filter_rejects_all
-  description: "Filter rejects all values"
+  description: >-
+    Var transform is `filter: = this.value > 100`. Feeding 1..3 yields [].
+    Guards the all-rejected case: downstream sees no values, the flow still
+    terminates cleanly without hang.
   inputs:
     - id: x
       int64: {}

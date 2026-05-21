@@ -1,0 +1,25 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fc_output_suspend_resume_stop
+  description: >-
+    Output with two flow_control conditions exercised in sequence on the same
+    handler: suspend_when at the ticker's eval_count==3 (CEL-triggered park),
+    then operator Resume(), then stop_when at eval_count>=6 (graceful drain).
+    The ticker is the eval_count source -- its default value is the count
+    itself, so each tick emits 1, 2, 3, ... Used by
+    TestFlowControl_Output_SuspendResumeStop to verify (1) Resume wakes a
+    handler that was parked by flow_control.suspend_when (no existing test
+    covers this -- the FC suspend tests all terminate without resuming), and
+    (2) a later flow_control.stop_when on the same node still fires after
+    Resume. Expected outputs.result sequence: [1, 2, 3, 4, 5, 6].
+  generators:
+    - id: tick
+      ticker:
+        interval: "0.05s"
+  outputs:
+    - id: result
+      value: "= generators.tick.value"
+      flow_control:
+        suspend_when: "= int(generators.tick.eval_count) == 3"
+        stop_when: "= int(generators.tick.eval_count) >= 6"

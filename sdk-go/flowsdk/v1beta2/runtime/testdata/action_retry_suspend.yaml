@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_retry_suspend
+  description: >-
+    Action with suspend_when=code-7 (PermissionDenied). The RPC fails with code
+    7; suspend_when matches and the action node parks in PHASE_SUSPENDED
+    instead of erroring. The test verifies (1) no further outputs are produced
+    while suspended, (2) a ResumeNode unparks the handler and (with input EOF)
+    the flow completes cleanly. Guards that suspend genuinely halts the handler
+    rather than just publishing a phase event.
   inputs:
     - id: msg
       int64: {}

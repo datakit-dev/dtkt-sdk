@@ -2,6 +2,14 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stop_multi_path
+  description: >-
+    Two independent action paths sharing the flow: fail_action calls
+    error.Internal (always errors), ok_action echoes its input (always
+    succeeds). Under STOP-strategy the failing path triggers a graceful drain;
+    the ok_action completes any in-flight work and emits its result before the
+    flow exits with the underlying error. Guards that the healthy branch's
+    already-produced value is preserved through STOP's drain phase rather than
+    being thrown away when the failure surfaces.
   inputs:
     - id: fail_input
       int64: {}

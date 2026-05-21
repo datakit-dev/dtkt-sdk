@@ -2,7 +2,14 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_context_cancel
-  description: "Ticker feeding a var with multi-step transform pipeline for context cancel test"
+  description: >-
+    Ticker generator at 0.01s feeds a var with map *2 and filter > 0. Used as
+    a long-running carrier in TestGraph_Transform_ContextCancel: the caller
+    cancels the runtime ctx after 50ms and Execute must return within ~1s
+    (regression bound; <<1s is normal). Test only verifies the timely-return
+    property; goroutine-leak detection is the package-wide `leakcheck` build
+    tag, not this individual test. Guards that ctx cancel propagates through
+    the var's transform pipeline goroutines so Execute doesn't hang.
   generators:
     - id: tick
       ticker:

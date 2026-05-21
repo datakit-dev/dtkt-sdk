@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: retry_inactive_nc_active
+  description: >-
+    Action calls echo.Echo (which succeeds), so retry_strategy.suspend_when
+    never fires (no error to match against). NC.stop_when=true still fires
+    after the first successful publish, stopping the node gracefully. Guards
+    that inactive retry doesn't block NC: when retry yields no escalation, NC
+    still applies.
   inputs:
     - id: msg
       int64: {}

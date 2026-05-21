@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_size_nested
-  description: "Compute size() of a list nested inside a struct"
+  description: >-
+    Input value is a struct with a `tags` list of strings. Output uses CEL
+    `size()` to count the elements. Feeding {tags: ['a','b','c','d']} emits 4.
+    Guards that `size()` operates correctly on a list nested inside a struct
+    input value (not just on a top-level list).
   inputs:
     - id: x
       string: {}

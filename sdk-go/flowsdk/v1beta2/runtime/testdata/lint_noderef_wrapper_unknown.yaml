@@ -1,0 +1,26 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_noderef_wrapper_unknown
+  description: >-
+    Output references `actions.run.bogus_wrapper`, a wrapper field that doesn't
+    exist in the action category (whitelisted wrappers are `value` and
+    `eval_count`). Lint must report CodeUnknownField naming `bogus_wrapper`.
+    Guards the per-category wrapper-field whitelist.
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: x
+      string: {}
+  actions:
+    - id: run
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request:
+          name: "= inputs.x.value"
+  outputs:
+    - id: bad
+      value: "= actions.run.bogus_wrapper"

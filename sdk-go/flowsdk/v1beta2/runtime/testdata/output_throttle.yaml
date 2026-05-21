@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: output_throttle
-  description: "Output with throttle rate limit"
+  description: >-
+    Output declares throttle: max 5 emits per 0.5s window. Bursts above the
+    limit are deferred to the next window. Guards the throttle rate-limiter
+    applied directly at the output stage.
   inputs:
     - id: x
       int64: {}

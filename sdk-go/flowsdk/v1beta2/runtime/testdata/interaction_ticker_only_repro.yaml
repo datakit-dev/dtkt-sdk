@@ -2,11 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: interaction_ticker_only_repro
-  # Bisection fixture between interaction_var_repro (passes) and
-  # interaction_ticker_var_repro (hangs). Removes the var so the
-  # interaction's only upstream is the ticker generator. If this
-  # hangs too, the bug is "ticker -> interaction multi-iter," not
-  # specific to the (ticker, var) pair on the interaction's deps.
+  description: >-
+    Bisection fixture between interaction_var_repro (passes) and
+    interaction_ticker_var_repro (used to hang). Removes the
+    var-on-interaction-deps so the interaction's only upstream is the ticker;
+    the test asserts the multi-iteration ticker-driven interaction loop
+    completes cleanly. Used to isolate whether a ticker-only or (ticker, var)
+    topology was the source of an earlier multi-iteration hang.
   inputs:
     - id: maxIters
       uint64:

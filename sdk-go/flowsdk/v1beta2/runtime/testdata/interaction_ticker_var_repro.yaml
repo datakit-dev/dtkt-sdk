@@ -2,12 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: interaction_ticker_var_repro
-  # Reproduces dtkt-cli/hack/flows/tickerv2_interactive.yaml shape:
-  # generator -> var (with stop_when) + interaction (title CEL pulls
-  # from generator+var) -> output that combines vars + interaction
-  # response and filters via transforms. Used to chase a production
-  # "no such key: discard" CEL error that interaction_output_filter_idiomatic
-  # didn't reproduce because it lacked the var/generator wiring.
+  description: >-
+    Reproduces a real interactive ticker flow shape: ticker -> var (with
+    stop_when on the var) + interaction (title CEL pulls from generator+var) ->
+    output that combines var output and interaction response then filters via
+    transforms. Used to chase down a 'no such key: discard' CEL error that the
+    simpler idiomatic fixture did not reproduce -- this fixture exercises the
+    var/generator wiring that surfaces it.
   inputs:
     - id: maxIters
       uint64:

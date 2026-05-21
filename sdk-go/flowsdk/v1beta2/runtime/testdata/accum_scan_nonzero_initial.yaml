@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: scan_nonzero_initial
+  description: >-
+    Scan with non-zero initial accumulator (100), emitting the running sum on
+    every input. Feeding 1, 2, 3 yields 101, 103, 106. Guards that `initial`
+    seeds the scan correctly and that scan emits exactly one result per input
+    (unlike reduce which buffers).
   inputs:
     - id: x
       int64: {}

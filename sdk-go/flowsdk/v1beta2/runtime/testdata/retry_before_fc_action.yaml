@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: retry_before_fc_action
+  description: >-
+    Action calls error.PermissionDenied (gRPC code 7);
+    retry_strategy.suspend_when fires (intent: SUSPEND); FC.terminate_when=true
+    then promotes to TERMINATE flow-wide. Execute returns ErrTerminated and the
+    flow's terminal state is PHASE_CANCELLED. Guards that FC.terminate promotes
+    retry.suspend and that the promotion lands at the flow level.
   inputs:
     - id: msg
       int64: {}

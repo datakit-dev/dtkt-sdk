@@ -3523,6 +3523,11 @@ func (*SendFlowRunEvent_ResumeNode) isSendFlowRunEvent_Event() {}
 func (*SendFlowRunEvent_Start) isSendFlowRunEvent_Event() {}
 
 // ReceiveFlowRunEvent represents an event received from a flowrun (executor -> client).
+//
+// Every variant is a LEAN DELTA: the event carries what just changed,
+// not a snapshot of the full resource. Consumers maintain client-side
+// state by applying these deltas; cold reads of full resources go via
+// GetFlowRun.
 type ReceiveFlowRunEvent struct {
 	state protoimpl.MessageState `protogen:"hybrid.v1"`
 	// Types that are valid to be assigned to Event:
@@ -3530,7 +3535,7 @@ type ReceiveFlowRunEvent struct {
 	//	*ReceiveFlowRunEvent_Output
 	//	*ReceiveFlowRunEvent_InputRequest
 	//	*ReceiveFlowRunEvent_InteractionRequest
-	//	*ReceiveFlowRunEvent_Flowrun
+	//	*ReceiveFlowRunEvent_FlowState
 	Event         isReceiveFlowRunEvent_Event `protobuf_oneof:"event"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -3595,10 +3600,10 @@ func (x *ReceiveFlowRunEvent) GetInteractionRequest() *v1beta2.InteractionReques
 	return nil
 }
 
-func (x *ReceiveFlowRunEvent) GetFlowrun() *FlowRun {
+func (x *ReceiveFlowRunEvent) GetFlowState() *v1beta2.FlowStateEvent {
 	if x != nil {
-		if x, ok := x.Event.(*ReceiveFlowRunEvent_Flowrun); ok {
-			return x.Flowrun
+		if x, ok := x.Event.(*ReceiveFlowRunEvent_FlowState); ok {
+			return x.FlowState
 		}
 	}
 	return nil
@@ -3628,12 +3633,12 @@ func (x *ReceiveFlowRunEvent) SetInteractionRequest(v *v1beta2.InteractionReques
 	x.Event = &ReceiveFlowRunEvent_InteractionRequest{v}
 }
 
-func (x *ReceiveFlowRunEvent) SetFlowrun(v *FlowRun) {
+func (x *ReceiveFlowRunEvent) SetFlowState(v *v1beta2.FlowStateEvent) {
 	if v == nil {
 		x.Event = nil
 		return
 	}
-	x.Event = &ReceiveFlowRunEvent_Flowrun{v}
+	x.Event = &ReceiveFlowRunEvent_FlowState{v}
 }
 
 func (x *ReceiveFlowRunEvent) HasEvent() bool {
@@ -3667,11 +3672,11 @@ func (x *ReceiveFlowRunEvent) HasInteractionRequest() bool {
 	return ok
 }
 
-func (x *ReceiveFlowRunEvent) HasFlowrun() bool {
+func (x *ReceiveFlowRunEvent) HasFlowState() bool {
 	if x == nil {
 		return false
 	}
-	_, ok := x.Event.(*ReceiveFlowRunEvent_Flowrun)
+	_, ok := x.Event.(*ReceiveFlowRunEvent_FlowState)
 	return ok
 }
 
@@ -3697,8 +3702,8 @@ func (x *ReceiveFlowRunEvent) ClearInteractionRequest() {
 	}
 }
 
-func (x *ReceiveFlowRunEvent) ClearFlowrun() {
-	if _, ok := x.Event.(*ReceiveFlowRunEvent_Flowrun); ok {
+func (x *ReceiveFlowRunEvent) ClearFlowState() {
+	if _, ok := x.Event.(*ReceiveFlowRunEvent_FlowState); ok {
 		x.Event = nil
 	}
 }
@@ -3707,7 +3712,7 @@ const ReceiveFlowRunEvent_Event_not_set_case case_ReceiveFlowRunEvent_Event = 0
 const ReceiveFlowRunEvent_Output_case case_ReceiveFlowRunEvent_Event = 1
 const ReceiveFlowRunEvent_InputRequest_case case_ReceiveFlowRunEvent_Event = 2
 const ReceiveFlowRunEvent_InteractionRequest_case case_ReceiveFlowRunEvent_Event = 3
-const ReceiveFlowRunEvent_Flowrun_case case_ReceiveFlowRunEvent_Event = 4
+const ReceiveFlowRunEvent_FlowState_case case_ReceiveFlowRunEvent_Event = 4
 
 func (x *ReceiveFlowRunEvent) WhichEvent() case_ReceiveFlowRunEvent_Event {
 	if x == nil {
@@ -3720,8 +3725,8 @@ func (x *ReceiveFlowRunEvent) WhichEvent() case_ReceiveFlowRunEvent_Event {
 		return ReceiveFlowRunEvent_InputRequest_case
 	case *ReceiveFlowRunEvent_InteractionRequest:
 		return ReceiveFlowRunEvent_InteractionRequest_case
-	case *ReceiveFlowRunEvent_Flowrun:
-		return ReceiveFlowRunEvent_Flowrun_case
+	case *ReceiveFlowRunEvent_FlowState:
+		return ReceiveFlowRunEvent_FlowState_case
 	default:
 		return ReceiveFlowRunEvent_Event_not_set_case
 	}
@@ -3731,14 +3736,14 @@ type ReceiveFlowRunEvent_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// Fields of oneof Event:
-	// An output node produced a value.
+	// An output node produced a value (with lifecycle metadata).
 	Output *v1beta2.OutputEvent
 	// The executor is soliciting input for a specific input node.
 	InputRequest *v1beta2.InputRequestEvent
 	// An interaction node needs external input (with token).
 	InteractionRequest *v1beta2.InteractionRequestEvent
-	// FlowRun state change (phase transitions, terminal states).
-	Flowrun *FlowRun
+	// Flow-level state change (phase transitions, terminal states).
+	FlowState *v1beta2.FlowStateEvent
 	// -- end of Event
 }
 
@@ -3755,8 +3760,8 @@ func (b0 ReceiveFlowRunEvent_builder) Build() *ReceiveFlowRunEvent {
 	if b.InteractionRequest != nil {
 		x.Event = &ReceiveFlowRunEvent_InteractionRequest{b.InteractionRequest}
 	}
-	if b.Flowrun != nil {
-		x.Event = &ReceiveFlowRunEvent_Flowrun{b.Flowrun}
+	if b.FlowState != nil {
+		x.Event = &ReceiveFlowRunEvent_FlowState{b.FlowState}
 	}
 	return m0
 }
@@ -3776,7 +3781,7 @@ type isReceiveFlowRunEvent_Event interface {
 }
 
 type ReceiveFlowRunEvent_Output struct {
-	// An output node produced a value.
+	// An output node produced a value (with lifecycle metadata).
 	Output *v1beta2.OutputEvent `protobuf:"bytes,1,opt,name=output,proto3,oneof"`
 }
 
@@ -3790,9 +3795,9 @@ type ReceiveFlowRunEvent_InteractionRequest struct {
 	InteractionRequest *v1beta2.InteractionRequestEvent `protobuf:"bytes,3,opt,name=interaction_request,json=interactionRequest,proto3,oneof"`
 }
 
-type ReceiveFlowRunEvent_Flowrun struct {
-	// FlowRun state change (phase transitions, terminal states).
-	Flowrun *FlowRun `protobuf:"bytes,4,opt,name=flowrun,proto3,oneof"`
+type ReceiveFlowRunEvent_FlowState struct {
+	// Flow-level state change (phase transitions, terminal states).
+	FlowState *v1beta2.FlowStateEvent `protobuf:"bytes,4,opt,name=flow_state,json=flowState,proto3,oneof"`
 }
 
 func (*ReceiveFlowRunEvent_Output) isReceiveFlowRunEvent_Event() {}
@@ -3801,7 +3806,7 @@ func (*ReceiveFlowRunEvent_InputRequest) isReceiveFlowRunEvent_Event() {}
 
 func (*ReceiveFlowRunEvent_InteractionRequest) isReceiveFlowRunEvent_Event() {}
 
-func (*ReceiveFlowRunEvent_Flowrun) isReceiveFlowRunEvent_Event() {}
+func (*ReceiveFlowRunEvent_FlowState) isReceiveFlowRunEvent_Event() {}
 
 type SendFlowRunEventRequest struct {
 	state protoimpl.MessageState `protogen:"hybrid.v1"`
@@ -16659,12 +16664,13 @@ const file_dtkt_core_v1_messages_proto_rawDesc = "" +
 	" \x01(\v2\".dtkt.flow.v1beta2.ResumeNodeEventH\x00R\n" +
 	"resumeNode\x129\n" +
 	"\x05start\x18\v \x01(\v2!.dtkt.flow.v1beta2.StartFlowEventH\x00R\x05startB\x0e\n" +
-	"\x05event\x12\x05\xbaH\x02\b\x01\"\xbe\x02\n" +
+	"\x05event\x12\x05\xbaH\x02\b\x01\"\xcf\x02\n" +
 	"\x13ReceiveFlowRunEvent\x128\n" +
 	"\x06output\x18\x01 \x01(\v2\x1e.dtkt.flow.v1beta2.OutputEventH\x00R\x06output\x12K\n" +
 	"\rinput_request\x18\x02 \x01(\v2$.dtkt.flow.v1beta2.InputRequestEventH\x00R\finputRequest\x12]\n" +
-	"\x13interaction_request\x18\x03 \x01(\v2*.dtkt.flow.v1beta2.InteractionRequestEventH\x00R\x12interactionRequest\x121\n" +
-	"\aflowrun\x18\x04 \x01(\v2\x15.dtkt.core.v1.FlowRunH\x00R\aflowrunB\x0e\n" +
+	"\x13interaction_request\x18\x03 \x01(\v2*.dtkt.flow.v1beta2.InteractionRequestEventH\x00R\x12interactionRequest\x12B\n" +
+	"\n" +
+	"flow_state\x18\x04 \x01(\v2!.dtkt.flow.v1beta2.FlowStateEventH\x00R\tflowStateB\x0e\n" +
 	"\x05event\x12\x05\xbaH\x02\b\x01\"s\n" +
 	"\x17SendFlowRunEventRequest\x12\x1a\n" +
 	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12<\n" +
@@ -17456,18 +17462,19 @@ var file_dtkt_core_v1_messages_proto_goTypes = []any{
 	(*v1beta2.OutputEvent)(nil),              // 173: dtkt.flow.v1beta2.OutputEvent
 	(*v1beta2.InputRequestEvent)(nil),        // 174: dtkt.flow.v1beta2.InputRequestEvent
 	(*v1beta2.InteractionRequestEvent)(nil),  // 175: dtkt.flow.v1beta2.InteractionRequestEvent
-	(*descriptorpb.FileDescriptorSet)(nil),   // 176: google.protobuf.FileDescriptorSet
-	(*v1beta1.TypeSchema)(nil),               // 177: dtkt.shared.v1beta1.TypeSchema
-	(*v1beta11.Runtime)(nil),                 // 178: dtkt.flow.v1beta1.Runtime
-	(*v1beta2.RunSnapshot)(nil),              // 179: dtkt.flow.v1beta2.RunSnapshot
-	(*v1beta11.Flow)(nil),                    // 180: dtkt.flow.v1beta1.Flow
-	(*v1beta2.Flow)(nil),                     // 181: dtkt.flow.v1beta2.Flow
-	(*v1beta11.Graph)(nil),                   // 182: dtkt.flow.v1beta1.Graph
-	(*v1beta2.Graph)(nil),                    // 183: dtkt.flow.v1beta2.Graph
-	(*v1beta1.Package)(nil),                  // 184: dtkt.shared.v1beta1.Package
-	(v1beta1.Runtime)(0),                     // 185: dtkt.shared.v1beta1.Runtime
-	(*v1beta1.Platform)(nil),                 // 186: dtkt.shared.v1beta1.Platform
-	(*v1beta11.UserAction)(nil),              // 187: dtkt.flow.v1beta1.UserAction
+	(*v1beta2.FlowStateEvent)(nil),           // 176: dtkt.flow.v1beta2.FlowStateEvent
+	(*descriptorpb.FileDescriptorSet)(nil),   // 177: google.protobuf.FileDescriptorSet
+	(*v1beta1.TypeSchema)(nil),               // 178: dtkt.shared.v1beta1.TypeSchema
+	(*v1beta11.Runtime)(nil),                 // 179: dtkt.flow.v1beta1.Runtime
+	(*v1beta2.RunSnapshot)(nil),              // 180: dtkt.flow.v1beta2.RunSnapshot
+	(*v1beta11.Flow)(nil),                    // 181: dtkt.flow.v1beta1.Flow
+	(*v1beta2.Flow)(nil),                     // 182: dtkt.flow.v1beta2.Flow
+	(*v1beta11.Graph)(nil),                   // 183: dtkt.flow.v1beta1.Graph
+	(*v1beta2.Graph)(nil),                    // 184: dtkt.flow.v1beta2.Graph
+	(*v1beta1.Package)(nil),                  // 185: dtkt.shared.v1beta1.Package
+	(v1beta1.Runtime)(0),                     // 186: dtkt.shared.v1beta1.Runtime
+	(*v1beta1.Platform)(nil),                 // 187: dtkt.shared.v1beta1.Platform
+	(*v1beta11.UserAction)(nil),              // 188: dtkt.flow.v1beta1.UserAction
 }
 var file_dtkt_core_v1_messages_proto_depIdxs = []int32{
 	0,   // 0: dtkt.core.v1.Auth.method:type_name -> dtkt.core.v1.Auth.AuthMethod
@@ -17520,7 +17527,7 @@ var file_dtkt_core_v1_messages_proto_depIdxs = []int32{
 	173, // 47: dtkt.core.v1.ReceiveFlowRunEvent.output:type_name -> dtkt.flow.v1beta2.OutputEvent
 	174, // 48: dtkt.core.v1.ReceiveFlowRunEvent.input_request:type_name -> dtkt.flow.v1beta2.InputRequestEvent
 	175, // 49: dtkt.core.v1.ReceiveFlowRunEvent.interaction_request:type_name -> dtkt.flow.v1beta2.InteractionRequestEvent
-	14,  // 50: dtkt.core.v1.ReceiveFlowRunEvent.flowrun:type_name -> dtkt.core.v1.FlowRun
+	176, // 50: dtkt.core.v1.ReceiveFlowRunEvent.flow_state:type_name -> dtkt.flow.v1beta2.FlowStateEvent
 	25,  // 51: dtkt.core.v1.SendFlowRunEventRequest.event:type_name -> dtkt.core.v1.SendFlowRunEvent
 	26,  // 52: dtkt.core.v1.ReceiveFlowRunEventsResponse.event:type_name -> dtkt.core.v1.ReceiveFlowRunEvent
 	25,  // 53: dtkt.core.v1.StreamFlowRunEventsRequest.event:type_name -> dtkt.core.v1.SendFlowRunEvent
@@ -17547,7 +17554,7 @@ var file_dtkt_core_v1_messages_proto_depIdxs = []int32{
 	48,  // 74: dtkt.core.v1.Integration.spec:type_name -> dtkt.core.v1.PackageSpecMetadata
 	157, // 75: dtkt.core.v1.Integration.create_time:type_name -> google.protobuf.Timestamp
 	157, // 76: dtkt.core.v1.Integration.update_time:type_name -> google.protobuf.Timestamp
-	176, // 77: dtkt.core.v1.File.protos:type_name -> google.protobuf.FileDescriptorSet
+	177, // 77: dtkt.core.v1.File.protos:type_name -> google.protobuf.FileDescriptorSet
 	157, // 78: dtkt.core.v1.File.create_time:type_name -> google.protobuf.Timestamp
 	157, // 79: dtkt.core.v1.File.update_time:type_name -> google.protobuf.Timestamp
 	157, // 80: dtkt.core.v1.Service.create_time:type_name -> google.protobuf.Timestamp
@@ -17557,7 +17564,7 @@ var file_dtkt_core_v1_messages_proto_depIdxs = []int32{
 	39,  // 84: dtkt.core.v1.Type.schema:type_name -> dtkt.core.v1.TypeSchema
 	157, // 85: dtkt.core.v1.Type.create_time:type_name -> google.protobuf.Timestamp
 	157, // 86: dtkt.core.v1.Type.update_time:type_name -> google.protobuf.Timestamp
-	177, // 87: dtkt.core.v1.TypeSchema.v1beta1:type_name -> dtkt.shared.v1beta1.TypeSchema
+	178, // 87: dtkt.core.v1.TypeSchema.v1beta1:type_name -> dtkt.shared.v1beta1.TypeSchema
 	157, // 88: dtkt.core.v1.AutomationMetadata.start_time:type_name -> google.protobuf.Timestamp
 	157, // 89: dtkt.core.v1.AutomationMetadata.stop_time:type_name -> google.protobuf.Timestamp
 	157, // 90: dtkt.core.v1.FlowRunOperationMetadata.start_time:type_name -> google.protobuf.Timestamp
@@ -17565,13 +17572,13 @@ var file_dtkt_core_v1_messages_proto_depIdxs = []int32{
 	157, // 92: dtkt.core.v1.DeploymentMetadata.start_time:type_name -> google.protobuf.Timestamp
 	157, // 93: dtkt.core.v1.DeploymentMetadata.stop_time:type_name -> google.protobuf.Timestamp
 	10,  // 94: dtkt.core.v1.FlowConnectionMetadata.context:type_name -> dtkt.core.v1.Context
-	178, // 95: dtkt.core.v1.FlowRuntimeMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Runtime
-	179, // 96: dtkt.core.v1.FlowRunMetadata.v1beta2:type_name -> dtkt.flow.v1beta2.RunSnapshot
-	180, // 97: dtkt.core.v1.FlowSpecMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Flow
-	181, // 98: dtkt.core.v1.FlowSpecMetadata.v1beta2:type_name -> dtkt.flow.v1beta2.Flow
-	182, // 99: dtkt.core.v1.FlowGraphMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Graph
-	183, // 100: dtkt.core.v1.FlowGraphMetadata.v1beta2:type_name -> dtkt.flow.v1beta2.Graph
-	184, // 101: dtkt.core.v1.PackageSpecMetadata.v1beta1:type_name -> dtkt.shared.v1beta1.Package
+	179, // 95: dtkt.core.v1.FlowRuntimeMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Runtime
+	180, // 96: dtkt.core.v1.FlowRunMetadata.v1beta2:type_name -> dtkt.flow.v1beta2.RunSnapshot
+	181, // 97: dtkt.core.v1.FlowSpecMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Flow
+	182, // 98: dtkt.core.v1.FlowSpecMetadata.v1beta2:type_name -> dtkt.flow.v1beta2.Flow
+	183, // 99: dtkt.core.v1.FlowGraphMetadata.v1beta1:type_name -> dtkt.flow.v1beta1.Graph
+	184, // 100: dtkt.core.v1.FlowGraphMetadata.v1beta2:type_name -> dtkt.flow.v1beta2.Graph
+	185, // 101: dtkt.core.v1.PackageSpecMetadata.v1beta1:type_name -> dtkt.shared.v1beta1.Package
 	146, // 102: dtkt.core.v1.PackageBuildMetadata.runtime:type_name -> dtkt.core.v1.PackageBuildMetadata.Runtime
 	147, // 103: dtkt.core.v1.PackageBuildMetadata.platform:type_name -> dtkt.core.v1.PackageBuildMetadata.Platform
 	148, // 104: dtkt.core.v1.PackageBuildMetadata.env:type_name -> dtkt.core.v1.PackageBuildMetadata.EnvEntry
@@ -17657,15 +17664,15 @@ var file_dtkt_core_v1_messages_proto_depIdxs = []int32{
 	55,  // 184: dtkt.core.v1.Deployment.Cloud.config:type_name -> dtkt.core.v1.EncryptedAny
 	144, // 185: dtkt.core.v1.Deployment.RuntimeMetadata.native:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata.Native
 	145, // 186: dtkt.core.v1.Deployment.RuntimeMetadata.docker:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata.Docker
-	185, // 187: dtkt.core.v1.PackageBuildMetadata.Runtime.v1beta1:type_name -> dtkt.shared.v1beta1.Runtime
-	186, // 188: dtkt.core.v1.PackageBuildMetadata.Platform.v1beta1:type_name -> dtkt.shared.v1beta1.Platform
+	186, // 187: dtkt.core.v1.PackageBuildMetadata.Runtime.v1beta1:type_name -> dtkt.shared.v1beta1.Runtime
+	187, // 188: dtkt.core.v1.PackageBuildMetadata.Platform.v1beta1:type_name -> dtkt.shared.v1beta1.Platform
 	160, // 189: dtkt.core.v1.BatchRunOperationMetadata.FailedRequestsEntry.value:type_name -> google.rpc.Status
 	152, // 190: dtkt.core.v1.SendAutomationEvent.InputsEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry
 	153, // 191: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry
 	158, // 192: dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
 	158, // 193: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry.value:type_name -> google.protobuf.Any
 	156, // 194: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.values:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry
-	187, // 195: dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent.user_action:type_name -> dtkt.flow.v1beta1.UserAction
+	188, // 195: dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent.user_action:type_name -> dtkt.flow.v1beta1.UserAction
 	158, // 196: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
 	197, // [197:197] is the sub-list for method output_type
 	197, // [197:197] is the sub-list for method input_type
@@ -17705,7 +17712,7 @@ func file_dtkt_core_v1_messages_proto_init() {
 		(*ReceiveFlowRunEvent_Output)(nil),
 		(*ReceiveFlowRunEvent_InputRequest)(nil),
 		(*ReceiveFlowRunEvent_InteractionRequest)(nil),
-		(*ReceiveFlowRunEvent_Flowrun)(nil),
+		(*ReceiveFlowRunEvent_FlowState)(nil),
 	}
 	file_dtkt_core_v1_messages_proto_msgTypes[24].OneofWrappers = []any{
 		(*Connection_Deployment)(nil),

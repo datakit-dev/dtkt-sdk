@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_action_terminate
+  description: >-
+    Action echoes its input; node_control.terminate_when=true cancels the
+    action's context after the first publish. Flow returns nil (NC scopes to
+    the node). Output is 0-or-more values from the bounded input set, in input
+    order. Guards that NC terminate on an action cancels only the action's
+    context and leaves the flow exit clean.
   inputs:
     - id: msg
       int64: {}

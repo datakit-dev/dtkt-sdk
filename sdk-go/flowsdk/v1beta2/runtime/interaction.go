@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta2/executor"
@@ -140,6 +141,75 @@ func (h *interactionHandler) resolveInteractionInputs(vars map[string]any) ([]*f
 		resolved[i] = clone
 	}
 	return resolved, nil
+}
+
+// responseValue lifts the interaction response (Interaction.Response: one
+// typed binding per form input, keyed by input id) into the CEL value the
+// node exposes: a map of input id -> binding, so `interactions.<id>.value
+// .<input_id>.<field>` resolves. Because each binding is a typed proto
+// message, every declared field is always present (`value` at its proto
+// zero, plus any per-binding metadata) - so the access path is robust to how
+// a responder serialized implicit-presence fields, with no reconstruction.
+//
+// Inputs the responder omitted entirely are filled with their zero typed
+// binding so `.value` still resolves. A non-Response payload is exposed
+// verbatim (defensive).
+func (h *interactionHandler) responseValue(a *anypb.Any) *expr.Value {
+	raw := &expr.Value{Kind: &expr.Value_ObjectValue{ObjectValue: a}}
+	if a == nil {
+		return raw
+	}
+	msg, err := a.UnmarshalNew()
+	if err != nil {
+		return raw
+	}
+	resp, ok := msg.(*flowv1beta2.Interaction_Response)
+	if !ok {
+		return raw
+	}
+	sent := resp.GetBindings()
+	entries := make([]*expr.MapValue_Entry, 0, len(h.formInputs))
+	for _, fi := range h.formInputs {
+		id := fi.spec.GetId()
+		bindingAny := sent[id]
+		if bindingAny == nil {
+			// Responder omitted this input: synthesize its zero typed binding
+			// so `.value` resolves at the typed default.
+			if zero := bindingForInput(fi.spec); zero != nil {
+				if z, err := anypb.New(zero); err == nil {
+					bindingAny = z
+				}
+			}
+		}
+		if bindingAny == nil {
+			continue
+		}
+		entries = append(entries, &expr.MapValue_Entry{
+			Key:   &expr.Value{Kind: &expr.Value_StringValue{StringValue: id}},
+			Value: &expr.Value{Kind: &expr.Value_ObjectValue{ObjectValue: bindingAny}},
+		})
+	}
+	return &expr.Value{Kind: &expr.Value_MapValue{MapValue: &expr.MapValue{Entries: entries}}}
+}
+
+// bindingForInput returns an empty typed binding proto for the input's
+// element kind, or nil if the kind is unrecognised. Mirrors the binding
+// selection in flowsdk/v1beta2.GetInteractionBinding (kept inline to avoid a
+// runtime -> flowsdk/v1beta2 import cycle).
+func bindingForInput(input *flowv1beta2.Interaction_Input) proto.Message {
+	switch input.WhichElement() {
+	case flowv1beta2.Interaction_Input_Confirm_case:
+		return &flowv1beta2.Interaction_ConfirmBinding{}
+	case flowv1beta2.Interaction_Input_Input_case:
+		return &flowv1beta2.Interaction_InputBinding{}
+	case flowv1beta2.Interaction_Input_File_case:
+		return &flowv1beta2.Interaction_FileBinding{}
+	case flowv1beta2.Interaction_Input_Select_case:
+		return &flowv1beta2.Interaction_SelectBinding{}
+	case flowv1beta2.Interaction_Input_MultiSelect_case:
+		return &flowv1beta2.Interaction_MultiSelectBinding{}
+	}
+	return nil
 }
 
 // TryDeliver validates the token and delivers the value atomically.

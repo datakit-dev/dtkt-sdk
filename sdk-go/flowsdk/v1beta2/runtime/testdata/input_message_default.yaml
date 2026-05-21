@@ -2,7 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_message_default
-  description: "Message-typed input with a default Struct; no value fed"
+  description: >-
+    Message-typed input with a declared default Struct ({name: 'fallback', age:
+    1}); no value is fed. A ticker drives output evaluation and the runtime
+    resolves the input to its default. Test asserts >=1 output with
+    name='fallback'. Guards that message-typed inputs honor their declared
+    default when no value is pushed -- the default-resolution path covers the
+    Message branch (not just scalars).
   inputs:
     - id: payload
       message:

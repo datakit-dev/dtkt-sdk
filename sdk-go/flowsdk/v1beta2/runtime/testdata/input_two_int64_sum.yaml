@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: two_int64_inputs_sum
-  description: "Two int64 inputs summed in a single output expression"
+  description: >-
+    Two separate int64 inputs feed a single output that sums them. Feeding a=10
+    and b=20 yields 30. Also reused by an InputRequestEvent test that feeds
+    both inputs and asserts the runtime emits one InputRequestEvent per
+    declared input (ids 'a', 'b'). Guards that an output expression can
+    reference multiple inputs simultaneously.
   inputs:
     - id: a
       int64: {}

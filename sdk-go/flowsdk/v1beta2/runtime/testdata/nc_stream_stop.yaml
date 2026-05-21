@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_stream_stop
+  description: >-
+    Stream echoes its input; node_control.stop_when=true halts the stream
+    handler gracefully after the first emit. Feeding hello, world: results
+    length is 1 or 2 (the second may surface), values in input order. Flow
+    returns nil. Guards that node_control.stop_when on a stream node closes the
+    handler without flow termination.
   inputs:
     - id: msg
       string: {}

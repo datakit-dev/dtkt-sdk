@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_double_map_filter
-  description: "Double map *2.5 then filter > 5.0"
+  description: >-
+    Var transform chain on a double-typed input: map (* 2.5) then filter (>
+    5.0). Feeding 1.0, 2.0, 3.0, 4.0: post-map [2.5, 5.0, 7.5, 10.0],
+    post-filter [7.5, 10.0]. Guards double-typed transform composition: map's
+    output type carries forward into filter.
   inputs:
     - id: x
       double: {}

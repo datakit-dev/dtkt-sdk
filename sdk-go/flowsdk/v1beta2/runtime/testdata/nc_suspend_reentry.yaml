@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_suspend_reentry
-  description: "NC.suspend_when always-true on a Var; re-fires after each ResumeNode"
+  description: >-
+    Var with node_control.suspend_when=true (always-true). The var suspends
+    after each emit; on ResumeNode the handler processes the next input and
+    immediately suspends again, re-firing the condition. Guards that
+    suspend_when can fire repeatedly across resume cycles -- the predicate is
+    re-evaluated, not one-shot.
   inputs:
     - id: x
       int64: {}

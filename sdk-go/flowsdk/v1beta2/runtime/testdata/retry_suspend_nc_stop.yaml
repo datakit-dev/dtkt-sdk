@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: retry_suspend_nc_stop
+  description: >-
+    Action's call errors with code 7; retry_strategy.suspend_when matches
+    (intent: SUSPEND); NC.stop_when=true promotes to STOP per the lifecycle
+    validity matrix (stop wins over suspend on the node-stop branch). Handler
+    exits cleanly, action topic emits PHASE_SUCCEEDED, flow returns nil. Guards
+    stop > suspend promotion at the NC stage.
   inputs:
     - id: msg
       int64: {}

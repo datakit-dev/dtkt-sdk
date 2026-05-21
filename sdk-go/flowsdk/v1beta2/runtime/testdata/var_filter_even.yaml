@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: var_filter_even
-  description: "Var with filter transform keeping even values"
+  description: >-
+    Single-var filter (`= this.value % 2 == 0`) keeps even inputs. Feeding
+    1..4 yields [2, 4]. Guards the most basic var filter case -- a sanity
+    baseline against transformation regressions.
   inputs:
     - id: x
       int64: {}

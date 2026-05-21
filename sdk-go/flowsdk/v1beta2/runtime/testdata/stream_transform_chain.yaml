@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_transform_chain
+  description: >-
+    Stream emits values; downstream var applies a chain: filter even, map *10,
+    scan running sum (initial 0). Guards multi-stage transform ordering and
+    that scan's accumulator state is preserved across stream emissions within
+    the var.
   inputs:
     - id: x
       int64: {}

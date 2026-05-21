@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_var_suspend
+  description: >-
+    Var doubles input; node_control.suspend_when=true parks the var's handler
+    until ResumeNode. The var is suspended after the first emit; subsequent
+    inputs queue. Until a Resume signal arrives the var stays paused. Guards
+    that NC suspend on a var parks the handler (vs. terminate's cancel).
   inputs:
     - id: x
       int64: {}

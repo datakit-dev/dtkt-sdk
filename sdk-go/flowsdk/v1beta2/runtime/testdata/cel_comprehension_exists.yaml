@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_comprehension_exists
-  description: "exists() macro over a list of structs nested inside an input value"
+  description: >-
+    Input value carries a struct with an `items` list; output uses CEL's
+    `exists()` to check if any item.name == 'needle'. The test feeds two inputs
+    (one containing 'needle', one not) and asserts true/false. Guards that
+    `exists()` short-circuits correctly over list-of-struct inputs and that
+    string equality works on field values.
   inputs:
     - id: x
       string: {}

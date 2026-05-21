@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_ticker_stop
+  description: >-
+    Ticker emits every 50ms; output forwards each tick with stop_when on tick
+    eval_count >= 3. Result: exactly 3 emissions before stop drains and the
+    flow exits cleanly. Guards that stop_when reading generator-side counters
+    works with a time-driven (vs range-driven) source and that the ticker
+    actually halts after the trigger.
   generators:
     - id: tick
       ticker:

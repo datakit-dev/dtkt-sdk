@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: var_deep_chain_flatten_across
-  description: "Two-level var chain with expand-map then flatten and filter"
+  description: >-
+    Two-var chain: `expand` maps each x to [x, x*10]; `flat` flattens then
+    filters >= 10. Feeding 1, 2: expand emits [[1,10], [2,20]], flat -> [10,
+    20] (after flatten+filter drops 1, 2). Guards flatten across a var
+    boundary -- flattening lives downstream of the list-producing map.
   inputs:
     - id: x
       int64: {}

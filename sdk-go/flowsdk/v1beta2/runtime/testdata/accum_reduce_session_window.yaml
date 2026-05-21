@@ -2,6 +2,17 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: reduce_session_window
+  description: >-
+    Session-window reduce (spec: Transform.Reduce.group_by.window.session --
+    the window closes after `timeout` of inactivity). Range emits 1, 2, 3
+    instantly (no gap exceeds the 200ms timeout) so all land in one session;
+    reduce sums to 6. IMPLEMENTATION GAP (Gap 1): the runtime never reads
+    group_by.window (transform.go:466-482), so the idle-timeout never fires
+    and emission is EOF-driven. With a single session the result (6) is
+    identical whether or not the session window works -- vacuous for the
+    session feature (it still exercises reduce summation). Non-vacuous
+    session-window coverage that catches the gap:
+    accum_reduce_session_window_multi.yaml.
   generators:
     - id: seq
       range:

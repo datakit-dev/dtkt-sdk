@@ -8,6 +8,7 @@ import (
 	"time"
 
 	expr "cel.dev/expr"
+	"github.com/cenkalti/backoff/v4"
 	"github.com/google/cel-go/cel"
 	"google.golang.org/genproto/googleapis/rpc/status"
 	grpcstatus "google.golang.org/grpc/status"
@@ -102,12 +103,11 @@ func executeWithRetry(ctx context.Context, retry *compiledRetryStrategy, vars ma
 		return fn(ctx)
 	}
 
-	maxAttempts := uint32(1)
-	if retry.backoff != nil && retry.backoff.GetMaxAttempts() > 0 {
-		maxAttempts = retry.backoff.GetMaxAttempts()
-	}
+	// Backoff engine. NextBackOff returns Stop once the attempt budget
+	// (max_attempts; 0/unset = run once) is spent. Delays + cap + the
+	// optional jitter all come from the proto via newRetryBackOff.
+	bo := newRetryBackOff(retry.backoff)
 
-	var attempt uint32
 	for {
 		err := fn(ctx)
 		if err == nil {
@@ -143,13 +143,11 @@ func executeWithRetry(ctx context.Context, retry *compiledRetryStrategy, vars ma
 			return &TerminateError{Status: errStatus, Cause: err}
 		}
 
-		// Attempt backoff retry.
-		attempt++
-		if attempt >= maxAttempts {
+		// Attempt backoff retry. Stop => the attempt budget is spent.
+		delay := bo.NextBackOff()
+		if delay == backoff.Stop {
 			return err // retries exhausted
 		}
-
-		delay := backoffDelay(retry.backoff, attempt)
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -264,26 +262,59 @@ func grpcStatusProto(err error) *status.Status {
 	return s.Proto()
 }
 
-// backoffDelay computes the delay for the given attempt using exponential backoff.
-func backoffDelay(b *flowv1beta2.Backoff, attempt uint32) time.Duration {
-	if b == nil || !b.GetInitialBackoff().IsValid() {
-		return 0
+// newRetryBackOff builds the backoff used to pace retries. The attempt
+// budget is enforced by WithMaxRetries: flow's max_attempts is the
+// *total* attempts (0/unset = 1, run once), while cenkalti counts
+// retries *after* the first, so the cap is max_attempts-1. Once that
+// many NextBackOff calls have been made, NextBackOff returns Stop and
+// executeWithRetry propagates the last error.
+func newRetryBackOff(b *flowv1beta2.Backoff) backoff.BackOff {
+	maxAttempts := uint32(1)
+	if b != nil && b.GetMaxAttempts() > 0 {
+		maxAttempts = b.GetMaxAttempts()
 	}
-	initial := b.GetInitialBackoff().AsDuration()
-	multiplier := b.GetBackoffMultiplier()
-	if multiplier < 1 {
-		multiplier = 2 // default multiplier
-	}
+	return backoff.WithMaxRetries(newExponential(b), uint64(maxAttempts-1))
+}
 
-	delay := float64(initial) * math.Pow(multiplier, float64(attempt-1))
-
-	if b.GetMaxBackoff().IsValid() {
-		maxDelay := float64(b.GetMaxBackoff().AsDuration())
-		if delay > maxDelay {
-			delay = maxDelay
+// newExponential builds the exponential schedule from the proto,
+// reproducing the prior hand-rolled backoffDelay exactly when jitter is
+// unset: with RandomizationFactor 0, cenkalti returns currentInterval
+// verbatim, so the sequence is initial, initial*mult, ... capped at
+// max_backoff - the same values the old math.Pow form produced. The
+// deviations from cenkalti's own defaults are deliberate:
+//   - RandomizationFactor defaults to 0 here (cenkalti's default is 0.5);
+//     jitter is opt-in via the proto field, keeping existing flows
+//     deterministic.
+//   - Multiplier falls back to 2 (not cenkalti's 1.5) to match the
+//     prior default-when-<1 behavior.
+//   - MaxInterval is left effectively unbounded when max_backoff is
+//     unset (cenkalti's default caps at 60s, which the old code did not).
+//   - An invalid/unset initial_backoff yields a 0 interval (all delays
+//     0), matching the old backoffDelay(nil-ish) == 0.
+func newExponential(b *flowv1beta2.Backoff) *backoff.ExponentialBackOff {
+	e := backoff.NewExponentialBackOff()
+	e.MaxElapsedTime = 0      // bounded by max_attempts, never by wall time
+	e.RandomizationFactor = 0 // deterministic unless jitter is set below
+	if b != nil {
+		if init := b.GetInitialBackoff(); init.IsValid() {
+			e.InitialInterval = init.AsDuration()
+		} else {
+			e.InitialInterval = 0
 		}
+		if mult := b.GetBackoffMultiplier(); mult >= 1 {
+			e.Multiplier = mult
+		} else {
+			e.Multiplier = 2
+		}
+		if mb := b.GetMaxBackoff(); mb.IsValid() {
+			e.MaxInterval = mb.AsDuration()
+		} else {
+			e.MaxInterval = math.MaxInt64
+		}
+		e.RandomizationFactor = b.GetJitter()
 	}
-	return time.Duration(delay)
+	e.Reset() // start currentInterval at InitialInterval
+	return e
 }
 
 // lintRetryStrategy validates CEL expressions in a RetryStrategy without

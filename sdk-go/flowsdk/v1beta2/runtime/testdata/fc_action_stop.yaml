@@ -2,17 +2,30 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_action_stop
-  inputs:
-    - id: msg
-      int64: {}
+  description: >-
+    Range generator 1..100 feeds an action that echoes each value;
+    flow_control.stop_when on the action fires when the generator's value
+    reaches 5. Without FC.stop firing, the generator would emit 100
+    values. With FC.stop firing, gracefulStop signals stopCh on the generator
+    and the flow exits in bounded time. Guards that flow_control.stop_when
+    on an action node actually fires (vs the previous finite-input fixture
+    where natural drain == graceful drain).
+  generators:
+    - id: seq
+      range:
+        start: 1
+        end: 100
+        rate:
+          count: 100
+          interval: "1s"
   actions:
     - id: call
       call:
         connection: echo
         method: echo.Echo
-        request: "= inputs.msg.value"
+        request: "= generators.seq.value"
       flow_control:
-        stop_when: "= true"
+        stop_when: "= generators.seq.value >= 5"
   outputs:
     - id: result
       value: "= actions.call.value"

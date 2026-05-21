@@ -2,14 +2,28 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_interaction_stop
-  inputs:
-    - id: x
-      int64: {}
+  description: >-
+    Range generator 1..100 drives an interaction node (gated by
+    `when: generators.seq.value > 0`); flow_control.stop_when on the
+    interaction fires when the generator's value reaches 5. Without
+    FC.stop firing, the generator would emit 100 values. With FC.stop
+    firing, gracefulStop signals stopCh on the generator and the flow
+    exits in bounded time. Guards that flow_control.stop_when on an
+    interaction node actually fires (vs the previous finite-input fixture
+    where natural drain == graceful drain).
+  generators:
+    - id: seq
+      range:
+        start: 1
+        end: 100
+        rate:
+          count: 100
+          interval: "1s"
   interactions:
     - id: confirm
-      when: "= inputs.x.value > 0"
+      when: "= generators.seq.value > 0"
       flow_control:
-        stop_when: "= true"
+        stop_when: "= generators.seq.value >= 5"
   outputs:
     - id: result
       value: "= interactions.confirm.value"

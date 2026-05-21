@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_bidi_throttle
+  description: >-
+    Bidi stream with throttle: max 5 emits per 0.5s window. Even with rapid
+    input feeding, the stream handler must rate-limit emissions to the
+    configured count/interval. Guards the throttle limiter on streams: bursts
+    above the count are deferred to the next window.
   inputs:
     - id: x
       int64: {}

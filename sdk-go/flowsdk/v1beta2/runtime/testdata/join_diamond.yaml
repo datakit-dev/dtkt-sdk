@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: join_diamond
-  description: "Diamond: input to left(*2) + right(*3), output(left+right)"
+  description: >-
+    Diamond topology: one input feeds two vars (left *2, right *3) that join at
+    a single output computing left+right. Guards that fan-out followed by a
+    join recombines values from both branches per input event, producing one
+    output per upstream emission rather than two separate streams.
   inputs:
     - id: x
       int64: {}

@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: outbox_range_generator
+  description: >-
+    Range generator (1..3 step 1) feeds an output directly. Output is [1, 2,
+    3]. Used by outbox tests to verify generator-driven flows write each emit
+    through the outbox, just like input-driven flows. Guards outbox capture for
+    generator-sourced values.
   generators:
     - id: r
       range:

@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_wkt_duration
-  description: "Compare a google.protobuf.Duration input against a CEL duration literal"
+  description: >-
+    Input is a google.protobuf.Duration; output compares it to the CEL literal
+    `duration('60s')`. Feeding 90s yields true; feeding 30s yields false.
+    Guards that the well-known Duration type is recognized by CEL with both the
+    input value and the literal converting to the same comparable type.
   inputs:
     - id: x
       string: {}

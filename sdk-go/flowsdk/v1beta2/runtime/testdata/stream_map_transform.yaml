@@ -2,6 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_map_transform
+  description: >-
+    Stream echoes input; downstream var applies a map transform (value * 10).
+    Guards that var transforms apply per stream emission (not per input) when
+    fed by a streams.X.value source.
   inputs:
     - id: msg
       int64: {}

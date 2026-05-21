@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_flatten_passthrough
-  description: "Flatten with false should be a no-op"
+  description: >-
+    Var transform is `flatten: false` -- an explicit no-op. Feeding 1..3 yields
+    [1, 2, 3] unchanged. Guards that flatten:false is a true passthrough (not
+    the same as the absence of a flatten directive) and that emit ordering
+    matches input ordering.
   inputs:
     - id: x
       int64: {}

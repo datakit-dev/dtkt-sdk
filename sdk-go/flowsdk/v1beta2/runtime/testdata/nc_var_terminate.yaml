@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_var_terminate
+  description: >-
+    Var doubles input; node_control.terminate_when fires at x>=3 and cancels
+    the var's context (not the flow's). Feeding 1..5: the doubled var's context
+    is cancelled at the trigger; the flow returns nil. Output is a prefix of
+    [2, 4, 6, 8, 10]. Guards that NC terminate on a var cancels only that
+    node's context and lets the flow finish naturally.
   inputs:
     - id: x
       int64: {}

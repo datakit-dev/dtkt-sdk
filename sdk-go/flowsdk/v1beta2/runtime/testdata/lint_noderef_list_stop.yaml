@@ -1,0 +1,22 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_noderef_list_stop
+  description: >-
+    Output references `inputs.req.value.tags.bogus_field`: walker resolves
+    `.tags` as repeated string, then must STOP (no descriptor for a scalar/list
+    elt to walk into). Lint must produce zero diagnostics even though the
+    expression is nonsensical at runtime. Codifies the zero-false-positives
+    invariant: when type info is lost, stop walking, even at the cost of
+    missing a typo.
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: req
+      message:
+        type: test.TestRequest
+  outputs:
+    - id: bad_through_list
+      value: "= inputs.req.value.tags.bogus_field"

@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_unary_echo
+  description: >-
+    Stream uses a unary RPC method (echo.Echo) -- a stream node wrapping a
+    non-streaming method. Each input produces one stream emission. Guards that
+    the stream handler correctly degrades to a request/response loop for unary
+    methods (no extra recv after the single response).
   inputs:
     - id: msg
       string: {}

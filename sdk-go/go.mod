@@ -23,6 +23,7 @@ require (
 	connectrpc.com/connect v1.19.1
 	entgo.io/ent v0.14.5
 	github.com/Khan/genqlient v0.8.1
+	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/charmbracelet/log v0.4.2
 	github.com/datakit-dev/grpc-proxy v0.0.0-20250812181120-d2a33c10eab0
 	github.com/dominikbraun/graph v0.23.0
@@ -77,7 +78,6 @@ require (
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.9.1 // indirect
 	github.com/buger/jsonparser v1.2.0 // indirect
-	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/charmbracelet/colorprofile v0.2.3-0.20250311203215-f60798e515dc // indirect
 	github.com/charmbracelet/lipgloss v1.1.0 // indirect

@@ -1,0 +1,24 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_noderef_input_message_chain
+  description: >-
+    Input is declared with `message: { type: test.TestRequest }` so its value
+    carries a typed proto. Action request reads `inputs.req.value.bogus_field`.
+    Lint must walk inputTypeInfo to the TestRequest descriptor and report
+    CodeUnknownField. Guards chain-walking for typed message inputs.
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: req
+      message:
+        type: test.TestRequest
+  actions:
+    - id: run
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request:
+          name: "= inputs.req.value.bogus_field"

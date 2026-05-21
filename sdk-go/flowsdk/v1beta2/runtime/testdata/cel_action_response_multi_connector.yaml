@@ -2,7 +2,14 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_action_response_multi_connector
-  description: "Two synthetic connectors each returning their own typed message; a single output expression combines responses from BOTH. Verifies the flow-global union resolver: per-connection scoping would fail because the output handler's env can only know one connector's resolver."
+  description: >-
+    Two distinct connectors (echoa, echob) each return their own typed response
+    message; a single output expression concatenates fields from BOTH
+    connectors' responses. Feeding one input that fans out to both actions
+    yields 'from-A:from-B' on the combined output. Guards that an expression
+    touching responses from MULTIPLE connectors works -- a runtime that scoped
+    types per-connector would fail to decode whichever response did not match
+    the active env.
   inputs:
     - id: x
       string: {}

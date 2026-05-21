@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_idle
+  description: >-
+    Stream calls stream.Idle -- a method that opens but never emits and never
+    closes on its own. The test feeds one input, waits 100ms for the stream
+    to open and idle, then calls exec.Terminate(); Execute must return
+    ErrTerminated promptly. Guards that an idle server stream observes the
+    per-handler ctx cancel and unwinds cleanly rather than livelocking on
+    recv.
   inputs:
     - id: msg
       int64: {}

@@ -54,22 +54,37 @@ function applyOne(
   const path = parsePath(message.desc, key, { registry });
   if (path.length === 0) return;
 
-  // Only field paths are supported. The buf path syntax also allows
-  // list/map subscripts; for URL params we don't try to support those.
-  if (path.some((p) => p.kind !== "field")) {
-    throw new Error(`protopath ${key}: non-field path elements are not supported`);
+  // Field paths and map subscripts are supported. List subscripts and
+  // extensions/oneofs are not (the URL convention is keyed by field).
+  for (const p of path) {
+    if (p.kind === "list_sub") {
+      throw new Error(`protopath ${key}: list subscripts are not supported`);
+    }
+    if (p.kind === "extension" || p.kind === "oneof") {
+      throw new Error(`protopath ${key}: ${p.kind} path elements are not supported`);
+    }
   }
 
   // Build a nested JSON object that mirrors the path, with the encoded
-  // leaf value at the bottom. Use the JSON name (or proto name) at each
-  // level so fromJson recognizes the structure.
-  const leaf = path[path.length - 1] as DescField;
+  // leaf value at the bottom. The leaf must be a regular field (not a
+  // subscript) so we can produce a sensible JSON shape.
+  const leaf = path[path.length - 1];
+  if (leaf?.kind !== "field") {
+    throw new Error(`protopath ${key}: path must end at a field`);
+  }
   const encoded = encodeLeaf(leaf, value);
 
   let json: unknown = { [jsonKey(leaf)]: encoded };
   for (let i = path.length - 2; i >= 0; i--) {
-    const step = path[i] as DescField;
-    json = { [jsonKey(step)]: json };
+    const step = path[i];
+    if (step === undefined) continue;
+    if (step.kind === "field") {
+      json = { [jsonKey(step)]: json };
+    } else if (step.kind === "map_sub") {
+      // map<string, M> JSON form is { "<key>": { ... } }. Map keys are
+      // always rendered as JSON strings per protobuf-JSON.
+      json = { [String(step.key)]: json };
+    }
   }
 
   // Parse the JSON into a fresh message of the same type, then merge
@@ -96,8 +111,12 @@ function encodeLeaf(field: DescField, raw: string): unknown {
       }
     }
     case "list":
+      throw new Error(`field ${field.name}: list leaves are not supported`);
     case "map":
-      throw new Error(`field ${field.name}: lists and maps are not supported`);
+      // Map leaves are only reachable via subscript; without a subscript
+      // the URL would have to encode the entire map as JSON, which is
+      // beyond the prefill contract.
+      throw new Error(`field ${field.name}: write the map via subscript syntax, e.g. ${field.name}[key].subfield=value`);
   }
 }
 

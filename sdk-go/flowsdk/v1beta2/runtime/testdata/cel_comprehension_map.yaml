@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_comprehension_map
-  description: "map() macro doubling the n field of each element"
+  description: >-
+    Input carries `items` list of {n} structs; output uses CEL `map()` to
+    double each item's n. Feeding {10, 20, 30} yields [20, 40, 60]. Guards that
+    `map()` over a list of structs produces a list of derived values with the
+    right element types (int64 here).
   inputs:
     - id: x
       string: {}

@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_string_map_world
-  description: "String input with map transform appending ' world'"
+  description: >-
+    String input with a map transform appending ' world'. Feeding 'hello' and
+    'goodbye' yields 'hello world' and 'goodbye world'. Guards that input-level
+    map transforms work on non-numeric scalar types (string here) and that CEL
+    string concatenation produces the expected result.
   inputs:
     - id: name
       string: {}

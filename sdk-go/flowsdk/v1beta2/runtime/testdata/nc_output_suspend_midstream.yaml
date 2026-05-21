@@ -2,11 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_output_suspend_midstream
-  description: |
-    Range generator emits 1..10 directly into an Output. NC.suspend_when on
-    the Output fires when value == 3. Tests per-node suspend mid-stream:
-    only the output is suspended; the generator and any sibling nodes keep
-    running. Resume drains the remaining values cleanly.
+  description: >-
+    Range generator emits 1..10 directly into an Output. NC.suspend_when on the
+    Output fires when value == 3. Tests per-node suspend mid-stream: only the
+    output is suspended; the generator and any sibling nodes keep running.
+    Resume drains the remaining values cleanly.
   generators:
     - id: seq
       range:

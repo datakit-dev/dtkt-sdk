@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: retry_before_nc_stream
+  description: >-
+    Stream calls error.StreamPermissionDenied (gRPC code 7);
+    retry_strategy.suspend_when matches and yields starting intent SUSPEND,
+    which NC.terminate_when=true promotes to TERMINATE. Stream topic publishes
+    PHASE_CANCELLED; flow returns nil (per-node scope). Stream-side counterpart
+    to retry_before_nc_action.
   inputs:
     - id: msg
       int64: {}

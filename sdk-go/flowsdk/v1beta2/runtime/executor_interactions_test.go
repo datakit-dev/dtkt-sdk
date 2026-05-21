@@ -1,18 +1,16 @@
 package runtime
 
 import (
-	"encoding/json"
 	"regexp"
 	"testing"
 
+	expr "cel.dev/expr"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
 	flowv1beta2 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // bareIDPattern matches the buf-validate regex on every per-event /
@@ -241,11 +239,25 @@ func TestGraph_Interaction_FormInputs(t *testing.T) {
 		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		var promptCount int
+		// Capture form input details from the first prompt so we can
+		// assert on form-input ids and the dynamic title outside the
+		// auto-responder goroutine (Go test asserts must run on the test
+		// goroutine).
+		var capturedFormInputIds []string
+		var capturedNotesTitle string
 		go func() {
 			for p := range prompt {
 				promptCount++
 				assert.NotEmpty(t, p.GetId(), "prompt must carry interaction id")
 				assert.NotEmpty(t, p.GetToken(), "prompt must carry token")
+				if capturedFormInputIds == nil {
+					for _, in := range p.GetInputs() {
+						capturedFormInputIds = append(capturedFormInputIds, in.GetId())
+						if in.GetId() == "notes" {
+							capturedNotesTitle = in.GetTitle()
+						}
+					}
+				}
 				anyVal, _ := common.WrapProtoAny(int64(7))
 				response <- &flowv1beta2.InteractionResponseEvent{Id: p.GetId(), Token: p.GetToken(), Value: anyVal}
 			}
@@ -259,6 +271,14 @@ func TestGraph_Interaction_FormInputs(t *testing.T) {
 		require.NoError(t, err)
 
 		assert.GreaterOrEqual(t, promptCount, 1, "form-input interaction must raise a prompt")
+
+		// Spec contract: form-input ids must appear in the prompt's Inputs[]
+		// list, and dynamic CEL titles must be resolved against upstream
+		// state (here, inputs.x.value=1 -> "Notes for value 1").
+		assert.ElementsMatch(t, []string{"agree", "notes"}, capturedFormInputIds,
+			"prompt must carry form-input ids from the YAML (agree, notes)")
+		assert.Equal(t, "Notes for value 1", capturedNotesTitle,
+			"dynamic CEL title must be resolved against inputs.x.value=1")
 
 		results := collectOutputs(ctx, ps, "outputs.result")
 		require.Len(t, results, 1)
@@ -303,40 +323,83 @@ func TestGraph_Interaction_WrongTokenDropped(t *testing.T) {
 	})
 }
 
-// buildInteractionStructResponse mirrors the canonical production
-// interaction-response shape: each input's binding proto is converted
-// to a JSON-friendly map (preserving the binding's field shape) and
-// wrapped as a struct keyed by input id, then encoded as
-// Any(google.protobuf.Struct).
+// buildInteractionResponse builds the canonical production interaction-response
+// wire shape: an Interaction.Response carrying one TYPED binding per input id,
+// each packed as its own Any, wrapped in an outer Any. Mirrors the CLI's
+// interactionResponseValue and the UI responder. The runtime lifts this into
+// the CEL map `interactions.<id>.value.<input_id>.<binding_field>`.
 //
-// CEL access through this shape is uniform regardless of input count:
+// Because bindings travel typed (not flattened into a generic
+// google.protobuf.Struct), every declared field is always present -- so this
+// helper is the only one needed: there is no "sparse" variant, a zero-valued
+// binding (e.g. an empty InputBinding) still carries its `value` field.
 //
-//	interactions.<id>.value.<input_id>.<binding_field>
-//
-// Tests that send a primitive directly via common.WrapProtoAny bypass
-// this binding-preserving wrap and therefore can't catch breakage in
-// the access path; use this helper for fixtures whose CEL path crosses
-// the input boundary.
-func buildInteractionStructResponse(t *testing.T, bindings map[string]proto.Message) *anypb.Any {
+// Tests that send a primitive directly via common.WrapProtoAny bypass this
+// binding-preserving wrap and can't catch breakage in the access path; use
+// this helper for fixtures whose CEL path crosses the input boundary.
+func buildInteractionResponse(t *testing.T, bindings map[string]proto.Message) *anypb.Any {
 	t.Helper()
-	fields := make(map[string]*structpb.Value, len(bindings))
+	out := make(map[string]*anypb.Any, len(bindings))
 	for id, binding := range bindings {
-		// protojson preserves the binding's proto/JSON field names so
-		// future bindings (FileBinding, SelectBinding, etc.) round-trip
-		// without changing the access pattern. EmitDefaultValues so a
-		// false confirm or empty list still appears as a key rather
-		// than dropping out of the struct entirely.
-		jsonBytes, err := protojson.MarshalOptions{EmitDefaultValues: true}.Marshal(binding)
+		b, err := anypb.New(binding)
 		require.NoError(t, err)
-		var asMap map[string]any
-		require.NoError(t, json.Unmarshal(jsonBytes, &asMap))
-		sv, err := structpb.NewValue(asMap)
-		require.NoError(t, err)
-		fields[id] = sv
+		out[id] = b
 	}
-	any, err := anypb.New(&structpb.Struct{Fields: fields})
+	resp := flowv1beta2.Interaction_Response_builder{Bindings: out}.Build()
+	any, err := anypb.New(resp)
 	require.NoError(t, err)
 	return any
+}
+
+// TestGraph_Interaction_ZeroValuedBinding proves a zero-valued binding still
+// resolves: a blank text input is an Interaction_InputBinding{} whose `value`
+// is the proto3 zero "". With the typed-binding wire shape, that field is
+// always present, so the output's CEL `interactions.ask.value.note.value`
+// resolves to "" instead of erroring "no such key: value" -- the structural
+// fix for the ticker-v2interaction-showcase bug, which a generic-Struct
+// encoding (now removed) could drop.
+func TestGraph_Interaction_ZeroValuedBinding(t *testing.T) {
+	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
+		graph := loadFlow(t, "interaction_zero_binding.yaml")
+
+		prompt := make(chan *flowv1beta2.InteractionRequestEvent, 16)
+		response := make(chan *flowv1beta2.InteractionResponseEvent, 16)
+		ps := newPubSub()
+		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
+
+		const maxIters uint64 = 3
+		var promptCount int
+		go func() {
+			for p := range prompt {
+				promptCount++
+				// Zero-valued InputBinding: value is "" (proto3 zero). Typed
+				// transport keeps the field present regardless.
+				anyVal := buildInteractionResponse(t, map[string]proto.Message{
+					"note": &flowv1beta2.Interaction_InputBinding{},
+				})
+				response <- &flowv1beta2.InteractionResponseEvent{
+					Id: p.GetId(), Token: p.GetToken(), Value: anyVal,
+				}
+			}
+			close(response)
+		}()
+
+		feedInput(ps, "inputs.maxIters", maxIters)
+		ctx := testContext(t)
+		err := NewExecutor(ps, testTopics, append([]Option{WithInteractions(prompt, response)}, extraOpts...)...).Execute(ctx, graph)
+		close(prompt)
+		require.NoError(t, err,
+			"a zero-valued InputBinding must resolve `.value` to \"\", not error 'no such key: value'")
+
+		results := collectOutputs(ctx, ps, "outputs.echo")
+		t.Logf("prompts=%d outputs=%d", promptCount, len(results))
+		require.Len(t, results, promptCount, "every prompt must yield an output")
+		for i, r := range results {
+			_, isStr := r.GetValue().GetKind().(*expr.Value_StringValue)
+			assert.True(t, isStr, "output[%d] must be a string kind (InputBinding.value zero), got %T", i, r.GetValue().GetKind())
+			assert.Equal(t, "", r.GetValue().GetStringValue(), "output[%d] is the blank input's default", i)
+		}
+	})
 }
 
 // TestGraph_Interaction_TickerVarRepro reproduces an interactive-ticker
@@ -371,7 +434,7 @@ func TestGraph_Interaction_TickerVarRepro(t *testing.T) {
 				promptCount++
 				binding := &flowv1beta2.Interaction_ConfirmBinding{}
 				binding.SetValue(false) // always pass the filter
-				anyVal := buildInteractionStructResponse(t, map[string]proto.Message{
+				anyVal := buildInteractionResponse(t, map[string]proto.Message{
 					"discard": binding,
 				})
 				response <- &flowv1beta2.InteractionResponseEvent{
@@ -424,7 +487,7 @@ func TestGraph_Interaction_TickerVarRepro_DiscardAll(t *testing.T) {
 				promptCount++
 				binding := &flowv1beta2.Interaction_ConfirmBinding{}
 				binding.SetValue(true) // filter rejects
-				anyVal := buildInteractionStructResponse(t, map[string]proto.Message{
+				anyVal := buildInteractionResponse(t, map[string]proto.Message{
 					"discard": binding,
 				})
 				response <- &flowv1beta2.InteractionResponseEvent{
@@ -469,7 +532,7 @@ func TestGraph_Interaction_TickerOnlyRepro(t *testing.T) {
 				promptCount++
 				binding := &flowv1beta2.Interaction_ConfirmBinding{}
 				binding.SetValue(false)
-				anyVal := buildInteractionStructResponse(t, map[string]proto.Message{
+				anyVal := buildInteractionResponse(t, map[string]proto.Message{
 					"discard": binding,
 				})
 				response <- &flowv1beta2.InteractionResponseEvent{
@@ -513,7 +576,7 @@ func TestGraph_Interaction_VarRepro(t *testing.T) {
 				promptCount++
 				binding := &flowv1beta2.Interaction_ConfirmBinding{}
 				binding.SetValue(false)
-				anyVal := buildInteractionStructResponse(t, map[string]proto.Message{
+				anyVal := buildInteractionResponse(t, map[string]proto.Message{
 					"discard": binding,
 				})
 				response <- &flowv1beta2.InteractionResponseEvent{
@@ -568,7 +631,7 @@ func TestGraph_Interaction_TickerVarRepro_Mixed(t *testing.T) {
 				}
 				binding := &flowv1beta2.Interaction_ConfirmBinding{}
 				binding.SetValue(discardPattern[idx])
-				anyVal := buildInteractionStructResponse(t, map[string]proto.Message{
+				anyVal := buildInteractionResponse(t, map[string]proto.Message{
 					"discard": binding,
 				})
 				response <- &flowv1beta2.InteractionResponseEvent{
@@ -634,7 +697,7 @@ func TestGraph_Interaction_OutputFilterIdiomatic(t *testing.T) {
 				discard := promptCount%2 == 1 // first true, second false
 				binding := &flowv1beta2.Interaction_ConfirmBinding{}
 				binding.SetValue(discard)
-				anyVal := buildInteractionStructResponse(t, map[string]proto.Message{
+				anyVal := buildInteractionResponse(t, map[string]proto.Message{
 					"discard": binding,
 				})
 				response <- &flowv1beta2.InteractionResponseEvent{Id: p.GetId(), Token: p.GetToken(), Value: anyVal}

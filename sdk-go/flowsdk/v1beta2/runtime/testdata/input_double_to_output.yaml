@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_double_to_output
-  description: "Double input passed directly to output"
+  description: >-
+    Double-typed input passed straight to output. Feeding 3.14, -0.5, 0.0 emits
+    DoubleValues unchanged. Guards that float64 inputs preserve precision and
+    sign through the wire.
   inputs:
     - id: x
       double: {}

@@ -1,0 +1,32 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: reduce_session_window_multi
+  description: >-
+    Int64 input fed by the test in two bursts separated by a 250ms gap.
+    Session window timeout is 100ms (less than the inter-burst gap,
+    greater than the intra-burst gap). A correctly-implemented session
+    window closes after the first burst's last value sits idle for 100ms
+    and emits sum=6 (1+2+3), then opens a new session for the second
+    burst and emits sum=60 (10+20+30). Companion to
+    accum_reduce_session_window.yaml which has no gap exceeding the
+    timeout (vacuous against Gap 1). Used by
+    TestGraph_Reduce_SessionWindow_MultiEmission. Without windowing, the
+    runtime emits a single sum=66 at EOF.
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: session
+      value: "= inputs.x.value"
+      transforms:
+        - reduce:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+            group_by:
+              window:
+                session:
+                  timeout: "0.1s"
+  outputs:
+    - id: result
+      value: "= vars.session.value"

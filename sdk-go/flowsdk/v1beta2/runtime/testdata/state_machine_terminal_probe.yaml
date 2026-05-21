@@ -2,7 +2,7 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: state_machine_terminal_probe
-  description: |
+  description: >-
     One input-driven output (exits quickly when x=42 + EOF arrive) and a
     long-running ticker that keeps the flow alive. Used by
     TestStateMachine_TerminalNodesFlag_SetOnHandlerExit to probe operator

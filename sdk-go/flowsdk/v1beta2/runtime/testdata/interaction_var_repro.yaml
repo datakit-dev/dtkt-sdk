@@ -2,10 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: interaction_var_repro
-  # Same shape as interaction_ticker_var_repro but without a ticker
-  # generator -- input drives the var iteration directly. Used to
-  # bisect the multi-iteration hang to "ticker generator + interaction"
-  # vs "var-driven + interaction" topologies.
+  description: >-
+    Same downstream shape as interaction_ticker_var_repro but with input-driven
+    var iteration instead of a ticker. Used to bisect a multi-iteration hang to
+    (ticker + interaction) vs (var-driven + interaction) topology. This variant
+    passes; the ticker variant exposed the bug -- isolating the source to
+    ticker-driven multi-iter interactions.
   inputs:
     - id: x
       int64: {}

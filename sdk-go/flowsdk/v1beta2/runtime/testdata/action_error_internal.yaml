@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_error_internal
+  description: >-
+    Action calling an RPC that always fails with an Internal error (code 13).
+    Used across multiple test suites to exercise the runtime's error-handling:
+    TERMINATE strategy propagates 'internal server error' and marks the action
+    PHASE_ERRORED; STOP strategy drains gracefully and emits no successful
+    outputs; flow-state tests verify the executor's terminal FlowState carries
+    the error correctly.
   inputs:
     - id: msg
       int64: {}

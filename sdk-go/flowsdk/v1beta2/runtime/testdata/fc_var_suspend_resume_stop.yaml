@@ -1,0 +1,26 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: fc_var_suspend_resume_stop
+  description: >-
+    Var with two flow_control conditions evaluated in sequence on the same
+    handler: suspend_when at inputs.x.value==3 (CEL-triggered park), then
+    operator Resume(), then stop_when at inputs.x.value>=6 (graceful drain).
+    Parallel to fc_output_suspend_resume_stop.yaml but for the var handler.
+    Used by TestFlowControl_Var_SuspendResumeStop to verify Resume actually
+    wakes a handler parked by flow_control.suspend_when, and that a later
+    flow_control condition still fires on the resumed handler. Feeding
+    [1, 2, 3, 4, 5, 6]: outputs sequence is [1, 2, 3, 4, 5, 6] with a
+    suspend boundary between 3 and 4 and a graceful stop after 6.
+  inputs:
+    - id: x
+      int64: {}
+  vars:
+    - id: passthrough
+      value: "= inputs.x.value"
+      flow_control:
+        suspend_when: "= inputs.x.value == 3"
+        stop_when: "= inputs.x.value >= 6"
+  outputs:
+    - id: result
+      value: "= vars.passthrough.value"

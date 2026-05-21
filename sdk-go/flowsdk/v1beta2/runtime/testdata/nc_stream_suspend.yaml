@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_stream_suspend
+  description: >-
+    Stream echoes its input; node_control.suspend_when=true parks the stream
+    handler until ResumeNode. The bidi RPC connection survives suspension (no
+    reconnect on resume). Guards that NC suspend on a stream parks the handler
+    in place; the underlying RPC is not torn down.
   inputs:
     - id: msg
       string: {}

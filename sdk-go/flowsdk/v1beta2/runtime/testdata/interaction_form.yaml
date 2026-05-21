@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: interaction_form
+  description: >-
+    Interaction with a multi-input form: one confirm prompt and one free-text
+    input. The free-text title uses a CEL expression interpolating the upstream
+    input value, exercising dynamic prompt text. Output forwards the form's
+    submitted response. Guards that form-input ids are emitted in the prompt,
+    dynamic titles evaluate from upstream state, and the form response routes
+    back as the interaction's value.
   inputs:
     - id: x
       int64: {}

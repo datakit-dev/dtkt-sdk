@@ -2,6 +2,19 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: reduce_event_window
+  description: >-
+    Event-window reduce (spec: Transform.Reduce.group_by.window.event --
+    the window closes when the `when` CEL evaluates true). Here
+    `when: inputs.x.closed` closes the window at stream end; summing 1..5
+    yields 15. IMPLEMENTATION GAP (Gap 1): the runtime never reads
+    group_by.window (transform.go:466-482 compiles only the key; emitOnEOF
+    emits on EOF regardless), so windowed emission is not honored. Because
+    this gate coincides with EOF, the single windowed result (15) is the
+    same whether or not the window feature works -- so this fixture
+    cannot, by itself, distinguish a correct event-window from the gap
+    (vacuous for the window feature; it still exercises reduce
+    accumulation). Non-vacuous event-window coverage that DOES catch the
+    gap: accum_reduce_event_window_multi.yaml.
   inputs:
     - id: x
       int64: {}

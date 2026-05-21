@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_terminate_priority
+  description: >-
+    Var sets all three NC branches (stop_when, suspend_when, terminate_when) to
+    true; the runtime must apply terminate_when (highest priority) and skip the
+    others. Observed phases on the var topic must NOT include PHASE_STOPPING or
+    PHASE_SUSPENDED; only PHASE_CANCELLED. Guards the terminate > suspend >
+    stop ordering when multiple NC branches fire on the same iteration.
   inputs:
     - id: x
       int64: {}

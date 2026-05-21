@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_invalid_switch_cel
+  description: >-
+    Var declared with switch.value expression that is syntactically invalid CEL
+    (`+++bad`). Lint must report a CodeInvalidCEL diagnostic with path
+    mentioning `switch.value`. Guards that switch-form var CEL is linted with
+    the right path.
   vars:
     - id: sw
       switch:

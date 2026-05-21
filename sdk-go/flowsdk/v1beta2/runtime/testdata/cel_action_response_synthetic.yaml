@@ -2,7 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_action_response_synthetic
-  description: "Action returns a synthetic (non-global-registry) typed message; output reads a field. Hermetic U10 repro: fails with 'proto: not found' until exprToRefVal resolves Any via the connector resolver."
+  description: >-
+    String input is sent to an echo RPC whose response is a custom proto
+    message type known ONLY to the connection's resolver (not registered
+    globally). The output reads a field off that response. Guards that the
+    runtime decodes connector responses via the connection's resolver -- a
+    globally-unaware decoder would fail with 'proto: not found' on the
+    runtime-loaded type.
   inputs:
     - id: x
       string: {}

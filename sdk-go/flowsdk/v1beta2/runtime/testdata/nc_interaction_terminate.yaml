@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_interaction_terminate
+  description: >-
+    Interaction node fires once (when=true), then
+    node_control.terminate_when=true cancels its context. Flow returns nil.
+    Output is a prefix of interaction responses. Guards that NC terminate on an
+    interaction cancels the interaction handler context, not the flow context.
   inputs:
     - id: x
       int64: {}

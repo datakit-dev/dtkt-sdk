@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_cache_over_default
+  description: >-
+    Int64 input with BOTH a default (99) and cache:true. The default seeds the
+    initial cached value; a pushed value (42) replaces it. The last output
+    value is always 42, demonstrating that pushed cache takes priority over
+    default. The test may see 1 or 2 outputs depending on race timing between
+    the pre-pulse drain and the bridge's first emit. Guards that pushed cache
+    wins over default.
   inputs:
     - id: x
       int64:

@@ -2,6 +2,17 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cache_var_to_output
+  description: >-
+    Var with cache:true doubling its input, feeding a single output. Used by
+    five tests in executor_cache_test.go: (a) feed 7 once -> emit 14 (basic
+    capture-and-forward); (b) feed 5, 99, 100 -> emit only 10 (first*2),
+    draining the rest (drain-and-skip after first capture); plus three
+    integration tests of Executor.ClearCache that reset the captured flag and
+    reverify drain behaviour. The cacheBackend's unit-level
+    capture/clear semantics tests instantiate `&cacheBackend{}` directly --
+    they do NOT load this fixture. Guards the all-cached-deps output-firing
+    contract: exactly one emission per producer pulse from the cached var,
+    and that ClearCache properly re-enables capture.
   inputs:
     - id: x
       int64: {}

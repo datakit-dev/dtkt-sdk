@@ -2,7 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fanout_parallel_chains
-  description: "Input to two parallel var chains with different transforms"
+  description: >-
+    One input fans out to two parallel var chains: chainA filters to evens then
+    multiplies by 10; chainB increments by 1 then filters > 3. Each chain's
+    result is an independent output. Feeding 1..5 yields a=[20, 40] and b=[4,
+    5, 6]. Guards that an input can drive multiple disjoint transform pipelines
+    simultaneously, each seeing every input but producing its own filtered
+    output.
   inputs:
     - id: x
       int64: {}

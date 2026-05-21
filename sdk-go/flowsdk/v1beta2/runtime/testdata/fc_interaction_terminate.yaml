@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_interaction_terminate
+  description: >-
+    Interaction node with flow_control.terminate_when=true (always true). After
+    the first interaction fires, terminate cancels the runtime context
+    immediately and the flow returns ErrTerminated. The output handler may or
+    may not have published the interaction result before cancellation -- the
+    test asserts output count <=1. Guards that terminate on an interaction is a
+    hard cancel rather than draining queued inputs.
   inputs:
     - id: x
       int64: {}

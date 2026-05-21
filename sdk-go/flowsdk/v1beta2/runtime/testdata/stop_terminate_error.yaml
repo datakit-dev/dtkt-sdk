@@ -2,6 +2,14 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stop_terminate_error
+  description: >-
+    Action calls error.Internal (code 13) with terminate_when matching that
+    code. The retry strategy surfaces a typed TerminateError. Used by the
+    lifecycle suite to verify that TerminateError surfaces consistently across
+    error strategies: under STOP the drain still completes and the
+    TerminateError is still returned. Guards that terminate_when overrides the
+    flow-level error strategy and yields the same typed error in all
+    configurations.
   inputs:
     - id: msg
       int64: {}

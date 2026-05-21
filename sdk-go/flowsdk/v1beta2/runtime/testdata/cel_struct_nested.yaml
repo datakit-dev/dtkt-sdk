@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_struct_nested
-  description: "Access deeply nested subfield of a structured input value"
+  description: >-
+    Output reaches a two-level-nested field `address.city` on a struct input.
+    Feeding {name: 'alice', address: {city: 'SF', zip: '94103'}} emits 'SF'.
+    Guards that CEL dotted-path traversal across multiple struct levels
+    resolves each step before reading the leaf value.
   inputs:
     - id: x
       string: {}

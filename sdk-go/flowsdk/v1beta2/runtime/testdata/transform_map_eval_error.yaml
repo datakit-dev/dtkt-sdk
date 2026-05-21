@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_map_eval_error
-  description: "Map expression fails at runtime (division by zero)"
+  description: >-
+    Var transform's map expression divides by zero (`= this.value / 0`). CEL
+    lint passes (syntax is valid) but eval fails at runtime for every input.
+    The flow surfaces an evaluation error rather than crashing. Guards that
+    runtime CEL errors during a transform stage are caught and reported, not
+    panicked.
   inputs:
     - id: x
       int64: {}

@@ -41,8 +41,16 @@ option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1be
 //   streams.<id>.request_count     Number of requests sent
 //   streams.<id>.response_count    Number of responses received
 //
-//   interactions.<id>.value        Last received value (per this node's subscription)
-//   interactions.<id>.submitted    Interaction form has been submitted
+//   interactions.<id>.value                    Response: map keyed by form input id (Interaction.Response)
+//   interactions.<id>.value.<input_id>          One input's typed binding (ConfirmBinding/InputBinding/...)
+//   interactions.<id>.value.<input_id>.value    That input's submitted value (bool/string/bytes/...)
+//   interactions.<id>.submitted                 Interaction form has been submitted
+//
+//   Note the two levels: unlike an input (whose value is unwrapped to a single
+//   typed scalar/message), an interaction's value is a map of typed bindings --
+//   one per form input. The input id selects the binding; `.value` reads its
+//   submitted value. A binding may carry sibling fields beyond `value` (e.g.
+//   agent-supplied metadata), reachable as `.<input_id>.<field>`.
 //
 //   outputs.<id>.value             Last received value (per this node's subscription)
 //   outputs.<id>.eval_count        Number of evaluations
@@ -669,6 +677,24 @@ message Interaction {
     repeated google.protobuf.Any value = 1 [(dtkt.protoform.v1beta1.field).multi_select = {}];
   }
 
+  // Response is an actor's reply to an InteractionRequestEvent: one typed
+  // binding per form input, keyed by input id. This is what
+  // InteractionResponseEvent.value wraps, and what the runtime exposes to CEL
+  // as `interactions.<id>.value` -- the input id selects a binding, and
+  // `.value` reads its submitted value.
+  //
+  // Typed bindings (vs an earlier generic google.protobuf.Struct encoding)
+  // guarantee every declared field is always present: `value` at its proto
+  // zero plus any future per-binding metadata. So the CEL access path
+  // `interactions.<id>.value.<input_id>.value` never hits a missing key,
+  // regardless of how a responder serializes implicit-presence fields.
+  message Response {
+    // Submitted binding per form input id. Each Any wraps the input's
+    // *Binding message (ConfirmBinding / InputBinding / FileBinding /
+    // SelectBinding / MultiSelectBinding).
+    map<string, google.protobuf.Any> bindings = 1;
+  }
+
   // Input defines a single form field within an interaction.
   message Input {
     // Unique identifier for this input within the interaction.
@@ -746,6 +772,12 @@ message Backoff {
   // Maximum number of retry attempts before escalating to the
   // RetryStrategy's skip/suspend/terminate path.
   uint32 max_attempts = 4 [(buf.validate.field).required = true];
+
+  // Jitter as a fraction in [0, 1]: each delay is randomized to within
+  // +/- jitter of its computed value (0 = deterministic). Spreads
+  // retries when many callers back off against the same failing
+  // dependency at once, avoiding synchronized retry storms.
+  double jitter = 5 [(buf.validate.field).double = {gte: 0, lte: 1}];
 }
 
 // RetryStrategy configures synchronous error handling for Action and Stream
@@ -884,7 +916,8 @@ message Generator {
     ];
   }
 
-  // Range emits a bounded sequence of values. Both start and end are inclusive.\n  // For example, start=1 end=3 step=1 emits [1, 2, 3].
+  // Range emits a bounded sequence of values. Both start and end are
+  // inclusive. For example, start=1 end=3 step=1 emits [1, 2, 3].
   message Range {
     // Starting value (inclusive). Defaults to 0.
     int64 start = 1;

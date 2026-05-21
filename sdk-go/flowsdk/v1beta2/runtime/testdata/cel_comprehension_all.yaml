@@ -2,7 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_comprehension_all
-  description: "all() macro over a list of structs nested inside an input value"
+  description: >-
+    Input value carries a struct with an `items` list of objects with field
+    `n`. Output uses CEL's `all()` comprehension to check every item's n > 0.
+    Feeding two inputs (one with all positive, one with a negative) yields true
+    then false. Guards that comprehension macros work over list-of-struct
+    values flowing through inputs, with each iteration variable seeing the
+    struct's fields by name.
   inputs:
     - id: x
       string: {}

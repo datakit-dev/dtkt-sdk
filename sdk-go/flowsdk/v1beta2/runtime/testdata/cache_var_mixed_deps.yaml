@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cache_var_mixed_deps
+  description: >-
+    Var with mixed dependencies: one streaming (`tick`) and one cached
+    (`const`). The streaming input drives iteration; on each tick the var reads
+    the cached const inline. Feeding const=100 once and tick=1, 2, 3 yields
+    101, 102, 103. Guards that streaming dependencies cause re-iteration while
+    cached dependencies are re-read (not re-captured) on each pass.
   inputs:
     - id: tick
       int64: {}

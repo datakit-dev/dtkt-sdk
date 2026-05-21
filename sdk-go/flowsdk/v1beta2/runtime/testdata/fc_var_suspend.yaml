@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_var_suspend
+  description: >-
+    Var doubles its input with suspend_when=true (always). After the first var
+    evaluation the node enters PHASE_SUSPENDED; the test feeds 5 inputs and
+    verifies the var produces no further outputs while suspended. Terminate
+    then unblocks the executor. Guards that suspend on a var halts further
+    evaluation rather than queuing them silently.
   inputs:
     - id: x
       int64: {}

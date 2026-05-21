@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_multiple_errors
+  description: >-
+    Two independent nodes each carry invalid CEL: var `bad1` (value `+++a`) and
+    output `bad2` (value `+++b`). Lint must report multiple CodeInvalidCEL
+    diagnostics, not stop at the first one. Guards that lint collects all
+    errors in a single pass.
   vars:
     - id: bad1
       value: "= +++a"

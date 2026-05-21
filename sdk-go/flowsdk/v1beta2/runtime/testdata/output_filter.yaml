@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: output_filter
-  description: "Output with filter transform"
+  description: >-
+    Output applies a filter transform directly on the output node (`=
+    this.value > 3`). Feeding 1..5 yields [4, 5] -- only values that satisfy
+    the predicate are kept. Guards that output-level filter transforms run at
+    the output stage without needing an intermediate var.
   inputs:
     - id: x
       int64: {}

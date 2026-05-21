@@ -2,6 +2,16 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: reduce_fixed_window
+  description: >-
+    Fixed (tumbling) window reduce (spec:
+    Transform.Reduce.group_by.window.fixed). Range emits 1, 2, 3 instantly
+    into a 1s window; reduce sums to 6. IMPLEMENTATION GAP (Gap 1): the
+    runtime never reads group_by.window (transform.go:466-482), so windowed
+    emission is not honored. With all three values in a single window the
+    result (6) is the same whether or not the window works -- so this
+    fixture is vacuous for the fixed-window feature (it still exercises
+    reduce summation). Non-vacuous fixed-window coverage that catches the
+    gap: accum_reduce_fixed_window_multi.yaml.
   generators:
     - id: seq
       range:

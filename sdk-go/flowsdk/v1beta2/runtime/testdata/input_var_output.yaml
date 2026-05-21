@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_var_output
-  description: "Int64 input through a passthrough var to output"
+  description: >-
+    Minimal input -> var -> output chain (var just passes the value through).
+    Used by multiple suites as a basic happy-path fixture for executor smoke
+    tests, phase-progression assertions (Input/Var/Output each go through
+    PHASE_RUNNING -> SUCCEEDED), and var-handler regression tests. Guards the
+    simplest possible 3-node graph runs cleanly.
   inputs:
     - id: x
       int64: {}

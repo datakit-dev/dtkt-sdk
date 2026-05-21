@@ -35,35 +35,51 @@ type compiledRequest struct {
 }
 
 // lintRequestTree recursively walks a structpb.Value and validates all CEL
-// expression leaves via parseCEL (AST-only). Returns structured diagnostics.
+// expression leaves and surfaces syntax + type errors. Returns structured
+// diagnostics. When `env` is provided (resolver-rich lint env), expressions
+// are compiled against it so connector proto types resolve (e.g.
+// `test.TestRequest{...}` as a request top-level value). When `env` is nil,
+// falls back to parseCEL's default env (flow-snapshot types only).
+//
 // The path parameter tracks location within the request tree.
-func lintRequestTree(v *structpb.Value, path string) []LintDiagnostic {
+func lintRequestTree(v *structpb.Value, path string, env shared.Env) []LintDiagnostic {
 	if v == nil {
 		return nil
 	}
 	switch v.GetKind().(type) {
 	case *structpb.Value_StringValue:
 		s := v.GetStringValue()
-		if _, ok := shared.IsValidExpr(s); ok {
-			if _, err := parseCEL(s); err != nil {
-				return []LintDiagnostic{{
-					Severity: SeverityError,
-					Path:     path,
-					Message:  err.Error(),
-					Code:     CodeInvalidCEL,
-				}}
+		src, ok := shared.IsValidExpr(s)
+		if !ok {
+			return nil
+		}
+		var compileErr error
+		if env != nil {
+			_, issues := env.Compile(src)
+			if issues != nil && issues.Err() != nil {
+				compileErr = issues.Err()
 			}
+		} else {
+			_, compileErr = parseCEL(s)
+		}
+		if compileErr != nil {
+			return []LintDiagnostic{{
+				Severity: SeverityError,
+				Path:     path,
+				Message:  compileErr.Error(),
+				Code:     CodeInvalidCEL,
+			}}
 		}
 	case *structpb.Value_StructValue:
 		var diags []LintDiagnostic
 		for key, field := range v.GetStructValue().GetFields() {
-			diags = append(diags, lintRequestTree(field, path+"."+key)...)
+			diags = append(diags, lintRequestTree(field, path+"."+key, env)...)
 		}
 		return diags
 	case *structpb.Value_ListValue:
 		var diags []LintDiagnostic
 		for i, elem := range v.GetListValue().GetValues() {
-			diags = append(diags, lintRequestTree(elem, fmt.Sprintf("%s[%d]", path, i))...)
+			diags = append(diags, lintRequestTree(elem, fmt.Sprintf("%s[%d]", path, i), env)...)
 		}
 		return diags
 	}

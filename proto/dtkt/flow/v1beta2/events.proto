@@ -3,8 +3,12 @@ syntax = "proto3";
 package dtkt.flow.v1beta2;
 
 import "buf/validate/validate.proto";
+import "cel/expr/value.proto";
 import "dtkt/flow/v1beta2/spec.proto";
+import "dtkt/flow/v1beta2/state.proto";
 import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+import "google/rpc/status.proto";
 
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta2;flowv1beta2";
 
@@ -31,14 +35,64 @@ message InputRequestEvent {
 }
 
 // OutputEvent is a result emitted by a specific output node.
+//
+// Carries the lean per-event delta: the value the node just produced
+// plus its lifecycle metadata (eval_count, phase, error, closed) so
+// consumers can render node state without a separate snapshot fetch.
+// Mirrors RunSnapshot.OutputNode minus the internal-only `transforms`
+// accumulator and the wire-envelope `event_id`.
+//
+// `value` is a cel.expr.Value, matching the internal OutputNode.value
+// shape. The CEL spec value handles all CEL kinds natively (primitives,
+// list, map, typed object via object_value Any with type_url); no
+// lossy intermediate conversion. Clients using cel-spec libraries
+// decode it the same way they handle any other CEL value.
 message OutputEvent {
   // Output node ID that produced the value.
   string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
   ];
-  // The output value, serialized as a protobuf Any.
-  google.protobuf.Any value = 2 [(buf.validate.field).required = true];
+  // The output value (CEL spec value; lossless across all CEL kinds).
+  cel.expr.Value value = 2;
+  // Error status if the node encountered a failure on this evaluation.
+  google.rpc.Status error = 3;
+  // Timestamp of this event.
+  google.protobuf.Timestamp event_time = 4;
+  // Number of times this output has been evaluated (including this one).
+  uint64 eval_count = 5;
+  // Whether the output has been closed (no further events expected).
+  bool closed = 6;
+  // Current lifecycle phase of this node.
+  RunSnapshot.Phase phase = 7 [(buf.validate.field).enum.defined_only = true];
+}
+
+// FlowStateEvent is a flow-level state-change delta emitted by the
+// executor on every flow-level phase transition (PENDING -> RUNNING,
+// RUNNING -> SUCCEEDED/FAILED/ERRORED/CANCELLED, etc.).
+//
+// Replaces the previous "ship the full FlowRun resource on every state
+// change" passthrough. Consumers maintain client-side state by applying
+// these deltas; the cold GetFlowRun remains authoritative for full-
+// resource queries.
+//
+// Run identity (name/uid/flow/connections/inputs/timeout/etc.) is NOT
+// on the event because it is invariant per run and known to the client
+// from the subscription scope or an initial GetFlowRun. Mirrors the
+// internal RunSnapshot.FlowState minus the `event_id` (wire envelope
+// already carries the cursor).
+message FlowStateEvent {
+  // The new flow-level phase.
+  RunSnapshot.Phase phase = 1 [(buf.validate.field).enum.defined_only = true];
+  // Error status when the flow fails or errors. Populated only on
+  // PHASE_FAILED or PHASE_ERRORED transitions.
+  google.rpc.Status error = 2;
+  // Timestamp when execution started (set when PENDING -> RUNNING).
+  google.protobuf.Timestamp start_time = 3;
+  // Timestamp when execution ended (set on any terminal phase).
+  google.protobuf.Timestamp stop_time = 4;
+  // Timestamp of this state change event.
+  google.protobuf.Timestamp event_time = 5;
 }
 
 // InteractionRequestEvent is emitted by the executor when an interaction node
@@ -83,7 +137,12 @@ message InteractionResponseEvent {
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
-  // The response value, serialized as a protobuf Any.
+  // The response value: an Interaction.Response (one typed binding per form
+  // input, keyed by input id), serialized as a protobuf Any. The runtime
+  // exposes it to CEL as `interactions.<id>.value.<input_id>.value`. Typed
+  // bindings (not a generic google.protobuf.Struct) keep every declared field
+  // present, so the access path is robust to how a responder serializes
+  // implicit-presence fields.
   google.protobuf.Any value = 3 [(buf.validate.field).required = true];
   // Actor is the resource name of the entity providing the response
   // (e.g. "users/bob", "agents/claude"). Stamped by the service layer

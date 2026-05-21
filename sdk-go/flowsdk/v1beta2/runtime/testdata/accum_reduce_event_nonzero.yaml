@@ -2,6 +2,14 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: reduce_event_nonzero
+  description: >-
+    Reduce with non-zero initial accumulator (50). Feeding 10 and 20 emits
+    80 once at stream EOF -- the load-bearing guard is that the `initial`
+    expression seeds the accumulator (a broken initial would yield 30, not
+    80). NOTE: the `window.event.when: inputs.x.closed` gate coincides with
+    stream EOF, so the event-window aspect is NOT independently verified
+    here (Gap 1: the runtime ignores group_by.window). See
+    accum_reduce_event_window_multi.yaml for non-vacuous event gating.
   inputs:
     - id: x
       int64: {}

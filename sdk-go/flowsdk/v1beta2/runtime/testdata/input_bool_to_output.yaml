@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_bool_to_output
-  description: "Bool input passed directly to output"
+  description: >-
+    Bool input passed straight to output. Feeding true, false, true emits the
+    same sequence on the wire as BoolValues. Guards the bool input -> output
+    passthrough.
   inputs:
     - id: x
       bool: {}

@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_output_suspend
+  description: >-
+    Output node has node_control.suspend_when=true so its handler parks after
+    the first publish until ResumeNode. Used both for suspend-resume tests and
+    for the no-hang test (suspending the output must not deadlock the producers
+    feeding it). Guards that NC suspend on an output is a clean park that does
+    not block upstream publish.
   inputs:
     - id: x
       int64: {}

@@ -2,6 +2,16 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_bidi_when
+  description: >-
+    Bidi stream gated by `when: x > 5`. Per the bidi eager-open contract the
+    connection opens immediately when the handler is scheduled (independent of
+    any request); `when` then gates only whether a REQUEST is SENT on the
+    already-open stream. Feeding 2, 10, 1: only 10 (>5) sends a request, so
+    echo.BidiEcho echoes exactly one value (10); below-threshold inputs send no
+    request and produce no output. Guards that the `when` gate suppresses
+    request-sending without deadlocking the send side when no value passes (the
+    send loop simply continues). NOTE: bidi opens eagerly - this does NOT test
+    the server-stream "first true when opens the connection" path.
   inputs:
     - id: x
       int64: {}

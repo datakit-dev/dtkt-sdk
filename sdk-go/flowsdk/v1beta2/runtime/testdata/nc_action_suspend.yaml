@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_action_suspend
+  description: >-
+    Action echoes its input; node_control.suspend_when=true parks the action
+    handler until ResumeNode. Guards that NC suspend on an action freezes the
+    handler in place rather than stopping/cancelling, and that the action
+    resumes cleanly on Resume.
   inputs:
     - id: msg
       int64: {}

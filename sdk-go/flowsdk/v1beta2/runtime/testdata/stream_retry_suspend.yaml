@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_retry_suspend
+  description: >-
+    Stream calls error.StreamPermissionDenied (code 7);
+    retry_strategy.suspend_when matches and parks the stream node until
+    external Resume. Guards the suspend branch on streams: matched errors lead
+    to a clean suspend (not a retry loop or terminate).
   inputs:
     - id: msg
       int64: {}

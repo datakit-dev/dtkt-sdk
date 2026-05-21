@@ -2,11 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: suspend_resume_var
-  description: |
+  description: >-
     Range generator -> var (compute) -> output. Used by suspend/resume
-    multi-cycle tests to verify the var handler preserves its input
-    sequence across operator-driven suspend cycles. Output equals the
-    input value (no transformation) so the sequence is exactly N.
+    multi-cycle tests to verify the var handler preserves its input sequence
+    across operator-driven suspend cycles. Output equals the input value (no
+    transformation) so the sequence is exactly N.
   generators:
     - id: seq
       range:

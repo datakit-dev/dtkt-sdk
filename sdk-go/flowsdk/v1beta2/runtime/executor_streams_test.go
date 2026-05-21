@@ -293,7 +293,10 @@ func TestGraph_Stream_Error_Idle_Terminate(t *testing.T) {
 		time.Sleep(100 * time.Millisecond)
 		exec.Terminate()
 
-		err := <-done
+		// Bound the post-Terminate wait. A regression that leaves the idle
+		// stream's recv blocked would otherwise fall through to testContext's
+		// 10s deadline instead of failing fast.
+		err := requireExecuteReturnsBy(t, done, 500*time.Millisecond)
 		assert.ErrorIs(t, err, ErrTerminated)
 	})
 }

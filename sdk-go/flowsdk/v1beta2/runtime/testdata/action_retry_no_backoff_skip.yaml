@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_retry_no_backoff_skip
+  description: >-
+    Action with skip_when=code-5 but NO backoff block. The RPC fails with
+    NotFound on the first try; skip_when matches and the item is dropped
+    without ever entering a retry loop. Guards that skip_when works independent
+    of backoff being configured -- the escalation rule fires on first failure
+    rather than requiring at least one retry attempt.
   inputs:
     - id: msg
       int64: {}

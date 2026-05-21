@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_stream_terminate
+  description: >-
+    Stream echoes its input; node_control.terminate_when=true cancels the
+    stream's context. Flow returns nil. Output is a prefix of the published
+    values in input order. Guards that NC terminate on a stream cancels the
+    stream handler context without terminating the flow.
   inputs:
     - id: msg
       string: {}

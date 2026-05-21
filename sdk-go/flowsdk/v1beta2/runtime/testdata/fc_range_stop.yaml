@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_range_stop
+  description: >-
+    Range generator 1..100 paced at 10/sec feeds an output with stop_when based
+    on the generator's eval_count >= 5. Stop is graceful so the emission that
+    triggers stop is included. Result: exactly the first 5 values (1, 2, 3, 4,
+    5). Guards that the stop_when expression's eval_count is read from the
+    generator and that the triggering iteration's value still surfaces.
   generators:
     - id: seq
       range:

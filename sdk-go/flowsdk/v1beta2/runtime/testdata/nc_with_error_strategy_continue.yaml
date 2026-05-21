@@ -2,7 +2,9 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_with_error_strategy_continue
-  description: "NC.terminate_when on one var with error_strategy CONTINUE; sibling var keeps running"
+  description: >-
+    NC.terminate_when on one var with error_strategy CONTINUE; sibling var
+    keeps running
   error_strategy: ERROR_STRATEGY_CONTINUE
   inputs:
     - id: x

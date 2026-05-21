@@ -2,5 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: interaction_missing_option
+  description: >-
+    Flow with an interaction node but the executor is run WITHOUT the
+    WithInteractions option (no prompt/response channels). The runtime fails
+    with 'requires WithInteractions option' before any work happens. Guards
+    that interaction-bearing flows surface a clear configuration error rather
+    than crashing or deadlocking when the host hasn't provided the IO channels.
   interactions:
     - id: confirm

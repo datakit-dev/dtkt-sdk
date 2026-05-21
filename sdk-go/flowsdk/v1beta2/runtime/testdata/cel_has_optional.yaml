@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_has_optional
-  description: "Use has() to check optional subfield presence inside a structured value"
+  description: >-
+    Output uses CEL `has()` to check whether the input's optional `nickname`
+    subfield is present, falling back to 'anonymous' if not. Feeding one input
+    with nickname set and one without yields the nickname then 'anonymous'.
+    Guards that `has()` distinguishes unset/missing fields from
+    present-but-empty values without erroring on the absent case.
   inputs:
     - id: x
       string: {}

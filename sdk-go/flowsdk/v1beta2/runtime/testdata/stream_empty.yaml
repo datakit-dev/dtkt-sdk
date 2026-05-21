@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_empty
+  description: >-
+    Stream calls error.StreamEmpty, a method that opens and immediately closes
+    with no emissions. Output sees zero values per input. Guards that a
+    successful but empty stream completes cleanly without hanging the iteration
+    or surfacing a fake error.
   inputs:
     - id: msg
       int64: {}

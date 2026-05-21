@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_type_default
+  description: >-
+    Int64 input with default=99 and throttle 1/50ms but NO cache. No value is
+    fed; the input handler falls back to the declared default on each throttle
+    pulse. Over a 130ms test window the test observes 2 outputs, each = 99.
+    Guards that an input's declared default is used when no value is pushed and
+    the throttle window elapses.
   inputs:
     - id: x
       int64:

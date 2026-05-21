@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_action_terminate
+  description: >-
+    Action with flow_control.terminate_when=true (always true). Terminate
+    cancels the runtime context immediately, returning ErrTerminated. The
+    output handler may or may not have published the in-flight action result
+    before the cancel propagates -- the test asserts the output count is <=1.
+    Guards that terminate is a hard cancel (not a graceful drain like stop),
+    with the flow exiting promptly with ErrTerminated.
   inputs:
     - id: msg
       int64: {}

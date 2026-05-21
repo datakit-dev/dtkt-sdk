@@ -2,7 +2,15 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_package_access
-  description: "Action returns a typed Package; outputs read its nested fields via CEL"
+  description: >-
+    Action calls pkg.Fixed which returns a typed Package proto; 13 outputs
+    exercise the full breadth of CEL access patterns on a typed message: nested
+    message field (identity.name/version), scalars, enum scalars (type),
+    repeated enums by index (runtimes[0]), repeated messages by index
+    (platforms[0].os), map<string,string> by key (build.env['FOO']), size()
+    over a repeated message (deploy.ports), and nested-by-index field
+    projection (deploy.ports[0].name). Guards that all proto access patterns
+    work in one flow against a single typed action response.
   inputs:
     - id: trigger
       int64: {}

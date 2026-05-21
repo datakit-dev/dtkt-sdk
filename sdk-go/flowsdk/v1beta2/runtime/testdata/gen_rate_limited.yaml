@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: gen_rate_limited
+  description: >-
+    Range generator 1..1,000,000 rate-limited to 100 emissions per second (10ms
+    apart). Used across the suspend suite as a long-running deterministic
+    counter source: tests issue Suspend/Resume/Terminate at known emission
+    counts and assert the flow responds (rather than racing past). Guards that
+    rate-limiting interacts cleanly with lifecycle commands -- e.g., suspend
+    after the 5th tick should pause at exactly tick 5, not somewhere later.
   generators:
     - id: seq
       range:

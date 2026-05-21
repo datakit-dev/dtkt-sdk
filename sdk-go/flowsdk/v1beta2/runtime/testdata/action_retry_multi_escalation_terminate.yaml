@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_retry_multi_escalation_terminate
+  description: >-
+    Sibling fixture to action_retry_multi_escalation, but the RPC now returns
+    Internal (code 13). skip_when does not match (5 != 13); terminate_when
+    matches and the flow surfaces a TerminateError. Guards that the runtime
+    checks each escalation rule independently against the actual error and
+    applies whichever one matches, even when both are declared.
   inputs:
     - id: msg
       int64: {}

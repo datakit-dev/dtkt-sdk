@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_suspend_over_stop
+  description: >-
+    Var sets both NC.stop_when and NC.suspend_when to true; suspend must win
+    over stop. Var transitions to PHASE_SUSPENDED without any prior
+    PHASE_STOPPING event on its topic. Test calls Terminate() afterward to
+    clean up the parked var (Execute would otherwise return ErrTerminated).
+    Guards the suspend > stop branch of the NC priority ordering.
   inputs:
     - id: x
       int64: {}

@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: gen_range_to_var
+  description: >-
+    Range generator 1..5 feeds a var that doubles each value via a map
+    transform; output forwards the doubled stream. Result: [2, 4, 6, 8, 10].
+    Guards that a generator can feed a downstream var (rather than going
+    straight to an output) and that the var's transform pipeline runs per
+    emission.
   generators:
     - id: seq
       range:

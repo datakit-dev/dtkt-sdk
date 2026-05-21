@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: reduce_sliding_window
+  description: >-
+    Range generator emits 1, 2, 3 instantly; a sliding window (1s length, 500ms
+    slide) captures them all in one active window; reduce sums to 6 and emits
+    one result. Guards that sliding-window grouping accumulates values arriving
+    within the same active interval and emits when the window advances.
   generators:
     - id: seq
       range:

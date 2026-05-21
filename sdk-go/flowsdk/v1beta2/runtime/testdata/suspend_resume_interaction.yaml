@@ -2,11 +2,14 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: suspend_resume_interaction
-  description: |
-    Range generator -> interaction (always-prompts) -> output. With an
-    auto-responder, the interaction echoes the input value back through
-    the prompt, giving 1:1 sequence preservation. Used by per-node
-    isolation tests for interaction handlers.
+  description: >-
+    Range generator -> interaction (always-prompts) -> output. The test rig's
+    auto-responder replies with an internal counter (`counter++`) that
+    happens to advance 1:1 with the generator, so the output sequence is
+    1, 2, 3, ... -- the value comes from the responder counter, not from
+    echoing the input. Used by per-node isolation tests that verify
+    SuspendNode/ResumeNode/TerminateNode on an interaction handler doesn't
+    corrupt the handler's lifecycle.
   generators:
     - id: seq
       range:

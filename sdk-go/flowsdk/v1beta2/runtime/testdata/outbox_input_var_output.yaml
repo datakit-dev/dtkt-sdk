@@ -2,6 +2,21 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: outbox_input_var_output
+  description: >-
+    Minimal input -> var (x * 2) -> output. Carrier fixture for three
+    outbox test suites: (1) outbox event/snapshot capture
+    (TestGraph_Outbox_InputToVarToOutput verifies per-node events and final
+    snapshot land in the outbox store), (2) outbox replay
+    (TestGraph_Outbox_PaginatedReplay walks the event log via cursor-based
+    ReadEvents and verifies pagination + chronological ordering;
+    TestGraph_Outbox_IntermediateSnapshot calls SnapshotAt at multiple
+    cursor positions and verifies the partial state reflects each cursor
+    rather than collapsing to final state), and (3) flow-state lifecycle
+    (FlowState_Success, FlowState_Outbox_Snapshot, FlowState_Outbox_Events,
+    FlowState_DirectPubSub in executor_flow_state_test.go). Feeding x
+    yields 2x. Guards that outbox event capture, paginated replay,
+    cursor-positioned snapshot reconstruction, and flow-state transitions
+    all work over the simplest viable topology.
   inputs:
     - id: x
       int64: {}

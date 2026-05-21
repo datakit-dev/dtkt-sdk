@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_to_var
+  description: >-
+    Stream echoes input; downstream var passes the stream value through with a
+    map transform (* 2). Output emits the doubled per-emit values. Guards that
+    a var can subscribe to streams.X.value and apply transforms over per-stream
+    events without buffering or batching.
   inputs:
     - id: x
       int64: {}

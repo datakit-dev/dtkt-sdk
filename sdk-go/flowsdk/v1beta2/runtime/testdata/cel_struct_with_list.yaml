@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: cel_struct_with_list
-  description: "Access subfield of a struct nested inside a list"
+  description: >-
+    Input is a struct containing an `items` list of structs; output indexes the
+    list and reads a subfield off the chosen element (`items[1].id`). Feeding
+    three items yields 'second'. Guards that CEL combines list indexing with
+    struct-field access on the indexed element without losing typing.
   inputs:
     - id: x
       string: {}

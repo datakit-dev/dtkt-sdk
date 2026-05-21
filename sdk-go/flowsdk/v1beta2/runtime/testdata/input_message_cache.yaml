@@ -2,7 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_message_cache
-  description: "Message-typed input with cache: true; one feed, two reads"
+  description: >-
+    Message-typed input with cache:true paired with a ticker (50ms) that drives
+    output emissions; flow stops at tick eval_count >= 2. A single struct is
+    pushed once; subsequent ticks re-read the cached value. The test asserts
+    >=2 outputs all carrying the same cached payload. Guards that cache:true on
+    a message input retains a struct value across multiple ticker-driven reads
+    without re-fetching.
   inputs:
     - id: payload
       message:

@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_undeclared_connection
+  description: >-
+    Action references connection `mocked` but the flow declares no connections
+    block. Lint must report a CodeUndeclaredConnection warning naming the
+    undeclared `mocked` reference. Guards that connection references are
+    cross-checked against the declared connections list.
   inputs:
     - id: x
       string: {}

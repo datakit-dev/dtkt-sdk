@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: join_two_inputs
-  description: "Two inputs joining at output via multiplication"
+  description: >-
+    Two independent int64 inputs join at a single output that multiplies them.
+    Guards that an output expression can reference multiple inputs and produce
+    one emission per joined event pair (rather than emitting twice or losing
+    values waiting for the other input).
   inputs:
     - id: a
       int64: {}

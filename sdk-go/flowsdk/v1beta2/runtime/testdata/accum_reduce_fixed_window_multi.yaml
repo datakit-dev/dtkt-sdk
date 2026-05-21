@@ -1,0 +1,36 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: reduce_fixed_window_multi
+  description: >-
+    Range generator emits 1..6 spaced 50ms apart (rate 20/sec); a 150ms
+    fixed (tumbling) window closes every 150ms. Each window holds exactly
+    3 values. Expected emissions: [1+2+3=6, 4+5+6=15] -- two distinct
+    emissions, one per window. Companion to accum_reduce_fixed_window.yaml
+    which has all values in a single window (vacuous against Gap 1).
+    Tests Gap 1: `transform.go:466-482` reads only gb.GetKey() and never
+    consults gb.GetWindow(); current behavior emits a single sum=21 at
+    EOF regardless of window config. Used by
+    TestGraph_Reduce_FixedWindow_MultiEmission.
+  generators:
+    - id: seq
+      range:
+        start: 1
+        end: 6
+        rate:
+          count: 1
+          interval: "0.05s"
+  vars:
+    - id: windowed
+      value: "= generators.seq.value"
+      transforms:
+        - reduce:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+            group_by:
+              window:
+                fixed:
+                  length: "0.15s"
+  outputs:
+    - id: result
+      value: "= vars.windowed.value"

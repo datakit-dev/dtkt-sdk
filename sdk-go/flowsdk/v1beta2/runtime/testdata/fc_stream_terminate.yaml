@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_stream_terminate
+  description: >-
+    Stream node with flow_control.terminate_when=true. After the first RPC,
+    terminate cancels the runtime context immediately and the flow returns
+    ErrTerminated. The output handler may or may not have processed the stream
+    result before cancellation -- output count <=1. Guards that terminate on a
+    stream cancels promptly rather than draining queued inputs.
   inputs:
     - id: msg
       string: {}

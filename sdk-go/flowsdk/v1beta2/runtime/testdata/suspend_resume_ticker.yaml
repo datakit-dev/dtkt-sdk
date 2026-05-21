@@ -2,11 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: suspend_resume_ticker
-  description: |
-    Ticker generator -> output. Used by suspend/resume multi-cycle test
-    to verify the ticker handler preserves its eval_count across operator
-    suspend cycles. Output equals the tick eval_count, so the sequence
-    is exactly 1, 2, 3, ...
+  description: >-
+    Ticker generator -> output. Used by suspend/resume multi-cycle test to
+    verify the ticker handler preserves its eval_count across operator suspend
+    cycles. Output equals the tick eval_count, so the sequence is exactly 1, 2,
+    3, ...
   generators:
     - id: tick
       ticker:

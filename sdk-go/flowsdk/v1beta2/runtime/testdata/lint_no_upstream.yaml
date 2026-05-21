@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_no_upstream
-  description: Stream with no upstream dependencies (should be flagged by lint)
+  description: >-
+    Stream node declared with no upstream dependencies (no inputs, no var, no
+    other node feeds it). Lint must report a CodeNoUpstream diagnostic on
+    streams.echo. Guards against a class of bugs where a stream is wired but
+    never fires because nothing triggers it.
   inputs:
     - id: x
       int64: {}

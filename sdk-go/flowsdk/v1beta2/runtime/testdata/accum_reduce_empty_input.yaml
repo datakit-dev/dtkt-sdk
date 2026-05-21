@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: reduce_empty_input
+  description: >-
+    Reduce without a window: sums int64 inputs from initial=0, emits one total
+    on stream EOF. With zero values fed before EOF the var stays empty and no
+    output is produced -- guards that a no-window reduce stays silent when no
+    values arrive.
   inputs:
     - id: x
       int64: {}

@@ -1,0 +1,29 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: nc_interaction_transforms_stop
+  description: >-
+    Interaction carries a filter (evens) + map (*10) transform pipeline
+    applied to the response value, with
+    node_control.stop_when=inputs.x.value>=5. Exposes Gap 2:
+    interactionHandler.runWithTransforms (interaction.go:243) doesn't call
+    checkLifecycle, so NC.stop_when may never fire on the transforms code
+    path. Test auto-responder echoes back the original input value, so the
+    interaction's value sequence equals the input sequence. Feeding 2, 4,
+    5, 6, 8 with echoing responder: filter keeps [2, 4, 6, 8], map yields
+    [20, 40, 60, 80]. NC stops when input 6 lands (first post-filter
+    trigger). Stop-fired bound is len < 4 (full drain).
+  inputs:
+    - id: x
+      int64: {}
+  interactions:
+    - id: confirm
+      when: "= inputs.x.value > 0"
+      transforms:
+        - filter: "= this.value % 2 == 0"
+        - map: "= this.value * 10"
+      node_control:
+        stop_when: "= inputs.x.value >= 5"
+  outputs:
+    - id: result
+      value: "= interactions.confirm.value"

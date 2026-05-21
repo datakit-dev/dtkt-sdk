@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_response_projection
+  description: >-
+    Action with a `call.response` transform: the raw RPC reply (bound as
+    `this.response`) is multiplied by 2 before being published as the action's
+    value. Feeding 5, 7 yields 10, 14. Guards that the response CEL expression
+    actually rewrites the action's emitted value rather than the raw RPC reply
+    flowing through unchanged.
   inputs:
     - id: x
       int64: {}

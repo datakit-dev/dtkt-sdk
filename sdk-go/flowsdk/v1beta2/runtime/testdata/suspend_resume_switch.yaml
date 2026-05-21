@@ -2,11 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: suspend_resume_switch
-  description: |
-    Range generator -> switch (categorize) -> output. Verifies the
-    switch handler preserves its input sequence across suspend/resume.
-    Output mirrors the input value through the switch's pass-through
-    default branch so the sequence is exactly 1, 2, 3, ...
+  description: >-
+    Range generator -> switch (categorize) -> output. Verifies the switch
+    handler preserves its input sequence across suspend/resume. Output mirrors
+    the input value through the switch's pass-through default branch so the
+    sequence is exactly 1, 2, 3, ...
   generators:
     - id: seq
       range:

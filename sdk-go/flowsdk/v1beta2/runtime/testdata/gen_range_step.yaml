@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: gen_range_step
+  description: >-
+    Range generator with start=0, end=10, step=3 emits 0, 3, 6, 9. The runtime
+    iterates `for i := start; i <= end; i += step` (range.go) -- the upper
+    bound is INCLUSIVE. 10 isn't emitted because step=3 from start=0 lands on
+    0, 3, 6, 9 and the next step would land on 12 > end. With step=5 the
+    sequence would be 0, 5, 10 (proving inclusive). Guards that the step
+    parameter advances by the configured amount per emission.
   generators:
     - id: seq
       range:

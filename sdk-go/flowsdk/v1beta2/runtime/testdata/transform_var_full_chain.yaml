@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_var_full_chain
-  description: "Var with filter, map, flatten, scan pipeline"
+  description: >-
+    Var transform chain combining all four kinds: filter > 1, map x -> [x,
+    x*2], flatten, scan running sum. Feeding 1..3: filter keeps [2, 3], map ->
+    [[2,4], [3,6]], flatten -> [2, 4, 3, 6], scan emits [2, 6, 9, 15]. Guards
+    4-stage transform composition on a single var.
   inputs:
     - id: x
       int64: {}

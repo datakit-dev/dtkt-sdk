@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_retry_skip
+  description: >-
+    Stream calls error.StreamNotFound (code 5); retry_strategy.skip_when
+    matches and skips the failing iteration, producing no output for it. Guards
+    the skip branch on a streaming RPC: the error is consumed and downstream
+    sees a gap rather than a failure.
   inputs:
     - id: msg
       int64: {}

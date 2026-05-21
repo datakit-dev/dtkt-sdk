@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: gen_cron_invalid
+  description: >-
+    Cron generator with a syntactically invalid expression (`not a valid
+    cron`). The runtime fails at startup with a 'parsing cron expression' error
+    before any tick fires. Guards that bad cron expressions are surfaced as a
+    clear startup error rather than silently no-oping or panicking at first
+    tick.
   generators:
     - id: cron
       cron:

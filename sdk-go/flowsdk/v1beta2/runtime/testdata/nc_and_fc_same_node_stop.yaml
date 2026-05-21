@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_and_fc_same_node_stop
+  description: >-
+    Var declares both flow_control.stop_when=true and
+    node_control.stop_when=true. The contract is NC-first: NC.StopNode
+    publishes PHASE_STOPPING on the var topic before FC's input-EOF cascade
+    tears the flow down. Observed phase order on the var topic must be
+    PHASE_STOPPING then PHASE_SUCCEEDED. Guards NC-then-FC ordering when both
+    stop branches fire on the same iteration.
   inputs:
     - id: x
       int64: {}

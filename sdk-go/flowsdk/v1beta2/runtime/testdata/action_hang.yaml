@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_hang
+  description: >-
+    Action calling a deliberately-hanging RPC (`error.Hang`) so tests can
+    exercise cancellation/suspend paths. The handler blocks indefinitely on the
+    RPC; the test then issues Terminate/Suspend and verifies the handler
+    unblocks and the flow returns the expected sentinel (ErrTerminated, etc.)
+    rather than deadlocking.
   inputs:
     - id: msg
       int64: {}

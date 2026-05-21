@@ -1,0 +1,38 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: reduce_group_by_sliding_multi
+  description: >-
+    GroupBy key (even/odd) + sliding window (length=200ms, slide=100ms)
+    with timing that spans multiple slides. Range emits 1..6 spaced 50ms
+    apart. A correctly-implemented sliding window with per-key
+    partitioning emits one result per (key, window-close) pair as each
+    slide tick fires. Companion to accum_reduce_group_by_fixed_multi.yaml
+    for the sliding variant. Tests Gap 1's key+sliding-window combined
+    code path. Non-vacuous bound: >= 4 emissions (any number > 2
+    disproves the "per-key-only at EOF" Gap 1 behavior). Used by
+    TestGraph_Reduce_GroupBy_SlidingWindow_MultiEmission.
+  generators:
+    - id: seq
+      range:
+        start: 1
+        end: 6
+        rate:
+          count: 1
+          interval: "0.05s"
+  vars:
+    - id: grouped
+      value: "= generators.seq.value"
+      transforms:
+        - reduce:
+            initial: "= 0"
+            accumulator: "= this.accumulator + this.value"
+            group_by:
+              key: '= this.value % 2 == 0 ? "even" : "odd"'
+              window:
+                sliding:
+                  length: "0.2s"
+                  slide: "0.1s"
+  outputs:
+    - id: result
+      value: "= vars.grouped.value"

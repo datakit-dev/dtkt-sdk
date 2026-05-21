@@ -2,6 +2,14 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: gen_two_paths_rate_limited
+  description: >-
+    Two independent rate-limited (100/sec) generators feeding their own
+    outputs. Used by TestCommand_Suspend_WithErrorStrategy_Stop: SuspendNode
+    is issued against gen1 and the test asserts gen1 reaches PHASE_SUSPENDED,
+    then exec.Stop() must wake the suspended generator (via its select's
+    stopCh) so it exits without hanging. Rate-limited generators keep both
+    paths active long enough for the test to observe the suspend (vs the
+    unrate-limited gen_two_paths which can complete before checks land).
   generators:
     - id: gen1
       range:

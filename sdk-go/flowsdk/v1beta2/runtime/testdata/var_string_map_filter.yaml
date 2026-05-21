@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: var_string_map_filter
-  description: "String var with map (add suffix) then filter by length"
+  description: >-
+    Var on string input: map appends `_suffix`, then filter by size > 8.
+    Feeding ["ab", "x", "hello"]: map -> ["ab_suffix" (9), "x_suffix" (8),
+    "hello_suffix" (12)], filter keeps ["ab_suffix", "hello_suffix"] (drops
+    "x_suffix" since 8 is not > 8). Guards string map-then-filter with a
+    size-based predicate.
   inputs:
     - id: name
       string: {}

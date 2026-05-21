@@ -2,6 +2,20 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_default_throttle
+  description: >-
+    Int64 input with cache:true and NO explicit throttle. Exercises the
+    cache half of the runtime's throttle-injection fallback: when an input
+    has a cache or a default but declares no throttle, the runtime injects
+    a minimum throttle so the resolution loop can pulse. Used by
+    TestGraph_Input_DefaultThrottleFallback: feeding 7 yields exactly one
+    output of 7. NOTE: this is a coverage/smoke test, NOT a behavioral
+    discriminator. With a value pushed, `cache` already makes the input
+    resolvable, so the value is delivered whether or not the throttle is
+    injected, and the cache dedup masks any re-emission -- the test still
+    passes even if the `cache` half of the injection were removed. The
+    injection's observable pulse effect is proven non-vacuously by the
+    default-only sibling input_default_only_throttle.yaml, which feeds no
+    value and asserts the default re-emits repeatedly.
   inputs:
     - id: x
       int64: {}

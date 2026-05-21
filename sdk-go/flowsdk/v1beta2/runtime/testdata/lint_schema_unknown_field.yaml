@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_schema_unknown_field
+  description: >-
+    Action request sets a `nonexistent` field that is not on the
+    test.TestRequest descriptor. With a resolver provided, lint must report a
+    CodeUnknownField diagnostic naming `nonexistent`. Without a resolver the
+    same fixture passes (separate WithoutResolver test); guards both branches.
   connections:
     - id: myconn
       services:

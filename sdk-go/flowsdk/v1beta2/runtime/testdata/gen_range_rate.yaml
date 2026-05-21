@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: gen_range_rate
+  description: >-
+    Range generator 1..5 rate-limited to 5 emissions per 100ms (20ms apart).
+    Result: [1, 2, 3, 4, 5] with the run taking at least ~60ms (4
+    inter-emission gaps). Guards that the range generator's `rate` setting
+    paces emissions rather than emitting all values instantly, and that the
+    first emission fires immediately.
   generators:
     - id: seq
       range:

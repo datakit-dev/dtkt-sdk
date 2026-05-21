@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: var_deep_chain_filter_middle
-  description: "Two-level var chain with filter for even values in the middle"
+  description: >-
+    Two-var chain: `even` filters inputs for even values; `scaled =
+    vars.even.value` then maps *10. Feeding 1..5: even keeps [2, 4], scaled
+    emits [20, 40]. Guards that a filter dropping values upstream means
+    downstream never sees them -- the chain produces fewer emits than inputs.
   inputs:
     - id: x
       int64: {}

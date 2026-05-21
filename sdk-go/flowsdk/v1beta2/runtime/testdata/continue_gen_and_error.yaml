@@ -2,8 +2,19 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: continue_gen_and_error
+  description: >-
+    Three action paths run alongside each other: fail_action and fail_action2
+    both error on every call (error.Internal), while ok_action echoes a range
+    generator (1, 2, 3). Three outputs collect from each path. The fixture is
+    reused by two tests: (a) verifies the ok_action runs to completion while
+    the two failing actions error (CONTINUE strategy keeps healthy branches
+    alive); (b) verifies CONTINUE's spec contract that ALL errors are collected
+    and returned (the multi-error aggregation invariant). Without two failing
+    actions the multi-error claim was untestable.
   inputs:
     - id: fail_input
+      int64: {}
+    - id: fail_input2
       int64: {}
   generators:
     - id: gen
@@ -16,6 +27,11 @@ spec:
         connection: echo
         method: error.Internal
         request: "= inputs.fail_input.value"
+    - id: fail_action2
+      call:
+        connection: echo
+        method: error.Internal
+        request: "= inputs.fail_input2.value"
     - id: ok_action
       call:
         connection: echo
@@ -24,5 +40,7 @@ spec:
   outputs:
     - id: fail_result
       value: "= actions.fail_action.value"
+    - id: fail_result2
+      value: "= actions.fail_action2.value"
     - id: ok_result
       value: "= actions.ok_action.value"

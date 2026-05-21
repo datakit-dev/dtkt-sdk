@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_int32_to_output
-  description: "Int32 input passed directly to output"
+  description: >-
+    Int32 input passed straight to an output. Feeding int32(100) and int32(-5)
+    yields int64 outputs 100 and -5. Guards that int32-typed inputs upcast
+    cleanly to int64 on the output wire (the wire format unifies signed
+    integers as Int64Value).
   inputs:
     - id: x
       int32: {}

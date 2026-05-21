@@ -161,11 +161,24 @@ func TestNodeControl_Var_TerminateWhen(t *testing.T) {
 		ps := newPubSub()
 		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
+		ctx := testContext(t)
+		// Subscribe BEFORE feeding so we capture PHASE_CANCELLED from
+		// TerminateNode (executor.go:332). Without this assertion the
+		// test is vacuous: natural drain produces the full
+		// [2, 4, 6, 8, 10] which satisfies the LessOrEqual bound and
+		// prefix-equality; a broken NC.terminate would still pass.
+		varCh, err := ps.Subscribe(ctx, testTopics.For("vars.doubled"))
+		require.NoError(t, err)
+
 		feedInput(ps, "inputs.x", int64(1), int64(2), int64(3), int64(4), int64(5))
 
-		ctx := testContext(t)
-		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, g)
+		err = NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, g)
 		require.NoError(t, err)
+
+		// Spec contract: NC.terminate must publish PHASE_CANCELLED on the
+		// var's topic. Load-bearing assertion that proves NC.terminate fired.
+		require.True(t, waitForPhase(ctx, varCh, flowv1beta2.RunSnapshot_PHASE_CANCELLED),
+			"NC.terminate_when must publish PHASE_CANCELLED on the var topic")
 
 		results := outputInt64s(collectOutputs(ctx, ps, "outputs.result"))
 		// terminate fires after publishing the value at x=3 (i.e. 6). Under
@@ -184,12 +197,24 @@ func TestNodeControl_Action_TerminateWhen(t *testing.T) {
 		ps := newPubSub()
 		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
+		ctx := testContext(t)
+		// Subscribe BEFORE feeding so we capture PHASE_CANCELLED from
+		// TerminateNode (executor.go:332). With only 1 input fed, the
+		// natural drain produces 1 output -- same as terminate -- so the
+		// output assertion alone can't tell whether terminate fired.
+		actionCh, err := ps.Subscribe(ctx, testTopics.For("actions.call"))
+		require.NoError(t, err)
+
 		feedInput(ps, "inputs.msg", int64(42))
 
-		ctx := testContext(t)
 		opts := append(mockRPCOptions(), extraOpts...)
-		err := NewExecutor(ps, testTopics, opts...).Execute(ctx, g)
+		err = NewExecutor(ps, testTopics, opts...).Execute(ctx, g)
 		require.NoError(t, err)
+
+		// Spec contract: NC.terminate publishes PHASE_CANCELLED on the
+		// action's topic. Load-bearing check.
+		require.True(t, waitForPhase(ctx, actionCh, flowv1beta2.RunSnapshot_PHASE_CANCELLED),
+			"NC.terminate_when must publish PHASE_CANCELLED on the action topic")
 
 		results := collectOutputs(ctx, ps, "outputs.result")
 		require.LessOrEqual(t, len(results), 1)
@@ -205,12 +230,22 @@ func TestNodeControl_Stream_TerminateWhen(t *testing.T) {
 		ps := newPubSub()
 		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
+		ctx := testContext(t)
+		// Single-input + LessOrEqual(1) is vacuous without phase observation:
+		// natural drain produces 1 output, same as terminate.
+		streamCh, err := ps.Subscribe(ctx, testTopics.For("streams.echo"))
+		require.NoError(t, err)
+
 		feedInput(ps, "inputs.msg", "hello")
 
-		ctx := testContext(t)
 		opts := append(mockRPCOptions(), extraOpts...)
-		err := NewExecutor(ps, testTopics, opts...).Execute(ctx, g)
+		err = NewExecutor(ps, testTopics, opts...).Execute(ctx, g)
 		require.NoError(t, err)
+
+		// Spec contract: NC.terminate publishes PHASE_CANCELLED on the
+		// stream's topic. Load-bearing check.
+		require.True(t, waitForPhase(ctx, streamCh, flowv1beta2.RunSnapshot_PHASE_CANCELLED),
+			"NC.terminate_when must publish PHASE_CANCELLED on the stream topic")
 
 		results := collectOutputs(ctx, ps, "outputs.result")
 		require.LessOrEqual(t, len(results), 1)
@@ -226,11 +261,23 @@ func TestNodeControl_Output_TerminateWhen(t *testing.T) {
 		ps := newPubSub()
 		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
+		ctx := testContext(t)
+		// Subscribe BEFORE feeding so PHASE_CANCELLED isn't missed.
+		// Without this, natural drain produces [10, 20, 30] which
+		// satisfies LessOrEqual(3) + prefix-equality -- broken NC would
+		// still pass.
+		outCh, err := ps.Subscribe(ctx, testTopics.For("outputs.result"))
+		require.NoError(t, err)
+
 		feedInput(ps, "inputs.x", int64(10), int64(20), int64(30))
 
-		ctx := testContext(t)
-		err := NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, g)
+		err = NewExecutor(ps, testTopics, extraOpts...).Execute(ctx, g)
 		require.NoError(t, err)
+
+		// Spec contract: NC.terminate publishes PHASE_CANCELLED on the
+		// output's topic. Load-bearing check.
+		require.True(t, waitForPhase(ctx, outCh, flowv1beta2.RunSnapshot_PHASE_CANCELLED),
+			"NC.terminate_when must publish PHASE_CANCELLED on the output topic")
 
 		results := outputInt64s(collectOutputs(ctx, ps, "outputs.result"))
 		// terminate fires after the first output is published; subsequent inputs
@@ -260,11 +307,22 @@ func TestNodeControl_Interaction_TerminateWhen(t *testing.T) {
 			close(responseCh)
 		}()
 
-		feedInput(ps, "inputs.x", int64(1))
 		ctx := testContext(t)
-		err := NewExecutor(ps, testTopics, append([]Option{WithInteractions(promptCh, responseCh)}, extraOpts...)...).Execute(ctx, g)
+		// Single-input + LessOrEqual(1) is vacuous: natural drain produces
+		// 1 output, same as terminate. Subscribe to interaction topic
+		// BEFORE feeding so PHASE_CANCELLED isn't missed.
+		interCh, err := ps.Subscribe(ctx, testTopics.For("interactions.confirm"))
+		require.NoError(t, err)
+
+		feedInput(ps, "inputs.x", int64(1))
+		err = NewExecutor(ps, testTopics, append([]Option{WithInteractions(promptCh, responseCh)}, extraOpts...)...).Execute(ctx, g)
 		close(promptCh)
 		require.NoError(t, err)
+
+		// Spec contract: NC.terminate publishes PHASE_CANCELLED on the
+		// interaction's topic. Load-bearing check.
+		require.True(t, waitForPhase(ctx, interCh, flowv1beta2.RunSnapshot_PHASE_CANCELLED),
+			"NC.terminate_when must publish PHASE_CANCELLED on the interaction topic")
 
 		results := collectOutputs(ctx, ps, "outputs.result")
 		require.LessOrEqual(t, len(results), 1)
@@ -609,6 +667,17 @@ func TestNodeControl_Interaction_SuspendThenResume(t *testing.T) {
 		close(promptCh)
 		err = requireExecuteReturnsBy(t, done, 500*time.Millisecond)
 		require.NoError(t, err, "Execute should return naturally")
+
+		// Spec contract: the auto-responder's value (100) for the prompt
+		// raised before suspend must reach the output. The YAML claim is
+		// "no token loss across the pause cycle" -- without this assertion
+		// a regression that lost the in-flight token (responder reply
+		// dropped) would still pass the phase checks.
+		results := collectOutputs(ctx, ps, "outputs.result")
+		require.Len(t, results, 1,
+			"the in-flight prompt's response must reach the output across suspend/resume")
+		assert.Equal(t, int64(100), results[0].GetValue().GetInt64Value(),
+			"in-flight response value must round-trip across the pause cycle")
 	})
 }
 
@@ -722,9 +791,17 @@ func TestNodeControl_AndFlowControl_SameNode_Stop(t *testing.T) {
 // nc_and_fc_same_node_terminate: both NC.terminate_when and FC.terminate_when
 // fire on the same iteration. NC.TerminateNode cancels the node's ctx and
 // publishes PHASE_CANCELLED on the node topic; FC.Terminate cancels runCtx
-// and surfaces ErrTerminated at the flow level. NC-first means the
-// per-node PHASE_CANCELLED state event reaches the topic before the
-// flow-level cancel takes everything down.
+// and surfaces ErrTerminated at the flow level.
+//
+// What's actually verified here: PHASE_CANCELLED appears on the var topic.
+// This proves NC.terminate fired -- per-node PHASE_CANCELLED is published
+// exclusively by TerminateNode (lifecycle.go:publishTerminalPhase); FC.terminate
+// alone doesn't touch per-node topics. So the existence check IS the proof
+// that the "NC fires before FC" ordering contract held (had FC fired first
+// and torn down runCtx, NC.TerminateNode wouldn't have run to completion).
+// Wall-clock cross-topic ordering between NC's per-node publish and FC's
+// flow-level cancel is not directly verified; that would require timestamp
+// comparison across topics (out of scope).
 func TestNodeControl_AndFlowControl_SameNode_Terminate(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_and_fc_same_node_terminate.yaml")
@@ -732,10 +809,6 @@ func TestNodeControl_AndFlowControl_SameNode_Terminate(t *testing.T) {
 		defer ps.Close() //nolint:errcheck // deferred test teardown; runs after assertions, no recovery path
 
 		ctx := testContext(t)
-		// Subscribe to the var topic to observe PHASE_CANCELLED, which
-		// proves NC.terminate landed (per-node CANCELLED publish from
-		// TerminateNode). FC.terminate alone wouldn't publish a per-node
-		// CANCELLED -- it just cancels runCtx and returns ErrTerminated.
 		varCh, err := ps.Subscribe(ctx, testTopics.For("vars.doubled"))
 		require.NoError(t, err)
 
@@ -744,9 +817,8 @@ func TestNodeControl_AndFlowControl_SameNode_Terminate(t *testing.T) {
 		// FC.terminate fires e.Terminate, so Execute returns ErrTerminated.
 		assert.ErrorIs(t, err, ErrTerminated)
 
-		// NC.terminate runs first (NC-then-FC ordering), so the var topic
-		// must show PHASE_CANCELLED before any FC-driven cancel races
-		// with it. This is the "NC fires first" invariant.
+		// PHASE_CANCELLED on the var topic proves NC.TerminateNode ran
+		// (FC.terminate alone wouldn't publish a per-node CANCELLED).
 		phases := drainPhasesUntil(ctx, varCh, flowv1beta2.RunSnapshot_PHASE_CANCELLED)
 		require.Contains(t, phases, flowv1beta2.RunSnapshot_PHASE_CANCELLED,
 			"NC.terminate must publish PHASE_CANCELLED on the var topic; phases=%v", phaseNames(phases))
@@ -755,17 +827,21 @@ func TestNodeControl_AndFlowControl_SameNode_Terminate(t *testing.T) {
 
 // nc_overrides_fc_same_node: NC.terminate_when AND FC.suspend_when fire
 // the same iteration. NC.TerminateNode cancels the node ctx (per-node);
-// FC.Suspend signals the whole flow. NC fires first per the ordering
-// contract, so the per-node PHASE_CANCELLED state event reaches the var
-// topic before any FC-driven flow-wide suspend can race with it.
+// FC.Suspend signals the whole flow.
+//
+// What's actually verified here: PHASE_CANCELLED appears on the var topic.
+// This proves NC.terminate fired -- per-node PHASE_CANCELLED is published
+// exclusively by TerminateNode; FC.suspend alone doesn't touch per-node
+// topics. So the waitForPhase check IS the proof that NC fired and that
+// FC.suspend didn't override it (had FC fired first, the var would have
+// been parked, and NC.TerminateNode would not have run).
 //
 // Downstream behavior depends on a goroutine race between the output
 // handler observing FC's suspendCh signal vs the EOF marker propagated
 // by var's terminal CANCELLED publish: either output parks (FC wins) or
 // output drains EOF and exits SUCCEEDED (race won by EOF arrival). Both
-// are valid; the invariant we verify is just NC's per-node state event
-// landing on the var topic. Use exec.Stop() to drain whichever state
-// the flow ended up in.
+// are valid downstream outcomes; only the per-node CANCELLED publish is
+// asserted here. Use exec.Stop() to drain whichever state the flow ended up in.
 func TestNodeControl_OverridesFlowControl_SameNode(t *testing.T) {
 	withAndWithoutOutbox(t, func(t *testing.T, extraOpts []Option) {
 		g := loadFlow(t, "nc_overrides_fc_same_node.yaml")

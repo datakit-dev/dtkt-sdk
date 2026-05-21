@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_retry_continue
+  description: >-
+    Stream calls error.StreamNotFound (code 5); retry_strategy.continue_when
+    evaluates a ternary that returns the error message string when matched
+    (truthy) or false otherwise. Truthy result tells retry to continue past the
+    error with a substitute value. Guards the continue branch on streams:
+    matched errors yield a replacement value rather than failing the iteration.
   inputs:
     - id: msg
       int64: {}

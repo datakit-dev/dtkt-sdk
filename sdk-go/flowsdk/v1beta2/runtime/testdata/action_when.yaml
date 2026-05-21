@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_when
+  description: >-
+    Action with a `when` guard: fires only when the input value > 5. Feeding 2,
+    10, 1 produces a single output (10); the 2 and 1 are skipped because the
+    guard returns false. Guards that the per-invocation `when` predicate gates
+    execution at the action level (input is consumed but no RPC is made when
+    the guard is false).
   inputs:
     - id: x
       int64: {}

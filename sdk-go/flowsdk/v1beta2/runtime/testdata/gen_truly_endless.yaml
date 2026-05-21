@@ -2,11 +2,14 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: gen_truly_endless
-  description: |
-    Endless ticker + an input bridge so the flow surfaces ctx-cancel as
-    a real error. The input bridge goroutine returns ctx.Err on cancel
-    (input handlers don't swallow ctx.Canceled the way other handlers do),
-    making the flow's terminal state PHASE_ERRORED instead of SUCCEEDED.
+  description: >-
+    Endless ticker (no stop_when, no bounded range) paired with an unused input
+    bridge. The input bridge causes the flow to treat context cancel as an
+    ERROR rather than silently completing -- needed by tests that assert
+    PHASE_ERRORED as the terminal phase when the runtime is cancelled
+    mid-flight (vs PHASE_SUCCEEDED if the flow happened to finish naturally
+    before the cancel arrived). Used in place of a tight range that could race
+    to natural completion under load.
   inputs:
     - id: x
       int64: {}

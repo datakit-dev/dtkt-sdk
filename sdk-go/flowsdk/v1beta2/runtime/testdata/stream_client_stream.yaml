@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_client_stream
+  description: >-
+    Stream uses client-streaming RPC (log.Collect): inputs are aggregated
+    client-side, server returns a single response when the stream closes.
+    Guards the client-stream-aggregation contract: one response total, after
+    all inputs have been fed and the request stream is closed.
   inputs:
     - id: msg
       int64: {}

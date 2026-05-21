@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: nc_output_stop
+  description: >-
+    Output node carries node_control.stop_when=true so the output handler stops
+    after the first publish. Feeding 10, 20, 30 yields a length-1-to-3 prefix
+    in input order. Flow returns nil (NC scopes to the output node). Guards
+    that node_control on outputs halts the output handler gracefully without
+    unwinding the producers.
   inputs:
     - id: x
       int64: {}

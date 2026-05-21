@@ -2,6 +2,13 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_retry_continue_no_match
+  description: >-
+    Sibling to action_retry_continue: same continue_when guard (code==5), but
+    the RPC returns Internal (code 13). The ternary returns false,
+    continue_when does not fire, and the error propagates normally ('internal
+    server error'). Guards that continue_when only converts errors-to-values
+    when its expression yields a non-false value; otherwise the error path is
+    unchanged.
   inputs:
     - id: msg
       int64: {}

@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: transform_string_map
-  description: "String map appending exclamation mark"
+  description: >-
+    Var transform on string input: map appends `!` (`= this.value + "!"`).
+    Feeding ["hello", "world"] yields ["hello!", "world!"]. Guards CEL string
+    concatenation in a map transform on a string-typed var.
   inputs:
     - id: name
       string: {}

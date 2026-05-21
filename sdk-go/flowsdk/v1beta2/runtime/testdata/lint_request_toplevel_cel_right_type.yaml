@@ -1,0 +1,25 @@
+apiVersion: v1beta2
+kind: Flow
+spec:
+  name: lint_request_toplevel_cel_right_type
+  description: >-
+    Action's request is a top-level CEL expression constructing the correct
+    proto type: `= test.TestRequest{name: inputs.x.value, count: 1}`. Lint must
+    produce zero diagnostics. Guards that the top-level-CEL identity check
+    accepts matching types (false-positive guard against the wrong_type test).
+  connections:
+    - id: myconn
+      services:
+        - test.Service
+  inputs:
+    - id: x
+      string: {}
+  actions:
+    - id: run
+      call:
+        connection: myconn
+        method: test.Service.Do
+        request: "= test.TestRequest{name: inputs.x.value, count: 1}"
+  outputs:
+    - id: result
+      value: "= actions.run.value"

@@ -2,7 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: join_shared_intermediary
-  description: "Shared var feeding two outputs with different transforms"
+  description: >-
+    Shared var (doubles its input) feeds two outputs each with its own
+    transform: plusOne (+1) and plusTen (+10). For input n, plusOne emits 2n+1
+    and plusTen emits 2n+10. Guards that one intermediate var can serve
+    multiple consumers, each applying its own per-output transform without
+    affecting the others or the source.
   inputs:
     - id: x
       int64: {}

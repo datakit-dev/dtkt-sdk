@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: gen_range
+  description: >-
+    Range generator emitting 1, 2, 3, 4, 5 (start=1, end=5, step=1). The flow
+    forwards each tick to an output. Result: [1, 2, 3, 4, 5]. Baseline for
+    range-generator tests -- guards the start/end/step semantics on the
+    simplest possible flow.
   generators:
     - id: seq
       range:

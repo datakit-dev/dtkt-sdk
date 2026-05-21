@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: output_scan
+  description: >-
+    Output's transform is a scan with initial=0 and accumulator = accumulator
+    + value. Feeding 10, 20, 30 yields the running sum [10, 30, 60] -- one
+    emit per input, each carrying the accumulated total. Guards the scan
+    transform on an output node (vs map/filter): emits every step, not just
+    the final.
   inputs:
     - id: x
       int64: {}

@@ -2,6 +2,12 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: lint_schema_type_mismatch
+  description: >-
+    Request literal sets `name: 42` (number where string is expected) and
+    `count: not_a_number` (string where int is expected). Lint must report two
+    CodeTypeMismatch diagnostics, one per field, citing both `number literal
+    incompatible` and `string literal incompatible`. Guards
+    literal-vs-descriptor type checks.
   connections:
     - id: myconn
       services:

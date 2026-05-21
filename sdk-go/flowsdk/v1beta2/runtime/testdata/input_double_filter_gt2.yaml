@@ -2,7 +2,10 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_double_filter_gt2
-  description: "Double input with filter transform keeping values > 2.0"
+  description: >-
+    Double input with a filter transform keeping values > 2.0. Feeding 1.0,
+    2.5, 0.5, 3.0 yields [2.5, 3.0]. Guards that input-level filtering works on
+    double-typed values with the comparison against a CEL double literal.
   inputs:
     - id: x
       double: {}

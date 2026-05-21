@@ -2,6 +2,14 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: fc_var_terminate
+  description: >-
+    Var doubles its input; terminate_when triggers when input >= 3. Feeding
+    1..5: terminate cancels the runtime context at the third input. The output
+    is a PREFIX of the full-drain sequence [2, 4, 6, 8, 10] -- some in-flight
+    iterations may complete before terminate propagates, but anything emitted
+    is in order. The flow returns ErrTerminated. Guards that var-level
+    terminate triggers a prompt context cancel while preserving in-flight
+    ordering.
   inputs:
     - id: x
       int64: {}

@@ -2,7 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: input_bytes_to_output
-  description: "Bytes input passed directly to output"
+  description: >-
+    Bytes input passed straight to output. Feeding []byte('abc') and binary
+    {0x01, 0x02} emits BytesValues unchanged. Guards that binary payloads (not
+    just printable strings) survive the wire roundtrip and that the bytes vs
+    string distinction is preserved.
   inputs:
     - id: x
       bytes: {}

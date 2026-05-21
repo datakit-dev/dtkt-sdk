@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: action_map_transform
+  description: >-
+    Action -> var with a map transform -> output. The var multiplies each
+    action response by 100. Feeding 3, 7 yields 300, 700. Guards that a
+    per-input map transform attached to a downstream var works on
+    action-produced values.
   inputs:
     - id: x
       int64: {}

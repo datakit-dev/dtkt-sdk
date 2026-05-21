@@ -2,6 +2,11 @@ apiVersion: v1beta2
 kind: Flow
 spec:
   name: stream_bidi_echo
+  description: >-
+    Stream uses bidirectional RPC (echo.BidiEcho) -- send side feeds the stream
+    from input.msg, recv side surfaces echoed values to the output. Guards that
+    the bidi handler runs send and recv in parallel goroutines and that
+    close-on-input-EOF triggers the recv side to drain and exit cleanly.
   inputs:
     - id: msg
       int64: {}
