@@ -1,6 +1,27 @@
 package util
 
-import "strconv"
+import (
+	"strconv"
+)
+
+type Number interface {
+	~int | ~int8 | ~int16 | ~int32 | ~int64 |
+		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr |
+		~float32 | ~float64
+}
+
+func IntMap[V any, T Number](num T, f func(int) V) (v []V) {
+	if num <= 0 {
+		return
+	}
+
+	v = make([]V, int(num))
+	for idx := range int(num) {
+		v[idx] = f(idx)
+	}
+
+	return
+}
 
 func ParseInt32(from string) (to int32, err error) {
 	i, err := strconv.ParseInt(from, 10, 32)

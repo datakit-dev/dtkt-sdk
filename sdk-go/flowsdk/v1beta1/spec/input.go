@@ -2,41 +2,34 @@ package spec
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
-	"github.com/google/cel-go/common/types/ref"
+	"github.com/google/cel-go/common/types"
 )
 
 var _ shared.ExecNode = (*Input)(nil)
 
 type Input struct {
+	id   string
 	node *flowv1beta1.Input
 	typ  InputType
 
-	defaultVal any
+	defaultVal,
+	cachedVal any
 
-	cachedMu  sync.Mutex
-	cachedVal ref.Val
-
-	valueCh chan ref.Val
+	mut sync.Mutex
 }
 
 func NewInput(env shared.Env, input *flowv1beta1.Input) *Input {
 	return &Input{
-		node:    input,
-		valueCh: make(chan ref.Val, 1),
+		id:   GetNodeIdent(input),
+		node: input,
 	}
 }
 
-func (i *Input) Compile(run shared.Runtime) error {
-	env, err := run.Env()
-	if err != nil {
-		return err
-	}
-
+func (i *Input) Compile(ctx context.Context, env shared.Env) (err error) {
 	i.typ, err = NewInputTypeWithResolver(i.node, env.Resolver())
 	if err != nil {
 		return err
@@ -52,99 +45,60 @@ func (i *Input) Compile(run shared.Runtime) error {
 	return nil
 }
 
-func (i *Input) Recv() (shared.RecvFunc, bool) {
-	return func(run shared.Runtime, recvCh <-chan any) error {
-		env, err := run.Env()
-		if err != nil {
-			return err
-		}
-
-	loop:
-		for {
-			select {
-			case <-run.Context().Done():
-				return context.Cause(run.Context())
-			case value, ok := <-recvCh:
-				if !ok {
-					return fmt.Errorf("receive channel closed")
-				}
-
-				var refVal ref.Val
-				if value == nil {
-					i.cachedMu.Lock()
-					cv := i.cachedVal
-					i.cachedMu.Unlock()
-
-					if i.node.GetCache() && cv != nil {
-						refVal = cv
-					} else if i.typ.HasDefault() {
-						refVal = env.TypeAdapter().NativeToValue(i.defaultVal)
-					} else if i.typ.IsRequired() {
-						continue loop
-					}
-				} else {
-					value, err := i.typ.Validate(value)
-					if err != nil {
-						return err
-					}
-
-					refVal = env.TypeAdapter().NativeToValue(value)
-
-					if i.node.GetCache() {
-						i.cachedMu.Lock()
-						if i.cachedVal == nil {
-							i.cachedVal = refVal
-						}
-						i.cachedMu.Unlock()
-					}
-				}
-
-				select {
-				case <-run.Context().Done():
-					return context.Cause(run.Context())
-				case i.valueCh <- refVal:
-				}
+func (i *Input) Run(ctx context.Context, env shared.Env, pipe shared.Pipe) (err error) {
+	return pipe.Run(ctx, func(ctx context.Context, value any) (any, error) {
+		cached, hasCached := i.HasCached()
+		if hasCached {
+			value = cached
+		} else {
+			value, err = i.typ.Validate(value)
+			if err != nil {
+				return nil, err
+			} else if i.typ.GetCache() {
+				i.setCached(value)
 			}
 		}
-	}, true
+		return value, nil
+	})
 }
 
-// Send reads the validated value produced by Recv and emits it as an event.
-// This makes Input a proper emitter so the executor's readiness check covers it.
-func (i *Input) Send() (shared.SendFunc, bool) {
-	return func(run shared.Runtime, sendCh chan<- ref.Val) error {
-		for {
-			select {
-			case <-run.Context().Done():
-				return context.Cause(run.Context())
-			case value := <-i.valueCh:
-				select {
-				case <-run.Context().Done():
-					return context.Cause(run.Context())
-				case sendCh <- value:
-				}
-			}
-		}
-	}, true
+func (i *Input) Type() InputType {
+	return i.typ
 }
 
-// IsRequired returns true when the input has no default and is not nullable,
-// meaning it must receive an external value before it can emit.
+func (i *Input) HasDefault() (any, bool) {
+	return i.defaultVal, i.typ.HasDefault()
+}
+
+func (i *Input) IsCacheable() bool {
+	return i.typ.GetCache()
+}
+
 func (i *Input) IsRequired() bool {
+	_, hasCached := i.HasCached()
+	if hasCached {
+		return false
+	}
 	return i.typ.IsRequired()
 }
 
-// HasCached returns the cached value if caching is enabled and a value has
-// already been captured from an external event. The executor uses this to
-// re-emit the same value each cycle without waiting on a new sendCh event.
-func (i *Input) HasCached() (ref.Val, bool) {
-	i.cachedMu.Lock()
-	cv := i.cachedVal
-	i.cachedMu.Unlock()
-	if i.node.GetCache() && cv != nil {
-		return cv, true
+func (i *Input) HasCached() (any, bool) {
+	if !i.typ.GetCache() {
+		return nil, false
 	}
-	return nil, false
+
+	i.mut.Lock()
+	defer i.mut.Unlock()
+
+	return i.cachedVal, i.cachedVal != nil
 }
 
-func (i *Input) Eval() (shared.EvalFunc, bool) { return nil, false }
+func (i *Input) setCached(value any) {
+	if value != nil && value != types.NullValue {
+		i.mut.Lock()
+		if i.cachedVal == nil {
+			i.cachedVal = value
+		}
+		i.mut.Unlock()
+	}
+}

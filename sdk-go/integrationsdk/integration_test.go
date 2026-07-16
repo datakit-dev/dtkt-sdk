@@ -1,4 +1,4 @@
-package integrationsdk
+package integrationsdk_test
 
 import (
 	"context"
@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk/v1beta1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/middleware"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/network"
 	basev1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/base/v1beta1"
@@ -72,18 +74,18 @@ func TestIntegrationInstance(t *testing.T) {
 		Version: "0.1.0",
 	}
 
-	intgr, err := New(&sharedv1beta1.Package{
+	intgr, err := integrationsdk.New(&sharedv1beta1.Package{
 		Identity: ident,
 		Icon:     "https://foo.bar/logo.png",
 		Type:     sharedv1beta1.PackageType_PACKAGE_TYPE_GO,
-	}, func(ctx context.Context, config *config) (*instance, error) {
-		return newInstance(t, config)
+	}, func(ctx context.Context, config v1beta1.InstanceConfig[*config]) (*instance, error) {
+		return newInstance(t, config.Get())
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	srv := NewServer(intgr)
+	srv := integrationsdk.NewServer(intgr)
 	defer srv.Stop()
 
 	errCh := make(chan error)
@@ -103,7 +105,12 @@ func TestIntegrationInstance(t *testing.T) {
 		t.Fatalf("server failed to start: %v", err)
 	}
 
-	client, err := network.DialGRPCClientUsing(intgr.conn,
+	conn, err := network.ResolveConnector(intgr.Address())
+	if err != nil {
+		t.Fatalf("failed to resolve connector: %v", err)
+	}
+
+	client, err := network.DialGRPCClientUsing(conn,
 		basev1beta1.NewBaseServiceClient,
 	)
 	if err != nil {
@@ -158,18 +165,19 @@ func TestIntegrationInstanceProto(t *testing.T) {
 		Version: "0.1.0",
 	}
 
-	intgr, err := New(&sharedv1beta1.Package{
+	intgr, err := integrationsdk.New(&sharedv1beta1.Package{
 		Identity: ident,
 		Icon:     "https://foo.bar/logo.png",
 		Type:     sharedv1beta1.PackageType_PACKAGE_TYPE_GO,
-	}, func(ctx context.Context, config *corev1.Flow) (*instanceProto, error) {
-		return newInstanceProto(t, config)
+	}, func(ctx context.Context, config v1beta1.InstanceConfig[*corev1.Flow]) (*instanceProto, error) {
+		return newInstanceProto(t, config.Get())
 	})
+
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	srv := NewServer(intgr)
+	srv := integrationsdk.NewServer(intgr)
 	defer srv.Stop()
 
 	errCh := make(chan error)
@@ -189,7 +197,12 @@ func TestIntegrationInstanceProto(t *testing.T) {
 		t.Fatalf("server failed to start: %v", err)
 	}
 
-	client, err := network.DialGRPCClientUsing(intgr.conn,
+	conn, err := network.ResolveConnector(intgr.Address())
+	if err != nil {
+		t.Fatalf("failed to resolve connector: %v", err)
+	}
+
+	client, err := network.DialGRPCClientUsing(conn,
 		basev1beta1.NewBaseServiceClient,
 	)
 	if err != nil {
@@ -199,7 +212,7 @@ func TestIntegrationInstanceProto(t *testing.T) {
 	var (
 		config = &corev1.Flow{
 			Name: "users/jordan/flows/test-flow",
-			Uid:  uuid.New().String(),
+			Uid:  uuid.NewString(),
 			Spec: &corev1.FlowSpecMetadata{
 				Version: &corev1.FlowSpecMetadata_V1Beta1{
 					V1Beta1: &flowv1beta1.Flow{

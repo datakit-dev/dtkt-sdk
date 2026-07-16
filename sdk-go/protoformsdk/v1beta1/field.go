@@ -7,12 +7,6 @@ import (
 )
 
 type (
-	FieldGroup struct {
-		fields []Field
-		title,
-		description string
-		hidden bool
-	}
 	Field struct {
 		FieldType
 	}
@@ -20,7 +14,15 @@ type (
 		Parent() *Message
 		Descriptor() protoreflect.FieldDescriptor
 		Element() *Element
+		Validate(Env) error
 		isFieldType()
+	}
+	FieldGroup struct {
+		fields []Field
+		title,
+		description string
+		hidden bool
+		parent *Message
 	}
 	fd struct {
 		protoreflect.FieldDescriptor
@@ -34,19 +36,11 @@ func NewFieldGroup(fields ...Field) *FieldGroup {
 }
 
 func (f *Field) Get() protoreflect.Value {
-	if _, ok := f.IsList(); ok {
-		return f.Parent().Get().Mutable(f.Descriptor())
-	} else if _, ok := f.IsMap(); ok {
-		return f.Parent().Get().Mutable(f.Descriptor())
-	} else if _, ok := f.IsMessage(); ok {
-		return f.Parent().Get().Mutable(f.Descriptor())
-	} else {
-		return f.Parent().Get().Get(f.Descriptor())
-	}
+	return f.Parent().GetField(f.Descriptor())
 }
 
 func (f *Field) Set(value protoreflect.Value) {
-	f.Parent().Get().Set(f.Descriptor(), value)
+	f.Parent().SetField(f.Descriptor(), value)
 }
 
 func (f *Field) IsList() (*ListField, bool) {
@@ -72,6 +66,13 @@ func (f *Field) IsOneOf() (*OneOfField, bool) {
 func (f *Field) IsScalar() (*ScalarField, bool) {
 	s, ok := f.FieldType.(*ScalarField)
 	return s, ok
+}
+
+func (g *FieldGroup) Parent() (*Message, bool) {
+	if g.parent == nil {
+		return nil, false
+	}
+	return g.parent, true
 }
 
 func (g *FieldGroup) Len() int {

@@ -1,65 +1,62 @@
 package spec
 
 import (
+	"context"
+
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/common/types"
-	"github.com/google/cel-go/common/types/ref"
 )
 
 var _ shared.ExecNode = (*Output)(nil)
 
 type Output struct {
+	id   string
 	node *flowv1beta1.Output
 	expr *cel.Ast
-	eval shared.EvalFunc
+	prog cel.Program
 }
 
-func NewOutput(env shared.Env, node *flowv1beta1.Output, visitor shared.NodeVisitFunc) (*Output, error) {
-	expr, err := shared.ParseExpr(env, node.GetValue(), visitor.ExprVisitor(GetID(node)))
+func NewOutput(env shared.Env, node *flowv1beta1.Output, visitor shared.NodeVisitor) (*Output, error) {
+	expr, err := shared.ParseExpr(env, node.GetValue(), visitor.ExprVisitor(GetNodeIdent(node)))
 	if err != nil {
 		return nil, err
 	}
 
 	return &Output{
+		id:   GetNodeIdent(node),
 		node: node,
 		expr: expr,
 	}, nil
 }
 
-func (o *Output) Compile(run shared.Runtime) error {
-	env, err := run.Env()
-	if err != nil {
-		return err
-	}
-
+func (o *Output) Compile(ctx context.Context, env shared.Env) (err error) {
 	prog, err := env.Program(o.expr)
 	if err != nil {
 		return err
 	}
 
-	o.eval = func(run shared.Runtime) ref.Val {
-		value, _, err := prog.ContextEval(run.Context(), env.Vars())
-		if err != nil {
-			return types.WrapErr(err)
-		}
-		return value
-	}
+	o.prog = prog
 
 	return nil
 }
 
-func (o *Output) Eval() (shared.EvalFunc, bool) {
-	return o.eval, true
+func (o *Output) Eval(ctx context.Context, env shared.Env) (any, error) {
+	vars, err := env.Vars(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	value, _, err := o.prog.ContextEval(ctx, vars)
+	if err != nil {
+		return nil, err
+	}
+
+	return value.Value(), nil
 }
 
-func (o *Output) Recv() (shared.RecvFunc, bool) {
-	return nil, false
+func (o *Output) Run(ctx context.Context, env shared.Env, pipe shared.Pipe) error {
+	return pipe.Run(ctx, func(ctx context.Context, value any) (any, error) {
+		return o.Eval(ctx, env)
+	})
 }
-
-func (o *Output) Send() (shared.SendFunc, bool) {
-	return nil, false
-}
-
-func (o *Output) HasCached() (ref.Val, bool) { return nil, false }

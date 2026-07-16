@@ -1,32 +1,24 @@
 package common
 
 import (
-	"sync"
-
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/ext"
 	"k8s.io/apiserver/pkg/cel/library"
 )
 
-var defaultCELOpts = sync.OnceValue(func() []cel.EnvOption {
-	return []cel.EnvOption{
+func NewCELEnv(opts ...cel.EnvOption) (*cel.Env, error) {
+	return cel.NewEnv(append([]cel.EnvOption{
 		library.URLs(),
 		ext.Encoders(),
 		ext.Lists(),
 		ext.Protos(),
-		ext.Strings(
-			ext.StringsVersion(4),
-		),
+		ext.Strings(),
+		ext.TwoVarComprehensions(),
 		CELEnumLib(),
 		CELJSONLib(),
 		CELUUIDLib(),
-	}
-})
-
-func NewCELEnv(opts ...cel.EnvOption) (*cel.Env, error) {
-	opts = append(defaultCELOpts(), opts...)
-
-	return cel.NewEnv(opts...)
+		CELProtoDescLib(),
+	}, opts...)...)
 }
 
 func CompileCELExpr(expr string, opts ...cel.EnvOption) (cel.Program, error) {

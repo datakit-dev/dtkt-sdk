@@ -4,7 +4,7 @@
 
 import type { GenFile, GenService } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { CheckAuthRequestSchema, CheckAuthResponseSchema, CheckConfigRequestSchema, CheckConfigResponseSchema, GetPackageRequestSchema, GetPackageResponseSchema, GetTypeRequestSchema, GetTypeResponseSchema, ListTypesRequestSchema, ListTypesResponseSchema } from "./messages_pb";
+import type { CheckAuthRequestSchema, CheckAuthResponseSchema, CheckConfigRequestSchema, CheckConfigResponseSchema, CloseRequestSchema, CloseResponseSchema, GetPackageRequestSchema, GetPackageResponseSchema, GetTypeRequestSchema, GetTypeResponseSchema, ListTypesRequestSchema, ListTypesResponseSchema, StreamIORequestSchema, StreamIOResponseSchema } from "./messages_pb";
 import { file_dtkt_base_v1beta1_messages } from "./messages_pb";
 import { file_google_api_annotations } from "../../../google/api/annotations_pb";
 
@@ -12,7 +12,7 @@ import { file_google_api_annotations } from "../../../google/api/annotations_pb"
  * Describes the file dtkt/base/v1beta1/services.proto.
  */
 export const file_dtkt_base_v1beta1_services: GenFile = /*@__PURE__*/
-  fileDesc("CiBkdGt0L2Jhc2UvdjFiZXRhMS9zZXJ2aWNlcy5wcm90bxIRZHRrdC5iYXNlLnYxYmV0YTEyrQUKC0Jhc2VTZXJ2aWNlEnMKCkdldFBhY2thZ2USJC5kdGt0LmJhc2UudjFiZXRhMS5HZXRQYWNrYWdlUmVxdWVzdBolLmR0a3QuYmFzZS52MWJldGExLkdldFBhY2thZ2VSZXNwb25zZSIYgtPkkwISEhAvdjFiZXRhMS9wYWNrYWdlEn0KC0NoZWNrQ29uZmlnEiUuZHRrdC5iYXNlLnYxYmV0YTEuQ2hlY2tDb25maWdSZXF1ZXN0GiYuZHRrdC5iYXNlLnYxYmV0YTEuQ2hlY2tDb25maWdSZXNwb25zZSIfgtPkkwIZOgEqIhQvdjFiZXRhMTpjaGVja0NvbmZpZxLIAQoJQ2hlY2tBdXRoEiMuZHRrdC5iYXNlLnYxYmV0YTEuQ2hlY2tBdXRoUmVxdWVzdBokLmR0a3QuYmFzZS52MWJldGExLkNoZWNrQXV0aFJlc3BvbnNlInCC0+STAmo6ASpaFzoBKiISL3YxYmV0YTEvYXV0aDpjb2RlWhs6ASoiFi92MWJldGExL2F1dGg6Y2FsbGJhY2taGjoBKiIVL3YxYmV0YTEvYXV0aDpyZWZyZXNoIhMvdjFiZXRhMS9hdXRoOmNoZWNrEm4KCUxpc3RUeXBlcxIjLmR0a3QuYmFzZS52MWJldGExLkxpc3RUeXBlc1JlcXVlc3QaJC5kdGt0LmJhc2UudjFiZXRhMS5MaXN0VHlwZXNSZXNwb25zZSIWgtPkkwIQEg4vdjFiZXRhMS90eXBlcxJvCgdHZXRUeXBlEiEuZHRrdC5iYXNlLnYxYmV0YTEuR2V0VHlwZVJlcXVlc3QaIi5kdGt0LmJhc2UudjFiZXRhMS5HZXRUeXBlUmVzcG9uc2UiHYLT5JMCFxIVL3YxYmV0YTEvdHlwZXMve25hbWV9QtoBChdwcm90by5kdGt0LmJhc2UudjFiZXRhMUINU2VydmljZXNQcm90b1ABWkpnaXRodWIuY29tL2RhdGFraXQtZGV2L2R0a3Qtc2RrL3Nkay1nby9wcm90by9kdGt0L2Jhc2UvdjFiZXRhMTtiYXNldjFiZXRhMaICA0RCWKoCEUR0a3QuQmFzZS5WMWJldGExygIRRHRrdFxCYXNlXFYxYmV0YTHiAh1EdGt0XEJhc2VcVjFiZXRhMVxHUEJNZXRhZGF0YeoCE0R0a3Q6OkJhc2U6OlYxYmV0YTFiBnByb3RvMw", [file_dtkt_base_v1beta1_messages, file_google_api_annotations]);
+  fileDesc("CiBkdGt0L2Jhc2UvdjFiZXRhMS9zZXJ2aWNlcy5wcm90bxIRZHRrdC5iYXNlLnYxYmV0YTEy0gYKC0Jhc2VTZXJ2aWNlEnMKCkdldFBhY2thZ2USJC5kdGt0LmJhc2UudjFiZXRhMS5HZXRQYWNrYWdlUmVxdWVzdBolLmR0a3QuYmFzZS52MWJldGExLkdldFBhY2thZ2VSZXNwb25zZSIYgtPkkwISEhAvdjFiZXRhMS9wYWNrYWdlEn0KC0NoZWNrQ29uZmlnEiUuZHRrdC5iYXNlLnYxYmV0YTEuQ2hlY2tDb25maWdSZXF1ZXN0GiYuZHRrdC5iYXNlLnYxYmV0YTEuQ2hlY2tDb25maWdSZXNwb25zZSIfgtPkkwIZOgEqIhQvdjFiZXRhMTpjaGVja0NvbmZpZxLIAQoJQ2hlY2tBdXRoEiMuZHRrdC5iYXNlLnYxYmV0YTEuQ2hlY2tBdXRoUmVxdWVzdBokLmR0a3QuYmFzZS52MWJldGExLkNoZWNrQXV0aFJlc3BvbnNlInCC0+STAmo6ASpaFzoBKiISL3YxYmV0YTEvYXV0aDpjb2RlWhs6ASoiFi92MWJldGExL2F1dGg6Y2FsbGJhY2taGjoBKiIVL3YxYmV0YTEvYXV0aDpyZWZyZXNoIhMvdjFiZXRhMS9hdXRoOmNoZWNrEm4KCUxpc3RUeXBlcxIjLmR0a3QuYmFzZS52MWJldGExLkxpc3RUeXBlc1JlcXVlc3QaJC5kdGt0LmJhc2UudjFiZXRhMS5MaXN0VHlwZXNSZXNwb25zZSIWgtPkkwIQEg4vdjFiZXRhMS90eXBlcxJvCgdHZXRUeXBlEiEuZHRrdC5iYXNlLnYxYmV0YTEuR2V0VHlwZVJlcXVlc3QaIi5kdGt0LmJhc2UudjFiZXRhMS5HZXRUeXBlUmVzcG9uc2UiHYLT5JMCFxIVL3YxYmV0YTEvdHlwZXMve25hbWV9EkoKBUNsb3NlEh8uZHRrdC5iYXNlLnYxYmV0YTEuQ2xvc2VSZXF1ZXN0GiAuZHRrdC5iYXNlLnYxYmV0YTEuQ2xvc2VSZXNwb25zZRJXCghTdHJlYW1JTxIiLmR0a3QuYmFzZS52MWJldGExLlN0cmVhbUlPUmVxdWVzdBojLmR0a3QuYmFzZS52MWJldGExLlN0cmVhbUlPUmVzcG9uc2UoATABQtoBChdwcm90by5kdGt0LmJhc2UudjFiZXRhMUINU2VydmljZXNQcm90b1ABWkpnaXRodWIuY29tL2RhdGFraXQtZGV2L2R0a3Qtc2RrL3Nkay1nby9wcm90by9kdGt0L2Jhc2UvdjFiZXRhMTtiYXNldjFiZXRhMaICA0RCWKoCEUR0a3QuQmFzZS5WMWJldGExygIRRHRrdFxCYXNlXFYxYmV0YTHiAh1EdGt0XEJhc2VcVjFiZXRhMVxHUEJNZXRhZGF0YeoCE0R0a3Q6OkJhc2U6OlYxYmV0YTFiBnByb3RvMw", [file_dtkt_base_v1beta1_messages, file_google_api_annotations]);
 
 /**
  * BaseService provides integration package metadata, config validation, and auth checks.
@@ -32,7 +32,7 @@ export const BaseService: GenService<{
     output: typeof GetPackageResponseSchema;
   },
   /**
-   * Validates config, allocates instances, and .
+   * Validates config and allocates instance.
    * NOTE: CheckConfig is implemented by the Integration SDK (not by authors).
    *
    * @generated from rpc dtkt.base.v1beta1.BaseService.CheckConfig
@@ -74,6 +74,48 @@ export const BaseService: GenService<{
     methodKind: "unary";
     input: typeof GetTypeRequestSchema;
     output: typeof GetTypeResponseSchema;
+  },
+  /**
+   * Close releases resources associated with an instance identified by headers
+   * in the request and (if valid) atomically removes it from the integration.
+   * NOTE: Close is implemented by the Integration SDK (not by authors).
+   *
+   * @generated from rpc dtkt.base.v1beta1.BaseService.Close
+   */
+  close: {
+    methodKind: "unary";
+    input: typeof CloseRequestSchema;
+    output: typeof CloseResponseSchema;
+  },
+  /**
+   * Opens a bidirectional IO stream between the caller and an active instance.
+   *
+   * The FIRST message must carry a valid instance_id (obtained after a
+   * successful CheckConfig call) and may optionally include an initial stdin
+   * payload.  All subsequent client messages carry additional stdin bytes;
+   * instance_id must still be set on every message due to proto validation
+   * requirements, but only the value in the first message is used for instance
+   * lookup.
+   *
+   * The server streams stdout and stderr frames back to the client as they are
+   * produced.  A terminal exit_code frame is sent before the stream closes to
+   * signal how the underlying operation ended.
+   *
+   * Client half-close (CloseSend) signals EOF to the instance stdin, allowing
+   * the underlying subprocess to detect end-of-input and terminate naturally.
+   * The server continues streaming output until both stdout and stderr are
+   * exhausted before closing the stream.
+   *
+   * Errors:
+   *   NOT_FOUND          – instance_id does not correspond to an active instance.
+   *   RESOURCE_EXHAUSTED – the instance already has an active IO stream.
+   *
+   * @generated from rpc dtkt.base.v1beta1.BaseService.StreamIO
+   */
+  streamIO: {
+    methodKind: "bidi_streaming";
+    input: typeof StreamIORequestSchema;
+    output: typeof StreamIOResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_dtkt_base_v1beta1_services, 0);

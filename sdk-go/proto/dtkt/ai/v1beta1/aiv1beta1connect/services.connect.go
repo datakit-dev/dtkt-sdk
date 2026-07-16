@@ -21,12 +21,14 @@ import (
 const _ = connect.IsAtLeastVersion1_13_0
 
 const (
+	// ModelServiceName is the fully-qualified name of the ModelService service.
+	ModelServiceName = "dtkt.ai.v1beta1.ModelService"
+	// EmbeddingServiceName is the fully-qualified name of the EmbeddingService service.
+	EmbeddingServiceName = "dtkt.ai.v1beta1.EmbeddingService"
 	// TextServiceName is the fully-qualified name of the TextService service.
 	TextServiceName = "dtkt.ai.v1beta1.TextService"
 	// ObjectServiceName is the fully-qualified name of the ObjectService service.
 	ObjectServiceName = "dtkt.ai.v1beta1.ObjectService"
-	// EmbeddingServiceName is the fully-qualified name of the EmbeddingService service.
-	EmbeddingServiceName = "dtkt.ai.v1beta1.EmbeddingService"
 	// ImageServiceName is the fully-qualified name of the ImageService service.
 	ImageServiceName = "dtkt.ai.v1beta1.ImageService"
 	// TranscriptionServiceName is the fully-qualified name of the TranscriptionService service.
@@ -43,6 +45,13 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
+	// ModelServiceListModelsProcedure is the fully-qualified name of the ModelService's ListModels RPC.
+	ModelServiceListModelsProcedure = "/dtkt.ai.v1beta1.ModelService/ListModels"
+	// ModelServiceGetModelProcedure is the fully-qualified name of the ModelService's GetModel RPC.
+	ModelServiceGetModelProcedure = "/dtkt.ai.v1beta1.ModelService/GetModel"
+	// EmbeddingServiceGenerateEmbeddingsProcedure is the fully-qualified name of the EmbeddingService's
+	// GenerateEmbeddings RPC.
+	EmbeddingServiceGenerateEmbeddingsProcedure = "/dtkt.ai.v1beta1.EmbeddingService/GenerateEmbeddings"
 	// TextServiceGenerateTextProcedure is the fully-qualified name of the TextService's GenerateText
 	// RPC.
 	TextServiceGenerateTextProcedure = "/dtkt.ai.v1beta1.TextService/GenerateText"
@@ -54,15 +63,6 @@ const (
 	// ObjectServiceStreamObjectsProcedure is the fully-qualified name of the ObjectService's
 	// StreamObjects RPC.
 	ObjectServiceStreamObjectsProcedure = "/dtkt.ai.v1beta1.ObjectService/StreamObjects"
-	// EmbeddingServiceListEmbeddingModelsProcedure is the fully-qualified name of the
-	// EmbeddingService's ListEmbeddingModels RPC.
-	EmbeddingServiceListEmbeddingModelsProcedure = "/dtkt.ai.v1beta1.EmbeddingService/ListEmbeddingModels"
-	// EmbeddingServiceGetEmbeddingModelProcedure is the fully-qualified name of the EmbeddingService's
-	// GetEmbeddingModel RPC.
-	EmbeddingServiceGetEmbeddingModelProcedure = "/dtkt.ai.v1beta1.EmbeddingService/GetEmbeddingModel"
-	// EmbeddingServiceGenerateEmbeddingsProcedure is the fully-qualified name of the EmbeddingService's
-	// GenerateEmbeddings RPC.
-	EmbeddingServiceGenerateEmbeddingsProcedure = "/dtkt.ai.v1beta1.EmbeddingService/GenerateEmbeddings"
 	// ImageServiceGenerateImageProcedure is the fully-qualified name of the ImageService's
 	// GenerateImage RPC.
 	ImageServiceGenerateImageProcedure = "/dtkt.ai.v1beta1.ImageService/GenerateImage"
@@ -82,6 +82,178 @@ const (
 	// StreamSpeech RPC.
 	SpeechServiceStreamSpeechProcedure = "/dtkt.ai.v1beta1.SpeechService/StreamSpeech"
 )
+
+// ModelServiceClient is a client for the dtkt.ai.v1beta1.ModelService service.
+type ModelServiceClient interface {
+	// Retrieves a list of models.
+	ListModels(context.Context, *connect.Request[v1beta1.ListModelsRequest]) (*connect.Response[v1beta1.ListModelsResponse], error)
+	// Retrieves a single model.
+	GetModel(context.Context, *connect.Request[v1beta1.GetModelRequest]) (*connect.Response[v1beta1.GetModelResponse], error)
+}
+
+// NewModelServiceClient constructs a client for the dtkt.ai.v1beta1.ModelService service. By
+// default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
+// and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
+// connect.WithGRPC() or connect.WithGRPCWeb() options.
+//
+// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
+// http://api.acme.com or https://acme.com/grpc).
+func NewModelServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ModelServiceClient {
+	baseURL = strings.TrimRight(baseURL, "/")
+	modelServiceMethods := v1beta1.File_dtkt_ai_v1beta1_services_proto.Services().ByName("ModelService").Methods()
+	return &modelServiceClient{
+		listModels: connect.NewClient[v1beta1.ListModelsRequest, v1beta1.ListModelsResponse](
+			httpClient,
+			baseURL+ModelServiceListModelsProcedure,
+			connect.WithSchema(modelServiceMethods.ByName("ListModels")),
+			connect.WithClientOptions(opts...),
+		),
+		getModel: connect.NewClient[v1beta1.GetModelRequest, v1beta1.GetModelResponse](
+			httpClient,
+			baseURL+ModelServiceGetModelProcedure,
+			connect.WithSchema(modelServiceMethods.ByName("GetModel")),
+			connect.WithClientOptions(opts...),
+		),
+	}
+}
+
+// modelServiceClient implements ModelServiceClient.
+type modelServiceClient struct {
+	listModels *connect.Client[v1beta1.ListModelsRequest, v1beta1.ListModelsResponse]
+	getModel   *connect.Client[v1beta1.GetModelRequest, v1beta1.GetModelResponse]
+}
+
+// ListModels calls dtkt.ai.v1beta1.ModelService.ListModels.
+func (c *modelServiceClient) ListModels(ctx context.Context, req *connect.Request[v1beta1.ListModelsRequest]) (*connect.Response[v1beta1.ListModelsResponse], error) {
+	return c.listModels.CallUnary(ctx, req)
+}
+
+// GetModel calls dtkt.ai.v1beta1.ModelService.GetModel.
+func (c *modelServiceClient) GetModel(ctx context.Context, req *connect.Request[v1beta1.GetModelRequest]) (*connect.Response[v1beta1.GetModelResponse], error) {
+	return c.getModel.CallUnary(ctx, req)
+}
+
+// ModelServiceHandler is an implementation of the dtkt.ai.v1beta1.ModelService service.
+type ModelServiceHandler interface {
+	// Retrieves a list of models.
+	ListModels(context.Context, *connect.Request[v1beta1.ListModelsRequest]) (*connect.Response[v1beta1.ListModelsResponse], error)
+	// Retrieves a single model.
+	GetModel(context.Context, *connect.Request[v1beta1.GetModelRequest]) (*connect.Response[v1beta1.GetModelResponse], error)
+}
+
+// NewModelServiceHandler builds an HTTP handler from the service implementation. It returns the
+// path on which to mount the handler and the handler itself.
+//
+// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
+// and JSON codecs. They also support gzip compression.
+func NewModelServiceHandler(svc ModelServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	modelServiceMethods := v1beta1.File_dtkt_ai_v1beta1_services_proto.Services().ByName("ModelService").Methods()
+	modelServiceListModelsHandler := connect.NewUnaryHandler(
+		ModelServiceListModelsProcedure,
+		svc.ListModels,
+		connect.WithSchema(modelServiceMethods.ByName("ListModels")),
+		connect.WithHandlerOptions(opts...),
+	)
+	modelServiceGetModelHandler := connect.NewUnaryHandler(
+		ModelServiceGetModelProcedure,
+		svc.GetModel,
+		connect.WithSchema(modelServiceMethods.ByName("GetModel")),
+		connect.WithHandlerOptions(opts...),
+	)
+	return "/dtkt.ai.v1beta1.ModelService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case ModelServiceListModelsProcedure:
+			modelServiceListModelsHandler.ServeHTTP(w, r)
+		case ModelServiceGetModelProcedure:
+			modelServiceGetModelHandler.ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
+}
+
+// UnimplementedModelServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedModelServiceHandler struct{}
+
+func (UnimplementedModelServiceHandler) ListModels(context.Context, *connect.Request[v1beta1.ListModelsRequest]) (*connect.Response[v1beta1.ListModelsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.ai.v1beta1.ModelService.ListModels is not implemented"))
+}
+
+func (UnimplementedModelServiceHandler) GetModel(context.Context, *connect.Request[v1beta1.GetModelRequest]) (*connect.Response[v1beta1.GetModelResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.ai.v1beta1.ModelService.GetModel is not implemented"))
+}
+
+// EmbeddingServiceClient is a client for the dtkt.ai.v1beta1.EmbeddingService service.
+type EmbeddingServiceClient interface {
+	// Generates embeddings for the provided input text using a specified model.
+	GenerateEmbeddings(context.Context, *connect.Request[v1beta1.GenerateEmbeddingsRequest]) (*connect.Response[v1beta1.GenerateEmbeddingsResponse], error)
+}
+
+// NewEmbeddingServiceClient constructs a client for the dtkt.ai.v1beta1.EmbeddingService service.
+// By default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped
+// responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
+// connect.WithGRPC() or connect.WithGRPCWeb() options.
+//
+// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
+// http://api.acme.com or https://acme.com/grpc).
+func NewEmbeddingServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) EmbeddingServiceClient {
+	baseURL = strings.TrimRight(baseURL, "/")
+	embeddingServiceMethods := v1beta1.File_dtkt_ai_v1beta1_services_proto.Services().ByName("EmbeddingService").Methods()
+	return &embeddingServiceClient{
+		generateEmbeddings: connect.NewClient[v1beta1.GenerateEmbeddingsRequest, v1beta1.GenerateEmbeddingsResponse](
+			httpClient,
+			baseURL+EmbeddingServiceGenerateEmbeddingsProcedure,
+			connect.WithSchema(embeddingServiceMethods.ByName("GenerateEmbeddings")),
+			connect.WithClientOptions(opts...),
+		),
+	}
+}
+
+// embeddingServiceClient implements EmbeddingServiceClient.
+type embeddingServiceClient struct {
+	generateEmbeddings *connect.Client[v1beta1.GenerateEmbeddingsRequest, v1beta1.GenerateEmbeddingsResponse]
+}
+
+// GenerateEmbeddings calls dtkt.ai.v1beta1.EmbeddingService.GenerateEmbeddings.
+func (c *embeddingServiceClient) GenerateEmbeddings(ctx context.Context, req *connect.Request[v1beta1.GenerateEmbeddingsRequest]) (*connect.Response[v1beta1.GenerateEmbeddingsResponse], error) {
+	return c.generateEmbeddings.CallUnary(ctx, req)
+}
+
+// EmbeddingServiceHandler is an implementation of the dtkt.ai.v1beta1.EmbeddingService service.
+type EmbeddingServiceHandler interface {
+	// Generates embeddings for the provided input text using a specified model.
+	GenerateEmbeddings(context.Context, *connect.Request[v1beta1.GenerateEmbeddingsRequest]) (*connect.Response[v1beta1.GenerateEmbeddingsResponse], error)
+}
+
+// NewEmbeddingServiceHandler builds an HTTP handler from the service implementation. It returns the
+// path on which to mount the handler and the handler itself.
+//
+// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
+// and JSON codecs. They also support gzip compression.
+func NewEmbeddingServiceHandler(svc EmbeddingServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	embeddingServiceMethods := v1beta1.File_dtkt_ai_v1beta1_services_proto.Services().ByName("EmbeddingService").Methods()
+	embeddingServiceGenerateEmbeddingsHandler := connect.NewUnaryHandler(
+		EmbeddingServiceGenerateEmbeddingsProcedure,
+		svc.GenerateEmbeddings,
+		connect.WithSchema(embeddingServiceMethods.ByName("GenerateEmbeddings")),
+		connect.WithHandlerOptions(opts...),
+	)
+	return "/dtkt.ai.v1beta1.EmbeddingService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case EmbeddingServiceGenerateEmbeddingsProcedure:
+			embeddingServiceGenerateEmbeddingsHandler.ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
+}
+
+// UnimplementedEmbeddingServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedEmbeddingServiceHandler struct{}
+
+func (UnimplementedEmbeddingServiceHandler) GenerateEmbeddings(context.Context, *connect.Request[v1beta1.GenerateEmbeddingsRequest]) (*connect.Response[v1beta1.GenerateEmbeddingsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.ai.v1beta1.EmbeddingService.GenerateEmbeddings is not implemented"))
+}
 
 // TextServiceClient is a client for the dtkt.ai.v1beta1.TextService service.
 type TextServiceClient interface {
@@ -281,134 +453,6 @@ func (UnimplementedObjectServiceHandler) GenerateObject(context.Context, *connec
 
 func (UnimplementedObjectServiceHandler) StreamObjects(context.Context, *connect.Request[v1beta1.StreamObjectsRequest], *connect.ServerStream[v1beta1.StreamObjectsResponse]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.ai.v1beta1.ObjectService.StreamObjects is not implemented"))
-}
-
-// EmbeddingServiceClient is a client for the dtkt.ai.v1beta1.EmbeddingService service.
-type EmbeddingServiceClient interface {
-	// Retrieves a list of available embedding models.
-	ListEmbeddingModels(context.Context, *connect.Request[v1beta1.ListEmbeddingModelsRequest]) (*connect.Response[v1beta1.ListEmbeddingModelsResponse], error)
-	// Retrieves details of a specific embedding model by its ID.
-	GetEmbeddingModel(context.Context, *connect.Request[v1beta1.GetEmbeddingModelRequest]) (*connect.Response[v1beta1.GetEmbeddingModelResponse], error)
-	// Generates embeddings for the provided input text using a specified model.
-	GenerateEmbeddings(context.Context, *connect.Request[v1beta1.GenerateEmbeddingsRequest]) (*connect.Response[v1beta1.GenerateEmbeddingsResponse], error)
-}
-
-// NewEmbeddingServiceClient constructs a client for the dtkt.ai.v1beta1.EmbeddingService service.
-// By default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped
-// responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
-// connect.WithGRPC() or connect.WithGRPCWeb() options.
-//
-// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
-// http://api.acme.com or https://acme.com/grpc).
-func NewEmbeddingServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) EmbeddingServiceClient {
-	baseURL = strings.TrimRight(baseURL, "/")
-	embeddingServiceMethods := v1beta1.File_dtkt_ai_v1beta1_services_proto.Services().ByName("EmbeddingService").Methods()
-	return &embeddingServiceClient{
-		listEmbeddingModels: connect.NewClient[v1beta1.ListEmbeddingModelsRequest, v1beta1.ListEmbeddingModelsResponse](
-			httpClient,
-			baseURL+EmbeddingServiceListEmbeddingModelsProcedure,
-			connect.WithSchema(embeddingServiceMethods.ByName("ListEmbeddingModels")),
-			connect.WithClientOptions(opts...),
-		),
-		getEmbeddingModel: connect.NewClient[v1beta1.GetEmbeddingModelRequest, v1beta1.GetEmbeddingModelResponse](
-			httpClient,
-			baseURL+EmbeddingServiceGetEmbeddingModelProcedure,
-			connect.WithSchema(embeddingServiceMethods.ByName("GetEmbeddingModel")),
-			connect.WithClientOptions(opts...),
-		),
-		generateEmbeddings: connect.NewClient[v1beta1.GenerateEmbeddingsRequest, v1beta1.GenerateEmbeddingsResponse](
-			httpClient,
-			baseURL+EmbeddingServiceGenerateEmbeddingsProcedure,
-			connect.WithSchema(embeddingServiceMethods.ByName("GenerateEmbeddings")),
-			connect.WithClientOptions(opts...),
-		),
-	}
-}
-
-// embeddingServiceClient implements EmbeddingServiceClient.
-type embeddingServiceClient struct {
-	listEmbeddingModels *connect.Client[v1beta1.ListEmbeddingModelsRequest, v1beta1.ListEmbeddingModelsResponse]
-	getEmbeddingModel   *connect.Client[v1beta1.GetEmbeddingModelRequest, v1beta1.GetEmbeddingModelResponse]
-	generateEmbeddings  *connect.Client[v1beta1.GenerateEmbeddingsRequest, v1beta1.GenerateEmbeddingsResponse]
-}
-
-// ListEmbeddingModels calls dtkt.ai.v1beta1.EmbeddingService.ListEmbeddingModels.
-func (c *embeddingServiceClient) ListEmbeddingModels(ctx context.Context, req *connect.Request[v1beta1.ListEmbeddingModelsRequest]) (*connect.Response[v1beta1.ListEmbeddingModelsResponse], error) {
-	return c.listEmbeddingModels.CallUnary(ctx, req)
-}
-
-// GetEmbeddingModel calls dtkt.ai.v1beta1.EmbeddingService.GetEmbeddingModel.
-func (c *embeddingServiceClient) GetEmbeddingModel(ctx context.Context, req *connect.Request[v1beta1.GetEmbeddingModelRequest]) (*connect.Response[v1beta1.GetEmbeddingModelResponse], error) {
-	return c.getEmbeddingModel.CallUnary(ctx, req)
-}
-
-// GenerateEmbeddings calls dtkt.ai.v1beta1.EmbeddingService.GenerateEmbeddings.
-func (c *embeddingServiceClient) GenerateEmbeddings(ctx context.Context, req *connect.Request[v1beta1.GenerateEmbeddingsRequest]) (*connect.Response[v1beta1.GenerateEmbeddingsResponse], error) {
-	return c.generateEmbeddings.CallUnary(ctx, req)
-}
-
-// EmbeddingServiceHandler is an implementation of the dtkt.ai.v1beta1.EmbeddingService service.
-type EmbeddingServiceHandler interface {
-	// Retrieves a list of available embedding models.
-	ListEmbeddingModels(context.Context, *connect.Request[v1beta1.ListEmbeddingModelsRequest]) (*connect.Response[v1beta1.ListEmbeddingModelsResponse], error)
-	// Retrieves details of a specific embedding model by its ID.
-	GetEmbeddingModel(context.Context, *connect.Request[v1beta1.GetEmbeddingModelRequest]) (*connect.Response[v1beta1.GetEmbeddingModelResponse], error)
-	// Generates embeddings for the provided input text using a specified model.
-	GenerateEmbeddings(context.Context, *connect.Request[v1beta1.GenerateEmbeddingsRequest]) (*connect.Response[v1beta1.GenerateEmbeddingsResponse], error)
-}
-
-// NewEmbeddingServiceHandler builds an HTTP handler from the service implementation. It returns the
-// path on which to mount the handler and the handler itself.
-//
-// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
-// and JSON codecs. They also support gzip compression.
-func NewEmbeddingServiceHandler(svc EmbeddingServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	embeddingServiceMethods := v1beta1.File_dtkt_ai_v1beta1_services_proto.Services().ByName("EmbeddingService").Methods()
-	embeddingServiceListEmbeddingModelsHandler := connect.NewUnaryHandler(
-		EmbeddingServiceListEmbeddingModelsProcedure,
-		svc.ListEmbeddingModels,
-		connect.WithSchema(embeddingServiceMethods.ByName("ListEmbeddingModels")),
-		connect.WithHandlerOptions(opts...),
-	)
-	embeddingServiceGetEmbeddingModelHandler := connect.NewUnaryHandler(
-		EmbeddingServiceGetEmbeddingModelProcedure,
-		svc.GetEmbeddingModel,
-		connect.WithSchema(embeddingServiceMethods.ByName("GetEmbeddingModel")),
-		connect.WithHandlerOptions(opts...),
-	)
-	embeddingServiceGenerateEmbeddingsHandler := connect.NewUnaryHandler(
-		EmbeddingServiceGenerateEmbeddingsProcedure,
-		svc.GenerateEmbeddings,
-		connect.WithSchema(embeddingServiceMethods.ByName("GenerateEmbeddings")),
-		connect.WithHandlerOptions(opts...),
-	)
-	return "/dtkt.ai.v1beta1.EmbeddingService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case EmbeddingServiceListEmbeddingModelsProcedure:
-			embeddingServiceListEmbeddingModelsHandler.ServeHTTP(w, r)
-		case EmbeddingServiceGetEmbeddingModelProcedure:
-			embeddingServiceGetEmbeddingModelHandler.ServeHTTP(w, r)
-		case EmbeddingServiceGenerateEmbeddingsProcedure:
-			embeddingServiceGenerateEmbeddingsHandler.ServeHTTP(w, r)
-		default:
-			http.NotFound(w, r)
-		}
-	})
-}
-
-// UnimplementedEmbeddingServiceHandler returns CodeUnimplemented from all methods.
-type UnimplementedEmbeddingServiceHandler struct{}
-
-func (UnimplementedEmbeddingServiceHandler) ListEmbeddingModels(context.Context, *connect.Request[v1beta1.ListEmbeddingModelsRequest]) (*connect.Response[v1beta1.ListEmbeddingModelsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.ai.v1beta1.EmbeddingService.ListEmbeddingModels is not implemented"))
-}
-
-func (UnimplementedEmbeddingServiceHandler) GetEmbeddingModel(context.Context, *connect.Request[v1beta1.GetEmbeddingModelRequest]) (*connect.Response[v1beta1.GetEmbeddingModelResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.ai.v1beta1.EmbeddingService.GetEmbeddingModel is not implemented"))
-}
-
-func (UnimplementedEmbeddingServiceHandler) GenerateEmbeddings(context.Context, *connect.Request[v1beta1.GenerateEmbeddingsRequest]) (*connect.Response[v1beta1.GenerateEmbeddingsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.ai.v1beta1.EmbeddingService.GenerateEmbeddings is not implemented"))
 }
 
 // ImageServiceClient is a client for the dtkt.ai.v1beta1.ImageService service.

@@ -8,7 +8,6 @@ import (
 	"buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	sharedv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
-	"github.com/invopop/jsonschema"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
@@ -142,42 +141,6 @@ func (v PackageVersion) Patch() string {
 		return parts[2]
 	}
 	return ""
-}
-
-func (PackageName) JSONSchema() *jsonschema.Schema {
-	return &jsonschema.Schema{
-		Type:        "string",
-		Title:       "PackageName",
-		Description: "Valid package name.",
-		Pattern:     packageNameRegex().String(),
-	}
-}
-
-func (PackageIcon) JSONSchema() *jsonschema.Schema {
-	return &jsonschema.Schema{
-		Type:        "string",
-		Title:       "PackageIcon",
-		Description: "Valid package image.",
-		Pattern:     packageIconRegex().String(),
-	}
-}
-
-func (PackageVersion) JSONSchema() *jsonschema.Schema {
-	return &jsonschema.Schema{
-		Type:        "string",
-		Title:       "PackageVersion",
-		Description: "Valid package semantic version.",
-		Pattern:     packageVersionRegex().String(),
-	}
-}
-
-func (PackageIdentity) JSONSchema() *jsonschema.Schema {
-	return &jsonschema.Schema{
-		Type:        "string",
-		Title:       "PackageIdentity",
-		Description: "Valid package identity, e.g.: PACKAGE_NAME[@latest|PACKAGE_VERSION]",
-		Pattern:     packageIdentityRegex().String(),
-	}
 }
 
 func (i PackageIdentity) String() string {

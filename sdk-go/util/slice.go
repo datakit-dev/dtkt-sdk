@@ -38,7 +38,7 @@ func SliceMap[V, T any](ts []T, fn func(T) V) []V {
 }
 
 // SliceReduce applies a function to each element of the input slice and
-// includes the result in the output slice only if the function returns ok as true.
+// includes the result in the output slice when the function returns true.
 func SliceReduce[T, V any](ts []T, fn func(T) (V, bool)) (s []V) {
 	for _, t := range ts {
 		if v, ok := fn(t); ok {
@@ -54,6 +54,29 @@ func SliceReduceError[T, V any](ts []T, fn func(T) (V, bool, error)) (s []V, _ e
 			return nil, err
 		} else if ok {
 			s = append(s, v)
+		}
+	}
+	return
+}
+
+func ReduceSliceToMap[T, V any, K comparable](ts []T, fn func(T) (K, V, bool)) (m map[K]V) {
+	m = map[K]V{}
+	for _, t := range ts {
+		if k, v, ok := fn(t); ok {
+			m[k] = v
+		}
+	}
+	return
+}
+
+func ReduceSliceToMapErr[T, V any, K comparable](ts []T, fn func(T) (K, V, bool, error)) (m map[K]V, _ error) {
+	m = map[K]V{}
+	for _, t := range ts {
+		k, v, ok, err := fn(t)
+		if err != nil {
+			return nil, err
+		} else if ok {
+			m[k] = v
 		}
 	}
 	return

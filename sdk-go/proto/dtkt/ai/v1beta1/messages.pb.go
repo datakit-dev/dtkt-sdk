@@ -9,6 +9,8 @@ package aiv1beta1
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protoform/v1beta1"
+	v1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
+	status "google.golang.org/genproto/googleapis/rpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	anypb "google.golang.org/protobuf/types/known/anypb"
@@ -27,35 +29,35 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Represents an embedding model, including its ID, name, and supported dimensions.
-type EmbeddingModel struct {
+// Represents a model with id, name, capabilities, and provider metadata.
+type Model struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Unique identifier for the embedding model.
+	// ID of the model.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// Name of the embedding model.
+	// Name of the model.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	// Minimum number of dimensions supported by the model.
-	MinDimensions uint32 `protobuf:"varint,3,opt,name=min_dimensions,json=minDimensions,proto3" json:"min_dimensions,omitempty"`
-	// Maximum number of dimensions supported by the model.
-	MaxDimensions uint32 `protobuf:"varint,4,opt,name=max_dimensions,json=maxDimensions,proto3" json:"max_dimensions,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// Capabilities of the model.
+	Capabilities []ModelCapability `protobuf:"varint,3,rep,packed,name=capabilities,proto3,enum=dtkt.ai.v1beta1.ModelCapability" json:"capabilities,omitempty"`
+	// Provider-specific metadata.
+	ProviderMetadata *structpb.Struct `protobuf:"bytes,10,opt,name=provider_metadata,json=providerMetadata,proto3" json:"provider_metadata,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
-func (x *EmbeddingModel) Reset() {
-	*x = EmbeddingModel{}
+func (x *Model) Reset() {
+	*x = Model{}
 	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *EmbeddingModel) String() string {
+func (x *Model) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*EmbeddingModel) ProtoMessage() {}
+func (*Model) ProtoMessage() {}
 
-func (x *EmbeddingModel) ProtoReflect() protoreflect.Message {
+func (x *Model) ProtoReflect() protoreflect.Message {
 	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -67,53 +69,264 @@ func (x *EmbeddingModel) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use EmbeddingModel.ProtoReflect.Descriptor instead.
-func (*EmbeddingModel) Descriptor() ([]byte, []int) {
+// Deprecated: Use Model.ProtoReflect.Descriptor instead.
+func (*Model) Descriptor() ([]byte, []int) {
 	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *EmbeddingModel) GetId() string {
+func (x *Model) GetId() string {
 	if x != nil {
 		return x.Id
 	}
 	return ""
 }
 
-func (x *EmbeddingModel) GetName() string {
+func (x *Model) GetName() string {
 	if x != nil {
 		return x.Name
 	}
 	return ""
 }
 
-func (x *EmbeddingModel) GetMinDimensions() uint32 {
+func (x *Model) GetCapabilities() []ModelCapability {
 	if x != nil {
-		return x.MinDimensions
+		return x.Capabilities
+	}
+	return nil
+}
+
+func (x *Model) GetProviderMetadata() *structpb.Struct {
+	if x != nil {
+		return x.ProviderMetadata
+	}
+	return nil
+}
+
+// Request to retrieve a list of models from a provider.
+type ListModelsRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Maximum number of models to return (default: server-assigned).
+	PageSize *int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3,oneof" json:"page_size,omitempty"`
+	// Token for retrieving the next page.
+	PageToken *string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3,oneof" json:"page_token,omitempty"`
+	// Filter expression.
+	Filter        *string `protobuf:"bytes,3,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListModelsRequest) Reset() {
+	*x = ListModelsRequest{}
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListModelsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListModelsRequest) ProtoMessage() {}
+
+func (x *ListModelsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListModelsRequest.ProtoReflect.Descriptor instead.
+func (*ListModelsRequest) Descriptor() ([]byte, []int) {
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ListModelsRequest) GetPageSize() int32 {
+	if x != nil && x.PageSize != nil {
+		return *x.PageSize
 	}
 	return 0
 }
 
-func (x *EmbeddingModel) GetMaxDimensions() uint32 {
-	if x != nil {
-		return x.MaxDimensions
+func (x *ListModelsRequest) GetPageToken() string {
+	if x != nil && x.PageToken != nil {
+		return *x.PageToken
 	}
-	return 0
+	return ""
+}
+
+func (x *ListModelsRequest) GetFilter() string {
+	if x != nil && x.Filter != nil {
+		return *x.Filter
+	}
+	return ""
+}
+
+// Response containing a list of models from a provider.
+type ListModelsResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// List of models.
+	Models []*Model `protobuf:"bytes,1,rep,name=models,proto3" json:"models,omitempty"`
+	// Token for retrieving the next page.
+	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListModelsResponse) Reset() {
+	*x = ListModelsResponse{}
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListModelsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListModelsResponse) ProtoMessage() {}
+
+func (x *ListModelsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListModelsResponse.ProtoReflect.Descriptor instead.
+func (*ListModelsResponse) Descriptor() ([]byte, []int) {
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ListModelsResponse) GetModels() []*Model {
+	if x != nil {
+		return x.Models
+	}
+	return nil
+}
+
+func (x *ListModelsResponse) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
+}
+
+// Request to retrieve details of a model from a provider.
+type GetModelRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// ID of the model to retrieve.
+	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetModelRequest) Reset() {
+	*x = GetModelRequest{}
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetModelRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetModelRequest) ProtoMessage() {}
+
+func (x *GetModelRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetModelRequest.ProtoReflect.Descriptor instead.
+func (*GetModelRequest) Descriptor() ([]byte, []int) {
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetModelRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+// Response containing details of a model from a provider.
+type GetModelResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Details of the requested model.
+	Model         *Model `protobuf:"bytes,1,opt,name=model,proto3" json:"model,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetModelResponse) Reset() {
+	*x = GetModelResponse{}
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetModelResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetModelResponse) ProtoMessage() {}
+
+func (x *GetModelResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetModelResponse.ProtoReflect.Descriptor instead.
+func (*GetModelResponse) Descriptor() ([]byte, []int) {
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetModelResponse) GetModel() *Model {
+	if x != nil {
+		return x.Model
+	}
+	return nil
 }
 
 // Represents an input for generating embeddings.
 type EmbeddingInput struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Unique identifier for the input.
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Text data to generate embeddings for.
-	Text          string `protobuf:"bytes,2,opt,name=text,proto3" json:"text,omitempty"`
+	Text string `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
+	// Unique identifier for the input (optional).
+	Id            string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *EmbeddingInput) Reset() {
 	*x = EmbeddingInput{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[1]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -125,7 +338,7 @@ func (x *EmbeddingInput) String() string {
 func (*EmbeddingInput) ProtoMessage() {}
 
 func (x *EmbeddingInput) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[1]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -138,14 +351,7 @@ func (x *EmbeddingInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EmbeddingInput.ProtoReflect.Descriptor instead.
 func (*EmbeddingInput) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *EmbeddingInput) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *EmbeddingInput) GetText() string {
@@ -155,24 +361,32 @@ func (x *EmbeddingInput) GetText() string {
 	return ""
 }
 
+func (x *EmbeddingInput) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
 // Represents the output of an embedding operation.
 type EmbeddingOutput struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The input data for which the embedding was generated.
 	Input *EmbeddingInput `protobuf:"bytes,1,opt,name=input,proto3" json:"input,omitempty"`
-	// The generated embedding vector.
-	Vector []float64 `protobuf:"fixed64,2,rep,packed,name=vector,proto3" json:"vector,omitempty"`
-	// Indicates if the embedding generation was successful.
-	Success bool `protobuf:"varint,3,opt,name=success,proto3" json:"success,omitempty"`
-	// Error message, if any.
-	Error         string `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`
+	// The generated embedding result (error or embedding).
+	//
+	// Types that are valid to be assigned to Result:
+	//
+	//	*EmbeddingOutput_Error
+	//	*EmbeddingOutput_Embedding
+	Result        isEmbeddingOutput_Result `protobuf_oneof:"result"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *EmbeddingOutput) Reset() {
 	*x = EmbeddingOutput{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[2]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -184,7 +398,7 @@ func (x *EmbeddingOutput) String() string {
 func (*EmbeddingOutput) ProtoMessage() {}
 
 func (x *EmbeddingOutput) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[2]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -197,7 +411,7 @@ func (x *EmbeddingOutput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EmbeddingOutput.ProtoReflect.Descriptor instead.
 func (*EmbeddingOutput) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{2}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *EmbeddingOutput) GetInput() *EmbeddingInput {
@@ -207,207 +421,52 @@ func (x *EmbeddingOutput) GetInput() *EmbeddingInput {
 	return nil
 }
 
-func (x *EmbeddingOutput) GetVector() []float64 {
+func (x *EmbeddingOutput) GetResult() isEmbeddingOutput_Result {
 	if x != nil {
-		return x.Vector
+		return x.Result
 	}
 	return nil
 }
 
-func (x *EmbeddingOutput) GetSuccess() bool {
+func (x *EmbeddingOutput) GetError() *status.Status {
 	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-func (x *EmbeddingOutput) GetError() string {
-	if x != nil {
-		return x.Error
-	}
-	return ""
-}
-
-// Request to retrieve a list of available embedding models.
-type ListEmbeddingModelsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListEmbeddingModelsRequest) Reset() {
-	*x = ListEmbeddingModelsRequest{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListEmbeddingModelsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListEmbeddingModelsRequest) ProtoMessage() {}
-
-func (x *ListEmbeddingModelsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
+		if x, ok := x.Result.(*EmbeddingOutput_Error); ok {
+			return x.Error
 		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListEmbeddingModelsRequest.ProtoReflect.Descriptor instead.
-func (*ListEmbeddingModelsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{3}
-}
-
-// Response containing a list of available embedding models.
-type ListEmbeddingModelsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// List of embedding models.
-	Models        []*EmbeddingModel `protobuf:"bytes,1,rep,name=models,proto3" json:"models,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListEmbeddingModelsResponse) Reset() {
-	*x = ListEmbeddingModelsResponse{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListEmbeddingModelsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListEmbeddingModelsResponse) ProtoMessage() {}
-
-func (x *ListEmbeddingModelsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListEmbeddingModelsResponse.ProtoReflect.Descriptor instead.
-func (*ListEmbeddingModelsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *ListEmbeddingModelsResponse) GetModels() []*EmbeddingModel {
-	if x != nil {
-		return x.Models
 	}
 	return nil
 }
 
-// Request to retrieve details of a specific embedding model.
-type GetEmbeddingModelRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// ID of the embedding model to retrieve.
-	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetEmbeddingModelRequest) Reset() {
-	*x = GetEmbeddingModelRequest{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetEmbeddingModelRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetEmbeddingModelRequest) ProtoMessage() {}
-
-func (x *GetEmbeddingModelRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[5]
+func (x *EmbeddingOutput) GetEmbedding() *Embedding {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
+		if x, ok := x.Result.(*EmbeddingOutput_Embedding); ok {
+			return x.Embedding
 		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetEmbeddingModelRequest.ProtoReflect.Descriptor instead.
-func (*GetEmbeddingModelRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *GetEmbeddingModelRequest) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-// Response containing details of a specific embedding model.
-type GetEmbeddingModelResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Details of the requested embedding model.
-	Model         *EmbeddingModel `protobuf:"bytes,1,opt,name=model,proto3" json:"model,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetEmbeddingModelResponse) Reset() {
-	*x = GetEmbeddingModelResponse{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetEmbeddingModelResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetEmbeddingModelResponse) ProtoMessage() {}
-
-func (x *GetEmbeddingModelResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetEmbeddingModelResponse.ProtoReflect.Descriptor instead.
-func (*GetEmbeddingModelResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *GetEmbeddingModelResponse) GetModel() *EmbeddingModel {
-	if x != nil {
-		return x.Model
 	}
 	return nil
 }
+
+type isEmbeddingOutput_Result interface {
+	isEmbeddingOutput_Result()
+}
+
+type EmbeddingOutput_Error struct {
+	Error *status.Status `protobuf:"bytes,2,opt,name=error,proto3,oneof"`
+}
+
+type EmbeddingOutput_Embedding struct {
+	Embedding *Embedding `protobuf:"bytes,3,opt,name=embedding,proto3,oneof"`
+}
+
+func (*EmbeddingOutput_Error) isEmbeddingOutput_Result() {}
+
+func (*EmbeddingOutput_Embedding) isEmbeddingOutput_Result() {}
 
 // Request to generate embeddings for input text using a specified model.
 type GenerateEmbeddingsRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// ID of the embedding model to use.
-	ModelId string `protobuf:"bytes,1,opt,name=model_id,json=modelId,proto3" json:"model_id,omitempty"`
+	// Model to use for generating embeddings.
+	Model string `protobuf:"bytes,1,opt,name=model,proto3" json:"model,omitempty"`
 	// Desired number of dimensions for the embedding.
 	Dimensions uint32 `protobuf:"varint,2,opt,name=dimensions,proto3" json:"dimensions,omitempty"`
 	// List of text inputs to generate embeddings for.
@@ -446,9 +505,9 @@ func (*GenerateEmbeddingsRequest) Descriptor() ([]byte, []int) {
 	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *GenerateEmbeddingsRequest) GetModelId() string {
+func (x *GenerateEmbeddingsRequest) GetModel() string {
 	if x != nil {
-		return x.ModelId
+		return x.Model
 	}
 	return ""
 }
@@ -470,7 +529,7 @@ func (x *GenerateEmbeddingsRequest) GetInputs() []*EmbeddingInput {
 // Response containing the generated embeddings for the input text.
 type GenerateEmbeddingsResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// List of embedding outputs corresponding to the inputs.
+	// List of embedding outputs corresponding to the request inputs.
 	Outputs       []*EmbeddingOutput `protobuf:"bytes,1,rep,name=outputs,proto3" json:"outputs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -513,9 +572,53 @@ func (x *GenerateEmbeddingsResponse) GetOutputs() []*EmbeddingOutput {
 	return nil
 }
 
+type Embedding struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Values        []float64              `protobuf:"fixed64,1,rep,packed,name=values,proto3" json:"values,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Embedding) Reset() {
+	*x = Embedding{}
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Embedding) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Embedding) ProtoMessage() {}
+
+func (x *Embedding) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Embedding.ProtoReflect.Descriptor instead.
+func (*Embedding) Descriptor() ([]byte, []int) {
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *Embedding) GetValues() []float64 {
+	if x != nil {
+		return x.Values
+	}
+	return nil
+}
+
 type Blob struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Media Type type/subtype or with parameters type/subtype;parameter=value;parameter2=value2
+	// Media type/subtype optionally with parameters: "type "/" subtype [ ";" parameter=value ]"
 	MediaType     string  `protobuf:"bytes,1,opt,name=media_type,json=mediaType,proto3" json:"media_type,omitempty"`
 	Data          []byte  `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
 	Name          *string `protobuf:"bytes,3,opt,name=name,proto3,oneof" json:"name,omitempty"`
@@ -525,7 +628,7 @@ type Blob struct {
 
 func (x *Blob) Reset() {
 	*x = Blob{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[9]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -537,7 +640,7 @@ func (x *Blob) String() string {
 func (*Blob) ProtoMessage() {}
 
 func (x *Blob) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[9]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -550,7 +653,7 @@ func (x *Blob) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Blob.ProtoReflect.Descriptor instead.
 func (*Blob) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{9}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *Blob) GetMediaType() string {
@@ -574,18 +677,99 @@ func (x *Blob) GetName() string {
 	return ""
 }
 
+// Tool metadata.
+type Tool struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Tool name.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Tool description.
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// Input type schema.
+	Input *v1beta1.TypeSchema `protobuf:"bytes,3,opt,name=input,proto3" json:"input,omitempty"`
+	// Output type schema.
+	Output        *v1beta1.TypeSchema `protobuf:"bytes,4,opt,name=output,proto3" json:"output,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Tool) Reset() {
+	*x = Tool{}
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Tool) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Tool) ProtoMessage() {}
+
+func (x *Tool) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Tool.ProtoReflect.Descriptor instead.
+func (*Tool) Descriptor() ([]byte, []int) {
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *Tool) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Tool) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *Tool) GetInput() *v1beta1.TypeSchema {
+	if x != nil {
+		return x.Input
+	}
+	return nil
+}
+
+func (x *Tool) GetOutput() *v1beta1.TypeSchema {
+	if x != nil {
+		return x.Output
+	}
+	return nil
+}
+
 type Message struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	ProviderOptions *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_options,json=providerOptions,proto3" json:"provider_options,omitempty"`
-	Role            string                 `protobuf:"bytes,2,opt,name=role,proto3" json:"role,omitempty"`
-	Content         []*Message_Content     `protobuf:"bytes,3,rep,name=content,proto3" json:"content,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Role  string                 `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`
+	// Types that are valid to be assigned to Content:
+	//
+	//	*Message_Text
+	//	*Message_Thinking
+	//	*Message_Blob
+	//	*Message_Source_
+	//	*Message_ToolCall_
+	//	*Message_ToolResult_
+	Content         isMessage_Content `protobuf_oneof:"content"`
+	ProviderOptions *structpb.Struct  `protobuf:"bytes,10,opt,name=provider_options,json=providerOptions,proto3" json:"provider_options,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
 
 func (x *Message) Reset() {
 	*x = Message{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[10]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -597,7 +781,7 @@ func (x *Message) String() string {
 func (*Message) ProtoMessage() {}
 
 func (x *Message) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[10]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -610,14 +794,7 @@ func (x *Message) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Message.ProtoReflect.Descriptor instead.
 func (*Message) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *Message) GetProviderOptions() *structpb.Struct {
-	if x != nil {
-		return x.ProviderOptions
-	}
-	return nil
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *Message) GetRole() string {
@@ -627,24 +804,132 @@ func (x *Message) GetRole() string {
 	return ""
 }
 
-func (x *Message) GetContent() []*Message_Content {
+func (x *Message) GetContent() isMessage_Content {
 	if x != nil {
 		return x.Content
 	}
 	return nil
 }
 
+func (x *Message) GetText() string {
+	if x != nil {
+		if x, ok := x.Content.(*Message_Text); ok {
+			return x.Text
+		}
+	}
+	return ""
+}
+
+func (x *Message) GetThinking() string {
+	if x != nil {
+		if x, ok := x.Content.(*Message_Thinking); ok {
+			return x.Thinking
+		}
+	}
+	return ""
+}
+
+func (x *Message) GetBlob() *Blob {
+	if x != nil {
+		if x, ok := x.Content.(*Message_Blob); ok {
+			return x.Blob
+		}
+	}
+	return nil
+}
+
+func (x *Message) GetSource() *Message_Source {
+	if x != nil {
+		if x, ok := x.Content.(*Message_Source_); ok {
+			return x.Source
+		}
+	}
+	return nil
+}
+
+func (x *Message) GetToolCall() *Message_ToolCall {
+	if x != nil {
+		if x, ok := x.Content.(*Message_ToolCall_); ok {
+			return x.ToolCall
+		}
+	}
+	return nil
+}
+
+func (x *Message) GetToolResult() *Message_ToolResult {
+	if x != nil {
+		if x, ok := x.Content.(*Message_ToolResult_); ok {
+			return x.ToolResult
+		}
+	}
+	return nil
+}
+
+func (x *Message) GetProviderOptions() *structpb.Struct {
+	if x != nil {
+		return x.ProviderOptions
+	}
+	return nil
+}
+
+type isMessage_Content interface {
+	isMessage_Content()
+}
+
+type Message_Text struct {
+	Text string `protobuf:"bytes,2,opt,name=text,proto3,oneof"`
+}
+
+type Message_Thinking struct {
+	Thinking string `protobuf:"bytes,3,opt,name=thinking,proto3,oneof"`
+}
+
+type Message_Blob struct {
+	Blob *Blob `protobuf:"bytes,4,opt,name=blob,proto3,oneof"`
+}
+
+type Message_Source_ struct {
+	Source *Message_Source `protobuf:"bytes,5,opt,name=source,proto3,oneof"`
+}
+
+type Message_ToolCall_ struct {
+	ToolCall *Message_ToolCall `protobuf:"bytes,6,opt,name=tool_call,json=toolCall,proto3,oneof"`
+}
+
+type Message_ToolResult_ struct {
+	ToolResult *Message_ToolResult `protobuf:"bytes,7,opt,name=tool_result,json=toolResult,proto3,oneof"`
+}
+
+func (*Message_Text) isMessage_Content() {}
+
+func (*Message_Thinking) isMessage_Content() {}
+
+func (*Message_Blob) isMessage_Content() {}
+
+func (*Message_Source_) isMessage_Content() {}
+
+func (*Message_ToolCall_) isMessage_Content() {}
+
+func (*Message_ToolResult_) isMessage_Content() {}
+
 type GenerateTextRequest struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	Messages        []*Message             `protobuf:"bytes,1,rep,name=messages,proto3" json:"messages,omitempty"`
-	ProviderOptions *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_options,json=providerOptions,proto3" json:"provider_options,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// ID of the embedding model to use.
+	ModelId string `protobuf:"bytes,1,opt,name=model_id,json=modelId,proto3" json:"model_id,omitempty"`
+	// Prompt is the textual message/prompt to send to the model.
+	Prompt string `protobuf:"bytes,2,opt,name=prompt,proto3" json:"prompt,omitempty"`
+	// System overrides the model's default system message/prompt.
+	System string `protobuf:"bytes,3,opt,name=system,proto3" json:"system,omitempty"`
+	// Format specifies a schema for structured output; optional.
+	Format          *v1beta1.TypeSchema `protobuf:"bytes,4,opt,name=format,proto3" json:"format,omitempty"`
+	ProviderOptions *structpb.Struct    `protobuf:"bytes,10,opt,name=provider_options,json=providerOptions,proto3" json:"provider_options,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
 
 func (x *GenerateTextRequest) Reset() {
 	*x = GenerateTextRequest{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[11]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -656,7 +941,7 @@ func (x *GenerateTextRequest) String() string {
 func (*GenerateTextRequest) ProtoMessage() {}
 
 func (x *GenerateTextRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[11]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -669,12 +954,33 @@ func (x *GenerateTextRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateTextRequest.ProtoReflect.Descriptor instead.
 func (*GenerateTextRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{11}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *GenerateTextRequest) GetMessages() []*Message {
+func (x *GenerateTextRequest) GetModelId() string {
 	if x != nil {
-		return x.Messages
+		return x.ModelId
+	}
+	return ""
+}
+
+func (x *GenerateTextRequest) GetPrompt() string {
+	if x != nil {
+		return x.Prompt
+	}
+	return ""
+}
+
+func (x *GenerateTextRequest) GetSystem() string {
+	if x != nil {
+		return x.System
+	}
+	return ""
+}
+
+func (x *GenerateTextRequest) GetFormat() *v1beta1.TypeSchema {
+	if x != nil {
+		return x.Format
 	}
 	return nil
 }
@@ -688,6 +994,7 @@ func (x *GenerateTextRequest) GetProviderOptions() *structpb.Struct {
 
 type GenerateTextResponse struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
+	Messages         []*Message             `protobuf:"bytes,1,rep,name=messages,proto3" json:"messages,omitempty"`
 	ProviderMetadata *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_metadata,json=providerMetadata,proto3" json:"provider_metadata,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -695,7 +1002,7 @@ type GenerateTextResponse struct {
 
 func (x *GenerateTextResponse) Reset() {
 	*x = GenerateTextResponse{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[12]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -707,7 +1014,7 @@ func (x *GenerateTextResponse) String() string {
 func (*GenerateTextResponse) ProtoMessage() {}
 
 func (x *GenerateTextResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[12]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -720,7 +1027,14 @@ func (x *GenerateTextResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateTextResponse.ProtoReflect.Descriptor instead.
 func (*GenerateTextResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{12}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GenerateTextResponse) GetMessages() []*Message {
+	if x != nil {
+		return x.Messages
+	}
+	return nil
 }
 
 func (x *GenerateTextResponse) GetProviderMetadata() *structpb.Struct {
@@ -740,7 +1054,7 @@ type StreamTextRequest struct {
 
 func (x *StreamTextRequest) Reset() {
 	*x = StreamTextRequest{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[13]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -752,7 +1066,7 @@ func (x *StreamTextRequest) String() string {
 func (*StreamTextRequest) ProtoMessage() {}
 
 func (x *StreamTextRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[13]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -765,7 +1079,7 @@ func (x *StreamTextRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamTextRequest.ProtoReflect.Descriptor instead.
 func (*StreamTextRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{13}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *StreamTextRequest) GetMessages() []*Message {
@@ -791,7 +1105,7 @@ type StreamTextResponse struct {
 
 func (x *StreamTextResponse) Reset() {
 	*x = StreamTextResponse{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[14]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -803,7 +1117,7 @@ func (x *StreamTextResponse) String() string {
 func (*StreamTextResponse) ProtoMessage() {}
 
 func (x *StreamTextResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[14]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -816,7 +1130,7 @@ func (x *StreamTextResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamTextResponse.ProtoReflect.Descriptor instead.
 func (*StreamTextResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{14}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *StreamTextResponse) GetProviderMetadata() *structpb.Struct {
@@ -836,7 +1150,7 @@ type GenerateObjectRequest struct {
 
 func (x *GenerateObjectRequest) Reset() {
 	*x = GenerateObjectRequest{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[15]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -848,7 +1162,7 @@ func (x *GenerateObjectRequest) String() string {
 func (*GenerateObjectRequest) ProtoMessage() {}
 
 func (x *GenerateObjectRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[15]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -861,7 +1175,7 @@ func (x *GenerateObjectRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateObjectRequest.ProtoReflect.Descriptor instead.
 func (*GenerateObjectRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{15}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *GenerateObjectRequest) GetMessages() []*Message {
@@ -887,7 +1201,7 @@ type GenerateObjectResponse struct {
 
 func (x *GenerateObjectResponse) Reset() {
 	*x = GenerateObjectResponse{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[16]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -899,7 +1213,7 @@ func (x *GenerateObjectResponse) String() string {
 func (*GenerateObjectResponse) ProtoMessage() {}
 
 func (x *GenerateObjectResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[16]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -912,7 +1226,7 @@ func (x *GenerateObjectResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateObjectResponse.ProtoReflect.Descriptor instead.
 func (*GenerateObjectResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{16}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *GenerateObjectResponse) GetProviderMetadata() *structpb.Struct {
@@ -932,7 +1246,7 @@ type StreamObjectsRequest struct {
 
 func (x *StreamObjectsRequest) Reset() {
 	*x = StreamObjectsRequest{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[17]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -944,7 +1258,7 @@ func (x *StreamObjectsRequest) String() string {
 func (*StreamObjectsRequest) ProtoMessage() {}
 
 func (x *StreamObjectsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[17]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -957,7 +1271,7 @@ func (x *StreamObjectsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamObjectsRequest.ProtoReflect.Descriptor instead.
 func (*StreamObjectsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{17}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *StreamObjectsRequest) GetMessages() []*Message {
@@ -983,7 +1297,7 @@ type StreamObjectsResponse struct {
 
 func (x *StreamObjectsResponse) Reset() {
 	*x = StreamObjectsResponse{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[18]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -995,7 +1309,7 @@ func (x *StreamObjectsResponse) String() string {
 func (*StreamObjectsResponse) ProtoMessage() {}
 
 func (x *StreamObjectsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[18]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1008,7 +1322,7 @@ func (x *StreamObjectsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamObjectsResponse.ProtoReflect.Descriptor instead.
 func (*StreamObjectsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{18}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *StreamObjectsResponse) GetProviderMetadata() *structpb.Struct {
@@ -1028,7 +1342,7 @@ type GenerateImageRequest struct {
 
 func (x *GenerateImageRequest) Reset() {
 	*x = GenerateImageRequest{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[19]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1040,7 +1354,7 @@ func (x *GenerateImageRequest) String() string {
 func (*GenerateImageRequest) ProtoMessage() {}
 
 func (x *GenerateImageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[19]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1053,7 +1367,7 @@ func (x *GenerateImageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateImageRequest.ProtoReflect.Descriptor instead.
 func (*GenerateImageRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{19}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *GenerateImageRequest) GetMessages() []*Message {
@@ -1079,7 +1393,7 @@ type GenerateImageResponse struct {
 
 func (x *GenerateImageResponse) Reset() {
 	*x = GenerateImageResponse{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[20]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1091,7 +1405,7 @@ func (x *GenerateImageResponse) String() string {
 func (*GenerateImageResponse) ProtoMessage() {}
 
 func (x *GenerateImageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[20]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1104,7 +1418,7 @@ func (x *GenerateImageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateImageResponse.ProtoReflect.Descriptor instead.
 func (*GenerateImageResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{20}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *GenerateImageResponse) GetProviderMetadata() *structpb.Struct {
@@ -1124,7 +1438,7 @@ type GenerateImagesRequest struct {
 
 func (x *GenerateImagesRequest) Reset() {
 	*x = GenerateImagesRequest{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[21]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1136,7 +1450,7 @@ func (x *GenerateImagesRequest) String() string {
 func (*GenerateImagesRequest) ProtoMessage() {}
 
 func (x *GenerateImagesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[21]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1149,7 +1463,7 @@ func (x *GenerateImagesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateImagesRequest.ProtoReflect.Descriptor instead.
 func (*GenerateImagesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{21}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *GenerateImagesRequest) GetMessages() []*Message {
@@ -1175,7 +1489,7 @@ type GenerateImagesResponse struct {
 
 func (x *GenerateImagesResponse) Reset() {
 	*x = GenerateImagesResponse{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[22]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1187,7 +1501,7 @@ func (x *GenerateImagesResponse) String() string {
 func (*GenerateImagesResponse) ProtoMessage() {}
 
 func (x *GenerateImagesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[22]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1200,7 +1514,7 @@ func (x *GenerateImagesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateImagesResponse.ProtoReflect.Descriptor instead.
 func (*GenerateImagesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{22}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *GenerateImagesResponse) GetProviderMetadata() *structpb.Struct {
@@ -1220,7 +1534,7 @@ type GenerateBatchImagesRequest struct {
 
 func (x *GenerateBatchImagesRequest) Reset() {
 	*x = GenerateBatchImagesRequest{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[23]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1232,7 +1546,7 @@ func (x *GenerateBatchImagesRequest) String() string {
 func (*GenerateBatchImagesRequest) ProtoMessage() {}
 
 func (x *GenerateBatchImagesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[23]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1245,7 +1559,7 @@ func (x *GenerateBatchImagesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateBatchImagesRequest.ProtoReflect.Descriptor instead.
 func (*GenerateBatchImagesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{23}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *GenerateBatchImagesRequest) GetMessages() []*Message {
@@ -1271,7 +1585,7 @@ type GenerateBatchImagesResponse struct {
 
 func (x *GenerateBatchImagesResponse) Reset() {
 	*x = GenerateBatchImagesResponse{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[24]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1283,7 +1597,7 @@ func (x *GenerateBatchImagesResponse) String() string {
 func (*GenerateBatchImagesResponse) ProtoMessage() {}
 
 func (x *GenerateBatchImagesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[24]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1296,7 +1610,7 @@ func (x *GenerateBatchImagesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateBatchImagesResponse.ProtoReflect.Descriptor instead.
 func (*GenerateBatchImagesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{24}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *GenerateBatchImagesResponse) GetProviderMetadata() *structpb.Struct {
@@ -1316,7 +1630,7 @@ type TranscribeRequest struct {
 
 func (x *TranscribeRequest) Reset() {
 	*x = TranscribeRequest{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[25]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1328,7 +1642,7 @@ func (x *TranscribeRequest) String() string {
 func (*TranscribeRequest) ProtoMessage() {}
 
 func (x *TranscribeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[25]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1341,7 +1655,7 @@ func (x *TranscribeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TranscribeRequest.ProtoReflect.Descriptor instead.
 func (*TranscribeRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{25}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *TranscribeRequest) GetAudio() *Blob {
@@ -1372,7 +1686,7 @@ type TranscribeResponse struct {
 
 func (x *TranscribeResponse) Reset() {
 	*x = TranscribeResponse{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[26]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1384,7 +1698,7 @@ func (x *TranscribeResponse) String() string {
 func (*TranscribeResponse) ProtoMessage() {}
 
 func (x *TranscribeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[26]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1397,7 +1711,7 @@ func (x *TranscribeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TranscribeResponse.ProtoReflect.Descriptor instead.
 func (*TranscribeResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{26}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *TranscribeResponse) GetText() string {
@@ -1456,7 +1770,7 @@ type GenerateSpeechRequest struct {
 
 func (x *GenerateSpeechRequest) Reset() {
 	*x = GenerateSpeechRequest{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[27]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1468,7 +1782,7 @@ func (x *GenerateSpeechRequest) String() string {
 func (*GenerateSpeechRequest) ProtoMessage() {}
 
 func (x *GenerateSpeechRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[27]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1481,7 +1795,7 @@ func (x *GenerateSpeechRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateSpeechRequest.ProtoReflect.Descriptor instead.
 func (*GenerateSpeechRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{27}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *GenerateSpeechRequest) GetText() string {
@@ -1543,7 +1857,7 @@ type GenerateSpeechResponse struct {
 
 func (x *GenerateSpeechResponse) Reset() {
 	*x = GenerateSpeechResponse{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[28]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1555,7 +1869,7 @@ func (x *GenerateSpeechResponse) String() string {
 func (*GenerateSpeechResponse) ProtoMessage() {}
 
 func (x *GenerateSpeechResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[28]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1568,7 +1882,7 @@ func (x *GenerateSpeechResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateSpeechResponse.ProtoReflect.Descriptor instead.
 func (*GenerateSpeechResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{28}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *GenerateSpeechResponse) GetAudio() *Blob {
@@ -1606,7 +1920,7 @@ type StreamSpeechRequest struct {
 
 func (x *StreamSpeechRequest) Reset() {
 	*x = StreamSpeechRequest{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[29]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1618,7 +1932,7 @@ func (x *StreamSpeechRequest) String() string {
 func (*StreamSpeechRequest) ProtoMessage() {}
 
 func (x *StreamSpeechRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[29]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1631,7 +1945,7 @@ func (x *StreamSpeechRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamSpeechRequest.ProtoReflect.Descriptor instead.
 func (*StreamSpeechRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{29}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *StreamSpeechRequest) GetText() string {
@@ -1693,7 +2007,7 @@ type StreamSpeechResponse struct {
 
 func (x *StreamSpeechResponse) Reset() {
 	*x = StreamSpeechResponse{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[30]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1705,7 +2019,7 @@ func (x *StreamSpeechResponse) String() string {
 func (*StreamSpeechResponse) ProtoMessage() {}
 
 func (x *StreamSpeechResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[30]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1718,7 +2032,7 @@ func (x *StreamSpeechResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamSpeechResponse.ProtoReflect.Descriptor instead.
 func (*StreamSpeechResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{30}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *StreamSpeechResponse) GetAudio() *Blob {
@@ -1735,258 +2049,32 @@ func (x *StreamSpeechResponse) GetProviderMetadata() *structpb.Struct {
 	return nil
 }
 
-type Message_Content struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	ProviderOptions *structpb.Struct       `protobuf:"bytes,10,opt,name=provider_options,json=providerOptions,proto3" json:"provider_options,omitempty"`
-	// Types that are valid to be assigned to Type:
-	//
-	//	*Message_Content_Text_
-	//	*Message_Content_Blob
-	//	*Message_Content_Source_
-	//	*Message_Content_ToolCall_
-	//	*Message_Content_ToolResult_
-	Type          isMessage_Content_Type `protobuf_oneof:"type"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Message_Content) Reset() {
-	*x = Message_Content{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[31]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Message_Content) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Message_Content) ProtoMessage() {}
-
-func (x *Message_Content) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[31]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Message_Content.ProtoReflect.Descriptor instead.
-func (*Message_Content) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{10, 0}
-}
-
-func (x *Message_Content) GetProviderOptions() *structpb.Struct {
-	if x != nil {
-		return x.ProviderOptions
-	}
-	return nil
-}
-
-func (x *Message_Content) GetType() isMessage_Content_Type {
-	if x != nil {
-		return x.Type
-	}
-	return nil
-}
-
-func (x *Message_Content) GetText() *Message_Content_Text {
-	if x != nil {
-		if x, ok := x.Type.(*Message_Content_Text_); ok {
-			return x.Text
-		}
-	}
-	return nil
-}
-
-func (x *Message_Content) GetBlob() *Blob {
-	if x != nil {
-		if x, ok := x.Type.(*Message_Content_Blob); ok {
-			return x.Blob
-		}
-	}
-	return nil
-}
-
-func (x *Message_Content) GetSource() *Message_Content_Source {
-	if x != nil {
-		if x, ok := x.Type.(*Message_Content_Source_); ok {
-			return x.Source
-		}
-	}
-	return nil
-}
-
-func (x *Message_Content) GetToolCall() *Message_Content_ToolCall {
-	if x != nil {
-		if x, ok := x.Type.(*Message_Content_ToolCall_); ok {
-			return x.ToolCall
-		}
-	}
-	return nil
-}
-
-func (x *Message_Content) GetToolResult() *Message_Content_ToolResult {
-	if x != nil {
-		if x, ok := x.Type.(*Message_Content_ToolResult_); ok {
-			return x.ToolResult
-		}
-	}
-	return nil
-}
-
-type isMessage_Content_Type interface {
-	isMessage_Content_Type()
-}
-
-type Message_Content_Text_ struct {
-	Text *Message_Content_Text `protobuf:"bytes,2,opt,name=text,proto3,oneof"`
-}
-
-type Message_Content_Blob struct {
-	Blob *Blob `protobuf:"bytes,3,opt,name=blob,proto3,oneof"`
-}
-
-type Message_Content_Source_ struct {
-	Source *Message_Content_Source `protobuf:"bytes,4,opt,name=source,proto3,oneof"`
-}
-
-type Message_Content_ToolCall_ struct {
-	ToolCall *Message_Content_ToolCall `protobuf:"bytes,5,opt,name=tool_call,json=toolCall,proto3,oneof"`
-}
-
-type Message_Content_ToolResult_ struct {
-	ToolResult *Message_Content_ToolResult `protobuf:"bytes,6,opt,name=tool_result,json=toolResult,proto3,oneof"`
-}
-
-func (*Message_Content_Text_) isMessage_Content_Type() {}
-
-func (*Message_Content_Blob) isMessage_Content_Type() {}
-
-func (*Message_Content_Source_) isMessage_Content_Type() {}
-
-func (*Message_Content_ToolCall_) isMessage_Content_Type() {}
-
-func (*Message_Content_ToolResult_) isMessage_Content_Type() {}
-
-type Message_Content_Text struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Text          string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Message_Content_Text) Reset() {
-	*x = Message_Content_Text{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[32]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Message_Content_Text) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Message_Content_Text) ProtoMessage() {}
-
-func (x *Message_Content_Text) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[32]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Message_Content_Text.ProtoReflect.Descriptor instead.
-func (*Message_Content_Text) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{10, 0, 0}
-}
-
-func (x *Message_Content_Text) GetText() string {
-	if x != nil {
-		return x.Text
-	}
-	return ""
-}
-
-type Message_Content_Reasoning struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Text          string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Message_Content_Reasoning) Reset() {
-	*x = Message_Content_Reasoning{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[33]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Message_Content_Reasoning) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Message_Content_Reasoning) ProtoMessage() {}
-
-func (x *Message_Content_Reasoning) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[33]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Message_Content_Reasoning.ProtoReflect.Descriptor instead.
-func (*Message_Content_Reasoning) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{10, 0, 1}
-}
-
-func (x *Message_Content_Reasoning) GetText() string {
-	if x != nil {
-		return x.Text
-	}
-	return ""
-}
-
-type Message_Content_Source struct {
+type Message_Source struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Type:
 	//
-	//	*Message_Content_Source_Url
-	//	*Message_Content_Source_Blob
-	Type          isMessage_Content_Source_Type `protobuf_oneof:"type"`
+	//	*Message_Source_Url
+	//	*Message_Source_Blob
+	Type          isMessage_Source_Type `protobuf_oneof:"type"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Message_Content_Source) Reset() {
-	*x = Message_Content_Source{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[34]
+func (x *Message_Source) Reset() {
+	*x = Message_Source{}
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Message_Content_Source) String() string {
+func (x *Message_Source) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Message_Content_Source) ProtoMessage() {}
+func (*Message_Source) ProtoMessage() {}
 
-func (x *Message_Content_Source) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[34]
+func (x *Message_Source) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1997,83 +2085,79 @@ func (x *Message_Content_Source) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Message_Content_Source.ProtoReflect.Descriptor instead.
-func (*Message_Content_Source) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{10, 0, 2}
+// Deprecated: Use Message_Source.ProtoReflect.Descriptor instead.
+func (*Message_Source) Descriptor() ([]byte, []int) {
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{12, 0}
 }
 
-func (x *Message_Content_Source) GetType() isMessage_Content_Source_Type {
+func (x *Message_Source) GetType() isMessage_Source_Type {
 	if x != nil {
 		return x.Type
 	}
 	return nil
 }
 
-func (x *Message_Content_Source) GetUrl() string {
+func (x *Message_Source) GetUrl() string {
 	if x != nil {
-		if x, ok := x.Type.(*Message_Content_Source_Url); ok {
+		if x, ok := x.Type.(*Message_Source_Url); ok {
 			return x.Url
 		}
 	}
 	return ""
 }
 
-func (x *Message_Content_Source) GetBlob() *Blob {
+func (x *Message_Source) GetBlob() *Blob {
 	if x != nil {
-		if x, ok := x.Type.(*Message_Content_Source_Blob); ok {
+		if x, ok := x.Type.(*Message_Source_Blob); ok {
 			return x.Blob
 		}
 	}
 	return nil
 }
 
-type isMessage_Content_Source_Type interface {
-	isMessage_Content_Source_Type()
+type isMessage_Source_Type interface {
+	isMessage_Source_Type()
 }
 
-type Message_Content_Source_Url struct {
+type Message_Source_Url struct {
 	Url string `protobuf:"bytes,1,opt,name=url,proto3,oneof"`
 }
 
-type Message_Content_Source_Blob struct {
+type Message_Source_Blob struct {
 	Blob *Blob `protobuf:"bytes,2,opt,name=blob,proto3,oneof"`
 }
 
-func (*Message_Content_Source_Url) isMessage_Content_Source_Type() {}
+func (*Message_Source_Url) isMessage_Source_Type() {}
 
-func (*Message_Content_Source_Blob) isMessage_Content_Source_Type() {}
+func (*Message_Source_Blob) isMessage_Source_Type() {}
 
-type Message_Content_ToolCall struct {
+type Message_ToolCall struct {
 	state      protoimpl.MessageState `protogen:"open.v1"`
 	ToolCallId string                 `protobuf:"bytes,1,opt,name=tool_call_id,json=toolCallId,proto3" json:"tool_call_id,omitempty"`
 	ToolName   string                 `protobuf:"bytes,2,opt,name=tool_name,json=toolName,proto3" json:"tool_name,omitempty"`
-	// Types that are valid to be assigned to Input:
-	//
-	//	*Message_Content_ToolCall_Json
-	//	*Message_Content_ToolCall_Proto
-	Input isMessage_Content_ToolCall_Input `protobuf_oneof:"input"`
 	// If the tool is executed by the provider or the client
 	// TODO: This is if ChatGPT calls our tool or if we call it for ChatGPT.
-	ProviderExecuted bool `protobuf:"varint,5,opt,name=provider_executed,json=providerExecuted,proto3" json:"provider_executed,omitempty"`
+	ProviderExecuted bool            `protobuf:"varint,3,opt,name=provider_executed,json=providerExecuted,proto3" json:"provider_executed,omitempty"`
+	Input            *structpb.Value `protobuf:"bytes,4,opt,name=input,proto3" json:"input,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
 
-func (x *Message_Content_ToolCall) Reset() {
-	*x = Message_Content_ToolCall{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[35]
+func (x *Message_ToolCall) Reset() {
+	*x = Message_ToolCall{}
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Message_Content_ToolCall) String() string {
+func (x *Message_ToolCall) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Message_Content_ToolCall) ProtoMessage() {}
+func (*Message_ToolCall) ProtoMessage() {}
 
-func (x *Message_Content_ToolCall) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[35]
+func (x *Message_ToolCall) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2084,102 +2168,68 @@ func (x *Message_Content_ToolCall) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Message_Content_ToolCall.ProtoReflect.Descriptor instead.
-func (*Message_Content_ToolCall) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{10, 0, 3}
+// Deprecated: Use Message_ToolCall.ProtoReflect.Descriptor instead.
+func (*Message_ToolCall) Descriptor() ([]byte, []int) {
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{12, 1}
 }
 
-func (x *Message_Content_ToolCall) GetToolCallId() string {
+func (x *Message_ToolCall) GetToolCallId() string {
 	if x != nil {
 		return x.ToolCallId
 	}
 	return ""
 }
 
-func (x *Message_Content_ToolCall) GetToolName() string {
+func (x *Message_ToolCall) GetToolName() string {
 	if x != nil {
 		return x.ToolName
 	}
 	return ""
 }
 
-func (x *Message_Content_ToolCall) GetInput() isMessage_Content_ToolCall_Input {
-	if x != nil {
-		return x.Input
-	}
-	return nil
-}
-
-func (x *Message_Content_ToolCall) GetJson() *structpb.Struct {
-	if x != nil {
-		if x, ok := x.Input.(*Message_Content_ToolCall_Json); ok {
-			return x.Json
-		}
-	}
-	return nil
-}
-
-func (x *Message_Content_ToolCall) GetProto() *anypb.Any {
-	if x != nil {
-		if x, ok := x.Input.(*Message_Content_ToolCall_Proto); ok {
-			return x.Proto
-		}
-	}
-	return nil
-}
-
-func (x *Message_Content_ToolCall) GetProviderExecuted() bool {
+func (x *Message_ToolCall) GetProviderExecuted() bool {
 	if x != nil {
 		return x.ProviderExecuted
 	}
 	return false
 }
 
-type isMessage_Content_ToolCall_Input interface {
-	isMessage_Content_ToolCall_Input()
+func (x *Message_ToolCall) GetInput() *structpb.Value {
+	if x != nil {
+		return x.Input
+	}
+	return nil
 }
 
-type Message_Content_ToolCall_Json struct {
-	Json *structpb.Struct `protobuf:"bytes,3,opt,name=json,proto3,oneof"`
-}
-
-type Message_Content_ToolCall_Proto struct {
-	Proto *anypb.Any `protobuf:"bytes,4,opt,name=proto,proto3,oneof"`
-}
-
-func (*Message_Content_ToolCall_Json) isMessage_Content_ToolCall_Input() {}
-
-func (*Message_Content_ToolCall_Proto) isMessage_Content_ToolCall_Input() {}
-
-type Message_Content_ToolResult struct {
+type Message_ToolResult struct {
 	state      protoimpl.MessageState `protogen:"open.v1"`
 	ToolCallId string                 `protobuf:"bytes,1,opt,name=tool_call_id,json=toolCallId,proto3" json:"tool_call_id,omitempty"`
 	ToolName   string                 `protobuf:"bytes,2,opt,name=tool_name,json=toolName,proto3" json:"tool_name,omitempty"`
 	// Types that are valid to be assigned to Result:
 	//
-	//	*Message_Content_ToolResult_Json
-	//	*Message_Content_ToolResult_Proto
-	Result        isMessage_Content_ToolResult_Result `protobuf_oneof:"result"`
-	IsError       bool                                `protobuf:"varint,5,opt,name=is_error,json=isError,proto3" json:"is_error,omitempty"`
+	//	*Message_ToolResult_Error
+	//	*Message_ToolResult_Json
+	//	*Message_ToolResult_Proto
+	Result        isMessage_ToolResult_Result `protobuf_oneof:"result"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Message_Content_ToolResult) Reset() {
-	*x = Message_Content_ToolResult{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[36]
+func (x *Message_ToolResult) Reset() {
+	*x = Message_ToolResult{}
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Message_Content_ToolResult) String() string {
+func (x *Message_ToolResult) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Message_Content_ToolResult) ProtoMessage() {}
+func (*Message_ToolResult) ProtoMessage() {}
 
-func (x *Message_Content_ToolResult) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[36]
+func (x *Message_ToolResult) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2190,72 +2240,80 @@ func (x *Message_Content_ToolResult) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Message_Content_ToolResult.ProtoReflect.Descriptor instead.
-func (*Message_Content_ToolResult) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{10, 0, 4}
+// Deprecated: Use Message_ToolResult.ProtoReflect.Descriptor instead.
+func (*Message_ToolResult) Descriptor() ([]byte, []int) {
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{12, 2}
 }
 
-func (x *Message_Content_ToolResult) GetToolCallId() string {
+func (x *Message_ToolResult) GetToolCallId() string {
 	if x != nil {
 		return x.ToolCallId
 	}
 	return ""
 }
 
-func (x *Message_Content_ToolResult) GetToolName() string {
+func (x *Message_ToolResult) GetToolName() string {
 	if x != nil {
 		return x.ToolName
 	}
 	return ""
 }
 
-func (x *Message_Content_ToolResult) GetResult() isMessage_Content_ToolResult_Result {
+func (x *Message_ToolResult) GetResult() isMessage_ToolResult_Result {
 	if x != nil {
 		return x.Result
 	}
 	return nil
 }
 
-func (x *Message_Content_ToolResult) GetJson() *structpb.Struct {
+func (x *Message_ToolResult) GetError() *status.Status {
 	if x != nil {
-		if x, ok := x.Result.(*Message_Content_ToolResult_Json); ok {
+		if x, ok := x.Result.(*Message_ToolResult_Error); ok {
+			return x.Error
+		}
+	}
+	return nil
+}
+
+func (x *Message_ToolResult) GetJson() *structpb.Value {
+	if x != nil {
+		if x, ok := x.Result.(*Message_ToolResult_Json); ok {
 			return x.Json
 		}
 	}
 	return nil
 }
 
-func (x *Message_Content_ToolResult) GetProto() *anypb.Any {
+func (x *Message_ToolResult) GetProto() *anypb.Any {
 	if x != nil {
-		if x, ok := x.Result.(*Message_Content_ToolResult_Proto); ok {
+		if x, ok := x.Result.(*Message_ToolResult_Proto); ok {
 			return x.Proto
 		}
 	}
 	return nil
 }
 
-func (x *Message_Content_ToolResult) GetIsError() bool {
-	if x != nil {
-		return x.IsError
-	}
-	return false
+type isMessage_ToolResult_Result interface {
+	isMessage_ToolResult_Result()
 }
 
-type isMessage_Content_ToolResult_Result interface {
-	isMessage_Content_ToolResult_Result()
+type Message_ToolResult_Error struct {
+	Error *status.Status `protobuf:"bytes,3,opt,name=error,proto3,oneof"`
 }
 
-type Message_Content_ToolResult_Json struct {
-	Json *structpb.Struct `protobuf:"bytes,3,opt,name=json,proto3,oneof"`
+type Message_ToolResult_Json struct {
+	Json *structpb.Value `protobuf:"bytes,4,opt,name=json,proto3,oneof"`
 }
 
-type Message_Content_ToolResult_Proto struct {
-	Proto *anypb.Any `protobuf:"bytes,4,opt,name=proto,proto3,oneof"`
+type Message_ToolResult_Proto struct {
+	Proto *anypb.Any `protobuf:"bytes,5,opt,name=proto,proto3,oneof"`
 }
 
-func (*Message_Content_ToolResult_Json) isMessage_Content_ToolResult_Result() {}
+func (*Message_ToolResult_Error) isMessage_ToolResult_Result() {}
 
-func (*Message_Content_ToolResult_Proto) isMessage_Content_ToolResult_Result() {}
+func (*Message_ToolResult_Json) isMessage_ToolResult_Result() {}
+
+func (*Message_ToolResult_Proto) isMessage_ToolResult_Result() {}
 
 type TranscribeResponse_Segment struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -2268,7 +2326,7 @@ type TranscribeResponse_Segment struct {
 
 func (x *TranscribeResponse_Segment) Reset() {
 	*x = TranscribeResponse_Segment{}
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[37]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2280,7 +2338,7 @@ func (x *TranscribeResponse_Segment) String() string {
 func (*TranscribeResponse_Segment) ProtoMessage() {}
 
 func (x *TranscribeResponse_Segment) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[37]
+	mi := &file_dtkt_ai_v1beta1_messages_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2293,7 +2351,7 @@ func (x *TranscribeResponse_Segment) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TranscribeResponse_Segment.ProtoReflect.Descriptor instead.
 func (*TranscribeResponse_Segment) Descriptor() ([]byte, []int) {
-	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{26, 0}
+	return file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP(), []int{28, 0}
 }
 
 func (x *TranscribeResponse_Segment) GetText() string {
@@ -2321,88 +2379,103 @@ var File_dtkt_ai_v1beta1_messages_proto protoreflect.FileDescriptor
 
 const file_dtkt_ai_v1beta1_messages_proto_rawDesc = "" +
 	"\n" +
-	"\x1edtkt/ai/v1beta1/messages.proto\x12\x0fdtkt.ai.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x82\x01\n" +
-	"\x0eEmbeddingModel\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12%\n" +
-	"\x0emin_dimensions\x18\x03 \x01(\rR\rminDimensions\x12%\n" +
-	"\x0emax_dimensions\x18\x04 \x01(\rR\rmaxDimensions\"4\n" +
-	"\x0eEmbeddingInput\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04text\x18\x02 \x01(\tR\x04text\"\x90\x01\n" +
-	"\x0fEmbeddingOutput\x125\n" +
-	"\x05input\x18\x01 \x01(\v2\x1f.dtkt.ai.v1beta1.EmbeddingInputR\x05input\x12\x16\n" +
-	"\x06vector\x18\x02 \x03(\x01R\x06vector\x12\x18\n" +
-	"\asuccess\x18\x03 \x01(\bR\asuccess\x12\x14\n" +
-	"\x05error\x18\x04 \x01(\tR\x05error\"\x1c\n" +
-	"\x1aListEmbeddingModelsRequest\"V\n" +
-	"\x1bListEmbeddingModelsResponse\x127\n" +
-	"\x06models\x18\x01 \x03(\v2\x1f.dtkt.ai.v1beta1.EmbeddingModelR\x06models\"*\n" +
-	"\x18GetEmbeddingModelRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"R\n" +
-	"\x19GetEmbeddingModelResponse\x125\n" +
-	"\x05model\x18\x01 \x01(\v2\x1f.dtkt.ai.v1beta1.EmbeddingModelR\x05model\"\xa1\x02\n" +
-	"\x19GenerateEmbeddingsRequest\x12\xaa\x01\n" +
-	"\bmodel_id\x18\x01 \x01(\tB\x8e\x01\x82\xb5\x18\x89\x01\n" +
-	"\x19Select an embedding model:l\n" +
-	"4dtkt.ai.v1beta1.EmbeddingService.ListEmbeddingModels\x12\x1athis.models.map(i, i.name)\x1a\x18this.models.map(i, i.id)R\amodelId\x12\x1e\n" +
+	"\x1edtkt/ai/v1beta1/messages.proto\x12\x0fdtkt.ai.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1bdtkt/ai/v1beta1/enums.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\"dtkt/shared/v1beta1/messages.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\"\xc7\x01\n" +
+	"\x05Model\x12\x16\n" +
+	"\x02id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x02id\x12\x1a\n" +
+	"\x04name\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12D\n" +
+	"\fcapabilities\x18\x03 \x03(\x0e2 .dtkt.ai.v1beta1.ModelCapabilityR\fcapabilities\x12D\n" +
+	"\x11provider_metadata\x18\n" +
+	" \x01(\v2\x17.google.protobuf.StructR\x10providerMetadata\"\x9e\x01\n" +
+	"\x11ListModelsRequest\x12 \n" +
+	"\tpage_size\x18\x01 \x01(\x05H\x00R\bpageSize\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"dimensions\x18\x02 \x01(\rR\n" +
-	"dimensions\x127\n" +
-	"\x06inputs\x18\x03 \x03(\v2\x1f.dtkt.ai.v1beta1.EmbeddingInputR\x06inputs\"X\n" +
+	"page_token\x18\x02 \x01(\tH\x01R\tpageToken\x88\x01\x01\x12\x1b\n" +
+	"\x06filter\x18\x03 \x01(\tH\x02R\x06filter\x88\x01\x01B\f\n" +
+	"\n" +
+	"_page_sizeB\r\n" +
+	"\v_page_tokenB\t\n" +
+	"\a_filter\"l\n" +
+	"\x12ListModelsResponse\x12.\n" +
+	"\x06models\x18\x01 \x03(\v2\x16.dtkt.ai.v1beta1.ModelR\x06models\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"!\n" +
+	"\x0fGetModelRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"@\n" +
+	"\x10GetModelResponse\x12,\n" +
+	"\x05model\x18\x01 \x01(\v2\x16.dtkt.ai.v1beta1.ModelR\x05model\"<\n" +
+	"\x0eEmbeddingInput\x12\x1a\n" +
+	"\x04text\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04text\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"\xc9\x01\n" +
+	"\x0fEmbeddingOutput\x12=\n" +
+	"\x05input\x18\x01 \x01(\v2\x1f.dtkt.ai.v1beta1.EmbeddingInputB\x06\xbaH\x03\xc8\x01\x01R\x05input\x12*\n" +
+	"\x05error\x18\x02 \x01(\v2\x12.google.rpc.StatusH\x00R\x05error\x12:\n" +
+	"\tembedding\x18\x03 \x01(\v2\x1a.dtkt.ai.v1beta1.EmbeddingH\x00R\tembeddingB\x0f\n" +
+	"\x06result\x12\x05\xbaH\x02\b\x01\"\xd1\x02\n" +
+	"\x19GenerateEmbeddingsRequest\x12\xc1\x01\n" +
+	"\x05model\x18\x01 \x01(\tB\xaa\x01\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x9f\x01\n" +
+	"\x19Select an embedding model:\x81\x01\n" +
+	"'dtkt.ai.v1beta1.ModelService.ListModels\x12\x06models\x1a\tthis.name\"\athis.id*:'EMBEDDING' in this.capabilities.map(c, enumName(c, true))R\x05model\x12*\n" +
+	"\n" +
+	"dimensions\x18\x02 \x01(\rB\n" +
+	"\xbaH\a\xc8\x01\x01*\x02 \x00R\n" +
+	"dimensions\x12D\n" +
+	"\x06inputs\x18\x03 \x03(\v2\x1f.dtkt.ai.v1beta1.EmbeddingInputB\v\xbaH\b\xc8\x01\x01\x92\x01\x02\b\x01R\x06inputs\"X\n" +
 	"\x1aGenerateEmbeddingsResponse\x12:\n" +
-	"\aoutputs\x18\x01 \x03(\v2 .dtkt.ai.v1beta1.EmbeddingOutputR\aoutputs\"\x9a\x01\n" +
-	"\x04Blob\x12\\\n" +
+	"\aoutputs\x18\x01 \x03(\v2 .dtkt.ai.v1beta1.EmbeddingOutputR\aoutputs\"#\n" +
+	"\tEmbedding\x12\x16\n" +
+	"\x06values\x18\x01 \x03(\x01R\x06values\"\xee\x01\n" +
+	"\x04Blob\x12\xaf\x01\n" +
 	"\n" +
-	"media_type\x18\x01 \x01(\tB=\xbaH:r826^[a-zA-Z0-9]+/[a-zA-Z0-9.+-]+( ?;[a-zA-Z0-9.+-]+=.+)*$R\tmediaType\x12\x12\n" +
+	"media_type\x18\x01 \x01(\tB\x8f\x01\xbaH\x8b\x01r\x88\x01\x10\x03\x18\xff\x012\x80\x01^[a-zA-Z0-9!#$%^&\\-_+{}|'.~]+/[a-zA-Z0-9!#$%^&\\-_+{}|'.~]+(?:\\s*;\\s*[a-zA-Z0-9!#$%^&\\-_+{}|'.~]+=[a-zA-Z0-9!#$%^&\\-_+{}|'.~]+)*$R\tmediaType\x12\x12\n" +
 	"\x04data\x18\x02 \x01(\fR\x04data\x12\x17\n" +
 	"\x04name\x18\x03 \x01(\tH\x00R\x04name\x88\x01\x01B\a\n" +
-	"\x05_name\"\x8b\t\n" +
-	"\aMessage\x12B\n" +
+	"\x05_name\"\xc4\x01\n" +
+	"\x04Tool\x12\x1a\n" +
+	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12=\n" +
+	"\x05input\x18\x03 \x01(\v2\x1f.dtkt.shared.v1beta1.TypeSchemaB\x06\xbaH\x03\xc8\x01\x01R\x05input\x12?\n" +
+	"\x06output\x18\x04 \x01(\v2\x1f.dtkt.shared.v1beta1.TypeSchemaB\x06\xbaH\x03\xc8\x01\x01R\x06output\"\xfa\x06\n" +
+	"\aMessage\x12\x12\n" +
+	"\x04role\x18\x01 \x01(\tR\x04role\x12\x14\n" +
+	"\x04text\x18\x02 \x01(\tH\x00R\x04text\x12\x1c\n" +
+	"\bthinking\x18\x03 \x01(\tH\x00R\bthinking\x12+\n" +
+	"\x04blob\x18\x04 \x01(\v2\x15.dtkt.ai.v1beta1.BlobH\x00R\x04blob\x129\n" +
+	"\x06source\x18\x05 \x01(\v2\x1f.dtkt.ai.v1beta1.Message.SourceH\x00R\x06source\x12@\n" +
+	"\ttool_call\x18\x06 \x01(\v2!.dtkt.ai.v1beta1.Message.ToolCallH\x00R\btoolCall\x12F\n" +
+	"\vtool_result\x18\a \x01(\v2#.dtkt.ai.v1beta1.Message.ToolResultH\x00R\n" +
+	"toolResult\x12B\n" +
 	"\x10provider_options\x18\n" +
-	" \x01(\v2\x17.google.protobuf.StructR\x0fproviderOptions\x12\x12\n" +
-	"\x04role\x18\x02 \x01(\tR\x04role\x12:\n" +
-	"\acontent\x18\x03 \x03(\v2 .dtkt.ai.v1beta1.Message.ContentR\acontent\x1a\xeb\a\n" +
-	"\aContent\x12B\n" +
-	"\x10provider_options\x18\n" +
-	" \x01(\v2\x17.google.protobuf.StructR\x0fproviderOptions\x12;\n" +
-	"\x04text\x18\x02 \x01(\v2%.dtkt.ai.v1beta1.Message.Content.TextH\x00R\x04text\x12+\n" +
-	"\x04blob\x18\x03 \x01(\v2\x15.dtkt.ai.v1beta1.BlobH\x00R\x04blob\x12A\n" +
-	"\x06source\x18\x04 \x01(\v2'.dtkt.ai.v1beta1.Message.Content.SourceH\x00R\x06source\x12H\n" +
-	"\ttool_call\x18\x05 \x01(\v2).dtkt.ai.v1beta1.Message.Content.ToolCallH\x00R\btoolCall\x12N\n" +
-	"\vtool_result\x18\x06 \x01(\v2+.dtkt.ai.v1beta1.Message.Content.ToolResultH\x00R\n" +
-	"toolResult\x1a\"\n" +
-	"\x04Text\x12\x1a\n" +
-	"\x04text\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04text\x1a'\n" +
-	"\tReasoning\x12\x1a\n" +
-	"\x04text\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04text\x1aQ\n" +
+	" \x01(\v2\x17.google.protobuf.StructR\x0fproviderOptions\x1aQ\n" +
 	"\x06Source\x12\x12\n" +
 	"\x03url\x18\x01 \x01(\tH\x00R\x03url\x12+\n" +
 	"\x04blob\x18\x02 \x01(\v2\x15.dtkt.ai.v1beta1.BlobH\x00R\x04blobB\x06\n" +
-	"\x04type\x1a\xdc\x01\n" +
+	"\x04type\x1a\xa4\x01\n" +
 	"\bToolCall\x12 \n" +
 	"\ftool_call_id\x18\x01 \x01(\tR\n" +
 	"toolCallId\x12\x1b\n" +
-	"\ttool_name\x18\x02 \x01(\tR\btoolName\x12-\n" +
-	"\x04json\x18\x03 \x01(\v2\x17.google.protobuf.StructH\x00R\x04json\x12,\n" +
-	"\x05proto\x18\x04 \x01(\v2\x14.google.protobuf.AnyH\x00R\x05proto\x12+\n" +
-	"\x11provider_executed\x18\x05 \x01(\bR\x10providerExecutedB\a\n" +
-	"\x05input\x1a\xcd\x01\n" +
+	"\ttool_name\x18\x02 \x01(\tR\btoolName\x12+\n" +
+	"\x11provider_executed\x18\x03 \x01(\bR\x10providerExecuted\x12,\n" +
+	"\x05input\x18\x04 \x01(\v2\x16.google.protobuf.ValueR\x05input\x1a\xe4\x01\n" +
 	"\n" +
 	"ToolResult\x12 \n" +
 	"\ftool_call_id\x18\x01 \x01(\tR\n" +
 	"toolCallId\x12\x1b\n" +
-	"\ttool_name\x18\x02 \x01(\tR\btoolName\x12-\n" +
-	"\x04json\x18\x03 \x01(\v2\x17.google.protobuf.StructH\x00R\x04json\x12,\n" +
-	"\x05proto\x18\x04 \x01(\v2\x14.google.protobuf.AnyH\x00R\x05proto\x12\x19\n" +
-	"\bis_error\x18\x05 \x01(\bR\aisErrorB\b\n" +
-	"\x06resultB\x06\n" +
-	"\x04type\"\x8f\x01\n" +
-	"\x13GenerateTextRequest\x124\n" +
-	"\bmessages\x18\x01 \x03(\v2\x18.dtkt.ai.v1beta1.MessageR\bmessages\x12B\n" +
+	"\ttool_name\x18\x02 \x01(\tR\btoolName\x12*\n" +
+	"\x05error\x18\x03 \x01(\v2\x12.google.rpc.StatusH\x00R\x05error\x12,\n" +
+	"\x04json\x18\x04 \x01(\v2\x16.google.protobuf.ValueH\x00R\x04json\x12,\n" +
+	"\x05proto\x18\x05 \x01(\v2\x14.google.protobuf.AnyH\x00R\x05protoB\x0f\n" +
+	"\x06result\x12\x05\xbaH\x02\b\x01B\x10\n" +
+	"\acontent\x12\x05\xbaH\x02\b\x01\"\x93\x03\n" +
+	"\x13GenerateTextRequest\x12\xc6\x01\n" +
+	"\bmodel_id\x18\x01 \x01(\tB\xaa\x01\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x9f\x01\n" +
+	"\x19Select an embedding model:\x81\x01\n" +
+	"'dtkt.ai.v1beta1.ModelService.ListModels\x12\x06models\x1a\tthis.name\"\athis.id*:'EMBEDDING' in this.capabilities.map(c, enumName(c, true))R\amodelId\x12\x1e\n" +
+	"\x06prompt\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06prompt\x12\x16\n" +
+	"\x06system\x18\x03 \x01(\tR\x06system\x127\n" +
+	"\x06format\x18\x04 \x01(\v2\x1f.dtkt.shared.v1beta1.TypeSchemaR\x06format\x12B\n" +
 	"\x10provider_options\x18\n" +
-	" \x01(\v2\x17.google.protobuf.StructR\x0fproviderOptions\"\\\n" +
-	"\x14GenerateTextResponse\x12D\n" +
+	" \x01(\v2\x17.google.protobuf.StructR\x0fproviderOptions\"\x92\x01\n" +
+	"\x14GenerateTextResponse\x124\n" +
+	"\bmessages\x18\x01 \x03(\v2\x18.dtkt.ai.v1beta1.MessageR\bmessages\x12D\n" +
 	"\x11provider_metadata\x18\n" +
 	" \x01(\v2\x17.google.protobuf.StructR\x10providerMetadata\"\x8d\x01\n" +
 	"\x11StreamTextRequest\x124\n" +
@@ -2515,111 +2588,118 @@ func file_dtkt_ai_v1beta1_messages_proto_rawDescGZIP() []byte {
 	return file_dtkt_ai_v1beta1_messages_proto_rawDescData
 }
 
-var file_dtkt_ai_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
+var file_dtkt_ai_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 37)
 var file_dtkt_ai_v1beta1_messages_proto_goTypes = []any{
-	(*EmbeddingModel)(nil),              // 0: dtkt.ai.v1beta1.EmbeddingModel
-	(*EmbeddingInput)(nil),              // 1: dtkt.ai.v1beta1.EmbeddingInput
-	(*EmbeddingOutput)(nil),             // 2: dtkt.ai.v1beta1.EmbeddingOutput
-	(*ListEmbeddingModelsRequest)(nil),  // 3: dtkt.ai.v1beta1.ListEmbeddingModelsRequest
-	(*ListEmbeddingModelsResponse)(nil), // 4: dtkt.ai.v1beta1.ListEmbeddingModelsResponse
-	(*GetEmbeddingModelRequest)(nil),    // 5: dtkt.ai.v1beta1.GetEmbeddingModelRequest
-	(*GetEmbeddingModelResponse)(nil),   // 6: dtkt.ai.v1beta1.GetEmbeddingModelResponse
+	(*Model)(nil),                       // 0: dtkt.ai.v1beta1.Model
+	(*ListModelsRequest)(nil),           // 1: dtkt.ai.v1beta1.ListModelsRequest
+	(*ListModelsResponse)(nil),          // 2: dtkt.ai.v1beta1.ListModelsResponse
+	(*GetModelRequest)(nil),             // 3: dtkt.ai.v1beta1.GetModelRequest
+	(*GetModelResponse)(nil),            // 4: dtkt.ai.v1beta1.GetModelResponse
+	(*EmbeddingInput)(nil),              // 5: dtkt.ai.v1beta1.EmbeddingInput
+	(*EmbeddingOutput)(nil),             // 6: dtkt.ai.v1beta1.EmbeddingOutput
 	(*GenerateEmbeddingsRequest)(nil),   // 7: dtkt.ai.v1beta1.GenerateEmbeddingsRequest
 	(*GenerateEmbeddingsResponse)(nil),  // 8: dtkt.ai.v1beta1.GenerateEmbeddingsResponse
-	(*Blob)(nil),                        // 9: dtkt.ai.v1beta1.Blob
-	(*Message)(nil),                     // 10: dtkt.ai.v1beta1.Message
-	(*GenerateTextRequest)(nil),         // 11: dtkt.ai.v1beta1.GenerateTextRequest
-	(*GenerateTextResponse)(nil),        // 12: dtkt.ai.v1beta1.GenerateTextResponse
-	(*StreamTextRequest)(nil),           // 13: dtkt.ai.v1beta1.StreamTextRequest
-	(*StreamTextResponse)(nil),          // 14: dtkt.ai.v1beta1.StreamTextResponse
-	(*GenerateObjectRequest)(nil),       // 15: dtkt.ai.v1beta1.GenerateObjectRequest
-	(*GenerateObjectResponse)(nil),      // 16: dtkt.ai.v1beta1.GenerateObjectResponse
-	(*StreamObjectsRequest)(nil),        // 17: dtkt.ai.v1beta1.StreamObjectsRequest
-	(*StreamObjectsResponse)(nil),       // 18: dtkt.ai.v1beta1.StreamObjectsResponse
-	(*GenerateImageRequest)(nil),        // 19: dtkt.ai.v1beta1.GenerateImageRequest
-	(*GenerateImageResponse)(nil),       // 20: dtkt.ai.v1beta1.GenerateImageResponse
-	(*GenerateImagesRequest)(nil),       // 21: dtkt.ai.v1beta1.GenerateImagesRequest
-	(*GenerateImagesResponse)(nil),      // 22: dtkt.ai.v1beta1.GenerateImagesResponse
-	(*GenerateBatchImagesRequest)(nil),  // 23: dtkt.ai.v1beta1.GenerateBatchImagesRequest
-	(*GenerateBatchImagesResponse)(nil), // 24: dtkt.ai.v1beta1.GenerateBatchImagesResponse
-	(*TranscribeRequest)(nil),           // 25: dtkt.ai.v1beta1.TranscribeRequest
-	(*TranscribeResponse)(nil),          // 26: dtkt.ai.v1beta1.TranscribeResponse
-	(*GenerateSpeechRequest)(nil),       // 27: dtkt.ai.v1beta1.GenerateSpeechRequest
-	(*GenerateSpeechResponse)(nil),      // 28: dtkt.ai.v1beta1.GenerateSpeechResponse
-	(*StreamSpeechRequest)(nil),         // 29: dtkt.ai.v1beta1.StreamSpeechRequest
-	(*StreamSpeechResponse)(nil),        // 30: dtkt.ai.v1beta1.StreamSpeechResponse
-	(*Message_Content)(nil),             // 31: dtkt.ai.v1beta1.Message.Content
-	(*Message_Content_Text)(nil),        // 32: dtkt.ai.v1beta1.Message.Content.Text
-	(*Message_Content_Reasoning)(nil),   // 33: dtkt.ai.v1beta1.Message.Content.Reasoning
-	(*Message_Content_Source)(nil),      // 34: dtkt.ai.v1beta1.Message.Content.Source
-	(*Message_Content_ToolCall)(nil),    // 35: dtkt.ai.v1beta1.Message.Content.ToolCall
-	(*Message_Content_ToolResult)(nil),  // 36: dtkt.ai.v1beta1.Message.Content.ToolResult
-	(*TranscribeResponse_Segment)(nil),  // 37: dtkt.ai.v1beta1.TranscribeResponse.Segment
+	(*Embedding)(nil),                   // 9: dtkt.ai.v1beta1.Embedding
+	(*Blob)(nil),                        // 10: dtkt.ai.v1beta1.Blob
+	(*Tool)(nil),                        // 11: dtkt.ai.v1beta1.Tool
+	(*Message)(nil),                     // 12: dtkt.ai.v1beta1.Message
+	(*GenerateTextRequest)(nil),         // 13: dtkt.ai.v1beta1.GenerateTextRequest
+	(*GenerateTextResponse)(nil),        // 14: dtkt.ai.v1beta1.GenerateTextResponse
+	(*StreamTextRequest)(nil),           // 15: dtkt.ai.v1beta1.StreamTextRequest
+	(*StreamTextResponse)(nil),          // 16: dtkt.ai.v1beta1.StreamTextResponse
+	(*GenerateObjectRequest)(nil),       // 17: dtkt.ai.v1beta1.GenerateObjectRequest
+	(*GenerateObjectResponse)(nil),      // 18: dtkt.ai.v1beta1.GenerateObjectResponse
+	(*StreamObjectsRequest)(nil),        // 19: dtkt.ai.v1beta1.StreamObjectsRequest
+	(*StreamObjectsResponse)(nil),       // 20: dtkt.ai.v1beta1.StreamObjectsResponse
+	(*GenerateImageRequest)(nil),        // 21: dtkt.ai.v1beta1.GenerateImageRequest
+	(*GenerateImageResponse)(nil),       // 22: dtkt.ai.v1beta1.GenerateImageResponse
+	(*GenerateImagesRequest)(nil),       // 23: dtkt.ai.v1beta1.GenerateImagesRequest
+	(*GenerateImagesResponse)(nil),      // 24: dtkt.ai.v1beta1.GenerateImagesResponse
+	(*GenerateBatchImagesRequest)(nil),  // 25: dtkt.ai.v1beta1.GenerateBatchImagesRequest
+	(*GenerateBatchImagesResponse)(nil), // 26: dtkt.ai.v1beta1.GenerateBatchImagesResponse
+	(*TranscribeRequest)(nil),           // 27: dtkt.ai.v1beta1.TranscribeRequest
+	(*TranscribeResponse)(nil),          // 28: dtkt.ai.v1beta1.TranscribeResponse
+	(*GenerateSpeechRequest)(nil),       // 29: dtkt.ai.v1beta1.GenerateSpeechRequest
+	(*GenerateSpeechResponse)(nil),      // 30: dtkt.ai.v1beta1.GenerateSpeechResponse
+	(*StreamSpeechRequest)(nil),         // 31: dtkt.ai.v1beta1.StreamSpeechRequest
+	(*StreamSpeechResponse)(nil),        // 32: dtkt.ai.v1beta1.StreamSpeechResponse
+	(*Message_Source)(nil),              // 33: dtkt.ai.v1beta1.Message.Source
+	(*Message_ToolCall)(nil),            // 34: dtkt.ai.v1beta1.Message.ToolCall
+	(*Message_ToolResult)(nil),          // 35: dtkt.ai.v1beta1.Message.ToolResult
+	(*TranscribeResponse_Segment)(nil),  // 36: dtkt.ai.v1beta1.TranscribeResponse.Segment
+	(ModelCapability)(0),                // 37: dtkt.ai.v1beta1.ModelCapability
 	(*structpb.Struct)(nil),             // 38: google.protobuf.Struct
-	(*durationpb.Duration)(nil),         // 39: google.protobuf.Duration
-	(*anypb.Any)(nil),                   // 40: google.protobuf.Any
-	(*timestamppb.Timestamp)(nil),       // 41: google.protobuf.Timestamp
+	(*status.Status)(nil),               // 39: google.rpc.Status
+	(*v1beta1.TypeSchema)(nil),          // 40: dtkt.shared.v1beta1.TypeSchema
+	(*durationpb.Duration)(nil),         // 41: google.protobuf.Duration
+	(*structpb.Value)(nil),              // 42: google.protobuf.Value
+	(*anypb.Any)(nil),                   // 43: google.protobuf.Any
+	(*timestamppb.Timestamp)(nil),       // 44: google.protobuf.Timestamp
 }
 var file_dtkt_ai_v1beta1_messages_proto_depIdxs = []int32{
-	1,  // 0: dtkt.ai.v1beta1.EmbeddingOutput.input:type_name -> dtkt.ai.v1beta1.EmbeddingInput
-	0,  // 1: dtkt.ai.v1beta1.ListEmbeddingModelsResponse.models:type_name -> dtkt.ai.v1beta1.EmbeddingModel
-	0,  // 2: dtkt.ai.v1beta1.GetEmbeddingModelResponse.model:type_name -> dtkt.ai.v1beta1.EmbeddingModel
-	1,  // 3: dtkt.ai.v1beta1.GenerateEmbeddingsRequest.inputs:type_name -> dtkt.ai.v1beta1.EmbeddingInput
-	2,  // 4: dtkt.ai.v1beta1.GenerateEmbeddingsResponse.outputs:type_name -> dtkt.ai.v1beta1.EmbeddingOutput
-	38, // 5: dtkt.ai.v1beta1.Message.provider_options:type_name -> google.protobuf.Struct
-	31, // 6: dtkt.ai.v1beta1.Message.content:type_name -> dtkt.ai.v1beta1.Message.Content
-	10, // 7: dtkt.ai.v1beta1.GenerateTextRequest.messages:type_name -> dtkt.ai.v1beta1.Message
-	38, // 8: dtkt.ai.v1beta1.GenerateTextRequest.provider_options:type_name -> google.protobuf.Struct
-	38, // 9: dtkt.ai.v1beta1.GenerateTextResponse.provider_metadata:type_name -> google.protobuf.Struct
-	10, // 10: dtkt.ai.v1beta1.StreamTextRequest.messages:type_name -> dtkt.ai.v1beta1.Message
-	38, // 11: dtkt.ai.v1beta1.StreamTextRequest.provider_options:type_name -> google.protobuf.Struct
-	38, // 12: dtkt.ai.v1beta1.StreamTextResponse.provider_metadata:type_name -> google.protobuf.Struct
-	10, // 13: dtkt.ai.v1beta1.GenerateObjectRequest.messages:type_name -> dtkt.ai.v1beta1.Message
-	38, // 14: dtkt.ai.v1beta1.GenerateObjectRequest.provider_options:type_name -> google.protobuf.Struct
-	38, // 15: dtkt.ai.v1beta1.GenerateObjectResponse.provider_metadata:type_name -> google.protobuf.Struct
-	10, // 16: dtkt.ai.v1beta1.StreamObjectsRequest.messages:type_name -> dtkt.ai.v1beta1.Message
-	38, // 17: dtkt.ai.v1beta1.StreamObjectsRequest.provider_options:type_name -> google.protobuf.Struct
-	38, // 18: dtkt.ai.v1beta1.StreamObjectsResponse.provider_metadata:type_name -> google.protobuf.Struct
-	10, // 19: dtkt.ai.v1beta1.GenerateImageRequest.messages:type_name -> dtkt.ai.v1beta1.Message
-	38, // 20: dtkt.ai.v1beta1.GenerateImageRequest.provider_options:type_name -> google.protobuf.Struct
-	38, // 21: dtkt.ai.v1beta1.GenerateImageResponse.provider_metadata:type_name -> google.protobuf.Struct
-	10, // 22: dtkt.ai.v1beta1.GenerateImagesRequest.messages:type_name -> dtkt.ai.v1beta1.Message
-	38, // 23: dtkt.ai.v1beta1.GenerateImagesRequest.provider_options:type_name -> google.protobuf.Struct
-	38, // 24: dtkt.ai.v1beta1.GenerateImagesResponse.provider_metadata:type_name -> google.protobuf.Struct
-	10, // 25: dtkt.ai.v1beta1.GenerateBatchImagesRequest.messages:type_name -> dtkt.ai.v1beta1.Message
-	38, // 26: dtkt.ai.v1beta1.GenerateBatchImagesRequest.provider_options:type_name -> google.protobuf.Struct
-	38, // 27: dtkt.ai.v1beta1.GenerateBatchImagesResponse.provider_metadata:type_name -> google.protobuf.Struct
-	9,  // 28: dtkt.ai.v1beta1.TranscribeRequest.audio:type_name -> dtkt.ai.v1beta1.Blob
-	38, // 29: dtkt.ai.v1beta1.TranscribeRequest.provider_options:type_name -> google.protobuf.Struct
-	37, // 30: dtkt.ai.v1beta1.TranscribeResponse.segments:type_name -> dtkt.ai.v1beta1.TranscribeResponse.Segment
-	39, // 31: dtkt.ai.v1beta1.TranscribeResponse.duration:type_name -> google.protobuf.Duration
-	38, // 32: dtkt.ai.v1beta1.TranscribeResponse.provider_metadata:type_name -> google.protobuf.Struct
-	10, // 33: dtkt.ai.v1beta1.GenerateSpeechRequest.messages:type_name -> dtkt.ai.v1beta1.Message
-	38, // 34: dtkt.ai.v1beta1.GenerateSpeechRequest.provider_options:type_name -> google.protobuf.Struct
-	9,  // 35: dtkt.ai.v1beta1.GenerateSpeechResponse.audio:type_name -> dtkt.ai.v1beta1.Blob
-	38, // 36: dtkt.ai.v1beta1.GenerateSpeechResponse.provider_metadata:type_name -> google.protobuf.Struct
-	10, // 37: dtkt.ai.v1beta1.StreamSpeechRequest.messages:type_name -> dtkt.ai.v1beta1.Message
-	38, // 38: dtkt.ai.v1beta1.StreamSpeechRequest.provider_options:type_name -> google.protobuf.Struct
-	9,  // 39: dtkt.ai.v1beta1.StreamSpeechResponse.audio:type_name -> dtkt.ai.v1beta1.Blob
-	38, // 40: dtkt.ai.v1beta1.StreamSpeechResponse.provider_metadata:type_name -> google.protobuf.Struct
-	38, // 41: dtkt.ai.v1beta1.Message.Content.provider_options:type_name -> google.protobuf.Struct
-	32, // 42: dtkt.ai.v1beta1.Message.Content.text:type_name -> dtkt.ai.v1beta1.Message.Content.Text
-	9,  // 43: dtkt.ai.v1beta1.Message.Content.blob:type_name -> dtkt.ai.v1beta1.Blob
-	34, // 44: dtkt.ai.v1beta1.Message.Content.source:type_name -> dtkt.ai.v1beta1.Message.Content.Source
-	35, // 45: dtkt.ai.v1beta1.Message.Content.tool_call:type_name -> dtkt.ai.v1beta1.Message.Content.ToolCall
-	36, // 46: dtkt.ai.v1beta1.Message.Content.tool_result:type_name -> dtkt.ai.v1beta1.Message.Content.ToolResult
-	9,  // 47: dtkt.ai.v1beta1.Message.Content.Source.blob:type_name -> dtkt.ai.v1beta1.Blob
-	38, // 48: dtkt.ai.v1beta1.Message.Content.ToolCall.json:type_name -> google.protobuf.Struct
-	40, // 49: dtkt.ai.v1beta1.Message.Content.ToolCall.proto:type_name -> google.protobuf.Any
-	38, // 50: dtkt.ai.v1beta1.Message.Content.ToolResult.json:type_name -> google.protobuf.Struct
-	40, // 51: dtkt.ai.v1beta1.Message.Content.ToolResult.proto:type_name -> google.protobuf.Any
-	41, // 52: dtkt.ai.v1beta1.TranscribeResponse.Segment.start_time:type_name -> google.protobuf.Timestamp
-	41, // 53: dtkt.ai.v1beta1.TranscribeResponse.Segment.end_time:type_name -> google.protobuf.Timestamp
-	54, // [54:54] is the sub-list for method output_type
-	54, // [54:54] is the sub-list for method input_type
-	54, // [54:54] is the sub-list for extension type_name
-	54, // [54:54] is the sub-list for extension extendee
-	0,  // [0:54] is the sub-list for field type_name
+	37, // 0: dtkt.ai.v1beta1.Model.capabilities:type_name -> dtkt.ai.v1beta1.ModelCapability
+	38, // 1: dtkt.ai.v1beta1.Model.provider_metadata:type_name -> google.protobuf.Struct
+	0,  // 2: dtkt.ai.v1beta1.ListModelsResponse.models:type_name -> dtkt.ai.v1beta1.Model
+	0,  // 3: dtkt.ai.v1beta1.GetModelResponse.model:type_name -> dtkt.ai.v1beta1.Model
+	5,  // 4: dtkt.ai.v1beta1.EmbeddingOutput.input:type_name -> dtkt.ai.v1beta1.EmbeddingInput
+	39, // 5: dtkt.ai.v1beta1.EmbeddingOutput.error:type_name -> google.rpc.Status
+	9,  // 6: dtkt.ai.v1beta1.EmbeddingOutput.embedding:type_name -> dtkt.ai.v1beta1.Embedding
+	5,  // 7: dtkt.ai.v1beta1.GenerateEmbeddingsRequest.inputs:type_name -> dtkt.ai.v1beta1.EmbeddingInput
+	6,  // 8: dtkt.ai.v1beta1.GenerateEmbeddingsResponse.outputs:type_name -> dtkt.ai.v1beta1.EmbeddingOutput
+	40, // 9: dtkt.ai.v1beta1.Tool.input:type_name -> dtkt.shared.v1beta1.TypeSchema
+	40, // 10: dtkt.ai.v1beta1.Tool.output:type_name -> dtkt.shared.v1beta1.TypeSchema
+	10, // 11: dtkt.ai.v1beta1.Message.blob:type_name -> dtkt.ai.v1beta1.Blob
+	33, // 12: dtkt.ai.v1beta1.Message.source:type_name -> dtkt.ai.v1beta1.Message.Source
+	34, // 13: dtkt.ai.v1beta1.Message.tool_call:type_name -> dtkt.ai.v1beta1.Message.ToolCall
+	35, // 14: dtkt.ai.v1beta1.Message.tool_result:type_name -> dtkt.ai.v1beta1.Message.ToolResult
+	38, // 15: dtkt.ai.v1beta1.Message.provider_options:type_name -> google.protobuf.Struct
+	40, // 16: dtkt.ai.v1beta1.GenerateTextRequest.format:type_name -> dtkt.shared.v1beta1.TypeSchema
+	38, // 17: dtkt.ai.v1beta1.GenerateTextRequest.provider_options:type_name -> google.protobuf.Struct
+	12, // 18: dtkt.ai.v1beta1.GenerateTextResponse.messages:type_name -> dtkt.ai.v1beta1.Message
+	38, // 19: dtkt.ai.v1beta1.GenerateTextResponse.provider_metadata:type_name -> google.protobuf.Struct
+	12, // 20: dtkt.ai.v1beta1.StreamTextRequest.messages:type_name -> dtkt.ai.v1beta1.Message
+	38, // 21: dtkt.ai.v1beta1.StreamTextRequest.provider_options:type_name -> google.protobuf.Struct
+	38, // 22: dtkt.ai.v1beta1.StreamTextResponse.provider_metadata:type_name -> google.protobuf.Struct
+	12, // 23: dtkt.ai.v1beta1.GenerateObjectRequest.messages:type_name -> dtkt.ai.v1beta1.Message
+	38, // 24: dtkt.ai.v1beta1.GenerateObjectRequest.provider_options:type_name -> google.protobuf.Struct
+	38, // 25: dtkt.ai.v1beta1.GenerateObjectResponse.provider_metadata:type_name -> google.protobuf.Struct
+	12, // 26: dtkt.ai.v1beta1.StreamObjectsRequest.messages:type_name -> dtkt.ai.v1beta1.Message
+	38, // 27: dtkt.ai.v1beta1.StreamObjectsRequest.provider_options:type_name -> google.protobuf.Struct
+	38, // 28: dtkt.ai.v1beta1.StreamObjectsResponse.provider_metadata:type_name -> google.protobuf.Struct
+	12, // 29: dtkt.ai.v1beta1.GenerateImageRequest.messages:type_name -> dtkt.ai.v1beta1.Message
+	38, // 30: dtkt.ai.v1beta1.GenerateImageRequest.provider_options:type_name -> google.protobuf.Struct
+	38, // 31: dtkt.ai.v1beta1.GenerateImageResponse.provider_metadata:type_name -> google.protobuf.Struct
+	12, // 32: dtkt.ai.v1beta1.GenerateImagesRequest.messages:type_name -> dtkt.ai.v1beta1.Message
+	38, // 33: dtkt.ai.v1beta1.GenerateImagesRequest.provider_options:type_name -> google.protobuf.Struct
+	38, // 34: dtkt.ai.v1beta1.GenerateImagesResponse.provider_metadata:type_name -> google.protobuf.Struct
+	12, // 35: dtkt.ai.v1beta1.GenerateBatchImagesRequest.messages:type_name -> dtkt.ai.v1beta1.Message
+	38, // 36: dtkt.ai.v1beta1.GenerateBatchImagesRequest.provider_options:type_name -> google.protobuf.Struct
+	38, // 37: dtkt.ai.v1beta1.GenerateBatchImagesResponse.provider_metadata:type_name -> google.protobuf.Struct
+	10, // 38: dtkt.ai.v1beta1.TranscribeRequest.audio:type_name -> dtkt.ai.v1beta1.Blob
+	38, // 39: dtkt.ai.v1beta1.TranscribeRequest.provider_options:type_name -> google.protobuf.Struct
+	36, // 40: dtkt.ai.v1beta1.TranscribeResponse.segments:type_name -> dtkt.ai.v1beta1.TranscribeResponse.Segment
+	41, // 41: dtkt.ai.v1beta1.TranscribeResponse.duration:type_name -> google.protobuf.Duration
+	38, // 42: dtkt.ai.v1beta1.TranscribeResponse.provider_metadata:type_name -> google.protobuf.Struct
+	12, // 43: dtkt.ai.v1beta1.GenerateSpeechRequest.messages:type_name -> dtkt.ai.v1beta1.Message
+	38, // 44: dtkt.ai.v1beta1.GenerateSpeechRequest.provider_options:type_name -> google.protobuf.Struct
+	10, // 45: dtkt.ai.v1beta1.GenerateSpeechResponse.audio:type_name -> dtkt.ai.v1beta1.Blob
+	38, // 46: dtkt.ai.v1beta1.GenerateSpeechResponse.provider_metadata:type_name -> google.protobuf.Struct
+	12, // 47: dtkt.ai.v1beta1.StreamSpeechRequest.messages:type_name -> dtkt.ai.v1beta1.Message
+	38, // 48: dtkt.ai.v1beta1.StreamSpeechRequest.provider_options:type_name -> google.protobuf.Struct
+	10, // 49: dtkt.ai.v1beta1.StreamSpeechResponse.audio:type_name -> dtkt.ai.v1beta1.Blob
+	38, // 50: dtkt.ai.v1beta1.StreamSpeechResponse.provider_metadata:type_name -> google.protobuf.Struct
+	10, // 51: dtkt.ai.v1beta1.Message.Source.blob:type_name -> dtkt.ai.v1beta1.Blob
+	42, // 52: dtkt.ai.v1beta1.Message.ToolCall.input:type_name -> google.protobuf.Value
+	39, // 53: dtkt.ai.v1beta1.Message.ToolResult.error:type_name -> google.rpc.Status
+	42, // 54: dtkt.ai.v1beta1.Message.ToolResult.json:type_name -> google.protobuf.Value
+	43, // 55: dtkt.ai.v1beta1.Message.ToolResult.proto:type_name -> google.protobuf.Any
+	44, // 56: dtkt.ai.v1beta1.TranscribeResponse.Segment.start_time:type_name -> google.protobuf.Timestamp
+	44, // 57: dtkt.ai.v1beta1.TranscribeResponse.Segment.end_time:type_name -> google.protobuf.Timestamp
+	58, // [58:58] is the sub-list for method output_type
+	58, // [58:58] is the sub-list for method input_type
+	58, // [58:58] is the sub-list for extension type_name
+	58, // [58:58] is the sub-list for extension extendee
+	0,  // [0:58] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_ai_v1beta1_messages_proto_init() }
@@ -2627,27 +2707,31 @@ func file_dtkt_ai_v1beta1_messages_proto_init() {
 	if File_dtkt_ai_v1beta1_messages_proto != nil {
 		return
 	}
-	file_dtkt_ai_v1beta1_messages_proto_msgTypes[9].OneofWrappers = []any{}
-	file_dtkt_ai_v1beta1_messages_proto_msgTypes[27].OneofWrappers = []any{}
-	file_dtkt_ai_v1beta1_messages_proto_msgTypes[29].OneofWrappers = []any{}
-	file_dtkt_ai_v1beta1_messages_proto_msgTypes[31].OneofWrappers = []any{
-		(*Message_Content_Text_)(nil),
-		(*Message_Content_Blob)(nil),
-		(*Message_Content_Source_)(nil),
-		(*Message_Content_ToolCall_)(nil),
-		(*Message_Content_ToolResult_)(nil),
+	file_dtkt_ai_v1beta1_enums_proto_init()
+	file_dtkt_ai_v1beta1_messages_proto_msgTypes[1].OneofWrappers = []any{}
+	file_dtkt_ai_v1beta1_messages_proto_msgTypes[6].OneofWrappers = []any{
+		(*EmbeddingOutput_Error)(nil),
+		(*EmbeddingOutput_Embedding)(nil),
 	}
-	file_dtkt_ai_v1beta1_messages_proto_msgTypes[34].OneofWrappers = []any{
-		(*Message_Content_Source_Url)(nil),
-		(*Message_Content_Source_Blob)(nil),
+	file_dtkt_ai_v1beta1_messages_proto_msgTypes[10].OneofWrappers = []any{}
+	file_dtkt_ai_v1beta1_messages_proto_msgTypes[12].OneofWrappers = []any{
+		(*Message_Text)(nil),
+		(*Message_Thinking)(nil),
+		(*Message_Blob)(nil),
+		(*Message_Source_)(nil),
+		(*Message_ToolCall_)(nil),
+		(*Message_ToolResult_)(nil),
+	}
+	file_dtkt_ai_v1beta1_messages_proto_msgTypes[29].OneofWrappers = []any{}
+	file_dtkt_ai_v1beta1_messages_proto_msgTypes[31].OneofWrappers = []any{}
+	file_dtkt_ai_v1beta1_messages_proto_msgTypes[33].OneofWrappers = []any{
+		(*Message_Source_Url)(nil),
+		(*Message_Source_Blob)(nil),
 	}
 	file_dtkt_ai_v1beta1_messages_proto_msgTypes[35].OneofWrappers = []any{
-		(*Message_Content_ToolCall_Json)(nil),
-		(*Message_Content_ToolCall_Proto)(nil),
-	}
-	file_dtkt_ai_v1beta1_messages_proto_msgTypes[36].OneofWrappers = []any{
-		(*Message_Content_ToolResult_Json)(nil),
-		(*Message_Content_ToolResult_Proto)(nil),
+		(*Message_ToolResult_Error)(nil),
+		(*Message_ToolResult_Json)(nil),
+		(*Message_ToolResult_Proto)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -2655,7 +2739,7 @@ func file_dtkt_ai_v1beta1_messages_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_ai_v1beta1_messages_proto_rawDesc), len(file_dtkt_ai_v1beta1_messages_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   38,
+			NumMessages:   37,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

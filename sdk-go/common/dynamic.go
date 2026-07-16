@@ -9,10 +9,10 @@ import (
 
 type (
 	DynamicClient interface {
-		CallUnary(ctx context.Context, methodName protoreflect.FullName, req proto.Message) (proto.Message, error)
-		CallBidiStream(ctx context.Context, methodName protoreflect.FullName) (DynamicBidiStream, error)
-		CallClientStream(ctx context.Context, methodName protoreflect.FullName) (DynamicClientStream, error)
-		CallServerStream(ctx context.Context, methodName protoreflect.FullName, req proto.Message) (DynamicServerStream, error)
+		CallUnary(context.Context, protoreflect.FullName, proto.Message) (proto.Message, error)
+		CallBidiStream(context.Context, protoreflect.FullName) (DynamicBidiStream, error)
+		CallClientStream(context.Context, protoreflect.FullName) (DynamicClientStream, error)
+		CallServerStream(context.Context, protoreflect.FullName, proto.Message) (DynamicServerStream, error)
 	}
 	DynamicBidiStream interface {
 		Context() context.Context

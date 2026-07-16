@@ -525,7 +525,7 @@ type Stream struct {
 	// Stream stops when expression evaluates to true; optional.
 	StopWhen      *string            `protobuf:"bytes,3,opt,name=stop_when,json=stopWhen,proto3,oneof" json:"stop_when,omitempty"`
 	Call          *Stream_MethodCall `protobuf:"bytes,4,opt,name=call,proto3" json:"call,omitempty"`
-	Generate      *Stream_Generator  `protobuf:"bytes,5,opt,name=generate,proto3" json:"generate,omitempty"`
+	Generate      *Stream_Generator  `protobuf:"bytes,5,opt,name=generate,proto3" json:"generate,omitempty"` // Reducer reduce = 6;
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -645,9 +645,9 @@ type Var struct {
 	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// When true var always returns its first non-null memoized value.
 	Cache *bool `protobuf:"varint,2,opt,name=cache,proto3,oneof" json:"cache,omitempty"`
-	// Var evaluates to given expression value.
+	// Var evaluates given expression.
 	Value string `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
-	// Var evaluates to switch statements first matching case (otherwise default).
+	// Var evaluates to given switch statement's first matching case (otherwise default).
 	Switch        *Var_Switch `protobuf:"bytes,4,opt,name=switch,proto3" json:"switch,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -712,9 +712,10 @@ func (x *Var) GetSwitch() *Var_Switch {
 }
 
 type Output struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Value         string                 `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Output evaluates given expression.
+	Value         string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

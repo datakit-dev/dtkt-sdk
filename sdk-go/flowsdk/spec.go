@@ -3,262 +3,272 @@ package flowsdk
 import (
 	"fmt"
 	"io"
+	"maps"
 	"strings"
 
-	"buf.build/go/protovalidate"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/api"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta1/runtime"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta1/spec"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk/v1beta1"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/lib/protoschema"
+	corev1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
-	sharedv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
-	"github.com/invopop/jsonschema"
+
+	"github.com/google/jsonschema-go/jsonschema"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 const (
-	SpecAPIVersion     = api.V1Beta1
-	SpecKind           = "Flow"
-	SpecSchemaID       = "dtkt.flowsdk.v1beta1.Flow"
+	SpecSchemaID       = "dtkt.core.v1.FlowSpec"
 	SpecSchemaFilename = SpecSchemaID + v1beta1.JSONSchemaFileExt
+
+	exprSchemaId = "CELExpr"
 )
 
-type (
-	Spec struct {
-		flow *flowv1beta1.Flow
-		raw  []byte
-		opts SpecOptions
+var (
+	connectionNode *flowv1beta1.Connection
+	actionNode     *flowv1beta1.Action
+	actionCallNode *flowv1beta1.Action_MethodCall
+	streamNode     *flowv1beta1.Stream
+	streamCallNode *flowv1beta1.Stream_MethodCall
+	exprSchemaRef  = jsonschema.Schema{
+		Ref: "#/$defs/" + exprSchemaId,
 	}
-	SpecOptions struct {
-		Resolver shared.Resolver
-		Syncer   v1beta1.TypeSyncer
+	exprSchema = &jsonschema.Schema{
+		Description: "CEL expression.",
+		Type:        "string",
+		Pattern:     "^\\s?=\\s?",
 	}
 )
 
-func SpecLoader(opts ...api.SpecLoaderOpt[*Spec]) *api.SpecLoader[*Spec] {
-	spec := &Spec{
-		opts: SpecOptions{
-			Resolver: api.V1Beta1,
-			Syncer:   v1beta1.DefaultTypeSyncer(),
-		},
-	}
+type SpecOptions struct {
+	Resolver shared.Resolver
+	Syncer   v1beta1.TypeSyncer
 
-	registry := v1beta1.DefaultTypeRegistry()
-	opts = append([]api.SpecLoaderOpt[*Spec]{
-		api.WithSchemaOpts[*Spec](
-			common.WithSchemaCompiler(registry.Compiler()),
-			common.WithSchemaID(registry.BaseUri().JoinPath(SpecSchemaFilename).String()),
-			common.WithJSONSchemaCallback(spec.opts.ExtendSchema),
-		),
-	}, opts...)
-	return api.NewLoader(spec, opts...)
+	schemaCache map[string]*jsonschema.Schema
 }
 
-func NewSpecWithFlow(flow *flowv1beta1.Flow) *Spec {
-	return &Spec{
-		flow: flow,
-	}
+func SpecLoader(opts ...common.JSONSchemaOption) *api.SpecLoader[*corev1.FlowSpec] {
+	return api.NewSpecLoader[*corev1.FlowSpec](opts...)
 }
 
-func ReadSpec(format encoding.Format, reader io.Reader) (*Spec, error) {
-	raw, err := io.ReadAll(reader)
+func ReadSpec(reader io.Reader, format encoding.Format, opts ...common.JSONSchemaOption) (*corev1.FlowSpec, error) {
+	data, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read: %w", err)
 	}
 
-	spec, err := SpecLoader().Decode(format, raw)
+	return SpecLoader(opts...).Decode(data, format)
+}
+
+func WriteSpec(writer io.Writer, format encoding.Format, spec *corev1.FlowSpec, opts ...common.JSONSchemaOption) error {
+	b, err := SpecLoader(opts...).Encode(spec, format)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode: %w", err)
-	}
-
-	spec.raw = raw
-
-	return spec, nil
-}
-
-func WriteSpec(spec *Spec, format encoding.Format, writer io.Writer) (int, error) {
-	b, err := SpecLoader().Encode(format, spec)
-	if err != nil {
-		return 0, err
-	}
-	spec.raw = b
-	return writer.Write(b)
-}
-
-func (s *Spec) GetFlow() *flowv1beta1.Flow {
-	return s.flow
-}
-
-func (s *Spec) GetRaw() []byte {
-	return s.raw
-}
-
-func (*Spec) SpecKind() string {
-	return SpecKind
-}
-
-func (*Spec) SpecID() string {
-	return SpecSchemaID
-}
-
-func (*Spec) APIVersion() api.Version {
-	return SpecAPIVersion
-}
-
-func (s *Spec) Validate() error {
-	if s == nil {
-		return fmt.Errorf("invalid spec: failed to load")
-	} else if s.flow == nil {
-		return fmt.Errorf("invalid spec: missing flow")
-	}
-	return protovalidate.Validate(s.flow)
-}
-
-func (s *Spec) ParseGraph() (*flowv1beta1.Graph, error) {
-	graph, err := runtime.GraphFromSpec(s.flow)
-	if err != nil {
-		return nil, err
-	}
-	return graph.Proto(), nil
-}
-
-func (s Spec) MarshalJSON() ([]byte, error) {
-	return encoding.ToJSONV2(s.flow)
-}
-
-func (s *Spec) UnmarshalJSON(data []byte) error {
-	flow := new(flowv1beta1.Flow)
-	if err := encoding.FromJSONV2(data, flow); err != nil {
 		return err
 	}
 
-	*s = Spec{
-		flow: flow,
+	_, err = writer.Write(b)
+
+	return err
+}
+
+func (o *SpecOptions) ExtendSchema(schema *jsonschema.Schema, opts *jsonschema.ResolveOptions) error {
+	if o.schemaCache == nil {
+		o.schemaCache = map[string]*jsonschema.Schema{}
+	}
+
+	if schema.Defs == nil {
+		schema.Defs = map[string]*jsonschema.Schema{}
+	}
+
+	schema.Defs[exprSchemaId] = exprSchema
+
+	if o.Resolver != nil {
+		var (
+			nodeTypes = []string{
+				string(connectionNode.ProtoReflect().Descriptor().FullName()),
+				string(actionCallNode.ProtoReflect().Descriptor().FullName()),
+				string(streamCallNode.ProtoReflect().Descriptor().FullName()),
+			}
+		)
+
+		for _, nodeType := range nodeTypes {
+			schemaId := nodeType + v1beta1.JSONSchemaFileExt
+			if nodeSchema, ok := schema.Defs[schemaId]; ok {
+				nodeDefs := o.extendNodeSchema(nodeType, nodeSchema, opts)
+
+				maps.Copy(schema.Defs, o.schemaCache)
+				maps.DeleteFunc(nodeDefs, func(id string, schema *jsonschema.Schema) bool {
+					_, exists := schema.Defs[id]
+					schema.ID = ""
+					schema.Schema = ""
+					return exists
+				})
+				maps.Copy(schema.Defs, nodeDefs)
+			}
+		}
 	}
 
 	return nil
 }
 
-func (Spec) Filename() string {
-	return SpecSchemaFilename
+func (o *SpecOptions) extendNodeSchema(nodeType string, nodeSchema *jsonschema.Schema, opts *jsonschema.ResolveOptions) (defs map[string]*jsonschema.Schema) {
+	if o.Resolver != nil {
+		switch nodeType {
+		case string(connectionNode.ProtoReflect().Descriptor().FullName()):
+			if services, ok := nodeSchema.Properties["services"]; ok && services.Items != nil {
+				services.Items.Enum = util.AnySlice(spec.ValidConnectionServices(o.Resolver))
+			}
+		case string(actionCallNode.ProtoReflect().Descriptor().FullName()):
+			return o.extendCallNodeSchema(actionNode, nodeSchema, opts)
+		case string(streamCallNode.ProtoReflect().Descriptor().FullName()):
+			return o.extendCallNodeSchema(streamNode, nodeSchema, opts)
+		}
+	}
+	return
 }
 
-func (o SpecOptions) ExtendSchema(schema *jsonschema.Schema) error {
-	var (
-		nodeSchemas = map[string]*jsonschema.Schema{}
-		typeNodes   = map[string]shared.SpecNode{
-			spec.GetIDPrefix((*flowv1beta1.Connection)(nil)): (*flowv1beta1.Connection)(nil),
-			spec.GetIDPrefix((*flowv1beta1.Action)(nil)):     (*flowv1beta1.Action)(nil),
-			spec.GetIDPrefix((*flowv1beta1.Stream)(nil)):     (*flowv1beta1.Stream)(nil),
+func (o *SpecOptions) extendCallNodeSchema(node shared.SpecNode, schema *jsonschema.Schema, opts *jsonschema.ResolveOptions) (defs map[string]*jsonschema.Schema) {
+	if o.Resolver == nil || len(schema.Properties) == 0 {
+		return
+	}
+
+	defs = map[string]*jsonschema.Schema{}
+	spec.RangeCallNodeMethods(o.Resolver, node, func(md protoreflect.MethodDescriptor) bool {
+		resolved, err := protoschema.ResolvedJSONSchemaWithOptions(md.Input(), opts)
+		if err != nil {
+			return true
 		}
+
+		reqName := string(md.Input().FullName())
+		reqId := reqName + v1beta1.JSONSchemaFileExt
+		reqSchema := o.extendMessageSchema(resolved.Schema().CloneSchemas())
+
+		schema.AllOf = append(schema.AllOf, &jsonschema.Schema{
+			If: &jsonschema.Schema{
+				Properties: map[string]*jsonschema.Schema{
+					"method": {
+						Const: new(any(string(md.FullName()))),
+					},
+				},
+				Required: []string{"method"},
+			},
+			Then: &jsonschema.Schema{
+				Properties: map[string]*jsonschema.Schema{
+					"request": {
+						AnyOf: []*jsonschema.Schema{
+							new(exprSchemaRef),
+							{Ref: "#/$defs/" + reqId},
+						},
+					},
+				},
+			},
+		})
+
+		maps.Copy(defs, reqSchema.Defs)
+
+		reqSchema.Defs = nil
+		defs[reqId] = reqSchema
+
+		return true
+	})
+
+	return
+}
+
+func (o *SpecOptions) extendMessageSchema(schema *jsonschema.Schema) *jsonschema.Schema {
+	if len(schema.Properties) > 0 {
+		props := map[string]*jsonschema.Schema{}
+		for fieldName, fieldSchema := range schema.Properties {
+			props[fieldName] = o.extendFieldSchema(fieldSchema)
+		}
+		maps.Copy(schema.Properties, props)
+	}
+	return schema
+}
+
+func (o *SpecOptions) extendFieldSchema(schema *jsonschema.Schema) *jsonschema.Schema {
+	switch {
+	case schema.Ref != "":
+		schema.Ref = "#/$defs/" + o.getRefOrExprId(schema)
+	case schema.Type == "array" && schema.Items != nil:
+		if schema.Items.Ref != "" {
+			schema.Items.Ref = "#/$defs/" + o.getRefOrExprId(schema.Items)
+		} else {
+			schema.Items.AnyOf = append(schema.Items.AnyOf,
+				new(exprSchemaRef),
+				new(*schema.Items),
+			)
+		}
+
+		schema.AnyOf = append(schema.AnyOf,
+			new(exprSchemaRef),
+			&jsonschema.Schema{
+				Type:  schema.Type,
+				Items: schema.Items,
+			},
+		)
+
+		schema.Type = ""
+		schema.Items = nil
+	case schema.Type == "object" && schema.PropertyNames != nil && schema.AdditionalProperties != nil:
+		if schema.AdditionalProperties.Ref != "" {
+			schema.AdditionalProperties.Ref = "#/$defs/" + o.getRefOrExprId(schema.AdditionalProperties)
+		} else {
+			schema.AdditionalProperties.AnyOf = append(schema.AdditionalProperties.AnyOf,
+				new(exprSchemaRef),
+				new(*schema.AdditionalProperties),
+			)
+		}
+
+		schema.AnyOf = append(schema.AnyOf,
+			new(exprSchemaRef),
+			&jsonschema.Schema{
+				Type:                 schema.Type,
+				PropertyNames:        schema.PropertyNames,
+				AdditionalProperties: schema.AdditionalProperties,
+			},
+		)
+
+		schema.Type = ""
+		schema.PropertyNames = nil
+		schema.AdditionalProperties = nil
+	case len(schema.AnyOf) > 0:
+		schema.AnyOf = append(schema.AnyOf, new(exprSchemaRef))
+	case schema.Type != "":
+		schema.AnyOf = append(schema.AnyOf,
+			new(exprSchemaRef),
+			&jsonschema.Schema{Type: schema.Type},
+		)
+		schema.Type = ""
+	}
+
+	return schema
+}
+
+func (o *SpecOptions) getRefOrExprId(schema *jsonschema.Schema) string {
+	id := "CELExprOr_" + strings.TrimSuffix(
+		strings.TrimPrefix(schema.Ref, "#/$defs/"),
+		v1beta1.JSONSchemaFileExt,
 	)
 
-	if schema.Definitions == nil {
-		schema.Definitions = jsonschema.Definitions{}
+	def, ok := o.schemaCache[id]
+	if !ok {
+		def = newRefOrExprSchema(schema)
+		o.schemaCache[id] = def
 	}
 
-	for prefix, node := range typeNodes {
-		typeName := string(node.ProtoReflect().Descriptor().FullName())
-		typeSchema, err := o.Syncer.GetType(typeName)
-		if err != nil {
-			return fmt.Errorf("failed to load type schema %s: %s", typeName, err)
-		} else {
-			b, err := encoding.ToJSONV2(typeSchema.JsonSchema)
-			if err != nil {
-				return err
-			}
+	return id
+}
 
-			var nodeSchema jsonschema.Schema
-			err = encoding.FromJSONV2(b, &nodeSchema)
-			if err != nil {
-				return err
-			}
-
-			var callTypeSchema *sharedv1beta1.TypeSchema
-			switch node.(type) {
-			case *flowv1beta1.Connection:
-				if services, ok := nodeSchema.Properties.Load("services"); ok && services.Items != nil {
-					services.Items.Enum = util.AnySlice(spec.ValidConnectionServices(o.Resolver))
-				}
-			case *flowv1beta1.Action:
-				callTypeSchema, err = o.Syncer.GetType("dtkt.flow.v1beta1.Action.MethodCall")
-				if err != nil {
-					return fmt.Errorf("failed to load service call schema: %s", err)
-				}
-			case *flowv1beta1.Stream:
-				callTypeSchema, err = o.Syncer.GetType("dtkt.flow.v1beta1.Stream.MethodCall")
-				if err != nil {
-					return fmt.Errorf("failed to load service call schema: %s", err)
-				}
-			}
-
-			if callTypeSchema != nil {
-				b, err := encoding.ToJSONV2(callTypeSchema.JsonSchema)
-				if err != nil {
-					return err
-				}
-
-				var callJsonSchema jsonschema.Schema
-				err = encoding.FromJSONV2(b, &callJsonSchema)
-				if err != nil {
-					return err
-				}
-
-				if callProp, ok := nodeSchema.Properties.Load("call"); ok {
-					if methodProp, ok := callJsonSchema.Properties.Load("method"); ok {
-						methodProp.Enum = util.AnySlice(spec.ValidCallNodeMethods(o.Resolver, node))
-					}
-					schema.Definitions[prefix+".call"] = &callJsonSchema
-					callProp.Ref = "#/$defs/" + prefix + ".call"
-				}
-				callJsonSchema.ID = ""
-				callJsonSchema.Version = ""
-			}
-
-			nodeSchemas[prefix] = &nodeSchema
-		}
+func newRefOrExprSchema(schema *jsonschema.Schema) *jsonschema.Schema {
+	return &jsonschema.Schema{
+		AnyOf: []*jsonschema.Schema{
+			new(exprSchemaRef),
+			{Ref: schema.Ref},
+		},
 	}
-
-	typeSchema, err := o.Syncer.GetType("dtkt.flow.v1beta1.Flow")
-	if err != nil {
-		return fmt.Errorf("failed to load schema: dtkt.flow.v1beta1.Flow")
-	}
-
-	b, err := encoding.ToJSONV2(typeSchema.JsonSchema)
-	if err != nil {
-		return err
-	}
-
-	var specSchema jsonschema.Schema
-	err = encoding.FromJSONV2(b, &specSchema)
-	if err != nil {
-		return err
-	}
-
-	specSchema.ID = ""
-	specSchema.Version = ""
-
-	for prefix, nodeSchema := range nodeSchemas {
-		schema.Definitions[prefix] = nodeSchema
-
-		if base, ok := specSchema.Properties.Load(prefix); ok {
-			if base.Items != nil && strings.HasSuffix(nodeSchema.ID.String(), base.Items.Ref) {
-				base.Items.Ref = "#/$defs/" + prefix
-			} else {
-				return fmt.Errorf("node schema ref missing for prefix: %s", prefix)
-			}
-		} else {
-			return fmt.Errorf("node schema missing for prefix: %s", prefix)
-		}
-
-		nodeSchema.ID = ""
-		nodeSchema.Version = ""
-	}
-
-	schema.Definitions["Spec"] = &specSchema
-
-	return nil
 }

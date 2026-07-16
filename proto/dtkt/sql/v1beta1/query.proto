@@ -1,0 +1,255 @@
+edition = "2023";
+
+package dtkt.sql.v1beta1;
+
+import "buf/validate/validate.proto";
+import "dtkt/sql/v1beta1/column.proto";
+import "google/protobuf/go_features.proto";
+import "google/protobuf/struct.proto";
+
+option features.(pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/sql/v1beta1";
+
+service QueryService {
+  // Returns query engine with dialect, capabilities, and data types.
+  rpc GetQueryEngine(GetQueryEngineRequest) returns (GetQueryEngineResponse);
+
+  // Validates the provided query.
+  rpc ValidateQuery(ValidateQueryRequest) returns (ValidateQueryResponse);
+
+  // Executes a query and retrieves the results.
+  rpc ListQueryResults(ListQueryResultsRequest) returns (ListQueryResultsResponse);
+
+  // Streams results of a query.
+  rpc StreamQueryResults(StreamQueryResultsRequest) returns (stream StreamQueryResultsResponse);
+}
+
+message GetQueryEngineRequest {}
+
+message GetQueryEngineResponse {
+  QueryEngine engine = 1;
+}
+
+message QueryEngine {
+  // Capabilities describes which optional query features a dialect supports.
+  message Capabilities {
+    // --- Query clauses ---
+
+    // supports_qualify indicates QUALIFY clause support
+    // (Snowflake, BigQuery, Databricks, DuckDB).
+    bool supports_qualify = 1;
+
+    // supports_array_join indicates ARRAY JOIN clause support (ClickHouse).
+    bool supports_array_join = 2;
+
+    // supports_prewhere indicates PREWHERE clause support (ClickHouse).
+    bool supports_prewhere = 3;
+
+    // supports_sample indicates SAMPLE / TABLESAMPLE clause support
+    // (ClickHouse SAMPLE, standard TABLESAMPLE in PostgreSQL, SQL Server, Snowflake).
+    bool supports_sample = 4;
+
+    // supports_time_travel indicates AT/BEFORE time-travel clauses
+    // (Snowflake AT/BEFORE, Oracle FLASHBACK).
+    bool supports_time_travel = 5;
+
+    // supports_match_recognize indicates MATCH_RECOGNIZE row-pattern
+    // recognition (Oracle 12c+, Snowflake, Trino).
+    bool supports_match_recognize = 6;
+
+    // supports_pivot_unpivot indicates PIVOT / UNPIVOT support
+    // (Oracle 11g+, SQL Server, Snowflake, Databricks).
+    bool supports_pivot_unpivot = 7;
+
+    // supports_window_ignore_nulls indicates IGNORE NULLS / RESPECT NULLS in
+    // window functions (Oracle, Snowflake, SQL Server, Redshift, BigQuery).
+    bool supports_window_ignore_nulls = 8;
+
+    // supports_connect_by indicates CONNECT BY / START WITH hierarchical
+    // queries (Oracle, Snowflake, MariaDB 10.2+).
+    bool supports_connect_by = 9;
+
+    // --- Row limiting ---
+
+    // supports_top indicates TOP N row limiting (SQL Server, Snowflake, Sybase).
+    bool supports_top = 10;
+
+    // supports_limit_offset indicates LIMIT / OFFSET row limiting
+    // (PostgreSQL, MySQL, MariaDB, SQLite, ClickHouse, Snowflake, BigQuery, Redshift).
+    bool supports_limit_offset = 11;
+
+    // supports_fetch_first indicates standard SQL FETCH FIRST / OFFSET
+    // (Oracle 12c+, SQL Server 2012+, PostgreSQL, DB2).
+    bool supports_fetch_first = 12;
+
+    // --- DML features ---
+
+    // supports_merge indicates MERGE statement support
+    // (SQL Server, Oracle, Snowflake, PostgreSQL 15+, BigQuery, ClickHouse 23.3+, MariaDB).
+    bool supports_merge = 13;
+
+    // supports_returning indicates RETURNING clause on DML
+    // (PostgreSQL, Oracle, SQLite 3.35+, MariaDB, BigQuery).
+    bool supports_returning = 14;
+
+    // supports_compound_returning indicates the SQL Server OUTPUT clause,
+    // which is similar to RETURNING but has different syntax and can emit
+    // into a result set or a table.
+    bool supports_compound_returning = 15;
+
+    // supports_distinct_on indicates SELECT DISTINCT ON (...) syntax
+    // (PostgreSQL-only, not standard SQL).
+    bool supports_distinct_on = 16;
+
+    // supports_materialized_view indicates MATERIALIZED VIEW DDL
+    // (PostgreSQL, Oracle, Snowflake, ClickHouse, Redshift, BigQuery, Databricks).
+    bool supports_materialized_view = 17;
+
+    // supports_index_hints indicates MySQL-style USE INDEX / FORCE INDEX /
+    // IGNORE INDEX table hints (MySQL, MariaDB).
+    bool supports_index_hints = 18;
+
+    // --- Identifier quoting ---
+
+    // supports_bracket_quoting indicates [column] identifier quoting
+    // (SQL Server, MS Access).
+    bool supports_bracket_quoting = 19;
+
+    // supports_backtick_quoting indicates `column` identifier quoting
+    // (MySQL, MariaDB, ClickHouse, BigQuery, Snowflake for some contexts).
+    bool supports_backtick_quoting = 20;
+
+    // supports_double_quote_identifier indicates "column" as identifier
+    // (standard SQL; supported by PostgreSQL, Oracle, SQLite, DB2, Snowflake, Redshift, SQL Server).
+    bool supports_double_quote_identifier = 21;
+
+    // --- String and pattern matching ---
+
+    // supports_i_like indicates case-insensitive LIKE via the ILIKE operator
+    // (PostgreSQL, Snowflake, DuckDB, Redshift).
+    bool supports_i_like = 22;
+  }
+
+  // Query engine dialect (e.g., GoogleSQL/BigQuery, Postgresql, SQLite3, Trino, etc.).
+  string dialect = 1;
+
+  // Query engine capabilities.
+  Capabilities capabilities = 2;
+
+  // Query engine types.
+  repeated Type types = 3;
+}
+
+// type FormatOptions struct {
+//     // IndentStyle selects spaces or tabs.
+//     IndentStyle IndentStyle
+//     // IndentWidth is the number of spaces (or tabs) per indent level.
+//     IndentWidth int
+//     // KeywordCase controls keyword casing.
+//     KeywordCase KeywordCase
+//     // LineWidth is the target max line width. 0 means no limit (compact).
+//     LineWidth int
+//     // NewlinePerClause puts each major clause (FROM, WHERE, etc.) on its own line.
+//     NewlinePerClause bool
+//     // AddSemicolon appends a semicolon to each statement.
+//     AddSemicolon bool
+//     // Dialect specifies the target SQL dialect for rendering. When empty,
+//     // the formatter emits whatever AST fields are set (generic behavior).
+//     // Valid values match keywords.SQLDialect constants: "postgresql", "mysql",
+//     // "sqlserver", "oracle", "sqlite", "snowflake", "clickhouse", "mariadb".
+//     Dialect string
+// }
+
+message QueryParam {
+  // Value of the param.
+  google.protobuf.Value value = 1 [(buf.validate.field).required = true];
+
+  // Name of the param (not present for positional params).
+  string name = 2;
+}
+
+// Represents a valid parsed query.
+message ParsedQuery {
+  message FieldType {
+    // Name of the field.
+    string name = 1;
+
+    // Type of the field.
+    Type type = 2;
+  }
+
+  message ParamType {
+    // Type of the param, if supported by query parser.
+    Type type = 1;
+
+    // Name of the param (not present for positional params).
+    string name = 2;
+  }
+
+  // SQL query text (may be formatted/canonicalized).
+  string sql = 1 [(buf.validate.field).required = true];
+
+  // Fingerprint as receipt of validation.
+  string fingerprint = 2 [(buf.validate.field).required = true];
+
+  // Params present in the query, if any.
+  repeated ParamType params = 3;
+
+  // Fields returned by the query, if any.
+  repeated FieldType fields = 4;
+}
+
+// Request to validate a query.
+message ValidateQueryRequest {
+  // SQL query text.
+  string sql = 1 [(buf.validate.field).required = true];
+}
+
+// Response for query validation.
+message ValidateQueryResponse {
+  // Valid query with fingerprint.
+  ParsedQuery query = 2;
+}
+
+// Request to retrieve query results.
+message ListQueryResultsRequest {
+  option (buf.validate.message).cel_expression = "size(this.query.params) == size(this.params)";
+
+  // Maximum number of result rows to return.
+  int32 page_size = 1;
+
+  // Token for the desired page (empty for first page).
+  string page_token = 2;
+
+  // Query to execute (must be unchanged for subsequent calls).
+  ParsedQuery query = 3 [(buf.validate.field).required = true];
+
+  // Param values applied to the query (must be unchanged for subsequent calls).
+  repeated QueryParam params = 4;
+}
+
+// Response containing query results.
+message ListQueryResultsResponse {
+  // A list of query result rows with a maximum size specified in the request.
+  repeated google.protobuf.Struct rows = 1;
+
+  // Next page token (empty for last page)
+  string next_page_token = 10;
+}
+
+// Request to stream query results.
+message StreamQueryResultsRequest {
+  option (buf.validate.message).cel_expression = "size(this.query.params) == size(this.params)";
+
+  // Query to execute.
+  ParsedQuery query = 1 [(buf.validate.field).required = true];
+
+  // Param values applied to the query.
+  repeated QueryParam params = 4;
+}
+
+// Response containing streamed query results.
+message StreamQueryResultsResponse {
+  // A single query result row conforming to the fields defined in query.
+  google.protobuf.Struct row = 1;
+}

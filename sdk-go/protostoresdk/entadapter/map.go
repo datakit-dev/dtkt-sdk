@@ -16,7 +16,7 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-func MapField[M map[K]V, K protostore.MapKeyType, V any](opts ...FieldOption) *fieldType[M] {
+func MapField[K protostore.MapKeyType, V any, M map[K]V](opts ...FieldOption) *fieldType[M] {
 	var (
 		map_  M
 		key   K
@@ -45,7 +45,7 @@ func MapField[M map[K]V, K protostore.MapKeyType, V any](opts ...FieldOption) *f
 
 	// Fix PkgPath for map value types: Bytes.GoType uses indirect(t).PkgPath()
 	// which returns "" for maps, causing the import template to skip the import.
-	fixDescriptorPkgPath[V](field.desc)
+	descriptorPkgPath[V](field.desc)
 
 	field.applyOptions(opts...)
 

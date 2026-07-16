@@ -62,6 +62,8 @@ var (
 	}
 )
 
-func AddressableTypes() []NameType {
-	return coreAddrs
+func init() {
+	for typ := range coreHierarchy {
+		typ.Pattern().loadOrStore()
+	}
 }

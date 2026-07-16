@@ -1,17 +1,16 @@
-package v1beta1_test
+package v1beta1
 
 import (
 	"strconv"
 	"testing"
 
-	form "github.com/datakit-dev/dtkt-sdk/sdk-go/protoformsdk/v1beta1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func TestMapParser(t *testing.T) {
-	boolMap, err := form.MapMessageParser(
+	boolMap, err := messageMapParser(
 		func(s string) (b bool) {
 			b, _ = strconv.ParseBool(s)
 			return
@@ -22,10 +21,10 @@ func TestMapParser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	} else {
-		t.Logf("%#v", form.MapMessageStringer(func(b bool) string { return strconv.FormatBool(b) }).StringOf(boolMap))
+		t.Logf("%#v", messageMapStringer(func(b bool) string { return strconv.FormatBool(b) }).StringOf(boolMap))
 	}
 
-	strMap, err := form.MapMessageParser(
+	strMap, err := messageMapParser(
 		func(s string) string { return s },
 		func() protoreflect.Message {
 			return (&emptypb.Empty{}).ProtoReflect()
@@ -33,10 +32,10 @@ func TestMapParser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	} else {
-		t.Logf("%#v", form.MapMessageStringer(func(s string) string { return s }).StringOf(strMap))
+		t.Logf("%#v", messageMapStringer(func(s string) string { return s }).StringOf(strMap))
 	}
 
-	intMap, err := form.MapMessageParser(
+	intMap, err := messageMapParser(
 		func(s string) int32 {
 			i, _ := strconv.Atoi(s)
 			return int32(i)
@@ -47,10 +46,10 @@ func TestMapParser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	} else {
-		t.Logf("%#v", form.MapMessageStringer(func(i int32) string { return util.FormatInt32(i) }).StringOf(intMap))
+		t.Logf("%#v", messageMapStringer(func(i int32) string { return util.FormatInt32(i) }).StringOf(intMap))
 	}
 
-	uintMap, err := form.MapMessageParser(
+	uintMap, err := messageMapParser(
 		func(s string) uint32 {
 			i, _ := strconv.ParseUint(s, 10, 32)
 			return uint32(i)
@@ -61,6 +60,6 @@ func TestMapParser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	} else {
-		t.Logf("%#v", form.MapMessageStringer(func(i uint32) string { return util.FormatUInt32(i) }).StringOf(uintMap))
+		t.Logf("%#v", messageMapStringer(func(i uint32) string { return util.FormatUInt32(i) }).StringOf(uintMap))
 	}
 }

@@ -5,7 +5,7 @@
 import { BlobService } from "./services_pb";
 
 /**
- * Retrieves a list of files provided by service.
+ * Retrieves a list of blobs.
  *
  * @generated from rpc dtkt.blob.v1beta1.BlobService.ListBlobs
  */
@@ -17,13 +17,6 @@ export const listBlobs = BlobService.method.listBlobs;
  * @generated from rpc dtkt.blob.v1beta1.BlobService.GetBlob
  */
 export const getBlob = BlobService.method.getBlob;
-
-/**
- * Writes or overwrites the blob stored at key.
- *
- * @generated from rpc dtkt.blob.v1beta1.BlobService.WriteBlob
- */
-export const writeBlob = BlobService.method.writeBlob;
 
 /**
  * Deletes the blob stored at key.

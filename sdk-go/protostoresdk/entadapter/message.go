@@ -69,21 +69,30 @@ func EncryptedAnyField(cipher Cipher, opts ...FieldOption) *fieldType[*anypb.Any
 func MessageScanner[M protostore.MessageType[T], T any](field *fieldType[M]) entfield.TypeValueScanner[M] {
 	return entfield.ValueScannerFunc[M, *sql.Null[[]byte]]{
 		V: func(msg M) (driver.Value, error) {
-			b, err := encoding.ToJSONV2(msg, encoding.WithEncodeProtoJSONOptions(protojson.MarshalOptions{
-				Resolver: protostore.GetResolver(),
-			}))
+			data, err := encoding.ToJSONV2(msg,
+				encoding.WithEncodeProtoJSONOptions(protojson.MarshalOptions{
+					Resolver: protostore.GetResolver(),
+				}),
+				encoding.WithEncodeDurationString(),
+			)
 			if err != nil {
 				return nil, fmt.Errorf("field: %s: %w", field.desc.Name, err)
 			}
 
-			return json.RawMessage(b), nil
+			value := json.RawMessage(data)
+			err = value.Canonicalize()
+
+			return value, err
 		},
 		S: func(ns *sql.Null[[]byte]) (msg M, err error) {
 			msg = new(T)
 			if ns.Valid {
-				err = encoding.FromJSONV2(ns.V, msg, encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
-					Resolver: protostore.GetResolver(),
-				}))
+				err = encoding.FromJSONV2(ns.V, msg,
+					encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
+						Resolver: protostore.GetResolver(),
+					}),
+					encoding.WithDecodeDurationString(),
+				)
 				if err != nil {
 					return nil, fmt.Errorf("field: %s: %w", field.desc.Name, err)
 				}
@@ -108,7 +117,7 @@ func EncryptedMessageScanner[T any, M protostore.MessageType[T]](field *fieldTyp
 				return nil, fmt.Errorf("field: %s: %w", field.desc.Name, err)
 			}
 
-			return json.RawMessage(data), nil
+			return data, nil
 		},
 		S: func(ns *sql.Null[[]byte]) (M, error) {
 			if ns.Valid {
@@ -149,7 +158,7 @@ func EncryptedAnyScanner(field *fieldType[*anypb.Any], cipher Cipher) entfield.T
 				return nil, fmt.Errorf("field: %s: %w", field.desc.Name, err)
 			}
 
-			return json.RawMessage(data), nil
+			return json.RawMessage(data), err
 		},
 		S: func(ns *sql.Null[[]byte]) (*anypb.Any, error) {
 			if ns.Valid {

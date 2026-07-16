@@ -25,62 +25,68 @@ var File_dtkt_blob_v1beta1_services_proto protoreflect.FileDescriptor
 
 const file_dtkt_blob_v1beta1_services_proto_rawDesc = "" +
 	"\n" +
-	" dtkt/blob/v1beta1/services.proto\x12\x11dtkt.blob.v1beta1\x1a dtkt/blob/v1beta1/messages.proto\x1a\x1cgoogle/api/annotations.proto2\xf0\n" +
+	" dtkt/blob/v1beta1/services.proto\x12\x11dtkt.blob.v1beta1\x1a dtkt/blob/v1beta1/messages.proto\x1a\x1cgoogle/api/annotations.proto2\x87\x01\n" +
+	"\rBucketService\x12v\n" +
+	"\vListBuckets\x12%.dtkt.blob.v1beta1.ListBucketsRequest\x1a&.dtkt.blob.v1beta1.ListBucketsResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1beta1/buckets2\xcb\n" +
 	"\n" +
-	"\vBlobService\x12\x97\x01\n" +
-	"\tListBlobs\x12#.dtkt.blob.v1beta1.ListBlobsRequest\x1a$.dtkt.blob.v1beta1.ListBlobsResponse\"?\x82\xd3\xe4\x93\x029Z\x10\x12\x0e/v1beta1/blobs\x12%/v1beta1/{bucket=blobBuckets/*}/blobs\x12\xa3\x01\n" +
-	"\aGetBlob\x12!.dtkt.blob.v1beta1.GetBlobRequest\x1a\".dtkt.blob.v1beta1.GetBlobResponse\"Q\x82\xd3\xe4\x93\x02KZ\x19\x12\x17/v1beta1/blobs/{key=**}\x12./v1beta1/{bucket=blobBuckets/*}/blobs/{key=**}\x12\xaf\x01\n" +
-	"\tWriteBlob\x12#.dtkt.blob.v1beta1.WriteBlobRequest\x1a$.dtkt.blob.v1beta1.WriteBlobResponse\"W\x82\xd3\xe4\x93\x02Q:\x01*Z\x1c:\x01*\x1a\x17/v1beta1/blobs/{key=**}\x1a./v1beta1/{bucket=blobBuckets/*}/blobs/{key=**}\x12\xac\x01\n" +
+	"\vBlobService\x12\x93\x01\n" +
+	"\tListBlobs\x12#.dtkt.blob.v1beta1.ListBlobsRequest\x1a$.dtkt.blob.v1beta1.ListBlobsResponse\";\x82\xd3\xe4\x93\x025Z\x10\x12\x0e/v1beta1/blobs\x12!/v1beta1/{bucket=buckets/*}/blobs\x12\x9f\x01\n" +
+	"\aGetBlob\x12!.dtkt.blob.v1beta1.GetBlobRequest\x1a\".dtkt.blob.v1beta1.GetBlobResponse\"M\x82\xd3\xe4\x93\x02GZ\x19\x12\x17/v1beta1/blobs/{key=**}\x12*/v1beta1/{bucket=buckets/*}/blobs/{key=**}\x12\xa8\x01\n" +
 	"\n" +
-	"DeleteBlob\x12$.dtkt.blob.v1beta1.DeleteBlobRequest\x1a%.dtkt.blob.v1beta1.DeleteBlobResponse\"Q\x82\xd3\xe4\x93\x02KZ\x19*\x17/v1beta1/blobs/{key=**}*./v1beta1/{bucket=blobBuckets/*}/blobs/{key=**}\x12\xb0\x01\n" +
-	"\bCopyBlob\x12\".dtkt.blob.v1beta1.CopyBlobRequest\x1a#.dtkt.blob.v1beta1.CopyBlobResponse\"[\x82\xd3\xe4\x93\x02U:\x01*Z\x18:\x01*\"\x13/v1beta1/blobs:copy\"6/v1beta1/{destination_bucket=blobBuckets/*}/blobs:copy\x12\xd7\x01\n" +
-	"\x11GenerateSignedURL\x12+.dtkt.blob.v1beta1.GenerateSignedURLRequest\x1a,.dtkt.blob.v1beta1.GenerateSignedURLResponse\"g\x82\xd3\xe4\x93\x02a:\x01*Z$:\x01*\"\x1f/v1beta1/blobs/{key=**}:signUrl\"6/v1beta1/{bucket=blobBuckets/*}/blobs/{key=**}:signUrl\x12d\n" +
-	"\rReadBlobLines\x12'.dtkt.blob.v1beta1.ReadBlobLinesRequest\x1a(.dtkt.blob.v1beta1.ReadBlobLinesResponse0\x01\x12d\n" +
-	"\rReadBlobRange\x12'.dtkt.blob.v1beta1.ReadBlobRangeRequest\x1a(.dtkt.blob.v1beta1.ReadBlobRangeResponse0\x01\x12g\n" +
+	"DeleteBlob\x12$.dtkt.blob.v1beta1.DeleteBlobRequest\x1a%.dtkt.blob.v1beta1.DeleteBlobResponse\"M\x82\xd3\xe4\x93\x02GZ\x19*\x17/v1beta1/blobs/{key=**}**/v1beta1/{bucket=buckets/*}/blobs/{key=**}\x12\xac\x01\n" +
+	"\bCopyBlob\x12\".dtkt.blob.v1beta1.CopyBlobRequest\x1a#.dtkt.blob.v1beta1.CopyBlobResponse\"W\x82\xd3\xe4\x93\x02Q:\x01*Z\x18:\x01*\"\x13/v1beta1/blobs:copy\"2/v1beta1/{destination_bucket=buckets/*}/blobs:copy\x12\xd3\x01\n" +
+	"\x11GenerateSignedURL\x12+.dtkt.blob.v1beta1.GenerateSignedURLRequest\x1a,.dtkt.blob.v1beta1.GenerateSignedURLResponse\"c\x82\xd3\xe4\x93\x02]:\x01*Z$:\x01*\"\x1f/v1beta1/blobs/{key=**}:signUrl\"2/v1beta1/{bucket=buckets/*}/blobs/{key=**}:signUrl\x12U\n" +
+	"\bReadBlob\x12\".dtkt.blob.v1beta1.ReadBlobRequest\x1a#.dtkt.blob.v1beta1.ReadBlobResponse0\x01\x12\xad\x01\n" +
+	"\tWriteBlob\x12#.dtkt.blob.v1beta1.WriteBlobRequest\x1a$.dtkt.blob.v1beta1.WriteBlobResponse\"S\x82\xd3\xe4\x93\x02M:\x01*Z\x1c:\x01*\x1a\x17/v1beta1/blobs/{key=**}\x1a*/v1beta1/{bucket=buckets/*}/blobs/{key=**}(\x01\x12d\n" +
+	"\rReadBlobLines\x12'.dtkt.blob.v1beta1.ReadBlobLinesRequest\x1a(.dtkt.blob.v1beta1.ReadBlobLinesResponse0\x01\x12g\n" +
 	"\x0eWriteBlobLines\x12(.dtkt.blob.v1beta1.WriteBlobLinesRequest\x1a).dtkt.blob.v1beta1.WriteBlobLinesResponse(\x01B\xda\x01\n" +
 	"\x17proto.dtkt.blob.v1beta1B\rServicesProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/blob/v1beta1;blobv1beta1\xa2\x02\x03DBX\xaa\x02\x11Dtkt.Blob.V1beta1\xca\x02\x11Dtkt\\Blob\\V1beta1\xe2\x02\x1dDtkt\\Blob\\V1beta1\\GPBMetadata\xea\x02\x13Dtkt::Blob::V1beta1b\x06proto3"
 
 var file_dtkt_blob_v1beta1_services_proto_goTypes = []any{
-	(*ListBlobsRequest)(nil),          // 0: dtkt.blob.v1beta1.ListBlobsRequest
-	(*GetBlobRequest)(nil),            // 1: dtkt.blob.v1beta1.GetBlobRequest
-	(*WriteBlobRequest)(nil),          // 2: dtkt.blob.v1beta1.WriteBlobRequest
+	(*ListBucketsRequest)(nil),        // 0: dtkt.blob.v1beta1.ListBucketsRequest
+	(*ListBlobsRequest)(nil),          // 1: dtkt.blob.v1beta1.ListBlobsRequest
+	(*GetBlobRequest)(nil),            // 2: dtkt.blob.v1beta1.GetBlobRequest
 	(*DeleteBlobRequest)(nil),         // 3: dtkt.blob.v1beta1.DeleteBlobRequest
 	(*CopyBlobRequest)(nil),           // 4: dtkt.blob.v1beta1.CopyBlobRequest
 	(*GenerateSignedURLRequest)(nil),  // 5: dtkt.blob.v1beta1.GenerateSignedURLRequest
-	(*ReadBlobLinesRequest)(nil),      // 6: dtkt.blob.v1beta1.ReadBlobLinesRequest
-	(*ReadBlobRangeRequest)(nil),      // 7: dtkt.blob.v1beta1.ReadBlobRangeRequest
-	(*WriteBlobLinesRequest)(nil),     // 8: dtkt.blob.v1beta1.WriteBlobLinesRequest
-	(*ListBlobsResponse)(nil),         // 9: dtkt.blob.v1beta1.ListBlobsResponse
-	(*GetBlobResponse)(nil),           // 10: dtkt.blob.v1beta1.GetBlobResponse
-	(*WriteBlobResponse)(nil),         // 11: dtkt.blob.v1beta1.WriteBlobResponse
-	(*DeleteBlobResponse)(nil),        // 12: dtkt.blob.v1beta1.DeleteBlobResponse
-	(*CopyBlobResponse)(nil),          // 13: dtkt.blob.v1beta1.CopyBlobResponse
-	(*GenerateSignedURLResponse)(nil), // 14: dtkt.blob.v1beta1.GenerateSignedURLResponse
-	(*ReadBlobLinesResponse)(nil),     // 15: dtkt.blob.v1beta1.ReadBlobLinesResponse
-	(*ReadBlobRangeResponse)(nil),     // 16: dtkt.blob.v1beta1.ReadBlobRangeResponse
-	(*WriteBlobLinesResponse)(nil),    // 17: dtkt.blob.v1beta1.WriteBlobLinesResponse
+	(*ReadBlobRequest)(nil),           // 6: dtkt.blob.v1beta1.ReadBlobRequest
+	(*WriteBlobRequest)(nil),          // 7: dtkt.blob.v1beta1.WriteBlobRequest
+	(*ReadBlobLinesRequest)(nil),      // 8: dtkt.blob.v1beta1.ReadBlobLinesRequest
+	(*WriteBlobLinesRequest)(nil),     // 9: dtkt.blob.v1beta1.WriteBlobLinesRequest
+	(*ListBucketsResponse)(nil),       // 10: dtkt.blob.v1beta1.ListBucketsResponse
+	(*ListBlobsResponse)(nil),         // 11: dtkt.blob.v1beta1.ListBlobsResponse
+	(*GetBlobResponse)(nil),           // 12: dtkt.blob.v1beta1.GetBlobResponse
+	(*DeleteBlobResponse)(nil),        // 13: dtkt.blob.v1beta1.DeleteBlobResponse
+	(*CopyBlobResponse)(nil),          // 14: dtkt.blob.v1beta1.CopyBlobResponse
+	(*GenerateSignedURLResponse)(nil), // 15: dtkt.blob.v1beta1.GenerateSignedURLResponse
+	(*ReadBlobResponse)(nil),          // 16: dtkt.blob.v1beta1.ReadBlobResponse
+	(*WriteBlobResponse)(nil),         // 17: dtkt.blob.v1beta1.WriteBlobResponse
+	(*ReadBlobLinesResponse)(nil),     // 18: dtkt.blob.v1beta1.ReadBlobLinesResponse
+	(*WriteBlobLinesResponse)(nil),    // 19: dtkt.blob.v1beta1.WriteBlobLinesResponse
 }
 var file_dtkt_blob_v1beta1_services_proto_depIdxs = []int32{
-	0,  // 0: dtkt.blob.v1beta1.BlobService.ListBlobs:input_type -> dtkt.blob.v1beta1.ListBlobsRequest
-	1,  // 1: dtkt.blob.v1beta1.BlobService.GetBlob:input_type -> dtkt.blob.v1beta1.GetBlobRequest
-	2,  // 2: dtkt.blob.v1beta1.BlobService.WriteBlob:input_type -> dtkt.blob.v1beta1.WriteBlobRequest
+	0,  // 0: dtkt.blob.v1beta1.BucketService.ListBuckets:input_type -> dtkt.blob.v1beta1.ListBucketsRequest
+	1,  // 1: dtkt.blob.v1beta1.BlobService.ListBlobs:input_type -> dtkt.blob.v1beta1.ListBlobsRequest
+	2,  // 2: dtkt.blob.v1beta1.BlobService.GetBlob:input_type -> dtkt.blob.v1beta1.GetBlobRequest
 	3,  // 3: dtkt.blob.v1beta1.BlobService.DeleteBlob:input_type -> dtkt.blob.v1beta1.DeleteBlobRequest
 	4,  // 4: dtkt.blob.v1beta1.BlobService.CopyBlob:input_type -> dtkt.blob.v1beta1.CopyBlobRequest
 	5,  // 5: dtkt.blob.v1beta1.BlobService.GenerateSignedURL:input_type -> dtkt.blob.v1beta1.GenerateSignedURLRequest
-	6,  // 6: dtkt.blob.v1beta1.BlobService.ReadBlobLines:input_type -> dtkt.blob.v1beta1.ReadBlobLinesRequest
-	7,  // 7: dtkt.blob.v1beta1.BlobService.ReadBlobRange:input_type -> dtkt.blob.v1beta1.ReadBlobRangeRequest
-	8,  // 8: dtkt.blob.v1beta1.BlobService.WriteBlobLines:input_type -> dtkt.blob.v1beta1.WriteBlobLinesRequest
-	9,  // 9: dtkt.blob.v1beta1.BlobService.ListBlobs:output_type -> dtkt.blob.v1beta1.ListBlobsResponse
-	10, // 10: dtkt.blob.v1beta1.BlobService.GetBlob:output_type -> dtkt.blob.v1beta1.GetBlobResponse
-	11, // 11: dtkt.blob.v1beta1.BlobService.WriteBlob:output_type -> dtkt.blob.v1beta1.WriteBlobResponse
-	12, // 12: dtkt.blob.v1beta1.BlobService.DeleteBlob:output_type -> dtkt.blob.v1beta1.DeleteBlobResponse
-	13, // 13: dtkt.blob.v1beta1.BlobService.CopyBlob:output_type -> dtkt.blob.v1beta1.CopyBlobResponse
-	14, // 14: dtkt.blob.v1beta1.BlobService.GenerateSignedURL:output_type -> dtkt.blob.v1beta1.GenerateSignedURLResponse
-	15, // 15: dtkt.blob.v1beta1.BlobService.ReadBlobLines:output_type -> dtkt.blob.v1beta1.ReadBlobLinesResponse
-	16, // 16: dtkt.blob.v1beta1.BlobService.ReadBlobRange:output_type -> dtkt.blob.v1beta1.ReadBlobRangeResponse
-	17, // 17: dtkt.blob.v1beta1.BlobService.WriteBlobLines:output_type -> dtkt.blob.v1beta1.WriteBlobLinesResponse
-	9,  // [9:18] is the sub-list for method output_type
-	0,  // [0:9] is the sub-list for method input_type
+	6,  // 6: dtkt.blob.v1beta1.BlobService.ReadBlob:input_type -> dtkt.blob.v1beta1.ReadBlobRequest
+	7,  // 7: dtkt.blob.v1beta1.BlobService.WriteBlob:input_type -> dtkt.blob.v1beta1.WriteBlobRequest
+	8,  // 8: dtkt.blob.v1beta1.BlobService.ReadBlobLines:input_type -> dtkt.blob.v1beta1.ReadBlobLinesRequest
+	9,  // 9: dtkt.blob.v1beta1.BlobService.WriteBlobLines:input_type -> dtkt.blob.v1beta1.WriteBlobLinesRequest
+	10, // 10: dtkt.blob.v1beta1.BucketService.ListBuckets:output_type -> dtkt.blob.v1beta1.ListBucketsResponse
+	11, // 11: dtkt.blob.v1beta1.BlobService.ListBlobs:output_type -> dtkt.blob.v1beta1.ListBlobsResponse
+	12, // 12: dtkt.blob.v1beta1.BlobService.GetBlob:output_type -> dtkt.blob.v1beta1.GetBlobResponse
+	13, // 13: dtkt.blob.v1beta1.BlobService.DeleteBlob:output_type -> dtkt.blob.v1beta1.DeleteBlobResponse
+	14, // 14: dtkt.blob.v1beta1.BlobService.CopyBlob:output_type -> dtkt.blob.v1beta1.CopyBlobResponse
+	15, // 15: dtkt.blob.v1beta1.BlobService.GenerateSignedURL:output_type -> dtkt.blob.v1beta1.GenerateSignedURLResponse
+	16, // 16: dtkt.blob.v1beta1.BlobService.ReadBlob:output_type -> dtkt.blob.v1beta1.ReadBlobResponse
+	17, // 17: dtkt.blob.v1beta1.BlobService.WriteBlob:output_type -> dtkt.blob.v1beta1.WriteBlobResponse
+	18, // 18: dtkt.blob.v1beta1.BlobService.ReadBlobLines:output_type -> dtkt.blob.v1beta1.ReadBlobLinesResponse
+	19, // 19: dtkt.blob.v1beta1.BlobService.WriteBlobLines:output_type -> dtkt.blob.v1beta1.WriteBlobLinesResponse
+	10, // [10:20] is the sub-list for method output_type
+	0,  // [0:10] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
@@ -100,7 +106,7 @@ func file_dtkt_blob_v1beta1_services_proto_init() {
 			NumEnums:      0,
 			NumMessages:   0,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
 		GoTypes:           file_dtkt_blob_v1beta1_services_proto_goTypes,
 		DependencyIndexes: file_dtkt_blob_v1beta1_services_proto_depIdxs,

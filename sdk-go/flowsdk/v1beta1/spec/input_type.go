@@ -28,6 +28,18 @@ type (
 	InputNode interface {
 		shared.SpecNode
 		GetCache() bool
+		GetBool() *flowv1beta1.Bool
+		GetBytes() *flowv1beta1.Bytes
+		GetDouble() *flowv1beta1.Double
+		GetFloat() *flowv1beta1.Float
+		GetInt32() *flowv1beta1.Int32
+		GetInt64() *flowv1beta1.Int64
+		GetList() *flowv1beta1.List
+		GetMap() *flowv1beta1.Map
+		GetMessage() *flowv1beta1.Message
+		GetString_() *flowv1beta1.String
+		GetUint32() *flowv1beta1.Uint32
+		GetUint64() *flowv1beta1.Uint64
 	}
 	InputDefault[V any] interface {
 		InputNullable
@@ -662,15 +674,15 @@ func (t *inputMessage) Spec() proto.Message {
 }
 
 func (t *inputMessage) IsRequired() bool {
-	return !t.spec.Nullable && t.spec.Default == nil
+	return !t.GetNullable() && !t.HasDefault()
 }
 
 func (t *inputMessage) GetNullable() bool {
-	return t.spec.Nullable
+	return t.spec.GetNullable()
 }
 
 func (t *inputMessage) HasDefault() bool {
-	return t.spec.Default != nil
+	return t.spec.GetDefault() != nil
 }
 
 func (t *inputMessage) GetDefault() (any, error) {

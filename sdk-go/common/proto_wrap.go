@@ -102,7 +102,7 @@ func (w ProtoOptions) UnwrapMap(from map[string]proto.Message) (to map[string]an
 }
 
 func (w ProtoOptions) UnwrapAnyMap(from map[string]*anypb.Any) (to map[string]any, err error) {
-	to = make(map[string]any, len(from))
+	to = map[string]any{}
 	if len(from) > 0 {
 		for key, proto := range from {
 			val, err := w.UnwrapAny(proto)

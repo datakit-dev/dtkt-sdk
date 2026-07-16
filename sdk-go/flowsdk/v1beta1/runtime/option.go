@@ -9,28 +9,41 @@ type (
 	OptionReceiver interface {
 		applyOptions(...Option)
 	}
+	GraphOption    = shared.GraphOption[*Node]
+	ExecutorOption = shared.ExecutorOption[*Node]
 )
 
-func WithConnectors(conns shared.ConnectorProvider) Option {
-	return func(r OptionReceiver) {
-		if run, ok := r.(*Runtime); ok {
+func WithConnectors(conns ConnectorProvider) Option {
+	return func(recv OptionReceiver) {
+		if run, ok := recv.(*Env); ok {
 			run.conns = conns
 		}
 	}
 }
 
-func WithResolver(resolver shared.Resolver) Option {
-	return func(r OptionReceiver) {
-		if env, ok := r.(*Env); ok {
-			env.resolver = resolver
+func WithNodes(nodes NodeMap) Option {
+	return func(recv OptionReceiver) {
+		if env, ok := recv.(*Env); ok {
+			env.nodes = nodes
 		}
 	}
 }
 
-func WithNodes(nodes NodeMap) Option {
-	return func(r OptionReceiver) {
-		if env, ok := r.(*Env); ok {
-			env.nodes = nodes
+func WithClient(client shared.Client) Option {
+	return func(recv OptionReceiver) {
+		if c, ok := recv.(*Connector); ok {
+			c.client = client
+		}
+	}
+}
+
+func WithResolver(resolver shared.Resolver) Option {
+	return func(recv OptionReceiver) {
+		switch recv := recv.(type) {
+		case *Env:
+			recv.resolver = resolver
+		case *Connector:
+			recv.resolver = resolver
 		}
 	}
 }

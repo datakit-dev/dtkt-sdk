@@ -58,6 +58,7 @@ func WithDefault(value any) FieldOption {
 		desc := f.Descriptor()
 		if desc != nil {
 			desc.Default = value
+			desc.Optional = true
 		}
 	}
 }

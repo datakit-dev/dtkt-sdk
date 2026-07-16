@@ -17,10 +17,10 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dtkt/catalog/v1beta2/table.proto.
  */
 export const file_dtkt_catalog_v1beta2_table: GenFile = /*@__PURE__*/
-  fileDesc("CiBkdGt0L2NhdGFsb2cvdjFiZXRhMi90YWJsZS5wcm90bxIUZHRrdC5jYXRhbG9nLnYxYmV0YTIiiAIKBVRhYmxlEgwKBG5hbWUYASABKAkSEAoIdGFibGVfaWQYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkSKwoGZmllbGRzGCIgAygLMhsuZHRrdC5jYXRhbG9nLnYxYmV0YTIuRmllbGQSLwoFc3RhdHMYBSABKAsyIC5kdGt0LmNhdGFsb2cudjFiZXRhMi5UYWJsZVN0YXRzEjsKCG1ldGFkYXRhGAogAygLMikuZHRrdC5jYXRhbG9nLnYxYmV0YTIuVGFibGUuTWV0YWRhdGFFbnRyeRovCg1NZXRhZGF0YUVudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiNQoKVGFibGVTdGF0cxISCgp0b3RhbF9yb3dzGAEgASgDEhMKC3RvdGFsX2J5dGVzGAIgASgDIloKEUxpc3RUYWJsZXNSZXF1ZXN0EhEKCXBhZ2Vfc2l6ZRgBIAEoBRISCgpwYWdlX3Rva2VuGAIgASgJEg4KBnBhcmVudBgDIAEoCRIOCgZmaWx0ZXIYBCABKAkiWgoSTGlzdFRhYmxlc1Jlc3BvbnNlEisKBnRhYmxlcxgBIAMoCzIbLmR0a3QuY2F0YWxvZy52MWJldGEyLlRhYmxlEhcKD25leHRfcGFnZV90b2tlbhgCIAEoCSKfAQoPR2V0VGFibGVSZXF1ZXN0EhQKBG5hbWUYASABKAlCBrpIA8gBARJFCghtZXRhZGF0YRgCIAMoCzIzLmR0a3QuY2F0YWxvZy52MWJldGEyLkdldFRhYmxlUmVxdWVzdC5NZXRhZGF0YUVudHJ5Gi8KDU1ldGFkYXRhRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASI+ChBHZXRUYWJsZVJlc3BvbnNlEioKBXRhYmxlGAEgASgLMhsuZHRrdC5jYXRhbG9nLnYxYmV0YTIuVGFibGUiegoSQ3JlYXRlVGFibGVSZXF1ZXN0EhYKBnBhcmVudBgBIAEoCUIGukgDyAEBEhgKCHRhYmxlX2lkGAIgASgJQga6SAPIAQESMgoFdGFibGUYAyABKAsyGy5kdGt0LmNhdGFsb2cudjFiZXRhMi5UYWJsZUIGukgDyAEBIkEKE0NyZWF0ZVRhYmxlUmVzcG9uc2USKgoFdGFibGUYASABKAsyGy5kdGt0LmNhdGFsb2cudjFiZXRhMi5UYWJsZSJ5ChJVcGRhdGVUYWJsZVJlcXVlc3QSMgoFdGFibGUYASABKAsyGy5kdGt0LmNhdGFsb2cudjFiZXRhMi5UYWJsZUIGukgDyAEBEi8KC3VwZGF0ZV9tYXNrGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLkZpZWxkTWFzayJBChNVcGRhdGVUYWJsZVJlc3BvbnNlEioKBXRhYmxlGAEgASgLMhsuZHRrdC5jYXRhbG9nLnYxYmV0YTIuVGFibGUiKgoSRGVsZXRlVGFibGVSZXF1ZXN0EhQKBG5hbWUYASABKAlCBrpIA8gBASIVChNEZWxldGVUYWJsZVJlc3BvbnNlIlkKEFdyaXRlUm93c1JlcXVlc3QSFQoFdGFibGUYASABKAlCBrpIA8gBARIuCgNyb3cYAiABKAsyGS5kdGt0LmNhdGFsb2cudjFiZXRhMi5Sb3dCBrpIA8gBASKnAQoRV3JpdGVSb3dzUmVzcG9uc2USWQoSdGFibGVfcm93c193cml0dGVuGAEgAygLMj0uZHRrdC5jYXRhbG9nLnYxYmV0YTIuV3JpdGVSb3dzUmVzcG9uc2UuVGFibGVSb3dzV3JpdHRlbkVudHJ5GjcKFVRhYmxlUm93c1dyaXR0ZW5FbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAM6AjgBIlEKD1JlYWRSb3dzUmVxdWVzdBIVCgV0YWJsZRgBIAEoCUIGukgDyAEBEg4KBm9mZnNldBgCIAEoAxIXCg9zZWxlY3RlZF9maWVsZHMYAyADKAkiSgoQUmVhZFJvd3NSZXNwb25zZRINCgV0YWJsZRgBIAEoCRInCgRyb3dzGAYgAygLMhkuZHRrdC5jYXRhbG9nLnYxYmV0YTIuUm93MrMFCgxUYWJsZVNlcnZpY2USXwoKTGlzdFRhYmxlcxInLmR0a3QuY2F0YWxvZy52MWJldGEyLkxpc3RUYWJsZXNSZXF1ZXN0GiguZHRrdC5jYXRhbG9nLnYxYmV0YTIuTGlzdFRhYmxlc1Jlc3BvbnNlElkKCEdldFRhYmxlEiUuZHRrdC5jYXRhbG9nLnYxYmV0YTIuR2V0VGFibGVSZXF1ZXN0GiYuZHRrdC5jYXRhbG9nLnYxYmV0YTIuR2V0VGFibGVSZXNwb25zZRJiCgtDcmVhdGVUYWJsZRIoLmR0a3QuY2F0YWxvZy52MWJldGEyLkNyZWF0ZVRhYmxlUmVxdWVzdBopLmR0a3QuY2F0YWxvZy52MWJldGEyLkNyZWF0ZVRhYmxlUmVzcG9uc2USYgoLVXBkYXRlVGFibGUSKC5kdGt0LmNhdGFsb2cudjFiZXRhMi5VcGRhdGVUYWJsZVJlcXVlc3QaKS5kdGt0LmNhdGFsb2cudjFiZXRhMi5VcGRhdGVUYWJsZVJlc3BvbnNlEmIKC0RlbGV0ZVRhYmxlEiguZHRrdC5jYXRhbG9nLnYxYmV0YTIuRGVsZXRlVGFibGVSZXF1ZXN0GikuZHRrdC5jYXRhbG9nLnYxYmV0YTIuRGVsZXRlVGFibGVSZXNwb25zZRJeCglXcml0ZVJvd3MSJi5kdGt0LmNhdGFsb2cudjFiZXRhMi5Xcml0ZVJvd3NSZXF1ZXN0GicuZHRrdC5jYXRhbG9nLnYxYmV0YTIuV3JpdGVSb3dzUmVzcG9uc2UoARJbCghSZWFkUm93cxIlLmR0a3QuY2F0YWxvZy52MWJldGEyLlJlYWRSb3dzUmVxdWVzdBomLmR0a3QuY2F0YWxvZy52MWJldGEyLlJlYWRSb3dzUmVzcG9uc2UwAULsAQoacHJvdG8uZHRrdC5jYXRhbG9nLnYxYmV0YTJCClRhYmxlUHJvdG9QAVpQZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9jYXRhbG9nL3YxYmV0YTI7Y2F0YWxvZ3YxYmV0YTKiAgNEQ1iqAhREdGt0LkNhdGFsb2cuVjFiZXRhMsoCFER0a3RcQ2F0YWxvZ1xWMWJldGEy4gIgRHRrdFxDYXRhbG9nXFYxYmV0YTJcR1BCTWV0YWRhdGHqAhZEdGt0OjpDYXRhbG9nOjpWMWJldGEyYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_catalog_v1beta2_type, file_dtkt_catalog_v1beta2_value, file_google_protobuf_field_mask]);
+  fileDesc("CiBkdGt0L2NhdGFsb2cvdjFiZXRhMi90YWJsZS5wcm90bxIUZHRrdC5jYXRhbG9nLnYxYmV0YTIihQIKBVRhYmxlEgwKBG5hbWUYASABKAkSDQoFaWRlbnQYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkSKwoGZmllbGRzGAQgAygLMhsuZHRrdC5jYXRhbG9nLnYxYmV0YTIuRmllbGQSLwoFc3RhdHMYBSABKAsyIC5kdGt0LmNhdGFsb2cudjFiZXRhMi5UYWJsZVN0YXRzEjsKCG1ldGFkYXRhGAogAygLMikuZHRrdC5jYXRhbG9nLnYxYmV0YTIuVGFibGUuTWV0YWRhdGFFbnRyeRovCg1NZXRhZGF0YUVudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiNQoKVGFibGVTdGF0cxISCgp0b3RhbF9yb3dzGAEgASgDEhMKC3RvdGFsX2J5dGVzGAIgASgDIloKEUxpc3RUYWJsZXNSZXF1ZXN0EhEKCXBhZ2Vfc2l6ZRgBIAEoBRISCgpwYWdlX3Rva2VuGAIgASgJEg4KBnBhcmVudBgDIAEoCRIOCgZmaWx0ZXIYBCABKAkiWgoSTGlzdFRhYmxlc1Jlc3BvbnNlEisKBnRhYmxlcxgBIAMoCzIbLmR0a3QuY2F0YWxvZy52MWJldGEyLlRhYmxlEhcKD25leHRfcGFnZV90b2tlbhgCIAEoCSKfAQoPR2V0VGFibGVSZXF1ZXN0EhQKBG5hbWUYASABKAlCBrpIA8gBARJFCghtZXRhZGF0YRgCIAMoCzIzLmR0a3QuY2F0YWxvZy52MWJldGEyLkdldFRhYmxlUmVxdWVzdC5NZXRhZGF0YUVudHJ5Gi8KDU1ldGFkYXRhRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASI+ChBHZXRUYWJsZVJlc3BvbnNlEioKBXRhYmxlGAEgASgLMhsuZHRrdC5jYXRhbG9nLnYxYmV0YTIuVGFibGUiegoSQ3JlYXRlVGFibGVSZXF1ZXN0EhYKBnBhcmVudBgBIAEoCUIGukgDyAEBEhgKCHRhYmxlX2lkGAIgASgJQga6SAPIAQESMgoFdGFibGUYAyABKAsyGy5kdGt0LmNhdGFsb2cudjFiZXRhMi5UYWJsZUIGukgDyAEBIkEKE0NyZWF0ZVRhYmxlUmVzcG9uc2USKgoFdGFibGUYASABKAsyGy5kdGt0LmNhdGFsb2cudjFiZXRhMi5UYWJsZSJ5ChJVcGRhdGVUYWJsZVJlcXVlc3QSMgoFdGFibGUYASABKAsyGy5kdGt0LmNhdGFsb2cudjFiZXRhMi5UYWJsZUIGukgDyAEBEi8KC3VwZGF0ZV9tYXNrGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLkZpZWxkTWFzayJBChNVcGRhdGVUYWJsZVJlc3BvbnNlEioKBXRhYmxlGAEgASgLMhsuZHRrdC5jYXRhbG9nLnYxYmV0YTIuVGFibGUiKgoSRGVsZXRlVGFibGVSZXF1ZXN0EhQKBG5hbWUYASABKAlCBrpIA8gBASIVChNEZWxldGVUYWJsZVJlc3BvbnNlIlkKEFdyaXRlUm93c1JlcXVlc3QSFQoFdGFibGUYASABKAlCBrpIA8gBARIuCgNyb3cYAiABKAsyGS5kdGt0LmNhdGFsb2cudjFiZXRhMi5Sb3dCBrpIA8gBASKnAQoRV3JpdGVSb3dzUmVzcG9uc2USWQoSdGFibGVfcm93c193cml0dGVuGAEgAygLMj0uZHRrdC5jYXRhbG9nLnYxYmV0YTIuV3JpdGVSb3dzUmVzcG9uc2UuVGFibGVSb3dzV3JpdHRlbkVudHJ5GjcKFVRhYmxlUm93c1dyaXR0ZW5FbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAM6AjgBIlEKD1JlYWRSb3dzUmVxdWVzdBIVCgV0YWJsZRgBIAEoCUIGukgDyAEBEg4KBm9mZnNldBgCIAEoAxIXCg9zZWxlY3RlZF9maWVsZHMYAyADKAkiSgoQUmVhZFJvd3NSZXNwb25zZRINCgV0YWJsZRgBIAEoCRInCgRyb3dzGAYgAygLMhkuZHRrdC5jYXRhbG9nLnYxYmV0YTIuUm93MrMFCgxUYWJsZVNlcnZpY2USXwoKTGlzdFRhYmxlcxInLmR0a3QuY2F0YWxvZy52MWJldGEyLkxpc3RUYWJsZXNSZXF1ZXN0GiguZHRrdC5jYXRhbG9nLnYxYmV0YTIuTGlzdFRhYmxlc1Jlc3BvbnNlElkKCEdldFRhYmxlEiUuZHRrdC5jYXRhbG9nLnYxYmV0YTIuR2V0VGFibGVSZXF1ZXN0GiYuZHRrdC5jYXRhbG9nLnYxYmV0YTIuR2V0VGFibGVSZXNwb25zZRJiCgtDcmVhdGVUYWJsZRIoLmR0a3QuY2F0YWxvZy52MWJldGEyLkNyZWF0ZVRhYmxlUmVxdWVzdBopLmR0a3QuY2F0YWxvZy52MWJldGEyLkNyZWF0ZVRhYmxlUmVzcG9uc2USYgoLVXBkYXRlVGFibGUSKC5kdGt0LmNhdGFsb2cudjFiZXRhMi5VcGRhdGVUYWJsZVJlcXVlc3QaKS5kdGt0LmNhdGFsb2cudjFiZXRhMi5VcGRhdGVUYWJsZVJlc3BvbnNlEmIKC0RlbGV0ZVRhYmxlEiguZHRrdC5jYXRhbG9nLnYxYmV0YTIuRGVsZXRlVGFibGVSZXF1ZXN0GikuZHRrdC5jYXRhbG9nLnYxYmV0YTIuRGVsZXRlVGFibGVSZXNwb25zZRJeCglXcml0ZVJvd3MSJi5kdGt0LmNhdGFsb2cudjFiZXRhMi5Xcml0ZVJvd3NSZXF1ZXN0GicuZHRrdC5jYXRhbG9nLnYxYmV0YTIuV3JpdGVSb3dzUmVzcG9uc2UoARJbCghSZWFkUm93cxIlLmR0a3QuY2F0YWxvZy52MWJldGEyLlJlYWRSb3dzUmVxdWVzdBomLmR0a3QuY2F0YWxvZy52MWJldGEyLlJlYWRSb3dzUmVzcG9uc2UwAULsAQoacHJvdG8uZHRrdC5jYXRhbG9nLnYxYmV0YTJCClRhYmxlUHJvdG9QAVpQZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9jYXRhbG9nL3YxYmV0YTI7Y2F0YWxvZ3YxYmV0YTKiAgNEQ1iqAhREdGt0LkNhdGFsb2cuVjFiZXRhMsoCFER0a3RcQ2F0YWxvZ1xWMWJldGEy4gIgRHRrdFxDYXRhbG9nXFYxYmV0YTJcR1BCTWV0YWRhdGHqAhZEdGt0OjpDYXRhbG9nOjpWMWJldGEyYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_catalog_v1beta2_type, file_dtkt_catalog_v1beta2_value, file_google_protobuf_field_mask]);
 
 /**
- * Represents a table within a table.
+ * Represents a table within a schema.
  *
  * @generated from message dtkt.catalog.v1beta2.Table
  */
@@ -33,11 +33,11 @@ export type Table = Message<"dtkt.catalog.v1beta2.Table"> & {
   name: string;
 
   /**
-   * Table identifier.
+   * Table identifier for use within a query.
    *
-   * @generated from field: string table_id = 2;
+   * @generated from field: string ident = 2;
    */
-  tableId: string;
+  ident: string;
 
   /**
    * Description of the table.
@@ -49,12 +49,12 @@ export type Table = Message<"dtkt.catalog.v1beta2.Table"> & {
   /**
    * List of fields defined by the table.
    *
-   * @generated from field: repeated dtkt.catalog.v1beta2.Field fields = 34;
+   * @generated from field: repeated dtkt.catalog.v1beta2.Field fields = 4;
    */
   fields: Field[];
 
   /**
-   * Statistics about the table (e.g., row count), if any.
+   * Statistics about the table, if any.
    *
    * @generated from field: dtkt.catalog.v1beta2.TableStats stats = 5;
    */
@@ -69,7 +69,7 @@ export type Table = Message<"dtkt.catalog.v1beta2.Table"> & {
 };
 
 /**
- * Represents a table within a table.
+ * Represents a table within a schema.
  *
  * @generated from message dtkt.catalog.v1beta2.Table
  */
@@ -82,11 +82,11 @@ export type TableValid = Message<"dtkt.catalog.v1beta2.Table"> & {
   name: string;
 
   /**
-   * Table identifier.
+   * Table identifier for use within a query.
    *
-   * @generated from field: string table_id = 2;
+   * @generated from field: string ident = 2;
    */
-  tableId: string;
+  ident: string;
 
   /**
    * Description of the table.
@@ -98,12 +98,12 @@ export type TableValid = Message<"dtkt.catalog.v1beta2.Table"> & {
   /**
    * List of fields defined by the table.
    *
-   * @generated from field: repeated dtkt.catalog.v1beta2.Field fields = 34;
+   * @generated from field: repeated dtkt.catalog.v1beta2.Field fields = 4;
    */
   fields: FieldValid[];
 
   /**
-   * Statistics about the table (e.g., row count), if any.
+   * Statistics about the table, if any.
    *
    * @generated from field: dtkt.catalog.v1beta2.TableStats stats = 5;
    */
@@ -161,21 +161,29 @@ export const TableStatsSchema: GenMessage<TableStats, {validType: TableStatsVali
  */
 export type ListTablesRequest = Message<"dtkt.catalog.v1beta2.ListTablesRequest"> & {
   /**
+   * Number of results to return per page. Leave empty for the server default.
+   *
    * @generated from field: int32 page_size = 1;
    */
   pageSize: number;
 
   /**
+   * Token from a previous response to retrieve the next page.
+   *
    * @generated from field: string page_token = 2;
    */
   pageToken: string;
 
   /**
+   * Parent resource name.
+   *
    * @generated from field: string parent = 3;
    */
   parent: string;
 
   /**
+   * Optional filter expression to narrow results.
+   *
    * @generated from field: string filter = 4;
    */
   filter: string;
@@ -322,7 +330,7 @@ export const GetTableResponseSchema: GenMessage<GetTableResponse, {validType: Ge
  */
 export type CreateTableRequest = Message<"dtkt.catalog.v1beta2.CreateTableRequest"> & {
   /**
-   * Parent catalog resource name.
+   * Parent schema resource name.
    *
    * @generated from field: string parent = 1;
    */
@@ -350,7 +358,7 @@ export type CreateTableRequest = Message<"dtkt.catalog.v1beta2.CreateTableReques
  */
 export type CreateTableRequestValid = Message<"dtkt.catalog.v1beta2.CreateTableRequest"> & {
   /**
-   * Parent catalog resource name.
+   * Parent schema resource name.
    *
    * @generated from field: string parent = 1;
    */

@@ -50,27 +50,27 @@ func WithGroup(ctx context.Context, name string) context.Context {
 
 //go:noinline
 func Debug(ctx context.Context, msg string, attrs ...slog.Attr) {
-	log(ctx, slog.LevelDebug, msg, attrs...)
+	writeLog(ctx, slog.LevelDebug, msg, attrs...)
 }
 
 //go:noinline
 func Info(ctx context.Context, msg string, attrs ...slog.Attr) {
-	log(ctx, slog.LevelInfo, msg, attrs...)
+	writeLog(ctx, slog.LevelInfo, msg, attrs...)
 }
 
 //go:noinline
 func Warn(ctx context.Context, msg string, attrs ...slog.Attr) {
-	log(ctx, slog.LevelWarn, msg, attrs...)
+	writeLog(ctx, slog.LevelWarn, msg, attrs...)
 }
 
 //go:noinline
 func Error(ctx context.Context, msg string, attrs ...slog.Attr) {
-	log(ctx, slog.LevelError, msg, attrs...)
+	writeLog(ctx, slog.LevelError, msg, attrs...)
 }
 
 //go:noinline
 func Fatal(ctx context.Context, msg string, attrs ...slog.Attr) {
-	log(ctx, 12, msg, attrs...)
+	writeLog(ctx, 12, msg, attrs...)
 	os.Exit(1)
 }
 
@@ -82,7 +82,7 @@ func LogCtx(ctx context.Context, options ...Option) context.Context {
 	return NewCtx(ctx, NewLogger(options...))
 }
 
-func log(ctx context.Context, level slog.Level, msg string, attrs ...slog.Attr) {
+func writeLog(ctx context.Context, level slog.Level, msg string, attrs ...slog.Attr) {
 	l := FromCtx(ctx)
 	if !l.Enabled(ctx, level) {
 		return

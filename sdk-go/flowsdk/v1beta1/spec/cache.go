@@ -1,6 +1,8 @@
 package spec
 
 import (
+	"context"
+
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
@@ -29,25 +31,20 @@ func (m *EvalCache) HasCached() (ref.Val, bool) {
 	return m.cached, m.node.GetCache() && m.cached != nil
 }
 
-func (m *EvalCache) Eval() (shared.EvalFunc, bool) {
+func (m *EvalCache) Eval(ctx context.Context, env shared.Env) ref.Val {
 	if !m.node.GetCache() {
-		return m.prog.Eval, true
+		return m.prog.Eval(ctx, env)
+	} else if m.cached != nil {
+		return m.cached
 	}
 
-	return shared.EvalFunc(func(run shared.Runtime) ref.Val {
-		if m.cached != nil {
-			return m.cached
-		}
-
-		refVal := m.prog.Eval(run)
-		if refVal == types.NullValue {
-			return refVal
-		} else if _, ok := refVal.Value().(error); ok {
-			return refVal
-		}
-
-		m.cached = refVal
-
+	refVal := m.prog.Eval(ctx, env)
+	switch refVal.(type) {
+	case types.Null, error:
 		return refVal
-	}), true
+	}
+
+	m.cached = refVal
+
+	return refVal
 }

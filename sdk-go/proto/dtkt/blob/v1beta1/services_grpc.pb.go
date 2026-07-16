@@ -19,14 +19,122 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	BucketService_ListBuckets_FullMethodName = "/dtkt.blob.v1beta1.BucketService/ListBuckets"
+)
+
+// BucketServiceClient is the client API for BucketService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// BucketService provides operations to interact with buckets within a storage location.
+type BucketServiceClient interface {
+	// Retrieves a list of buckets.
+	ListBuckets(ctx context.Context, in *ListBucketsRequest, opts ...grpc.CallOption) (*ListBucketsResponse, error)
+}
+
+type bucketServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewBucketServiceClient(cc grpc.ClientConnInterface) BucketServiceClient {
+	return &bucketServiceClient{cc}
+}
+
+func (c *bucketServiceClient) ListBuckets(ctx context.Context, in *ListBucketsRequest, opts ...grpc.CallOption) (*ListBucketsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListBucketsResponse)
+	err := c.cc.Invoke(ctx, BucketService_ListBuckets_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// BucketServiceServer is the server API for BucketService service.
+// All implementations must embed UnimplementedBucketServiceServer
+// for forward compatibility.
+//
+// BucketService provides operations to interact with buckets within a storage location.
+type BucketServiceServer interface {
+	// Retrieves a list of buckets.
+	ListBuckets(context.Context, *ListBucketsRequest) (*ListBucketsResponse, error)
+	mustEmbedUnimplementedBucketServiceServer()
+}
+
+// UnimplementedBucketServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedBucketServiceServer struct{}
+
+func (UnimplementedBucketServiceServer) ListBuckets(context.Context, *ListBucketsRequest) (*ListBucketsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListBuckets not implemented")
+}
+func (UnimplementedBucketServiceServer) mustEmbedUnimplementedBucketServiceServer() {}
+func (UnimplementedBucketServiceServer) testEmbeddedByValue()                       {}
+
+// UnsafeBucketServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to BucketServiceServer will
+// result in compilation errors.
+type UnsafeBucketServiceServer interface {
+	mustEmbedUnimplementedBucketServiceServer()
+}
+
+func RegisterBucketServiceServer(s grpc.ServiceRegistrar, srv BucketServiceServer) {
+	// If the following call pancis, it indicates UnimplementedBucketServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&BucketService_ServiceDesc, srv)
+}
+
+func _BucketService_ListBuckets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListBucketsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BucketServiceServer).ListBuckets(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BucketService_ListBuckets_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BucketServiceServer).ListBuckets(ctx, req.(*ListBucketsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// BucketService_ServiceDesc is the grpc.ServiceDesc for BucketService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var BucketService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "dtkt.blob.v1beta1.BucketService",
+	HandlerType: (*BucketServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ListBuckets",
+			Handler:    _BucketService_ListBuckets_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "dtkt/blob/v1beta1/services.proto",
+}
+
+const (
 	BlobService_ListBlobs_FullMethodName         = "/dtkt.blob.v1beta1.BlobService/ListBlobs"
 	BlobService_GetBlob_FullMethodName           = "/dtkt.blob.v1beta1.BlobService/GetBlob"
-	BlobService_WriteBlob_FullMethodName         = "/dtkt.blob.v1beta1.BlobService/WriteBlob"
 	BlobService_DeleteBlob_FullMethodName        = "/dtkt.blob.v1beta1.BlobService/DeleteBlob"
 	BlobService_CopyBlob_FullMethodName          = "/dtkt.blob.v1beta1.BlobService/CopyBlob"
 	BlobService_GenerateSignedURL_FullMethodName = "/dtkt.blob.v1beta1.BlobService/GenerateSignedURL"
+	BlobService_ReadBlob_FullMethodName          = "/dtkt.blob.v1beta1.BlobService/ReadBlob"
+	BlobService_WriteBlob_FullMethodName         = "/dtkt.blob.v1beta1.BlobService/WriteBlob"
 	BlobService_ReadBlobLines_FullMethodName     = "/dtkt.blob.v1beta1.BlobService/ReadBlobLines"
-	BlobService_ReadBlobRange_FullMethodName     = "/dtkt.blob.v1beta1.BlobService/ReadBlobRange"
 	BlobService_WriteBlobLines_FullMethodName    = "/dtkt.blob.v1beta1.BlobService/WriteBlobLines"
 )
 
@@ -36,22 +144,26 @@ const (
 //
 // BlobService provides operations to interact with blobs within a storage location.
 type BlobServiceClient interface {
-	// Retrieves a list of files provided by service.
+	// Retrieves a list of blobs.
 	ListBlobs(ctx context.Context, in *ListBlobsRequest, opts ...grpc.CallOption) (*ListBlobsResponse, error)
 	// Retrieves attributes for the blob stored at key.
 	GetBlob(ctx context.Context, in *GetBlobRequest, opts ...grpc.CallOption) (*GetBlobResponse, error)
-	// Writes or overwrites the blob stored at key.
-	WriteBlob(ctx context.Context, in *WriteBlobRequest, opts ...grpc.CallOption) (*WriteBlobResponse, error)
 	// Deletes the blob stored at key.
 	DeleteBlob(ctx context.Context, in *DeleteBlobRequest, opts ...grpc.CallOption) (*DeleteBlobResponse, error)
 	// Copies a blob from source to destination key.
 	CopyBlob(ctx context.Context, in *CopyBlobRequest, opts ...grpc.CallOption) (*CopyBlobResponse, error)
 	// Generates a signed URL for accessing the blob.
 	GenerateSignedURL(ctx context.Context, in *GenerateSignedURLRequest, opts ...grpc.CallOption) (*GenerateSignedURLResponse, error)
-	// ReadBlobLines streams lines of blob with requested key and options.
+	// Retrieves the contents of a blob as a stream of responses containing a
+	// portion of the requested bytes. The stream ends when all data has been
+	// sent or the end of contents has been reached (may be less than requested).
+	ReadBlob(ctx context.Context, in *ReadBlobRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ReadBlobResponse], error)
+	// Writes the contents of a blob as a stream of requests containing a portion
+	// of bytes to be written. The stream ends when the request specifies it has
+	// finished sending.
+	WriteBlob(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[WriteBlobRequest, WriteBlobResponse], error)
+	// Streams lines of data format and mode of blob content.
 	ReadBlobLines(ctx context.Context, in *ReadBlobLinesRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ReadBlobLinesResponse], error)
-	// ReadBlobRange streams chunks of blob with requested key and options.
-	ReadBlobRange(ctx context.Context, in *ReadBlobRangeRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ReadBlobRangeResponse], error)
 	// WriteBlobLines streams lines into blob with requested key and options.
 	WriteBlobLines(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[WriteBlobLinesRequest, WriteBlobLinesResponse], error)
 }
@@ -78,16 +190,6 @@ func (c *blobServiceClient) GetBlob(ctx context.Context, in *GetBlobRequest, opt
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetBlobResponse)
 	err := c.cc.Invoke(ctx, BlobService_GetBlob_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *blobServiceClient) WriteBlob(ctx context.Context, in *WriteBlobRequest, opts ...grpc.CallOption) (*WriteBlobResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(WriteBlobResponse)
-	err := c.cc.Invoke(ctx, BlobService_WriteBlob_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -124,9 +226,41 @@ func (c *blobServiceClient) GenerateSignedURL(ctx context.Context, in *GenerateS
 	return out, nil
 }
 
+func (c *blobServiceClient) ReadBlob(ctx context.Context, in *ReadBlobRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ReadBlobResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &BlobService_ServiceDesc.Streams[0], BlobService_ReadBlob_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[ReadBlobRequest, ReadBlobResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type BlobService_ReadBlobClient = grpc.ServerStreamingClient[ReadBlobResponse]
+
+func (c *blobServiceClient) WriteBlob(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[WriteBlobRequest, WriteBlobResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &BlobService_ServiceDesc.Streams[1], BlobService_WriteBlob_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[WriteBlobRequest, WriteBlobResponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type BlobService_WriteBlobClient = grpc.ClientStreamingClient[WriteBlobRequest, WriteBlobResponse]
+
 func (c *blobServiceClient) ReadBlobLines(ctx context.Context, in *ReadBlobLinesRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ReadBlobLinesResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &BlobService_ServiceDesc.Streams[0], BlobService_ReadBlobLines_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &BlobService_ServiceDesc.Streams[2], BlobService_ReadBlobLines_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -143,28 +277,9 @@ func (c *blobServiceClient) ReadBlobLines(ctx context.Context, in *ReadBlobLines
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type BlobService_ReadBlobLinesClient = grpc.ServerStreamingClient[ReadBlobLinesResponse]
 
-func (c *blobServiceClient) ReadBlobRange(ctx context.Context, in *ReadBlobRangeRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ReadBlobRangeResponse], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &BlobService_ServiceDesc.Streams[1], BlobService_ReadBlobRange_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[ReadBlobRangeRequest, ReadBlobRangeResponse]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type BlobService_ReadBlobRangeClient = grpc.ServerStreamingClient[ReadBlobRangeResponse]
-
 func (c *blobServiceClient) WriteBlobLines(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[WriteBlobLinesRequest, WriteBlobLinesResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &BlobService_ServiceDesc.Streams[2], BlobService_WriteBlobLines_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &BlobService_ServiceDesc.Streams[3], BlobService_WriteBlobLines_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -181,22 +296,26 @@ type BlobService_WriteBlobLinesClient = grpc.ClientStreamingClient[WriteBlobLine
 //
 // BlobService provides operations to interact with blobs within a storage location.
 type BlobServiceServer interface {
-	// Retrieves a list of files provided by service.
+	// Retrieves a list of blobs.
 	ListBlobs(context.Context, *ListBlobsRequest) (*ListBlobsResponse, error)
 	// Retrieves attributes for the blob stored at key.
 	GetBlob(context.Context, *GetBlobRequest) (*GetBlobResponse, error)
-	// Writes or overwrites the blob stored at key.
-	WriteBlob(context.Context, *WriteBlobRequest) (*WriteBlobResponse, error)
 	// Deletes the blob stored at key.
 	DeleteBlob(context.Context, *DeleteBlobRequest) (*DeleteBlobResponse, error)
 	// Copies a blob from source to destination key.
 	CopyBlob(context.Context, *CopyBlobRequest) (*CopyBlobResponse, error)
 	// Generates a signed URL for accessing the blob.
 	GenerateSignedURL(context.Context, *GenerateSignedURLRequest) (*GenerateSignedURLResponse, error)
-	// ReadBlobLines streams lines of blob with requested key and options.
+	// Retrieves the contents of a blob as a stream of responses containing a
+	// portion of the requested bytes. The stream ends when all data has been
+	// sent or the end of contents has been reached (may be less than requested).
+	ReadBlob(*ReadBlobRequest, grpc.ServerStreamingServer[ReadBlobResponse]) error
+	// Writes the contents of a blob as a stream of requests containing a portion
+	// of bytes to be written. The stream ends when the request specifies it has
+	// finished sending.
+	WriteBlob(grpc.ClientStreamingServer[WriteBlobRequest, WriteBlobResponse]) error
+	// Streams lines of data format and mode of blob content.
 	ReadBlobLines(*ReadBlobLinesRequest, grpc.ServerStreamingServer[ReadBlobLinesResponse]) error
-	// ReadBlobRange streams chunks of blob with requested key and options.
-	ReadBlobRange(*ReadBlobRangeRequest, grpc.ServerStreamingServer[ReadBlobRangeResponse]) error
 	// WriteBlobLines streams lines into blob with requested key and options.
 	WriteBlobLines(grpc.ClientStreamingServer[WriteBlobLinesRequest, WriteBlobLinesResponse]) error
 	mustEmbedUnimplementedBlobServiceServer()
@@ -215,9 +334,6 @@ func (UnimplementedBlobServiceServer) ListBlobs(context.Context, *ListBlobsReque
 func (UnimplementedBlobServiceServer) GetBlob(context.Context, *GetBlobRequest) (*GetBlobResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBlob not implemented")
 }
-func (UnimplementedBlobServiceServer) WriteBlob(context.Context, *WriteBlobRequest) (*WriteBlobResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method WriteBlob not implemented")
-}
 func (UnimplementedBlobServiceServer) DeleteBlob(context.Context, *DeleteBlobRequest) (*DeleteBlobResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteBlob not implemented")
 }
@@ -227,11 +343,14 @@ func (UnimplementedBlobServiceServer) CopyBlob(context.Context, *CopyBlobRequest
 func (UnimplementedBlobServiceServer) GenerateSignedURL(context.Context, *GenerateSignedURLRequest) (*GenerateSignedURLResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GenerateSignedURL not implemented")
 }
+func (UnimplementedBlobServiceServer) ReadBlob(*ReadBlobRequest, grpc.ServerStreamingServer[ReadBlobResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method ReadBlob not implemented")
+}
+func (UnimplementedBlobServiceServer) WriteBlob(grpc.ClientStreamingServer[WriteBlobRequest, WriteBlobResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method WriteBlob not implemented")
+}
 func (UnimplementedBlobServiceServer) ReadBlobLines(*ReadBlobLinesRequest, grpc.ServerStreamingServer[ReadBlobLinesResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method ReadBlobLines not implemented")
-}
-func (UnimplementedBlobServiceServer) ReadBlobRange(*ReadBlobRangeRequest, grpc.ServerStreamingServer[ReadBlobRangeResponse]) error {
-	return status.Errorf(codes.Unimplemented, "method ReadBlobRange not implemented")
 }
 func (UnimplementedBlobServiceServer) WriteBlobLines(grpc.ClientStreamingServer[WriteBlobLinesRequest, WriteBlobLinesResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method WriteBlobLines not implemented")
@@ -293,24 +412,6 @@ func _BlobService_GetBlob_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BlobService_WriteBlob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WriteBlobRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BlobServiceServer).WriteBlob(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: BlobService_WriteBlob_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BlobServiceServer).WriteBlob(ctx, req.(*WriteBlobRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _BlobService_DeleteBlob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteBlobRequest)
 	if err := dec(in); err != nil {
@@ -365,6 +466,24 @@ func _BlobService_GenerateSignedURL_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BlobService_ReadBlob_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ReadBlobRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(BlobServiceServer).ReadBlob(m, &grpc.GenericServerStream[ReadBlobRequest, ReadBlobResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type BlobService_ReadBlobServer = grpc.ServerStreamingServer[ReadBlobResponse]
+
+func _BlobService_WriteBlob_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(BlobServiceServer).WriteBlob(&grpc.GenericServerStream[WriteBlobRequest, WriteBlobResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type BlobService_WriteBlobServer = grpc.ClientStreamingServer[WriteBlobRequest, WriteBlobResponse]
+
 func _BlobService_ReadBlobLines_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(ReadBlobLinesRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -375,17 +494,6 @@ func _BlobService_ReadBlobLines_Handler(srv interface{}, stream grpc.ServerStrea
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type BlobService_ReadBlobLinesServer = grpc.ServerStreamingServer[ReadBlobLinesResponse]
-
-func _BlobService_ReadBlobRange_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(ReadBlobRangeRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(BlobServiceServer).ReadBlobRange(m, &grpc.GenericServerStream[ReadBlobRangeRequest, ReadBlobRangeResponse]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type BlobService_ReadBlobRangeServer = grpc.ServerStreamingServer[ReadBlobRangeResponse]
 
 func _BlobService_WriteBlobLines_Handler(srv interface{}, stream grpc.ServerStream) error {
 	return srv.(BlobServiceServer).WriteBlobLines(&grpc.GenericServerStream[WriteBlobLinesRequest, WriteBlobLinesResponse]{ServerStream: stream})
@@ -410,10 +518,6 @@ var BlobService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _BlobService_GetBlob_Handler,
 		},
 		{
-			MethodName: "WriteBlob",
-			Handler:    _BlobService_WriteBlob_Handler,
-		},
-		{
 			MethodName: "DeleteBlob",
 			Handler:    _BlobService_DeleteBlob_Handler,
 		},
@@ -428,13 +532,18 @@ var BlobService_ServiceDesc = grpc.ServiceDesc{
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "ReadBlobLines",
-			Handler:       _BlobService_ReadBlobLines_Handler,
+			StreamName:    "ReadBlob",
+			Handler:       _BlobService_ReadBlob_Handler,
 			ServerStreams: true,
 		},
 		{
-			StreamName:    "ReadBlobRange",
-			Handler:       _BlobService_ReadBlobRange_Handler,
+			StreamName:    "WriteBlob",
+			Handler:       _BlobService_WriteBlob_Handler,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "ReadBlobLines",
+			Handler:       _BlobService_ReadBlobLines_Handler,
 			ServerStreams: true,
 		},
 		{

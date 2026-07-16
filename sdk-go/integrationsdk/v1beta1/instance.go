@@ -11,16 +11,26 @@ import (
 
 type (
 	InstanceMux[I InstanceType] interface {
+		GetInstance(context.Context) (I, error)
 		Address() network.Address
 		Logger() *slog.Logger
 		Package() *sharedv1beta1.Package
-		ConfigSchema() *sharedv1beta1.TypeSchema
-		GetInstance(context.Context) (I, error)
-		GetDataRoot() (string, error)
 		Types() *TypeRegistry
 		Actions() *ActionRegistry
 		Events() *EventRegistry
 		EventSources() *EventSourceRegistry
+	}
+	InstanceConfig[C any] interface {
+		Get() C
+		Actions() *ActionRegistry
+		Address() network.Address
+		Events() *EventRegistry
+		EventSources() *EventSourceRegistry
+		DataRoot() string
+		Logger() *slog.Logger
+		Package() *sharedv1beta1.Package
+		Schema() *TypeSchema[C]
+		Types() *TypeRegistry
 	}
 	InstanceType interface {
 		CheckAuth(context.Context, *basev1beta1.CheckAuthRequest) (*basev1beta1.CheckAuthResponse, error)

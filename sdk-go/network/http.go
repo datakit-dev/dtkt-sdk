@@ -65,6 +65,10 @@ func (c *HTTPClient) DialContext(ctx context.Context, _ string, _ string) (net.C
 	return c.dialer.DialContext(ctx)
 }
 
+func (c *HTTPClient) Address() Address {
+	return c.address
+}
+
 func (c *HTTPClient) BaseURL() string {
 	return c.address.HTTP().String()
 }

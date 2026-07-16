@@ -1,0 +1,207 @@
+edition = "2023";
+
+package dtkt.sql.v1beta1;
+
+import "buf/validate/validate.proto";
+import "dtkt/protoform/v1beta1/protoform.proto";
+import "dtkt/sql/v1beta1/column.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/go_features.proto";
+import "google/protobuf/struct.proto";
+
+option features.(pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/sql/v1beta1";
+
+service TableService {
+  // List tables.
+  rpc ListTables(ListTablesRequest) returns (ListTablesResponse);
+
+  // Get a table.
+  rpc GetTable(GetTableRequest) returns (GetTableResponse);
+
+  // Create a table.
+  rpc CreateTable(CreateTableRequest) returns (CreateTableResponse);
+
+  // Update a table.
+  rpc UpdateTable(UpdateTableRequest) returns (UpdateTableResponse);
+
+  // Delete a table.
+  rpc DeleteTable(DeleteTableRequest) returns (DeleteTableResponse);
+
+  // Read rows from a table.
+  rpc ReadTableRows(ReadTableRowsRequest) returns (stream ReadTableRowsResponse);
+
+  // Write rows to a table.
+  rpc WriteTableRows(stream WriteTableRowsRequest) returns (WriteTableRowsResponse);
+}
+
+// A table within a schema.
+message Table {
+  // Fully qualified table name, format: `{schema}.{table}`.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER
+  ];
+
+  // List of columns within the table.
+  repeated Column columns = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).repeated.min_items = 1
+  ];
+
+  // List of indexes within the table.
+  repeated Index indexes = 5;
+
+  // List of foreign keys within the table.
+  repeated ForeignKey foreign_keys = 6;
+
+  // Additional metadata, if any.
+  map<string, string> metadata = 10;
+}
+
+// List tables request.
+message ListTablesRequest {
+  // Number of results to return per page. Leave empty for the server default.
+  int32 page_size = 1;
+
+  // Token from a previous response to retrieve the next page.
+  string page_token = 2;
+
+  // Optional parent schema name. When not set, returns all tables across schemas.
+  string parent = 3;
+
+  // Optional filter expression to narrow results.
+  string filter = 4;
+}
+
+// List tables response.
+message ListTablesResponse {
+  repeated Table tables = 1;
+
+  // Token to retrieve the next page of tables, if any.
+  string next_page_token = 2;
+}
+
+// Get table request.
+message GetTableRequest {
+  // Fully-qualified table name to retrieve.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+// Get table response.
+message GetTableResponse {
+  // The retrieved table.
+  Table table = 1;
+}
+
+// Create table request.
+message CreateTableRequest {
+  // Parent schema name.
+  string parent = 1 [(buf.validate.field).required = true];
+
+  // Table identifier (unqualified), example: "sales".
+  string table_id = 2 [(buf.validate.field).required = true];
+
+  // Table to create.
+  Table table = 3 [(buf.validate.field).required = true];
+}
+
+// Create table response.
+message CreateTableResponse {
+  // The created table.
+  Table table = 1;
+}
+
+// Update table request.
+message UpdateTableRequest {
+  // The table containing updates.
+  Table table = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).title = "Table",
+    (dtkt.protoform.v1beta1.field).description = "Select a table to update.",
+    (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.sql.v1beta1.TableService.ListTables",
+    (dtkt.protoform.v1beta1.field).select.response_field = "tables",
+    (dtkt.protoform.v1beta1.field).select.label_expr = "this.name"
+  ];
+
+  // Fields to update.
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+// Update table response.
+message UpdateTableResponse {
+  // The updated table.
+  Table table = 1;
+}
+
+// Delete table request.
+message DeleteTableRequest {
+  // Fully-qualified table name to delete, format: `{schema}.{table}`.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+// Delete table response.
+message DeleteTableResponse {}
+
+// Read table rows request.
+message ReadTableRowsRequest {
+  // Fully-qualified table name, format: `{schema}.{table}`.
+  string table = 1 [(buf.validate.field).required = true];
+
+  // Columns to read from the table; when empty, returns all columns.
+  repeated string columns = 2;
+
+  // Maximum number of rows to read from the table:
+  //  - if unset or 0, reads all rows relative to offset;
+  //  - if > 0, reads at most this number of rows relative to offset.
+  uint64 limit = 4;
+
+  // Offset for reading rows.
+  uint64 offset = 5;
+
+  // message Filter {
+  //   message Values {
+  //     repeated Value values = 1;
+  //   }
+
+  //   oneof operator {
+  //     bool null = 1;
+  //     Value equal = 2;
+  //     Values in = 3;
+  //     Filter not = 4;
+  //   }
+  // }
+
+  // Filter rows by
+  // map<string, Filter> filters = 3;
+}
+
+// Read table rows response.
+message ReadTableRowsResponse {
+  // A row read from the table.
+  google.protobuf.Struct row = 1;
+}
+
+// Write table rows request.
+message WriteTableRowsRequest {
+  // Fully-qualified table name, format: `{schema}.{table}`.
+  string table = 1 [(buf.validate.field).required = true];
+
+  // The row to write to the table.
+  google.protobuf.Struct row = 2;
+
+  // The number of rows to be written at a time. When not set or zero, service
+  // will use a default size of its choosing and may also have an upper limit.
+  uint32 batch_size = 3;
+
+  // When set to true errors are ignored, otherwise stream is closed when an
+  // error is encountered while attempting to write row.
+  bool ignore_errors = 4;
+}
+
+// Write table rows response.
+message WriteTableRowsResponse {
+  // Number of rows written for each fully-qualified table name.
+  map<string, int64> rows_written = 1;
+}

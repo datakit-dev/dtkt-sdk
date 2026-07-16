@@ -19,6 +19,258 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	ModelService_ListModels_FullMethodName = "/dtkt.ai.v1beta1.ModelService/ListModels"
+	ModelService_GetModel_FullMethodName   = "/dtkt.ai.v1beta1.ModelService/GetModel"
+)
+
+// ModelServiceClient is the client API for ModelService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type ModelServiceClient interface {
+	// Retrieves a list of models.
+	ListModels(ctx context.Context, in *ListModelsRequest, opts ...grpc.CallOption) (*ListModelsResponse, error)
+	// Retrieves a single model.
+	GetModel(ctx context.Context, in *GetModelRequest, opts ...grpc.CallOption) (*GetModelResponse, error)
+}
+
+type modelServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewModelServiceClient(cc grpc.ClientConnInterface) ModelServiceClient {
+	return &modelServiceClient{cc}
+}
+
+func (c *modelServiceClient) ListModels(ctx context.Context, in *ListModelsRequest, opts ...grpc.CallOption) (*ListModelsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListModelsResponse)
+	err := c.cc.Invoke(ctx, ModelService_ListModels_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *modelServiceClient) GetModel(ctx context.Context, in *GetModelRequest, opts ...grpc.CallOption) (*GetModelResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetModelResponse)
+	err := c.cc.Invoke(ctx, ModelService_GetModel_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ModelServiceServer is the server API for ModelService service.
+// All implementations must embed UnimplementedModelServiceServer
+// for forward compatibility.
+type ModelServiceServer interface {
+	// Retrieves a list of models.
+	ListModels(context.Context, *ListModelsRequest) (*ListModelsResponse, error)
+	// Retrieves a single model.
+	GetModel(context.Context, *GetModelRequest) (*GetModelResponse, error)
+	mustEmbedUnimplementedModelServiceServer()
+}
+
+// UnimplementedModelServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedModelServiceServer struct{}
+
+func (UnimplementedModelServiceServer) ListModels(context.Context, *ListModelsRequest) (*ListModelsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListModels not implemented")
+}
+func (UnimplementedModelServiceServer) GetModel(context.Context, *GetModelRequest) (*GetModelResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetModel not implemented")
+}
+func (UnimplementedModelServiceServer) mustEmbedUnimplementedModelServiceServer() {}
+func (UnimplementedModelServiceServer) testEmbeddedByValue()                      {}
+
+// UnsafeModelServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ModelServiceServer will
+// result in compilation errors.
+type UnsafeModelServiceServer interface {
+	mustEmbedUnimplementedModelServiceServer()
+}
+
+func RegisterModelServiceServer(s grpc.ServiceRegistrar, srv ModelServiceServer) {
+	// If the following call pancis, it indicates UnimplementedModelServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&ModelService_ServiceDesc, srv)
+}
+
+func _ModelService_ListModels_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListModelsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ModelServiceServer).ListModels(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ModelService_ListModels_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ModelServiceServer).ListModels(ctx, req.(*ListModelsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ModelService_GetModel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetModelRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ModelServiceServer).GetModel(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ModelService_GetModel_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ModelServiceServer).GetModel(ctx, req.(*GetModelRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// ModelService_ServiceDesc is the grpc.ServiceDesc for ModelService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var ModelService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "dtkt.ai.v1beta1.ModelService",
+	HandlerType: (*ModelServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ListModels",
+			Handler:    _ModelService_ListModels_Handler,
+		},
+		{
+			MethodName: "GetModel",
+			Handler:    _ModelService_GetModel_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "dtkt/ai/v1beta1/services.proto",
+}
+
+const (
+	EmbeddingService_GenerateEmbeddings_FullMethodName = "/dtkt.ai.v1beta1.EmbeddingService/GenerateEmbeddings"
+)
+
+// EmbeddingServiceClient is the client API for EmbeddingService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// EmbeddingService provides operations to generate embeddings.
+type EmbeddingServiceClient interface {
+	// Generates embeddings for the provided input text using a specified model.
+	GenerateEmbeddings(ctx context.Context, in *GenerateEmbeddingsRequest, opts ...grpc.CallOption) (*GenerateEmbeddingsResponse, error)
+}
+
+type embeddingServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewEmbeddingServiceClient(cc grpc.ClientConnInterface) EmbeddingServiceClient {
+	return &embeddingServiceClient{cc}
+}
+
+func (c *embeddingServiceClient) GenerateEmbeddings(ctx context.Context, in *GenerateEmbeddingsRequest, opts ...grpc.CallOption) (*GenerateEmbeddingsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GenerateEmbeddingsResponse)
+	err := c.cc.Invoke(ctx, EmbeddingService_GenerateEmbeddings_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// EmbeddingServiceServer is the server API for EmbeddingService service.
+// All implementations must embed UnimplementedEmbeddingServiceServer
+// for forward compatibility.
+//
+// EmbeddingService provides operations to generate embeddings.
+type EmbeddingServiceServer interface {
+	// Generates embeddings for the provided input text using a specified model.
+	GenerateEmbeddings(context.Context, *GenerateEmbeddingsRequest) (*GenerateEmbeddingsResponse, error)
+	mustEmbedUnimplementedEmbeddingServiceServer()
+}
+
+// UnimplementedEmbeddingServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedEmbeddingServiceServer struct{}
+
+func (UnimplementedEmbeddingServiceServer) GenerateEmbeddings(context.Context, *GenerateEmbeddingsRequest) (*GenerateEmbeddingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateEmbeddings not implemented")
+}
+func (UnimplementedEmbeddingServiceServer) mustEmbedUnimplementedEmbeddingServiceServer() {}
+func (UnimplementedEmbeddingServiceServer) testEmbeddedByValue()                          {}
+
+// UnsafeEmbeddingServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to EmbeddingServiceServer will
+// result in compilation errors.
+type UnsafeEmbeddingServiceServer interface {
+	mustEmbedUnimplementedEmbeddingServiceServer()
+}
+
+func RegisterEmbeddingServiceServer(s grpc.ServiceRegistrar, srv EmbeddingServiceServer) {
+	// If the following call pancis, it indicates UnimplementedEmbeddingServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&EmbeddingService_ServiceDesc, srv)
+}
+
+func _EmbeddingService_GenerateEmbeddings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateEmbeddingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EmbeddingServiceServer).GenerateEmbeddings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EmbeddingService_GenerateEmbeddings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EmbeddingServiceServer).GenerateEmbeddings(ctx, req.(*GenerateEmbeddingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// EmbeddingService_ServiceDesc is the grpc.ServiceDesc for EmbeddingService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var EmbeddingService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "dtkt.ai.v1beta1.EmbeddingService",
+	HandlerType: (*EmbeddingServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GenerateEmbeddings",
+			Handler:    _EmbeddingService_GenerateEmbeddings_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "dtkt/ai/v1beta1/services.proto",
+}
+
+const (
 	TextService_GenerateText_FullMethodName = "/dtkt.ai.v1beta1.TextService/GenerateText"
 	TextService_StreamText_FullMethodName   = "/dtkt.ai.v1beta1.TextService/StreamText"
 )
@@ -319,194 +571,6 @@ var ObjectService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "dtkt/ai/v1beta1/services.proto",
-}
-
-const (
-	EmbeddingService_ListEmbeddingModels_FullMethodName = "/dtkt.ai.v1beta1.EmbeddingService/ListEmbeddingModels"
-	EmbeddingService_GetEmbeddingModel_FullMethodName   = "/dtkt.ai.v1beta1.EmbeddingService/GetEmbeddingModel"
-	EmbeddingService_GenerateEmbeddings_FullMethodName  = "/dtkt.ai.v1beta1.EmbeddingService/GenerateEmbeddings"
-)
-
-// EmbeddingServiceClient is the client API for EmbeddingService service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// EmbeddingService provides operations to generate and stream embeddings using AI models.
-type EmbeddingServiceClient interface {
-	// Retrieves a list of available embedding models.
-	ListEmbeddingModels(ctx context.Context, in *ListEmbeddingModelsRequest, opts ...grpc.CallOption) (*ListEmbeddingModelsResponse, error)
-	// Retrieves details of a specific embedding model by its ID.
-	GetEmbeddingModel(ctx context.Context, in *GetEmbeddingModelRequest, opts ...grpc.CallOption) (*GetEmbeddingModelResponse, error)
-	// Generates embeddings for the provided input text using a specified model.
-	GenerateEmbeddings(ctx context.Context, in *GenerateEmbeddingsRequest, opts ...grpc.CallOption) (*GenerateEmbeddingsResponse, error)
-}
-
-type embeddingServiceClient struct {
-	cc grpc.ClientConnInterface
-}
-
-func NewEmbeddingServiceClient(cc grpc.ClientConnInterface) EmbeddingServiceClient {
-	return &embeddingServiceClient{cc}
-}
-
-func (c *embeddingServiceClient) ListEmbeddingModels(ctx context.Context, in *ListEmbeddingModelsRequest, opts ...grpc.CallOption) (*ListEmbeddingModelsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListEmbeddingModelsResponse)
-	err := c.cc.Invoke(ctx, EmbeddingService_ListEmbeddingModels_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *embeddingServiceClient) GetEmbeddingModel(ctx context.Context, in *GetEmbeddingModelRequest, opts ...grpc.CallOption) (*GetEmbeddingModelResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetEmbeddingModelResponse)
-	err := c.cc.Invoke(ctx, EmbeddingService_GetEmbeddingModel_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *embeddingServiceClient) GenerateEmbeddings(ctx context.Context, in *GenerateEmbeddingsRequest, opts ...grpc.CallOption) (*GenerateEmbeddingsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GenerateEmbeddingsResponse)
-	err := c.cc.Invoke(ctx, EmbeddingService_GenerateEmbeddings_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// EmbeddingServiceServer is the server API for EmbeddingService service.
-// All implementations must embed UnimplementedEmbeddingServiceServer
-// for forward compatibility.
-//
-// EmbeddingService provides operations to generate and stream embeddings using AI models.
-type EmbeddingServiceServer interface {
-	// Retrieves a list of available embedding models.
-	ListEmbeddingModels(context.Context, *ListEmbeddingModelsRequest) (*ListEmbeddingModelsResponse, error)
-	// Retrieves details of a specific embedding model by its ID.
-	GetEmbeddingModel(context.Context, *GetEmbeddingModelRequest) (*GetEmbeddingModelResponse, error)
-	// Generates embeddings for the provided input text using a specified model.
-	GenerateEmbeddings(context.Context, *GenerateEmbeddingsRequest) (*GenerateEmbeddingsResponse, error)
-	mustEmbedUnimplementedEmbeddingServiceServer()
-}
-
-// UnimplementedEmbeddingServiceServer must be embedded to have
-// forward compatible implementations.
-//
-// NOTE: this should be embedded by value instead of pointer to avoid a nil
-// pointer dereference when methods are called.
-type UnimplementedEmbeddingServiceServer struct{}
-
-func (UnimplementedEmbeddingServiceServer) ListEmbeddingModels(context.Context, *ListEmbeddingModelsRequest) (*ListEmbeddingModelsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListEmbeddingModels not implemented")
-}
-func (UnimplementedEmbeddingServiceServer) GetEmbeddingModel(context.Context, *GetEmbeddingModelRequest) (*GetEmbeddingModelResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetEmbeddingModel not implemented")
-}
-func (UnimplementedEmbeddingServiceServer) GenerateEmbeddings(context.Context, *GenerateEmbeddingsRequest) (*GenerateEmbeddingsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GenerateEmbeddings not implemented")
-}
-func (UnimplementedEmbeddingServiceServer) mustEmbedUnimplementedEmbeddingServiceServer() {}
-func (UnimplementedEmbeddingServiceServer) testEmbeddedByValue()                          {}
-
-// UnsafeEmbeddingServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to EmbeddingServiceServer will
-// result in compilation errors.
-type UnsafeEmbeddingServiceServer interface {
-	mustEmbedUnimplementedEmbeddingServiceServer()
-}
-
-func RegisterEmbeddingServiceServer(s grpc.ServiceRegistrar, srv EmbeddingServiceServer) {
-	// If the following call pancis, it indicates UnimplementedEmbeddingServiceServer was
-	// embedded by pointer and is nil.  This will cause panics if an
-	// unimplemented method is ever invoked, so we test this at initialization
-	// time to prevent it from happening at runtime later due to I/O.
-	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
-		t.testEmbeddedByValue()
-	}
-	s.RegisterService(&EmbeddingService_ServiceDesc, srv)
-}
-
-func _EmbeddingService_ListEmbeddingModels_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListEmbeddingModelsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(EmbeddingServiceServer).ListEmbeddingModels(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: EmbeddingService_ListEmbeddingModels_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EmbeddingServiceServer).ListEmbeddingModels(ctx, req.(*ListEmbeddingModelsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _EmbeddingService_GetEmbeddingModel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetEmbeddingModelRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(EmbeddingServiceServer).GetEmbeddingModel(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: EmbeddingService_GetEmbeddingModel_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EmbeddingServiceServer).GetEmbeddingModel(ctx, req.(*GetEmbeddingModelRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _EmbeddingService_GenerateEmbeddings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GenerateEmbeddingsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(EmbeddingServiceServer).GenerateEmbeddings(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: EmbeddingService_GenerateEmbeddings_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EmbeddingServiceServer).GenerateEmbeddings(ctx, req.(*GenerateEmbeddingsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-// EmbeddingService_ServiceDesc is the grpc.ServiceDesc for EmbeddingService service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var EmbeddingService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "dtkt.ai.v1beta1.EmbeddingService",
-	HandlerType: (*EmbeddingServiceServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "ListEmbeddingModels",
-			Handler:    _EmbeddingService_ListEmbeddingModels_Handler,
-		},
-		{
-			MethodName: "GetEmbeddingModel",
-			Handler:    _EmbeddingService_GetEmbeddingModel_Handler,
-		},
-		{
-			MethodName: "GenerateEmbeddings",
-			Handler:    _EmbeddingService_GenerateEmbeddings_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "dtkt/ai/v1beta1/services.proto",
 }
 

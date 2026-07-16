@@ -8,6 +8,7 @@ package catalogv1beta2
 
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	fieldmaskpb "google.golang.org/protobuf/types/known/fieldmaskpb"
@@ -23,20 +24,15 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Represents a catalog resource specifying a query dialect, supported data types
-// and additional metadata (if any).
+// Represents a catalog resource.
 type Catalog struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Catalog resource name, format: `catalogs/{catalog}` (e.g. catalogs/google-project-id, catalogs/postgres_database, etc.)
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Catalog identifier.
-	CatalogId string `protobuf:"bytes,2,opt,name=catalog_id,json=catalogId,proto3" json:"catalog_id,omitempty"`
+	// Catalog identifier for use within a Query.
+	Ident string `protobuf:"bytes,2,opt,name=ident,proto3" json:"ident,omitempty"`
 	// Description of the catalog.
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	// Supported query dialect (e.g., Trino, GoogleSQL, Postgres, etc.).
-	QueryDialect string `protobuf:"bytes,4,opt,name=query_dialect,json=queryDialect,proto3" json:"query_dialect,omitempty"`
-	// List of supported data types.
-	DataTypes []*Type `protobuf:"bytes,5,rep,name=data_types,json=dataTypes,proto3" json:"data_types,omitempty"`
 	// Additional metadata, if any.
 	Metadata      map[string]string `protobuf:"bytes,10,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
@@ -80,9 +76,9 @@ func (x *Catalog) GetName() string {
 	return ""
 }
 
-func (x *Catalog) GetCatalogId() string {
+func (x *Catalog) GetIdent() string {
 	if x != nil {
-		return x.CatalogId
+		return x.Ident
 	}
 	return ""
 }
@@ -92,20 +88,6 @@ func (x *Catalog) GetDescription() string {
 		return x.Description
 	}
 	return ""
-}
-
-func (x *Catalog) GetQueryDialect() string {
-	if x != nil {
-		return x.QueryDialect
-	}
-	return ""
-}
-
-func (x *Catalog) GetDataTypes() []*Type {
-	if x != nil {
-		return x.DataTypes
-	}
-	return nil
 }
 
 func (x *Catalog) GetMetadata() map[string]string {
@@ -310,10 +292,13 @@ func (x *GetCatalogResponse) GetCatalog() *Catalog {
 
 // List catalogs request.
 type ListCatalogsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	Filter        string                 `protobuf:"bytes,4,opt,name=filter,proto3" json:"filter,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Number of results to return per page. Leave empty for the server default.
+	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	// Token from a previous response to retrieve the next page.
+	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	// Optional filter expression to narrow results.
+	Filter        string `protobuf:"bytes,3,opt,name=filter,proto3" json:"filter,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -620,20 +605,17 @@ var File_dtkt_catalog_v1beta2_catalog_proto protoreflect.FileDescriptor
 
 const file_dtkt_catalog_v1beta2_catalog_proto_rawDesc = "" +
 	"\n" +
-	"\"dtkt/catalog/v1beta2/catalog.proto\x12\x14dtkt.catalog.v1beta2\x1a\x1bbuf/validate/validate.proto\x1a\x1fdtkt/catalog/v1beta2/type.proto\x1a google/protobuf/field_mask.proto\"\xc4\x02\n" +
-	"\aCatalog\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1d\n" +
-	"\n" +
-	"catalog_id\x18\x02 \x01(\tR\tcatalogId\x12 \n" +
-	"\vdescription\x18\x03 \x01(\tR\vdescription\x12#\n" +
-	"\rquery_dialect\x18\x04 \x01(\tR\fqueryDialect\x129\n" +
-	"\n" +
-	"data_types\x18\x05 \x03(\v2\x1a.dtkt.catalog.v1beta2.TypeR\tdataTypes\x12G\n" +
+	"\"dtkt/catalog/v1beta2/catalog.proto\x12\x14dtkt.catalog.v1beta2\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a google/protobuf/field_mask.proto\"\xa0\x02\n" +
+	"\aCatalog\x12\x1d\n" +
+	"\x04name\x18\x01 \x01(\tB\t\xe0A\b\xbaH\x03\xc8\x01\x01R\x04name\x12\x14\n" +
+	"\x05ident\x18\x02 \x01(\tR\x05ident\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12L\n" +
 	"\bmetadata\x18\n" +
-	" \x03(\v2+.dtkt.catalog.v1beta2.Catalog.MetadataEntryR\bmetadata\x1a;\n" +
+	" \x03(\v2+.dtkt.catalog.v1beta2.Catalog.MetadataEntryB\x03\xe0A\x03R\bmetadata\x1a;\n" +
 	"\rMetadataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"~\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01:3\xeaA0\n" +
+	"\aCatalog\x12\x12catalogs/{catalog}*\bcatalogs2\acatalog\"~\n" +
 	"\x14CreateCatalogRequest\x12%\n" +
 	"\n" +
 	"catalog_id\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\tcatalogId\x12?\n" +
@@ -648,7 +630,7 @@ const file_dtkt_catalog_v1beta2_catalog_proto_rawDesc = "" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x16\n" +
-	"\x06filter\x18\x04 \x01(\tR\x06filter\"y\n" +
+	"\x06filter\x18\x03 \x01(\tR\x06filter\"y\n" +
 	"\x14ListCatalogsResponse\x129\n" +
 	"\bcatalogs\x18\x01 \x03(\v2\x1d.dtkt.catalog.v1beta2.CatalogR\bcatalogs\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\x94\x01\n" +
@@ -697,34 +679,32 @@ var file_dtkt_catalog_v1beta2_catalog_proto_goTypes = []any{
 	(*DeleteCatalogRequest)(nil),  // 9: dtkt.catalog.v1beta2.DeleteCatalogRequest
 	(*DeleteCatalogResponse)(nil), // 10: dtkt.catalog.v1beta2.DeleteCatalogResponse
 	nil,                           // 11: dtkt.catalog.v1beta2.Catalog.MetadataEntry
-	(*Type)(nil),                  // 12: dtkt.catalog.v1beta2.Type
-	(*fieldmaskpb.FieldMask)(nil), // 13: google.protobuf.FieldMask
+	(*fieldmaskpb.FieldMask)(nil), // 12: google.protobuf.FieldMask
 }
 var file_dtkt_catalog_v1beta2_catalog_proto_depIdxs = []int32{
-	12, // 0: dtkt.catalog.v1beta2.Catalog.data_types:type_name -> dtkt.catalog.v1beta2.Type
-	11, // 1: dtkt.catalog.v1beta2.Catalog.metadata:type_name -> dtkt.catalog.v1beta2.Catalog.MetadataEntry
-	0,  // 2: dtkt.catalog.v1beta2.CreateCatalogRequest.catalog:type_name -> dtkt.catalog.v1beta2.Catalog
-	0,  // 3: dtkt.catalog.v1beta2.CreateCatalogResponse.catalog:type_name -> dtkt.catalog.v1beta2.Catalog
-	0,  // 4: dtkt.catalog.v1beta2.GetCatalogResponse.catalog:type_name -> dtkt.catalog.v1beta2.Catalog
-	0,  // 5: dtkt.catalog.v1beta2.ListCatalogsResponse.catalogs:type_name -> dtkt.catalog.v1beta2.Catalog
-	0,  // 6: dtkt.catalog.v1beta2.UpdateCatalogRequest.catalog:type_name -> dtkt.catalog.v1beta2.Catalog
-	13, // 7: dtkt.catalog.v1beta2.UpdateCatalogRequest.update_mask:type_name -> google.protobuf.FieldMask
-	0,  // 8: dtkt.catalog.v1beta2.UpdateCatalogResponse.catalog:type_name -> dtkt.catalog.v1beta2.Catalog
-	1,  // 9: dtkt.catalog.v1beta2.CatalogService.CreateCatalog:input_type -> dtkt.catalog.v1beta2.CreateCatalogRequest
-	9,  // 10: dtkt.catalog.v1beta2.CatalogService.DeleteCatalog:input_type -> dtkt.catalog.v1beta2.DeleteCatalogRequest
-	3,  // 11: dtkt.catalog.v1beta2.CatalogService.GetCatalog:input_type -> dtkt.catalog.v1beta2.GetCatalogRequest
-	5,  // 12: dtkt.catalog.v1beta2.CatalogService.ListCatalogs:input_type -> dtkt.catalog.v1beta2.ListCatalogsRequest
-	7,  // 13: dtkt.catalog.v1beta2.CatalogService.UpdateCatalog:input_type -> dtkt.catalog.v1beta2.UpdateCatalogRequest
-	2,  // 14: dtkt.catalog.v1beta2.CatalogService.CreateCatalog:output_type -> dtkt.catalog.v1beta2.CreateCatalogResponse
-	10, // 15: dtkt.catalog.v1beta2.CatalogService.DeleteCatalog:output_type -> dtkt.catalog.v1beta2.DeleteCatalogResponse
-	4,  // 16: dtkt.catalog.v1beta2.CatalogService.GetCatalog:output_type -> dtkt.catalog.v1beta2.GetCatalogResponse
-	6,  // 17: dtkt.catalog.v1beta2.CatalogService.ListCatalogs:output_type -> dtkt.catalog.v1beta2.ListCatalogsResponse
-	8,  // 18: dtkt.catalog.v1beta2.CatalogService.UpdateCatalog:output_type -> dtkt.catalog.v1beta2.UpdateCatalogResponse
-	14, // [14:19] is the sub-list for method output_type
-	9,  // [9:14] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	11, // 0: dtkt.catalog.v1beta2.Catalog.metadata:type_name -> dtkt.catalog.v1beta2.Catalog.MetadataEntry
+	0,  // 1: dtkt.catalog.v1beta2.CreateCatalogRequest.catalog:type_name -> dtkt.catalog.v1beta2.Catalog
+	0,  // 2: dtkt.catalog.v1beta2.CreateCatalogResponse.catalog:type_name -> dtkt.catalog.v1beta2.Catalog
+	0,  // 3: dtkt.catalog.v1beta2.GetCatalogResponse.catalog:type_name -> dtkt.catalog.v1beta2.Catalog
+	0,  // 4: dtkt.catalog.v1beta2.ListCatalogsResponse.catalogs:type_name -> dtkt.catalog.v1beta2.Catalog
+	0,  // 5: dtkt.catalog.v1beta2.UpdateCatalogRequest.catalog:type_name -> dtkt.catalog.v1beta2.Catalog
+	12, // 6: dtkt.catalog.v1beta2.UpdateCatalogRequest.update_mask:type_name -> google.protobuf.FieldMask
+	0,  // 7: dtkt.catalog.v1beta2.UpdateCatalogResponse.catalog:type_name -> dtkt.catalog.v1beta2.Catalog
+	1,  // 8: dtkt.catalog.v1beta2.CatalogService.CreateCatalog:input_type -> dtkt.catalog.v1beta2.CreateCatalogRequest
+	9,  // 9: dtkt.catalog.v1beta2.CatalogService.DeleteCatalog:input_type -> dtkt.catalog.v1beta2.DeleteCatalogRequest
+	3,  // 10: dtkt.catalog.v1beta2.CatalogService.GetCatalog:input_type -> dtkt.catalog.v1beta2.GetCatalogRequest
+	5,  // 11: dtkt.catalog.v1beta2.CatalogService.ListCatalogs:input_type -> dtkt.catalog.v1beta2.ListCatalogsRequest
+	7,  // 12: dtkt.catalog.v1beta2.CatalogService.UpdateCatalog:input_type -> dtkt.catalog.v1beta2.UpdateCatalogRequest
+	2,  // 13: dtkt.catalog.v1beta2.CatalogService.CreateCatalog:output_type -> dtkt.catalog.v1beta2.CreateCatalogResponse
+	10, // 14: dtkt.catalog.v1beta2.CatalogService.DeleteCatalog:output_type -> dtkt.catalog.v1beta2.DeleteCatalogResponse
+	4,  // 15: dtkt.catalog.v1beta2.CatalogService.GetCatalog:output_type -> dtkt.catalog.v1beta2.GetCatalogResponse
+	6,  // 16: dtkt.catalog.v1beta2.CatalogService.ListCatalogs:output_type -> dtkt.catalog.v1beta2.ListCatalogsResponse
+	8,  // 17: dtkt.catalog.v1beta2.CatalogService.UpdateCatalog:output_type -> dtkt.catalog.v1beta2.UpdateCatalogResponse
+	13, // [13:18] is the sub-list for method output_type
+	8,  // [8:13] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_catalog_v1beta2_catalog_proto_init() }
@@ -732,7 +712,6 @@ func file_dtkt_catalog_v1beta2_catalog_proto_init() {
 	if File_dtkt_catalog_v1beta2_catalog_proto != nil {
 		return
 	}
-	file_dtkt_catalog_v1beta2_type_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

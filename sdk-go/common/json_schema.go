@@ -2,18 +2,18 @@ package common
 
 import (
 	"encoding/json"
-	"fmt"
 	"net"
 	"net/url"
 	"reflect"
-	"slices"
 	"time"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
-	"github.com/gowebpki/jcs"
-	"github.com/invopop/jsonschema"
-	compileschema "github.com/santhosh-tekuri/jsonschema/v6"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/lib/protoschema"
+
+	"github.com/google/jsonschema-go/jsonschema"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -25,320 +25,303 @@ var _ JSONSchemaType = (*JSONSchema[any])(nil)
 
 type (
 	JSONSchema[T any] struct {
-		id             string
-		reflector      *jsonschema.Reflector
-		reflectorOpts  []func(*jsonschema.Reflector)
-		schemaBytes    []byte
-		jsonSchema     *jsonschema.Schema
-		protoSchema    *structpb.Struct
-		compiler       *compileschema.Compiler
-		compiledSchema *compileschema.Schema
-		callback       JSONSchemaCallbackFunc
+		options JSONSchemaOptions
+
+		schema   *jsonschema.Schema
+		resolved *jsonschema.Resolved
+
+		proto     *structpb.Struct
+		protoType protoreflect.MessageType
 	}
 	JSONSchemaType interface {
-		GetID() string
-		ValidateAny(any) error
-		JSONSchema() *jsonschema.Schema
-		ToProto() *structpb.Struct
+		ID() string
 		Bytes() []byte
+		Proto() *structpb.Struct
 		String() string
-		setID(string)
-		setSchemaBytes([]byte)
-		setCallback(JSONSchemaCallbackFunc)
-		setCompiler(*compileschema.Compiler)
-		setReflector(*jsonschema.Reflector)
-		setReflectorOpts(...func(*jsonschema.Reflector))
+		Schema() *jsonschema.Schema
+		Resolved() (*jsonschema.Resolved, error)
 	}
 )
 
-func JSONSchemaFor[T any](opts ...JSONSchemaOpt) (*JSONSchema[T], error) {
-	var v T
-	return NewJSONSchema(v, opts...)
-}
+func NewJSONSchemaWithOptions[T any](value T, opts *JSONSchemaOptions) (*JSONSchema[T], error) {
+	s := &JSONSchema[T]{}
 
-func NewJSONSchema[T any](value T, opts ...JSONSchemaOpt) (*JSONSchema[T], error) {
-	var s = &JSONSchema[T]{}
-
-	if len(opts) > 0 {
-		for opt := range slices.Values(opts) {
-			if opt != nil {
-				opt(s)
-			}
-		}
+	if opts != nil {
+		s.options = *opts
 	}
 
-	if s.reflector == nil {
-		s.reflector = new(jsonschema.Reflector)
-		s.reflector.ExpandedStruct = true
-		// Add mapper to annotate fields with Go type information
-		s.reflector.Mapper = GoTypeAnnotationMapper
+	if s.options.BaseURI == "" {
+		s.options.BaseURI = "mem://"
 	}
 
-	if len(s.reflectorOpts) > 0 {
-		for _, opt := range s.reflectorOpts {
-			if opt != nil {
-				opt(s.reflector)
-			}
-		}
+	if msg, ok := any(value).(proto.Message); ok {
+		s.protoType = msg.ProtoReflect().Type()
 	}
 
-	if s.schemaBytes != nil {
-		var jsonSchema jsonschema.Schema
-		err := json.Unmarshal(s.schemaBytes, &jsonSchema)
+	if s.options.Bytes != nil {
+		var schema jsonschema.Schema
+		err := json.Unmarshal(s.options.Bytes, &schema)
 		if err != nil {
 			return nil, err
 		}
-		s.jsonSchema = &jsonSchema
+
+		s.schema = &schema
 	} else {
-		jsonSchema, ok := DefaultJSONSchema(value)
-		if ok {
-			s.jsonSchema = jsonSchema
-		} else {
-			jsonSchema, err := reflectJSONSchema(s.reflector, value)
+		switch value := any(value).(type) {
+		case time.Duration, *time.Duration, *durationpb.Duration:
+			s.schema = &jsonschema.Schema{
+				Type:   "string",
+				Format: "duration",
+			}
+		case time.Time, *time.Time, *timestamppb.Timestamp:
+			s.schema = &jsonschema.Schema{
+				Type:   "string",
+				Format: "date-time",
+			}
+		case *url.URL, url.URL:
+			s.schema = &jsonschema.Schema{
+				Type:   "string",
+				Format: "uri",
+			}
+		case net.IP, *net.IP:
+			s.schema = &jsonschema.Schema{
+				Type:   "string",
+				Format: "ipv4",
+			}
+		case proto.Message:
+			if s.options.Loader == nil {
+				resolved, err := protoschema.ResolvedJSONSchemaWithOptions(value.ProtoReflect().Descriptor(), &s.options.ResolveOptions)
+				if err != nil {
+					return nil, err
+				}
+
+				s.resolved = resolved
+				s.schema = resolved.Schema().CloneSchemas()
+			} else {
+				schema, err := protoschema.NewJSONSchema(value.ProtoReflect().Descriptor())
+				if err != nil {
+					return nil, err
+				}
+
+				s.schema = schema
+			}
+		default:
+			schema, err := jsonschema.For[T](&jsonschema.ForOptions{
+				IgnoreInvalidTypes: true,
+			})
 			if err != nil {
 				return nil, err
 			}
 
-			s.jsonSchema = jsonSchema
+			s.schema = schema
 		}
 	}
 
-	if s.reflector.BaseSchemaID != "" && s.id != "" {
-		s.jsonSchema.ID = s.reflector.BaseSchemaID.Add(s.id)
-	} else if s.id != "" {
-		s.jsonSchema.ID = jsonschema.ID(s.id)
+	if s.options.ID != "" {
+		s.schema.ID = s.options.ID
+	} else {
+		s.schema.ID = s.options.BaseURI + "/" + s.schema.ID
 	}
 
-	if s.callback != nil {
-		err := s.callback(s.jsonSchema)
+	if s.options.Callback != nil {
+		err := s.options.Callback(s.schema, &s.options.ResolveOptions)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	b, err := json.Marshal(s.jsonSchema)
+	b, err := json.Marshal(s.schema)
 	if err != nil {
 		return nil, err
 	}
 
-	b, err = jcs.Transform(b)
+	raw := json.RawMessage(b)
+	err = raw.Canonicalize()
 	if err != nil {
 		return nil, err
 	}
 
-	s.schemaBytes = b
+	s.options.Bytes = raw
+	s.proto = new(structpb.Struct)
 
-	protoSchema := new(structpb.Struct)
-	err = protojson.Unmarshal(b, protoSchema)
+	err = protojson.Unmarshal(s.options.Bytes, s.proto)
 	if err != nil {
 		return nil, err
-	}
-
-	s.protoSchema = protoSchema
-
-	if s.compiler == nil {
-		s.compiler = compileschema.NewCompiler()
-	}
-
-	var exists bool
-	err = s.compiler.AddResource(s.jsonSchema.ID.String(), protoSchema.AsMap())
-	if err != nil {
-		if _, exists = err.(*compileschema.ResourceExistsError); !exists {
-			return nil, fmt.Errorf("add resource: %w", err)
-		}
-	}
-
-	if !exists {
-		s.compiledSchema, err = s.compiler.Compile(s.jsonSchema.ID.String())
-		if err != nil {
-			return nil, fmt.Errorf("compile: %w", err)
-		}
 	}
 
 	return s, nil
 }
 
-func DefaultJSONSchema(v any) (*jsonschema.Schema, bool) {
-	switch v.(type) {
-	case time.Duration, *time.Duration, *durationpb.Duration:
-		return &jsonschema.Schema{
-			Type:   "string",
-			Format: "duration",
-		}, true
-	case time.Time, *time.Time, *timestamppb.Timestamp:
-		return &jsonschema.Schema{
-			Type:   "string",
-			Format: "date-time",
-		}, true
-	case *url.URL, url.URL:
-		return &jsonschema.Schema{
-			Type:   "string",
-			Format: "uri",
-		}, true
-	case net.IP, *net.IP:
-		return &jsonschema.Schema{
-			Type:   "string",
-			Format: "ipv4",
-		}, true
-	}
-	return nil, false
-}
-
-func reflectJSONSchema(reflector *jsonschema.Reflector, value any) (*jsonschema.Schema, error) {
-	reflectType := reflect.TypeOf(value)
-	if reflectType == nil {
-		return nil, fmt.Errorf("json schema reflect: unknown Go type")
-	}
-
-	if reflectType.Kind() == reflect.Interface {
-		return &jsonschema.Schema{}, nil
-	} else if reflectType.Kind() == reflect.Pointer {
-		reflectType = reflectType.Elem()
-	}
-
-	if reflectType == nil {
-		return nil, fmt.Errorf("json schema reflect: unknown Go type")
-	}
-
-	jsonType, ok := JSONTypeFromKind(reflectType.Kind())
-	if ok {
-		jsonSchema := &jsonschema.Schema{
-			Type: jsonType.String(),
-		}
-
-		switch jsonType {
-		case JSONInteger:
-			// Add Go type annotation for integers
-			if goFormat := GoTypeFormat(reflectType.Kind()); goFormat != "" {
-				if jsonSchema.Extras == nil {
-					jsonSchema.Extras = make(map[string]any)
-				}
-				jsonSchema.Extras["x-dtkt-format"] = goFormat
-			}
-		case JSONNumber:
-			// Add Go type annotation for numbers
-			if goFormat := GoTypeFormat(reflectType.Kind()); goFormat != "" {
-				if jsonSchema.Extras == nil {
-					jsonSchema.Extras = make(map[string]any)
-				}
-				jsonSchema.Extras["x-dtkt-format"] = goFormat
-			}
-		case JSONObject:
-			switch reflectType.Kind() {
-			case reflect.Map:
-				if reflectType.Elem() == nil {
-					return nil, fmt.Errorf("%s is not a valid JSON object", reflectType)
-				} else if reflectType.Elem().Kind() != reflect.Interface {
-					itemSchema, err := reflectJSONSchema(reflector, reflect.New(reflectType.Elem()).Interface())
-					if err != nil {
-						return nil, err
-					}
-
-					jsonSchema.ID = itemSchema.ID
-					jsonSchema.Version = itemSchema.Version
-					itemSchema.ID = ""
-					itemSchema.Version = ""
-
-					jsonSchema.AdditionalProperties = itemSchema
-				}
-			case reflect.Struct:
-				if reflectType.NumField() > 0 {
-					jsonSchema = reflector.ReflectFromType(reflectType)
-				}
-			}
-		case JSONArray:
-			if reflectType.Elem() == nil {
-				return nil, fmt.Errorf("%s is not a valid JSON array", reflectType)
-			} else if reflectType.Elem().Kind() != reflect.Interface {
-				itemSchema, err := reflectJSONSchema(reflector, reflect.New(reflectType.Elem()).Interface())
-				if err != nil {
-					return nil, err
-				}
-
-				jsonSchema.ID = itemSchema.ID
-				jsonSchema.Version = itemSchema.Version
-				itemSchema.ID = ""
-				itemSchema.Version = ""
-				jsonSchema.Items = itemSchema
+func NewJSONSchema[T any](value T, opts ...JSONSchemaOption) (*JSONSchema[T], error) {
+	var o JSONSchemaOptions
+	if len(opts) > 0 {
+		for _, opt := range opts {
+			if opt != nil {
+				opt(&o)
 			}
 		}
-
-		return jsonSchema, nil
 	}
-
-	return nil, fmt.Errorf("%s cannot be represented as a json type", reflectType.Kind())
+	return NewJSONSchemaWithOptions(value, &o)
 }
 
-func (s *JSONSchema[T]) setCallback(f JSONSchemaCallbackFunc) {
-	s.callback = f
+func JSONSchemaWithOptionsFor[T any](opts *JSONSchemaOptions) (*JSONSchema[T], error) {
+	var v T
+	return NewJSONSchemaWithOptions(v, opts)
 }
 
-func (s *JSONSchema[T]) setID(id string) {
-	s.id = id
-	if s.jsonSchema != nil {
-		s.jsonSchema.ID = jsonschema.ID(id)
+func JSONSchemaFor[T any](opts ...JSONSchemaOption) (*JSONSchema[T], error) {
+	var v T
+	return NewJSONSchema(v, opts...)
+}
+
+func (s *JSONSchema[T]) ID() string {
+	if s.schema.ID != "" {
+		return s.schema.ID
 	}
-}
-
-func (s *JSONSchema[T]) setSchemaBytes(b []byte) {
-	s.schemaBytes = b
-}
-
-func (s *JSONSchema[T]) setReflector(r *jsonschema.Reflector) {
-	s.reflector = r
-}
-
-func (s *JSONSchema[T]) setReflectorOpts(opts ...func(*jsonschema.Reflector)) {
-	s.reflectorOpts = opts
-}
-
-func (s *JSONSchema[T]) setCompiler(c *compileschema.Compiler) {
-	s.compiler = c
-}
-
-func (s *JSONSchema[T]) GetID() string {
-	if s.jsonSchema != nil {
-		return s.jsonSchema.ID.String()
-	}
-	return s.id
+	return s.options.ID
 }
 
 func (s *JSONSchema[T]) Bytes() []byte {
-	return s.schemaBytes
+	return s.options.Bytes
 }
 
 func (s *JSONSchema[T]) String() string {
-	return string(s.schemaBytes)
+	return string(s.options.Bytes)
 }
 
-func (s *JSONSchema[T]) JSONSchema() *jsonschema.Schema {
-	return s.jsonSchema
+func (s *JSONSchema[T]) Schema() *jsonschema.Schema {
+	return s.schema
 }
 
-func (s *JSONSchema[T]) ToProto() *structpb.Struct {
-	return s.protoSchema
+func (s *JSONSchema[T]) Proto() *structpb.Struct {
+	return s.proto
 }
 
-func (s *JSONSchema[T]) ValidateString(doc string) (v T, err error) {
-	return s.ValidateBytes([]byte(doc))
-}
+func (s *JSONSchema[T]) Resolved() (*jsonschema.Resolved, error) {
+	if s.resolved == nil {
+		resolved, err := s.schema.Resolve(&s.options.ResolveOptions)
+		if err != nil {
+			return nil, err
+		}
 
-func (s *JSONSchema[T]) ValidateBytes(doc []byte) (v T, err error) {
-	err = s.ValidateAny(doc)
-	if err != nil {
-		return
+		s.resolved = resolved
 	}
-	return UnmarshalJSON[T](doc)
+
+	return s.resolved, nil
 }
 
 func (s *JSONSchema[T]) Validate(value T) error {
-	doc, err := encoding.ToJSON(value)
+	_, err := s.ValidateAny(value)
+	return err
+}
+
+func (s *JSONSchema[T]) ValidateAny(input any) (value T, err error) {
+	schema, err := s.Resolved()
 	if err != nil {
-		return err
+		return
 	}
 
-	return s.ValidateAny(doc)
+	doc, err := encoding.ToJSONV2(input)
+	if err != nil {
+		return
+	}
+
+	var val any
+	err = encoding.FromJSONV2(doc, &val)
+	if err != nil {
+		return
+	}
+
+	err = schema.Validate(val)
+	if err != nil {
+		return
+	}
+
+	if s.protoType != nil {
+		msg := s.protoType.New().Interface()
+		err = encoding.FromJSONV2(doc, msg)
+		if err != nil {
+			return
+		}
+
+		value = msg.(T)
+	} else {
+		err = encoding.FromJSONV2(doc, &value)
+	}
+
+	return
 }
+
+// if s.protoType != nil && v.ProtoReflect().Descriptor() == s.protoType.Descriptor() {
+// 	err = protovalidate.Validate(v)
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	value = v.(T)
+// 	return
+// } else if s.protoType != nil {
+// 	doc, err = encoding.ToJSONV2(input)
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	msg := s.protoType.New().Interface()
+// 	err = encoding.FromJSONV2(doc, msg)
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	value = msg.(T)
+// 	return
+// }
+
+// msg := s.protoType.New().Interface()
+// err = encoding.FromJSONV2(doc, msg)
+// if err != nil {
+// 	return
+// }
+
+// err = protovalidate.Validate(msg)
+// if err != nil {
+// 	return
+// }
+
+// value = msg.(T)
+
+// return
+
+// switch v := input.(type) {
+// case []byte:
+// 	doc = v
+// case json.RawMessage:
+// 	doc = v
+// case string:
+// 	if JSONType(s.schema.Type) != JSONString {
+// 		doc = []byte(v)
+// 	} else if len(v) > 0 || (v[0] != '"' && v[len(v)-1] != '"') {
+// 		input = strconv.Quote(v)
+// 		useInput = true
+// 	}
+// case map[string]any, []any:
+// 	useInput = true
+// }
+
+// if doc == nil {
+// 	doc, err = encoding.ToJSONV2(input)
+// 	if err != nil {
+// 		return
+// 	}
+// }
+
+// if !useInput {
+// 	var val any
+// 	err = encoding.FromJSONV2(doc, &val)
+// 	if err != nil {
+// 		return
+// 	}
+// 	input = val
+// }
 
 // GoTypeAnnotationMapper is a jsonschema.Mapper that annotates schema fields
 // with x-dtkt-format to preserve Go type information for round-trip conversion.
@@ -365,48 +348,129 @@ func GoTypeAnnotationMapper(t reflect.Type) *jsonschema.Schema {
 	}
 
 	// Add x-dtkt-format extension
-	if schema.Extras == nil {
-		schema.Extras = make(map[string]any)
+	if schema.Extra == nil {
+		schema.Extra = make(map[string]any)
 	}
-	schema.Extras["x-dtkt-format"] = goFormat
+	schema.Extra["x-dtkt-format"] = goFormat
 
 	return schema
 }
 
-func (s *JSONSchema[T]) ValidateAny(value any) error {
-	var err error
-	switch JSONType(s.jsonSchema.Type) {
-	case JSONArray:
-		switch doc := value.(type) {
-		case string:
-			value, err = UnmarshalJSON[[]any](doc)
-		case []byte:
-			value, err = UnmarshalJSON[[]any](doc)
-		}
-		if err != nil {
-			return err
-		}
-	case JSONObject:
-		switch doc := value.(type) {
-		case string:
-			value, err = UnmarshalJSON[map[string]any](doc)
-		case []byte:
-			value, err = UnmarshalJSON[map[string]any](doc)
-		}
-		if err != nil {
-			return err
-		}
-	default:
-		switch doc := value.(type) {
-		case string:
-			value, err = UnmarshalJSON[any](doc)
-		case []byte:
-			value, err = UnmarshalJSON[any](doc)
-		}
-		if err != nil {
-			return err
-		}
-	}
+// schema, err := defaultJSONSchema(value, &s.resolve)
+// if err != nil {
+// 	return nil, err
+// } else {
+// if s.reflector == nil {
+// 	s.reflector = new(jsonschema.Reflector)
+// 	s.reflector.ExpandedStruct = true
+// 	// Add mapper to annotate fields with Go type information
+// 	s.reflector.Mapper = GoTypeAnnotationMapper
+// }
 
-	return s.compiledSchema.Validate(value)
-}
+// if len(s.reflectorOpts) > 0 {
+// 	for _, opt := range s.reflectorOpts {
+// 		if opt != nil {
+// 			opt(s.reflector)
+// 		}
+// 	}
+// }
+
+// jsonSchema, err := reflectJSONSchema(s.reflector, value)
+// if err != nil {
+// 	return nil, err
+// }
+
+// s.jsons.schema = &jsonSchema
+// }
+// s.schema = schema
+
+// if s.reflector != nil && s.reflector.BaseSchemaID != "" && s.id != "" {
+// 	s.jsonSchema.ID = s.reflector.BaseSchemaID.Add(s.id)
+// } else if s.id != "" {
+// 	s.jsonSchema.ID = jsonschema.ID(s.id)
+// }
+
+// func reflectJSONSchema(reflector *jsonschema.Reflector, value any) (*jsonschema.Schema, error) {
+// 	reflectType := reflect.TypeOf(value)
+// 	if reflectType == nil {
+// 		return nil, fmt.Errorf("json schema reflect: unknown Go type")
+// 	}
+
+// 	if reflectType.Kind() == reflect.Interface {
+// 		return &jsonschema.Schema{}, nil
+// 	} else if reflectType.Kind() == reflect.Pointer {
+// 		reflectType = reflectType.Elem()
+// 	}
+
+// 	if reflectType == nil {
+// 		return nil, fmt.Errorf("json schema reflect: unknown Go type")
+// 	}
+
+// 	jsonType, ok := JSONTypeFromKind(reflectType.Kind())
+// 	if ok {
+// 		jsonSchema := &jsonschema.Schema{
+// 			Type: jsonType.String(),
+// 		}
+
+// 		switch jsonType {
+// 		case JSONInteger:
+// 			// Add Go type annotation for integers
+// 			if goFormat := GoTypeFormat(reflectType.Kind()); goFormat != "" {
+// 				if jsonSchema.Extras == nil {
+// 					jsonSchema.Extras = make(map[string]any)
+// 				}
+// 				jsonSchema.Extras["x-dtkt-format"] = goFormat
+// 			}
+// 		case JSONNumber:
+// 			// Add Go type annotation for numbers
+// 			if goFormat := GoTypeFormat(reflectType.Kind()); goFormat != "" {
+// 				if jsonSchema.Extras == nil {
+// 					jsonSchema.Extras = make(map[string]any)
+// 				}
+// 				jsonSchema.Extras["x-dtkt-format"] = goFormat
+// 			}
+// 		case JSONObject:
+// 			switch reflectType.Kind() {
+// 			case reflect.Map:
+// 				if reflectType.Elem() == nil {
+// 					return nil, fmt.Errorf("%s is not a valid JSON object", reflectType)
+// 				} else if reflectType.Elem().Kind() != reflect.Interface {
+// 					itemSchema, err := reflectJSONSchema(reflector, reflect.New(reflectType.Elem()).Interface())
+// 					if err != nil {
+// 						return nil, err
+// 					}
+
+// 					jsonSchema.ID = itemSchema.ID
+// 					jsonSchema.Version = itemSchema.Version
+// 					itemSchema.ID = ""
+// 					itemSchema.Version = ""
+
+// 					jsonSchema.AdditionalProperties = itemSchema
+// 				}
+// 			case reflect.Struct:
+// 				if reflectType.NumField() > 0 {
+// 					jsonSchema = reflector.ReflectFromType(reflectType)
+// 				}
+// 			}
+// 		case JSONArray:
+// 			if reflectType.Elem() == nil {
+// 				return nil, fmt.Errorf("%s is not a valid JSON array", reflectType)
+// 			} else if reflectType.Elem().Kind() != reflect.Interface {
+// 				itemSchema, err := reflectJSONSchema(reflector, reflect.New(reflectType.Elem()).Interface())
+// 				if err != nil {
+// 					return nil, err
+// 				}
+
+// 				jsonSchema.ID = itemSchema.ID
+// 				jsonSchema.Version = itemSchema.Version
+// 				itemSchema.ID = ""
+// 				itemSchema.Version = ""
+// 				jsonSchema.Items = itemSchema
+// 			}
+// 		}
+
+// 		return jsonSchema, nil
+// 	}
+
+// 	return nil, fmt.Errorf("%s cannot be represented as a json type", reflectType.Kind())
+// }

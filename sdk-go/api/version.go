@@ -5,11 +5,9 @@ import (
 	"path"
 	"slices"
 	"strings"
-	"sync"
 
 	"buf.build/go/protovalidate"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
-	"github.com/invopop/jsonschema"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
 
@@ -39,6 +37,8 @@ import (
 	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/event/v1beta1"
 	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/geo/v1beta1"
+	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protoform/v1beta1"
+	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protostore/v1beta1"
 	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/replication/v1beta1"
 	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
 
@@ -59,8 +59,7 @@ var validVersions = versions{
 }
 
 var _ Version = version("")
-var versionValidators = map[version]protovalidate.Validator{}
-var versionMutex sync.Mutex
+var validators util.SyncMap[version, protovalidate.Validator]
 
 type (
 	Version interface {
@@ -92,21 +91,12 @@ func (v version) GetName() string {
 	return string(v)
 }
 
-func (v version) GetValidator() (validator protovalidate.Validator, err error) {
-	versionMutex.Lock()
-	defer versionMutex.Unlock()
-
-	validator, ok := versionValidators[v]
-	if ok {
-		return
+func (v version) GetValidator() (validator protovalidate.Validator, _ error) {
+	validator, ok := validators.Load(v)
+	if !ok {
+		validator = NewValidator(v)
+		validators.Store(v, validator)
 	}
-
-	validator, err = protovalidate.New(protovalidate.WithExtensionTypeResolver(v))
-	if err != nil {
-		return nil, err
-	}
-	versionValidators[v] = validator
-
 	return
 }
 
@@ -242,15 +232,6 @@ func (v version) RangeEnums(f func(protoreflect.EnumType) bool) {
 func (v version) RangeExtensionsByMessage(name protoreflect.FullName, f func(protoreflect.ExtensionType) bool) {
 	if IsWellKnownName(name) || VersionContainsName(v, name) {
 		getGlobalResolver().RangeExtensionsByMessage(name, f)
-	}
-}
-
-func (version) JSONSchema() *jsonschema.Schema {
-	return &jsonschema.Schema{
-		Type:        "string",
-		Title:       "API Version",
-		Description: "A valid DataKit SDK API Version.",
-		Enum:        util.AnySlice(Versions().Names()),
 	}
 }
 

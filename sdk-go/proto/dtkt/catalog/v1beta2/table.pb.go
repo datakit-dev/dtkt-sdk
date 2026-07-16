@@ -23,18 +23,18 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Represents a table within a table.
+// Represents a table within a schema.
 type Table struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Table resource name, format: `catalogs/{catalog}/schemas/{schema}/tables/{table}`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Table identifier.
-	TableId string `protobuf:"bytes,2,opt,name=table_id,json=tableId,proto3" json:"table_id,omitempty"`
+	// Table identifier for use within a query.
+	Ident string `protobuf:"bytes,2,opt,name=ident,proto3" json:"ident,omitempty"`
 	// Description of the table.
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	// List of fields defined by the table.
-	Fields []*Field `protobuf:"bytes,34,rep,name=fields,proto3" json:"fields,omitempty"`
-	// Statistics about the table (e.g., row count), if any.
+	Fields []*Field `protobuf:"bytes,4,rep,name=fields,proto3" json:"fields,omitempty"`
+	// Statistics about the table, if any.
 	Stats *TableStats `protobuf:"bytes,5,opt,name=stats,proto3" json:"stats,omitempty"`
 	// Additional metadata, if any.
 	Metadata      map[string]string `protobuf:"bytes,10,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
@@ -79,9 +79,9 @@ func (x *Table) GetName() string {
 	return ""
 }
 
-func (x *Table) GetTableId() string {
+func (x *Table) GetIdent() string {
 	if x != nil {
-		return x.TableId
+		return x.Ident
 	}
 	return ""
 }
@@ -171,11 +171,15 @@ func (x *TableStats) GetTotalBytes() int64 {
 
 // Request message for listing Tables.
 type ListTablesRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	Parent        string                 `protobuf:"bytes,3,opt,name=parent,proto3" json:"parent,omitempty"`
-	Filter        string                 `protobuf:"bytes,4,opt,name=filter,proto3" json:"filter,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Number of results to return per page. Leave empty for the server default.
+	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	// Token from a previous response to retrieve the next page.
+	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	// Parent resource name.
+	Parent string `protobuf:"bytes,3,opt,name=parent,proto3" json:"parent,omitempty"`
+	// Optional filter expression to narrow results.
+	Filter        string `protobuf:"bytes,4,opt,name=filter,proto3" json:"filter,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -395,7 +399,7 @@ func (x *GetTableResponse) GetTable() *Table {
 // Create Table request.
 type CreateTableRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Parent catalog resource name.
+	// Parent schema resource name.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// Table identifier, e.g. final segment in resource name: `.../tables/{table}`
 	TableId string `protobuf:"bytes,2,opt,name=table_id,json=tableId,proto3" json:"table_id,omitempty"`
@@ -912,12 +916,12 @@ var File_dtkt_catalog_v1beta2_table_proto protoreflect.FileDescriptor
 
 const file_dtkt_catalog_v1beta2_table_proto_rawDesc = "" +
 	"\n" +
-	" dtkt/catalog/v1beta2/table.proto\x12\x14dtkt.catalog.v1beta2\x1a\x1bbuf/validate/validate.proto\x1a\x1fdtkt/catalog/v1beta2/type.proto\x1a dtkt/catalog/v1beta2/value.proto\x1a google/protobuf/field_mask.proto\"\xc9\x02\n" +
+	" dtkt/catalog/v1beta2/table.proto\x12\x14dtkt.catalog.v1beta2\x1a\x1bbuf/validate/validate.proto\x1a\x1fdtkt/catalog/v1beta2/type.proto\x1a dtkt/catalog/v1beta2/value.proto\x1a google/protobuf/field_mask.proto\"\xc4\x02\n" +
 	"\x05Table\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x19\n" +
-	"\btable_id\x18\x02 \x01(\tR\atableId\x12 \n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
+	"\x05ident\x18\x02 \x01(\tR\x05ident\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x123\n" +
-	"\x06fields\x18\" \x03(\v2\x1b.dtkt.catalog.v1beta2.FieldR\x06fields\x126\n" +
+	"\x06fields\x18\x04 \x03(\v2\x1b.dtkt.catalog.v1beta2.FieldR\x06fields\x126\n" +
 	"\x05stats\x18\x05 \x01(\v2 .dtkt.catalog.v1beta2.TableStatsR\x05stats\x12E\n" +
 	"\bmetadata\x18\n" +
 	" \x03(\v2).dtkt.catalog.v1beta2.Table.MetadataEntryR\bmetadata\x1a;\n" +

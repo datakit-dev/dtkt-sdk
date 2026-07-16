@@ -45,31 +45,33 @@ func NewOneOfField(parent *Message, field protoreflect.FieldDescriptor) (*OneOfF
 	return oneOfField, true
 }
 
-func (o *OneOfField) isFieldType() {}
-
-func (o *OneOfField) Parent() *Message {
-	return o.parent
+func (f *OneOfField) Parent() *Message {
+	return f.parent
 }
 
-func (o *OneOfField) OneOfDescriptor() protoreflect.OneofDescriptor {
-	return o.descriptor
+func (f *OneOfField) Validate(env Env) error {
+	return f.WhichOneOf().Validate(env)
 }
 
-func (o *OneOfField) Descriptor() protoreflect.FieldDescriptor {
-	return o.WhichOneOf().Descriptor()
+func (f *OneOfField) OneOfDescriptor() protoreflect.OneofDescriptor {
+	return f.descriptor
 }
 
-func (o *OneOfField) Element() *Element {
-	return o.WhichOneOf().Element()
+func (f *OneOfField) Descriptor() protoreflect.FieldDescriptor {
+	return f.WhichOneOf().Descriptor()
 }
 
-func (o *OneOfField) GetFieldGroup(field Field) (*FieldGroup, bool) {
-	idx := slices.Index(o.fields, field)
+func (f *OneOfField) Element() *Element {
+	return f.WhichOneOf().Element()
+}
+
+func (f *OneOfField) GetFieldGroup(field Field) (*FieldGroup, bool) {
+	idx := slices.Index(f.fields, field)
 	if idx == -1 {
 		return nil, false
 	}
 
-	field = o.fields[idx]
+	field = f.fields[idx]
 	if msg, ok := field.IsMessage(); ok {
 		return msg.FieldGroup(), true
 	}
@@ -77,31 +79,29 @@ func (o *OneOfField) GetFieldGroup(field Field) (*FieldGroup, bool) {
 	return NewFieldGroup(field), true
 }
 
-func (o *OneOfField) WhichOneOf() Field {
-	field := o.parent.Get().WhichOneof(o.descriptor)
-	idx := max(slices.IndexFunc(o.fields, func(f Field) bool {
+func (f *OneOfField) WhichOneOf() Field {
+	field := f.parent.Get().WhichOneof(f.descriptor)
+	idx := max(0, slices.IndexFunc(f.fields, func(f Field) bool {
 		return f.Descriptor() == field
-	}), 0)
-
-	return o.fields[idx]
+	}))
+	return f.fields[idx]
 }
 
-func (o *OneOfField) SetOneOf(field Field) error {
-	idx := max(slices.IndexFunc(o.fields, func(f Field) bool {
+func (f *OneOfField) SetOneOf(field Field) error {
+	idx := max(slices.IndexFunc(f.fields, func(f Field) bool {
 		return f.Descriptor() == field.Descriptor()
 	}), 0)
 	if idx == -1 {
 		return fmt.Errorf("invalid oneOf field: %s", field.Descriptor().FullName())
 	}
 
-	parent := o.parent.Get()
-	if msg, ok := field.IsMessage(); ok && parent != nil {
-		parent.Set(msg.Descriptor(), protoreflect.ValueOfMessage(msg.Get()))
-	} else if scalar, ok := field.IsScalar(); ok && parent != nil {
-		parent.Set(scalar.Descriptor(), protoreflect.ValueOf(scalar.GetAny()))
+	if msg, ok := field.IsMessage(); ok {
+		f.parent.SetField(msg.Descriptor(), protoreflect.ValueOfMessage(msg.Get()))
+	} else if scalar, ok := field.IsScalar(); ok {
+		f.parent.SetField(scalar.Descriptor(), protoreflect.ValueOf(scalar.GetAny()))
 	}
-
-	o.parent.Set(parent)
 
 	return nil
 }
+
+func (f *OneOfField) isFieldType() {}

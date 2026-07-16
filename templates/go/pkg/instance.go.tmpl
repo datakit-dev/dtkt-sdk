@@ -5,6 +5,7 @@ import (
 
 	basev1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/base/v1beta1"
   sharedv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk/v1beta1"
 {{ if $.PROTO_ENABLED }}
 	{{ $.PROTO_IMPORT }} "github.com/datakit-dev/dtkt-integrations/{{ $.PKG_SLUG }}/pkg/proto/{{ $.PROTO_PATH }}"
 {{- end }}
@@ -32,9 +33,9 @@ type Instance struct {
 }
 
 // Creates a new instance
-func NewInstance(ctx context.Context, config *{{ if $.PROTO_ENABLED }}{{ $.PROTO_IMPORT }}.{{ end }}Config) (*Instance, error) {
+func NewInstance(ctx context.Context, config v1beta1.InstanceConfig[*{{ if $.PROTO_ENABLED }}{{ $.PROTO_IMPORT }}.{{ end }}Config]) (*Instance, error) {
 	return &Instance{
-    config: config,
+    config: config.Get(),
   }, nil
 }
 

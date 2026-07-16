@@ -40,13 +40,12 @@ type Integration[C any, I v1beta1.InstanceType] struct {
 	basev1beta1.UnimplementedBaseServiceServer
 
 	log  *slog.Logger
-	name resource.Name
 	addr network.Address
-	conn network.Connector
+	name resource.Name
+	root string
 
-	spec   *sharedv1beta1.Package
-	config *v1beta1.TypeSchema[C]
-
+	spec     *sharedv1beta1.Package
+	schema   *v1beta1.TypeSchema[C]
 	registry *v1beta1.TypeRegistry
 	actions  *v1beta1.ActionRegistry
 	events   *v1beta1.EventRegistry
@@ -55,7 +54,7 @@ type Integration[C any, I v1beta1.InstanceType] struct {
 	services map[string]Service
 	handlers map[string]http.Handler
 
-	instances   util.SyncMap[string, *Instance[I]]
+	instances   util.SyncMap[string, *instance]
 	newInstance NewInstanceFunc[C, I]
 
 	started bool
@@ -76,11 +75,6 @@ func New[C any, I v1beta1.InstanceType](
 		return nil, err
 	}
 
-	conn, err := network.ResolveConnector()
-	if err != nil {
-		return nil, err
-	}
-
 	var (
 		ident    = common.GetPackageIdentity(spec)
 		name     resource.Name
@@ -91,6 +85,16 @@ func New[C any, I v1beta1.InstanceType](
 			slog.String("address", addr.String()),
 		}
 	)
+
+	root := os.Getenv(env.DataRoot)
+	if root == "" {
+		root, err = os.UserCacheDir()
+		if err != nil {
+			return nil, err
+		}
+
+		root = filepath.Join(root, strings.ToLower(ident.String()))
+	}
 
 	if env.GetVar(env.ContextAddress) != "" && resource.Deployment.IsName(env.GetVar(env.DeployName)) {
 		addr, err := network.ParseAddr(env.GetVar(env.ContextAddress))
@@ -125,14 +129,12 @@ func New[C any, I v1beta1.InstanceType](
 			log.WithFormat(log.FormatPretty),
 			log.WithSource(true),
 		).With(logOpts...),
-
-		spec:   spec,
-		config: config,
-
-		name: name,
 		addr: addr,
-		conn: conn,
+		name: name,
+		root: root,
 
+		spec:     spec,
+		schema:   config,
 		registry: registry,
 		actions:  &v1beta1.ActionRegistry{},
 		events:   &v1beta1.EventRegistry{},
@@ -147,6 +149,7 @@ func New[C any, I v1beta1.InstanceType](
 	if env.GetVar(env.AppEnv) == "dev" {
 		debugPath, debugHandler := env.Handler()
 		intgr.handlers[debugPath] = debugHandler
+		intgr.handlers[StatsPath] = StatsHandler(intgr.log, &intgr.instances)
 	}
 
 	// Register Integration as BaseService implementation
@@ -171,12 +174,12 @@ func NewFS[C any, I v1beta1.InstanceType](
 	//nolint:errcheck
 	defer reader.Close()
 
-	spec, err := ReadSpec(encoding.YAML, reader)
+	spec, err := ReadSpec(reader, encoding.YAML)
 	if err != nil {
 		return nil, err
 	}
 
-	return New(spec.GetPackage(), newInstance)
+	return New(spec.GetV1Beta1(), newInstance)
 }
 
 func (i *Integration[C, I]) String() string {
@@ -196,7 +199,7 @@ func (i *Integration[C, I]) Package() *sharedv1beta1.Package {
 }
 
 func (i *Integration[C, I]) ConfigSchema() *sharedv1beta1.TypeSchema {
-	return i.config.ToProto()
+	return i.schema.ToProto()
 }
 
 func (i *Integration[C, I]) Types() *v1beta1.TypeRegistry {
@@ -215,33 +218,23 @@ func (i *Integration[C, I]) EventSources() *v1beta1.EventSourceRegistry {
 	return i.sources
 }
 
-func (i *Integration[C, I]) GetInstance(ctx context.Context) (inst I, err error) {
+func (i *Integration[C, I]) GetInstance(ctx context.Context) (_ I, err error) {
 	req, err := middleware.RequestFromContext(ctx)
 	if err != nil {
 		err = status.Error(codes.InvalidArgument, err.Error())
 		return
 	}
 
-	wrap, err := i.getInstance(req)
+	inst, err := i.getInstance(req)
 	if err != nil {
 		return
 	}
 
-	return wrap.InstanceType.(I), nil
+	return inst.InstanceType.(I), nil
 }
 
-func (i *Integration[C, I]) GetDataRoot() (string, error) {
-	root := os.Getenv(env.DataRoot)
-	if root != "" {
-		return root, nil
-	}
-
-	root, err := os.UserCacheDir()
-	if err != nil {
-		return "", err
-	}
-
-	return filepath.Join(root, strings.ToLower(i.String())), nil
+func (i *Integration[C, I]) DataRoot() string {
+	return i.root
 }
 
 func (i *Integration[C, I]) Serve() error {
@@ -289,15 +282,12 @@ func (i *Integration[C, I]) RegisterService(svcDesc *grpc.ServiceDesc, regSvc fu
 		return err
 	}
 
-	i.services[svcName] = Service{
-		info:   NewServiceInfo(svcDesc),
-		regSvc: regSvc,
-	}
+	i.services[svcName] = NewService(svcDesc, regSvc)
 
 	return nil
 }
 
-func (i *Integration[C, I]) RegisterProxy(svcDesc *grpc.ServiceDesc, getConn GetProxyConnFunc) error {
+func (i *Integration[C, I]) RegisterProxy(svcDesc *grpc.ServiceDesc, getConn GetProxyConnFunc[I]) error {
 	if i.isRunning() {
 		return fmt.Errorf("cannot modify services, server running")
 	} else if svcDesc == nil {
@@ -321,11 +311,9 @@ func (i *Integration[C, I]) RegisterProxy(svcDesc *grpc.ServiceDesc, getConn Get
 		return err
 	}
 
-	i.services[svcName] = Service{
-		info:    NewServiceInfo(svcDesc),
-		getConn: getConn,
-		isProxy: true,
-	}
+	i.services[svcName] = NewServiceProxy(svcDesc, func(ctx context.Context, opts ...grpc.DialOption) (context.Context, *grpc.ClientConn, error) {
+		return getConn(ctx, i, opts...)
+	})
 
 	return nil
 }
@@ -333,7 +321,7 @@ func (i *Integration[C, I]) RegisterProxy(svcDesc *grpc.ServiceDesc, getConn Get
 func (i *Integration[C, I]) GetPackage(context.Context, *basev1beta1.GetPackageRequest) (*basev1beta1.GetPackageResponse, error) {
 	return &basev1beta1.GetPackageResponse{
 		Package:      i.spec,
-		ConfigSchema: i.config.ToProto(),
+		ConfigSchema: i.schema.ToProto(),
 	}, nil
 }
 
@@ -345,8 +333,12 @@ func (i *Integration[C, I]) CheckConfig(ctx context.Context, req *basev1beta1.Ch
 			return nil, status.Errorf(codes.InvalidArgument, "new instance error: %s", err)
 		}
 
-		i.invalidatePrev(inst.Prev())
-		i.instances.Store(inst.String(), inst)
+		err = i.closeInstance(inst.PrevSHA256())
+		if err != nil {
+			i.log.Error("Error while closing instance.", log.Err(err))
+		}
+
+		i.instances.Store(inst.HashSHA256(), inst)
 	}
 
 	var authRequired *sharedv1beta1.AuthType
@@ -375,6 +367,25 @@ func (i *Integration[C, I]) ListTypes(_ context.Context, req *basev1beta1.ListTy
 
 func (i *Integration[C, I]) GetType(_ context.Context, req *basev1beta1.GetTypeRequest) (*basev1beta1.GetTypeResponse, error) {
 	return i.registry.GetType(req)
+}
+
+func (i *Integration[C, I]) Close(ctx context.Context, req *basev1beta1.CloseRequest) (*basev1beta1.CloseResponse, error) {
+	mreq, err := middleware.RequestFromContext(ctx)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	inst, err := i.getInstance(mreq)
+	if err != nil {
+		return nil, status.Error(codes.FailedPrecondition, err.Error())
+	}
+
+	err = i.closeInstance(inst.HashSHA256())
+	if err != nil {
+		return nil, status.Error(codes.Aborted, err.Error())
+	}
+
+	return &basev1beta1.CloseResponse{}, nil
 }
 
 func (i *Integration[C, I]) syncServiceTypes(svcName string) error {
@@ -472,7 +483,8 @@ func (i *Integration[C, I]) streamInterceptor() grpc.StreamServerInterceptor {
 		}()
 
 		switch info.FullMethod {
-		case grpc_reflection_v1.ServerReflection_ServerReflectionInfo_FullMethodName, grpc_health_v1.Health_Watch_FullMethodName:
+		case grpc_reflection_v1.ServerReflection_ServerReflectionInfo_FullMethodName,
+			grpc_health_v1.Health_Watch_FullMethodName:
 			return handler(srv, stream)
 		}
 
@@ -486,7 +498,10 @@ func (i *Integration[C, I]) streamInterceptor() grpc.StreamServerInterceptor {
 			return status.Errorf(codes.InvalidArgument, "request invalid: %s", err)
 		}
 
-		err = handler(srv, &grpcServerStream{ServerStream: stream, ctx: i.newContext(stream.Context(), req)})
+		err = handler(srv, &grpcServerStream{
+			ServerStream: stream,
+			ctx:          i.newContext(stream.Context(), req),
+		})
 		if err != nil {
 			return grpcError(err)
 		}
@@ -496,27 +511,27 @@ func (i *Integration[C, I]) streamInterceptor() grpc.StreamServerInterceptor {
 }
 
 func (i *Integration[C, I]) newContext(ctx context.Context, req *middleware.Request) context.Context {
-	if resource.Connection.IsName(req.AddrName()) {
-		ctx = log.NewCtx(ctx, i.log.With(slog.String("connection", req.AddrName())))
+	if resource.Connection.IsName(req.ResourceName()) {
+		ctx = log.NewCtx(ctx, i.log.With(slog.String("connection", req.ResourceName())))
 	}
 	return middleware.AddRequestToContext(ctx, req)
 }
 
-func (i *Integration[C, I]) getInstance(req *middleware.Request) (*Instance[I], error) {
-	inst, ok := i.instances.Load(req.String())
+func (i *Integration[C, I]) getInstance(req *middleware.Request) (*instance, error) {
+	inst, ok := i.instances.Load(req.HashSHA256())
 	if !ok {
-		value, err, _ := i.mux.Do(req.String(), func() (any, error) {
-			cached, ok := i.instances.Load(req.String())
+		value, err, _ := i.mux.Do(req.HashSHA256(), func() (any, error) {
+			cached, ok := i.instances.Load(req.HashSHA256())
 			if ok {
 				return cached, nil
 			}
-			return nil, fmt.Errorf("instance not found: %s", req.AddrName())
+			return nil, fmt.Errorf("instance not found: %s", req.ResourceName())
 		})
 		if err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
+			return nil, status.Error(codes.NotFound, err.Error())
 		}
 
-		inst = value.(*Instance[I])
+		inst = value.(*instance)
 	}
 
 	if req.ConfigHash() != inst.ConfigHash() {
@@ -526,15 +541,14 @@ func (i *Integration[C, I]) getInstance(req *middleware.Request) (*Instance[I], 
 	return inst, nil
 }
 
-func (i *Integration[C, I]) invalidatePrev(reqHash string) {
-	if inst, ok := i.instances.Load(reqHash); ok {
-		err := inst.Close()
-		if err != nil {
-			i.log.Error("Error while closing instance.", log.Err(err))
-		}
+func (i *Integration[C, I]) closeInstance(reqHash string) (err error) {
+	inst, ok := i.instances.Load(reqHash)
+	if ok {
+		err = inst.close()
 		i.instances.Delete(reqHash)
 		i.mux.Forget(reqHash)
 	}
+	return
 }
 
 func (i *Integration[C, I]) close() error {
@@ -544,8 +558,8 @@ func (i *Integration[C, I]) close() error {
 		errs = append(errs, i.sources.Close())
 	}
 
-	i.instances.Range(func(key string, inst *Instance[I]) bool {
-		errs = append(errs, inst.Close())
+	i.instances.Range(func(key string, inst *instance) bool {
+		errs = append(errs, inst.close())
 		return true
 	})
 	return errors.Join(errs...)

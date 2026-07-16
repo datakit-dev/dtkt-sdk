@@ -11,6 +11,7 @@ import (
 	"google.golang.org/protobuf/reflect/protopath"
 	"google.golang.org/protobuf/reflect/protorange"
 	"google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 type (
@@ -66,9 +67,14 @@ func WithEncodeProtoJSON() JSONEncoderV2Option {
 // WithEncodeDurationString adds support for encoding time.Duration to JSON strings.
 func WithEncodeDurationString() JSONEncoderV2Option {
 	return func(e *JSONEncoderV2) {
-		e.marshalers = append(e.marshalers, json.MarshalFunc(func(d time.Duration) ([]byte, error) {
-			return jsontext.Value(strconv.Quote(d.String())), nil
-		}))
+		e.marshalers = append(e.marshalers,
+			json.MarshalFunc(func(dur time.Duration) ([]byte, error) {
+				return jsontext.Value(strconv.Quote(dur.String())), nil
+			}),
+			json.MarshalFunc(func(dur *durationpb.Duration) ([]byte, error) {
+				return jsontext.Value(strconv.Quote(dur.AsDuration().String())), nil
+			}),
+		)
 	}
 }
 
@@ -124,9 +130,9 @@ func WithDecodeJSONStream(stream bool) JSONDecoderV2Option {
 
 // WithDecodeDurationString adds support for decoding time.Duration from JSON strings.
 func WithDecodeDurationString() JSONDecoderV2Option {
-	return func(d *JSONDecoderV2) {
-		d.unmarshalers = append(d.unmarshalers,
-			json.UnmarshalFunc(func(b []byte, p *time.Duration) error {
+	return func(dec *JSONDecoderV2) {
+		dec.unmarshalers = append(dec.unmarshalers,
+			json.UnmarshalFunc(func(b []byte, dur *time.Duration) error {
 				d, err := time.ParseDuration(string(b))
 				if err != nil {
 					d, err = time.ParseDuration(string(b[1 : len(b)-1]))
@@ -134,7 +140,18 @@ func WithDecodeDurationString() JSONDecoderV2Option {
 						return err
 					}
 				}
-				*p = d
+				*dur = d
+				return nil
+			}),
+			json.UnmarshalFunc(func(b []byte, p *durationpb.Duration) error {
+				d, err := time.ParseDuration(string(b))
+				if err != nil {
+					d, err = time.ParseDuration(string(b[1 : len(b)-1]))
+					if err != nil {
+						return err
+					}
+				}
+				*p = *durationpb.New(d)
 				return nil
 			}),
 		)

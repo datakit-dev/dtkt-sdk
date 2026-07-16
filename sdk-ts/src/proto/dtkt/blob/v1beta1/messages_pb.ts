@@ -5,7 +5,7 @@
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_buf_validate_validate } from "../../../buf/validate/validate_pb";
-import type { LineFormat, SignedURLMethod } from "./enums_pb";
+import type { SignedURLMethod } from "./enums_pb";
 import { file_dtkt_blob_v1beta1_enums } from "./enums_pb";
 import type { Duration } from "../../../google/protobuf/duration_pb";
 import { file_google_protobuf_duration } from "../../../google/protobuf/duration_pb";
@@ -13,105 +13,566 @@ import type { Value } from "../../../google/protobuf/struct_pb";
 import { file_google_protobuf_struct } from "../../../google/protobuf/struct_pb";
 import type { Timestamp } from "../../../google/protobuf/timestamp_pb";
 import { file_google_protobuf_timestamp } from "../../../google/protobuf/timestamp_pb";
-import type { Message } from "@bufbuild/protobuf";
+import type { JsonObject, Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file dtkt/blob/v1beta1/messages.proto.
  */
 export const file_dtkt_blob_v1beta1_messages: GenFile = /*@__PURE__*/
-  fileDesc("CiBkdGt0L2Jsb2IvdjFiZXRhMS9tZXNzYWdlcy5wcm90bxIRZHRrdC5ibG9iLnYxYmV0YTEicgoKTGlzdFJlc3VsdBILCgNrZXkYASABKAkSLAoIbW9kX3RpbWUYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEgwKBHNpemUYAyABKAMSCwoDbWQ1GAQgASgJEg4KBmlzX2RpchgFIAEoCCJlChBMaXN0QmxvYnNSZXF1ZXN0Eg4KBnByZWZpeBgBIAEoCRIdCglwYWdlX3NpemUYAiABKAVCCrpIBxoFGOgHIAASEgoKcGFnZV90b2tlbhgDIAEoCRIOCgZidWNrZXQYBCABKAkiXAoRTGlzdEJsb2JzUmVzcG9uc2USLgoHcmVzdWx0cxgBIAMoCzIdLmR0a3QuYmxvYi52MWJldGExLkxpc3RSZXN1bHQSFwoPbmV4dF9wYWdlX3Rva2VuGAIgASgJIjUKDkdldEJsb2JSZXF1ZXN0EhMKA2tleRgBIAEoCUIGukgDyAEBEg4KBmJ1Y2tldBgCIAEoCSKZAwoPR2V0QmxvYlJlc3BvbnNlEgsKA2tleRgBIAEoCRIVCg1jYWNoZV9jb250cm9sGAIgASgJEhsKE2NvbnRlbnRfZGlzcG9zaXRpb24YAyABKAkSGAoQY29udGVudF9lbmNvZGluZxgEIAEoCRIYChBjb250ZW50X2xhbmd1YWdlGAUgASgJEhQKDGNvbnRlbnRfdHlwZRgGIAEoCRJCCghtZXRhZGF0YRgHIAMoCzIwLmR0a3QuYmxvYi52MWJldGExLkdldEJsb2JSZXNwb25zZS5NZXRhZGF0YUVudHJ5Ei8KC2NyZWF0ZV90aW1lGAggASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghtb2RfdGltZRgJIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDAoEc2l6ZRgKIAEoAxILCgNtZDUYCyABKAkSDAoEZXRhZxgMIAEoCRovCg1NZXRhZGF0YUVudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEirQEKFFJlYWRCbG9iTGluZXNSZXF1ZXN0EhMKA2tleRgBIAEoCUIGukgDyAEBEhEKCWRlbGltaXRlchgCIAEoCRIQCghtYXhfc2l6ZRgDIAEoAxIOCgZidWNrZXQYBCABKAkSMgoLbGluZV9mb3JtYXQYBSABKA4yHS5kdGt0LmJsb2IudjFiZXRhMS5MaW5lRm9ybWF0EhcKD2pzb25fYXJyYXlfbW9kZRgGIAEoCCJkChVSZWFkQmxvYkxpbmVzUmVzcG9uc2USCwoDa2V5GAEgASgJEg4KBGRhdGEYAiABKAxIABImCgRqc29uGAMgASgLMhYuZ29vZ2xlLnByb3RvYnVmLlZhbHVlSABCBgoEbGluZSJbChRSZWFkQmxvYlJhbmdlUmVxdWVzdBITCgNrZXkYASABKAlCBrpIA8gBARIOCgZidWNrZXQYAiABKAkSDgoGb2Zmc2V0GAMgASgEEg4KBmxlbmd0aBgEIAEoAyIyChVSZWFkQmxvYlJhbmdlUmVzcG9uc2USCwoDa2V5GAEgASgJEgwKBGRhdGEYAiABKAwi+AIKEFdyaXRlQmxvYlJlcXVlc3QSEwoDa2V5GAEgASgJQga6SAPIAQESDgoGYnVja2V0GAIgASgJEgwKBGRhdGEYAyABKAwSFAoMY29udGVudF90eXBlGAQgASgJEhgKEGNvbnRlbnRfbGFuZ3VhZ2UYBSABKAkSGAoQY29udGVudF9lbmNvZGluZxgGIAEoCRIVCg1jYWNoZV9jb250cm9sGAcgASgJEhsKE2NvbnRlbnRfZGlzcG9zaXRpb24YCCABKAkSQwoIbWV0YWRhdGEYCSADKAsyMS5kdGt0LmJsb2IudjFiZXRhMS5Xcml0ZUJsb2JSZXF1ZXN0Lk1ldGFkYXRhRW50cnkSEAoIaWZfbWF0Y2gYCiABKAkSFQoNaWZfbm9uZV9tYXRjaBgLIAEoCRIUCgxpZl9ub3RfZXhpc3QYDCABKAgaLwoNTWV0YWRhdGFFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBImoKEVdyaXRlQmxvYlJlc3BvbnNlEgsKA2tleRgBIAEoCRIMCgRzaXplGAIgASgDEiwKCG1vZF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIMCgRldGFnGAQgASgJIkoKFVdyaXRlQmxvYkxpbmVzUmVxdWVzdBITCgNrZXkYASABKAlCBrpIA8gBARIOCgZidWNrZXQYAiABKAkSDAoEZGF0YRgDIAEoDCLZAQoWV3JpdGVCbG9iTGluZXNSZXNwb25zZRJECgdyZXN1bHRzGAEgAygLMjMuZHRrdC5ibG9iLnYxYmV0YTEuV3JpdGVCbG9iTGluZXNSZXNwb25zZS5LZXlSZXN1bHQaeQoJS2V5UmVzdWx0EgsKA2tleRgBIAEoCRIMCgRzaXplGAIgASgDEiwKCG1vZF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIMCgRldGFnGAQgASgJEhUKDWxpbmVzX3dyaXR0ZW4YBSABKAMiOAoRRGVsZXRlQmxvYlJlcXVlc3QSEwoDa2V5GAEgASgJQga6SAPIAQESDgoGYnVja2V0GAIgASgJIjMKEkRlbGV0ZUJsb2JSZXNwb25zZRIPCgdkZWxldGVkGAEgASgIEgwKBGV0YWcYAiABKAkiiQIKD0NvcHlCbG9iUmVxdWVzdBIVCg1zb3VyY2VfYnVja2V0GAEgASgJEhoKCnNvdXJjZV9rZXkYAiABKAlCBrpIA8gBARIaChJkZXN0aW5hdGlvbl9idWNrZXQYAyABKAkSHwoPZGVzdGluYXRpb25fa2V5GAQgASgJQga6SAPIAQESEQoJb3ZlcndyaXRlGAUgASgIEkIKCG1ldGFkYXRhGAYgAygLMjAuZHRrdC5ibG9iLnYxYmV0YTEuQ29weUJsb2JSZXF1ZXN0Lk1ldGFkYXRhRW50cnkaLwoNTWV0YWRhdGFFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBInUKEENvcHlCbG9iUmVzcG9uc2USFwoPZGVzdGluYXRpb25fa2V5GAEgASgJEgwKBHNpemUYAiABKAMSLAoIbW9kX3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEgwKBGV0YWcYBCABKAkixwMKGEdlbmVyYXRlU2lnbmVkVVJMUmVxdWVzdBITCgNrZXkYASABKAlCBrpIA8gBARIOCgZidWNrZXQYAiABKAkSMgoGbWV0aG9kGAMgASgOMiIuZHRrdC5ibG9iLnYxYmV0YTEuU2lnbmVkVVJMTWV0aG9kEi0KCmV4cGlyZXNfaW4YBCABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SFAoMY29udGVudF90eXBlGAUgASgJEloKEHF1ZXJ5X3BhcmFtZXRlcnMYBiADKAsyQC5kdGt0LmJsb2IudjFiZXRhMS5HZW5lcmF0ZVNpZ25lZFVSTFJlcXVlc3QuUXVlcnlQYXJhbWV0ZXJzRW50cnkSSQoHaGVhZGVycxgHIAMoCzI4LmR0a3QuYmxvYi52MWJldGExLkdlbmVyYXRlU2lnbmVkVVJMUmVxdWVzdC5IZWFkZXJzRW50cnkaNgoUUXVlcnlQYXJhbWV0ZXJzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ARouCgxIZWFkZXJzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJYChlHZW5lcmF0ZVNpZ25lZFVSTFJlc3BvbnNlEgsKA3VybBgBIAEoCRIuCgpleHBpcmVzX2F0GAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcELaAQoXcHJvdG8uZHRrdC5ibG9iLnYxYmV0YTFCDU1lc3NhZ2VzUHJvdG9QAVpKZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9ibG9iL3YxYmV0YTE7YmxvYnYxYmV0YTGiAgNEQliqAhFEdGt0LkJsb2IuVjFiZXRhMcoCEUR0a3RcQmxvYlxWMWJldGEx4gIdRHRrdFxCbG9iXFYxYmV0YTFcR1BCTWV0YWRhdGHqAhNEdGt0OjpCbG9iOjpWMWJldGExYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_blob_v1beta1_enums, file_google_protobuf_duration, file_google_protobuf_struct, file_google_protobuf_timestamp]);
+  fileDesc("CiBkdGt0L2Jsb2IvdjFiZXRhMS9tZXNzYWdlcy5wcm90bxIRZHRrdC5ibG9iLnYxYmV0YTEiUgoGQnVja2V0EhQKBG5hbWUYASABKAlCBrpIA8gBARIyChFwcm92aWRlcl9tZXRhZGF0YRgCIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3Qi5gEKBEJsb2ISEwoDa2V5GAEgASgJQga6SAPIAQESDgoGYnVja2V0GAIgASgJEgwKBHNpemUYAyABKAQSCwoDbWQ1GAQgASgJEgwKBGV0YWcYBSABKAkSMQoIbWV0YWRhdGEYBiABKAsyHy5kdGt0LmJsb2IudjFiZXRhMS5CbG9iTWV0YWRhdGESLAoIbW9kX3RpbWUYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi8KC2NyZWF0ZV90aW1lGAggASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCLAAQoMQmxvYk1ldGFkYXRhEhQKDGNvbnRlbnRfdHlwZRgBIAEoCRIbChNjb250ZW50X2Rpc3Bvc2l0aW9uGAIgASgJEhgKEGNvbnRlbnRfZW5jb2RpbmcYAyABKAkSGAoQY29udGVudF9sYW5ndWFnZRgEIAEoCRIVCg1jYWNoZV9jb250cm9sGAUgASgJEjIKEXByb3ZpZGVyX21ldGFkYXRhGAogASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdCJTCglCbG9iUnVsZXMSFAoMaWZfbm90X2V4aXN0GAEgASgIEhUKDWlmX2V0YWdfbWF0Y2gYAiABKAkSGQoRdW5sZXNzX2V0YWdfbWF0Y2gYAyABKAki+wEKCkxpbmVGb3JtYXQSGAoObGluZV9kZWxpbWl0ZXIYAiABKAlIABIyCgRqc29uGAMgASgLMiIuZHRrdC5ibG9iLnYxYmV0YTEuTGluZUZvcm1hdC5KU09OSAASMAoDY3N2GAQgASgLMiEuZHRrdC5ibG9iLnYxYmV0YTEuTGluZUZvcm1hdC5DU1ZIABoaCgRKU09OEhIKCmFycmF5X21vZGUYASABKAgaSQoDQ1NWEg4KBmZpZWxkcxgBIAMoCRIgCg9maWVsZF9kZWxpbWl0ZXIYAiABKAlCB7pIBHICGAESEAoIdXNlX2NybGYYAyABKAhCBgoEdHlwZSKQAQoITGluZURhdGESDQoDcmF3GAEgASgMSAASJgoEanNvbhgCIAEoCzIWLmdvb2dsZS5wcm90b2J1Zi5WYWx1ZUgAEi4KA2NzdhgDIAEoCzIfLmR0a3QuYmxvYi52MWJldGExLkxpbmVEYXRhLkNTVkgAGhUKA0NTVhIOCgZ2YWx1ZXMYASADKAlCBgoEdHlwZSJLChJMaXN0QnVja2V0c1JlcXVlc3QSEQoJcGFnZV9zaXplGAEgASgFEhIKCnBhZ2VfdG9rZW4YAiABKAkSDgoGZmlsdGVyGAMgASgJIloKE0xpc3RCdWNrZXRzUmVzcG9uc2USKgoHYnVja2V0cxgBIAMoCzIZLmR0a3QuYmxvYi52MWJldGExLkJ1Y2tldBIXCg9uZXh0X3BhZ2VfdG9rZW4YAiABKAkiWQoQTGlzdEJsb2JzUmVxdWVzdBIRCglwYWdlX3NpemUYASABKAUSEgoKcGFnZV90b2tlbhgCIAEoCRIOCgZidWNrZXQYAyABKAkSDgoGcHJlZml4GAQgASgJIlQKEUxpc3RCbG9ic1Jlc3BvbnNlEiYKBWJsb2JzGAEgAygLMhcuZHRrdC5ibG9iLnYxYmV0YTEuQmxvYhIXCg9uZXh0X3BhZ2VfdG9rZW4YAiABKAkiNQoOR2V0QmxvYlJlcXVlc3QSDgoGYnVja2V0GAEgASgJEhMKA2tleRgCIAEoCUIGukgDyAEBIjgKD0dldEJsb2JSZXNwb25zZRIlCgRibG9iGAEgASgLMhcuZHRrdC5ibG9iLnYxYmV0YTEuQmxvYiJWCg9SZWFkQmxvYlJlcXVlc3QSDgoGYnVja2V0GAEgASgJEhMKA2tleRgCIAEoCUIGukgDyAEBEg4KBm9mZnNldBgDIAEoAxIOCgZsZW5ndGgYBCABKAMiIAoQUmVhZEJsb2JSZXNwb25zZRIMCgRkYXRhGAEgASgMIrUBChBXcml0ZUJsb2JSZXF1ZXN0Eg4KBmJ1Y2tldBgBIAEoCRITCgNrZXkYAiABKAlCBrpIA8gBARIxCghtZXRhZGF0YRgDIAEoCzIfLmR0a3QuYmxvYi52MWJldGExLkJsb2JNZXRhZGF0YRIrCgVydWxlcxgEIAEoCzIcLmR0a3QuYmxvYi52MWJldGExLkJsb2JSdWxlcxIOCgZvZmZzZXQYBiABKAMSDAoEZGF0YRgHIAEoDCIpChFXcml0ZUJsb2JSZXNwb25zZRIUCgx3cml0dGVuX3NpemUYAiABKAMikwEKFFJlYWRCbG9iTGluZXNSZXF1ZXN0Eg4KBmJ1Y2tldBgBIAEoCRITCgNrZXkYAiABKAlCBrpIA8gBARItCgZmb3JtYXQYAyABKAsyHS5kdGt0LmJsb2IudjFiZXRhMS5MaW5lRm9ybWF0EhcKBm9mZnNldBgEIAEoA0IHukgEIgIoABIOCgZsZW5ndGgYBSABKAMiQgoVUmVhZEJsb2JMaW5lc1Jlc3BvbnNlEikKBGRhdGEYASABKAsyGy5kdGt0LmJsb2IudjFiZXRhMS5MaW5lRGF0YSKRAgoVV3JpdGVCbG9iTGluZXNSZXF1ZXN0Eg4KBmJ1Y2tldBgBIAEoCRITCgNrZXkYAiABKAlCBrpIA8gBARIxCghtZXRhZGF0YRgDIAEoCzIfLmR0a3QuYmxvYi52MWJldGExLkJsb2JNZXRhZGF0YRIrCgVydWxlcxgEIAEoCzIcLmR0a3QuYmxvYi52MWJldGExLkJsb2JSdWxlcxItCgZmb3JtYXQYBSABKAsyHS5kdGt0LmJsb2IudjFiZXRhMS5MaW5lRm9ybWF0EhEKCW92ZXJ3cml0ZRgGIAEoCBIxCgRkYXRhGAcgASgLMhsuZHRrdC5ibG9iLnYxYmV0YTEuTGluZURhdGFCBrpIA8gBASIvChZXcml0ZUJsb2JMaW5lc1Jlc3BvbnNlEhUKDXdyaXR0ZW5fbGluZXMYASABKAMiOAoRRGVsZXRlQmxvYlJlcXVlc3QSEwoDa2V5GAEgASgJQga6SAPIAQESDgoGYnVja2V0GAIgASgJIjMKEkRlbGV0ZUJsb2JSZXNwb25zZRIPCgdkZWxldGVkGAEgASgIEgwKBGV0YWcYAiABKAkiiQIKD0NvcHlCbG9iUmVxdWVzdBIVCg1zb3VyY2VfYnVja2V0GAEgASgJEhoKCnNvdXJjZV9rZXkYAiABKAlCBrpIA8gBARIaChJkZXN0aW5hdGlvbl9idWNrZXQYAyABKAkSHwoPZGVzdGluYXRpb25fa2V5GAQgASgJQga6SAPIAQESEQoJb3ZlcndyaXRlGAUgASgIEkIKCG1ldGFkYXRhGAYgAygLMjAuZHRrdC5ibG9iLnYxYmV0YTEuQ29weUJsb2JSZXF1ZXN0Lk1ldGFkYXRhRW50cnkaLwoNTWV0YWRhdGFFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBInUKEENvcHlCbG9iUmVzcG9uc2USFwoPZGVzdGluYXRpb25fa2V5GAEgASgJEgwKBHNpemUYAiABKAMSLAoIbW9kX3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEgwKBGV0YWcYBCABKAkixwMKGEdlbmVyYXRlU2lnbmVkVVJMUmVxdWVzdBITCgNrZXkYASABKAlCBrpIA8gBARIOCgZidWNrZXQYAiABKAkSMgoGbWV0aG9kGAMgASgOMiIuZHRrdC5ibG9iLnYxYmV0YTEuU2lnbmVkVVJMTWV0aG9kEi0KCmV4cGlyZXNfaW4YBCABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SFAoMY29udGVudF90eXBlGAUgASgJEloKEHF1ZXJ5X3BhcmFtZXRlcnMYBiADKAsyQC5kdGt0LmJsb2IudjFiZXRhMS5HZW5lcmF0ZVNpZ25lZFVSTFJlcXVlc3QuUXVlcnlQYXJhbWV0ZXJzRW50cnkSSQoHaGVhZGVycxgHIAMoCzI4LmR0a3QuYmxvYi52MWJldGExLkdlbmVyYXRlU2lnbmVkVVJMUmVxdWVzdC5IZWFkZXJzRW50cnkaNgoUUXVlcnlQYXJhbWV0ZXJzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ARouCgxIZWFkZXJzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJYChlHZW5lcmF0ZVNpZ25lZFVSTFJlc3BvbnNlEgsKA3VybBgBIAEoCRIuCgpleHBpcmVzX2F0GAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcELaAQoXcHJvdG8uZHRrdC5ibG9iLnYxYmV0YTFCDU1lc3NhZ2VzUHJvdG9QAVpKZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9ibG9iL3YxYmV0YTE7YmxvYnYxYmV0YTGiAgNEQliqAhFEdGt0LkJsb2IuVjFiZXRhMcoCEUR0a3RcQmxvYlxWMWJldGEx4gIdRHRrdFxCbG9iXFYxYmV0YTFcR1BCTWV0YWRhdGHqAhNEdGt0OjpCbG9iOjpWMWJldGExYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_blob_v1beta1_enums, file_google_protobuf_duration, file_google_protobuf_struct, file_google_protobuf_timestamp]);
 
 /**
- * @generated from message dtkt.blob.v1beta1.ListResult
+ * @generated from message dtkt.blob.v1beta1.Bucket
  */
-export type ListResult = Message<"dtkt.blob.v1beta1.ListResult"> & {
+export type Bucket = Message<"dtkt.blob.v1beta1.Bucket"> & {
   /**
-   * Key for this blob result.
+   * Name of this bucket.
+   *
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * Provider-specific metadata.
+   *
+   * @generated from field: google.protobuf.Struct provider_metadata = 2;
+   */
+  providerMetadata?: JsonObject;
+};
+
+/**
+ * @generated from message dtkt.blob.v1beta1.Bucket
+ */
+export type BucketValid = Message<"dtkt.blob.v1beta1.Bucket"> & {
+  /**
+   * Name of this bucket.
+   *
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * Provider-specific metadata.
+   *
+   * @generated from field: google.protobuf.Struct provider_metadata = 2;
+   */
+  providerMetadata?: JsonObject;
+};
+
+/**
+ * Describes the message dtkt.blob.v1beta1.Bucket.
+ * Use `create(BucketSchema)` to create a new message.
+ */
+export const BucketSchema: GenMessage<Bucket, {validType: BucketValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_blob_v1beta1_messages, 0);
+
+/**
+ * @generated from message dtkt.blob.v1beta1.Blob
+ */
+export type Blob = Message<"dtkt.blob.v1beta1.Blob"> & {
+  /**
+   * Key of this blob.
    *
    * @generated from field: string key = 1;
    */
   key: string;
 
   /**
-   * ModTime is the time the blob was last modified.
+   * Bucket containing this blob.
    *
-   * @generated from field: google.protobuf.Timestamp mod_time = 2;
+   * @generated from field: string bucket = 2;
    */
-  modTime?: Timestamp;
+  bucket: string;
 
   /**
-   * Size is the size of the blob's content in bytes.
+   * Size of the blob's content in number of bytes.
    *
-   * @generated from field: int64 size = 3;
+   * @generated from field: uint64 size = 3;
    */
   size: bigint;
 
   /**
-   * MD5 is an MD5 hash of the blob contents or nil if not available.
+   * MD5 hash of the blob contents, if available.
    *
    * @generated from field: string md5 = 4;
    */
   md5: string;
 
   /**
-   * IsDir indicates that this result represents a "directory" in the
-   * hierarchical namespace, ending in ListOptions.Delimiter. Key can be
-   * passed as ListOptions.Prefix to list items in the "directory".
-   * Fields other than Key and IsDir will not be set if IsDir is true.
+   * ETag of the blob contents, if available; see https://en.wikipedia.org/wiki/HTTP_ETag.
    *
-   * @generated from field: bool is_dir = 5;
+   * @generated from field: string etag = 5;
    */
-  isDir: boolean;
+  etag: string;
+
+  /**
+   * Metadata of the blob contents, if available.
+   *
+   * @generated from field: dtkt.blob.v1beta1.BlobMetadata metadata = 6;
+   */
+  metadata?: BlobMetadata;
+
+  /**
+   * Time blob was last modified, if available.
+   *
+   * @generated from field: google.protobuf.Timestamp mod_time = 7;
+   */
+  modTime?: Timestamp;
+
+  /**
+   * Time blob was created, if available.
+   *
+   * @generated from field: google.protobuf.Timestamp create_time = 8;
+   */
+  createTime?: Timestamp;
 };
 
-export type ListResultValid = ListResult;
+/**
+ * @generated from message dtkt.blob.v1beta1.Blob
+ */
+export type BlobValid = Message<"dtkt.blob.v1beta1.Blob"> & {
+  /**
+   * Key of this blob.
+   *
+   * @generated from field: string key = 1;
+   */
+  key: string;
+
+  /**
+   * Bucket containing this blob.
+   *
+   * @generated from field: string bucket = 2;
+   */
+  bucket: string;
+
+  /**
+   * Size of the blob's content in number of bytes.
+   *
+   * @generated from field: uint64 size = 3;
+   */
+  size: bigint;
+
+  /**
+   * MD5 hash of the blob contents, if available.
+   *
+   * @generated from field: string md5 = 4;
+   */
+  md5: string;
+
+  /**
+   * ETag of the blob contents, if available; see https://en.wikipedia.org/wiki/HTTP_ETag.
+   *
+   * @generated from field: string etag = 5;
+   */
+  etag: string;
+
+  /**
+   * Metadata of the blob contents, if available.
+   *
+   * @generated from field: dtkt.blob.v1beta1.BlobMetadata metadata = 6;
+   */
+  metadata?: BlobMetadataValid;
+
+  /**
+   * Time blob was last modified, if available.
+   *
+   * @generated from field: google.protobuf.Timestamp mod_time = 7;
+   */
+  modTime?: Timestamp;
+
+  /**
+   * Time blob was created, if available.
+   *
+   * @generated from field: google.protobuf.Timestamp create_time = 8;
+   */
+  createTime?: Timestamp;
+};
 
 /**
- * Describes the message dtkt.blob.v1beta1.ListResult.
- * Use `create(ListResultSchema)` to create a new message.
+ * Describes the message dtkt.blob.v1beta1.Blob.
+ * Use `create(BlobSchema)` to create a new message.
  */
-export const ListResultSchema: GenMessage<ListResult, {validType: ListResultValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 0);
+export const BlobSchema: GenMessage<Blob, {validType: BlobValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_blob_v1beta1_messages, 1);
+
+/**
+ * @generated from message dtkt.blob.v1beta1.BlobMetadata
+ */
+export type BlobMetadata = Message<"dtkt.blob.v1beta1.BlobMetadata"> & {
+  /**
+   * The MIME type of the blob contents.
+   * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type
+   *
+   * @generated from field: string content_type = 1;
+   */
+  contentType: string;
+
+  /**
+   * The disposition specifies whether the blob contents is expected to be
+   * displayed inline or as an attachment.
+   * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
+   *
+   * @generated from field: string content_disposition = 2;
+   */
+  contentDisposition: string;
+
+  /**
+   * The encoding used for the blob's content, if any.
+   * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding
+   *
+   * @generated from field: string content_encoding = 3;
+   */
+  contentEncoding: string;
+
+  /**
+   * The language used in the blob's content, if any.
+   * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Language
+   *
+   * @generated from field: string content_language = 4;
+   */
+  contentLanguage: string;
+
+  /**
+   * The caching attributes that services may use when serving the blob.
+   * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
+   *
+   * @generated from field: string cache_control = 5;
+   */
+  cacheControl: string;
+
+  /**
+   * Provider-specific metadata.
+   *
+   * @generated from field: google.protobuf.Struct provider_metadata = 10;
+   */
+  providerMetadata?: JsonObject;
+};
+
+export type BlobMetadataValid = BlobMetadata;
+
+/**
+ * Describes the message dtkt.blob.v1beta1.BlobMetadata.
+ * Use `create(BlobMetadataSchema)` to create a new message.
+ */
+export const BlobMetadataSchema: GenMessage<BlobMetadata, {validType: BlobMetadataValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_blob_v1beta1_messages, 2);
+
+/**
+ * @generated from message dtkt.blob.v1beta1.BlobRules
+ */
+export type BlobRules = Message<"dtkt.blob.v1beta1.BlobRules"> & {
+  /**
+   * Require the blob does not already exist.
+   *
+   * @generated from field: bool if_not_exist = 1;
+   */
+  ifNotExist: boolean;
+
+  /**
+   * Require the blob to match the provided ETag.
+   *
+   * @generated from field: string if_etag_match = 2;
+   */
+  ifEtagMatch: string;
+
+  /**
+   * Require the blob to *not* match the provided ETag.
+   *
+   * @generated from field: string unless_etag_match = 3;
+   */
+  unlessEtagMatch: string;
+};
+
+export type BlobRulesValid = BlobRules;
+
+/**
+ * Describes the message dtkt.blob.v1beta1.BlobRules.
+ * Use `create(BlobRulesSchema)` to create a new message.
+ */
+export const BlobRulesSchema: GenMessage<BlobRules, {validType: BlobRulesValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_blob_v1beta1_messages, 3);
+
+/**
+ * @generated from message dtkt.blob.v1beta1.LineFormat
+ */
+export type LineFormat = Message<"dtkt.blob.v1beta1.LineFormat"> & {
+  /**
+   * @generated from oneof dtkt.blob.v1beta1.LineFormat.type
+   */
+  type: {
+    /**
+     * Expects lines of raw data separated by given delimiter.
+     * Default: "\n"
+     *
+     * @generated from field: string line_delimiter = 2;
+     */
+    value: string;
+    case: "lineDelimiter";
+  } | {
+    /**
+     * Expects lines of JSON encoded values.
+     *
+     * @generated from field: dtkt.blob.v1beta1.LineFormat.JSON json = 3;
+     */
+    value: LineFormat_JSON;
+    case: "json";
+  } | {
+    /**
+     * Expects lines of CSV encoded records.
+     *
+     * @generated from field: dtkt.blob.v1beta1.LineFormat.CSV csv = 4;
+     */
+    value: LineFormat_CSV;
+    case: "csv";
+  } | { case: undefined; value?: undefined };
+};
+
+export type LineFormatValid = LineFormat;
+
+/**
+ * Describes the message dtkt.blob.v1beta1.LineFormat.
+ * Use `create(LineFormatSchema)` to create a new message.
+ */
+export const LineFormatSchema: GenMessage<LineFormat, {validType: LineFormatValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_blob_v1beta1_messages, 4);
+
+/**
+ * @generated from message dtkt.blob.v1beta1.LineFormat.JSON
+ */
+export type LineFormat_JSON = Message<"dtkt.blob.v1beta1.LineFormat.JSON"> & {
+  /**
+   * If true, expects line values to be nested within a JSON array at root of
+   * blob contents.
+   *
+   * @generated from field: bool array_mode = 1;
+   */
+  arrayMode: boolean;
+};
+
+export type LineFormat_JSONValid = LineFormat_JSON;
+
+/**
+ * Describes the message dtkt.blob.v1beta1.LineFormat.JSON.
+ * Use `create(LineFormat_JSONSchema)` to create a new message.
+ */
+export const LineFormat_JSONSchema: GenMessage<LineFormat_JSON, {validType: LineFormat_JSONValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_blob_v1beta1_messages, 4, 0);
+
+/**
+ * @generated from message dtkt.blob.v1beta1.LineFormat.CSV
+ */
+export type LineFormat_CSV = Message<"dtkt.blob.v1beta1.LineFormat.CSV"> & {
+  /**
+   * Fields specify CSV headers (first line) and cardinality of records.
+   *
+   * @generated from field: repeated string fields = 1;
+   */
+  fields: string[];
+
+  /**
+   * Expects fields to be separated with given delimiter.
+   * Default: ","
+   *
+   * @generated from field: string field_delimiter = 2;
+   */
+  fieldDelimiter: string;
+
+  /**
+   * If true, expects "\r\n" as the line terminator.
+   *
+   * @generated from field: bool use_crlf = 3;
+   */
+  useCrlf: boolean;
+};
+
+export type LineFormat_CSVValid = LineFormat_CSV;
+
+/**
+ * Describes the message dtkt.blob.v1beta1.LineFormat.CSV.
+ * Use `create(LineFormat_CSVSchema)` to create a new message.
+ */
+export const LineFormat_CSVSchema: GenMessage<LineFormat_CSV, {validType: LineFormat_CSVValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_blob_v1beta1_messages, 4, 1);
+
+/**
+ * @generated from message dtkt.blob.v1beta1.LineData
+ */
+export type LineData = Message<"dtkt.blob.v1beta1.LineData"> & {
+  /**
+   * @generated from oneof dtkt.blob.v1beta1.LineData.type
+   */
+  type: {
+    /**
+     * Raw data.
+     *
+     * @generated from field: bytes raw = 1;
+     */
+    value: Uint8Array;
+    case: "raw";
+  } | {
+    /**
+     * JSON encoded value.
+     *
+     * @generated from field: google.protobuf.Value json = 2;
+     */
+    value: Value;
+    case: "json";
+  } | {
+    /**
+     * CSV encoded record.
+     *
+     * @generated from field: dtkt.blob.v1beta1.LineData.CSV csv = 3;
+     */
+    value: LineData_CSV;
+    case: "csv";
+  } | { case: undefined; value?: undefined };
+};
+
+export type LineDataValid = LineData;
+
+/**
+ * Describes the message dtkt.blob.v1beta1.LineData.
+ * Use `create(LineDataSchema)` to create a new message.
+ */
+export const LineDataSchema: GenMessage<LineData, {validType: LineDataValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_blob_v1beta1_messages, 5);
+
+/**
+ * @generated from message dtkt.blob.v1beta1.LineData.CSV
+ */
+export type LineData_CSV = Message<"dtkt.blob.v1beta1.LineData.CSV"> & {
+  /**
+   * @generated from field: repeated string values = 1;
+   */
+  values: string[];
+};
+
+export type LineData_CSVValid = LineData_CSV;
+
+/**
+ * Describes the message dtkt.blob.v1beta1.LineData.CSV.
+ * Use `create(LineData_CSVSchema)` to create a new message.
+ */
+export const LineData_CSVSchema: GenMessage<LineData_CSV, {validType: LineData_CSVValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_blob_v1beta1_messages, 5, 0);
+
+/**
+ * @generated from message dtkt.blob.v1beta1.ListBucketsRequest
+ */
+export type ListBucketsRequest = Message<"dtkt.blob.v1beta1.ListBucketsRequest"> & {
+  /**
+   * The maximum number of results to return.
+   *
+   * @generated from field: int32 page_size = 1;
+   */
+  pageSize: number;
+
+  /**
+   * A page token received from a previous response. All other parameters
+   * provided must match the call that provided this page token.
+   *
+   * @generated from field: string page_token = 2;
+   */
+  pageToken: string;
+
+  /**
+   * Optional filter expression to narrow results.
+   *
+   * @generated from field: string filter = 3;
+   */
+  filter: string;
+};
+
+export type ListBucketsRequestValid = ListBucketsRequest;
+
+/**
+ * Describes the message dtkt.blob.v1beta1.ListBucketsRequest.
+ * Use `create(ListBucketsRequestSchema)` to create a new message.
+ */
+export const ListBucketsRequestSchema: GenMessage<ListBucketsRequest, {validType: ListBucketsRequestValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_blob_v1beta1_messages, 6);
+
+/**
+ * @generated from message dtkt.blob.v1beta1.ListBucketsResponse
+ */
+export type ListBucketsResponse = Message<"dtkt.blob.v1beta1.ListBucketsResponse"> & {
+  /**
+   * List of bucket results.
+   *
+   * @generated from field: repeated dtkt.blob.v1beta1.Bucket buckets = 1;
+   */
+  buckets: Bucket[];
+
+  /**
+   * A token that can be sent as `page_token` to retrieve the next page.
+   * If this field is empty, there are no subsequent pages.
+   *
+   * @generated from field: string next_page_token = 2;
+   */
+  nextPageToken: string;
+};
+
+/**
+ * @generated from message dtkt.blob.v1beta1.ListBucketsResponse
+ */
+export type ListBucketsResponseValid = Message<"dtkt.blob.v1beta1.ListBucketsResponse"> & {
+  /**
+   * List of bucket results.
+   *
+   * @generated from field: repeated dtkt.blob.v1beta1.Bucket buckets = 1;
+   */
+  buckets: BucketValid[];
+
+  /**
+   * A token that can be sent as `page_token` to retrieve the next page.
+   * If this field is empty, there are no subsequent pages.
+   *
+   * @generated from field: string next_page_token = 2;
+   */
+  nextPageToken: string;
+};
+
+/**
+ * Describes the message dtkt.blob.v1beta1.ListBucketsResponse.
+ * Use `create(ListBucketsResponseSchema)` to create a new message.
+ */
+export const ListBucketsResponseSchema: GenMessage<ListBucketsResponse, {validType: ListBucketsResponseValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_blob_v1beta1_messages, 7);
 
 /**
  * @generated from message dtkt.blob.v1beta1.ListBlobsRequest
  */
 export type ListBlobsRequest = Message<"dtkt.blob.v1beta1.ListBlobsRequest"> & {
   /**
-   * Prefix indicates that only blobs with a key starting with this prefix
-   * should be returned.
+   * The maximum number of results to return.
    *
-   * @generated from field: string prefix = 1;
-   */
-  prefix: string;
-
-  /**
-   * The maximum number of blobs to return. The service may return fewer than
-   * this value.
-   * If unspecified, at most 50 blobs will be returned.
-   * The maximum value is 1000; values above 1000 will be coerced to 1000.
-   *
-   * @generated from field: int32 page_size = 2;
+   * @generated from field: int32 page_size = 1;
    */
   pageSize: number;
 
   /**
-   * A page token, received from a previous `ListBlobs` call.
-   * Provide this to retrieve the subsequent page.
+   * A page token received from a previous call. Provide this to retrieve the
+   * subsequent page. All other parameters provided must match the call that
+   * provided this page token.
    *
-   * When paginating, all other parameters provided to `ListBlobs` must match
-   * the call that provided the page token.
-   *
-   * @generated from field: string page_token = 3;
+   * @generated from field: string page_token = 2;
    */
   pageToken: string;
 
   /**
-   * Bucket to write blob (may be optional).
+   * Bucket containing blob results (may be optional).
    *
-   * @generated from field: string bucket = 4;
+   * @generated from field: string bucket = 3;
    */
   bucket: string;
+
+  /**
+   * Prefix indicates that only blobs with a key starting with this prefix
+   * should be returned.
+   *
+   * @generated from field: string prefix = 4;
+   */
+  prefix: string;
 };
 
 export type ListBlobsRequestValid = ListBlobsRequest;
@@ -121,54 +582,73 @@ export type ListBlobsRequestValid = ListBlobsRequest;
  * Use `create(ListBlobsRequestSchema)` to create a new message.
  */
 export const ListBlobsRequestSchema: GenMessage<ListBlobsRequest, {validType: ListBlobsRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 1);
+  messageDesc(file_dtkt_blob_v1beta1_messages, 8);
 
 /**
  * @generated from message dtkt.blob.v1beta1.ListBlobsResponse
  */
 export type ListBlobsResponse = Message<"dtkt.blob.v1beta1.ListBlobsResponse"> & {
   /**
-   * The results from the specified prefix.
+   * List of blob results.
    *
-   * @generated from field: repeated dtkt.blob.v1beta1.ListResult results = 1;
+   * @generated from field: repeated dtkt.blob.v1beta1.Blob blobs = 1;
    */
-  results: ListResult[];
+  blobs: Blob[];
 
   /**
    * A token that can be sent as `page_token` to retrieve the next page.
-   * If this field is omitted, there are no subsequent pages.
+   * If this field is empty, there are no subsequent pages.
    *
    * @generated from field: string next_page_token = 2;
    */
   nextPageToken: string;
 };
 
-export type ListBlobsResponseValid = ListBlobsResponse;
+/**
+ * @generated from message dtkt.blob.v1beta1.ListBlobsResponse
+ */
+export type ListBlobsResponseValid = Message<"dtkt.blob.v1beta1.ListBlobsResponse"> & {
+  /**
+   * List of blob results.
+   *
+   * @generated from field: repeated dtkt.blob.v1beta1.Blob blobs = 1;
+   */
+  blobs: BlobValid[];
+
+  /**
+   * A token that can be sent as `page_token` to retrieve the next page.
+   * If this field is empty, there are no subsequent pages.
+   *
+   * @generated from field: string next_page_token = 2;
+   */
+  nextPageToken: string;
+};
 
 /**
  * Describes the message dtkt.blob.v1beta1.ListBlobsResponse.
  * Use `create(ListBlobsResponseSchema)` to create a new message.
  */
 export const ListBlobsResponseSchema: GenMessage<ListBlobsResponse, {validType: ListBlobsResponseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 2);
+  messageDesc(file_dtkt_blob_v1beta1_messages, 9);
 
 /**
  * @generated from message dtkt.blob.v1beta1.GetBlobRequest
  */
 export type GetBlobRequest = Message<"dtkt.blob.v1beta1.GetBlobRequest"> & {
   /**
-   * Key of blob to retrieve attributes.
+   * Name of the bucket containing blob. The service may not require this to
+   * be specified.
    *
-   * @generated from field: string key = 1;
-   */
-  key: string;
-
-  /**
-   * Bucket to write blob (may be optional).
-   *
-   * @generated from field: string bucket = 2;
+   * @generated from field: string bucket = 1;
    */
   bucket: string;
+
+  /**
+   * Key of the blob to retrieve.
+   *
+   * @generated from field: string key = 2;
+   */
+  key: string;
 };
 
 /**
@@ -176,18 +656,19 @@ export type GetBlobRequest = Message<"dtkt.blob.v1beta1.GetBlobRequest"> & {
  */
 export type GetBlobRequestValid = Message<"dtkt.blob.v1beta1.GetBlobRequest"> & {
   /**
-   * Key of blob to retrieve attributes.
+   * Name of the bucket containing blob. The service may not require this to
+   * be specified.
    *
-   * @generated from field: string key = 1;
-   */
-  key: string;
-
-  /**
-   * Bucket to write blob (may be optional).
-   *
-   * @generated from field: string bucket = 2;
+   * @generated from field: string bucket = 1;
    */
   bucket: string;
+
+  /**
+   * Key of the blob to retrieve.
+   *
+   * @generated from field: string key = 2;
+   */
+  key: string;
 };
 
 /**
@@ -195,289 +676,65 @@ export type GetBlobRequestValid = Message<"dtkt.blob.v1beta1.GetBlobRequest"> & 
  * Use `create(GetBlobRequestSchema)` to create a new message.
  */
 export const GetBlobRequestSchema: GenMessage<GetBlobRequest, {validType: GetBlobRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 3);
+  messageDesc(file_dtkt_blob_v1beta1_messages, 10);
 
 /**
  * @generated from message dtkt.blob.v1beta1.GetBlobResponse
  */
 export type GetBlobResponse = Message<"dtkt.blob.v1beta1.GetBlobResponse"> & {
   /**
-   * Key of blob of retrieved attributes.
-   *
-   * @generated from field: string key = 1;
+   * @generated from field: dtkt.blob.v1beta1.Blob blob = 1;
    */
-  key: string;
-
-  /**
-   * CacheControl specifies caching attributes that services may use
-   * when serving the blob.
-   * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
-   *
-   * @generated from field: string cache_control = 2;
-   */
-  cacheControl: string;
-
-  /**
-   * ContentDisposition specifies whether the blob content is expected to be
-   * displayed inline or as an attachment.
-   * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
-   *
-   * @generated from field: string content_disposition = 3;
-   */
-  contentDisposition: string;
-
-  /**
-   * ContentEncoding specifies the encoding used for the blob's content, if any.
-   * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding
-   *
-   * @generated from field: string content_encoding = 4;
-   */
-  contentEncoding: string;
-
-  /**
-   * ContentLanguage specifies the language used in the blob's content, if any.
-   * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Language
-   *
-   * @generated from field: string content_language = 5;
-   */
-  contentLanguage: string;
-
-  /**
-   * ContentType is the MIME type of the blob. It will not be empty.
-   * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type
-   *
-   * @generated from field: string content_type = 6;
-   */
-  contentType: string;
-
-  /**
-   * Metadata holds key/value pairs associated with the blob.
-   * Keys are guaranteed to be in lowercase, even if the backend service
-   * has case-sensitive keys (although note that Metadata written via
-   * this package will always be lowercased). If there are duplicate
-   * case-insensitive keys (e.g., "foo" and "FOO"), only one value
-   * will be kept, and it is undefined which one.
-   *
-   * @generated from field: map<string, string> metadata = 7;
-   */
-  metadata: { [key: string]: string };
-
-  /**
-   * CreateTime is the time the blob was created, if available. If not available,
-   * CreateTime will be the zero time.
-   *
-   * @generated from field: google.protobuf.Timestamp create_time = 8;
-   */
-  createTime?: Timestamp;
-
-  /**
-   * ModTime is the time the blob was last modified.
-   *
-   * @generated from field: google.protobuf.Timestamp mod_time = 9;
-   */
-  modTime?: Timestamp;
-
-  /**
-   * Size is the size of the blob's content in bytes.
-   *
-   * @generated from field: int64 size = 10;
-   */
-  size: bigint;
-
-  /**
-   * MD5 is an MD5 hash of the blob contents or nil if not available.
-   *
-   * @generated from field: string md5 = 11;
-   */
-  md5: string;
-
-  /**
-   * ETag for the blob; see https://en.wikipedia.org/wiki/HTTP_ETag.
-   *
-   * @generated from field: string etag = 12;
-   */
-  etag: string;
+  blob?: Blob;
 };
 
-export type GetBlobResponseValid = GetBlobResponse;
+/**
+ * @generated from message dtkt.blob.v1beta1.GetBlobResponse
+ */
+export type GetBlobResponseValid = Message<"dtkt.blob.v1beta1.GetBlobResponse"> & {
+  /**
+   * @generated from field: dtkt.blob.v1beta1.Blob blob = 1;
+   */
+  blob?: BlobValid;
+};
 
 /**
  * Describes the message dtkt.blob.v1beta1.GetBlobResponse.
  * Use `create(GetBlobResponseSchema)` to create a new message.
  */
 export const GetBlobResponseSchema: GenMessage<GetBlobResponse, {validType: GetBlobResponseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 4);
+  messageDesc(file_dtkt_blob_v1beta1_messages, 11);
 
 /**
- * @generated from message dtkt.blob.v1beta1.ReadBlobLinesRequest
+ * @generated from message dtkt.blob.v1beta1.ReadBlobRequest
  */
-export type ReadBlobLinesRequest = Message<"dtkt.blob.v1beta1.ReadBlobLinesRequest"> & {
+export type ReadBlobRequest = Message<"dtkt.blob.v1beta1.ReadBlobRequest"> & {
   /**
-   * Key of blob to read.
+   * Name of the bucket containing blob. The service may not require this to
+   * be specified.
    *
-   * @generated from field: string key = 1;
-   */
-  key: string;
-
-  /**
-   * Line delimiter; default: \n.
-   *
-   * @generated from field: string delimiter = 2;
-   */
-  delimiter: string;
-
-  /**
-   * Max size (in bytes) of individual line.
-   *
-   * @generated from field: int64 max_size = 3;
-   */
-  maxSize: bigint;
-
-  /**
-   * Bucket to read blob (may be optional).
-   *
-   * @generated from field: string bucket = 4;
+   * @generated from field: string bucket = 1;
    */
   bucket: string;
 
   /**
-   * Format of lines to read (default: LINE_FORMAT_RAW if unspecified).
+   * Key of the blob to read contents.
    *
-   * @generated from field: dtkt.blob.v1beta1.LineFormat line_format = 5;
-   */
-  lineFormat: LineFormat;
-
-  /**
-   * JSON array mode: if true (when line_format is JSON), expects root JSON array; if false, expects newline-delimited JSON (default).
-   *
-   * @generated from field: bool json_array_mode = 6;
-   */
-  jsonArrayMode: boolean;
-};
-
-/**
- * @generated from message dtkt.blob.v1beta1.ReadBlobLinesRequest
- */
-export type ReadBlobLinesRequestValid = Message<"dtkt.blob.v1beta1.ReadBlobLinesRequest"> & {
-  /**
-   * Key of blob to read.
-   *
-   * @generated from field: string key = 1;
+   * @generated from field: string key = 2;
    */
   key: string;
 
   /**
-   * Line delimiter; default: \n.
+   * Offset for the first byte to read, relative to the start of the contents.
    *
-   * @generated from field: string delimiter = 2;
-   */
-  delimiter: string;
-
-  /**
-   * Max size (in bytes) of individual line.
-   *
-   * @generated from field: int64 max_size = 3;
-   */
-  maxSize: bigint;
-
-  /**
-   * Bucket to read blob (may be optional).
-   *
-   * @generated from field: string bucket = 4;
-   */
-  bucket: string;
-
-  /**
-   * Format of lines to read (default: LINE_FORMAT_RAW if unspecified).
-   *
-   * @generated from field: dtkt.blob.v1beta1.LineFormat line_format = 5;
-   */
-  lineFormat: LineFormat;
-
-  /**
-   * JSON array mode: if true (when line_format is JSON), expects root JSON array; if false, expects newline-delimited JSON (default).
-   *
-   * @generated from field: bool json_array_mode = 6;
-   */
-  jsonArrayMode: boolean;
-};
-
-/**
- * Describes the message dtkt.blob.v1beta1.ReadBlobLinesRequest.
- * Use `create(ReadBlobLinesRequestSchema)` to create a new message.
- */
-export const ReadBlobLinesRequestSchema: GenMessage<ReadBlobLinesRequest, {validType: ReadBlobLinesRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 5);
-
-/**
- * @generated from message dtkt.blob.v1beta1.ReadBlobLinesResponse
- */
-export type ReadBlobLinesResponse = Message<"dtkt.blob.v1beta1.ReadBlobLinesResponse"> & {
-  /**
-   * Key of blob read.
-   *
-   * @generated from field: string key = 1;
-   */
-  key: string;
-
-  /**
-   * @generated from oneof dtkt.blob.v1beta1.ReadBlobLinesResponse.line
-   */
-  line: {
-    /**
-     * Raw line data.
-     *
-     * @generated from field: bytes data = 2;
-     */
-    value: Uint8Array;
-    case: "data";
-  } | {
-    /**
-     * JSON parsed line data.
-     *
-     * @generated from field: google.protobuf.Value json = 3;
-     */
-    value: Value;
-    case: "json";
-  } | { case: undefined; value?: undefined };
-};
-
-export type ReadBlobLinesResponseValid = ReadBlobLinesResponse;
-
-/**
- * Describes the message dtkt.blob.v1beta1.ReadBlobLinesResponse.
- * Use `create(ReadBlobLinesResponseSchema)` to create a new message.
- */
-export const ReadBlobLinesResponseSchema: GenMessage<ReadBlobLinesResponse, {validType: ReadBlobLinesResponseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 6);
-
-/**
- * @generated from message dtkt.blob.v1beta1.ReadBlobRangeRequest
- */
-export type ReadBlobRangeRequest = Message<"dtkt.blob.v1beta1.ReadBlobRangeRequest"> & {
-  /**
-   * Key of blob to read.
-   *
-   * @generated from field: string key = 1;
-   */
-  key: string;
-
-  /**
-   * Bucket to write blob (may be optional).
-   *
-   * @generated from field: string bucket = 2;
-   */
-  bucket: string;
-
-  /**
-   * Read starting at offset.
-   *
-   * @generated from field: uint64 offset = 3;
+   * @generated from field: int64 offset = 3;
    */
   offset: bigint;
 
   /**
-   * Read at most length bytes if greater than 0. If less than 0, reads the whole blob.
+   * Maximum number of bytes to read relative to the offset:
+   *  - if <= 0, reads remaining bytes.
+   *  - if > 0, reads at most this number bytes;
    *
    * @generated from field: int64 length = 4;
    */
@@ -485,32 +742,35 @@ export type ReadBlobRangeRequest = Message<"dtkt.blob.v1beta1.ReadBlobRangeReque
 };
 
 /**
- * @generated from message dtkt.blob.v1beta1.ReadBlobRangeRequest
+ * @generated from message dtkt.blob.v1beta1.ReadBlobRequest
  */
-export type ReadBlobRangeRequestValid = Message<"dtkt.blob.v1beta1.ReadBlobRangeRequest"> & {
+export type ReadBlobRequestValid = Message<"dtkt.blob.v1beta1.ReadBlobRequest"> & {
   /**
-   * Key of blob to read.
+   * Name of the bucket containing blob. The service may not require this to
+   * be specified.
    *
-   * @generated from field: string key = 1;
-   */
-  key: string;
-
-  /**
-   * Bucket to write blob (may be optional).
-   *
-   * @generated from field: string bucket = 2;
+   * @generated from field: string bucket = 1;
    */
   bucket: string;
 
   /**
-   * Read starting at offset.
+   * Key of the blob to read contents.
    *
-   * @generated from field: uint64 offset = 3;
+   * @generated from field: string key = 2;
+   */
+  key: string;
+
+  /**
+   * Offset for the first byte to read, relative to the start of the contents.
+   *
+   * @generated from field: int64 offset = 3;
    */
   offset: bigint;
 
   /**
-   * Read at most length bytes if greater than 0. If less than 0, reads the whole blob.
+   * Maximum number of bytes to read relative to the offset:
+   *  - if <= 0, reads remaining bytes.
+   *  - if > 0, reads at most this number bytes;
    *
    * @generated from field: int64 length = 4;
    */
@@ -518,127 +778,91 @@ export type ReadBlobRangeRequestValid = Message<"dtkt.blob.v1beta1.ReadBlobRange
 };
 
 /**
- * Describes the message dtkt.blob.v1beta1.ReadBlobRangeRequest.
- * Use `create(ReadBlobRangeRequestSchema)` to create a new message.
+ * Describes the message dtkt.blob.v1beta1.ReadBlobRequest.
+ * Use `create(ReadBlobRequestSchema)` to create a new message.
  */
-export const ReadBlobRangeRequestSchema: GenMessage<ReadBlobRangeRequest, {validType: ReadBlobRangeRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 7);
+export const ReadBlobRequestSchema: GenMessage<ReadBlobRequest, {validType: ReadBlobRequestValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_blob_v1beta1_messages, 12);
 
 /**
- * @generated from message dtkt.blob.v1beta1.ReadBlobRangeResponse
+ * @generated from message dtkt.blob.v1beta1.ReadBlobResponse
  */
-export type ReadBlobRangeResponse = Message<"dtkt.blob.v1beta1.ReadBlobRangeResponse"> & {
+export type ReadBlobResponse = Message<"dtkt.blob.v1beta1.ReadBlobResponse"> & {
   /**
-   * Key of blob read.
+   * A portion of the contents read from the blob.
    *
-   * @generated from field: string key = 1;
-   */
-  key: string;
-
-  /**
-   * Data of blob range.
-   *
-   * @generated from field: bytes data = 2;
+   * @generated from field: bytes data = 1;
    */
   data: Uint8Array;
 };
 
-export type ReadBlobRangeResponseValid = ReadBlobRangeResponse;
+export type ReadBlobResponseValid = ReadBlobResponse;
 
 /**
- * Describes the message dtkt.blob.v1beta1.ReadBlobRangeResponse.
- * Use `create(ReadBlobRangeResponseSchema)` to create a new message.
+ * Describes the message dtkt.blob.v1beta1.ReadBlobResponse.
+ * Use `create(ReadBlobResponseSchema)` to create a new message.
  */
-export const ReadBlobRangeResponseSchema: GenMessage<ReadBlobRangeResponse, {validType: ReadBlobRangeResponseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 8);
+export const ReadBlobResponseSchema: GenMessage<ReadBlobResponse, {validType: ReadBlobResponseValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_blob_v1beta1_messages, 13);
 
 /**
  * @generated from message dtkt.blob.v1beta1.WriteBlobRequest
  */
 export type WriteBlobRequest = Message<"dtkt.blob.v1beta1.WriteBlobRequest"> & {
   /**
-   * Key of blob to write.
+   * Name of the bucket containing blob. The service may not require this to
+   * be specified. If required, this **must** be set on the first request. If it
+   * is set on any subsequent requests it must match the value of the first
+   * request.
    *
-   * @generated from field: string key = 1;
-   */
-  key: string;
-
-  /**
-   * Bucket to write blob (may be optional).
-   *
-   * @generated from field: string bucket = 2;
+   * @generated from field: string bucket = 1;
    */
   bucket: string;
 
   /**
-   * Raw blob payload.
+   * Key of the blob to write contents. This **must** be set on the first
+   * request. If it is set on any subsequent requests it must match the value of
+   * the first request.
    *
-   * @generated from field: bytes data = 3;
+   * @generated from field: string key = 2;
+   */
+  key: string;
+
+  /**
+   * Metadata of the blob contents to be written. This **may** be set on the
+   * first request and **must not** be set on any subsequent request.
+   *
+   * @generated from field: dtkt.blob.v1beta1.BlobMetadata metadata = 3;
+   */
+  metadata?: BlobMetadata;
+
+  /**
+   * Rules assert the state of the blob and its contents (if it exists) which
+   * must be valid before writing to the blob. This **may** be set on the first
+   * request and **must not** be set on any subsequent request.
+   *
+   * @generated from field: dtkt.blob.v1beta1.BlobRules rules = 4;
+   */
+  rules?: BlobRules;
+
+  /**
+   * Offset of the contents at which the data should be written.
+   * This **may** be set on the first request and **must not** be set on any
+   * subsequent request.
+   * Default: 0
+   *  - if < 0, offset relative to the end (e.g.: -1 appends to contents);
+   *  - if >= 0, offset relative to the start of contents.
+   *
+   * @generated from field: int64 offset = 6;
+   */
+  offset: bigint;
+
+  /**
+   * Raw data to write to contents (relative to offset).
+   *
+   * @generated from field: bytes data = 7;
    */
   data: Uint8Array;
-
-  /**
-   * MIME type for the blob payload.
-   *
-   * @generated from field: string content_type = 4;
-   */
-  contentType: string;
-
-  /**
-   * Language for the blob payload.
-   *
-   * @generated from field: string content_language = 5;
-   */
-  contentLanguage: string;
-
-  /**
-   * Content encoding for the blob payload.
-   *
-   * @generated from field: string content_encoding = 6;
-   */
-  contentEncoding: string;
-
-  /**
-   * Cache control directives.
-   *
-   * @generated from field: string cache_control = 7;
-   */
-  cacheControl: string;
-
-  /**
-   * Content disposition for the blob payload.
-   *
-   * @generated from field: string content_disposition = 8;
-   */
-  contentDisposition: string;
-
-  /**
-   * Blob metadata (all keys lower-case).
-   *
-   * @generated from field: map<string, string> metadata = 9;
-   */
-  metadata: { [key: string]: string };
-
-  /**
-   * Require the blob to match the provided ETag before writing.
-   *
-   * @generated from field: string if_match = 10;
-   */
-  ifMatch: string;
-
-  /**
-   * Require the blob to *not* match the provided ETag before writing.
-   *
-   * @generated from field: string if_none_match = 11;
-   */
-  ifNoneMatch: string;
-
-  /**
-   * Require the blob does not already exist before writing.
-   *
-   * @generated from field: bool if_not_exist = 12;
-   */
-  ifNotExist: boolean;
 };
 
 /**
@@ -646,88 +870,59 @@ export type WriteBlobRequest = Message<"dtkt.blob.v1beta1.WriteBlobRequest"> & {
  */
 export type WriteBlobRequestValid = Message<"dtkt.blob.v1beta1.WriteBlobRequest"> & {
   /**
-   * Key of blob to write.
+   * Name of the bucket containing blob. The service may not require this to
+   * be specified. If required, this **must** be set on the first request. If it
+   * is set on any subsequent requests it must match the value of the first
+   * request.
    *
-   * @generated from field: string key = 1;
-   */
-  key: string;
-
-  /**
-   * Bucket to write blob (may be optional).
-   *
-   * @generated from field: string bucket = 2;
+   * @generated from field: string bucket = 1;
    */
   bucket: string;
 
   /**
-   * Raw blob payload.
+   * Key of the blob to write contents. This **must** be set on the first
+   * request. If it is set on any subsequent requests it must match the value of
+   * the first request.
    *
-   * @generated from field: bytes data = 3;
+   * @generated from field: string key = 2;
+   */
+  key: string;
+
+  /**
+   * Metadata of the blob contents to be written. This **may** be set on the
+   * first request and **must not** be set on any subsequent request.
+   *
+   * @generated from field: dtkt.blob.v1beta1.BlobMetadata metadata = 3;
+   */
+  metadata?: BlobMetadataValid;
+
+  /**
+   * Rules assert the state of the blob and its contents (if it exists) which
+   * must be valid before writing to the blob. This **may** be set on the first
+   * request and **must not** be set on any subsequent request.
+   *
+   * @generated from field: dtkt.blob.v1beta1.BlobRules rules = 4;
+   */
+  rules?: BlobRulesValid;
+
+  /**
+   * Offset of the contents at which the data should be written.
+   * This **may** be set on the first request and **must not** be set on any
+   * subsequent request.
+   * Default: 0
+   *  - if < 0, offset relative to the end (e.g.: -1 appends to contents);
+   *  - if >= 0, offset relative to the start of contents.
+   *
+   * @generated from field: int64 offset = 6;
+   */
+  offset: bigint;
+
+  /**
+   * Raw data to write to contents (relative to offset).
+   *
+   * @generated from field: bytes data = 7;
    */
   data: Uint8Array;
-
-  /**
-   * MIME type for the blob payload.
-   *
-   * @generated from field: string content_type = 4;
-   */
-  contentType: string;
-
-  /**
-   * Language for the blob payload.
-   *
-   * @generated from field: string content_language = 5;
-   */
-  contentLanguage: string;
-
-  /**
-   * Content encoding for the blob payload.
-   *
-   * @generated from field: string content_encoding = 6;
-   */
-  contentEncoding: string;
-
-  /**
-   * Cache control directives.
-   *
-   * @generated from field: string cache_control = 7;
-   */
-  cacheControl: string;
-
-  /**
-   * Content disposition for the blob payload.
-   *
-   * @generated from field: string content_disposition = 8;
-   */
-  contentDisposition: string;
-
-  /**
-   * Blob metadata (all keys lower-case).
-   *
-   * @generated from field: map<string, string> metadata = 9;
-   */
-  metadata: { [key: string]: string };
-
-  /**
-   * Require the blob to match the provided ETag before writing.
-   *
-   * @generated from field: string if_match = 10;
-   */
-  ifMatch: string;
-
-  /**
-   * Require the blob to *not* match the provided ETag before writing.
-   *
-   * @generated from field: string if_none_match = 11;
-   */
-  ifNoneMatch: string;
-
-  /**
-   * Require the blob does not already exist before writing.
-   *
-   * @generated from field: bool if_not_exist = 12;
-   */
-  ifNotExist: boolean;
 };
 
 /**
@@ -735,39 +930,18 @@ export type WriteBlobRequestValid = Message<"dtkt.blob.v1beta1.WriteBlobRequest"
  * Use `create(WriteBlobRequestSchema)` to create a new message.
  */
 export const WriteBlobRequestSchema: GenMessage<WriteBlobRequest, {validType: WriteBlobRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 9);
+  messageDesc(file_dtkt_blob_v1beta1_messages, 14);
 
 /**
  * @generated from message dtkt.blob.v1beta1.WriteBlobResponse
  */
 export type WriteBlobResponse = Message<"dtkt.blob.v1beta1.WriteBlobResponse"> & {
   /**
-   * Key of the written blob.
+   * Total number of bytes written to blob contents.
    *
-   * @generated from field: string key = 1;
+   * @generated from field: int64 written_size = 2;
    */
-  key: string;
-
-  /**
-   * Size of the stored blob.
-   *
-   * @generated from field: int64 size = 2;
-   */
-  size: bigint;
-
-  /**
-   * Modification time reported by the provider.
-   *
-   * @generated from field: google.protobuf.Timestamp mod_time = 3;
-   */
-  modTime?: Timestamp;
-
-  /**
-   * ETag assigned by the provider.
-   *
-   * @generated from field: string etag = 4;
-   */
-  etag: string;
+  writtenSize: bigint;
 };
 
 export type WriteBlobResponseValid = WriteBlobResponse;
@@ -777,32 +951,188 @@ export type WriteBlobResponseValid = WriteBlobResponse;
  * Use `create(WriteBlobResponseSchema)` to create a new message.
  */
 export const WriteBlobResponseSchema: GenMessage<WriteBlobResponse, {validType: WriteBlobResponseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 10);
+  messageDesc(file_dtkt_blob_v1beta1_messages, 15);
+
+/**
+ * @generated from message dtkt.blob.v1beta1.ReadBlobLinesRequest
+ */
+export type ReadBlobLinesRequest = Message<"dtkt.blob.v1beta1.ReadBlobLinesRequest"> & {
+  /**
+   * Name of the bucket containing blob. The service may not require this to
+   * be specified.
+   *
+   * @generated from field: string bucket = 1;
+   */
+  bucket: string;
+
+  /**
+   * Key of the blob to read contents.
+   *
+   * @generated from field: string key = 2;
+   */
+  key: string;
+
+  /**
+   * Specifies the expected format of each line of data read from contents.
+   *
+   * @generated from field: dtkt.blob.v1beta1.LineFormat format = 3;
+   */
+  format?: LineFormat;
+
+  /**
+   * Offset determines the index of the first line to read from blob contents.
+   *
+   * @generated from field: int64 offset = 4;
+   */
+  offset: bigint;
+
+  /**
+   * Maximum number of lines to read relative to the offset:
+   *  - if <= 0, read remaining lines;
+   *  - if > 0, read at most this number lines.
+   *
+   * @generated from field: int64 length = 5;
+   */
+  length: bigint;
+};
+
+/**
+ * @generated from message dtkt.blob.v1beta1.ReadBlobLinesRequest
+ */
+export type ReadBlobLinesRequestValid = Message<"dtkt.blob.v1beta1.ReadBlobLinesRequest"> & {
+  /**
+   * Name of the bucket containing blob. The service may not require this to
+   * be specified.
+   *
+   * @generated from field: string bucket = 1;
+   */
+  bucket: string;
+
+  /**
+   * Key of the blob to read contents.
+   *
+   * @generated from field: string key = 2;
+   */
+  key: string;
+
+  /**
+   * Specifies the expected format of each line of data read from contents.
+   *
+   * @generated from field: dtkt.blob.v1beta1.LineFormat format = 3;
+   */
+  format?: LineFormatValid;
+
+  /**
+   * Offset determines the index of the first line to read from blob contents.
+   *
+   * @generated from field: int64 offset = 4;
+   */
+  offset: bigint;
+
+  /**
+   * Maximum number of lines to read relative to the offset:
+   *  - if <= 0, read remaining lines;
+   *  - if > 0, read at most this number lines.
+   *
+   * @generated from field: int64 length = 5;
+   */
+  length: bigint;
+};
+
+/**
+ * Describes the message dtkt.blob.v1beta1.ReadBlobLinesRequest.
+ * Use `create(ReadBlobLinesRequestSchema)` to create a new message.
+ */
+export const ReadBlobLinesRequestSchema: GenMessage<ReadBlobLinesRequest, {validType: ReadBlobLinesRequestValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_blob_v1beta1_messages, 16);
+
+/**
+ * @generated from message dtkt.blob.v1beta1.ReadBlobLinesResponse
+ */
+export type ReadBlobLinesResponse = Message<"dtkt.blob.v1beta1.ReadBlobLinesResponse"> & {
+  /**
+   * Line data read from blob content in the requested format.
+   *
+   * @generated from field: dtkt.blob.v1beta1.LineData data = 1;
+   */
+  data?: LineData;
+};
+
+export type ReadBlobLinesResponseValid = ReadBlobLinesResponse;
+
+/**
+ * Describes the message dtkt.blob.v1beta1.ReadBlobLinesResponse.
+ * Use `create(ReadBlobLinesResponseSchema)` to create a new message.
+ */
+export const ReadBlobLinesResponseSchema: GenMessage<ReadBlobLinesResponse, {validType: ReadBlobLinesResponseValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_blob_v1beta1_messages, 17);
 
 /**
  * @generated from message dtkt.blob.v1beta1.WriteBlobLinesRequest
  */
 export type WriteBlobLinesRequest = Message<"dtkt.blob.v1beta1.WriteBlobLinesRequest"> & {
   /**
-   * Key of blob to write.
+   * Name of the bucket containing blob. The service may not require this to
+   * be specified. If required, this **must** be set on the first request. If it
+   * is set on any subsequent requests it must match the value of the first
+   * request.
    *
-   * @generated from field: string key = 1;
-   */
-  key: string;
-
-  /**
-   * Bucket to write blob (may be optional).
-   *
-   * @generated from field: string bucket = 2;
+   * @generated from field: string bucket = 1;
    */
   bucket: string;
 
   /**
-   * Data of blob line.
+   * Key of the blob to write contents. This **must** be set on the first
+   * request. If it is set on any subsequent requests it must match the value of
+   * the first request.
    *
-   * @generated from field: bytes data = 3;
+   * @generated from field: string key = 2;
    */
-  data: Uint8Array;
+  key: string;
+
+  /**
+   * Metadata of the blob contents to be written. This **may** be set on the
+   * first request and **must not** be set on any subsequent request.
+   *
+   * @generated from field: dtkt.blob.v1beta1.BlobMetadata metadata = 3;
+   */
+  metadata?: BlobMetadata;
+
+  /**
+   * Rules assert the state of the blob and its contents (if it exists) which
+   * must be valid before writing to the blob. This **may** be set on the first
+   * request and **must not** be set on any subsequent request.
+   *
+   * @generated from field: dtkt.blob.v1beta1.BlobRules rules = 4;
+   */
+  rules?: BlobRules;
+
+  /**
+   * Specifies the format to expect for each line of data.
+   * This **may** be set on the first request and **must not** be set on any
+   * subsequent request.
+   *
+   * @generated from field: dtkt.blob.v1beta1.LineFormat format = 5;
+   */
+  format?: LineFormat;
+
+  /**
+   * Specifies whether contents should be overwritten when blob already exists.
+   * When false and blob exists lines will be appended to existing contents.
+   * Default: false
+   *
+   * @generated from field: bool overwrite = 6;
+   */
+  overwrite: boolean;
+
+  /**
+   * Line data to write to contents.
+   * This **must** be set on every request and in the format corresponding with
+   * the `format` set on the first request.
+   *
+   * @generated from field: dtkt.blob.v1beta1.LineData data = 7;
+   */
+  data?: LineData;
 };
 
 /**
@@ -810,25 +1140,67 @@ export type WriteBlobLinesRequest = Message<"dtkt.blob.v1beta1.WriteBlobLinesReq
  */
 export type WriteBlobLinesRequestValid = Message<"dtkt.blob.v1beta1.WriteBlobLinesRequest"> & {
   /**
-   * Key of blob to write.
+   * Name of the bucket containing blob. The service may not require this to
+   * be specified. If required, this **must** be set on the first request. If it
+   * is set on any subsequent requests it must match the value of the first
+   * request.
    *
-   * @generated from field: string key = 1;
-   */
-  key: string;
-
-  /**
-   * Bucket to write blob (may be optional).
-   *
-   * @generated from field: string bucket = 2;
+   * @generated from field: string bucket = 1;
    */
   bucket: string;
 
   /**
-   * Data of blob line.
+   * Key of the blob to write contents. This **must** be set on the first
+   * request. If it is set on any subsequent requests it must match the value of
+   * the first request.
    *
-   * @generated from field: bytes data = 3;
+   * @generated from field: string key = 2;
    */
-  data: Uint8Array;
+  key: string;
+
+  /**
+   * Metadata of the blob contents to be written. This **may** be set on the
+   * first request and **must not** be set on any subsequent request.
+   *
+   * @generated from field: dtkt.blob.v1beta1.BlobMetadata metadata = 3;
+   */
+  metadata?: BlobMetadataValid;
+
+  /**
+   * Rules assert the state of the blob and its contents (if it exists) which
+   * must be valid before writing to the blob. This **may** be set on the first
+   * request and **must not** be set on any subsequent request.
+   *
+   * @generated from field: dtkt.blob.v1beta1.BlobRules rules = 4;
+   */
+  rules?: BlobRulesValid;
+
+  /**
+   * Specifies the format to expect for each line of data.
+   * This **may** be set on the first request and **must not** be set on any
+   * subsequent request.
+   *
+   * @generated from field: dtkt.blob.v1beta1.LineFormat format = 5;
+   */
+  format?: LineFormatValid;
+
+  /**
+   * Specifies whether contents should be overwritten when blob already exists.
+   * When false and blob exists lines will be appended to existing contents.
+   * Default: false
+   *
+   * @generated from field: bool overwrite = 6;
+   */
+  overwrite: boolean;
+
+  /**
+   * Line data to write to contents.
+   * This **must** be set on every request and in the format corresponding with
+   * the `format` set on the first request.
+   *
+   * @generated from field: dtkt.blob.v1beta1.LineData data = 7;
+   */
+  data: LineDataValid;
 };
 
 /**
@@ -836,16 +1208,18 @@ export type WriteBlobLinesRequestValid = Message<"dtkt.blob.v1beta1.WriteBlobLin
  * Use `create(WriteBlobLinesRequestSchema)` to create a new message.
  */
 export const WriteBlobLinesRequestSchema: GenMessage<WriteBlobLinesRequest, {validType: WriteBlobLinesRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 11);
+  messageDesc(file_dtkt_blob_v1beta1_messages, 18);
 
 /**
  * @generated from message dtkt.blob.v1beta1.WriteBlobLinesResponse
  */
 export type WriteBlobLinesResponse = Message<"dtkt.blob.v1beta1.WriteBlobLinesResponse"> & {
   /**
-   * @generated from field: repeated dtkt.blob.v1beta1.WriteBlobLinesResponse.KeyResult results = 1;
+   * Total number of lines written to blob contents.
+   *
+   * @generated from field: int64 written_lines = 1;
    */
-  results: WriteBlobLinesResponse_KeyResult[];
+  writtenLines: bigint;
 };
 
 export type WriteBlobLinesResponseValid = WriteBlobLinesResponse;
@@ -855,56 +1229,7 @@ export type WriteBlobLinesResponseValid = WriteBlobLinesResponse;
  * Use `create(WriteBlobLinesResponseSchema)` to create a new message.
  */
 export const WriteBlobLinesResponseSchema: GenMessage<WriteBlobLinesResponse, {validType: WriteBlobLinesResponseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 12);
-
-/**
- * @generated from message dtkt.blob.v1beta1.WriteBlobLinesResponse.KeyResult
- */
-export type WriteBlobLinesResponse_KeyResult = Message<"dtkt.blob.v1beta1.WriteBlobLinesResponse.KeyResult"> & {
-  /**
-   * Key of blob to write.
-   *
-   * @generated from field: string key = 1;
-   */
-  key: string;
-
-  /**
-   * Size of the stored blob.
-   *
-   * @generated from field: int64 size = 2;
-   */
-  size: bigint;
-
-  /**
-   * Modification time reported by the provider.
-   *
-   * @generated from field: google.protobuf.Timestamp mod_time = 3;
-   */
-  modTime?: Timestamp;
-
-  /**
-   * ETag assigned by the provider.
-   *
-   * @generated from field: string etag = 4;
-   */
-  etag: string;
-
-  /**
-   * Total lines written.
-   *
-   * @generated from field: int64 lines_written = 5;
-   */
-  linesWritten: bigint;
-};
-
-export type WriteBlobLinesResponse_KeyResultValid = WriteBlobLinesResponse_KeyResult;
-
-/**
- * Describes the message dtkt.blob.v1beta1.WriteBlobLinesResponse.KeyResult.
- * Use `create(WriteBlobLinesResponse_KeyResultSchema)` to create a new message.
- */
-export const WriteBlobLinesResponse_KeyResultSchema: GenMessage<WriteBlobLinesResponse_KeyResult, {validType: WriteBlobLinesResponse_KeyResultValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 12, 0);
+  messageDesc(file_dtkt_blob_v1beta1_messages, 19);
 
 /**
  * @generated from message dtkt.blob.v1beta1.DeleteBlobRequest
@@ -949,7 +1274,7 @@ export type DeleteBlobRequestValid = Message<"dtkt.blob.v1beta1.DeleteBlobReques
  * Use `create(DeleteBlobRequestSchema)` to create a new message.
  */
 export const DeleteBlobRequestSchema: GenMessage<DeleteBlobRequest, {validType: DeleteBlobRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 13);
+  messageDesc(file_dtkt_blob_v1beta1_messages, 20);
 
 /**
  * @generated from message dtkt.blob.v1beta1.DeleteBlobResponse
@@ -977,7 +1302,7 @@ export type DeleteBlobResponseValid = DeleteBlobResponse;
  * Use `create(DeleteBlobResponseSchema)` to create a new message.
  */
 export const DeleteBlobResponseSchema: GenMessage<DeleteBlobResponse, {validType: DeleteBlobResponseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 14);
+  messageDesc(file_dtkt_blob_v1beta1_messages, 21);
 
 /**
  * @generated from message dtkt.blob.v1beta1.CopyBlobRequest
@@ -1078,7 +1403,7 @@ export type CopyBlobRequestValid = Message<"dtkt.blob.v1beta1.CopyBlobRequest"> 
  * Use `create(CopyBlobRequestSchema)` to create a new message.
  */
 export const CopyBlobRequestSchema: GenMessage<CopyBlobRequest, {validType: CopyBlobRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 15);
+  messageDesc(file_dtkt_blob_v1beta1_messages, 22);
 
 /**
  * @generated from message dtkt.blob.v1beta1.CopyBlobResponse
@@ -1120,7 +1445,7 @@ export type CopyBlobResponseValid = CopyBlobResponse;
  * Use `create(CopyBlobResponseSchema)` to create a new message.
  */
 export const CopyBlobResponseSchema: GenMessage<CopyBlobResponse, {validType: CopyBlobResponseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 16);
+  messageDesc(file_dtkt_blob_v1beta1_messages, 23);
 
 /**
  * @generated from message dtkt.blob.v1beta1.GenerateSignedURLRequest
@@ -1235,7 +1560,7 @@ export type GenerateSignedURLRequestValid = Message<"dtkt.blob.v1beta1.GenerateS
  * Use `create(GenerateSignedURLRequestSchema)` to create a new message.
  */
 export const GenerateSignedURLRequestSchema: GenMessage<GenerateSignedURLRequest, {validType: GenerateSignedURLRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 17);
+  messageDesc(file_dtkt_blob_v1beta1_messages, 24);
 
 /**
  * @generated from message dtkt.blob.v1beta1.GenerateSignedURLResponse
@@ -1263,5 +1588,5 @@ export type GenerateSignedURLResponseValid = GenerateSignedURLResponse;
  * Use `create(GenerateSignedURLResponseSchema)` to create a new message.
  */
 export const GenerateSignedURLResponseSchema: GenMessage<GenerateSignedURLResponse, {validType: GenerateSignedURLResponseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_blob_v1beta1_messages, 18);
+  messageDesc(file_dtkt_blob_v1beta1_messages, 25);
 

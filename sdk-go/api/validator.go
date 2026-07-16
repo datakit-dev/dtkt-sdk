@@ -12,62 +12,49 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
-var getGlobalValidator = sync.OnceValues(func() (protovalidate.Validator, error) {
-	return protovalidate.New(protovalidate.WithExtensionTypeResolver(getGlobalResolver()))
-})
-
-type (
-	requestValidator struct {
-		resolver Resolver
-	}
-	requestFieldValidator struct {
-		request proto.Message
-	}
-)
-
-func GlobalValidator() (protovalidate.Validator, error) {
-	return getGlobalValidator()
+type validator struct {
+	resolver  Resolver
+	validator func() (protovalidate.Validator, error)
 }
 
-func RequestValidator(resolver Resolver) *requestValidator {
-	return &requestValidator{
+func NewValidator(resolver Resolver) *validator {
+	return &validator{
 		resolver: resolver,
+		validator: sync.OnceValues(func() (protovalidate.Validator, error) {
+			return protovalidate.New(
+				protovalidate.WithExtensionTypeResolver(resolver),
+			)
+		}),
 	}
 }
 
-func RequestFieldValidator(request proto.Message) *requestFieldValidator {
-	return &requestFieldValidator{request: request}
+func ValidatorFilter(root proto.Message) protovalidate.Filter {
+	return protovalidate.FilterFunc(func(msg protoreflect.Message, desc protoreflect.Descriptor) bool {
+		if opts, ok := desc.Options().(*descriptorpb.FieldOptions); ok && opts != nil {
+			if proto.HasExtension(opts, annotations.E_FieldBehavior) {
+				if ext, ok := proto.GetExtension(opts, annotations.E_FieldBehavior).([]annotations.FieldBehavior); ok && len(ext) > 0 {
+					if (strings.HasPrefix(string(root.ProtoReflect().Descriptor().Name()), "Create") &&
+						slices.Contains(ext, annotations.FieldBehavior_IDENTIFIER)) ||
+						(strings.HasSuffix(string(root.ProtoReflect().Descriptor().Name()), "Request") &&
+							slices.Contains(ext, annotations.FieldBehavior_OUTPUT_ONLY)) {
+						return false
+					}
+				}
+			}
+		}
+		return true
+	})
 }
 
-func RequestValidatorOption(request proto.Message) protovalidate.ValidationOption {
-	return protovalidate.WithFilter(&requestFieldValidator{request: request})
-}
-
-func (f *requestValidator) Validate(request proto.Message, opts ...protovalidate.ValidationOption) error {
-	validator, err := f.resolver.GetValidator()
+func (f *validator) Validate(root proto.Message, opts ...protovalidate.ValidationOption) error {
+	validator, err := f.validator()
 	if err != nil {
 		return err
 	}
 
-	opts = append(opts,
-		protovalidate.WithFilter(&requestFieldValidator{request: request}),
-	)
+	opts = append([]protovalidate.ValidationOption{
+		protovalidate.WithFilter(ValidatorFilter(root)),
+	}, opts...)
 
-	return validator.Validate(request, opts...)
-}
-
-func (f *requestFieldValidator) ShouldValidate(msg protoreflect.Message, desc protoreflect.Descriptor) bool {
-	if opts, ok := desc.Options().(*descriptorpb.FieldOptions); ok && opts != nil {
-		if proto.HasExtension(opts, annotations.E_FieldBehavior) {
-			if ext, ok := proto.GetExtension(opts, annotations.E_FieldBehavior).([]annotations.FieldBehavior); ok && len(ext) > 0 {
-				if (strings.HasPrefix(string(f.request.ProtoReflect().Descriptor().Name()), "Create") &&
-					slices.Contains(ext, annotations.FieldBehavior_IDENTIFIER)) ||
-					(strings.HasSuffix(string(f.request.ProtoReflect().Descriptor().Name()), "Request") &&
-						slices.Contains(ext, annotations.FieldBehavior_OUTPUT_ONLY)) {
-					return false
-				}
-			}
-		}
-	}
-	return true
+	return validator.Validate(root, opts...)
 }

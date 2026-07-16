@@ -2,7 +2,6 @@ package encoding
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/json/jsontext"
 	"encoding/json/v2"
 	"fmt"
@@ -11,13 +10,19 @@ import (
 	"strconv"
 	"time"
 
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 const DefaultJSONDelim = "\n"
 
 var _ EncoderV2 = (*JSONEncoderV2)(nil)
 var _ DecoderV2 = (*JSONDecoderV2)(nil)
+
+var defaultJsonEncoder = NewJSONEncoderV2()
+var defaultJsonDecoder = NewJSONDecoderV2()
 
 type (
 	JSONEncoderV2 struct {
@@ -101,17 +106,58 @@ func NewJSONDecoderV2(opts ...JSONDecoderV2Option) *JSONDecoderV2 {
 func (e *JSONEncoderV2) encodeRaw(v any) (jsontext.Value, bool) {
 	switch v := v.(type) {
 	case string:
+		if len(v) >= 2 && v[0] == '"' && v[len(v)-1] == '"' {
+			v = v[1 : len(v)-1]
+		}
+
 		if e.raw {
 			return []byte(v), true
 		}
+
+		return []byte(strconv.Quote(v)), true
+	case time.Time:
+		return e.encodeRaw(v.Format(time.RFC3339))
 	case time.Duration:
-		if e.raw {
-			return []byte(v.String()), true
-		} else {
-			return []byte(strconv.Quote(v.String())), true
-		}
+		return e.encodeRaw(v.String())
+	case *wrapperspb.BytesValue:
+		return e.encodeRaw(string(v.GetValue()))
+	case *wrapperspb.StringValue:
+		return e.encodeRaw(v.GetValue())
+	case *timestamppb.Timestamp:
+		return e.encodeRaw(v.AsTime())
 	case *durationpb.Duration:
 		return e.encodeRaw(v.AsDuration())
+	case proto.Message:
+		switch v.ProtoReflect().Descriptor().FullName() {
+		case "google.protobuf.Timestamp":
+			b, err := proto.Marshal(v)
+			if err == nil {
+				d := &timestamppb.Timestamp{}
+				err = proto.Unmarshal(b, d)
+				if err == nil {
+					return e.encodeRaw(d.AsTime())
+				}
+			}
+		case "google.protobuf.Duration":
+			b, err := proto.Marshal(v)
+			if err == nil {
+				d := &durationpb.Duration{}
+				err = proto.Unmarshal(b, d)
+				if err == nil {
+					return e.encodeRaw(d.AsDuration())
+				}
+			}
+		case "google.protobuf.StringValue", "google.protobuf.BytesValue":
+			field := v.ProtoReflect().Descriptor().Fields().ByName("value")
+			if field != nil && v.ProtoReflect().Has(field) {
+				return e.encodeRaw(v.ProtoReflect().Get(field).String())
+			}
+		case "google.protobuf.Value":
+			field := v.ProtoReflect().Descriptor().Fields().ByName("string_value")
+			if field != nil && v.ProtoReflect().Has(field) {
+				return e.encodeRaw(v.ProtoReflect().Get(field).String())
+			}
+		}
 	}
 	return nil, false
 }
@@ -120,26 +166,18 @@ func (e *JSONEncoderV2) Encode(v any) ([]byte, error) {
 	if raw, ok := e.encodeRaw(v); ok {
 		return raw, nil
 	}
-
-	buf := &bytes.Buffer{}
-	err := json.MarshalWrite(buf, v, e.opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return json.Marshal(v, e.opts...)
 }
 
 func (e *JSONEncoderV2) StreamEncode(w io.Writer) func(any) error {
 	enc := jsontext.NewEncoder(w, e.opts...)
-	return func(v any) error {
-		if e.delim != DefaultJSONDelim {
+	if e.delim != DefaultJSONDelim {
+		return func(v any) error {
 			if raw, ok := e.encodeRaw(v); ok {
 				_, err := fmt.Fprint(w, string(raw))
 				if err != nil {
 					return err
 				}
-				return nil
 			} else {
 				err := json.MarshalWrite(w, v, e.opts...)
 				if err != nil {
@@ -149,14 +187,16 @@ func (e *JSONEncoderV2) StreamEncode(w io.Writer) func(any) error {
 
 			_, err := fmt.Fprint(w, e.delim)
 			return err
-		} else {
-			if raw, ok := e.encodeRaw(v); ok {
-				_, err := fmt.Fprintln(w, string(raw))
-				return err
-			}
-
-			return json.MarshalEncode(enc, v)
 		}
+	}
+
+	return func(v any) error {
+		if raw, ok := e.encodeRaw(v); ok {
+			_, err := fmt.Fprintln(w, string(raw))
+			return err
+		}
+
+		return json.MarshalEncode(enc, v)
 	}
 }
 
@@ -165,65 +205,73 @@ func (d *JSONDecoderV2) Decode(b []byte, v any) error {
 }
 
 func (d *JSONDecoderV2) StreamDecode(r io.Reader) func(any) error {
+	scan := d.StreamScanner(r)
+	return func(v any) error {
+		b, err := scan()
+		if err != nil {
+			return err
+		}
+		return d.Decode(b, v)
+	}
+}
+
+func (d *JSONDecoderV2) StreamScanner(r io.Reader) func() ([]byte, error) {
 	// Custom delimiter with stream mode is not supported (uncommon combination)
 	if d.delim != DefaultJSONDelim && d.stream {
-		return func(any) error {
-			return fmt.Errorf("stream mode with custom delimiter is not supported")
+		return func() ([]byte, error) {
+			return nil, fmt.Errorf("stream mode with custom delimiter is not supported")
 		}
 	}
 
 	if d.delim != DefaultJSONDelim {
-		scan := bufio.NewScanner(r)
-		scan.Split(DelimSplitFunc(d.delim))
+		scanner := bufio.NewScanner(r)
+		scanner.Split(DelimSplitFunc(d.delim))
 
-		return func(v any) error {
-			if scan.Scan() {
-				err := d.Decode(scan.Bytes(), v)
-				if err != nil {
-					return err
-				}
+		return func() ([]byte, error) {
+			if scanner.Scan() {
+				return scanner.Bytes(), nil
 			}
 
-			if err := scan.Err(); err != nil {
-				return err
+			if err := scanner.Err(); err != nil {
+				return nil, err
 			}
 
-			return io.EOF
+			return nil, io.EOF
 		}
 	} else {
 		var (
-			dec = jsontext.NewDecoder(r, d.opts...)
+			decoder = jsontext.NewDecoder(r, d.opts...)
 			streamOpen,
 			streamClose bool
 		)
 
-		return func(v any) error {
+		return func() ([]byte, error) {
 			if d.stream && streamOpen && streamClose {
-				return io.EOF
+				return nil, io.EOF
 			}
 
 			if d.stream && !streamOpen {
-				tok, err := dec.ReadToken()
+				tok, err := decoder.ReadToken()
 				if err != nil {
-					return fmt.Errorf("stream decode start: %w", err)
+					return nil, fmt.Errorf("stream decode start: %w", err)
 				} else if tok.Kind() != '[' {
-					return fmt.Errorf("invalid stream start token: %s, expected: `[`", tok)
+					return nil, fmt.Errorf("invalid stream start token: %s, expected: `[`", tok)
 				}
 				streamOpen = true
 			}
 
 			if d.stream && !streamClose {
-				kind := dec.PeekKind()
+				kind := decoder.PeekKind()
 				if kind == ']' {
-					_, err := dec.ReadToken()
+					_, err := decoder.ReadToken()
 					if err != nil {
-						return fmt.Errorf("stream decode end: %w", err)
+						return nil, fmt.Errorf("stream decode end: %w", err)
 					}
 					streamClose = true
 				}
 			}
 
-			return json.UnmarshalDecode(dec, v, d.opts...)
+			return decoder.ReadValue()
 		}
 	}
 }

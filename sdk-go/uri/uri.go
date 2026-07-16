@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
@@ -41,6 +42,28 @@ func TrimScheme(uri string) string {
 		return strings.TrimPrefix(uri, scheme+"://")
 	}
 	return uri
+}
+
+// IsGlob checks if a string is a valid file glob pattern.
+func IsGlob(pattern string) bool {
+	// 1. Validate the syntax using the standard library.
+	// We pass an empty string because we only care if the pattern itself is malformed.
+	_, err := filepath.Match(pattern, "")
+	if err != nil {
+		// Returns filepath.ErrBadPattern if syntax is invalid
+		return false
+	}
+
+	// 2. Define standard glob magic characters.
+	// On Windows, the backslash (\) is a path separator, not an escape character.
+	// On Unix systems, a backslash can escape a glob character.
+	globChars := `*?[`
+	if runtime.GOOS != "windows" {
+		globChars = `*?[\`
+	}
+
+	// 3. If syntax is valid and it contains magic characters, it's a glob pattern.
+	return strings.ContainsAny(pattern, globChars)
 }
 
 func Parse(uriStr string) (*url.URL, error) {

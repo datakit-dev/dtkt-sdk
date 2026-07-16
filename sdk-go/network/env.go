@@ -45,15 +45,10 @@ func DefaultAddress(network Type) (Address, error) {
 	return network.DefaultAddress()
 }
 
-func ResolveConnector() (Connector, error) {
-	addr, err := DefaultAddress(DefaultNetwork())
-	if err != nil {
-		return nil, err
-	}
-
+func ResolveConnector(addr Address) (Connector, error) {
 	if addr.Type().IsCloud() {
 		if CloudConfigFromEnv() == "" {
-			return nil, fmt.Errorf("invalid %q connector: missing cloud config", addr.Network())
+			return nil, fmt.Errorf("invalid %q connector: env missing %s", addr.Network(), env.CloudConfig)
 		}
 
 		config := &corev1.Resource{}

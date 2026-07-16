@@ -76,6 +76,10 @@ func StringFormatAny(val any) string {
 	}
 
 	switch val := val.(type) {
+	case protoreflect.Enum:
+		return fmt.Sprintf("%s", val)
+	case protoreflect.Value:
+		return StringFormatAny(val.Interface())
 	case protoreflect.Message:
 		return prototext.MarshalOptions{
 			Multiline: false,

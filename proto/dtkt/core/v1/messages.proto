@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "dtkt/flow/v1beta1/eval.proto";
 import "dtkt/flow/v1beta1/spec.proto";
 import "dtkt/protoform/v1beta1/protoform.proto";
+import "dtkt/protostore/v1beta1/protostore.proto";
 import "dtkt/shared/v1beta1/enums.proto";
 import "dtkt/shared/v1beta1/messages.proto";
 import "google/api/field_behavior.proto";
@@ -75,7 +76,7 @@ message Context {
   Auth auth = 3;
 }
 
-// Resource is a named reference to resource from a context with optional
+// Resource is a named reference to a resource message from a context with optional
 // address and associated data payload. Resource is used for tracing data origin
 // across network boundaries and can represent resources such as connections,
 // deployments, etc. which may contain encrypted or decrypted data payloads
@@ -158,8 +159,9 @@ message Automation {
     (dtkt.protoform.v1beta1.field).title = "Flow",
     (dtkt.protoform.v1beta1.field).description = "Select a flow.",
     (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.core.v1.FlowService.ListFlows",
-    (dtkt.protoform.v1beta1.field).select.key_expr = "this.flows.map(i, i.name)",
-    (dtkt.protoform.v1beta1.field).select.val_expr = "this.flows.map(i, i.name)"
+    (dtkt.protoform.v1beta1.field).select.response_field = "flows",
+    (dtkt.protoform.v1beta1.field).select.label_expr = "has(this.spec.v1beta1) ? this.spec.v1beta1.name : this.name",
+    (dtkt.protoform.v1beta1.field).select.value_expr = "this.name"
   ];
 
   // Checksum of flow spec must match flow when resolving spec (concurrency control).
@@ -233,6 +235,8 @@ message Flow {
     pattern: "users/{user}/flows/{flow}"
   };
 
+  option (dtkt.protostore.v1beta1.search_index) = {contents_expr: "has(this.spec.v1beta1) ? this.spec.v1beta1.name + ' ' + this.spec.v1beta1.description : ''"};
+
   string name = 1 [
     (buf.validate.field).required = true,
     (google.api.field_behavior) = IDENTIFIER,
@@ -248,13 +252,13 @@ message Flow {
   ];
 
   // Flow spec URI (optional).
-  string spec_uri = 3 [
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
-    (buf.validate.field).string.uri = true
-  ];
+  optional string spec_uri = 3 [(buf.validate.field).string.uri = true];
 
   // Flow spec checksum for concurrency control.
-  string spec_etag = 4 [(buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE];
+  string spec_etag = 4 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
 
   // Flow spec metadata (versioned).
   FlowSpecMetadata spec = 5 [(buf.validate.field).required = true];
@@ -316,8 +320,9 @@ message Connection {
       (dtkt.protoform.v1beta1.field).title = "Deployment",
       (dtkt.protoform.v1beta1.field).description = "Select a deployment.",
       (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.core.v1.DeploymentService.ListDeployments",
-      (dtkt.protoform.v1beta1.field).select.key_expr = "this.deployments.map(i, i.name)",
-      (dtkt.protoform.v1beta1.field).select.val_expr = "this.deployments.map(i, i.name)"
+      (dtkt.protoform.v1beta1.field).select.response_field = "deployments",
+      (dtkt.protoform.v1beta1.field).select.label_expr = "this.name",
+      (dtkt.protoform.v1beta1.field).select.value_expr = "this.name"
     ];
 
     // Custom proto descriptors URI.
@@ -373,8 +378,7 @@ message Connection {
   ];
 
   // Config source uri (optional).
-  string config_uri = 13 [
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+  optional string config_uri = 13 [
     (buf.validate.field).string.uri = true,
     (google.api.field_behavior) = INPUT_ONLY,
     (dtkt.protoform.v1beta1.field).description = "Config data URI (optional)",
@@ -582,6 +586,8 @@ message Integration {
     pattern: "users/{user}/integrations/{integration}"
   };
 
+  option (dtkt.protostore.v1beta1.search_index).contents_expr = "has(this.spec.v1beta1) ? this.spec.v1beta1.identity.name + ' ' + this.spec.v1beta1.description : ''";
+
   string name = 1 [
     (buf.validate.field).required = true,
     (google.api.field_behavior) = IDENTIFIER,
@@ -694,6 +700,8 @@ message Service {
     pattern: "users/{user}/deployments/{deployment}/services/{service}"
   };
 
+  option (dtkt.protostore.v1beta1.search_index).contents_expr = "size(this.description) > 0 ? this.name + ' ' + this.description : this.name";
+
   // Service resource name.
   string name = 1 [(buf.validate.field).required = true];
 
@@ -731,6 +739,8 @@ message Method {
     pattern: "organizations/{organization}/deployments/{deployment}/methods/{method}"
     pattern: "users/{user}/deployments/{deployment}/methods/{method}"
   };
+
+  option (dtkt.protostore.v1beta1.search_index).contents_expr = "size(this.description) > 0 ? this.name + ' ' + this.description : this.name";
 
   // Method resource name.
   string name = 1 [(buf.validate.field).required = true];
@@ -781,6 +791,8 @@ message Type {
     pattern: "organizations/{organization}/deployments/{deployment}/types/{type}"
     pattern: "users/{user}/deployments/{deployment}/types/{type}"
   };
+
+  option (dtkt.protostore.v1beta1.search_index).contents_expr = "size(this.description) > 0 ? this.name + ' ' + this.description : this.name";
 
   // Type resource name.
   string name = 1 [(buf.validate.field).required = true];
@@ -851,8 +863,9 @@ message FlowConnectionMetadata {
     (dtkt.protoform.v1beta1.field).title = "Connection",
     (dtkt.protoform.v1beta1.field).description = "Select a connection.",
     (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.core.v1.ConnectionService.ListConnections",
-    (dtkt.protoform.v1beta1.field).select.key_expr = "this.connections.map(i, i.name)",
-    (dtkt.protoform.v1beta1.field).select.val_expr = "this.connections.map(i, i.name)"
+    (dtkt.protoform.v1beta1.field).select.response_field = "connections",
+    (dtkt.protoform.v1beta1.field).select.label_expr = "this.name",
+    (dtkt.protoform.v1beta1.field).select.value_expr = "this.name"
   ];
 
   // Optional context to resolve connection resource by name.
@@ -1168,6 +1181,49 @@ message ListAutomationsRequest {
 message ListAutomationsResponse {
   // The list of automations.
   repeated Automation automations = 1 [(buf.validate.field).required = true];
+
+  // Token for retrieving the next page.
+  string next_page_token = 2;
+}
+
+message ListSearchResultsRequest {
+  // Maximum number of search results to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page of search results.
+  string page_token = 2;
+
+  // Search query text.
+  string query = 3 [(buf.validate.field).required = true];
+
+  // Filter results to only include these resource types
+  // When empty, all resource types are included
+  repeated string resource_types = 6;
+
+  // RRFK is the constant used in Reciprocal Rank Fusion algorithm
+  // Typical value is 60
+  // RRFK float64
+
+  // WeightFTS is the weight given to full-text search results
+  // Default: 1.0
+  // WeightFTS float64
+
+  // WeightVector is the weight given to vector search results
+  // Default: 1.0
+  // WeightVector float64
+}
+
+message ListSearchResultsResponse {
+  message SearchResult {
+    // Search result text contents.
+    string contents = 1;
+
+    // Search result resource message.
+    google.protobuf.Any resource = 2;
+  }
+
+  // The list of search results.
+  repeated SearchResult results = 1;
 
   // Token for retrieving the next page.
   string next_page_token = 2;

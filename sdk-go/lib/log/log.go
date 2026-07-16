@@ -5,32 +5,18 @@ import (
 	"os"
 	"path/filepath"
 
-	charmLog "github.com/charmbracelet/log"
+	charmlog "charm.land/log/v2"
 )
 
 type Format string
 
-var logFiles map[*slog.Logger]*os.File = make(map[*slog.Logger]*os.File)
+var logFiles = make(map[*slog.Logger]*os.File)
 
 const (
 	FormatText   Format = "text"
 	FormatJSON   Format = "json"
 	FormatPretty Format = "pretty"
 )
-
-func CloseLogger(logger *slog.Logger) error {
-	if logFiles[logger] != nil {
-		err := logFiles[logger].Close()
-
-		if err != nil {
-			return err
-		}
-
-		delete(logFiles, logger)
-	}
-
-	return nil
-}
 
 func NewLogger(options ...Option) *slog.Logger {
 	config := GetDefaultConfig()
@@ -67,7 +53,7 @@ func NewLogger(options ...Option) *slog.Logger {
 	case FormatJSON:
 		handler = slog.NewJSONHandler(w, &handlerOptions)
 	case FormatPretty:
-		handler = charmLog.NewWithOptions(w, charmLog.Options{
+		handler = charmlog.NewWithOptions(w, charmlog.Options{
 			Level: toCharmLogLevel(handlerOptions.Level.Level()),
 		})
 	}
@@ -85,19 +71,33 @@ func NewLogger(options ...Option) *slog.Logger {
 	return logger
 }
 
-func toCharmLogLevel(level slog.Level) charmLog.Level {
+func CloseLogger(logger *slog.Logger) error {
+	if logFiles[logger] != nil {
+		err := logFiles[logger].Close()
+
+		if err != nil {
+			return err
+		}
+
+		delete(logFiles, logger)
+	}
+
+	return nil
+}
+
+func toCharmLogLevel(level slog.Level) charmlog.Level {
 	switch level {
 	case slog.LevelDebug:
-		return charmLog.DebugLevel
+		return charmlog.DebugLevel
 	case slog.LevelInfo:
-		return charmLog.InfoLevel
+		return charmlog.InfoLevel
 	case slog.LevelWarn:
-		return charmLog.WarnLevel
+		return charmlog.WarnLevel
 	case slog.LevelError:
-		return charmLog.ErrorLevel
+		return charmlog.ErrorLevel
 	case 12:
-		return charmLog.FatalLevel
+		return charmlog.FatalLevel
 	default:
-		return charmLog.InfoLevel
+		return charmlog.InfoLevel
 	}
 }

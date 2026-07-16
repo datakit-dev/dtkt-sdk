@@ -3,7 +3,6 @@ package spec
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"log/slog"
 	"sync"
@@ -12,10 +11,9 @@ import (
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/lib/log"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
-	"github.com/google/cel-go/common/types/ref"
 )
 
-var _ ExecNodeCloser = (*BidiStream)(nil)
+var _ shared.ExecNode = (*BidiStream)(nil)
 
 // BidiStream implements a bidirectional-streaming RPC.
 // Requests and responses are fully decoupled: each executor trigger sends one
@@ -23,159 +21,110 @@ var _ ExecNodeCloser = (*BidiStream)(nil)
 // When the response loop terminates (EOF or error), the request loop also exits.
 type BidiStream struct {
 	id     string
-	stream *Stream
 	method *Method
+	stream common.DynamicBidiStream
 
-	getStream func() (common.DynamicBidiStream, error)
+	shouldStart,
+	shouldStop func(ctx context.Context, env shared.Env) (bool, error)
 
-	// sendDone is closed by Send() when the response loop exits so that
-	// Recv() can exit cleanly instead of blocking on recvCh forever.
-	sendDone chan struct{}
-
-	ctx    context.Context
-	cancel context.CancelFunc
+	ctx     context.Context
+	cancel  context.CancelCauseFunc
+	runSend func()
 }
 
 // NewBidiStream is called by NewCaller for bidirectional-streaming RPCs.
 func NewBidiStream(node *flowv1beta1.Stream, stream *Stream, method *Method) *BidiStream {
 	return &BidiStream{
-		id:     GetID(node),
-		stream: stream,
+		id:     GetNodeIdent(node),
 		method: method,
 
-		sendDone: make(chan struct{}),
+		shouldStart: stream.ShouldStart,
+		shouldStop:  stream.ShouldStart,
 	}
 }
 
-func (s *BidiStream) Compile(run shared.Runtime) error {
-	conn, err := s.method.GetConnector(run)
+func (s *BidiStream) Compile(ctx context.Context, env shared.Env) error {
+	ctx, client, err := s.method.GetClient(ctx, env)
 	if err != nil {
 		return err
 	}
 
-	method, err := s.method.GetDescriptor(run)
+	ctx, cancel := context.WithCancelCause(ctx)
+
+	stream, err := client.CallBidiStream(ctx, s.method.FullName())
 	if err != nil {
+		cancel(err)
 		return err
 	}
 
-	ctx, client, err := conn.GetClient(run.Context())
-	if err != nil {
-		return err
-	}
+	s.runSend = sync.OnceFunc(func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
 
-	s.ctx, s.cancel = context.WithCancel(ctx)
-	s.getStream = sync.OnceValues(func() (common.DynamicBidiStream, error) {
-		stream, err := client.CallBidiStream(s.ctx, method.FullName())
-		if err != nil {
-			s.cancel()
-			return nil, err
+			req, err := s.method.EvalRequest(ctx, env)
+			if err != nil {
+				cancel(err)
+				return
+			}
+
+			err = s.stream.SendMsg(req)
+			if err != nil {
+				cancel(err)
+				log.FromCtx(ctx).Info("BidiStream send EOF.", slog.String("id", s.id))
+				return
+			}
 		}
-		return stream, nil
 	})
+
+	s.stream = stream
+	s.ctx = ctx
+	s.cancel = cancel
 
 	return nil
 }
 
-// Recv accepts one executor trigger per cycle, evaluates and sends one request.
-// It exits when Send() terminates (sendDone is closed).
-func (s *BidiStream) Recv() (shared.RecvFunc, bool) {
-	return func(run shared.Runtime, recvCh <-chan any) error {
-		log.FromCtx(s.ctx).Info("BidiStream recv running...", slog.String("id", s.id))
-		defer log.FromCtx(s.ctx).Info("BidiStream recv done.", slog.String("id", s.id))
+func (s *BidiStream) Run(ctx context.Context, env shared.Env, pipe shared.Pipe) error {
+	defer log.FromCtx(ctx).Info("BidiStream done.", slog.String("id", s.id))
+	defer s.cancel(nil)
 
-		// loop:
-		for {
-			select {
-			case <-s.ctx.Done():
-				return context.Cause(s.ctx)
-			case <-s.sendDone:
-				s.cancel()
-				return nil
-			case <-recvCh:
-				// shouldStart, err := s.stream.ShouldStart(run)
-				// if err != nil {
-				// 	return err
-				// } else if !shouldStart {
-				// 	continue loop
-				// }
+	go s.runSend()
 
-				stream, err := s.getStream()
-				if err != nil {
-					return err
-				}
+	var started, closed bool
 
-				req, err := s.method.EvalRequest(run)
-				if err != nil {
-					return fmt.Errorf("%s: eval request: %w", s.id, err)
-				}
-
-				err = stream.SendMsg(req)
-				if err != nil {
-					if errors.Is(err, io.EOF) {
-						return nil
-					}
-					return fmt.Errorf("%s: send: %w", s.id, err)
-				}
+	return pipe.Run(ctx, func(ctx context.Context, value any) (any, error) {
+		if closed {
+			return &flowv1beta1.Runtime_EOF{}, nil
+		} else if !started {
+			shouldStart, err := s.shouldStart(ctx, env)
+			if err != nil {
+				return nil, err
+			} else if !shouldStart {
+				return nil, nil
 			}
+
+			started = true
+
+			log.FromCtx(ctx).Info("BidiStream send started...", slog.String("id", s.id))
 		}
-	}, true
-}
 
-// Send independently receives responses from the gRPC stream and emits each
-// as an event. It is completely decoupled from Recv. Closing sendDone signals
-// Recv to exit when this goroutine terminates.
-func (s *BidiStream) Send() (shared.SendFunc, bool) {
-	return func(run shared.Runtime, sendCh chan<- ref.Val) error {
-		log.FromCtx(s.ctx).Info("BidiStream send running...", slog.String("id", s.id))
-		defer func() {
-			close(s.sendDone)
-			log.FromCtx(s.ctx).Info("BidiStream send done.", slog.String("id", s.id))
-		}()
-
-		env, err := run.Env()
+		res, err := s.stream.RecvMsg()
 		if err != nil {
-			return err
+			s.cancel(err)
+
+			if errors.Is(err, io.EOF) {
+				log.FromCtx(ctx).Info("BidiStream recv EOF.", slog.String("id", s.id))
+
+				closed = true
+				return &flowv1beta1.Runtime_EOF{}, nil
+			}
+
+			return nil, err
 		}
 
-		for {
-			// shouldStop, err := s.stream.ShouldStop(run)
-			// if err != nil {
-			// 	return err
-			// } else if shouldStop {
-			// 	return nil
-			// }
-
-			stream, err := s.getStream()
-			if err != nil {
-				return err
-			}
-
-			msg, err := stream.RecvMsg()
-			if err != nil {
-				if errors.Is(err, io.EOF) {
-					select {
-					case <-s.ctx.Done():
-						return context.Cause(s.ctx)
-					case sendCh <- env.TypeAdapter().NativeToValue(&flowv1beta1.Runtime_EOF{}):
-					}
-					return nil
-				}
-				return fmt.Errorf("%s: recv: %w", s.id, err)
-			}
-
-			select {
-			case <-s.ctx.Done():
-				return context.Cause(s.ctx)
-			case sendCh <- env.TypeAdapter().NativeToValue(msg):
-			}
-		}
-	}, true
+		return res, nil
+	})
 }
-
-func (s *BidiStream) Close() error {
-	s.cancel()
-	return context.Cause(s.ctx)
-}
-
-func (s *BidiStream) Eval() (shared.EvalFunc, bool) { return nil, false }
-func (s *BidiStream) HasCached() (ref.Val, bool)    { return nil, false }

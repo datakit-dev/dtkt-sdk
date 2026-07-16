@@ -7,12 +7,20 @@ import "google/api/annotations.proto";
 
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/blob/v1beta1";
 
+// BucketService provides operations to interact with buckets within a storage location.
+service BucketService {
+  // Retrieves a list of buckets.
+  rpc ListBuckets(ListBucketsRequest) returns (ListBucketsResponse) {
+    option (google.api.http) = {get: "/v1beta1/buckets"};
+  }
+}
+
 // BlobService provides operations to interact with blobs within a storage location.
 service BlobService {
-  // Retrieves a list of files provided by service.
+  // Retrieves a list of blobs.
   rpc ListBlobs(ListBlobsRequest) returns (ListBlobsResponse) {
     option (google.api.http) = {
-      get: "/v1beta1/{bucket=blobBuckets/*}/blobs"
+      get: "/v1beta1/{bucket=buckets/*}/blobs"
       additional_bindings: {get: "/v1beta1/blobs"}
     };
   }
@@ -20,27 +28,15 @@ service BlobService {
   // Retrieves attributes for the blob stored at key.
   rpc GetBlob(GetBlobRequest) returns (GetBlobResponse) {
     option (google.api.http) = {
-      get: "/v1beta1/{bucket=blobBuckets/*}/blobs/{key=**}"
+      get: "/v1beta1/{bucket=buckets/*}/blobs/{key=**}"
       additional_bindings: {get: "/v1beta1/blobs/{key=**}"}
-    };
-  }
-
-  // Writes or overwrites the blob stored at key.
-  rpc WriteBlob(WriteBlobRequest) returns (WriteBlobResponse) {
-    option (google.api.http) = {
-      put: "/v1beta1/{bucket=blobBuckets/*}/blobs/{key=**}"
-      body: "*"
-      additional_bindings: {
-        put: "/v1beta1/blobs/{key=**}"
-        body: "*"
-      }
     };
   }
 
   // Deletes the blob stored at key.
   rpc DeleteBlob(DeleteBlobRequest) returns (DeleteBlobResponse) {
     option (google.api.http) = {
-      delete: "/v1beta1/{bucket=blobBuckets/*}/blobs/{key=**}"
+      delete: "/v1beta1/{bucket=buckets/*}/blobs/{key=**}"
       additional_bindings: {delete: "/v1beta1/blobs/{key=**}"}
     };
   }
@@ -48,7 +44,7 @@ service BlobService {
   // Copies a blob from source to destination key.
   rpc CopyBlob(CopyBlobRequest) returns (CopyBlobResponse) {
     option (google.api.http) = {
-      post: "/v1beta1/{destination_bucket=blobBuckets/*}/blobs:copy"
+      post: "/v1beta1/{destination_bucket=buckets/*}/blobs:copy"
       body: "*"
       additional_bindings: {
         post: "/v1beta1/blobs:copy"
@@ -60,7 +56,7 @@ service BlobService {
   // Generates a signed URL for accessing the blob.
   rpc GenerateSignedURL(GenerateSignedURLRequest) returns (GenerateSignedURLResponse) {
     option (google.api.http) = {
-      post: "/v1beta1/{bucket=blobBuckets/*}/blobs/{key=**}:signUrl"
+      post: "/v1beta1/{bucket=buckets/*}/blobs/{key=**}:signUrl"
       body: "*"
       additional_bindings: {
         post: "/v1beta1/blobs/{key=**}:signUrl"
@@ -69,11 +65,27 @@ service BlobService {
     };
   }
 
-  // ReadBlobLines streams lines of blob with requested key and options.
-  rpc ReadBlobLines(ReadBlobLinesRequest) returns (stream ReadBlobLinesResponse);
+  // Retrieves the contents of a blob as a stream of responses containing a
+  // portion of the requested bytes. The stream ends when all data has been
+  // sent or the end of contents has been reached (may be less than requested).
+  rpc ReadBlob(ReadBlobRequest) returns (stream ReadBlobResponse);
 
-  // ReadBlobRange streams chunks of blob with requested key and options.
-  rpc ReadBlobRange(ReadBlobRangeRequest) returns (stream ReadBlobRangeResponse);
+  // Writes the contents of a blob as a stream of requests containing a portion
+  // of bytes to be written. The stream ends when the request specifies it has
+  // finished sending.
+  rpc WriteBlob(stream WriteBlobRequest) returns (WriteBlobResponse) {
+    option (google.api.http) = {
+      put: "/v1beta1/{bucket=buckets/*}/blobs/{key=**}"
+      body: "*"
+      additional_bindings: {
+        put: "/v1beta1/blobs/{key=**}"
+        body: "*"
+      }
+    };
+  }
+
+  // Streams lines of data format and mode of blob content.
+  rpc ReadBlobLines(ReadBlobLinesRequest) returns (stream ReadBlobLinesResponse);
 
   // WriteBlobLines streams lines into blob with requested key and options.
   rpc WriteBlobLines(stream WriteBlobLinesRequest) returns (WriteBlobLinesResponse);

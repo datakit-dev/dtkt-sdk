@@ -1,6 +1,7 @@
 package v1beta1
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"path"
@@ -14,7 +15,7 @@ import (
 	sharedv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/resource"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
-	"github.com/santhosh-tekuri/jsonschema/v6"
+	"github.com/google/jsonschema-go/jsonschema"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -28,16 +29,13 @@ const (
 
 var (
 	defaultTypeRegistry = sync.OnceValue(func() *TypeRegistry {
-		return NewTypeRegistry(defaultTypeSyncer(), defaultTypeBaseUri())
-	})
-	defaultTypeSyncer = sync.OnceValue(func() *MemoryTypeSyncer {
-		return &MemoryTypeSyncer{}
-	})
-	defaultTypeBaseUri = sync.OnceValue(func() *url.URL {
-		return &url.URL{
+		return NewTypeRegistry(defaultTypeSyncer(), &url.URL{
 			Scheme: "memory",
 			Path:   "/types",
-		}
+		})
+	})
+	defaultTypeSyncer = sync.OnceValue(func() *MemoryTypeSyncer {
+		return NewMemoryTypeSyncer()
 	})
 )
 
@@ -45,9 +43,9 @@ type (
 	// TypeRegistry contains type schemas which may or may not be native protobuf
 	// types. Each entry contains a resolved type schema.
 	TypeRegistry struct {
-		syncer   TypeSyncer
-		compiler *jsonschema.Compiler
-		baseUri  *url.URL
+		loader  common.JSONSchemaLoaderFunc
+		syncer  TypeSyncer
+		baseUri *url.URL
 
 		protoGen bool
 		protoPkg string
@@ -72,38 +70,41 @@ type (
 )
 
 func NewTypeRegistry(syncer TypeSyncer, baseUri *url.URL, opts ...TypeRegistryOption) *TypeRegistry {
-	compiler := jsonschema.NewCompiler()
-	compiler.UseLoader(common.JSONSchemaLoaderFunc(func(uri string) (any, error) {
-		schemaUri, err := url.Parse(uri)
-		if err != nil {
-			return nil, err
-		}
-
-		if !strings.HasPrefix(schemaUri.String(), baseUri.String()) {
-			uri = baseUri.JoinPath(schemaUri.Path).String()
-		}
-
-		if !strings.HasSuffix(uri, JSONSchemaFileExt) {
-			uri += JSONSchemaFileExt
-		}
-
-		path, err := TypePathFromUri(uri)
-		if err != nil {
-			return nil, err
-		}
-
-		schema, err := syncer.GetType(path)
-		if err != nil {
-			return nil, err
-		}
-
-		return schema.JsonSchema.AsMap(), nil
-	}))
-
 	reg := &TypeRegistry{
-		syncer:   syncer,
-		compiler: compiler,
-		baseUri:  baseUri,
+		syncer:  syncer,
+		baseUri: baseUri,
+		loader: func(uri *url.URL) (*jsonschema.Schema, error) {
+			if !strings.HasPrefix(uri.String(), baseUri.String()) {
+				uri = baseUri.JoinPath(uri.Path)
+			}
+
+			if !strings.HasSuffix(uri.Path, JSONSchemaFileExt) {
+				uri.Path += JSONSchemaFileExt
+			}
+
+			path, err := TypePathFromUri(uri.String())
+			if err != nil {
+				return nil, err
+			}
+
+			typ, err := syncer.GetType(path)
+			if err != nil {
+				return nil, err
+			}
+
+			b, err := typ.GetJsonSchema().MarshalJSON()
+			if err != nil {
+				return nil, err
+			}
+
+			var schema jsonschema.Schema
+			err = json.Unmarshal(b, &schema)
+			if err != nil {
+				return nil, err
+			}
+
+			return &schema, nil
+		},
 	}
 
 	for _, opt := range opts {
@@ -115,13 +116,8 @@ func NewTypeRegistry(syncer TypeSyncer, baseUri *url.URL, opts ...TypeRegistryOp
 	return reg
 }
 
-func WithRuntimeProtoGen(protoPkg string) TypeRegistryOption {
-	return func(r *TypeRegistry) {
-		if resource.ValidProtoNameRegex().MatchString(protoPkg) {
-			r.protoGen = true
-			r.protoPkg = protoPkg
-		}
-	}
+func NewMemoryTypeSyncer() *MemoryTypeSyncer {
+	return &MemoryTypeSyncer{}
 }
 
 func DefaultTypeRegistry() *TypeRegistry {
@@ -130,6 +126,15 @@ func DefaultTypeRegistry() *TypeRegistry {
 
 func DefaultTypeSyncer() *MemoryTypeSyncer {
 	return defaultTypeSyncer()
+}
+
+func WithRuntimeProtoGen(protoPkg string) TypeRegistryOption {
+	return func(r *TypeRegistry) {
+		if resource.ValidProtoNameRegex().MatchString(protoPkg) {
+			r.protoGen = true
+			r.protoPkg = protoPkg
+		}
+	}
 }
 
 func (r *TypeRegistry) BaseUri() *url.URL {
@@ -141,12 +146,16 @@ func (r *TypeRegistry) Syncer() TypeSyncer {
 	return r.syncer
 }
 
-func (r *TypeRegistry) Compiler() *jsonschema.Compiler {
-	return r.compiler
+func (r *TypeRegistry) SchemaLoader() common.JSONSchemaLoaderFunc {
+	return r.loader
 }
 
 func (r *TypeRegistry) LoadResolverTypes(resolver ProtoResolver) (err error) {
 	resolver.RangeMessages(func(mt protoreflect.MessageType) bool {
+		if t, err := r.syncer.GetType(string(mt.Descriptor().FullName())); err == nil && t != nil {
+			return true
+		}
+
 		_, err = NewTypeSchemaForProto(r, mt.New().Interface())
 		return err == nil
 	})

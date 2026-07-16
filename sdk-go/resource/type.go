@@ -46,7 +46,7 @@ func (t NameType) GetName(input string) (Name, error) {
 	var name Name
 	for i, submatch := range matches {
 		if i > 0 && subexpNames[i] != "" && submatch != "" {
-			name = append(name, Pair{subexpNames[i], submatch})
+			name = append(name, Segment{subexpNames[i], submatch})
 		}
 	}
 
@@ -96,10 +96,4 @@ func (t NameType) Pattern() Pattern {
 
 func (t NameType) String() string {
 	return string(t)
-}
-
-func init() {
-	for typ := range coreHierarchy {
-		typ.Pattern().loadOrStore()
-	}
 }

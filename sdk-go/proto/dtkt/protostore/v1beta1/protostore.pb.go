@@ -190,6 +190,54 @@ func (x *Edge) GetField() string {
 	return ""
 }
 
+type SearchIndex struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// CEL expression which must resolve to a string value containing text
+	// contents to be indexed for full-text and/or semantic search.
+	// The message of the declared option is `this` in the CEL expression context.
+	// Example: contents_expr: "this.title + ' ' + this.description"
+	ContentsExpr  *string `protobuf:"bytes,1,opt,name=contents_expr,json=contentsExpr,proto3,oneof" json:"contents_expr,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SearchIndex) Reset() {
+	*x = SearchIndex{}
+	mi := &file_dtkt_protostore_v1beta1_protostore_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchIndex) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchIndex) ProtoMessage() {}
+
+func (x *SearchIndex) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_protostore_v1beta1_protostore_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchIndex.ProtoReflect.Descriptor instead.
+func (*SearchIndex) Descriptor() ([]byte, []int) {
+	return file_dtkt_protostore_v1beta1_protostore_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *SearchIndex) GetContentsExpr() string {
+	if x != nil && x.ContentsExpr != nil {
+		return *x.ContentsExpr
+	}
+	return ""
+}
+
 var file_dtkt_protostore_v1beta1_protostore_proto_extTypes = []protoimpl.ExtensionInfo{
 	{
 		ExtendedType:  (*descriptorpb.MessageOptions)(nil),
@@ -197,6 +245,14 @@ var file_dtkt_protostore_v1beta1_protostore_proto_extTypes = []protoimpl.Extensi
 		Field:         50006,
 		Name:          "dtkt.protostore.v1beta1.edges",
 		Tag:           "bytes,50006,rep,name=edges",
+		Filename:      "dtkt/protostore/v1beta1/protostore.proto",
+	},
+	{
+		ExtendedType:  (*descriptorpb.MessageOptions)(nil),
+		ExtensionType: (*SearchIndex)(nil),
+		Field:         50007,
+		Name:          "dtkt.protostore.v1beta1.search_index",
+		Tag:           "bytes,50007,opt,name=search_index",
 		Filename:      "dtkt/protostore/v1beta1/protostore.proto",
 	},
 	{
@@ -211,16 +267,16 @@ var file_dtkt_protostore_v1beta1_protostore_proto_extTypes = []protoimpl.Extensi
 
 // Extension fields to descriptorpb.MessageOptions.
 var (
-	// repeated Index
-	//
 	// repeated dtkt.protostore.v1beta1.Edge edges = 50006;
 	E_Edges = &file_dtkt_protostore_v1beta1_protostore_proto_extTypes[0]
+	// optional dtkt.protostore.v1beta1.SearchIndex search_index = 50007;
+	E_SearchIndex = &file_dtkt_protostore_v1beta1_protostore_proto_extTypes[1]
 )
 
 // Extension fields to descriptorpb.FieldOptions.
 var (
 	// optional dtkt.protostore.v1beta1.Field field = 50005;
-	E_Field = &file_dtkt_protostore_v1beta1_protostore_proto_extTypes[1]
+	E_Field = &file_dtkt_protostore_v1beta1_protostore_proto_extTypes[2]
 )
 
 var File_dtkt_protostore_v1beta1_protostore_proto protoreflect.FileDescriptor
@@ -256,8 +312,12 @@ const file_dtkt_protostore_v1beta1_protostore_proto_rawDesc = "" +
 	"\a_uniqueB\x06\n" +
 	"\x04_refB\v\n" +
 	"\t_requiredB\b\n" +
-	"\x06_field:V\n" +
-	"\x05edges\x12\x1f.google.protobuf.MessageOptions\x18ֆ\x03 \x03(\v2\x1d.dtkt.protostore.v1beta1.EdgeR\x05edges:X\n" +
+	"\x06_field\"I\n" +
+	"\vSearchIndex\x12(\n" +
+	"\rcontents_expr\x18\x01 \x01(\tH\x00R\fcontentsExpr\x88\x01\x01B\x10\n" +
+	"\x0e_contents_expr:V\n" +
+	"\x05edges\x12\x1f.google.protobuf.MessageOptions\x18ֆ\x03 \x03(\v2\x1d.dtkt.protostore.v1beta1.EdgeR\x05edges:j\n" +
+	"\fsearch_index\x12\x1f.google.protobuf.MessageOptions\x18׆\x03 \x01(\v2$.dtkt.protostore.v1beta1.SearchIndexR\vsearchIndex:X\n" +
 	"\x05field\x12\x1d.google.protobuf.FieldOptions\x18Ն\x03 \x01(\v2\x1e.dtkt.protostore.v1beta1.FieldR\x05field\x88\x01\x01B\x86\x02\n" +
 	"\x1dproto.dtkt.protostore.v1beta1B\x0fProtostoreProtoP\x01ZVgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protostore/v1beta1;protostorev1beta1\xa2\x02\x03DPX\xaa\x02\x17Dtkt.Protostore.V1beta1\xca\x02\x17Dtkt\\Protostore\\V1beta1\xe2\x02#Dtkt\\Protostore\\V1beta1\\GPBMetadata\xea\x02\x19Dtkt::Protostore::V1beta1b\x06proto3"
 
@@ -273,22 +333,25 @@ func file_dtkt_protostore_v1beta1_protostore_proto_rawDescGZIP() []byte {
 	return file_dtkt_protostore_v1beta1_protostore_proto_rawDescData
 }
 
-var file_dtkt_protostore_v1beta1_protostore_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_dtkt_protostore_v1beta1_protostore_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_dtkt_protostore_v1beta1_protostore_proto_goTypes = []any{
 	(*Field)(nil),                       // 0: dtkt.protostore.v1beta1.Field
 	(*Edge)(nil),                        // 1: dtkt.protostore.v1beta1.Edge
-	(*descriptorpb.MessageOptions)(nil), // 2: google.protobuf.MessageOptions
-	(*descriptorpb.FieldOptions)(nil),   // 3: google.protobuf.FieldOptions
+	(*SearchIndex)(nil),                 // 2: dtkt.protostore.v1beta1.SearchIndex
+	(*descriptorpb.MessageOptions)(nil), // 3: google.protobuf.MessageOptions
+	(*descriptorpb.FieldOptions)(nil),   // 4: google.protobuf.FieldOptions
 }
 var file_dtkt_protostore_v1beta1_protostore_proto_depIdxs = []int32{
-	2, // 0: dtkt.protostore.v1beta1.edges:extendee -> google.protobuf.MessageOptions
-	3, // 1: dtkt.protostore.v1beta1.field:extendee -> google.protobuf.FieldOptions
-	1, // 2: dtkt.protostore.v1beta1.edges:type_name -> dtkt.protostore.v1beta1.Edge
-	0, // 3: dtkt.protostore.v1beta1.field:type_name -> dtkt.protostore.v1beta1.Field
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	2, // [2:4] is the sub-list for extension type_name
-	0, // [0:2] is the sub-list for extension extendee
+	3, // 0: dtkt.protostore.v1beta1.edges:extendee -> google.protobuf.MessageOptions
+	3, // 1: dtkt.protostore.v1beta1.search_index:extendee -> google.protobuf.MessageOptions
+	4, // 2: dtkt.protostore.v1beta1.field:extendee -> google.protobuf.FieldOptions
+	1, // 3: dtkt.protostore.v1beta1.edges:type_name -> dtkt.protostore.v1beta1.Edge
+	2, // 4: dtkt.protostore.v1beta1.search_index:type_name -> dtkt.protostore.v1beta1.SearchIndex
+	0, // 5: dtkt.protostore.v1beta1.field:type_name -> dtkt.protostore.v1beta1.Field
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	3, // [3:6] is the sub-list for extension type_name
+	0, // [0:3] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
 }
 
@@ -299,14 +362,15 @@ func file_dtkt_protostore_v1beta1_protostore_proto_init() {
 	}
 	file_dtkt_protostore_v1beta1_protostore_proto_msgTypes[0].OneofWrappers = []any{}
 	file_dtkt_protostore_v1beta1_protostore_proto_msgTypes[1].OneofWrappers = []any{}
+	file_dtkt_protostore_v1beta1_protostore_proto_msgTypes[2].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_protostore_v1beta1_protostore_proto_rawDesc), len(file_dtkt_protostore_v1beta1_protostore_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
-			NumExtensions: 2,
+			NumMessages:   3,
+			NumExtensions: 3,
 			NumServices:   0,
 		},
 		GoTypes:           file_dtkt_protostore_v1beta1_protostore_proto_goTypes,

@@ -63,8 +63,9 @@ message GetActionRequest {
     (buf.validate.field).required = true,
     (dtkt.protoform.v1beta1.field).title = "Select an action",
     (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.action.v1beta1.ActionService.ListActions",
-    (dtkt.protoform.v1beta1.field).select.key_expr = "this.actions.map(i, i.display_name)",
-    (dtkt.protoform.v1beta1.field).select.val_expr = "this.actions.map(i, i.name)"
+    (dtkt.protoform.v1beta1.field).select.response_field = "actions",
+    (dtkt.protoform.v1beta1.field).select.label_expr = "this.display_name",
+    (dtkt.protoform.v1beta1.field).select.value_expr = "this.name"
   ];
 }
 
@@ -79,8 +80,9 @@ message ExecuteActionRequest {
     (buf.validate.field).required = true,
     (dtkt.protoform.v1beta1.field).title = "Select an action to execute",
     (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.action.v1beta1.ActionService.ListActions",
-    (dtkt.protoform.v1beta1.field).select.key_expr = "this.actions.map(i, i.display_name)",
-    (dtkt.protoform.v1beta1.field).select.val_expr = "this.actions.map(i, i.name)"
+    (dtkt.protoform.v1beta1.field).select.response_field = "actions",
+    (dtkt.protoform.v1beta1.field).select.label_expr = "this.display_name",
+    (dtkt.protoform.v1beta1.field).select.value_expr = "this.name"
   ];
 
   // The input data to pass to the action. The required fields depend on the action's input schema.

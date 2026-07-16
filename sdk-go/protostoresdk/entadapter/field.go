@@ -30,51 +30,51 @@ type (
 
 func NewField(field *v1beta1.Field, opts ...FieldOption) *Field {
 	var (
-		desc *ent.Descriptor
-		a    = Annotation{
+		descriptor *ent.Descriptor
+		annotation = Annotation{
 			ID: uuid.NewString(),
 		}
 	)
 	if field.Descriptor().IsList() {
-		a.IsList = true
+		annotation.IsList = true
 
 		if field.Descriptor().Enum() != nil {
-			a.ProtoName = string(field.Descriptor().Enum().FullName())
-			a.IsEnum = true
+			annotation.ProtoName = string(field.Descriptor().Enum().FullName())
+			annotation.IsEnum = true
 		} else if field.Descriptor().Message() != nil {
-			a.ProtoName = string(field.Descriptor().Message().FullName())
-			a.IsMessage = true
+			annotation.ProtoName = string(field.Descriptor().Message().FullName())
+			annotation.IsMessage = true
 		}
 
-		desc = ent.
+		descriptor = ent.
 			JSON(field.Proto().GetName(), reflect.Zero(field.Type()).Interface()).
-			Annotations(a).
+			Annotations(annotation).
 			Descriptor()
 	} else if field.Descriptor().IsMap() {
-		a.IsMap = true
+		annotation.IsMap = true
 
 		if field.Descriptor().MapValue().Enum() != nil {
-			a.ProtoName = string(field.Descriptor().MapValue().Enum().FullName())
-			a.IsEnum = true
+			annotation.ProtoName = string(field.Descriptor().MapValue().Enum().FullName())
+			annotation.IsEnum = true
 		} else if field.Descriptor().MapValue().Message() != nil {
-			a.ProtoName = string(field.Descriptor().MapValue().Message().FullName())
-			a.IsMessage = true
+			annotation.ProtoName = string(field.Descriptor().MapValue().Message().FullName())
+			annotation.IsMessage = true
 		}
 
-		desc = ent.
+		descriptor = ent.
 			JSON(field.Proto().GetName(), reflect.Zero(field.Type()).Interface()).
-			Annotations(a).
+			Annotations(annotation).
 			Descriptor()
 	} else if field.Descriptor().Message() != nil {
-		a.ProtoName = string(field.Descriptor().Message().FullName())
-		a.IsMessage = true
+		annotation.ProtoName = string(field.Descriptor().Message().FullName())
+		annotation.IsMessage = true
 
-		desc = ent.
+		descriptor = ent.
 			JSON(field.Proto().GetName(), reflect.Zero(field.Type()).Interface()).
-			Annotations(a).
+			Annotations(annotation).
 			Descriptor()
 	} else if field.Descriptor().Enum() != nil {
-		desc = ent.
+		descriptor = ent.
 			Int32(field.Proto().GetName()).
 			GoType(reflect.Zero(field.Type()).Interface()).
 			Annotations(Annotation{
@@ -85,34 +85,34 @@ func NewField(field *v1beta1.Field, opts ...FieldOption) *Field {
 	} else {
 		switch field.Descriptor().Kind() {
 		case protoreflect.BoolKind:
-			desc = ent.Bool(field.Proto().GetName()).Descriptor()
+			descriptor = ent.Bool(field.Proto().GetName()).Descriptor()
 		case protoreflect.Int32Kind, protoreflect.Sint32Kind, protoreflect.Sfixed32Kind:
-			desc = ent.Int32(field.Proto().GetName()).Descriptor()
+			descriptor = ent.Int32(field.Proto().GetName()).Descriptor()
 		case protoreflect.Int64Kind, protoreflect.Sint64Kind, protoreflect.Sfixed64Kind:
-			desc = ent.Int64(field.Proto().GetName()).Descriptor()
+			descriptor = ent.Int64(field.Proto().GetName()).Descriptor()
 		case protoreflect.Uint32Kind, protoreflect.Fixed32Kind:
-			desc = ent.Uint32(field.Proto().GetName()).Descriptor()
+			descriptor = ent.Uint32(field.Proto().GetName()).Descriptor()
 		case protoreflect.Uint64Kind, protoreflect.Fixed64Kind:
-			desc = ent.Uint64(field.Proto().GetName()).Descriptor()
+			descriptor = ent.Uint64(field.Proto().GetName()).Descriptor()
 		case protoreflect.FloatKind:
-			desc = ent.Float32(field.Proto().GetName()).Descriptor()
+			descriptor = ent.Float32(field.Proto().GetName()).Descriptor()
 		case protoreflect.DoubleKind:
-			desc = ent.Float(field.Proto().GetName()).Descriptor()
+			descriptor = ent.Float(field.Proto().GetName()).Descriptor()
 		case protoreflect.StringKind:
-			desc = ent.String(field.Proto().GetName()).Descriptor()
+			descriptor = ent.String(field.Proto().GetName()).Descriptor()
 		case protoreflect.BytesKind:
-			desc = ent.Bytes(field.Proto().GetName()).Descriptor()
+			descriptor = ent.Bytes(field.Proto().GetName()).Descriptor()
 		}
 	}
 
 	f := &Field{
 		field: field,
-		desc:  desc,
+		desc:  descriptor,
 	}
 
 	f.applyOptions(opts...)
 
-	fieldCache.Store(a.ID, f)
+	fieldCache.Store(annotation.ID, f)
 
 	return f
 }

@@ -35,6 +35,8 @@ const (
 	IntegrationServiceName = "dtkt.core.v1.IntegrationService"
 	// ReflectServiceName is the fully-qualified name of the ReflectService service.
 	ReflectServiceName = "dtkt.core.v1.ReflectService"
+	// SearchServiceName is the fully-qualified name of the SearchService service.
+	SearchServiceName = "dtkt.core.v1.SearchService"
 	// EncryptionServiceName is the fully-qualified name of the EncryptionService service.
 	EncryptionServiceName = "dtkt.core.v1.EncryptionService"
 )
@@ -155,6 +157,9 @@ const (
 	// ReflectServiceListTypesProcedure is the fully-qualified name of the ReflectService's ListTypes
 	// RPC.
 	ReflectServiceListTypesProcedure = "/dtkt.core.v1.ReflectService/ListTypes"
+	// SearchServiceListSearchResultsProcedure is the fully-qualified name of the SearchService's
+	// ListSearchResults RPC.
+	SearchServiceListSearchResultsProcedure = "/dtkt.core.v1.SearchService/ListSearchResults"
 	// EncryptionServiceEncryptProcedure is the fully-qualified name of the EncryptionService's Encrypt
 	// RPC.
 	EncryptionServiceEncryptProcedure = "/dtkt.core.v1.EncryptionService/Encrypt"
@@ -1511,6 +1516,76 @@ func (UnimplementedReflectServiceHandler) ListMethods(context.Context, *connect.
 
 func (UnimplementedReflectServiceHandler) ListTypes(context.Context, *connect.Request[v1.ListTypesRequest]) (*connect.Response[v1.ListTypesResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.ReflectService.ListTypes is not implemented"))
+}
+
+// SearchServiceClient is a client for the dtkt.core.v1.SearchService service.
+type SearchServiceClient interface {
+	ListSearchResults(context.Context, *connect.Request[v1.ListSearchResultsRequest]) (*connect.Response[v1.ListSearchResultsResponse], error)
+}
+
+// NewSearchServiceClient constructs a client for the dtkt.core.v1.SearchService service. By
+// default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
+// and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
+// connect.WithGRPC() or connect.WithGRPCWeb() options.
+//
+// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
+// http://api.acme.com or https://acme.com/grpc).
+func NewSearchServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) SearchServiceClient {
+	baseURL = strings.TrimRight(baseURL, "/")
+	searchServiceMethods := v1.File_dtkt_core_v1_services_proto.Services().ByName("SearchService").Methods()
+	return &searchServiceClient{
+		listSearchResults: connect.NewClient[v1.ListSearchResultsRequest, v1.ListSearchResultsResponse](
+			httpClient,
+			baseURL+SearchServiceListSearchResultsProcedure,
+			connect.WithSchema(searchServiceMethods.ByName("ListSearchResults")),
+			connect.WithClientOptions(opts...),
+		),
+	}
+}
+
+// searchServiceClient implements SearchServiceClient.
+type searchServiceClient struct {
+	listSearchResults *connect.Client[v1.ListSearchResultsRequest, v1.ListSearchResultsResponse]
+}
+
+// ListSearchResults calls dtkt.core.v1.SearchService.ListSearchResults.
+func (c *searchServiceClient) ListSearchResults(ctx context.Context, req *connect.Request[v1.ListSearchResultsRequest]) (*connect.Response[v1.ListSearchResultsResponse], error) {
+	return c.listSearchResults.CallUnary(ctx, req)
+}
+
+// SearchServiceHandler is an implementation of the dtkt.core.v1.SearchService service.
+type SearchServiceHandler interface {
+	ListSearchResults(context.Context, *connect.Request[v1.ListSearchResultsRequest]) (*connect.Response[v1.ListSearchResultsResponse], error)
+}
+
+// NewSearchServiceHandler builds an HTTP handler from the service implementation. It returns the
+// path on which to mount the handler and the handler itself.
+//
+// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
+// and JSON codecs. They also support gzip compression.
+func NewSearchServiceHandler(svc SearchServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	searchServiceMethods := v1.File_dtkt_core_v1_services_proto.Services().ByName("SearchService").Methods()
+	searchServiceListSearchResultsHandler := connect.NewUnaryHandler(
+		SearchServiceListSearchResultsProcedure,
+		svc.ListSearchResults,
+		connect.WithSchema(searchServiceMethods.ByName("ListSearchResults")),
+		connect.WithHandlerOptions(opts...),
+	)
+	return "/dtkt.core.v1.SearchService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case SearchServiceListSearchResultsProcedure:
+			searchServiceListSearchResultsHandler.ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
+}
+
+// UnimplementedSearchServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedSearchServiceHandler struct{}
+
+func (UnimplementedSearchServiceHandler) ListSearchResults(context.Context, *connect.Request[v1.ListSearchResultsRequest]) (*connect.Response[v1.ListSearchResultsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.core.v1.SearchService.ListSearchResults is not implemented"))
 }
 
 // EncryptionServiceClient is a client for the dtkt.core.v1.EncryptionService service.

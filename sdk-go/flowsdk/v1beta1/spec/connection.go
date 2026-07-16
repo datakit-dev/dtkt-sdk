@@ -1,25 +1,29 @@
 package spec
 
 import (
+	"context"
+	"fmt"
 	"slices"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/api"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
-	"github.com/google/cel-go/common/types"
-	"github.com/google/cel-go/common/types/ref"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var _ shared.ExecNode = (*Connection)(nil)
 
 type Connection struct {
-	node *flowv1beta1.Connection
-	eval shared.EvalFunc
+	ident string
+	node  *flowv1beta1.Connection
+	conn  shared.Connector
 }
 
-func NewConnection(_ shared.Env, node *flowv1beta1.Connection) *Connection {
-	return &Connection{node: node}
+func NewConnection(env shared.Env, node *flowv1beta1.Connection) *Connection {
+	return &Connection{
+		ident: GetNodeIdent(node),
+		node:  node,
+	}
 }
 
 func ValidConnectionServices(resolver shared.Resolver) (names []string) {
@@ -35,27 +39,17 @@ func ValidConnectionServices(resolver shared.Resolver) (names []string) {
 	return
 }
 
-func (c *Connection) Compile(run shared.Runtime) error {
-	eval, err := CompileConnection(run, c.node)
+func (c *Connection) Compile(ctx context.Context, env shared.Env) error {
+	conn, err := env.Connector(c.ident)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %s", c.ident, err)
 	}
-	c.eval = eval.Eval
+	c.conn = conn
 	return nil
 }
 
-func (c *Connection) Eval() (shared.EvalFunc, bool) { return c.eval, true }
-func (c *Connection) Recv() (shared.RecvFunc, bool) { return nil, false }
-func (c *Connection) Send() (shared.SendFunc, bool) { return nil, false }
-func (c *Connection) HasCached() (ref.Val, bool)    { return nil, false }
-
-func CompileConnection(run shared.Runtime, conn *flowv1beta1.Connection) (shared.Program, error) {
-	return shared.EvalFunc(func(run shared.Runtime) ref.Val {
-		env, err := run.Env()
-		if err != nil {
-			return types.WrapErr(err)
-		}
-
-		return env.TypeAdapter().NativeToValue(conn)
-	}), nil
+func (c *Connection) Run(ctx context.Context, env shared.Env, pipe shared.Pipe) error {
+	return pipe.Run(ctx, func(ctx context.Context, value any) (any, error) {
+		return c.node, nil
+	})
 }

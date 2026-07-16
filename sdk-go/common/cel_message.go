@@ -7,22 +7,61 @@ import (
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/common/types/traits"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
+var anyValueType = reflect.TypeOf(&anypb.Any{})
+
 type celMessage struct {
+	adapter     *CELTypes
 	msg         proto.Message
 	refVal      ref.Val
 	indexer     traits.Indexer
 	fieldTester traits.FieldTester
-	adapter     *CELTypes
-	aliases     map[string]string
 }
 
-func (p *celMessage) ConvertToNative(t reflect.Type) (any, error) {
-	return p.refVal.ConvertToNative(t)
+func (p *celMessage) ConvertToNative(typeDesc reflect.Type) (any, error) {
+	srcPB := p.msg
+
+	if reflect.TypeOf(srcPB).AssignableTo(typeDesc) {
+		return srcPB, nil
+	}
+
+	if reflect.TypeOf(p).AssignableTo(typeDesc) {
+		return p, nil
+	}
+
+	switch typeDesc {
+	case anyValueType:
+		_, isAny := srcPB.(*anypb.Any)
+		if isAny {
+			return srcPB, nil
+		}
+		return anypb.New(srcPB)
+	case types.JSONValueType:
+		// Marshal the proto to JSON first, and then rehydrate as protobuf.Value as there is no
+		// support for direct conversion from proto.Message to protobuf.Value.
+		bytes, err := protojson.MarshalOptions{
+			Resolver: p.adapter.resolver,
+		}.Marshal(srcPB)
+		if err != nil {
+			return nil, err
+		}
+
+		json := &structpb.Value{}
+		err = protojson.UnmarshalOptions{
+			Resolver: p.adapter.resolver,
+		}.Unmarshal(bytes, json)
+		if err != nil {
+			return nil, err
+		}
+		return json, nil
+	}
+	return p.refVal.ConvertToNative(typeDesc)
 }
 
 func (p *celMessage) ConvertToType(typeVal ref.Type) ref.Val {
@@ -38,14 +77,16 @@ func (p *celMessage) Type() ref.Type {
 }
 
 func (p *celMessage) Value() any {
-	return p.refVal.Value()
+	return p.msg
 }
 
 func (p *celMessage) Get(index ref.Val) ref.Val {
-	name := p.normalize(index)
-	refVal := p.indexer.Get(name)
+	refVal := p.indexer.Get(index)
 
-	field := p.msg.ProtoReflect().Descriptor().Fields().ByName(protoreflect.Name(fmt.Sprint(name.Value())))
+	field := p.msg.ProtoReflect().Descriptor().Fields().ByName(protoreflect.Name(fmt.Sprint(index.Value())))
+	if field == nil {
+		field = p.msg.ProtoReflect().Descriptor().Fields().ByJSONName(fmt.Sprint(index.Value()))
+	}
 	if field != nil {
 		switch {
 		case field.Enum() != nil:
@@ -58,8 +99,8 @@ func (p *celMessage) Get(index ref.Val) ref.Val {
 				// Wrap each element in the list as an enum.
 				length := list.Size().Value().(int64)
 				enumList := make([]ref.Val, 0, length)
-				for i := range length {
-					elem := list.Get(types.Int(i))
+				for idx := range length {
+					elem := list.Get(types.Int(idx))
 					enumList = append(enumList, &celEnum{
 						desc:   field.Enum(),
 						refVal: elem,
@@ -127,32 +168,8 @@ func (p *celMessage) IsSet(field ref.Val) ref.Val {
 	if p.fieldTester == nil {
 		return types.NewErr("presence testing is not supported for %v", p.refVal.Type())
 	}
-	return p.fieldTester.IsSet(p.normalize(field))
+	return p.fieldTester.IsSet(field)
 }
-
-func (p *celMessage) normalize(val ref.Val) ref.Val {
-	str, ok := val.(types.String)
-	if !ok {
-		return val
-	}
-
-	name := string(str)
-	if canonical, ok := p.aliases[name]; ok {
-		if canonical == name {
-			return val
-		}
-		return types.String(canonical)
-	}
-
-	if canonical, ok := p.aliases[normalizeProtoFieldName(name)]; ok {
-		return types.String(canonical)
-	}
-
-	return val
-}
-
-// Implement traits.Lister interface by delegating to inner refVal
-// This is required for cel.ValueAsProto to work correctly with list types
 
 func (p *celMessage) Add(other ref.Val) ref.Val {
 	if lister, ok := p.refVal.(traits.Lister); ok {

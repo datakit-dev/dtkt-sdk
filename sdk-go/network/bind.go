@@ -6,7 +6,7 @@ import (
 )
 
 type Binder interface {
-	Address() net.Addr
+	Address() Address
 	Bind(context.Context) (net.Listener, error)
 	Close() error
 }

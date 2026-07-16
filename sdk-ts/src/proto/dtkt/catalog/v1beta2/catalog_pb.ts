@@ -5,8 +5,8 @@
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_buf_validate_validate } from "../../../buf/validate/validate_pb";
-import type { Type } from "./type_pb";
-import { file_dtkt_catalog_v1beta2_type } from "./type_pb";
+import { file_google_api_field_behavior } from "../../../google/api/field_behavior_pb";
+import { file_google_api_resource } from "../../../google/api/resource_pb";
 import type { FieldMask } from "../../../google/protobuf/field_mask_pb";
 import { file_google_protobuf_field_mask } from "../../../google/protobuf/field_mask_pb";
 import type { Message } from "@bufbuild/protobuf";
@@ -15,11 +15,10 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dtkt/catalog/v1beta2/catalog.proto.
  */
 export const file_dtkt_catalog_v1beta2_catalog: GenFile = /*@__PURE__*/
-  fileDesc("CiJkdGt0L2NhdGFsb2cvdjFiZXRhMi9jYXRhbG9nLnByb3RvEhRkdGt0LmNhdGFsb2cudjFiZXRhMiL3AQoHQ2F0YWxvZxIMCgRuYW1lGAEgASgJEhIKCmNhdGFsb2dfaWQYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkSFQoNcXVlcnlfZGlhbGVjdBgEIAEoCRIuCgpkYXRhX3R5cGVzGAUgAygLMhouZHRrdC5jYXRhbG9nLnYxYmV0YTIuVHlwZRI9CghtZXRhZGF0YRgKIAMoCzIrLmR0a3QuY2F0YWxvZy52MWJldGEyLkNhdGFsb2cuTWV0YWRhdGFFbnRyeRovCg1NZXRhZGF0YUVudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiagoUQ3JlYXRlQ2F0YWxvZ1JlcXVlc3QSGgoKY2F0YWxvZ19pZBgCIAEoCUIGukgDyAEBEjYKB2NhdGFsb2cYAyABKAsyHS5kdGt0LmNhdGFsb2cudjFiZXRhMi5DYXRhbG9nQga6SAPIAQEiRwoVQ3JlYXRlQ2F0YWxvZ1Jlc3BvbnNlEi4KB2NhdGFsb2cYASABKAsyHS5kdGt0LmNhdGFsb2cudjFiZXRhMi5DYXRhbG9nIiEKEUdldENhdGFsb2dSZXF1ZXN0EgwKBG5hbWUYASABKAkiRAoSR2V0Q2F0YWxvZ1Jlc3BvbnNlEi4KB2NhdGFsb2cYASABKAsyHS5kdGt0LmNhdGFsb2cudjFiZXRhMi5DYXRhbG9nIkwKE0xpc3RDYXRhbG9nc1JlcXVlc3QSEQoJcGFnZV9zaXplGAEgASgFEhIKCnBhZ2VfdG9rZW4YAiABKAkSDgoGZmlsdGVyGAQgASgJImAKFExpc3RDYXRhbG9nc1Jlc3BvbnNlEi8KCGNhdGFsb2dzGAEgAygLMh0uZHRrdC5jYXRhbG9nLnYxYmV0YTIuQ2F0YWxvZxIXCg9uZXh0X3BhZ2VfdG9rZW4YAiABKAkifwoUVXBkYXRlQ2F0YWxvZ1JlcXVlc3QSNgoHY2F0YWxvZxgBIAEoCzIdLmR0a3QuY2F0YWxvZy52MWJldGEyLkNhdGFsb2dCBrpIA8gBARIvCgt1cGRhdGVfbWFzaxgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5GaWVsZE1hc2siRwoVVXBkYXRlQ2F0YWxvZ1Jlc3BvbnNlEi4KB2NhdGFsb2cYASABKAsyHS5kdGt0LmNhdGFsb2cudjFiZXRhMi5DYXRhbG9nIjsKFERlbGV0ZUNhdGFsb2dSZXF1ZXN0EhQKBG5hbWUYASABKAlCBrpIA8gBARINCgVmb3JjZRgCIAEoCCIXChVEZWxldGVDYXRhbG9nUmVzcG9uc2UylgQKDkNhdGFsb2dTZXJ2aWNlEmgKDUNyZWF0ZUNhdGFsb2cSKi5kdGt0LmNhdGFsb2cudjFiZXRhMi5DcmVhdGVDYXRhbG9nUmVxdWVzdBorLmR0a3QuY2F0YWxvZy52MWJldGEyLkNyZWF0ZUNhdGFsb2dSZXNwb25zZRJoCg1EZWxldGVDYXRhbG9nEiouZHRrdC5jYXRhbG9nLnYxYmV0YTIuRGVsZXRlQ2F0YWxvZ1JlcXVlc3QaKy5kdGt0LmNhdGFsb2cudjFiZXRhMi5EZWxldGVDYXRhbG9nUmVzcG9uc2USXwoKR2V0Q2F0YWxvZxInLmR0a3QuY2F0YWxvZy52MWJldGEyLkdldENhdGFsb2dSZXF1ZXN0GiguZHRrdC5jYXRhbG9nLnYxYmV0YTIuR2V0Q2F0YWxvZ1Jlc3BvbnNlEmUKDExpc3RDYXRhbG9ncxIpLmR0a3QuY2F0YWxvZy52MWJldGEyLkxpc3RDYXRhbG9nc1JlcXVlc3QaKi5kdGt0LmNhdGFsb2cudjFiZXRhMi5MaXN0Q2F0YWxvZ3NSZXNwb25zZRJoCg1VcGRhdGVDYXRhbG9nEiouZHRrdC5jYXRhbG9nLnYxYmV0YTIuVXBkYXRlQ2F0YWxvZ1JlcXVlc3QaKy5kdGt0LmNhdGFsb2cudjFiZXRhMi5VcGRhdGVDYXRhbG9nUmVzcG9uc2VC7gEKGnByb3RvLmR0a3QuY2F0YWxvZy52MWJldGEyQgxDYXRhbG9nUHJvdG9QAVpQZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9jYXRhbG9nL3YxYmV0YTI7Y2F0YWxvZ3YxYmV0YTKiAgNEQ1iqAhREdGt0LkNhdGFsb2cuVjFiZXRhMsoCFER0a3RcQ2F0YWxvZ1xWMWJldGEy4gIgRHRrdFxDYXRhbG9nXFYxYmV0YTJcR1BCTWV0YWRhdGHqAhZEdGt0OjpDYXRhbG9nOjpWMWJldGEyYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_catalog_v1beta2_type, file_google_protobuf_field_mask]);
+  fileDesc("CiJkdGt0L2NhdGFsb2cvdjFiZXRhMi9jYXRhbG9nLnByb3RvEhRkdGt0LmNhdGFsb2cudjFiZXRhMiLwAQoHQ2F0YWxvZxIXCgRuYW1lGAEgASgJQgngQQi6SAPIAQESDQoFaWRlbnQYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkSQgoIbWV0YWRhdGEYCiADKAsyKy5kdGt0LmNhdGFsb2cudjFiZXRhMi5DYXRhbG9nLk1ldGFkYXRhRW50cnlCA+BBAxovCg1NZXRhZGF0YUVudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAE6M+pBMAoHQ2F0YWxvZxISY2F0YWxvZ3Mve2NhdGFsb2d9KghjYXRhbG9nczIHY2F0YWxvZyJqChRDcmVhdGVDYXRhbG9nUmVxdWVzdBIaCgpjYXRhbG9nX2lkGAIgASgJQga6SAPIAQESNgoHY2F0YWxvZxgDIAEoCzIdLmR0a3QuY2F0YWxvZy52MWJldGEyLkNhdGFsb2dCBrpIA8gBASJHChVDcmVhdGVDYXRhbG9nUmVzcG9uc2USLgoHY2F0YWxvZxgBIAEoCzIdLmR0a3QuY2F0YWxvZy52MWJldGEyLkNhdGFsb2ciIQoRR2V0Q2F0YWxvZ1JlcXVlc3QSDAoEbmFtZRgBIAEoCSJEChJHZXRDYXRhbG9nUmVzcG9uc2USLgoHY2F0YWxvZxgBIAEoCzIdLmR0a3QuY2F0YWxvZy52MWJldGEyLkNhdGFsb2ciTAoTTGlzdENhdGFsb2dzUmVxdWVzdBIRCglwYWdlX3NpemUYASABKAUSEgoKcGFnZV90b2tlbhgCIAEoCRIOCgZmaWx0ZXIYAyABKAkiYAoUTGlzdENhdGFsb2dzUmVzcG9uc2USLwoIY2F0YWxvZ3MYASADKAsyHS5kdGt0LmNhdGFsb2cudjFiZXRhMi5DYXRhbG9nEhcKD25leHRfcGFnZV90b2tlbhgCIAEoCSJ/ChRVcGRhdGVDYXRhbG9nUmVxdWVzdBI2CgdjYXRhbG9nGAEgASgLMh0uZHRrdC5jYXRhbG9nLnYxYmV0YTIuQ2F0YWxvZ0IGukgDyAEBEi8KC3VwZGF0ZV9tYXNrGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLkZpZWxkTWFzayJHChVVcGRhdGVDYXRhbG9nUmVzcG9uc2USLgoHY2F0YWxvZxgBIAEoCzIdLmR0a3QuY2F0YWxvZy52MWJldGEyLkNhdGFsb2ciOwoURGVsZXRlQ2F0YWxvZ1JlcXVlc3QSFAoEbmFtZRgBIAEoCUIGukgDyAEBEg0KBWZvcmNlGAIgASgIIhcKFURlbGV0ZUNhdGFsb2dSZXNwb25zZTKWBAoOQ2F0YWxvZ1NlcnZpY2USaAoNQ3JlYXRlQ2F0YWxvZxIqLmR0a3QuY2F0YWxvZy52MWJldGEyLkNyZWF0ZUNhdGFsb2dSZXF1ZXN0GisuZHRrdC5jYXRhbG9nLnYxYmV0YTIuQ3JlYXRlQ2F0YWxvZ1Jlc3BvbnNlEmgKDURlbGV0ZUNhdGFsb2cSKi5kdGt0LmNhdGFsb2cudjFiZXRhMi5EZWxldGVDYXRhbG9nUmVxdWVzdBorLmR0a3QuY2F0YWxvZy52MWJldGEyLkRlbGV0ZUNhdGFsb2dSZXNwb25zZRJfCgpHZXRDYXRhbG9nEicuZHRrdC5jYXRhbG9nLnYxYmV0YTIuR2V0Q2F0YWxvZ1JlcXVlc3QaKC5kdGt0LmNhdGFsb2cudjFiZXRhMi5HZXRDYXRhbG9nUmVzcG9uc2USZQoMTGlzdENhdGFsb2dzEikuZHRrdC5jYXRhbG9nLnYxYmV0YTIuTGlzdENhdGFsb2dzUmVxdWVzdBoqLmR0a3QuY2F0YWxvZy52MWJldGEyLkxpc3RDYXRhbG9nc1Jlc3BvbnNlEmgKDVVwZGF0ZUNhdGFsb2cSKi5kdGt0LmNhdGFsb2cudjFiZXRhMi5VcGRhdGVDYXRhbG9nUmVxdWVzdBorLmR0a3QuY2F0YWxvZy52MWJldGEyLlVwZGF0ZUNhdGFsb2dSZXNwb25zZULuAQoacHJvdG8uZHRrdC5jYXRhbG9nLnYxYmV0YTJCDENhdGFsb2dQcm90b1ABWlBnaXRodWIuY29tL2RhdGFraXQtZGV2L2R0a3Qtc2RrL3Nkay1nby9wcm90by9kdGt0L2NhdGFsb2cvdjFiZXRhMjtjYXRhbG9ndjFiZXRhMqICA0RDWKoCFER0a3QuQ2F0YWxvZy5WMWJldGEyygIURHRrdFxDYXRhbG9nXFYxYmV0YTLiAiBEdGt0XENhdGFsb2dcVjFiZXRhMlxHUEJNZXRhZGF0YeoCFkR0a3Q6OkNhdGFsb2c6OlYxYmV0YTJiBnByb3RvMw", [file_buf_validate_validate, file_google_api_field_behavior, file_google_api_resource, file_google_protobuf_field_mask]);
 
 /**
- * Represents a catalog resource specifying a query dialect, supported data types
- * and additional metadata (if any).
+ * Represents a catalog resource.
  *
  * @generated from message dtkt.catalog.v1beta2.Catalog
  */
@@ -32,11 +31,11 @@ export type Catalog = Message<"dtkt.catalog.v1beta2.Catalog"> & {
   name: string;
 
   /**
-   * Catalog identifier.
+   * Catalog identifier for use within a Query.
    *
-   * @generated from field: string catalog_id = 2;
+   * @generated from field: string ident = 2;
    */
-  catalogId: string;
+  ident: string;
 
   /**
    * Description of the catalog.
@@ -46,18 +45,39 @@ export type Catalog = Message<"dtkt.catalog.v1beta2.Catalog"> & {
   description: string;
 
   /**
-   * Supported query dialect (e.g., Trino, GoogleSQL, Postgres, etc.).
+   * Additional metadata, if any.
    *
-   * @generated from field: string query_dialect = 4;
+   * @generated from field: map<string, string> metadata = 10;
    */
-  queryDialect: string;
+  metadata: { [key: string]: string };
+};
+
+/**
+ * Represents a catalog resource.
+ *
+ * @generated from message dtkt.catalog.v1beta2.Catalog
+ */
+export type CatalogValid = Message<"dtkt.catalog.v1beta2.Catalog"> & {
+  /**
+   * Catalog resource name, format: `catalogs/{catalog}` (e.g. catalogs/google-project-id, catalogs/postgres_database, etc.)
+   *
+   * @generated from field: string name = 1;
+   */
+  name: string;
 
   /**
-   * List of supported data types.
+   * Catalog identifier for use within a Query.
    *
-   * @generated from field: repeated dtkt.catalog.v1beta2.Type data_types = 5;
+   * @generated from field: string ident = 2;
    */
-  dataTypes: Type[];
+  ident: string;
+
+  /**
+   * Description of the catalog.
+   *
+   * @generated from field: string description = 3;
+   */
+  description: string;
 
   /**
    * Additional metadata, if any.
@@ -66,8 +86,6 @@ export type Catalog = Message<"dtkt.catalog.v1beta2.Catalog"> & {
    */
   metadata: { [key: string]: string };
 };
-
-export type CatalogValid = Catalog;
 
 /**
  * Describes the message dtkt.catalog.v1beta2.Catalog.
@@ -139,7 +157,19 @@ export type CreateCatalogResponse = Message<"dtkt.catalog.v1beta2.CreateCatalogR
   catalog?: Catalog;
 };
 
-export type CreateCatalogResponseValid = CreateCatalogResponse;
+/**
+ * Create catalog response.
+ *
+ * @generated from message dtkt.catalog.v1beta2.CreateCatalogResponse
+ */
+export type CreateCatalogResponseValid = Message<"dtkt.catalog.v1beta2.CreateCatalogResponse"> & {
+  /**
+   * Catalog created.
+   *
+   * @generated from field: dtkt.catalog.v1beta2.Catalog catalog = 1;
+   */
+  catalog?: CatalogValid;
+};
 
 /**
  * Describes the message dtkt.catalog.v1beta2.CreateCatalogResponse.
@@ -185,7 +215,19 @@ export type GetCatalogResponse = Message<"dtkt.catalog.v1beta2.GetCatalogRespons
   catalog?: Catalog;
 };
 
-export type GetCatalogResponseValid = GetCatalogResponse;
+/**
+ * Response containing catalog details.
+ *
+ * @generated from message dtkt.catalog.v1beta2.GetCatalogResponse
+ */
+export type GetCatalogResponseValid = Message<"dtkt.catalog.v1beta2.GetCatalogResponse"> & {
+  /**
+   * The requested catalog.
+   *
+   * @generated from field: dtkt.catalog.v1beta2.Catalog catalog = 1;
+   */
+  catalog?: CatalogValid;
+};
 
 /**
  * Describes the message dtkt.catalog.v1beta2.GetCatalogResponse.
@@ -201,17 +243,23 @@ export const GetCatalogResponseSchema: GenMessage<GetCatalogResponse, {validType
  */
 export type ListCatalogsRequest = Message<"dtkt.catalog.v1beta2.ListCatalogsRequest"> & {
   /**
+   * Number of results to return per page. Leave empty for the server default.
+   *
    * @generated from field: int32 page_size = 1;
    */
   pageSize: number;
 
   /**
+   * Token from a previous response to retrieve the next page.
+   *
    * @generated from field: string page_token = 2;
    */
   pageToken: string;
 
   /**
-   * @generated from field: string filter = 4;
+   * Optional filter expression to narrow results.
+   *
+   * @generated from field: string filter = 3;
    */
   filter: string;
 };
@@ -242,7 +290,22 @@ export type ListCatalogsResponse = Message<"dtkt.catalog.v1beta2.ListCatalogsRes
   nextPageToken: string;
 };
 
-export type ListCatalogsResponseValid = ListCatalogsResponse;
+/**
+ * List catalogs response.
+ *
+ * @generated from message dtkt.catalog.v1beta2.ListCatalogsResponse
+ */
+export type ListCatalogsResponseValid = Message<"dtkt.catalog.v1beta2.ListCatalogsResponse"> & {
+  /**
+   * @generated from field: repeated dtkt.catalog.v1beta2.Catalog catalogs = 1;
+   */
+  catalogs: CatalogValid[];
+
+  /**
+   * @generated from field: string next_page_token = 2;
+   */
+  nextPageToken: string;
+};
 
 /**
  * Describes the message dtkt.catalog.v1beta2.ListCatalogsResponse.
@@ -314,7 +377,19 @@ export type UpdateCatalogResponse = Message<"dtkt.catalog.v1beta2.UpdateCatalogR
   catalog?: Catalog;
 };
 
-export type UpdateCatalogResponseValid = UpdateCatalogResponse;
+/**
+ * Update catalog response.
+ *
+ * @generated from message dtkt.catalog.v1beta2.UpdateCatalogResponse
+ */
+export type UpdateCatalogResponseValid = Message<"dtkt.catalog.v1beta2.UpdateCatalogResponse"> & {
+  /**
+   * The updated catalog.
+   *
+   * @generated from field: dtkt.catalog.v1beta2.Catalog catalog = 1;
+   */
+  catalog?: CatalogValid;
+};
 
 /**
  * Describes the message dtkt.catalog.v1beta2.UpdateCatalogResponse.
@@ -392,8 +467,6 @@ export const DeleteCatalogResponseSchema: GenMessage<DeleteCatalogResponse, {val
   messageDesc(file_dtkt_catalog_v1beta2_catalog, 10);
 
 /**
- * CatalogService provides operations for managing catalogs, schemas, tables, and query validation.
- *
  * @generated from service dtkt.catalog.v1beta2.CatalogService
  */
 export const CatalogService: GenService<{

@@ -6,6 +6,7 @@ import (
 	stdfs "io/fs"
 	"net/url"
 	"os"
+	"path/filepath"
 )
 
 // NewURIFilesystem creates a filesystem (fs.FS) from a URI.
@@ -43,7 +44,25 @@ func NewURIFilesystem(ctx context.Context, uri *url.URL) (stdfs.FS, error) {
 		if uri.Path == "" {
 			return nil, fmt.Errorf("file:// URI requires a path")
 		}
-		return os.DirFS(uri.Path), nil
+
+		path := filepath.FromSlash(uri.Path)
+		info, err := os.Stat(path)
+		if err != nil {
+			return nil, fmt.Errorf("failed to access fs %s: %w", uri, err)
+		}
+
+		if !info.IsDir() {
+			path = filepath.Dir(path)
+
+			info, err := os.Stat(path)
+			if err != nil {
+				return nil, fmt.Errorf("failed to access fs %s: %w", uri, err)
+			} else if !info.IsDir() {
+				return nil, fmt.Errorf("failed to access fs %s: not a directory", uri)
+			}
+		}
+
+		return os.DirFS(path), nil
 	case "sftp", "ssh":
 		// For sftp|ssh:// URIs, create an SFTP filesystem
 		return NewSFTPFileSystem(ctx, uri)

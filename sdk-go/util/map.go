@@ -64,7 +64,15 @@ func NewMapPair[K comparable, V any](k K, v V) MapPair[K, V] {
 	}
 }
 
-func AnyMap[M map[K]V, K comparable, V any](m M) map[K]any {
+func MapKeys[M ~map[K]V, K comparable, V any](m M) []K {
+	return slices.Collect(maps.Keys(m))
+}
+
+func MapVals[M ~map[K]V, K comparable, V any](m M) []V {
+	return slices.Collect(maps.Values(m))
+}
+
+func AnyMap[M ~map[K]V, K comparable, V any](m M) map[K]any {
 	result := map[K]any{}
 	for k, v := range m {
 		result[k] = v
@@ -72,7 +80,7 @@ func AnyMap[M map[K]V, K comparable, V any](m M) map[K]any {
 	return result
 }
 
-func MapToMap[V2 any, M map[K]V, K comparable, V any](m1 M, fn func(K, V) V2) map[K]V2 {
+func MapToMap[V2 any, M ~map[K]V, K comparable, V any](m1 M, fn func(K, V) V2) map[K]V2 {
 	result := map[K]V2{}
 	for k, v := range m1 {
 		result[k] = fn(k, v)
@@ -102,12 +110,24 @@ func JoinMaps[M ~map[K]V, K comparable, V any](srcs ...M) (dst M) {
 	return
 }
 
-// ReduceMap returns a map r for any key/value pairs from m for which fn returns true.
-func ReduceMap[Map ~map[K]V, K comparable, V any](m Map, fn func(K, V) bool) (r Map) {
-	r = maps.Clone(m)
-	maps.DeleteFunc(r, func(k K, v V) bool {
+// ReduceMap returns a map m2 for any key/value pairs from m for which fn returns true.
+func ReduceMap[Map ~map[K]V, K comparable, V any](m Map, fn func(K, V) bool) (m2 Map) {
+	m2 = maps.Clone(m)
+	maps.DeleteFunc(m2, func(k K, v V) bool {
 		return !fn(k, v)
 	})
+	return
+}
+
+// TransformMap returns a map[K2]V2 m2 for any key/value pairs from m for which fn returns true.
+func TransformMap[K2 comparable, V2 any, Map ~map[K]V, K comparable, V any](m Map, fn func(K, V) (K2, V2, bool)) (m2 map[K2]V2) {
+	m2 = map[K2]V2{}
+	for k, v := range m {
+		k2, v2, ok := fn(k, v)
+		if ok {
+			m2[k2] = v2
+		}
+	}
 	return
 }
 
@@ -159,6 +179,12 @@ func (m *SyncMap[K, V]) StorePairs(pairs ...MapPair[K, V]) {
 }
 
 func (m *SyncMap[K, V]) StoreNative(native map[K]V) {
+	for k, v := range native {
+		m.Store(k, v)
+	}
+}
+
+func (m *OrderedMap[K, V]) StoreNative(native map[K]V) {
 	for k, v := range native {
 		m.Store(k, v)
 	}
@@ -364,7 +390,9 @@ func (m *OrderedMap[K, V]) UnmarshalJSONFrom(dec *jsontext.Decoder) error {
 		}
 
 		var val V
-		err = encoding.FromJSONV2(raw, &val, encoding.WithDecodeJSONOptions(dec.Options()))
+		err = encoding.FromJSONV2(raw, &val,
+			encoding.WithDecodeJSONOptions(dec.Options()),
+		)
 		if err != nil {
 			return err
 		}

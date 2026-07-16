@@ -24,6 +24,8 @@ const (
 	BaseService_CheckAuth_FullMethodName   = "/dtkt.base.v1beta1.BaseService/CheckAuth"
 	BaseService_ListTypes_FullMethodName   = "/dtkt.base.v1beta1.BaseService/ListTypes"
 	BaseService_GetType_FullMethodName     = "/dtkt.base.v1beta1.BaseService/GetType"
+	BaseService_Close_FullMethodName       = "/dtkt.base.v1beta1.BaseService/Close"
+	BaseService_StreamIO_FullMethodName    = "/dtkt.base.v1beta1.BaseService/StreamIO"
 )
 
 // BaseServiceClient is the client API for BaseService service.
@@ -35,7 +37,7 @@ type BaseServiceClient interface {
 	// Returns the embedded package manifest (package.dtkt.yaml) and metadata.
 	// NOTE: GetPackage is implemented by the Integration SDK (not by authors).
 	GetPackage(ctx context.Context, in *GetPackageRequest, opts ...grpc.CallOption) (*GetPackageResponse, error)
-	// Validates config, allocates instances, and .
+	// Validates config and allocates instance.
 	// NOTE: CheckConfig is implemented by the Integration SDK (not by authors).
 	CheckConfig(ctx context.Context, in *CheckConfigRequest, opts ...grpc.CallOption) (*CheckConfigResponse, error)
 	// Orchestrates OAuth checks/exchanges (3-legged).
@@ -47,6 +49,33 @@ type BaseServiceClient interface {
 	// Returns type registered to integration.
 	// NOTE: GetType is implemented by the Integration SDK (not by authors).
 	GetType(ctx context.Context, in *GetTypeRequest, opts ...grpc.CallOption) (*GetTypeResponse, error)
+	// Close releases resources associated with an instance identified by headers
+	// in the request and (if valid) atomically removes it from the integration.
+	// NOTE: Close is implemented by the Integration SDK (not by authors).
+	Close(ctx context.Context, in *CloseRequest, opts ...grpc.CallOption) (*CloseResponse, error)
+	// Opens a bidirectional IO stream between the caller and an active instance.
+	//
+	// The FIRST message must carry a valid instance_id (obtained after a
+	// successful CheckConfig call) and may optionally include an initial stdin
+	// payload.  All subsequent client messages carry additional stdin bytes;
+	// instance_id must still be set on every message due to proto validation
+	// requirements, but only the value in the first message is used for instance
+	// lookup.
+	//
+	// The server streams stdout and stderr frames back to the client as they are
+	// produced.  A terminal exit_code frame is sent before the stream closes to
+	// signal how the underlying operation ended.
+	//
+	// Client half-close (CloseSend) signals EOF to the instance stdin, allowing
+	// the underlying subprocess to detect end-of-input and terminate naturally.
+	// The server continues streaming output until both stdout and stderr are
+	// exhausted before closing the stream.
+	//
+	// Errors:
+	//
+	//	NOT_FOUND          – instance_id does not correspond to an active instance.
+	//	RESOURCE_EXHAUSTED – the instance already has an active IO stream.
+	StreamIO(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[StreamIORequest, StreamIOResponse], error)
 }
 
 type baseServiceClient struct {
@@ -107,6 +136,29 @@ func (c *baseServiceClient) GetType(ctx context.Context, in *GetTypeRequest, opt
 	return out, nil
 }
 
+func (c *baseServiceClient) Close(ctx context.Context, in *CloseRequest, opts ...grpc.CallOption) (*CloseResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CloseResponse)
+	err := c.cc.Invoke(ctx, BaseService_Close_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *baseServiceClient) StreamIO(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[StreamIORequest, StreamIOResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &BaseService_ServiceDesc.Streams[0], BaseService_StreamIO_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[StreamIORequest, StreamIOResponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type BaseService_StreamIOClient = grpc.BidiStreamingClient[StreamIORequest, StreamIOResponse]
+
 // BaseServiceServer is the server API for BaseService service.
 // All implementations must embed UnimplementedBaseServiceServer
 // for forward compatibility.
@@ -116,7 +168,7 @@ type BaseServiceServer interface {
 	// Returns the embedded package manifest (package.dtkt.yaml) and metadata.
 	// NOTE: GetPackage is implemented by the Integration SDK (not by authors).
 	GetPackage(context.Context, *GetPackageRequest) (*GetPackageResponse, error)
-	// Validates config, allocates instances, and .
+	// Validates config and allocates instance.
 	// NOTE: CheckConfig is implemented by the Integration SDK (not by authors).
 	CheckConfig(context.Context, *CheckConfigRequest) (*CheckConfigResponse, error)
 	// Orchestrates OAuth checks/exchanges (3-legged).
@@ -128,6 +180,33 @@ type BaseServiceServer interface {
 	// Returns type registered to integration.
 	// NOTE: GetType is implemented by the Integration SDK (not by authors).
 	GetType(context.Context, *GetTypeRequest) (*GetTypeResponse, error)
+	// Close releases resources associated with an instance identified by headers
+	// in the request and (if valid) atomically removes it from the integration.
+	// NOTE: Close is implemented by the Integration SDK (not by authors).
+	Close(context.Context, *CloseRequest) (*CloseResponse, error)
+	// Opens a bidirectional IO stream between the caller and an active instance.
+	//
+	// The FIRST message must carry a valid instance_id (obtained after a
+	// successful CheckConfig call) and may optionally include an initial stdin
+	// payload.  All subsequent client messages carry additional stdin bytes;
+	// instance_id must still be set on every message due to proto validation
+	// requirements, but only the value in the first message is used for instance
+	// lookup.
+	//
+	// The server streams stdout and stderr frames back to the client as they are
+	// produced.  A terminal exit_code frame is sent before the stream closes to
+	// signal how the underlying operation ended.
+	//
+	// Client half-close (CloseSend) signals EOF to the instance stdin, allowing
+	// the underlying subprocess to detect end-of-input and terminate naturally.
+	// The server continues streaming output until both stdout and stderr are
+	// exhausted before closing the stream.
+	//
+	// Errors:
+	//
+	//	NOT_FOUND          – instance_id does not correspond to an active instance.
+	//	RESOURCE_EXHAUSTED – the instance already has an active IO stream.
+	StreamIO(grpc.BidiStreamingServer[StreamIORequest, StreamIOResponse]) error
 	mustEmbedUnimplementedBaseServiceServer()
 }
 
@@ -152,6 +231,12 @@ func (UnimplementedBaseServiceServer) ListTypes(context.Context, *ListTypesReque
 }
 func (UnimplementedBaseServiceServer) GetType(context.Context, *GetTypeRequest) (*GetTypeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetType not implemented")
+}
+func (UnimplementedBaseServiceServer) Close(context.Context, *CloseRequest) (*CloseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Close not implemented")
+}
+func (UnimplementedBaseServiceServer) StreamIO(grpc.BidiStreamingServer[StreamIORequest, StreamIOResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method StreamIO not implemented")
 }
 func (UnimplementedBaseServiceServer) mustEmbedUnimplementedBaseServiceServer() {}
 func (UnimplementedBaseServiceServer) testEmbeddedByValue()                     {}
@@ -264,6 +349,31 @@ func _BaseService_GetType_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BaseService_Close_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CloseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BaseServiceServer).Close(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BaseService_Close_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BaseServiceServer).Close(ctx, req.(*CloseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BaseService_StreamIO_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(BaseServiceServer).StreamIO(&grpc.GenericServerStream[StreamIORequest, StreamIOResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type BaseService_StreamIOServer = grpc.BidiStreamingServer[StreamIORequest, StreamIOResponse]
+
 // BaseService_ServiceDesc is the grpc.ServiceDesc for BaseService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -291,7 +401,18 @@ var BaseService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "GetType",
 			Handler:    _BaseService_GetType_Handler,
 		},
+		{
+			MethodName: "Close",
+			Handler:    _BaseService_Close_Handler,
+		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StreamIO",
+			Handler:       _BaseService_StreamIO_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "dtkt/base/v1beta1/services.proto",
 }

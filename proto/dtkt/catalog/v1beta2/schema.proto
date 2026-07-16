@@ -29,8 +29,8 @@ message Schema {
   // Schema resource name, format: `catalogs/{catalog}/schemas/{schema}`.
   string name = 1;
 
-  // Schema identifier.
-  string schema_id = 2;
+  // Schema identifier for use within a query.
+  string ident = 2;
 
   // Description of the schema.
   string description = 3;
@@ -41,9 +41,16 @@ message Schema {
 
 // Request message for listing schemas.
 message ListSchemasRequest {
+  // Number of results to return per page. Leave empty for the server default.
   int32 page_size = 1;
+
+  // Token from a previous response to retrieve the next page.
   string page_token = 2;
+
+  // Parent resource name.
   string parent = 3;
+
+  // Optional filter expression to narrow results.
   string filter = 4;
 }
 
@@ -70,10 +77,10 @@ message GetSchemaResponse {
 
 // Create schema request.
 message CreateSchemaRequest {
-  // Parent catalog resource name.
+  // Parent catalog resource name, format: `catalogs/{catalog}`.
   string parent = 1 [(buf.validate.field).required = true];
 
-  // Schema identifier, e.g. final segment in resource name: `.../schemas/{schema}`
+  // Schema identifier, e.g. "prod", "test", etc.
   string schema_id = 2 [(buf.validate.field).required = true];
 
   // Schema to create.

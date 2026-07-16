@@ -24,11 +24,11 @@ func deepPkgPath(t reflect.Type) string {
 	return ""
 }
 
-// fixDescriptorPkgPath sets Info.PkgPath on a descriptor when the GoType is
+// descriptorPkgPath sets Info.PkgPath on a descriptor when the GoType is
 // a composite type (slice/map) whose element lives in an external package.
 // Ent's Bytes.GoType uses indirect(t).PkgPath() which returns "" for slices
 // and maps, causing the import template to skip required imports.
-func fixDescriptorPkgPath[T any](desc *entfield.Descriptor) {
+func descriptorPkgPath[T any](desc *entfield.Descriptor) {
 	if desc.Info == nil || desc.Info.PkgPath != "" {
 		return
 	}

@@ -9,7 +9,7 @@ import { enumDesc, fileDesc } from "@bufbuild/protobuf/codegenv2";
  * Describes the file dtkt/blob/v1beta1/enums.proto.
  */
 export const file_dtkt_blob_v1beta1_enums: GenFile = /*@__PURE__*/
-  fileDesc("Ch1kdGt0L2Jsb2IvdjFiZXRhMS9lbnVtcy5wcm90bxIRZHRrdC5ibG9iLnYxYmV0YTEqpAEKD1NpZ25lZFVSTE1ldGhvZBIhCh1TSUdORURfVVJMX01FVEhPRF9VTlNQRUNJRklFRBAAEhkKFVNJR05FRF9VUkxfTUVUSE9EX0dFVBABEhkKFVNJR05FRF9VUkxfTUVUSE9EX1BVVBACEhoKFlNJR05FRF9VUkxfTUVUSE9EX1BPU1QQAxIcChhTSUdORURfVVJMX01FVEhPRF9ERUxFVEUQBCpUCgpMaW5lRm9ybWF0EhsKF0xJTkVfRk9STUFUX1VOU1BFQ0lGSUVEEAASEwoPTElORV9GT1JNQVRfUkFXEAESFAoQTElORV9GT1JNQVRfSlNPThACQtcBChdwcm90by5kdGt0LmJsb2IudjFiZXRhMUIKRW51bXNQcm90b1ABWkpnaXRodWIuY29tL2RhdGFraXQtZGV2L2R0a3Qtc2RrL3Nkay1nby9wcm90by9kdGt0L2Jsb2IvdjFiZXRhMTtibG9idjFiZXRhMaICA0RCWKoCEUR0a3QuQmxvYi5WMWJldGExygIRRHRrdFxCbG9iXFYxYmV0YTHiAh1EdGt0XEJsb2JcVjFiZXRhMVxHUEJNZXRhZGF0YeoCE0R0a3Q6OkJsb2I6OlYxYmV0YTFiBnByb3RvMw");
+  fileDesc("Ch1kdGt0L2Jsb2IvdjFiZXRhMS9lbnVtcy5wcm90bxIRZHRrdC5ibG9iLnYxYmV0YTEqpAEKD1NpZ25lZFVSTE1ldGhvZBIhCh1TSUdORURfVVJMX01FVEhPRF9VTlNQRUNJRklFRBAAEhkKFVNJR05FRF9VUkxfTUVUSE9EX0dFVBABEhkKFVNJR05FRF9VUkxfTUVUSE9EX1BVVBACEhoKFlNJR05FRF9VUkxfTUVUSE9EX1BPU1QQAxIcChhTSUdORURfVVJMX01FVEhPRF9ERUxFVEUQBELXAQoXcHJvdG8uZHRrdC5ibG9iLnYxYmV0YTFCCkVudW1zUHJvdG9QAVpKZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9ibG9iL3YxYmV0YTE7YmxvYnYxYmV0YTGiAgNEQliqAhFEdGt0LkJsb2IuVjFiZXRhMcoCEUR0a3RcQmxvYlxWMWJldGEx4gIdRHRrdFxCbG9iXFYxYmV0YTFcR1BCTWV0YWRhdGHqAhNEdGt0OjpCbG9iOjpWMWJldGExYgZwcm90bzM");
 
 /**
  * Supported HTTP verbs for signed URL generation.
@@ -48,32 +48,4 @@ export enum SignedURLMethod {
  */
 export const SignedURLMethodSchema: GenEnum<SignedURLMethod> = /*@__PURE__*/
   enumDesc(file_dtkt_blob_v1beta1_enums, 0);
-
-/**
- * LineFormat specifies the format of lines read from a blob.
- *
- * @generated from enum dtkt.blob.v1beta1.LineFormat
- */
-export enum LineFormat {
-  /**
-   * @generated from enum value: LINE_FORMAT_UNSPECIFIED = 0;
-   */
-  UNSPECIFIED = 0,
-
-  /**
-   * @generated from enum value: LINE_FORMAT_RAW = 1;
-   */
-  RAW = 1,
-
-  /**
-   * @generated from enum value: LINE_FORMAT_JSON = 2;
-   */
-  JSON = 2,
-}
-
-/**
- * Describes the enum dtkt.blob.v1beta1.LineFormat.
- */
-export const LineFormatSchema: GenEnum<LineFormat> = /*@__PURE__*/
-  enumDesc(file_dtkt_blob_v1beta1_enums, 1);
 

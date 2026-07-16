@@ -20,7 +20,6 @@ func (l *celUUIDLib) LibraryName() string {
 }
 
 func (l *celUUIDLib) CompileOptions() []cel.EnvOption {
-	uuid.NewV7()
 	return []cel.EnvOption{
 		cel.Function("uuid.new",
 			cel.SingletonFunctionBinding(

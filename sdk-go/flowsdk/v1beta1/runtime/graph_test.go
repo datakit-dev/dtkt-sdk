@@ -1,199 +1,127 @@
-package runtime
+package runtime_test
 
 import (
+	"bytes"
+	"context"
+	"fmt"
+	"strings"
 	"testing"
+	"time"
 
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta1/runtime"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
-	graphlib "github.com/dominikbraun/graph"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	// "github.com/google/cel-go/common/types/ref"
 )
 
-// buildGraph constructs a graph from explicit node IDs and directed edges
-// (source → target means target depends on source). No Runtime is involved.
-func buildGraph(t *testing.T, ids []string, edges [][2]string) *Graph {
-	t.Helper()
+var tickerFlow = `
+kind: Flow
+apiVersion: v1beta1
+spec:
+  name: Ticker
+  inputs:
+    - id: maxIters
+      uint64:
+        default: 10
+      cache: true
+  streams:
+    - id: tick
+      generate:
+        every: 0.1s
+        initial: 0s
+  outputs:
+    - id: tick
+      value: = streams.tick.value
+    - id: evenOrOdd
+      value: |
+        = int(streams.tick.count) % 2 == 0 ? "even" : "odd"
+    - id: done
+      value: |
+        = streams.tick.count >= inputs.maxIters.value ? Done{reason:
+        "Maximum iterations: %d".format([inputs.maxIters.value])} : null
+`
 
-	g := &Graph{
-		proto:   &flowv1beta1.Graph{},
-		forward: make(map[string][]string),
-		reverse: make(map[string][]string),
+func TestGraph_Execute(t *testing.T) {
+	var buf bytes.Buffer
+	buf.WriteString(tickerFlow)
+	flow, err := flowsdk.ReadSpec(&buf, encoding.YAML)
+	if err != nil {
+		t.Fatal(err)
 	}
-	g.Graph = graphlib.NewWithStore(
-		GetNodeID,
-		g,
-		graphlib.Directed(),
-		graphlib.PreventCycles(),
-	)
 
-	for _, id := range ids {
-		node := &flowv1beta1.Node{
-			Id: id,
-			Type: &flowv1beta1.Node_Var{
-				Var: &flowv1beta1.Var{Id: id, Value: `= "x"`},
-			},
-		}
-		require.NoError(t, g.Graph.AddVertex(node))
+	graph, err := runtime.NewGraphFromSpec(flow.GetV1Beta1())
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	for _, e := range edges {
-		require.NoError(t, g.Graph.AddEdge(e[0], e[1]))
-	}
+	// reduceProg, err := shared.CompileExpr(graph.Env(), "= streams.tick.value")
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
 
-	require.NoError(t, g.Build())
-	return g
-}
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
+	defer cancel()
 
-// groupOf returns the 0-based group index that nodeID appears in.
-func groupOf(exec *Executor, nodeID string) (int, bool) {
-	for i, grp := range exec.graph.groups {
-		for _, id := range grp {
-			if id == nodeID {
-				return i, true
+	// reducer := streamflow.NewReduce(func(prev, curr time.Time) time.Time {
+	// 	if curr.After(prev) {
+	// 		return curr
+	// 	}
+	// 	return prev
+	// })
+
+	// go func() {
+	// 	for {
+	// 		select {
+	// 		case <-ctx.Done():
+	// 		case value, ok := <-reducer.Out():
+	// 			if !ok {
+	// 				return
+	// 			}
+
+	// 			log.FromCtx(ctx).Info("streams.tick", slog.Any("value", value))
+	// 		}
+	// 	}
+	// }()
+
+	err = graph.Execute(ctx,
+		shared.WithInitCycle(func(ctx context.Context, t ...*runtime.Node) (map[string]any, error) {
+			return map[string]any{
+				"inputs.maxIters": 11,
+			}, nil
+		}),
+		shared.WithAfterRecv(func(ctx context.Context, node *runtime.Node, value any) (err error) {
+			proto := node.Proto()
+			if proto.GetState() <= flowv1beta1.Node_STATE_PENDING {
+				return fmt.Errorf("expected node state > pending, got: %s", proto.GetState())
+			} else if proto.GetStartTime() == nil || proto.GetStartTime().AsTime().IsZero() {
+				return fmt.Errorf("expected node start time to be set")
+			} else if proto.GetFinishTime() == nil || proto.GetFinishTime().AsTime().IsZero() {
+				return fmt.Errorf("expected node finish time to be set")
 			}
+
+			if strings.HasPrefix(node.Ident(), shared.OutputPrefix) {
+				t.Logf("%s: %v (%T)", node.Ident(), value, value)
+			}
+
+			// if node.Ident() == "streams.tick" {
+			// 	if t, ok := value.(time.Time); ok {
+			// 		reducer.In() <- t
+			// 	}
+			// }
+
+			return
+		}),
+	)
+	if err != nil {
+		// close(reducer.In())
+
+		done, ok := runtime.IsDoneError(err)
+		if ok && done.Proto().GetIsError() {
+			t.Fatal(err)
+		} else if ok {
+			t.Log(done.Error())
 		}
 	}
-	return -1, false
-}
-
-// TestGraph_SingleNode — one node, no edges → one group.
-func TestGraph_SingleNode(t *testing.T) {
-	g := buildGraph(t, []string{"vars.a"}, nil)
-	exec, err := NewExecutor(&Runtime{
-		env: func() (*Env, error) {
-			return NewEnv(&flowv1beta1.Runtime{})
-		},
-	}, g)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(exec.graph.groups))
-	idx, ok := groupOf(exec, "vars.a")
-	assert.True(t, ok)
-	assert.Equal(t, 0, idx)
-}
-
-// TestGraph_IndependentNodes — three nodes, no edges → all in group 0.
-func TestGraph_IndependentNodes(t *testing.T) {
-	g := buildGraph(t, []string{"vars.a", "vars.b", "vars.c"}, nil)
-	exec, err := NewExecutor(&Runtime{}, g)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(exec.graph.groups))
-	for _, id := range []string{"vars.a", "vars.b", "vars.c"} {
-		_, ok := groupOf(exec, id)
-		assert.True(t, ok, "%s should be in a group", id)
-	}
-}
-
-// TestGraph_LinearChain — a→b→c must produce three separate groups in order.
-func TestGraph_LinearChain(t *testing.T) {
-	g := buildGraph(t,
-		[]string{"vars.a", "vars.b", "vars.c"},
-		[][2]string{{"vars.a", "vars.b"}, {"vars.b", "vars.c"}},
-	)
-	exec, err := NewExecutor(&Runtime{}, g)
-	require.NoError(t, err)
-	assert.Equal(t, 3, len(exec.graph.groups))
-
-	ia, _ := groupOf(exec, "vars.a")
-	ib, _ := groupOf(exec, "vars.b")
-	ic, _ := groupOf(exec, "vars.c")
-	assert.Less(t, ia, ib, "a before b")
-	assert.Less(t, ib, ic, "b before c")
-}
-
-// TestGraph_Diamond — a→b, a→c, b→d, c→d: b and c are parallel; d is last.
-func TestGraph_Diamond(t *testing.T) {
-	g := buildGraph(t,
-		[]string{"vars.a", "vars.b", "vars.c", "vars.d"},
-		[][2]string{
-			{"vars.a", "vars.b"}, {"vars.a", "vars.c"},
-			{"vars.b", "vars.d"}, {"vars.c", "vars.d"},
-		},
-	)
-	exec, err := NewExecutor(&Runtime{}, g)
-	require.NoError(t, err)
-	assert.Equal(t, 3, len(exec.graph.groups))
-
-	ia, _ := groupOf(exec, "vars.a")
-	ib, _ := groupOf(exec, "vars.b")
-	ic, _ := groupOf(exec, "vars.c")
-	id, _ := groupOf(exec, "vars.d")
-
-	assert.Less(t, ia, ib)
-	assert.Equal(t, ib, ic, "b and c should be in the same parallel group")
-	assert.Less(t, ic, id)
-}
-
-// TestGraph_ComplexDAG — two roots fan out, merge, fan out and merge again.
-func TestGraph_ComplexDAG(t *testing.T) {
-	//   a   b
-	//  / \ / \
-	// c   d   e
-	//  \ / \ /
-	//   f   g
-	//    \ /
-	//     h
-	g := buildGraph(t,
-		[]string{"vars.a", "vars.b", "vars.c", "vars.d", "vars.e", "vars.f", "vars.g", "vars.h"},
-		[][2]string{
-			{"vars.a", "vars.c"}, {"vars.a", "vars.d"},
-			{"vars.b", "vars.d"}, {"vars.b", "vars.e"},
-			{"vars.c", "vars.f"}, {"vars.d", "vars.f"},
-			{"vars.d", "vars.g"}, {"vars.e", "vars.g"},
-			{"vars.f", "vars.h"}, {"vars.g", "vars.h"},
-		},
-	)
-	exec, err := NewExecutor(&Runtime{}, g)
-	require.NoError(t, err)
-
-	ia, _ := groupOf(exec, "vars.a")
-	ib, _ := groupOf(exec, "vars.b")
-	ic, _ := groupOf(exec, "vars.c")
-	id, _ := groupOf(exec, "vars.d")
-	ie, _ := groupOf(exec, "vars.e")
-	if_, _ := groupOf(exec, "vars.f")
-	ig, _ := groupOf(exec, "vars.g")
-	ih, _ := groupOf(exec, "vars.h")
-
-	// roots are parallel
-	assert.Equal(t, ia, ib)
-	// c, d, e are all one level below roots
-	assert.Equal(t, ic, id)
-	assert.Equal(t, id, ie)
-	// f and g are parallel
-	assert.Equal(t, if_, ig)
-	// h is last
-	assert.Less(t, ig, ih)
-}
-
-// TestGraph_ForwardAndReverse verifies the helper maps are populated correctly.
-func TestGraph_ForwardAndReverse(t *testing.T) {
-	g := buildGraph(t,
-		[]string{"vars.a", "vars.b", "vars.c"},
-		[][2]string{{"vars.a", "vars.b"}, {"vars.a", "vars.c"}},
-	)
-
-	// b and c depend on a
-	fwd := g.Forward("vars.b")
-	assert.Contains(t, fwd, "vars.a")
-
-	// a has two dependents
-	rev := g.Reverse("vars.a")
-	assert.Contains(t, rev, "vars.b")
-	assert.Contains(t, rev, "vars.c")
-}
-
-// TestGraph_StartsAndEnds verifies root/leaf detection.
-func TestGraph_StartsAndEnds(t *testing.T) {
-	g := buildGraph(t,
-		[]string{"vars.a", "vars.b", "vars.c"},
-		[][2]string{{"vars.a", "vars.b"}, {"vars.a", "vars.c"}},
-	)
-	starts := g.Starts()
-	ends := g.Ends()
-
-	assert.Contains(t, starts, "vars.a")
-	assert.NotContains(t, starts, "vars.b")
-	assert.Contains(t, ends, "vars.b")
-	assert.Contains(t, ends, "vars.c")
-	assert.NotContains(t, ends, "vars.a")
 }

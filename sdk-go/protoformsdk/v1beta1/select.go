@@ -6,7 +6,6 @@ import (
 
 	protoformv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protoform/v1beta1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
-	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var _ ElementType = (*SelectElement)(nil)
@@ -35,10 +34,6 @@ func NewSelectElement(elem *Element) *SelectElement {
 	return elem.Type.(*SelectElement)
 }
 
-func (*SelectElement) isElementType()    {}
-func (*SelectElement) isLoadElement()    {}
-func (*SelectElement) isOptionsElement() {}
-
 func (s *SelectElement) GetOptions() *util.OrderedMap[string, any] {
 	slices.SortFunc(s.options, func(a, b util.MapPair[string, any]) int {
 		return strings.Compare(a.Key, b.Key)
@@ -50,18 +45,38 @@ func (s *SelectElement) GetMethodName() string {
 	return s.element.GetMethodName()
 }
 
-func (s *SelectElement) GetKeyExpr() string {
-	return s.element.GetKeyExpr()
+func (s *SelectElement) GetLabelExpr() string {
+	return s.element.GetLabelExpr()
 }
 
-func (s *SelectElement) GetValExpr() string {
-	return s.element.GetValExpr()
+func (s *SelectElement) GetValueExpr() string {
+	return s.element.GetValueExpr()
 }
 
-func (s *SelectElement) SetOption(env Env, key string, val protoreflect.Value) {
-	s.options = append(s.options, util.NewMapPair(key, any(val)))
+func (s *SelectElement) GetFilterExpr() string {
+	return s.element.GetFilterExpr()
+}
+
+func (s *SelectElement) GetResponseField() string {
+	return s.element.GetResponseField()
+}
+
+func (s *SelectElement) GetUseFilterField() bool {
+	return s.element.GetUseFilterField()
+}
+
+func (s *SelectElement) ClearOptions() {
+	s.options = nil
+}
+
+func (s *SelectElement) SetOption(key string, val any) {
+	s.options = append(s.options, util.NewMapPair(key, val))
 }
 
 func (s *SelectElement) Load(env Env) error {
-	return LoadOptions(env, s)
+	return ResolveOptions(env, s)
 }
+
+func (*SelectElement) isElementType()    {}
+func (*SelectElement) isLoadElement()    {}
+func (*SelectElement) isOptionsElement() {}

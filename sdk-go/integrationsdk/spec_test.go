@@ -22,7 +22,7 @@ func TestSpec_Valid(t *testing.T) {
 		t.Fatalf("ReadFile() error = %v", err)
 	}
 
-	_, err = integrationsdk.ReadSpec(encoding.YAML, reader)
+	_, err = integrationsdk.ReadSpec(reader, encoding.YAML)
 	if err != nil {
 		t.Fatalf("Load() error = %v", err)
 	}
@@ -34,7 +34,7 @@ func TestSpec_Invalid(t *testing.T) {
 		t.Fatalf("ReadFile() error = %v", err)
 	}
 
-	_, err = integrationsdk.ReadSpec(encoding.YAML, reader)
+	_, err = integrationsdk.ReadSpec(reader, encoding.YAML)
 	if err == nil {
 		t.Fatalf("Load() error = %v, want error", err)
 	}

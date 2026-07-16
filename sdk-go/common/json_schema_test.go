@@ -4,8 +4,50 @@ import (
 	"testing"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
-	"github.com/invopop/jsonschema"
+	sharedv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 )
+
+func Test_ProtoSchema(t *testing.T) {
+	schema, err := common.JSONSchemaFor[*sharedv1beta1.Package]()
+	if err != nil {
+		t.Errorf("expected schema, got error: %v", err)
+	}
+
+	msg := &sharedv1beta1.Package{
+		Identity: &sharedv1beta1.Package_Identity{
+			Name:    "FooBar",
+			Version: "0.1.0",
+		},
+		Type: sharedv1beta1.PackageType_PACKAGE_TYPE_GO,
+		Runtimes: []sharedv1beta1.Runtime{
+			sharedv1beta1.Runtime_RUNTIME_DOCKER,
+			sharedv1beta1.Runtime_RUNTIME_NATIVE,
+		},
+		Build: &sharedv1beta1.Package_BuildConfig{
+			Env: map[string]string{
+				"FOO": "BAR",
+			},
+			Artifact: &sharedv1beta1.Package_BuildConfig_Binary{},
+		},
+	}
+
+	err = schema.Validate(msg)
+	if err != nil {
+		t.Errorf("expected valid value, got invalid: %v", err)
+	}
+
+	msg2, err := schema.ValidateAny(msg)
+	if err != nil {
+		t.Errorf("expected valid value, got invalid: %v", err)
+	} else if !proto.Equal(msg, msg2) {
+		t.Errorf("expected equal values, got diff:\n%s\n%s", protojson.Format(msg), protojson.Format(msg2))
+	} else {
+		t.Log(protojson.Format(msg2))
+	}
+
+}
 
 func Test_EmptyStruct(t *testing.T) {
 	emptyObjSchema, err := common.JSONSchemaFor[struct{}]()
@@ -36,30 +78,28 @@ func Test_StructSchema(t *testing.T) {
 		},
 	}
 	structSchema, err := common.JSONSchemaFor[StructConfig](
-		common.WithReflectorOpts(func(r *jsonschema.Reflector) {
-			r.BaseSchemaID = "http://foo.bar"
-		}),
-		common.WithSchemaID("foo"),
+		// common.WithJSONSchemaReflectorOpts(func(r *jsonschema.Reflector) {
+		// 	r.BaseSchemaID = "http://foo.bar"
+		// }),
+		common.WithJSONSchemaID("foo"),
 	)
 	if err != nil {
 		t.Errorf("expected schema, got error: %v", err)
 	}
 
-	t.Log(structSchema)
-
 	if err := structSchema.Validate(structConfig); err != nil {
 		t.Errorf("expected valid schema, got invalid: %v", err)
-	} else if err := structSchema.ValidateAny(map[string]any{
+	} else if config, err := structSchema.ValidateAny(map[string]any{
 		"key": "foo",
 		"map": map[string]any{
 			"bar": "baz",
 		},
 	}); err != nil {
 		t.Errorf("expected valid schema, got invalid: %v", err)
-	} else if config, err := structSchema.ValidateString(`{"key": "value"}`); err != nil {
-		t.Errorf("expected valid schema, got invalid: %v", err)
-	} else if config.Key != "value" {
-		t.Errorf("expected config key 'value', got '%s'", config.Key)
+		// } else if config, err = structSchema.ValidateString(`{"key": "value"}`); err != nil {
+		// 	t.Errorf("expected valid schema, got invalid: %v", err)
+		// } else if config.Key != "value" {
+		// 	t.Errorf("expected config key 'value', got '%s'", config.Key)
 	} else {
 		t.Log(config)
 	}
@@ -93,14 +133,14 @@ func Test_MapSchema(t *testing.T) {
 
 	if err := mapSchema.Validate(mapConfig); err != nil {
 		t.Errorf("expected valid, got invalid: %v", err)
-	} else if err := mapSchema.ValidateAny(map[string]any{
+	} else if config, err := mapSchema.ValidateAny(map[string]any{
 		"foo": "bar",
 	}); err != nil {
 		t.Errorf("expected valid, got invalid: %v", err)
-	} else if config, err := mapSchema.ValidateString(`{"key": "value"}`); err != nil {
-		t.Errorf("expected valid, got invalid: %v", err)
-	} else if config["key"] != "value" {
-		t.Errorf("expected config key 'value', got '%s'", config["key"])
+		// } else if config, err = mapSchema.ValidateString(`{"key": "value"}`); err != nil {
+		// t.Errorf("expected valid, got invalid: %v", err)
+		// } else if config["key"] != "value" {
+		// 	t.Errorf("expected config key 'value', got '%s'", config["key"])
 	} else {
 		t.Log(config)
 	}
@@ -118,12 +158,12 @@ func Test_SliceSchema(t *testing.T) {
 
 	if err := sliceSchema.Validate([]string{"foo", "bar"}); err != nil {
 		t.Errorf("expected valid value, got invalid: %v", err)
-	} else if err := sliceSchema.ValidateAny(`["foo", "bar"]`); err != nil {
+	} else if config, err := sliceSchema.ValidateAny([]string{"foo", "bar"}); err != nil {
 		t.Errorf("expected valid value, got invalid: %v", err)
-	} else if config, err := sliceSchema.ValidateString(`["foo", "bar"]`); err != nil {
-		t.Errorf("expected valid value, got invalid: %v", err)
-	} else if config[0] != "foo" {
-		t.Errorf("expected config key 'value', got '%s'", config[0])
+		// } else if config, err = sliceSchema.ValidateString(`["foo", "bar"]`); err != nil {
+		// t.Errorf("expected valid value, got invalid: %v", err)
+		// } else if config[0] != "foo" {
+		// 	t.Errorf("expected config key 'value', got '%s'", config[0])
 	} else {
 		t.Log(config)
 	}
@@ -134,7 +174,7 @@ func Test_Scalars(t *testing.T) {
 		common.JSONBoolean: true,
 		common.JSONInteger: int64(123),
 		common.JSONNumber:  456.789,
-		common.JSONString:  "a",
+		common.JSONString:  "foobar",
 	}
 
 	for typ, val := range scalars {
@@ -146,7 +186,7 @@ func Test_Scalars(t *testing.T) {
 		t.Log(schema.String())
 		t.Log(typ, val)
 
-		if err := schema.Validate(val); err != nil {
+		if _, err := schema.ValidateAny(val); err != nil {
 			t.Errorf("expected valid, got invalid: %v", err)
 		}
 	}

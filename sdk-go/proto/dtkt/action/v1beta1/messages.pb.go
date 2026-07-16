@@ -470,17 +470,17 @@ const file_dtkt_action_v1beta1_messages_proto_rawDesc = "" +
 	"\x06filter\x18\x03 \x01(\tR\x06filter\"t\n" +
 	"\x13ListActionsResponse\x125\n" +
 	"\aactions\x18\x01 \x03(\v2\x1b.dtkt.action.v1beta1.ActionR\aactions\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xba\x01\n" +
-	"\x10GetActionRequest\x12\xa5\x01\n" +
-	"\x04name\x18\x01 \x01(\tB\x90\x01\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x85\x01\n" +
-	"\x10Select an action:q\n" +
-	"-dtkt.action.v1beta1.ActionService.ListActions\x12#this.actions.map(i, i.display_name)\x1a\x1bthis.actions.map(i, i.name)R\x04name\"H\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\x9d\x01\n" +
+	"\x10GetActionRequest\x12\x88\x01\n" +
+	"\x04name\x18\x01 \x01(\tBt\xbaH\x03\xc8\x01\x01\x82\xb5\x18j\n" +
+	"\x10Select an action:V\n" +
+	"-dtkt.action.v1beta1.ActionService.ListActions\x12\aactions\x1a\x11this.display_name\"\tthis.nameR\x04name\"H\n" +
 	"\x11GetActionResponse\x123\n" +
-	"\x06action\x18\x01 \x01(\v2\x1b.dtkt.action.v1beta1.ActionR\x06action\"\xaa\x02\n" +
-	"\x14ExecuteActionRequest\x12\xb0\x01\n" +
-	"\x04name\x18\x01 \x01(\tB\x9b\x01\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x90\x01\n" +
-	"\x1bSelect an action to execute:q\n" +
-	"-dtkt.action.v1beta1.ActionService.ListActions\x12#this.actions.map(i, i.display_name)\x1a\x1bthis.actions.map(i, i.name)R\x04name\x12*\n" +
+	"\x06action\x18\x01 \x01(\v2\x1b.dtkt.action.v1beta1.ActionR\x06action\"\x8d\x02\n" +
+	"\x14ExecuteActionRequest\x12\x93\x01\n" +
+	"\x04name\x18\x01 \x01(\tB\x7f\xbaH\x03\xc8\x01\x01\x82\xb5\x18u\n" +
+	"\x1bSelect an action to execute:V\n" +
+	"-dtkt.action.v1beta1.ActionService.ListActions\x12\aactions\x1a\x11this.display_name\"\tthis.nameR\x04name\x12*\n" +
 	"\x05input\x18\x02 \x01(\v2\x14.google.protobuf.AnyR\x05input\x123\n" +
 	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\x8a\x01\n" +
 	"\x15ExecuteActionResponse\x12\x12\n" +

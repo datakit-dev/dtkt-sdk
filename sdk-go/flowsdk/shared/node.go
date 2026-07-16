@@ -1,21 +1,12 @@
 package shared
 
 import (
-	"fmt"
+	"context"
 	"slices"
 	"strings"
 
-	"github.com/google/cel-go/common/types/ref"
+	"github.com/google/cel-go/cel"
 	"google.golang.org/protobuf/proto"
-)
-
-const (
-	ActionType     = "Action"
-	ConnectionType = "Connection"
-	InputType      = "Input"
-	OutputType     = "Output"
-	StreamType     = "Stream"
-	VarType        = "Var"
 )
 
 const (
@@ -27,6 +18,11 @@ const (
 	VarPrefix        = "vars"
 )
 
+// NodeVarsType is the CEL type used for node variable bindings (e.g.
+// vars.x, streams.y, and self), each of which resolves to a map exposing
+// value, prev, count, start_time, and finish_time.
+var NodeVarsType = cel.MapType(cel.StringType, cel.DynType)
+
 var (
 	// validNodePrefixes is a list of valid node id prefixes
 	validNodePrefixes = []string{
@@ -37,31 +33,27 @@ var (
 		StreamPrefix,
 		VarPrefix,
 	}
-	// invalidEdges is a map of target -> source prefixes which are not supported
-	invalidEdges = map[string][]string{
-		// connections and inputs contain no expressions
-		ActionPrefix: {"connections", "outputs"},
-		OutputPrefix: {"connections"},
-		StreamPrefix: {"connections", "outputs"},
-		VarPrefix:    {"connections", "outputs"},
-	}
 )
 
 type (
+	Node interface {
+		Ident() string
+		Spec() SpecNode
+		Exec() ExecNode
+		Pipe() Pipe
+		Send() chan<- any
+		Recv() <-chan any
+	}
 	SpecNode interface {
 		proto.Message
 		GetId() string
 	}
 	ExecNode interface {
-		Compile(Runtime) error
-		Recv() (RecvFunc, bool)
-		Send() (SendFunc, bool)
-		Eval() (EvalFunc, bool)
-		// HasCached returns the cached value and true if this node has caching
-		// enabled and a value has already been captured. The executor re-uses this
-		// value each cycle instead of waiting for a new external event.
-		HasCached() (ref.Val, bool)
+		Compile(context.Context, Env) error
+		Run(context.Context, Env, Pipe) error
 	}
+	NodeParser[T Node] func(T, NodeVisitor) error
+	NodeVisitor        func(id string, expr *cel.Ast)
 )
 
 func IsNodeID(id string) bool {
@@ -87,23 +79,4 @@ func ParseNodePrefixAndID(ident string) (string, string, bool) {
 		return parts[0], parts[1], true
 	}
 	return "", "", false
-}
-
-func IsValidEdge(sourceID, targetID string) error {
-	sourcePrefix, ok := ParseNodePrefix(sourceID)
-	if !ok {
-		return fmt.Errorf("invalid source node id: %s", sourceID)
-	}
-
-	targetPrefix, ok := ParseNodePrefix(targetID)
-	if !ok {
-		return fmt.Errorf("invalid target node id: %s", targetID)
-	}
-
-	invalidSources, ok := invalidEdges[targetPrefix]
-	if ok && slices.Contains(invalidSources, sourcePrefix) {
-		return fmt.Errorf("invalid edge: source[%s] -> target[%s]", sourceID, targetID)
-	}
-
-	return nil
 }

@@ -11,6 +11,8 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 )
 
+var boolType = reflect.TypeFor[bool]()
+
 type ActionCaller struct {
 	node   *flowv1beta1.Action
 	method *Method
@@ -27,7 +29,7 @@ type ActionCaller struct {
 func NewActionCaller(
 	env shared.Env,
 	node *flowv1beta1.Action,
-	visitor shared.NodeVisitFunc,
+	visitor shared.NodeVisitor,
 ) (_ *ActionCaller, err error) {
 	call := node.GetCall()
 	caller := &ActionCaller{
@@ -35,33 +37,31 @@ func NewActionCaller(
 	}
 
 	if call.GetInvokeWhen() != "" {
-		caller.invokeWhenExpr, err = shared.ParseExpr(env, call.GetInvokeWhen(), visitor.ExprVisitor(GetID(node)))
+		caller.invokeWhenExpr, err = shared.ParseExpr(env, call.GetInvokeWhen(), visitor.ExprVisitor(GetNodeIdent(node)))
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	if call.GetOnError() != "" {
-		caller.onErrorExpr, err = shared.ParseExpr(env, call.GetOnError(), visitor.ExprVisitor(GetID(node)))
+		caller.onErrorExpr, err = shared.ParseExpr(env, call.GetOnError(), visitor.ExprVisitor(GetNodeIdent(node)))
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	caller.method, err = NewMethod(env, node, visitor)
+	method, err := NewMethod(env, node, visitor)
 	if err != nil {
 		return nil, err
 	}
 
+	caller.method = method
+	caller.cache = NewEvalCache(node, caller)
+
 	return caller, nil
 }
 
-func (m *ActionCaller) Compile(run shared.Runtime) error {
-	env, err := run.Env()
-	if err != nil {
-		return err
-	}
-
+func (m *ActionCaller) Compile(ctx context.Context, env shared.Env) (err error) {
 	opts := []cel.ProgramOption{cel.InterruptCheckFrequency(1)}
 
 	if m.invokeWhenExpr != nil {
@@ -78,63 +78,27 @@ func (m *ActionCaller) Compile(run shared.Runtime) error {
 		}
 	}
 
-	err = m.method.Compile(run)
+	err = m.method.Compile(ctx, env)
 	if err != nil {
 		return err
 	}
-
-	conn, err := m.method.GetConnector(run)
-	if err != nil {
-		return err
-	}
-
-	method, err := m.method.GetDescriptor(run)
-	if err != nil {
-		return err
-	}
-
-	ctx, client, err := conn.GetClient(run.Context())
-	if err != nil {
-		return err
-	}
-
-	m.cache = NewEvalCache(m.node, shared.EvalFunc(func(run shared.Runtime) ref.Val {
-		env, err := run.Env()
-		if err != nil {
-			return types.WrapErr(err)
-		}
-
-		shouldInvoke, err := m.ShouldInvoke(run.Context(), env)
-		if err != nil {
-			return types.WrapErr(err)
-		} else if !shouldInvoke {
-			return types.NullValue
-		}
-
-		req, err := m.method.EvalRequest(run)
-		if err != nil {
-			return types.WrapErr(err)
-		}
-
-		res, err := client.CallUnary(ctx, method.FullName(), req)
-		if err != nil {
-			return types.WrapErr(err)
-		}
-
-		return env.TypeAdapter().NativeToValue(res)
-	}))
 
 	return nil
 }
 
 func (m *ActionCaller) ShouldInvoke(ctx context.Context, env shared.Env) (bool, error) {
 	if m.invokeWhenProg != nil {
-		val, _, err := m.invokeWhenProg.ContextEval(ctx, env.Vars())
+		vars, err := env.Vars(ctx)
 		if err != nil {
 			return false, err
 		}
 
-		shouldInvoke, err := val.ConvertToNative(reflect.TypeFor[bool]())
+		val, _, err := m.invokeWhenProg.ContextEval(ctx, vars)
+		if err != nil {
+			return false, err
+		}
+
+		shouldInvoke, err := val.ConvertToNative(boolType)
 		if err != nil {
 			return false, err
 		}
@@ -145,14 +109,34 @@ func (m *ActionCaller) ShouldInvoke(ctx context.Context, env shared.Env) (bool, 
 	return true, nil
 }
 
-func (m *ActionCaller) Eval() (shared.EvalFunc, bool) {
-	return m.cache.Eval()
+func (m *ActionCaller) Eval(ctx context.Context, env shared.Env) ref.Val {
+	ctx, client, err := m.method.GetClient(ctx, env)
+	if err != nil {
+		return types.WrapErr(err)
+	}
+
+	shouldInvoke, err := m.ShouldInvoke(ctx, env)
+	if err != nil {
+		return types.WrapErr(err)
+	} else if !shouldInvoke {
+		return types.NullValue
+	}
+
+	req, err := m.method.EvalRequest(ctx, env)
+	if err != nil {
+		return types.WrapErr(err)
+	}
+
+	res, err := client.CallUnary(ctx, m.method.FullName(), req)
+	if err != nil {
+		return types.WrapErr(err)
+	}
+
+	return env.Types().NativeToValue(res)
 }
 
-func (m *ActionCaller) HasCached() (ref.Val, bool) {
-	return m.cache.HasCached()
+func (m *ActionCaller) Run(ctx context.Context, env shared.Env, pipe shared.Pipe) error {
+	return pipe.Run(ctx, func(ctx context.Context, value any) (any, error) {
+		return m.cache.Eval(ctx, env), nil
+	})
 }
-
-func (m *ActionCaller) Close() error                  { return nil }
-func (m *ActionCaller) Recv() (shared.RecvFunc, bool) { return nil, false }
-func (m *ActionCaller) Send() (shared.SendFunc, bool) { return nil, false }

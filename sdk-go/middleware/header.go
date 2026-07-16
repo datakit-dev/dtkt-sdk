@@ -31,7 +31,7 @@ func GetFromGRPC(md metadata.MD, key string) (val string) {
 
 func RequestToGRPCPairs(req *Request) []string {
 	return []string{
-		AddrNameHeader, req.addrName,
+		AddrNameHeader, req.resourceName,
 		ConfigHashHeader, req.configHash,
 		ConfigGenHeader, strconv.Itoa(int(req.configGen)),
 	}
@@ -52,7 +52,7 @@ func RequestFromGRPC(md metadata.MD) *Request {
 
 func RequestToHeader(req *Request) http.Header {
 	header := http.Header{}
-	header.Add(AddrNameHeader, req.addrName)
+	header.Add(AddrNameHeader, req.resourceName)
 	header.Add(ConfigHashHeader, req.configHash)
 	header.Add(ConfigGenHeader, strconv.Itoa(int(req.configGen)))
 	return header

@@ -16,19 +16,35 @@ import (
 
 type (
 	Service struct {
-		info    grpc.ServiceInfo
+		desc    *grpc.ServiceDesc
 		regSvc  RegisterServiceFunc
-		getConn GetProxyConnFunc
+		getConn GetConnFunc
 		isProxy bool
 	}
 	InitServiceFunc[I v1beta1.InstanceType, S any] func(v1beta1.InstanceMux[I]) S
 	RegisterServiceFunc                            func(grpc.ServiceRegistrar)
-	GetProxyConnFunc                               func(context.Context, ...grpc.DialOption) (context.Context, *grpc.ClientConn, error)
+	GetProxyConnFunc[I v1beta1.InstanceType]       func(context.Context, v1beta1.InstanceMux[I], ...grpc.DialOption) (context.Context, *grpc.ClientConn, error)
+	GetConnFunc                                    func(context.Context, ...grpc.DialOption) (context.Context, *grpc.ClientConn, error)
 )
 
-func NewServiceInfo(svcDesc *grpc.ServiceDesc) grpc.ServiceInfo {
-	methods := make([]grpc.MethodInfo, 0, len(svcDesc.Methods)+len(svcDesc.Streams))
-	for _, m := range svcDesc.Methods {
+func NewService(desc *grpc.ServiceDesc, regFunc RegisterServiceFunc) Service {
+	return Service{
+		desc:   desc,
+		regSvc: regFunc,
+	}
+}
+
+func NewServiceProxy(desc *grpc.ServiceDesc, connFunc GetConnFunc) Service {
+	return Service{
+		desc:    desc,
+		getConn: connFunc,
+		isProxy: true,
+	}
+}
+
+func NewServiceInfo(desc *grpc.ServiceDesc) grpc.ServiceInfo {
+	methods := make([]grpc.MethodInfo, 0, len(desc.Methods)+len(desc.Streams))
+	for _, m := range desc.Methods {
 		methods = append(methods, grpc.MethodInfo{
 			Name:           m.MethodName,
 			IsClientStream: false,
@@ -36,7 +52,7 @@ func NewServiceInfo(svcDesc *grpc.ServiceDesc) grpc.ServiceInfo {
 		})
 	}
 
-	for _, s := range svcDesc.Streams {
+	for _, s := range desc.Streams {
 		methods = append(methods, grpc.MethodInfo{
 			Name:           s.StreamName,
 			IsClientStream: s.ClientStreams,
@@ -46,11 +62,11 @@ func NewServiceInfo(svcDesc *grpc.ServiceDesc) grpc.ServiceInfo {
 
 	return grpc.ServiceInfo{
 		Methods:  methods,
-		Metadata: svcDesc.Metadata,
+		Metadata: desc.Metadata,
 	}
 }
 
-func RegisterServiceProxy[C any, I v1beta1.InstanceType](intgr *Integration[C, I], svcDesc *grpc.ServiceDesc, getConn GetProxyConnFunc) {
+func RegisterProxy[C any, I v1beta1.InstanceType](intgr *Integration[C, I], svcDesc *grpc.ServiceDesc, getConn GetProxyConnFunc[I]) {
 	err := intgr.RegisterProxy(svcDesc, getConn)
 	if err != nil {
 		log.Fatal(err)

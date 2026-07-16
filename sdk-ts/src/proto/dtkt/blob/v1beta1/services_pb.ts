@@ -4,7 +4,7 @@
 
 import type { GenFile, GenService } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { CopyBlobRequestSchema, CopyBlobResponseSchema, DeleteBlobRequestSchema, DeleteBlobResponseSchema, GenerateSignedURLRequestSchema, GenerateSignedURLResponseSchema, GetBlobRequestSchema, GetBlobResponseSchema, ListBlobsRequestSchema, ListBlobsResponseSchema, ReadBlobLinesRequestSchema, ReadBlobLinesResponseSchema, ReadBlobRangeRequestSchema, ReadBlobRangeResponseSchema, WriteBlobLinesRequestSchema, WriteBlobLinesResponseSchema, WriteBlobRequestSchema, WriteBlobResponseSchema } from "./messages_pb";
+import type { CopyBlobRequestSchema, CopyBlobResponseSchema, DeleteBlobRequestSchema, DeleteBlobResponseSchema, GenerateSignedURLRequestSchema, GenerateSignedURLResponseSchema, GetBlobRequestSchema, GetBlobResponseSchema, ListBlobsRequestSchema, ListBlobsResponseSchema, ListBucketsRequestSchema, ListBucketsResponseSchema, ReadBlobLinesRequestSchema, ReadBlobLinesResponseSchema, ReadBlobRequestSchema, ReadBlobResponseSchema, WriteBlobLinesRequestSchema, WriteBlobLinesResponseSchema, WriteBlobRequestSchema, WriteBlobResponseSchema } from "./messages_pb";
 import { file_dtkt_blob_v1beta1_messages } from "./messages_pb";
 import { file_google_api_annotations } from "../../../google/api/annotations_pb";
 
@@ -12,7 +12,26 @@ import { file_google_api_annotations } from "../../../google/api/annotations_pb"
  * Describes the file dtkt/blob/v1beta1/services.proto.
  */
 export const file_dtkt_blob_v1beta1_services: GenFile = /*@__PURE__*/
-  fileDesc("CiBkdGt0L2Jsb2IvdjFiZXRhMS9zZXJ2aWNlcy5wcm90bxIRZHRrdC5ibG9iLnYxYmV0YTEy8AoKC0Jsb2JTZXJ2aWNlEpcBCglMaXN0QmxvYnMSIy5kdGt0LmJsb2IudjFiZXRhMS5MaXN0QmxvYnNSZXF1ZXN0GiQuZHRrdC5ibG9iLnYxYmV0YTEuTGlzdEJsb2JzUmVzcG9uc2UiP4LT5JMCOVoQEg4vdjFiZXRhMS9ibG9icxIlL3YxYmV0YTEve2J1Y2tldD1ibG9iQnVja2V0cy8qfS9ibG9icxKjAQoHR2V0QmxvYhIhLmR0a3QuYmxvYi52MWJldGExLkdldEJsb2JSZXF1ZXN0GiIuZHRrdC5ibG9iLnYxYmV0YTEuR2V0QmxvYlJlc3BvbnNlIlGC0+STAktaGRIXL3YxYmV0YTEvYmxvYnMve2tleT0qKn0SLi92MWJldGExL3tidWNrZXQ9YmxvYkJ1Y2tldHMvKn0vYmxvYnMve2tleT0qKn0SrwEKCVdyaXRlQmxvYhIjLmR0a3QuYmxvYi52MWJldGExLldyaXRlQmxvYlJlcXVlc3QaJC5kdGt0LmJsb2IudjFiZXRhMS5Xcml0ZUJsb2JSZXNwb25zZSJXgtPkkwJROgEqWhw6ASoaFy92MWJldGExL2Jsb2JzL3trZXk9Kip9Gi4vdjFiZXRhMS97YnVja2V0PWJsb2JCdWNrZXRzLyp9L2Jsb2JzL3trZXk9Kip9EqwBCgpEZWxldGVCbG9iEiQuZHRrdC5ibG9iLnYxYmV0YTEuRGVsZXRlQmxvYlJlcXVlc3QaJS5kdGt0LmJsb2IudjFiZXRhMS5EZWxldGVCbG9iUmVzcG9uc2UiUYLT5JMCS1oZKhcvdjFiZXRhMS9ibG9icy97a2V5PSoqfSouL3YxYmV0YTEve2J1Y2tldD1ibG9iQnVja2V0cy8qfS9ibG9icy97a2V5PSoqfRKwAQoIQ29weUJsb2ISIi5kdGt0LmJsb2IudjFiZXRhMS5Db3B5QmxvYlJlcXVlc3QaIy5kdGt0LmJsb2IudjFiZXRhMS5Db3B5QmxvYlJlc3BvbnNlIluC0+STAlU6ASpaGDoBKiITL3YxYmV0YTEvYmxvYnM6Y29weSI2L3YxYmV0YTEve2Rlc3RpbmF0aW9uX2J1Y2tldD1ibG9iQnVja2V0cy8qfS9ibG9iczpjb3B5EtcBChFHZW5lcmF0ZVNpZ25lZFVSTBIrLmR0a3QuYmxvYi52MWJldGExLkdlbmVyYXRlU2lnbmVkVVJMUmVxdWVzdBosLmR0a3QuYmxvYi52MWJldGExLkdlbmVyYXRlU2lnbmVkVVJMUmVzcG9uc2UiZ4LT5JMCYToBKlokOgEqIh8vdjFiZXRhMS9ibG9icy97a2V5PSoqfTpzaWduVXJsIjYvdjFiZXRhMS97YnVja2V0PWJsb2JCdWNrZXRzLyp9L2Jsb2JzL3trZXk9Kip9OnNpZ25VcmwSZAoNUmVhZEJsb2JMaW5lcxInLmR0a3QuYmxvYi52MWJldGExLlJlYWRCbG9iTGluZXNSZXF1ZXN0GiguZHRrdC5ibG9iLnYxYmV0YTEuUmVhZEJsb2JMaW5lc1Jlc3BvbnNlMAESZAoNUmVhZEJsb2JSYW5nZRInLmR0a3QuYmxvYi52MWJldGExLlJlYWRCbG9iUmFuZ2VSZXF1ZXN0GiguZHRrdC5ibG9iLnYxYmV0YTEuUmVhZEJsb2JSYW5nZVJlc3BvbnNlMAESZwoOV3JpdGVCbG9iTGluZXMSKC5kdGt0LmJsb2IudjFiZXRhMS5Xcml0ZUJsb2JMaW5lc1JlcXVlc3QaKS5kdGt0LmJsb2IudjFiZXRhMS5Xcml0ZUJsb2JMaW5lc1Jlc3BvbnNlKAFC2gEKF3Byb3RvLmR0a3QuYmxvYi52MWJldGExQg1TZXJ2aWNlc1Byb3RvUAFaSmdpdGh1Yi5jb20vZGF0YWtpdC1kZXYvZHRrdC1zZGsvc2RrLWdvL3Byb3RvL2R0a3QvYmxvYi92MWJldGExO2Jsb2J2MWJldGExogIDREJYqgIRRHRrdC5CbG9iLlYxYmV0YTHKAhFEdGt0XEJsb2JcVjFiZXRhMeICHUR0a3RcQmxvYlxWMWJldGExXEdQQk1ldGFkYXRh6gITRHRrdDo6QmxvYjo6VjFiZXRhMWIGcHJvdG8z", [file_dtkt_blob_v1beta1_messages, file_google_api_annotations]);
+  fileDesc("CiBkdGt0L2Jsb2IvdjFiZXRhMS9zZXJ2aWNlcy5wcm90bxIRZHRrdC5ibG9iLnYxYmV0YTEyhwEKDUJ1Y2tldFNlcnZpY2USdgoLTGlzdEJ1Y2tldHMSJS5kdGt0LmJsb2IudjFiZXRhMS5MaXN0QnVja2V0c1JlcXVlc3QaJi5kdGt0LmJsb2IudjFiZXRhMS5MaXN0QnVja2V0c1Jlc3BvbnNlIhiC0+STAhISEC92MWJldGExL2J1Y2tldHMyywoKC0Jsb2JTZXJ2aWNlEpMBCglMaXN0QmxvYnMSIy5kdGt0LmJsb2IudjFiZXRhMS5MaXN0QmxvYnNSZXF1ZXN0GiQuZHRrdC5ibG9iLnYxYmV0YTEuTGlzdEJsb2JzUmVzcG9uc2UiO4LT5JMCNVoQEg4vdjFiZXRhMS9ibG9icxIhL3YxYmV0YTEve2J1Y2tldD1idWNrZXRzLyp9L2Jsb2JzEp8BCgdHZXRCbG9iEiEuZHRrdC5ibG9iLnYxYmV0YTEuR2V0QmxvYlJlcXVlc3QaIi5kdGt0LmJsb2IudjFiZXRhMS5HZXRCbG9iUmVzcG9uc2UiTYLT5JMCR1oZEhcvdjFiZXRhMS9ibG9icy97a2V5PSoqfRIqL3YxYmV0YTEve2J1Y2tldD1idWNrZXRzLyp9L2Jsb2JzL3trZXk9Kip9EqgBCgpEZWxldGVCbG9iEiQuZHRrdC5ibG9iLnYxYmV0YTEuRGVsZXRlQmxvYlJlcXVlc3QaJS5kdGt0LmJsb2IudjFiZXRhMS5EZWxldGVCbG9iUmVzcG9uc2UiTYLT5JMCR1oZKhcvdjFiZXRhMS9ibG9icy97a2V5PSoqfSoqL3YxYmV0YTEve2J1Y2tldD1idWNrZXRzLyp9L2Jsb2JzL3trZXk9Kip9EqwBCghDb3B5QmxvYhIiLmR0a3QuYmxvYi52MWJldGExLkNvcHlCbG9iUmVxdWVzdBojLmR0a3QuYmxvYi52MWJldGExLkNvcHlCbG9iUmVzcG9uc2UiV4LT5JMCUToBKloYOgEqIhMvdjFiZXRhMS9ibG9iczpjb3B5IjIvdjFiZXRhMS97ZGVzdGluYXRpb25fYnVja2V0PWJ1Y2tldHMvKn0vYmxvYnM6Y29weRLTAQoRR2VuZXJhdGVTaWduZWRVUkwSKy5kdGt0LmJsb2IudjFiZXRhMS5HZW5lcmF0ZVNpZ25lZFVSTFJlcXVlc3QaLC5kdGt0LmJsb2IudjFiZXRhMS5HZW5lcmF0ZVNpZ25lZFVSTFJlc3BvbnNlImOC0+STAl06ASpaJDoBKiIfL3YxYmV0YTEvYmxvYnMve2tleT0qKn06c2lnblVybCIyL3YxYmV0YTEve2J1Y2tldD1idWNrZXRzLyp9L2Jsb2JzL3trZXk9Kip9OnNpZ25VcmwSVQoIUmVhZEJsb2ISIi5kdGt0LmJsb2IudjFiZXRhMS5SZWFkQmxvYlJlcXVlc3QaIy5kdGt0LmJsb2IudjFiZXRhMS5SZWFkQmxvYlJlc3BvbnNlMAESrQEKCVdyaXRlQmxvYhIjLmR0a3QuYmxvYi52MWJldGExLldyaXRlQmxvYlJlcXVlc3QaJC5kdGt0LmJsb2IudjFiZXRhMS5Xcml0ZUJsb2JSZXNwb25zZSJTgtPkkwJNOgEqWhw6ASoaFy92MWJldGExL2Jsb2JzL3trZXk9Kip9GiovdjFiZXRhMS97YnVja2V0PWJ1Y2tldHMvKn0vYmxvYnMve2tleT0qKn0oARJkCg1SZWFkQmxvYkxpbmVzEicuZHRrdC5ibG9iLnYxYmV0YTEuUmVhZEJsb2JMaW5lc1JlcXVlc3QaKC5kdGt0LmJsb2IudjFiZXRhMS5SZWFkQmxvYkxpbmVzUmVzcG9uc2UwARJnCg5Xcml0ZUJsb2JMaW5lcxIoLmR0a3QuYmxvYi52MWJldGExLldyaXRlQmxvYkxpbmVzUmVxdWVzdBopLmR0a3QuYmxvYi52MWJldGExLldyaXRlQmxvYkxpbmVzUmVzcG9uc2UoAULaAQoXcHJvdG8uZHRrdC5ibG9iLnYxYmV0YTFCDVNlcnZpY2VzUHJvdG9QAVpKZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9ibG9iL3YxYmV0YTE7YmxvYnYxYmV0YTGiAgNEQliqAhFEdGt0LkJsb2IuVjFiZXRhMcoCEUR0a3RcQmxvYlxWMWJldGEx4gIdRHRrdFxCbG9iXFYxYmV0YTFcR1BCTWV0YWRhdGHqAhNEdGt0OjpCbG9iOjpWMWJldGExYgZwcm90bzM", [file_dtkt_blob_v1beta1_messages, file_google_api_annotations]);
+
+/**
+ * BucketService provides operations to interact with buckets within a storage location.
+ *
+ * @generated from service dtkt.blob.v1beta1.BucketService
+ */
+export const BucketService: GenService<{
+  /**
+   * Retrieves a list of buckets.
+   *
+   * @generated from rpc dtkt.blob.v1beta1.BucketService.ListBuckets
+   */
+  listBuckets: {
+    methodKind: "unary";
+    input: typeof ListBucketsRequestSchema;
+    output: typeof ListBucketsResponseSchema;
+  },
+}> = /*@__PURE__*/
+  serviceDesc(file_dtkt_blob_v1beta1_services, 0);
 
 /**
  * BlobService provides operations to interact with blobs within a storage location.
@@ -21,7 +40,7 @@ export const file_dtkt_blob_v1beta1_services: GenFile = /*@__PURE__*/
  */
 export const BlobService: GenService<{
   /**
-   * Retrieves a list of files provided by service.
+   * Retrieves a list of blobs.
    *
    * @generated from rpc dtkt.blob.v1beta1.BlobService.ListBlobs
    */
@@ -39,16 +58,6 @@ export const BlobService: GenService<{
     methodKind: "unary";
     input: typeof GetBlobRequestSchema;
     output: typeof GetBlobResponseSchema;
-  },
-  /**
-   * Writes or overwrites the blob stored at key.
-   *
-   * @generated from rpc dtkt.blob.v1beta1.BlobService.WriteBlob
-   */
-  writeBlob: {
-    methodKind: "unary";
-    input: typeof WriteBlobRequestSchema;
-    output: typeof WriteBlobResponseSchema;
   },
   /**
    * Deletes the blob stored at key.
@@ -81,7 +90,31 @@ export const BlobService: GenService<{
     output: typeof GenerateSignedURLResponseSchema;
   },
   /**
-   * ReadBlobLines streams lines of blob with requested key and options.
+   * Retrieves the contents of a blob as a stream of responses containing a
+   * portion of the requested bytes. The stream ends when all data has been
+   * sent or the end of contents has been reached (may be less than requested).
+   *
+   * @generated from rpc dtkt.blob.v1beta1.BlobService.ReadBlob
+   */
+  readBlob: {
+    methodKind: "server_streaming";
+    input: typeof ReadBlobRequestSchema;
+    output: typeof ReadBlobResponseSchema;
+  },
+  /**
+   * Writes the contents of a blob as a stream of requests containing a portion
+   * of bytes to be written. The stream ends when the request specifies it has
+   * finished sending.
+   *
+   * @generated from rpc dtkt.blob.v1beta1.BlobService.WriteBlob
+   */
+  writeBlob: {
+    methodKind: "client_streaming";
+    input: typeof WriteBlobRequestSchema;
+    output: typeof WriteBlobResponseSchema;
+  },
+  /**
+   * Streams lines of data format and mode of blob content.
    *
    * @generated from rpc dtkt.blob.v1beta1.BlobService.ReadBlobLines
    */
@@ -89,16 +122,6 @@ export const BlobService: GenService<{
     methodKind: "server_streaming";
     input: typeof ReadBlobLinesRequestSchema;
     output: typeof ReadBlobLinesResponseSchema;
-  },
-  /**
-   * ReadBlobRange streams chunks of blob with requested key and options.
-   *
-   * @generated from rpc dtkt.blob.v1beta1.BlobService.ReadBlobRange
-   */
-  readBlobRange: {
-    methodKind: "server_streaming";
-    input: typeof ReadBlobRangeRequestSchema;
-    output: typeof ReadBlobRangeResponseSchema;
   },
   /**
    * WriteBlobLines streams lines into blob with requested key and options.
@@ -111,5 +134,5 @@ export const BlobService: GenService<{
     output: typeof WriteBlobLinesResponseSchema;
   },
 }> = /*@__PURE__*/
-  serviceDesc(file_dtkt_blob_v1beta1_services, 0);
+  serviceDesc(file_dtkt_blob_v1beta1_services, 1);
 

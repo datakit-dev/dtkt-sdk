@@ -539,6 +539,8 @@ export type Stream = Message<"dtkt.flow.v1beta1.Stream"> & {
   call?: Stream_MethodCall;
 
   /**
+   * Reducer reduce = 6;
+   *
    * @generated from field: dtkt.flow.v1beta1.Stream.Generator generate = 5;
    */
   generate?: Stream_Generator;
@@ -573,6 +575,8 @@ export type StreamValid = Message<"dtkt.flow.v1beta1.Stream"> & {
   call?: Stream_MethodCallValid;
 
   /**
+   * Reducer reduce = 6;
+   *
    * @generated from field: dtkt.flow.v1beta1.Stream.Generator generate = 5;
    */
   generate?: Stream_GeneratorValid;
@@ -965,14 +969,14 @@ export type Var = Message<"dtkt.flow.v1beta1.Var"> & {
   cache?: boolean;
 
   /**
-   * Var evaluates to given expression value.
+   * Var evaluates given expression.
    *
    * @generated from field: string value = 3;
    */
   value: string;
 
   /**
-   * Var evaluates to switch statements first matching case (otherwise default).
+   * Var evaluates to given switch statement's first matching case (otherwise default).
    *
    * @generated from field: dtkt.flow.v1beta1.Var.Switch switch = 4;
    */
@@ -998,14 +1002,14 @@ export type VarValid = Message<"dtkt.flow.v1beta1.Var"> & {
   cache?: boolean;
 
   /**
-   * Var evaluates to given expression value.
+   * Var evaluates given expression.
    *
    * @generated from field: string value = 3;
    */
   value: string;
 
   /**
-   * Var evaluates to switch statements first matching case (otherwise default).
+   * Var evaluates to given switch statement's first matching case (otherwise default).
    *
    * @generated from field: dtkt.flow.v1beta1.Var.Switch switch = 4;
    */
@@ -1113,6 +1117,8 @@ export type Output = Message<"dtkt.flow.v1beta1.Output"> & {
   id: string;
 
   /**
+   * Output evaluates given expression.
+   *
    * @generated from field: string value = 2;
    */
   value: string;
@@ -1128,6 +1134,8 @@ export type OutputValid = Message<"dtkt.flow.v1beta1.Output"> & {
   id: string;
 
   /**
+   * Output evaluates given expression.
+   *
    * @generated from field: string value = 2;
    */
   value: string;

@@ -2,6 +2,7 @@ package v1beta1
 
 import (
 	"buf.build/go/protovalidate"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/api"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -37,7 +38,7 @@ func ValidateMessage(env Env, msg protoreflect.Message) error {
 		return nil
 	}
 
-	validator, err := env.Validator()
+	validator, err := env.Resolver().GetValidator()
 	if err != nil {
 		return err
 	}
@@ -45,19 +46,20 @@ func ValidateMessage(env Env, msg protoreflect.Message) error {
 	return validator.Validate(msg.Interface())
 }
 
-func ValidateField(env Env, msg protoreflect.Message, field protoreflect.FieldDescriptor) error {
-	if msg == nil || field == nil {
+func ValidateField(env Env, root protoreflect.Message, field protoreflect.FieldDescriptor) error {
+	if root == nil || field == nil {
 		return nil
 	}
 
-	validator, err := env.Validator()
+	validator, err := env.Resolver().GetValidator()
 	if err != nil {
 		return err
 	}
 
-	return validator.Validate(msg.Interface(), protovalidate.WithFilter(
+	filter := api.ValidatorFilter(root.Interface())
+	return validator.Validate(root.Interface(), protovalidate.WithFilter(
 		protovalidate.FilterFunc(func(msg protoreflect.Message, desc protoreflect.Descriptor) bool {
-			return field == desc
+			return field == desc && filter.ShouldValidate(msg, desc)
 		}),
 	))
 }

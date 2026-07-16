@@ -29,8 +29,6 @@ const (
 // CatalogServiceClient is the client API for CatalogService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// CatalogService provides operations for managing catalogs, schemas, tables, and query validation.
 type CatalogServiceClient interface {
 	// Create a catalog.
 	CreateCatalog(ctx context.Context, in *CreateCatalogRequest, opts ...grpc.CallOption) (*CreateCatalogResponse, error)
@@ -105,8 +103,6 @@ func (c *catalogServiceClient) UpdateCatalog(ctx context.Context, in *UpdateCata
 // CatalogServiceServer is the server API for CatalogService service.
 // All implementations must embed UnimplementedCatalogServiceServer
 // for forward compatibility.
-//
-// CatalogService provides operations for managing catalogs, schemas, tables, and query validation.
 type CatalogServiceServer interface {
 	// Create a catalog.
 	CreateCatalog(context.Context, *CreateCatalogRequest) (*CreateCatalogResponse, error)

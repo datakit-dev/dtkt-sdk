@@ -11,6 +11,8 @@ import (
 )
 
 var _ cel.Library = (*celJSONLib)(nil)
+var stringType = reflect.TypeFor[string]()
+var bytesType = reflect.TypeFor[[]byte]()
 
 type celJSONLib struct{}
 
@@ -30,11 +32,16 @@ func (l *celJSONLib) CompileOptions() []cel.EnvOption {
 				cel.DynType,
 				cel.UnaryBinding(l.unmarshalJSON),
 			),
+			cel.Overload("json.unmarshal_bytes",
+				[]*cel.Type{cel.BytesType},
+				cel.DynType,
+				cel.UnaryBinding(l.unmarshalJSON),
+			),
 		),
 		cel.Function("json.marshal",
 			cel.Overload("json.marshal_dyn",
 				[]*cel.Type{cel.DynType},
-				cel.StringType,
+				cel.BytesType,
 				cel.UnaryBinding(l.marshalJSON),
 			),
 		),
@@ -45,19 +52,23 @@ func (l *celJSONLib) ProgramOptions() []cel.ProgramOption {
 	return nil
 }
 
-func (l *celJSONLib) unmarshalJSON(jsonString ref.Val) ref.Val {
-	native, err := jsonString.ConvertToNative(reflect.TypeFor[string]())
-	if err != nil {
-		return types.NewErr("json.unmarshal argument must be a string")
-	}
+func (l *celJSONLib) unmarshalJSON(value ref.Val) ref.Val {
+	var bytes []byte
 
-	str, ok := native.(string)
-	if !ok {
-		return types.NewErr("json.unmarshal argument must be a string")
+	native, err := value.ConvertToNative(stringType)
+	if err != nil {
+		native, err = value.ConvertToNative(bytesType)
+		if err != nil {
+			return types.NewErr("json.unmarshal argument must be a string or bytes")
+		} else {
+			bytes = native.([]byte)
+		}
+	} else {
+		bytes = []byte(native.(string))
 	}
 
 	result := new(structpb.Value)
-	if err := encoding.FromJSONV2([]byte(str), result); err != nil {
+	if err := encoding.FromJSONV2(bytes, result); err != nil {
 		return types.NewErr("json.unmarshal failed to parse JSON: %s", err.Error())
 	}
 
@@ -70,5 +81,5 @@ func (l *celJSONLib) marshalJSON(value ref.Val) ref.Val {
 		return types.NewErr("json.marshal failed to encode value: %s", err.Error())
 	}
 
-	return types.String(string(b))
+	return types.Bytes(b)
 }

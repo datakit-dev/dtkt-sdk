@@ -29,15 +29,14 @@ func IsKnownName[T ~string](name T) bool {
 
 func VersionContainsName[T ~string](version Version, name T) bool {
 	matches := dtktTypePattern.FindStringSubmatch(string(name))
+
 	if len(matches) < 3 {
 		return false
 	}
 
 	switch version {
 	case CoreV1:
-		if matches[1] == "core" && matches[2] == "v1" {
-			return true
-		}
+		return matches[1] == "core" && matches[2] == "v1"
 	}
 
 	return version.GetName() == matches[2]

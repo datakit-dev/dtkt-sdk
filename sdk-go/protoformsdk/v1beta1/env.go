@@ -4,8 +4,8 @@ import (
 	"context"
 	"log/slog"
 
-	"buf.build/go/protovalidate"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/api"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
@@ -16,7 +16,8 @@ type (
 		Logger() *slog.Logger
 		OnGroupCompleted(*FieldGroup, GroupCallbackFunc) error
 		Resolver() Resolver
-		Validator() (protovalidate.Validator, error)
+		Encoder() (encoding.Encoder, bool)
+		Decoder() (encoding.Decoder, bool)
 	}
 	Resolver interface {
 		api.Resolver

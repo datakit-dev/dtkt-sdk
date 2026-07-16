@@ -3,11 +3,50 @@ package v1beta1_test
 import (
 	"testing"
 
+	corev1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1"
 	sharedv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
 	form "github.com/datakit-dev/dtkt-sdk/sdk-go/protoformsdk/v1beta1"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
+
+func TestMessageField(t *testing.T) {
+	conn := &corev1.Connection{}
+	msg := form.NewMessage(conn.ProtoReflect())
+	for _, field := range msg.FieldGroup().GetFields() {
+		if field.Descriptor().Name() == "address" {
+			addr, ok := field.IsMessage()
+			if !ok {
+				t.Fatal("expected address message field")
+			}
+
+			for _, subfield := range addr.FieldGroup().GetFields() {
+				if subfield.Descriptor().Name() == "target" {
+					target, ok := subfield.IsScalar()
+					if !ok {
+						t.Fatal("expected target scalar field")
+					}
+
+					value := "tcp"
+					err := target.SetAny(value)
+					if err != nil {
+						t.Fatalf("unexpected error setting target string: %v", err)
+					}
+
+					if value != "tcp" {
+						t.Fatalf("expected target string: %s, got: %v", value, target.GetAny())
+					}
+
+					if !addr.HasField(target.Descriptor()) {
+						t.Fatalf("expected address to have target field")
+					} else if !msg.HasField(addr.Descriptor()) {
+						t.Fatalf("expected connection to have address field")
+					}
+				}
+			}
+		}
+	}
+}
 
 func TestMessage(t *testing.T) {
 	pkg := &sharedv1beta1.Package{
@@ -97,8 +136,8 @@ func TestMessage(t *testing.T) {
 					msgs, err := list.Parse(list.String())
 					if err != nil {
 						t.Fatal(err)
-					} else if len(list.GetItems()) != len(msgs) {
-						t.Fatalf("expected platforms len: %d, got: %d", len(list.GetItems()), len(msgs))
+					} else if len(list.GetItemsAny()) != len(msgs) {
+						t.Fatalf("expected platforms len: %d, got: %d", len(list.GetItemsAny()), len(msgs))
 					} else {
 						for _, msg := range msgs {
 							t.Log(msg.Get().Interface())

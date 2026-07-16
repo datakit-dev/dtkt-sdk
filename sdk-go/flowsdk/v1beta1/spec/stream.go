@@ -1,6 +1,7 @@
 package spec
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -10,11 +11,9 @@ import (
 	"github.com/google/cel-go/cel"
 )
 
-var _ ExecNodeCloser = (*Stream)(nil)
-
 type (
 	Stream struct {
-		ExecNodeCloser
+		shared.ExecNode
 		node *flowv1beta1.Stream
 
 		startWhenExpr,
@@ -25,77 +24,76 @@ type (
 	}
 )
 
-func NewStream(env shared.Env, node *flowv1beta1.Stream, visitor shared.NodeVisitFunc) (_ *Stream, err error) {
+func NewStream(env shared.Env, node *flowv1beta1.Stream, visitor shared.NodeVisitor) (_ *Stream, err error) {
 	stream := &Stream{
 		node: node,
 	}
 
 	switch {
 	case node.GetCall() != nil:
-		stream.ExecNodeCloser, err = NewStreamCaller(env, node, stream, visitor)
+		stream, err := NewStreamCaller(env, node, stream, visitor)
 		if err != nil {
 			return nil, err
 		}
+
+		stream.ExecNode = stream
 	case node.GetGenerate() != nil:
-		stream.ExecNodeCloser, err = NewGenerator(env, node, stream, visitor)
+		generator, err := NewGenerator(env, node, stream, visitor)
 		if err != nil {
 			return nil, err
 		}
+
+		stream.ExecNode = generator
 	default:
 		return nil, errors.New("call or generate required")
 	}
 
 	if node.GetStartWhen() != "" {
-		stream.startWhenExpr, err = shared.ParseExpr(env, node.GetStartWhen(), visitor.ExprVisitor(GetID(node)))
+		stream.startWhenExpr, err = shared.ParseExpr(env, node.GetStartWhen(), visitor.ExprVisitor(GetNodeIdent(node)))
 		if err != nil {
-			return nil, fmt.Errorf("%s.startWhen parse error: %w", GetID(node), err)
+			return nil, fmt.Errorf("%s.startWhen parse error: %w", GetNodeIdent(node), err)
 		}
 	}
 
 	if node.GetStopWhen() != "" {
-		stream.stopWhenExpr, err = shared.ParseExpr(env, node.GetStopWhen(), visitor.ExprVisitor(GetID(node)))
+		stream.stopWhenExpr, err = shared.ParseExpr(env, node.GetStopWhen(), visitor.ExprVisitor(GetNodeIdent(node)))
 		if err != nil {
-			return nil, fmt.Errorf("%s.stopWhen parse error: %w", GetID(node), err)
+			return nil, fmt.Errorf("%s.stopWhen parse error: %w", GetNodeIdent(node), err)
 		}
 	}
 
 	return stream, nil
 }
 
-func (s *Stream) Compile(run shared.Runtime) error {
-	env, err := run.Env()
-	if err != nil {
-		return err
-	}
-
+func (s *Stream) Compile(ctx context.Context, env shared.Env) (err error) {
 	if s.startWhenExpr != nil {
 		s.startWhenProg, err = env.Program(s.startWhenExpr)
 		if err != nil {
-			return fmt.Errorf("%s.startWhen compile error: %w", GetID(s.node), err)
+			return fmt.Errorf("%s.startWhen compile error: %w", GetNodeIdent(s.node), err)
 		}
 	}
 
 	if s.stopWhenExpr != nil {
 		s.stopWhenProg, err = env.Program(s.stopWhenExpr)
 		if err != nil {
-			return fmt.Errorf("%s.stopWhen compile error: %w", GetID(s.node), err)
+			return fmt.Errorf("%s.stopWhen compile error: %w", GetNodeIdent(s.node), err)
 		}
 	}
 
-	return s.ExecNodeCloser.Compile(run)
+	return s.ExecNode.Compile(ctx, env)
 }
 
-func (s *Stream) ShouldStart(run shared.Runtime) (bool, error) {
+func (s *Stream) ShouldStart(ctx context.Context, env shared.Env) (bool, error) {
 	if s.startWhenProg == nil {
 		return true, nil
 	}
 
-	env, err := run.Env()
+	vars, err := env.Vars(ctx)
 	if err != nil {
-		return true, err
+		return false, err
 	}
 
-	val, _, err := s.startWhenProg.ContextEval(run.Context(), env.Vars())
+	val, _, err := s.startWhenProg.ContextEval(ctx, vars)
 	if err != nil {
 		return true, err
 	}
@@ -108,17 +106,17 @@ func (s *Stream) ShouldStart(run shared.Runtime) (bool, error) {
 	return shouldStart.(bool), nil
 }
 
-func (s *Stream) ShouldStop(run shared.Runtime) (bool, error) {
+func (s *Stream) ShouldStop(ctx context.Context, env shared.Env) (bool, error) {
 	if s.stopWhenProg == nil {
 		return false, nil
 	}
 
-	env, err := run.Env()
+	vars, err := env.Vars(ctx)
 	if err != nil {
-		return true, err
+		return false, err
 	}
 
-	val, _, err := s.stopWhenProg.ContextEval(run.Context(), env.Vars())
+	val, _, err := s.stopWhenProg.ContextEval(ctx, vars)
 	if err != nil {
 		return true, err
 	}

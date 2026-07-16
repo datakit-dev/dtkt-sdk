@@ -25,14 +25,16 @@ var File_dtkt_base_v1beta1_services_proto protoreflect.FileDescriptor
 
 const file_dtkt_base_v1beta1_services_proto_rawDesc = "" +
 	"\n" +
-	" dtkt/base/v1beta1/services.proto\x12\x11dtkt.base.v1beta1\x1a dtkt/base/v1beta1/messages.proto\x1a\x1cgoogle/api/annotations.proto2\xad\x05\n" +
+	" dtkt/base/v1beta1/services.proto\x12\x11dtkt.base.v1beta1\x1a dtkt/base/v1beta1/messages.proto\x1a\x1cgoogle/api/annotations.proto2\xd2\x06\n" +
 	"\vBaseService\x12s\n" +
 	"\n" +
 	"GetPackage\x12$.dtkt.base.v1beta1.GetPackageRequest\x1a%.dtkt.base.v1beta1.GetPackageResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1beta1/package\x12}\n" +
 	"\vCheckConfig\x12%.dtkt.base.v1beta1.CheckConfigRequest\x1a&.dtkt.base.v1beta1.CheckConfigResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/v1beta1:checkConfig\x12\xc8\x01\n" +
 	"\tCheckAuth\x12#.dtkt.base.v1beta1.CheckAuthRequest\x1a$.dtkt.base.v1beta1.CheckAuthResponse\"p\x82\xd3\xe4\x93\x02j:\x01*Z\x17:\x01*\"\x12/v1beta1/auth:codeZ\x1b:\x01*\"\x16/v1beta1/auth:callbackZ\x1a:\x01*\"\x15/v1beta1/auth:refresh\"\x13/v1beta1/auth:check\x12n\n" +
 	"\tListTypes\x12#.dtkt.base.v1beta1.ListTypesRequest\x1a$.dtkt.base.v1beta1.ListTypesResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/v1beta1/types\x12o\n" +
-	"\aGetType\x12!.dtkt.base.v1beta1.GetTypeRequest\x1a\".dtkt.base.v1beta1.GetTypeResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/v1beta1/types/{name}B\xda\x01\n" +
+	"\aGetType\x12!.dtkt.base.v1beta1.GetTypeRequest\x1a\".dtkt.base.v1beta1.GetTypeResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/v1beta1/types/{name}\x12J\n" +
+	"\x05Close\x12\x1f.dtkt.base.v1beta1.CloseRequest\x1a .dtkt.base.v1beta1.CloseResponse\x12W\n" +
+	"\bStreamIO\x12\".dtkt.base.v1beta1.StreamIORequest\x1a#.dtkt.base.v1beta1.StreamIOResponse(\x010\x01B\xda\x01\n" +
 	"\x17proto.dtkt.base.v1beta1B\rServicesProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/base/v1beta1;basev1beta1\xa2\x02\x03DBX\xaa\x02\x11Dtkt.Base.V1beta1\xca\x02\x11Dtkt\\Base\\V1beta1\xe2\x02\x1dDtkt\\Base\\V1beta1\\GPBMetadata\xea\x02\x13Dtkt::Base::V1beta1b\x06proto3"
 
 var file_dtkt_base_v1beta1_services_proto_goTypes = []any{
@@ -41,28 +43,36 @@ var file_dtkt_base_v1beta1_services_proto_goTypes = []any{
 	(*CheckAuthRequest)(nil),    // 2: dtkt.base.v1beta1.CheckAuthRequest
 	(*ListTypesRequest)(nil),    // 3: dtkt.base.v1beta1.ListTypesRequest
 	(*GetTypeRequest)(nil),      // 4: dtkt.base.v1beta1.GetTypeRequest
-	(*GetPackageResponse)(nil),  // 5: dtkt.base.v1beta1.GetPackageResponse
-	(*CheckConfigResponse)(nil), // 6: dtkt.base.v1beta1.CheckConfigResponse
-	(*CheckAuthResponse)(nil),   // 7: dtkt.base.v1beta1.CheckAuthResponse
-	(*ListTypesResponse)(nil),   // 8: dtkt.base.v1beta1.ListTypesResponse
-	(*GetTypeResponse)(nil),     // 9: dtkt.base.v1beta1.GetTypeResponse
+	(*CloseRequest)(nil),        // 5: dtkt.base.v1beta1.CloseRequest
+	(*StreamIORequest)(nil),     // 6: dtkt.base.v1beta1.StreamIORequest
+	(*GetPackageResponse)(nil),  // 7: dtkt.base.v1beta1.GetPackageResponse
+	(*CheckConfigResponse)(nil), // 8: dtkt.base.v1beta1.CheckConfigResponse
+	(*CheckAuthResponse)(nil),   // 9: dtkt.base.v1beta1.CheckAuthResponse
+	(*ListTypesResponse)(nil),   // 10: dtkt.base.v1beta1.ListTypesResponse
+	(*GetTypeResponse)(nil),     // 11: dtkt.base.v1beta1.GetTypeResponse
+	(*CloseResponse)(nil),       // 12: dtkt.base.v1beta1.CloseResponse
+	(*StreamIOResponse)(nil),    // 13: dtkt.base.v1beta1.StreamIOResponse
 }
 var file_dtkt_base_v1beta1_services_proto_depIdxs = []int32{
-	0, // 0: dtkt.base.v1beta1.BaseService.GetPackage:input_type -> dtkt.base.v1beta1.GetPackageRequest
-	1, // 1: dtkt.base.v1beta1.BaseService.CheckConfig:input_type -> dtkt.base.v1beta1.CheckConfigRequest
-	2, // 2: dtkt.base.v1beta1.BaseService.CheckAuth:input_type -> dtkt.base.v1beta1.CheckAuthRequest
-	3, // 3: dtkt.base.v1beta1.BaseService.ListTypes:input_type -> dtkt.base.v1beta1.ListTypesRequest
-	4, // 4: dtkt.base.v1beta1.BaseService.GetType:input_type -> dtkt.base.v1beta1.GetTypeRequest
-	5, // 5: dtkt.base.v1beta1.BaseService.GetPackage:output_type -> dtkt.base.v1beta1.GetPackageResponse
-	6, // 6: dtkt.base.v1beta1.BaseService.CheckConfig:output_type -> dtkt.base.v1beta1.CheckConfigResponse
-	7, // 7: dtkt.base.v1beta1.BaseService.CheckAuth:output_type -> dtkt.base.v1beta1.CheckAuthResponse
-	8, // 8: dtkt.base.v1beta1.BaseService.ListTypes:output_type -> dtkt.base.v1beta1.ListTypesResponse
-	9, // 9: dtkt.base.v1beta1.BaseService.GetType:output_type -> dtkt.base.v1beta1.GetTypeResponse
-	5, // [5:10] is the sub-list for method output_type
-	0, // [0:5] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: dtkt.base.v1beta1.BaseService.GetPackage:input_type -> dtkt.base.v1beta1.GetPackageRequest
+	1,  // 1: dtkt.base.v1beta1.BaseService.CheckConfig:input_type -> dtkt.base.v1beta1.CheckConfigRequest
+	2,  // 2: dtkt.base.v1beta1.BaseService.CheckAuth:input_type -> dtkt.base.v1beta1.CheckAuthRequest
+	3,  // 3: dtkt.base.v1beta1.BaseService.ListTypes:input_type -> dtkt.base.v1beta1.ListTypesRequest
+	4,  // 4: dtkt.base.v1beta1.BaseService.GetType:input_type -> dtkt.base.v1beta1.GetTypeRequest
+	5,  // 5: dtkt.base.v1beta1.BaseService.Close:input_type -> dtkt.base.v1beta1.CloseRequest
+	6,  // 6: dtkt.base.v1beta1.BaseService.StreamIO:input_type -> dtkt.base.v1beta1.StreamIORequest
+	7,  // 7: dtkt.base.v1beta1.BaseService.GetPackage:output_type -> dtkt.base.v1beta1.GetPackageResponse
+	8,  // 8: dtkt.base.v1beta1.BaseService.CheckConfig:output_type -> dtkt.base.v1beta1.CheckConfigResponse
+	9,  // 9: dtkt.base.v1beta1.BaseService.CheckAuth:output_type -> dtkt.base.v1beta1.CheckAuthResponse
+	10, // 10: dtkt.base.v1beta1.BaseService.ListTypes:output_type -> dtkt.base.v1beta1.ListTypesResponse
+	11, // 11: dtkt.base.v1beta1.BaseService.GetType:output_type -> dtkt.base.v1beta1.GetTypeResponse
+	12, // 12: dtkt.base.v1beta1.BaseService.Close:output_type -> dtkt.base.v1beta1.CloseResponse
+	13, // 13: dtkt.base.v1beta1.BaseService.StreamIO:output_type -> dtkt.base.v1beta1.StreamIOResponse
+	7,  // [7:14] is the sub-list for method output_type
+	0,  // [0:7] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_base_v1beta1_services_proto_init() }

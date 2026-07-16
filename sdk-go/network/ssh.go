@@ -46,8 +46,8 @@ func NewSSHConnector(addr net.Addr) (_ *SSHConnector, err error) {
 }
 
 // Address returns the remote address (net.Addr interface).
-func (c *SSHConnector) Address() net.Addr {
-	return c.uri
+func (c *SSHConnector) Address() Address {
+	return c.uri.RemoteAddr
 }
 
 // GRPCTarget returns the target string for dialing (e.g., for gRPC).

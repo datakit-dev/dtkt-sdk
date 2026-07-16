@@ -13,7 +13,7 @@ import { BaseService } from "./services_pb";
 export const getPackage = BaseService.method.getPackage;
 
 /**
- * Validates config, allocates instances, and .
+ * Validates config and allocates instance.
  * NOTE: CheckConfig is implemented by the Integration SDK (not by authors).
  *
  * @generated from rpc dtkt.base.v1beta1.BaseService.CheckConfig
@@ -43,3 +43,12 @@ export const listTypes = BaseService.method.listTypes;
  * @generated from rpc dtkt.base.v1beta1.BaseService.GetType
  */
 export const getType = BaseService.method.getType;
+
+/**
+ * Close releases resources associated with an instance identified by headers
+ * in the request and (if valid) atomically removes it from the integration.
+ * NOTE: Close is implemented by the Integration SDK (not by authors).
+ *
+ * @generated from rpc dtkt.base.v1beta1.BaseService.Close
+ */
+export const close = BaseService.method.close;

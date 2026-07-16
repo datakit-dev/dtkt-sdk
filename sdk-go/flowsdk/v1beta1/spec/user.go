@@ -50,7 +50,7 @@ func (m UserActionInputsEvalMap) Eval(ctx context.Context) (err error) {
 }
 
 func UserActionInputID(action *flowv1beta1.Action, input *flowv1beta1.UserAction_Input) string {
-	return fmt.Sprintf("%s.inputs.%s", GetID(action), input.GetId())
+	return fmt.Sprintf("%s.inputs.%s", GetNodeIdent(action), input.GetId())
 }
 
 func GetUserActionBinding(input *flowv1beta1.UserAction_Input) (*protoformv1beta1.FieldElement, UserActionBinding, bool) {
@@ -90,7 +90,7 @@ func GetUserActionBinding(input *flowv1beta1.UserAction_Input) (*protoformv1beta
 	return elem, binding, ok
 }
 
-func ParseUserAction(env shared.Env, action *flowv1beta1.UserAction, visitor shared.ExprVisitFunc) error {
+func ParseUserAction(env shared.Env, action *flowv1beta1.UserAction, visitor shared.ExprVisitor) error {
 	for _, input := range action.GetInputs() {
 		switch elemType := input.GetElement().(type) {
 		case *flowv1beta1.UserAction_Input_Confirm:
@@ -113,13 +113,8 @@ func ParseUserAction(env shared.Env, action *flowv1beta1.UserAction, visitor sha
 	return nil
 }
 
-func CompileUserAction(run shared.Runtime, action *flowv1beta1.Action) (_ shared.Program, err error) {
-	env, err := run.Env()
-	if err != nil {
-		return nil, err
-	}
-
-	actionID := GetID(action)
+func CompileUserAction(env shared.Env, action *flowv1beta1.Action) (_ shared.Program, err error) {
+	actionID := GetNodeIdent(action)
 	if action.GetUser() == nil || len(action.GetUser().GetInputs()) == 0 {
 		return nil, fmt.Errorf("%s invalid: inputs required", actionID)
 	}
@@ -131,7 +126,7 @@ func CompileUserAction(run shared.Runtime, action *flowv1beta1.Action) (_ shared
 			return nil, fmt.Errorf("%s invalid: element required", inputID)
 		}
 
-		inputEval, err := CompileUserActionInput(run, action, input)
+		inputEval, err := CompileUserActionInput(env, action, input)
 		if err != nil {
 			return nil, fmt.Errorf("%s invalid: %w", inputID, err)
 		}
@@ -139,109 +134,110 @@ func CompileUserAction(run shared.Runtime, action *flowv1beta1.Action) (_ shared
 		inputsEval[inputID] = inputEval
 	}
 
-	return shared.EvalFunc(func(run shared.Runtime) ref.Val {
-		if err := inputsEval.Eval(run.Context()); err != nil {
+	return shared.ProgramFunc(func(ctx context.Context, env shared.Env) ref.Val {
+		if err := inputsEval.Eval(ctx); err != nil {
 			return types.WrapErr(err)
 		}
 
 		// values, err := r.GetUserValues(actionID)
-		values, err := run.GetValue(actionID)
-		if err != nil {
-			return types.WrapErr(context.Cause(run.Context()))
-		}
+		// values, err := run.GetValue(actionID)
+		// if err != nil {
+		// 	return types.WrapErr(context.Cause(ctx))
+		// }
 
-		return env.TypeAdapter().NativeToValue(values)
+		// return env.Types().NativeToValue(values)
+		return nil
 	}), nil
 }
 
-func CompileUserActionInput(run shared.Runtime, action *flowv1beta1.Action, input *flowv1beta1.UserAction_Input) (_ UserActionInputEvalFunc, err error) {
-	var elemEval UserActionInputEvalFunc
-	switch elemType := input.GetElement().(type) {
-	case *flowv1beta1.UserAction_Input_Confirm:
-		elemEval, err = CompileUserActionConfirm(run, action, elemType.Confirm)
-		if err != nil {
-			return nil, err
-		}
-	case *flowv1beta1.UserAction_Input_Input:
-		elemEval = func(ctx context.Context) error {
-			return nil
-		}
-	case *flowv1beta1.UserAction_Input_File:
-	case *flowv1beta1.UserAction_Input_Select:
-	default:
-		return nil, fmt.Errorf("%s: invalid input", UserActionInputID(action, input))
-	}
+func CompileUserActionInput(env shared.Env, action *flowv1beta1.Action, input *flowv1beta1.UserAction_Input) (_ UserActionInputEvalFunc, err error) {
+	// var elemEval UserActionInputEvalFunc
+	// switch elemType := input.GetElement().(type) {
+	// case *flowv1beta1.UserAction_Input_Confirm:
+	// 	elemEval, err = CompileUserActionConfirm(env, action, elemType.Confirm)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// case *flowv1beta1.UserAction_Input_Input:
+	// 	elemEval = func(ctx context.Context) error {
+	// 		return nil
+	// 	}
+	// case *flowv1beta1.UserAction_Input_File:
+	// case *flowv1beta1.UserAction_Input_Select:
+	// default:
+	// 	return nil, fmt.Errorf("%s: invalid input", UserActionInputID(action, input))
+	// }
 
-	env, err := run.Env()
-	if err != nil {
-		return nil, err
-	}
-
-	titleExpr, _ := shared.CompileExpr(run, input.GetTitle())
-	descExpr, _ := shared.CompileExpr(run, input.GetDescription())
+	// titleExpr, _ := shared.CompileExpr(env, input.GetTitle())
+	// descExpr, _ := shared.CompileExpr(env, input.GetDescription())
 
 	return func(ctx context.Context) error {
-		if titleExpr != nil {
-			val, _, err := titleExpr.ContextEval(ctx, env.Vars())
-			if err != nil {
-				return err
-			} else if titleVal, ok := val.Value().(string); ok {
-				input.Title = titleVal
-			} else {
-				return fmt.Errorf("title: invalid expression, expected: string, got: %T", val.Value())
-			}
-		}
+		// vars, err := env.Vars()
+		// if err != nil {
+		// 	return err
+		// }
 
-		if descExpr != nil {
-			val, _, err := descExpr.ContextEval(ctx, env.Vars())
-			if err != nil {
-				return err
-			} else if descVal, ok := val.Value().(string); ok {
-				input.Description = new(descVal)
-			} else {
-				return fmt.Errorf("description: invalid expression, expected: string, got: %T", val.Value())
-			}
-		}
+		// if titleExpr != nil {
+		// 	val, _, err := titleExpr.ContextEval(ctx, vars)
+		// 	if err != nil {
+		// 		return err
+		// 	} else if titleVal, ok := val.Value().(string); ok {
+		// 		input.Title = titleVal
+		// 	} else {
+		// 		return fmt.Errorf("title: invalid expression, expected: string, got: %T", val.Value())
+		// 	}
+		// }
 
-		if elemEval != nil {
-			return elemEval(ctx)
-		}
+		// if descExpr != nil {
+		// 	val, _, err := descExpr.ContextEval(ctx, vars)
+		// 	if err != nil {
+		// 		return err
+		// 	} else if descVal, ok := val.Value().(string); ok {
+		// 		input.Description = new(descVal)
+		// 	} else {
+		// 		return fmt.Errorf("description: invalid expression, expected: string, got: %T", val.Value())
+		// 	}
+		// }
+
+		// if elemEval != nil {
+		// 	return elemEval(ctx)
+		// }
 
 		return nil
 	}, nil
 }
 
-func CompileUserActionConfirm(run shared.Runtime, action *flowv1beta1.Action, confirm *protoformv1beta1.ConfirmElement) (UserActionInputEvalFunc, error) {
-	env, err := run.Env()
-	if err != nil {
-		return nil, err
-	}
-
-	approveExpr, _ := shared.CompileExpr(run, confirm.GetApprove())
-	declineExpr, _ := shared.CompileExpr(run, confirm.GetDecline())
+func CompileUserActionConfirm(env shared.Env, action *flowv1beta1.Action, confirm *protoformv1beta1.ConfirmElement) (UserActionInputEvalFunc, error) {
+	// approveExpr, _ := shared.CompileExpr(env, confirm.GetApprove())
+	// declineExpr, _ := shared.CompileExpr(env, confirm.GetDecline())
 
 	return func(ctx context.Context) error {
-		if approveExpr != nil {
-			val, _, err := approveExpr.ContextEval(ctx, env.Vars())
-			if err != nil {
-				return err
-			} else if approveVal, ok := val.Value().(string); ok {
-				confirm.Approve = approveVal
-			} else {
-				return fmt.Errorf("confirm.approve: invalid expression, expected: string, got: %T", val.Value())
-			}
-		}
+		// vars, err := run.Vars()
+		// if err != nil {
+		// 	return err
+		// }
 
-		if declineExpr != nil {
-			val, _, err := declineExpr.ContextEval(ctx, env.Vars())
-			if err != nil {
-				return err
-			} else if declineVal, ok := val.Value().(string); ok {
-				confirm.Decline = declineVal
-			} else {
-				return fmt.Errorf("confirm.decline: invalid expression, expected: string, got: %T", val.Value())
-			}
-		}
+		// if approveExpr != nil {
+		// 	val, _, err := approveExpr.ContextEval(ctx, vars)
+		// 	if err != nil {
+		// 		return err
+		// 	} else if approveVal, ok := val.Value().(string); ok {
+		// 		confirm.Approve = approveVal
+		// 	} else {
+		// 		return fmt.Errorf("confirm.approve: invalid expression, expected: string, got: %T", val.Value())
+		// 	}
+		// }
+
+		// if declineExpr != nil {
+		// 	val, _, err := declineExpr.ContextEval(ctx, vars)
+		// 	if err != nil {
+		// 		return err
+		// 	} else if declineVal, ok := val.Value().(string); ok {
+		// 		confirm.Decline = declineVal
+		// 	} else {
+		// 		return fmt.Errorf("confirm.decline: invalid expression, expected: string, got: %T", val.Value())
+		// 	}
+		// }
 
 		return nil
 	}, nil

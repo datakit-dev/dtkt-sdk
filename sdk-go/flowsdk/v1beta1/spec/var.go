@@ -1,6 +1,7 @@
 package spec
 
 import (
+	"context"
 	"errors"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
@@ -12,19 +13,20 @@ import (
 var _ shared.ExecNode = (*Var)(nil)
 
 type Var struct {
+	id    string
 	node  *flowv1beta1.Var
 	cache *EvalCache
 }
 
-func NewVar(env shared.Env, node *flowv1beta1.Var, visitor shared.NodeVisitFunc) (*Var, error) {
+func NewVar(env shared.Env, node *flowv1beta1.Var, visitor shared.NodeVisitor) (*Var, error) {
 	switch {
 	case node.GetSwitch() != nil:
-		err := ParseSwitch(env, node.GetSwitch(), visitor.ExprVisitor(GetID(node)))
+		err := ParseSwitch(env, node.GetSwitch(), visitor.ExprVisitor(GetNodeIdent(node)))
 		if err != nil {
 			return nil, err
 		}
 	case node.GetValue() != "":
-		_, err := shared.ParseExpr(env, node.GetValue(), visitor.ExprVisitor(GetID(node)))
+		_, err := shared.ParseExpr(env, node.GetValue(), visitor.ExprVisitor(GetNodeIdent(node)))
 		if err != nil {
 			return nil, err
 		}
@@ -33,32 +35,37 @@ func NewVar(env shared.Env, node *flowv1beta1.Var, visitor shared.NodeVisitFunc)
 	}
 
 	return &Var{
+		id:   GetNodeIdent(node),
 		node: node,
 	}, nil
 }
 
-func (v *Var) Compile(run shared.Runtime) error {
-	env, err := run.Env()
-	if err != nil {
-		return err
-	}
-
+func (v *Var) Compile(ctx context.Context, env shared.Env) error {
 	switch {
 	case v.node.GetSwitch() != nil:
-		prog, err := CompileSwitch(run, v.node.GetSwitch())
+		prog, err := CompileSwitch(env, v.node.GetSwitch())
 		if err != nil {
 			return err
 		}
 
 		v.cache = NewEvalCache(v.node, prog)
 	case v.node.GetValue() != "":
-		prog, err := shared.CompileExpr(run, v.node.GetValue())
+		prog, err := shared.CompileExpr(env, v.node.GetValue())
 		if err != nil {
 			return err
 		}
 
-		v.cache = NewEvalCache(v.node, shared.EvalFunc(func(run shared.Runtime) ref.Val {
-			val, _, err := prog.ContextEval(run.Context(), env.Vars())
+		v.cache = NewEvalCache(v.node, shared.ProgramFunc(func(ctx context.Context, _ shared.Env) ref.Val {
+			// Use the env captured at Compile time (rather than the env
+			// argument, which reflects the shared runtime env used to drive
+			// execution) so that node-scoped bindings such as "self" remain
+			// available.
+			vars, err := env.Vars(ctx)
+			if err != nil {
+				return types.WrapErr(err)
+			}
+
+			val, _, err := prog.ContextEval(ctx, vars)
 			if err != nil {
 				return types.WrapErr(err)
 			}
@@ -72,13 +79,8 @@ func (v *Var) Compile(run shared.Runtime) error {
 	return nil
 }
 
-func (v *Var) Eval() (shared.EvalFunc, bool) {
-	return v.cache.Eval()
+func (v *Var) Run(ctx context.Context, env shared.Env, pipe shared.Pipe) error {
+	return pipe.Run(ctx, func(ctx context.Context, value any) (any, error) {
+		return v.cache.Eval(ctx, env), nil
+	})
 }
-
-func (v *Var) HasCached() (ref.Val, bool) {
-	return v.cache.HasCached()
-}
-
-func (v *Var) Recv() (shared.RecvFunc, bool) { return nil, false }
-func (v *Var) Send() (shared.SendFunc, bool) { return nil, false }

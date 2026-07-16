@@ -5,20 +5,6 @@
 import { EmbeddingService } from "./services_pb";
 
 /**
- * Retrieves a list of available embedding models.
- *
- * @generated from rpc dtkt.ai.v1beta1.EmbeddingService.ListEmbeddingModels
- */
-export const listEmbeddingModels = EmbeddingService.method.listEmbeddingModels;
-
-/**
- * Retrieves details of a specific embedding model by its ID.
- *
- * @generated from rpc dtkt.ai.v1beta1.EmbeddingService.GetEmbeddingModel
- */
-export const getEmbeddingModel = EmbeddingService.method.getEmbeddingModel;
-
-/**
  * Generates embeddings for the provided input text using a specified model.
  *
  * @generated from rpc dtkt.ai.v1beta1.EmbeddingService.GenerateEmbeddings

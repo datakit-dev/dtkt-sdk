@@ -16,7 +16,7 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-func ListField[S []V, V any](opts ...FieldOption) *fieldType[S] {
+func ListField[V any, S []V](opts ...FieldOption) *fieldType[S] {
 	var (
 		list  S
 		value V
@@ -44,7 +44,7 @@ func ListField[S []V, V any](opts ...FieldOption) *fieldType[S] {
 
 	// Fix PkgPath for slice element types: Bytes.GoType uses indirect(t).PkgPath()
 	// which returns "" for slices, causing the import template to skip the import.
-	fixDescriptorPkgPath[V](field.desc)
+	descriptorPkgPath[V](field.desc)
 
 	field.applyOptions(opts...)
 

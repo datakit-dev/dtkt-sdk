@@ -3,7 +3,7 @@ package v1beta1
 import (
 	"buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	protoformv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protoform/v1beta1"
-	"google.golang.org/protobuf/proto"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -12,6 +12,8 @@ type (
 		Type  ElementType
 		proto *protoformv1beta1.FieldElement
 		rules *validate.FieldRules
+
+		title, description string
 	}
 	ElementType interface {
 		isElementType()
@@ -23,72 +25,54 @@ type (
 	ElementTypeOpt[T ElementType] func(T)
 )
 
-func NewElement(field protoreflect.FieldDescriptor) *Element {
-	var (
-		proto *protoformv1beta1.FieldElement
-		rules *validate.FieldRules
-	)
+func NewElement(desc protoreflect.FieldDescriptor) *Element {
+	elem := &Element{}
 
-	if field != nil {
-		if fieldElem, ok := GetFieldElement(field); ok {
-			proto = fieldElem
+	if desc != nil {
+		if fieldElem, ok := GetFieldElement(desc); ok {
+			elem.proto = fieldElem
 		}
 
-		if fieldRules, ok := GetFieldRules(field); ok {
-			rules = fieldRules
+		if fieldRules, ok := GetFieldRules(desc); ok {
+			elem.rules = fieldRules
 		}
 	}
 
-	if proto == nil {
-		proto = &protoformv1beta1.FieldElement{}
+	if elem.proto == nil {
+		elem.proto = &protoformv1beta1.FieldElement{}
 	}
 
-	if rules == nil {
-		rules = &validate.FieldRules{}
+	if elem.rules == nil {
+		elem.rules = &validate.FieldRules{}
 	}
 
-	if proto.Title == nil {
-		proto.Title = new(string)
+	if desc != nil && elem.proto.GetTitle() == "" {
+		elem.title = fd{desc}.GetTitle()
 	}
 
-	if field != nil && proto.GetTitle() == "" {
-		proto.Title = new(fd{field}.GetTitle())
-	}
-
-	if proto.Description == nil {
-		proto.Description = new(string)
-	}
-
-	if field != nil && proto.GetDescription() == "" {
-		desc := ProtoSourceInfoOptions{
+	if desc != nil && elem.proto.GetDescription() == "" {
+		elem.description = util.ProtoSourceInfoOptions{
 			Multiline: false,
-		}.GetDescription(field)
+		}.GetDescription(desc)
 
-		if desc == "" {
-			desc = fd{field}.GetDescription()
+		if elem.description == "" {
+			elem.description = fd{desc}.GetDescription()
 		}
-
-		proto.Description = new(desc)
 	}
 
-	if proto.Hidden == nil {
-		proto.Hidden = new(bool)
+	if elem.proto.Hidden == nil {
+		elem.proto.Hidden = new(false)
 	}
 
-	elem := &Element{
-		proto: proto,
-		rules: rules,
-	}
-
-	switch proto.GetType().(type) {
+	switch elem.proto.GetType().(type) {
 	case *protoformv1beta1.FieldElement_Confirm:
-		elem.AsConfirm()
+		return elem.AsConfirm()
 	case *protoformv1beta1.FieldElement_Input:
-		elem.AsInput()
+		return elem.AsInput()
 	case *protoformv1beta1.FieldElement_MultiSelect:
-		elem.AsMultiSelect()
+		return elem.AsMultiSelect()
 	case *protoformv1beta1.FieldElement_Select:
-		elem.AsSelect()
+		return elem.AsSelect()
 	}
 
 	return elem
@@ -113,16 +97,22 @@ func (e *Element) WithDescription(desc string) *Element {
 }
 
 func (e *Element) WithHidden(hidden bool) *Element {
-	e.proto.Hidden = proto.Bool(hidden)
+	e.proto.Hidden = new(hidden)
 	return e
 }
 
-func (e *Element) GetTitle() string {
-	return e.proto.GetTitle()
+func (e *Element) GetTitle() (string, bool) {
+	if e.proto.GetTitle() == "" {
+		return e.title, false
+	}
+	return e.proto.GetTitle(), true
 }
 
-func (e *Element) GetDescription() string {
-	return e.proto.GetDescription()
+func (e *Element) GetDescription() (string, bool) {
+	if e.proto.GetDescription() == "" {
+		return e.description, false
+	}
+	return e.proto.GetDescription(), true
 }
 
 func (e *Element) GetHidden() bool {

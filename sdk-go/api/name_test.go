@@ -13,6 +13,11 @@ func TestVersionContainsName(t *testing.T) {
 	if !api.VersionContainsName(api.V1Beta1, pkg) {
 		t.Fatalf("expected: %s to be version: %s", pkg, api.V1Beta1)
 	}
+
+	name := "ziti.trace.pb.TogglePipeTracesRequest"
+	if v, ok := api.VersionFromName(name); ok {
+		t.Fatalf("expected: %s to not be an api type: %s", name, v)
+	}
 }
 
 func TestIsWellKnownName(t *testing.T) {

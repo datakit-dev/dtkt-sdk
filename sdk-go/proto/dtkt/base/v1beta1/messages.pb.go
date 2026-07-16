@@ -24,6 +24,174 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// StreamIORequest is sent by the client over a bidirectional StreamIO stream.
+//
+// Protocol:
+//   - The FIRST message establishes the stream and stdin may carry an initial
+//     payload (e.g. a shell script to pipe into a subprocess).
+//   - SUBSEQUENT messages carry additional stdin bytes.
+//   - The client signals end-of-stdin by calling CloseSend (gRPC half-close),
+//     which causes the server to close the instance stdin pipe so that any
+//     blocking subprocess receives EOF.
+type StreamIORequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Raw bytes to write to the instance stdin pipe.  Omit (or leave empty) for
+	// messages that carry no input (e.g. a keep-alive or a stream-open with no
+	// initial payload).
+	Stdin         []byte `protobuf:"bytes,1,opt,name=stdin,proto3,oneof" json:"stdin,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamIORequest) Reset() {
+	*x = StreamIORequest{}
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamIORequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamIORequest) ProtoMessage() {}
+
+func (x *StreamIORequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamIORequest.ProtoReflect.Descriptor instead.
+func (*StreamIORequest) Descriptor() ([]byte, []int) {
+	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *StreamIORequest) GetStdin() []byte {
+	if x != nil {
+		return x.Stdin
+	}
+	return nil
+}
+
+// StreamIOResponse is sent by the server over a bidirectional StreamIO stream.
+//
+// Each frame carries one of: a chunk of stdout bytes, a chunk of stderr bytes,
+// or a terminal exit_code that signals how the underlying operation ended.
+// The server sends an exit_code frame before closing the stream whenever the
+// exit status is known; stream closure without an exit_code frame indicates
+// the operation was cancelled or the stream context was terminated.
+type StreamIOResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Type:
+	//
+	//	*StreamIOResponse_Stdout
+	//	*StreamIOResponse_Stderr
+	//	*StreamIOResponse_ExitCode
+	Type          isStreamIOResponse_Type `protobuf_oneof:"type"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamIOResponse) Reset() {
+	*x = StreamIOResponse{}
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamIOResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamIOResponse) ProtoMessage() {}
+
+func (x *StreamIOResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamIOResponse.ProtoReflect.Descriptor instead.
+func (*StreamIOResponse) Descriptor() ([]byte, []int) {
+	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *StreamIOResponse) GetType() isStreamIOResponse_Type {
+	if x != nil {
+		return x.Type
+	}
+	return nil
+}
+
+func (x *StreamIOResponse) GetStdout() []byte {
+	if x != nil {
+		if x, ok := x.Type.(*StreamIOResponse_Stdout); ok {
+			return x.Stdout
+		}
+	}
+	return nil
+}
+
+func (x *StreamIOResponse) GetStderr() []byte {
+	if x != nil {
+		if x, ok := x.Type.(*StreamIOResponse_Stderr); ok {
+			return x.Stderr
+		}
+	}
+	return nil
+}
+
+func (x *StreamIOResponse) GetExitCode() int32 {
+	if x != nil {
+		if x, ok := x.Type.(*StreamIOResponse_ExitCode); ok {
+			return x.ExitCode
+		}
+	}
+	return 0
+}
+
+type isStreamIOResponse_Type interface {
+	isStreamIOResponse_Type()
+}
+
+type StreamIOResponse_Stdout struct {
+	// A chunk of bytes written to the instance stdout.
+	Stdout []byte `protobuf:"bytes,1,opt,name=stdout,proto3,oneof"`
+}
+
+type StreamIOResponse_Stderr struct {
+	// A chunk of bytes written to the instance stderr.
+	Stderr []byte `protobuf:"bytes,2,opt,name=stderr,proto3,oneof"`
+}
+
+type StreamIOResponse_ExitCode struct {
+	// Terminal frame: exit status of the underlying operation.  Sent once,
+	// immediately before the server closes the stream.  A value of 0 indicates
+	// success; non-zero values follow standard Unix exit-code conventions.
+	// Absence of this frame means the stream ended abnormally (e.g. context
+	// cancellation).
+	ExitCode int32 `protobuf:"varint,3,opt,name=exit_code,json=exitCode,proto3,oneof"`
+}
+
+func (*StreamIOResponse_Stdout) isStreamIOResponse_Type() {}
+
+func (*StreamIOResponse_Stderr) isStreamIOResponse_Type() {}
+
+func (*StreamIOResponse_ExitCode) isStreamIOResponse_Type() {}
+
 // Request for getting package spec and config schema.
 type GetPackageRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -33,7 +201,7 @@ type GetPackageRequest struct {
 
 func (x *GetPackageRequest) Reset() {
 	*x = GetPackageRequest{}
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[0]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +213,7 @@ func (x *GetPackageRequest) String() string {
 func (*GetPackageRequest) ProtoMessage() {}
 
 func (x *GetPackageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[0]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +226,7 @@ func (x *GetPackageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPackageRequest.ProtoReflect.Descriptor instead.
 func (*GetPackageRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{0}
+	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{2}
 }
 
 // Response for getting package spec and config schema.
@@ -74,7 +242,7 @@ type GetPackageResponse struct {
 
 func (x *GetPackageResponse) Reset() {
 	*x = GetPackageResponse{}
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[1]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -86,7 +254,7 @@ func (x *GetPackageResponse) String() string {
 func (*GetPackageResponse) ProtoMessage() {}
 
 func (x *GetPackageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[1]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -99,7 +267,7 @@ func (x *GetPackageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPackageResponse.ProtoReflect.Descriptor instead.
 func (*GetPackageResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{1}
+	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetPackageResponse) GetPackage() *v1beta1.Package {
@@ -119,7 +287,7 @@ func (x *GetPackageResponse) GetConfigSchema() *v1beta1.TypeSchema {
 // Request for checking config.
 type CheckConfigRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Connection resource of provided config.
+	// Connection resource name of provided config.
 	Connection string `protobuf:"bytes,1,opt,name=connection,proto3" json:"connection,omitempty"`
 	// Config to validate.
 	ConfigData *anypb.Any `protobuf:"bytes,2,opt,name=config_data,json=configData,proto3" json:"config_data,omitempty"`
@@ -133,7 +301,7 @@ type CheckConfigRequest struct {
 
 func (x *CheckConfigRequest) Reset() {
 	*x = CheckConfigRequest{}
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[2]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -145,7 +313,7 @@ func (x *CheckConfigRequest) String() string {
 func (*CheckConfigRequest) ProtoMessage() {}
 
 func (x *CheckConfigRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[2]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -158,7 +326,7 @@ func (x *CheckConfigRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckConfigRequest.ProtoReflect.Descriptor instead.
 func (*CheckConfigRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{2}
+	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CheckConfigRequest) GetConnection() string {
@@ -200,7 +368,7 @@ type CheckConfigResponse struct {
 
 func (x *CheckConfigResponse) Reset() {
 	*x = CheckConfigResponse{}
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[3]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -212,7 +380,7 @@ func (x *CheckConfigResponse) String() string {
 func (*CheckConfigResponse) ProtoMessage() {}
 
 func (x *CheckConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[3]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -225,7 +393,7 @@ func (x *CheckConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckConfigResponse.ProtoReflect.Descriptor instead.
 func (*CheckConfigResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{3}
+	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CheckConfigResponse) GetAuthRequired() v1beta1.AuthType {
@@ -233,6 +401,80 @@ func (x *CheckConfigResponse) GetAuthRequired() v1beta1.AuthType {
 		return *x.AuthRequired
 	}
 	return v1beta1.AuthType(0)
+}
+
+// Request for checking config.
+type CloseRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CloseRequest) Reset() {
+	*x = CloseRequest{}
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CloseRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CloseRequest) ProtoMessage() {}
+
+func (x *CloseRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CloseRequest.ProtoReflect.Descriptor instead.
+func (*CloseRequest) Descriptor() ([]byte, []int) {
+	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{6}
+}
+
+// Response of closing instance.
+type CloseResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CloseResponse) Reset() {
+	*x = CloseResponse{}
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CloseResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CloseResponse) ProtoMessage() {}
+
+func (x *CloseResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CloseResponse.ProtoReflect.Descriptor instead.
+func (*CloseResponse) Descriptor() ([]byte, []int) {
+	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{7}
 }
 
 // Request for checking auth (3-legged OAuth over gRPC).
@@ -250,7 +492,7 @@ type CheckAuthRequest struct {
 
 func (x *CheckAuthRequest) Reset() {
 	*x = CheckAuthRequest{}
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[4]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -262,7 +504,7 @@ func (x *CheckAuthRequest) String() string {
 func (*CheckAuthRequest) ProtoMessage() {}
 
 func (x *CheckAuthRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[4]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -275,7 +517,7 @@ func (x *CheckAuthRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckAuthRequest.ProtoReflect.Descriptor instead.
 func (*CheckAuthRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{4}
+	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *CheckAuthRequest) GetType() isCheckAuthRequest_Type {
@@ -350,7 +592,7 @@ type CheckAuthResponse struct {
 
 func (x *CheckAuthResponse) Reset() {
 	*x = CheckAuthResponse{}
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[5]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -362,7 +604,7 @@ func (x *CheckAuthResponse) String() string {
 func (*CheckAuthResponse) ProtoMessage() {}
 
 func (x *CheckAuthResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[5]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -375,7 +617,7 @@ func (x *CheckAuthResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckAuthResponse.ProtoReflect.Descriptor instead.
 func (*CheckAuthResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{5}
+	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *CheckAuthResponse) GetAuthRequired() v1beta1.AuthType {
@@ -439,7 +681,7 @@ type ListTypesRequest struct {
 
 func (x *ListTypesRequest) Reset() {
 	*x = ListTypesRequest{}
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[6]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -451,7 +693,7 @@ func (x *ListTypesRequest) String() string {
 func (*ListTypesRequest) ProtoMessage() {}
 
 func (x *ListTypesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[6]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -464,7 +706,7 @@ func (x *ListTypesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTypesRequest.ProtoReflect.Descriptor instead.
 func (*ListTypesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{6}
+	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ListTypesRequest) GetPageSize() int32 {
@@ -493,7 +735,7 @@ type ListTypesResponse struct {
 
 func (x *ListTypesResponse) Reset() {
 	*x = ListTypesResponse{}
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[7]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -505,7 +747,7 @@ func (x *ListTypesResponse) String() string {
 func (*ListTypesResponse) ProtoMessage() {}
 
 func (x *ListTypesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[7]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -518,7 +760,7 @@ func (x *ListTypesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTypesResponse.ProtoReflect.Descriptor instead.
 func (*ListTypesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{7}
+	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ListTypesResponse) GetTypes() []*v1beta1.TypeSchema {
@@ -545,7 +787,7 @@ type GetTypeRequest struct {
 
 func (x *GetTypeRequest) Reset() {
 	*x = GetTypeRequest{}
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[8]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -557,7 +799,7 @@ func (x *GetTypeRequest) String() string {
 func (*GetTypeRequest) ProtoMessage() {}
 
 func (x *GetTypeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[8]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -570,7 +812,7 @@ func (x *GetTypeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTypeRequest.ProtoReflect.Descriptor instead.
 func (*GetTypeRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{8}
+	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *GetTypeRequest) GetName() string {
@@ -590,7 +832,7 @@ type GetTypeResponse struct {
 
 func (x *GetTypeResponse) Reset() {
 	*x = GetTypeResponse{}
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[9]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -602,7 +844,7 @@ func (x *GetTypeResponse) String() string {
 func (*GetTypeResponse) ProtoMessage() {}
 
 func (x *GetTypeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[9]
+	mi := &file_dtkt_base_v1beta1_messages_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -615,7 +857,7 @@ func (x *GetTypeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTypeResponse.ProtoReflect.Descriptor instead.
 func (*GetTypeResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{9}
+	return file_dtkt_base_v1beta1_messages_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *GetTypeResponse) GetType() *v1beta1.TypeSchema {
@@ -629,7 +871,15 @@ var File_dtkt_base_v1beta1_messages_proto protoreflect.FileDescriptor
 
 const file_dtkt_base_v1beta1_messages_proto_rawDesc = "" +
 	"\n" +
-	" dtkt/base/v1beta1/messages.proto\x12\x11dtkt.base.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1fdtkt/shared/v1beta1/enums.proto\x1a\"dtkt/shared/v1beta1/messages.proto\x1a\x19google/protobuf/any.proto\"\x13\n" +
+	" dtkt/base/v1beta1/messages.proto\x12\x11dtkt.base.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1fdtkt/shared/v1beta1/enums.proto\x1a\"dtkt/shared/v1beta1/messages.proto\x1a\x19google/protobuf/any.proto\"6\n" +
+	"\x0fStreamIORequest\x12\x19\n" +
+	"\x05stdin\x18\x01 \x01(\fH\x00R\x05stdin\x88\x01\x01B\b\n" +
+	"\x06_stdin\"t\n" +
+	"\x10StreamIOResponse\x12\x18\n" +
+	"\x06stdout\x18\x01 \x01(\fH\x00R\x06stdout\x12\x18\n" +
+	"\x06stderr\x18\x02 \x01(\fH\x00R\x06stderr\x12\x1d\n" +
+	"\texit_code\x18\x03 \x01(\x05H\x00R\bexitCodeB\r\n" +
+	"\x04type\x12\x05\xbaH\x02\b\x01\"\x13\n" +
 	"\x11GetPackageRequest\"\xa2\x01\n" +
 	"\x12GetPackageResponse\x12>\n" +
 	"\apackage\x18\x01 \x01(\v2\x1c.dtkt.shared.v1beta1.PackageB\x06\xbaH\x03\xc8\x01\x01R\apackage\x12L\n" +
@@ -646,7 +896,9 @@ const file_dtkt_base_v1beta1_messages_proto_rawDesc = "" +
 	"config_gen\x18\x04 \x01(\x04B\x06\xbaH\x03\xc8\x01\x01R\tconfigGen\"p\n" +
 	"\x13CheckConfigResponse\x12G\n" +
 	"\rauth_required\x18\x01 \x01(\x0e2\x1d.dtkt.shared.v1beta1.AuthTypeH\x00R\fauthRequired\x88\x01\x01B\x10\n" +
-	"\x0e_auth_required\"\x8a\x02\n" +
+	"\x0e_auth_required\"\x0e\n" +
+	"\fCloseRequest\"\x0f\n" +
+	"\rCloseResponse\"\x8a\x02\n" +
 	"\x10CheckAuthRequest\x12J\n" +
 	"\fcode_request\x18\x02 \x01(\v2%.dtkt.shared.v1beta1.OAuthCodeRequestH\x00R\vcodeRequest\x12M\n" +
 	"\rtoken_request\x18\x03 \x01(\v2&.dtkt.shared.v1beta1.OAuthTokenRequestH\x00R\ftokenRequest\x12S\n" +
@@ -682,39 +934,43 @@ func file_dtkt_base_v1beta1_messages_proto_rawDescGZIP() []byte {
 	return file_dtkt_base_v1beta1_messages_proto_rawDescData
 }
 
-var file_dtkt_base_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_dtkt_base_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_dtkt_base_v1beta1_messages_proto_goTypes = []any{
-	(*GetPackageRequest)(nil),           // 0: dtkt.base.v1beta1.GetPackageRequest
-	(*GetPackageResponse)(nil),          // 1: dtkt.base.v1beta1.GetPackageResponse
-	(*CheckConfigRequest)(nil),          // 2: dtkt.base.v1beta1.CheckConfigRequest
-	(*CheckConfigResponse)(nil),         // 3: dtkt.base.v1beta1.CheckConfigResponse
-	(*CheckAuthRequest)(nil),            // 4: dtkt.base.v1beta1.CheckAuthRequest
-	(*CheckAuthResponse)(nil),           // 5: dtkt.base.v1beta1.CheckAuthResponse
-	(*ListTypesRequest)(nil),            // 6: dtkt.base.v1beta1.ListTypesRequest
-	(*ListTypesResponse)(nil),           // 7: dtkt.base.v1beta1.ListTypesResponse
-	(*GetTypeRequest)(nil),              // 8: dtkt.base.v1beta1.GetTypeRequest
-	(*GetTypeResponse)(nil),             // 9: dtkt.base.v1beta1.GetTypeResponse
-	(*v1beta1.Package)(nil),             // 10: dtkt.shared.v1beta1.Package
-	(*v1beta1.TypeSchema)(nil),          // 11: dtkt.shared.v1beta1.TypeSchema
-	(*anypb.Any)(nil),                   // 12: google.protobuf.Any
-	(v1beta1.AuthType)(0),               // 13: dtkt.shared.v1beta1.AuthType
-	(*v1beta1.OAuthCodeRequest)(nil),    // 14: dtkt.shared.v1beta1.OAuthCodeRequest
-	(*v1beta1.OAuthTokenRequest)(nil),   // 15: dtkt.shared.v1beta1.OAuthTokenRequest
-	(*v1beta1.OAuthRefreshRequest)(nil), // 16: dtkt.shared.v1beta1.OAuthRefreshRequest
-	(*v1beta1.OAuthToken)(nil),          // 17: dtkt.shared.v1beta1.OAuthToken
+	(*StreamIORequest)(nil),             // 0: dtkt.base.v1beta1.StreamIORequest
+	(*StreamIOResponse)(nil),            // 1: dtkt.base.v1beta1.StreamIOResponse
+	(*GetPackageRequest)(nil),           // 2: dtkt.base.v1beta1.GetPackageRequest
+	(*GetPackageResponse)(nil),          // 3: dtkt.base.v1beta1.GetPackageResponse
+	(*CheckConfigRequest)(nil),          // 4: dtkt.base.v1beta1.CheckConfigRequest
+	(*CheckConfigResponse)(nil),         // 5: dtkt.base.v1beta1.CheckConfigResponse
+	(*CloseRequest)(nil),                // 6: dtkt.base.v1beta1.CloseRequest
+	(*CloseResponse)(nil),               // 7: dtkt.base.v1beta1.CloseResponse
+	(*CheckAuthRequest)(nil),            // 8: dtkt.base.v1beta1.CheckAuthRequest
+	(*CheckAuthResponse)(nil),           // 9: dtkt.base.v1beta1.CheckAuthResponse
+	(*ListTypesRequest)(nil),            // 10: dtkt.base.v1beta1.ListTypesRequest
+	(*ListTypesResponse)(nil),           // 11: dtkt.base.v1beta1.ListTypesResponse
+	(*GetTypeRequest)(nil),              // 12: dtkt.base.v1beta1.GetTypeRequest
+	(*GetTypeResponse)(nil),             // 13: dtkt.base.v1beta1.GetTypeResponse
+	(*v1beta1.Package)(nil),             // 14: dtkt.shared.v1beta1.Package
+	(*v1beta1.TypeSchema)(nil),          // 15: dtkt.shared.v1beta1.TypeSchema
+	(*anypb.Any)(nil),                   // 16: google.protobuf.Any
+	(v1beta1.AuthType)(0),               // 17: dtkt.shared.v1beta1.AuthType
+	(*v1beta1.OAuthCodeRequest)(nil),    // 18: dtkt.shared.v1beta1.OAuthCodeRequest
+	(*v1beta1.OAuthTokenRequest)(nil),   // 19: dtkt.shared.v1beta1.OAuthTokenRequest
+	(*v1beta1.OAuthRefreshRequest)(nil), // 20: dtkt.shared.v1beta1.OAuthRefreshRequest
+	(*v1beta1.OAuthToken)(nil),          // 21: dtkt.shared.v1beta1.OAuthToken
 }
 var file_dtkt_base_v1beta1_messages_proto_depIdxs = []int32{
-	10, // 0: dtkt.base.v1beta1.GetPackageResponse.package:type_name -> dtkt.shared.v1beta1.Package
-	11, // 1: dtkt.base.v1beta1.GetPackageResponse.config_schema:type_name -> dtkt.shared.v1beta1.TypeSchema
-	12, // 2: dtkt.base.v1beta1.CheckConfigRequest.config_data:type_name -> google.protobuf.Any
-	13, // 3: dtkt.base.v1beta1.CheckConfigResponse.auth_required:type_name -> dtkt.shared.v1beta1.AuthType
-	14, // 4: dtkt.base.v1beta1.CheckAuthRequest.code_request:type_name -> dtkt.shared.v1beta1.OAuthCodeRequest
-	15, // 5: dtkt.base.v1beta1.CheckAuthRequest.token_request:type_name -> dtkt.shared.v1beta1.OAuthTokenRequest
-	16, // 6: dtkt.base.v1beta1.CheckAuthRequest.refresh_request:type_name -> dtkt.shared.v1beta1.OAuthRefreshRequest
-	13, // 7: dtkt.base.v1beta1.CheckAuthResponse.auth_required:type_name -> dtkt.shared.v1beta1.AuthType
-	17, // 8: dtkt.base.v1beta1.CheckAuthResponse.token:type_name -> dtkt.shared.v1beta1.OAuthToken
-	11, // 9: dtkt.base.v1beta1.ListTypesResponse.types:type_name -> dtkt.shared.v1beta1.TypeSchema
-	11, // 10: dtkt.base.v1beta1.GetTypeResponse.type:type_name -> dtkt.shared.v1beta1.TypeSchema
+	14, // 0: dtkt.base.v1beta1.GetPackageResponse.package:type_name -> dtkt.shared.v1beta1.Package
+	15, // 1: dtkt.base.v1beta1.GetPackageResponse.config_schema:type_name -> dtkt.shared.v1beta1.TypeSchema
+	16, // 2: dtkt.base.v1beta1.CheckConfigRequest.config_data:type_name -> google.protobuf.Any
+	17, // 3: dtkt.base.v1beta1.CheckConfigResponse.auth_required:type_name -> dtkt.shared.v1beta1.AuthType
+	18, // 4: dtkt.base.v1beta1.CheckAuthRequest.code_request:type_name -> dtkt.shared.v1beta1.OAuthCodeRequest
+	19, // 5: dtkt.base.v1beta1.CheckAuthRequest.token_request:type_name -> dtkt.shared.v1beta1.OAuthTokenRequest
+	20, // 6: dtkt.base.v1beta1.CheckAuthRequest.refresh_request:type_name -> dtkt.shared.v1beta1.OAuthRefreshRequest
+	17, // 7: dtkt.base.v1beta1.CheckAuthResponse.auth_required:type_name -> dtkt.shared.v1beta1.AuthType
+	21, // 8: dtkt.base.v1beta1.CheckAuthResponse.token:type_name -> dtkt.shared.v1beta1.OAuthToken
+	15, // 9: dtkt.base.v1beta1.ListTypesResponse.types:type_name -> dtkt.shared.v1beta1.TypeSchema
+	15, // 10: dtkt.base.v1beta1.GetTypeResponse.type:type_name -> dtkt.shared.v1beta1.TypeSchema
 	11, // [11:11] is the sub-list for method output_type
 	11, // [11:11] is the sub-list for method input_type
 	11, // [11:11] is the sub-list for extension type_name
@@ -727,13 +983,19 @@ func file_dtkt_base_v1beta1_messages_proto_init() {
 	if File_dtkt_base_v1beta1_messages_proto != nil {
 		return
 	}
-	file_dtkt_base_v1beta1_messages_proto_msgTypes[3].OneofWrappers = []any{}
-	file_dtkt_base_v1beta1_messages_proto_msgTypes[4].OneofWrappers = []any{
+	file_dtkt_base_v1beta1_messages_proto_msgTypes[0].OneofWrappers = []any{}
+	file_dtkt_base_v1beta1_messages_proto_msgTypes[1].OneofWrappers = []any{
+		(*StreamIOResponse_Stdout)(nil),
+		(*StreamIOResponse_Stderr)(nil),
+		(*StreamIOResponse_ExitCode)(nil),
+	}
+	file_dtkt_base_v1beta1_messages_proto_msgTypes[5].OneofWrappers = []any{}
+	file_dtkt_base_v1beta1_messages_proto_msgTypes[8].OneofWrappers = []any{
 		(*CheckAuthRequest_CodeRequest)(nil),
 		(*CheckAuthRequest_TokenRequest)(nil),
 		(*CheckAuthRequest_RefreshRequest)(nil),
 	}
-	file_dtkt_base_v1beta1_messages_proto_msgTypes[5].OneofWrappers = []any{
+	file_dtkt_base_v1beta1_messages_proto_msgTypes[9].OneofWrappers = []any{
 		(*CheckAuthResponse_OauthCodeUrl)(nil),
 		(*CheckAuthResponse_Token)(nil),
 	}
@@ -743,7 +1005,7 @@ func file_dtkt_base_v1beta1_messages_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_base_v1beta1_messages_proto_rawDesc), len(file_dtkt_base_v1beta1_messages_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

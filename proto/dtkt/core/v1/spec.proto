@@ -1,0 +1,59 @@
+edition = "2023";
+
+package dtkt.core.v1;
+
+import "buf/validate/validate.proto";
+import "dtkt/flow/v1beta1/spec.proto";
+import "dtkt/shared/v1beta1/messages.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/go_features.proto";
+import "google/protobuf/struct.proto";
+
+option features.(pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1";
+
+// FlowSpec is a versioned Flow specification wrapper and implements
+// api.SpecLoader interface which handles encoding, decoding, and validation.
+message FlowSpec {
+  string kind = 1 [
+    default = "Flow",
+    (buf.validate.field).string.const = "Flow"
+  ];
+
+  string api_version = 2 [
+    default = "v1beta1",
+    (buf.validate.field).string = {
+      in: ["v1beta1"]
+    }
+  ];
+
+  google.protobuf.Struct spec = 3 [(google.api.field_behavior) = INPUT_ONLY];
+
+  oneof version {
+    option (buf.validate.oneof).required = true;
+    dtkt.flow.v1beta1.Flow v1beta1 = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+  }
+}
+
+// PackageSpec is a versioned Package specification wrapper and implements
+// api.SpecLoader interface which handles encoding, decoding, and validation.
+message PackageSpec {
+  string kind = 1 [
+    default = "Package",
+    (buf.validate.field).string.const = "Package"
+  ];
+
+  string api_version = 2 [
+    default = "v1beta1",
+    (buf.validate.field).string = {
+      in: ["v1beta1"]
+    }
+  ];
+
+  google.protobuf.Struct spec = 3 [(google.api.field_behavior) = INPUT_ONLY];
+
+  oneof version {
+    option (buf.validate.oneof).required = true;
+    dtkt.shared.v1beta1.Package v1beta1 = 4;
+  }
+}

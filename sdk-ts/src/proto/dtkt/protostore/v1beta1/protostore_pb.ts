@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dtkt/protostore/v1beta1/protostore.proto.
  */
 export const file_dtkt_protostore_v1beta1_protostore: GenFile = /*@__PURE__*/
-  fileDesc("CihkdGt0L3Byb3Rvc3RvcmUvdjFiZXRhMS9wcm90b3N0b3JlLnByb3RvEhdkdGt0LnByb3Rvc3RvcmUudjFiZXRhMSKVAgoFRmllbGQSEQoEbmFtZRgBIAEoCUgAiAEBEhUKCG9wdGlvbmFsGAIgASgISAGIAQESFQoIbmlsbGFibGUYAyABKAhIAogBARITCgZ1bmlxdWUYBCABKAhIA4gBARIWCglzZW5zaXRpdmUYBSABKAhIBIgBARIWCglpbW11dGFibGUYBiABKAhIBYgBARIRCgRza2lwGAcgASgISAaIAQESFAoHcHJpbWFyeRgIIAEoCEgHiAEBQgcKBV9uYW1lQgsKCV9vcHRpb25hbEILCglfbmlsbGFibGVCCQoHX3VuaXF1ZUIMCgpfc2Vuc2l0aXZlQgwKCl9pbW11dGFibGVCBwoFX3NraXBCCgoIX3ByaW1hcnkiggEKBEVkZ2USEwoGdW5pcXVlGAEgASgISACIAQESEAoDcmVmGAIgASgJSAGIAQESFQoIcmVxdWlyZWQYAyABKAhIAogBARISCgVmaWVsZBgEIAEoCUgDiAEBQgkKB191bmlxdWVCBgoEX3JlZkILCglfcmVxdWlyZWRCCAoGX2ZpZWxkOlYKBWVkZ2VzEh8uZ29vZ2xlLnByb3RvYnVmLk1lc3NhZ2VPcHRpb25zGNaGAyADKAsyHS5kdGt0LnByb3Rvc3RvcmUudjFiZXRhMS5FZGdlUgVlZGdlczpYCgVmaWVsZBIdLmdvb2dsZS5wcm90b2J1Zi5GaWVsZE9wdGlvbnMY1YYDIAEoCzIeLmR0a3QucHJvdG9zdG9yZS52MWJldGExLkZpZWxkUgVmaWVsZIgBAUKGAgodcHJvdG8uZHRrdC5wcm90b3N0b3JlLnYxYmV0YTFCD1Byb3Rvc3RvcmVQcm90b1ABWlZnaXRodWIuY29tL2RhdGFraXQtZGV2L2R0a3Qtc2RrL3Nkay1nby9wcm90by9kdGt0L3Byb3Rvc3RvcmUvdjFiZXRhMTtwcm90b3N0b3JldjFiZXRhMaICA0RQWKoCF0R0a3QuUHJvdG9zdG9yZS5WMWJldGExygIXRHRrdFxQcm90b3N0b3JlXFYxYmV0YTHiAiNEdGt0XFByb3Rvc3RvcmVcVjFiZXRhMVxHUEJNZXRhZGF0YeoCGUR0a3Q6OlByb3Rvc3RvcmU6OlYxYmV0YTFiBnByb3RvMw", [file_google_protobuf_descriptor]);
+  fileDesc("CihkdGt0L3Byb3Rvc3RvcmUvdjFiZXRhMS9wcm90b3N0b3JlLnByb3RvEhdkdGt0LnByb3Rvc3RvcmUudjFiZXRhMSKVAgoFRmllbGQSEQoEbmFtZRgBIAEoCUgAiAEBEhUKCG9wdGlvbmFsGAIgASgISAGIAQESFQoIbmlsbGFibGUYAyABKAhIAogBARITCgZ1bmlxdWUYBCABKAhIA4gBARIWCglzZW5zaXRpdmUYBSABKAhIBIgBARIWCglpbW11dGFibGUYBiABKAhIBYgBARIRCgRza2lwGAcgASgISAaIAQESFAoHcHJpbWFyeRgIIAEoCEgHiAEBQgcKBV9uYW1lQgsKCV9vcHRpb25hbEILCglfbmlsbGFibGVCCQoHX3VuaXF1ZUIMCgpfc2Vuc2l0aXZlQgwKCl9pbW11dGFibGVCBwoFX3NraXBCCgoIX3ByaW1hcnkiggEKBEVkZ2USEwoGdW5pcXVlGAEgASgISACIAQESEAoDcmVmGAIgASgJSAGIAQESFQoIcmVxdWlyZWQYAyABKAhIAogBARISCgVmaWVsZBgEIAEoCUgDiAEBQgkKB191bmlxdWVCBgoEX3JlZkILCglfcmVxdWlyZWRCCAoGX2ZpZWxkIjsKC1NlYXJjaEluZGV4EhoKDWNvbnRlbnRzX2V4cHIYASABKAlIAIgBAUIQCg5fY29udGVudHNfZXhwcjpWCgVlZGdlcxIfLmdvb2dsZS5wcm90b2J1Zi5NZXNzYWdlT3B0aW9ucxjWhgMgAygLMh0uZHRrdC5wcm90b3N0b3JlLnYxYmV0YTEuRWRnZVIFZWRnZXM6agoMc2VhcmNoX2luZGV4Eh8uZ29vZ2xlLnByb3RvYnVmLk1lc3NhZ2VPcHRpb25zGNeGAyABKAsyJC5kdGt0LnByb3Rvc3RvcmUudjFiZXRhMS5TZWFyY2hJbmRleFILc2VhcmNoSW5kZXg6WAoFZmllbGQSHS5nb29nbGUucHJvdG9idWYuRmllbGRPcHRpb25zGNWGAyABKAsyHi5kdGt0LnByb3Rvc3RvcmUudjFiZXRhMS5GaWVsZFIFZmllbGSIAQFChgIKHXByb3RvLmR0a3QucHJvdG9zdG9yZS52MWJldGExQg9Qcm90b3N0b3JlUHJvdG9QAVpWZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9wcm90b3N0b3JlL3YxYmV0YTE7cHJvdG9zdG9yZXYxYmV0YTGiAgNEUFiqAhdEdGt0LlByb3Rvc3RvcmUuVjFiZXRhMcoCF0R0a3RcUHJvdG9zdG9yZVxWMWJldGEx4gIjRHRrdFxQcm90b3N0b3JlXFYxYmV0YTFcR1BCTWV0YWRhdGHqAhlEdGt0OjpQcm90b3N0b3JlOjpWMWJldGExYgZwcm90bzM", [file_google_protobuf_descriptor]);
 
 /**
  * @generated from message dtkt.protostore.v1beta1.Field
@@ -103,16 +103,44 @@ export const EdgeSchema: GenMessage<Edge, {validType: EdgeValid}> = /*@__PURE__*
   messageDesc(file_dtkt_protostore_v1beta1_protostore, 1);
 
 /**
- * repeated Index
- *
+ * @generated from message dtkt.protostore.v1beta1.SearchIndex
+ */
+export type SearchIndex = Message<"dtkt.protostore.v1beta1.SearchIndex"> & {
+  /**
+   * CEL expression which must resolve to a string value containing text
+   * contents to be indexed for full-text and/or semantic search.
+   * The message of the declared option is `this` in the CEL expression context.
+   * Example: contents_expr: "this.title + ' ' + this.description"
+   *
+   * @generated from field: optional string contents_expr = 1;
+   */
+  contentsExpr?: string;
+};
+
+export type SearchIndexValid = SearchIndex;
+
+/**
+ * Describes the message dtkt.protostore.v1beta1.SearchIndex.
+ * Use `create(SearchIndexSchema)` to create a new message.
+ */
+export const SearchIndexSchema: GenMessage<SearchIndex, {validType: SearchIndexValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_protostore_v1beta1_protostore, 2);
+
+/**
  * @generated from extension: repeated dtkt.protostore.v1beta1.Edge edges = 50006;
  */
 export const edges: GenExtension<MessageOptions, Edge[]> = /*@__PURE__*/
   extDesc(file_dtkt_protostore_v1beta1_protostore, 0);
 
 /**
+ * @generated from extension: dtkt.protostore.v1beta1.SearchIndex search_index = 50007;
+ */
+export const search_index: GenExtension<MessageOptions, SearchIndex> = /*@__PURE__*/
+  extDesc(file_dtkt_protostore_v1beta1_protostore, 1);
+
+/**
  * @generated from extension: optional dtkt.protostore.v1beta1.Field field = 50005;
  */
 export const field: GenExtension<FieldOptions, Field> = /*@__PURE__*/
-  extDesc(file_dtkt_protostore_v1beta1_protostore, 1);
+  extDesc(file_dtkt_protostore_v1beta1_protostore, 2);
 

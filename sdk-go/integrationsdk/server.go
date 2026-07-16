@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -35,19 +36,47 @@ type (
 		intgr  *Integration[C, I]
 		health *health.Server
 
-		services     map[string]grpc.ServiceInfo
-		proxyMethods map[string]GetProxyConnFunc
-
-		mux  *http.ServeMux
 		grpc *grpc.Server
 		http http.Server
 
-		stopCh chan struct{}
-		doneCh chan struct{}
+		services map[string]grpc.ServiceInfo
+		proxies  map[string]GetConnFunc
+
+		regOnce sync.Once // protects one-time gRPC service registration
+		stopCh  chan struct{}
+		doneCh  chan struct{}
 	}
 )
 
 func NewServer[C any, I v1beta1.InstanceType](intgr *Integration[C, I]) *Server[C, I] {
+	var (
+		services = map[string]grpc.ServiceInfo{}
+		proxies  = map[string]GetConnFunc{}
+	)
+
+	for name, svc := range intgr.services {
+		info := NewServiceInfo(svc.desc)
+
+		services[name] = info
+
+		if svc.isProxy && svc.getConn != nil {
+			for _, m := range info.Methods {
+				proxies["/"+name+"/"+m.Name] = svc.getConn
+			}
+		}
+	}
+
+	srv := &Server[C, I]{
+		intgr:  intgr,
+		health: health.NewServer(),
+
+		services: services,
+		proxies:  proxies,
+
+		stopCh: make(chan struct{}, 1),
+		doneCh: make(chan struct{}, 1),
+	}
+
 	opts := []grpc.ServerOption{
 		grpc.UnaryInterceptor(
 			intgr.unaryInterceptor(),
@@ -57,33 +86,7 @@ func NewServer[C any, I v1beta1.InstanceType](intgr *Integration[C, I]) *Server[
 		),
 	}
 
-	var (
-		services     = map[string]grpc.ServiceInfo{}
-		proxyMethods = map[string]GetProxyConnFunc{}
-	)
-
-	for name, svc := range intgr.services {
-		services[name] = svc.info
-		if svc.isProxy && svc.getConn != nil {
-			for _, m := range svc.info.Methods {
-				proxyMethods["/"+name+"/"+m.Name] = svc.getConn
-			}
-		}
-	}
-
-	srv := &Server[C, I]{
-		intgr:        intgr,
-		health:       health.NewServer(),
-		services:     services,
-		proxyMethods: proxyMethods,
-
-		mux: http.NewServeMux(),
-
-		stopCh: make(chan struct{}, 1),
-		doneCh: make(chan struct{}, 1),
-	}
-
-	if len(proxyMethods) > 0 {
+	if len(proxies) > 0 {
 		encoding.RegisterCodecV2(proxy.Codec())
 
 		opts = append(opts,
@@ -98,8 +101,15 @@ func NewServer[C any, I v1beta1.InstanceType](intgr *Integration[C, I]) *Server[
 }
 
 func (s *Server[C, I]) Serve() error {
+	conn, err := network.ResolveConnector(s.intgr.addr)
+	if err != nil {
+		return err
+	}
+
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
+
+	s.registerGRPCServices()
 
 	s.http.Protocols = new(http.Protocols)
 	s.http.Protocols.SetHTTP1(true)
@@ -108,28 +118,9 @@ func (s *Server[C, I]) Serve() error {
 		return ctx
 	}
 
-	for name, svc := range s.intgr.services {
-		if svc.isProxy {
-			continue
-		}
-
-		svc.regSvc(s.grpc)
-		s.health.SetServingStatus(name, grpc_health_v1.HealthCheckResponse_SERVING)
-	}
-
-	grpc_health_v1.RegisterHealthServer(s.grpc, s.health)
-	grpc_reflection_v1.RegisterServerReflectionServer(s.grpc,
-		reflection.NewServerV1(reflection.ServerOptions{
-			Services:           s,
-			DescriptorResolver: sourceinfo.Files,
-			ExtensionResolver:  sourceinfo.Types,
-		}),
-	)
-
-	s.health.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
-
+	mux := http.NewServeMux()
 	for pattern, handler := range s.intgr.handlers {
-		s.mux.Handle(pattern, handler)
+		mux.Handle(pattern, handler)
 	}
 
 	s.http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -137,21 +128,21 @@ func (s *Server[C, I]) Serve() error {
 			r.Header.Get("Content-Type"), "application/grpc") {
 			s.grpc.ServeHTTP(w, r)
 		} else {
-			s.mux.ServeHTTP(w, r)
+			mux.ServeHTTP(w, r)
 		}
 	})
 
 	s.intgr.log.Info("Integration server starting...")
 
-	if s.intgr.conn.Address().Network() == network.Socket.String() {
+	if conn.Address().Network() == network.Socket.String() {
 		// Close socket before bind to ensure new socket file
 		//nolint:errcheck
-		os.Remove(s.intgr.conn.Address().String())
+		os.Remove(conn.Address().String())
 	}
 	//nolint:errcheck
-	defer s.intgr.conn.Close()
+	defer conn.Close()
 
-	lis, err := s.intgr.conn.Bind(ctx)
+	lis, err := conn.Bind(ctx)
 	if err != nil {
 		return err
 	}
@@ -172,6 +163,7 @@ func (s *Server[C, I]) Serve() error {
 	go s.stopWatch(ctx)
 
 	s.intgr.setRunning(true)
+	defer s.intgr.setRunning(false)
 
 	err = s.http.Serve(lis)
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -193,10 +185,36 @@ func (s *Server[C, I]) Stop() {
 	s.stopCh <- struct{}{}
 }
 
+// registerGRPCServices registers all gRPC services, health, and reflection on
+// s.grpc exactly once. It is safe to call from multiple code paths.
+func (s *Server[C, I]) registerGRPCServices() {
+	s.regOnce.Do(func() {
+		for name, svc := range s.intgr.services {
+			if svc.isProxy {
+				continue
+			}
+
+			svc.regSvc(s.grpc)
+			s.health.SetServingStatus(name, grpc_health_v1.HealthCheckResponse_SERVING)
+		}
+
+		grpc_health_v1.RegisterHealthServer(s.grpc, s.health)
+		grpc_reflection_v1.RegisterServerReflectionServer(s.grpc,
+			reflection.NewServerV1(reflection.ServerOptions{
+				Services:           s,
+				DescriptorResolver: sourceinfo.Files,
+				ExtensionResolver:  sourceinfo.Types,
+			}),
+		)
+
+		s.health.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
+	})
+}
+
 func (s *Server[C, I]) proxyHandler() grpc.StreamHandler {
 	return proxy.TransparentHandler(
 		func(ctx context.Context, method string) (proxy.Mode, []proxy.Backend, error) {
-			getConn, ok := s.proxyMethods[method]
+			getConn, ok := s.proxies[method]
 			if !ok {
 				return 0, nil, status.Errorf(codes.Aborted, "proxy method not found: %s", method)
 			}
@@ -230,11 +248,8 @@ func (s *Server[C, I]) stopWatch(ctx context.Context) {
 func (s *Server[C, I]) shutdown() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	defer s.intgr.setRunning(false)
 
 	s.intgr.log.Info("Integration server stopping...")
-
-	s.grpc.GracefulStop()
 
 	if err := s.http.Shutdown(ctx); err != nil {
 		if !errors.Is(err, http.ErrServerClosed) && !errors.Is(err, context.Canceled) {

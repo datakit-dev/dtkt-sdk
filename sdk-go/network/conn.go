@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net"
 	"os"
+	"sync"
 	"time"
 
 	"google.golang.org/grpc"
@@ -20,6 +21,7 @@ type (
 	connector struct {
 		addr Address
 		opts connectorOptions
+		mu   sync.Mutex // protects opts.close
 	}
 )
 
@@ -34,13 +36,12 @@ func NewConnector(addr Address, opts ...ConnectorOption) (Connector, error) {
 	conn := &connector{
 		addr: addr,
 	}
-
 	conn.opts.apply(opts...)
 
 	return conn, nil
 }
 
-func (c *connector) Address() net.Addr {
+func (c *connector) Address() Address {
 	return c.addr
 }
 
@@ -50,6 +51,7 @@ func (c *connector) Bind(context.Context) (net.Listener, error) {
 		return nil, err
 	}
 
+	c.mu.Lock()
 	if c.addr.Network() == Socket.String() && c.opts.close == nil {
 		c.opts.close = func() error {
 			return errors.Join(lis.Close(), os.Remove(c.Address().String()))
@@ -57,6 +59,7 @@ func (c *connector) Bind(context.Context) (net.Listener, error) {
 	} else {
 		c.opts.close = lis.Close
 	}
+	c.mu.Unlock()
 
 	return lis, nil
 }
@@ -70,7 +73,10 @@ func (c *connector) DialContext(ctx context.Context) (net.Conn, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	c.mu.Lock()
 	c.opts.close = conn.Close
+	c.mu.Unlock()
 
 	return conn, nil
 }
@@ -83,7 +89,9 @@ func (c *connector) DialGRPC(opts ...grpc.DialOption) (*grpc.ClientConn, error) 
 		return nil, err
 	}
 
+	c.mu.Lock()
 	c.opts.close = conn.Close
+	c.mu.Unlock()
 
 	return conn, nil
 }
@@ -93,5 +101,13 @@ func (c *connector) GRPCTarget() string {
 }
 
 func (c *connector) Close() error {
-	return c.opts.Close()
+	c.mu.Lock()
+	close := c.opts.close
+	c.mu.Unlock()
+
+	if close != nil {
+		return close()
+	}
+
+	return nil
 }

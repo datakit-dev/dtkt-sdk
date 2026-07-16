@@ -7,12 +7,7 @@ import (
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 )
 
-type ExecNodeCloser interface {
-	shared.ExecNode
-	Close() error
-}
-
-func ParseNode(env shared.Env, node shared.SpecNode, visitor shared.NodeVisitFunc) (shared.ExecNode, error) {
+func ParseNode(env shared.Env, node shared.SpecNode, visitor shared.NodeVisitor) (shared.ExecNode, error) {
 	switch node := node.(type) {
 	case *flowv1beta1.Action:
 		return NewAction(env, node, visitor)
@@ -27,15 +22,14 @@ func ParseNode(env shared.Env, node shared.SpecNode, visitor shared.NodeVisitFun
 	case *flowv1beta1.Var:
 		return NewVar(env, node, visitor)
 	}
-
 	return nil, nil
 }
 
-func GetID(node shared.SpecNode) string {
-	return fmt.Sprintf("%s.%s", GetIDPrefix(node), node.GetId())
+func GetNodeIdent(node shared.SpecNode) string {
+	return fmt.Sprintf("%s.%s", GetNodePrefix(node), node.GetId())
 }
 
-func GetIDPrefix(node shared.SpecNode) string {
+func GetNodePrefix(node shared.SpecNode) string {
 	switch node.(type) {
 	case *flowv1beta1.Action:
 		return shared.ActionPrefix

@@ -20,10 +20,10 @@ func NewTypeSchemaForProto[T proto.Message](registry *TypeRegistry, typeProto T)
 	}
 
 	name := string(typeProto.ProtoReflect().Descriptor().FullName())
-	opts := []common.JSONSchemaOpt{
-		common.WithSchemaCompiler(registry.compiler),
+	opts := []common.JSONSchemaOption{
+		common.WithJSONSchemaID(registry.baseUri.JoinPath(name + JSONSchemaFileExt).String()),
+		common.WithJSONSchemaLoader(registry.loader),
 		common.WithJSONSchemaBytes(schemaBytes),
-		common.WithSchemaID(registry.baseUri.JoinPath(name + JSONSchemaFileExt).String()),
 	}
 
 	jsonSchema, err := common.JSONSchemaFor[T](opts...)
@@ -33,7 +33,7 @@ func NewTypeSchemaForProto[T proto.Message](registry *TypeRegistry, typeProto T)
 
 	typeSchema := &sharedv1beta1.TypeSchema{
 		Uri:        registry.baseUri.JoinPath(name).String(),
-		JsonSchema: jsonSchema.ToProto(),
+		JsonSchema: jsonSchema.Proto(),
 		ProtoName:  string(typeProto.ProtoReflect().Descriptor().FullName()),
 		ModTime:    timestamppb.Now(),
 	}

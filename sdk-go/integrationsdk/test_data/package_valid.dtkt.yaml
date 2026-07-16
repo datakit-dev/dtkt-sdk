@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=http://localhost:9900/schemas/types/dtkt.integrationsdk.v1beta1.Package.jsonschema.json
+# yaml-language-server: $schema=http://localhost:9900/schemas/types/dtkt.core.v1.PackageSpec.jsonschema.json
 
 kind: Package
 apiVersion: v1beta1

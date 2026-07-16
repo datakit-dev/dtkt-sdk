@@ -318,7 +318,7 @@ type ListEventsRequest struct {
 	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Token from a previous response's `next_page_token` to retrieve the next page of results.
 	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	// Optional filter expression to narrow results..
+	// Optional filter expression to narrow results.
 	Filter        string `protobuf:"bytes,3,opt,name=filter,proto3" json:"filter,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -437,7 +437,7 @@ type ListEventSourcesRequest struct {
 	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Token from a previous response's `next_page_token` to retrieve the next page of results.
 	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	// Optional filter expression to narrow results..
+	// Optional filter expression to narrow results.
 	Filter        string `protobuf:"bytes,3,opt,name=filter,proto3" json:"filter,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1139,29 +1139,27 @@ const file_dtkt_event_v1beta1_messages_proto_rawDesc = "" +
 	"\x0eSTATE_INACTIVE\x10\x02:K\xeaAH\n" +
 	"\vEventSource\x12\x1cevent_sources/{event_source}*\revent_sources2\fevent_sourceB\n" +
 	"\n" +
-	"\bstrategy\"s\n" +
-	"\x11ListEventsRequest\x12'\n" +
-	"\tpage_size\x18\x01 \x01(\x05B\n" +
-	"\xbaH\a\x1a\x05\x18\xe8\a(\x00R\bpageSize\x12\x1d\n" +
+	"\bstrategy\"g\n" +
+	"\x11ListEventsRequest\x12\x1b\n" +
+	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x16\n" +
 	"\x06filter\x18\x03 \x01(\tR\x06filter\"o\n" +
 	"\x12ListEventsResponse\x121\n" +
 	"\x06events\x18\x01 \x03(\v2\x19.dtkt.event.v1beta1.EventR\x06events\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"y\n" +
-	"\x17ListEventSourcesRequest\x12'\n" +
-	"\tpage_size\x18\x01 \x01(\x05B\n" +
-	"\xbaH\a\x1a\x05\x18\xe8\a(\x00R\bpageSize\x12\x1d\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"m\n" +
+	"\x17ListEventSourcesRequest\x12\x1b\n" +
+	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x16\n" +
 	"\x06filter\x18\x03 \x01(\tR\x06filter\"\x88\x01\n" +
 	"\x18ListEventSourcesResponse\x12D\n" +
 	"\revent_sources\x18\x01 \x03(\v2\x1f.dtkt.event.v1beta1.EventSourceR\feventSources\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xc1\x02\n" +
-	"\x17StreamPullEventsRequest\x12\xbf\x01\n" +
-	"\x04name\x18\x01 \x01(\tB\xaa\x01\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x9f\x01\n" +
-	"\x1aSelect a pull event source:\x80\x01\n" +
-	"0dtkt.event.v1beta1.EventService.ListEventSources\x12)this.event_sources.map(i, i.display_name)\x1a!this.event_sources.map(i, i.name)R\x04name\x12,\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\x9e\x02\n" +
+	"\x17StreamPullEventsRequest\x12\x9c\x01\n" +
+	"\x04name\x18\x01 \x01(\tB\x87\x01\xbaH\x03\xc8\x01\x01\x82\xb5\x18}\n" +
+	"\x1aSelect a pull event source:_\n" +
+	"0dtkt.event.v1beta1.EventService.ListEventSources\x12\revent_sources\x1a\x11this.display_name\"\tthis.nameR\x04name\x12,\n" +
 	"\x06config\x18\x02 \x01(\v2\x14.google.protobuf.AnyR\x06config\x126\n" +
 	"\tpull_freq\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\bpullFreq\"\xcc\x01\n" +
 	"\x18StreamPullEventsResponse\x12!\n" +
@@ -1169,11 +1167,11 @@ const file_dtkt_event_v1beta1_messages_proto_rawDesc = "" +
 	"\x05event\x18\x02 \x01(\tR\x05event\x12.\n" +
 	"\apayload\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\apayload\x12<\n" +
 	"\x06action\x18\x04 \x01(\x0e2\x1f.dtkt.shared.v1beta1.ActionTypeH\x00R\x06action\x88\x01\x01B\t\n" +
-	"\a_action\"\xa0\x03\n" +
-	"\x17StreamPushEventsRequest\x12\xbf\x01\n" +
-	"\x04name\x18\x01 \x01(\tB\xaa\x01\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x9f\x01\n" +
-	"\x1aSelect a push event source:\x80\x01\n" +
-	"0dtkt.event.v1beta1.EventService.ListEventSources\x12)this.event_sources.map(i, i.display_name)\x1a!this.event_sources.map(i, i.name)R\x04name\x12R\n" +
+	"\a_action\"\xfd\x02\n" +
+	"\x17StreamPushEventsRequest\x12\x9c\x01\n" +
+	"\x04name\x18\x01 \x01(\tB\x87\x01\xbaH\x03\xc8\x01\x01\x82\xb5\x18}\n" +
+	"\x1aSelect a push event source:_\n" +
+	"0dtkt.event.v1beta1.EventService.ListEventSources\x12\revent_sources\x1a\x11this.display_name\"\tthis.nameR\x04name\x12R\n" +
 	"\aheaders\x18\x02 \x03(\v28.dtkt.event.v1beta1.StreamPushEventsRequest.HeadersEntryR\aheaders\x12\x12\n" +
 	"\x04body\x18\x03 \x01(\fR\x04body\x1a[\n" +
 	"\fHeadersEntry\x12\x10\n" +

@@ -86,7 +86,9 @@ const file_dtkt_core_v1_services_proto_rawDesc = "" +
 	"\aGetType\x12\x1c.dtkt.core.v1.GetTypeRequest\x1a\x1d.dtkt.core.v1.GetTypeResponse\x12U\n" +
 	"\fListServices\x12!.dtkt.core.v1.ListServicesRequest\x1a\".dtkt.core.v1.ListServicesResponse\x12R\n" +
 	"\vListMethods\x12 .dtkt.core.v1.ListMethodsRequest\x1a!.dtkt.core.v1.ListMethodsResponse\x12L\n" +
-	"\tListTypes\x12\x1e.dtkt.core.v1.ListTypesRequest\x1a\x1f.dtkt.core.v1.ListTypesResponse2\xa3\x01\n" +
+	"\tListTypes\x12\x1e.dtkt.core.v1.ListTypesRequest\x1a\x1f.dtkt.core.v1.ListTypesResponse2u\n" +
+	"\rSearchService\x12d\n" +
+	"\x11ListSearchResults\x12&.dtkt.core.v1.ListSearchResultsRequest\x1a'.dtkt.core.v1.ListSearchResultsResponse2\xa3\x01\n" +
 	"\x11EncryptionService\x12F\n" +
 	"\aEncrypt\x12\x1c.dtkt.core.v1.EncryptRequest\x1a\x1d.dtkt.core.v1.EncryptResponse\x12F\n" +
 	"\aDecrypt\x12\x1c.dtkt.core.v1.DecryptRequest\x1a\x1d.dtkt.core.v1.DecryptResponseB\xb7\x01\n" +
@@ -131,41 +133,43 @@ var file_dtkt_core_v1_services_proto_goTypes = []any{
 	(*ListServicesRequest)(nil),             // 35: dtkt.core.v1.ListServicesRequest
 	(*ListMethodsRequest)(nil),              // 36: dtkt.core.v1.ListMethodsRequest
 	(*ListTypesRequest)(nil),                // 37: dtkt.core.v1.ListTypesRequest
-	(*EncryptRequest)(nil),                  // 38: dtkt.core.v1.EncryptRequest
-	(*DecryptRequest)(nil),                  // 39: dtkt.core.v1.DecryptRequest
-	(*ListAutomationsResponse)(nil),         // 40: dtkt.core.v1.ListAutomationsResponse
-	(*GetAutomationResponse)(nil),           // 41: dtkt.core.v1.GetAutomationResponse
-	(*longrunningpb.Operation)(nil),         // 42: google.longrunning.Operation
-	(*ReceiveAutomationEventsResponse)(nil), // 43: dtkt.core.v1.ReceiveAutomationEventsResponse
-	(*emptypb.Empty)(nil),                   // 44: google.protobuf.Empty
-	(*StreamAutomationEventsResponse)(nil),  // 45: dtkt.core.v1.StreamAutomationEventsResponse
-	(*DialConnectionResponse)(nil),          // 46: dtkt.core.v1.DialConnectionResponse
-	(*ListConnectionsResponse)(nil),         // 47: dtkt.core.v1.ListConnectionsResponse
-	(*GetConnectionResponse)(nil),           // 48: dtkt.core.v1.GetConnectionResponse
-	(*CreateConnectionResponse)(nil),        // 49: dtkt.core.v1.CreateConnectionResponse
-	(*UpdateConnectionResponse)(nil),        // 50: dtkt.core.v1.UpdateConnectionResponse
-	(*DeleteConnectionResponse)(nil),        // 51: dtkt.core.v1.DeleteConnectionResponse
-	(*ListDeploymentsResponse)(nil),         // 52: dtkt.core.v1.ListDeploymentsResponse
-	(*GetDeploymentResponse)(nil),           // 53: dtkt.core.v1.GetDeploymentResponse
-	(*ListFlowsResponse)(nil),               // 54: dtkt.core.v1.ListFlowsResponse
-	(*GetFlowResponse)(nil),                 // 55: dtkt.core.v1.GetFlowResponse
-	(*CreateFlowResponse)(nil),              // 56: dtkt.core.v1.CreateFlowResponse
-	(*UpdateFlowResponse)(nil),              // 57: dtkt.core.v1.UpdateFlowResponse
-	(*DeleteFlowResponse)(nil),              // 58: dtkt.core.v1.DeleteFlowResponse
-	(*ListIntegrationsResponse)(nil),        // 59: dtkt.core.v1.ListIntegrationsResponse
-	(*GetIntegrationResponse)(nil),          // 60: dtkt.core.v1.GetIntegrationResponse
-	(*CreateIntegrationResponse)(nil),       // 61: dtkt.core.v1.CreateIntegrationResponse
-	(*UpdateIntegrationResponse)(nil),       // 62: dtkt.core.v1.UpdateIntegrationResponse
-	(*DeleteIntegrationResponse)(nil),       // 63: dtkt.core.v1.DeleteIntegrationResponse
-	(*GetDescriptorsResponse)(nil),          // 64: dtkt.core.v1.GetDescriptorsResponse
-	(*GetServiceResponse)(nil),              // 65: dtkt.core.v1.GetServiceResponse
-	(*GetMethodResponse)(nil),               // 66: dtkt.core.v1.GetMethodResponse
-	(*GetTypeResponse)(nil),                 // 67: dtkt.core.v1.GetTypeResponse
-	(*ListServicesResponse)(nil),            // 68: dtkt.core.v1.ListServicesResponse
-	(*ListMethodsResponse)(nil),             // 69: dtkt.core.v1.ListMethodsResponse
-	(*ListTypesResponse)(nil),               // 70: dtkt.core.v1.ListTypesResponse
-	(*EncryptResponse)(nil),                 // 71: dtkt.core.v1.EncryptResponse
-	(*DecryptResponse)(nil),                 // 72: dtkt.core.v1.DecryptResponse
+	(*ListSearchResultsRequest)(nil),        // 38: dtkt.core.v1.ListSearchResultsRequest
+	(*EncryptRequest)(nil),                  // 39: dtkt.core.v1.EncryptRequest
+	(*DecryptRequest)(nil),                  // 40: dtkt.core.v1.DecryptRequest
+	(*ListAutomationsResponse)(nil),         // 41: dtkt.core.v1.ListAutomationsResponse
+	(*GetAutomationResponse)(nil),           // 42: dtkt.core.v1.GetAutomationResponse
+	(*longrunningpb.Operation)(nil),         // 43: google.longrunning.Operation
+	(*ReceiveAutomationEventsResponse)(nil), // 44: dtkt.core.v1.ReceiveAutomationEventsResponse
+	(*emptypb.Empty)(nil),                   // 45: google.protobuf.Empty
+	(*StreamAutomationEventsResponse)(nil),  // 46: dtkt.core.v1.StreamAutomationEventsResponse
+	(*DialConnectionResponse)(nil),          // 47: dtkt.core.v1.DialConnectionResponse
+	(*ListConnectionsResponse)(nil),         // 48: dtkt.core.v1.ListConnectionsResponse
+	(*GetConnectionResponse)(nil),           // 49: dtkt.core.v1.GetConnectionResponse
+	(*CreateConnectionResponse)(nil),        // 50: dtkt.core.v1.CreateConnectionResponse
+	(*UpdateConnectionResponse)(nil),        // 51: dtkt.core.v1.UpdateConnectionResponse
+	(*DeleteConnectionResponse)(nil),        // 52: dtkt.core.v1.DeleteConnectionResponse
+	(*ListDeploymentsResponse)(nil),         // 53: dtkt.core.v1.ListDeploymentsResponse
+	(*GetDeploymentResponse)(nil),           // 54: dtkt.core.v1.GetDeploymentResponse
+	(*ListFlowsResponse)(nil),               // 55: dtkt.core.v1.ListFlowsResponse
+	(*GetFlowResponse)(nil),                 // 56: dtkt.core.v1.GetFlowResponse
+	(*CreateFlowResponse)(nil),              // 57: dtkt.core.v1.CreateFlowResponse
+	(*UpdateFlowResponse)(nil),              // 58: dtkt.core.v1.UpdateFlowResponse
+	(*DeleteFlowResponse)(nil),              // 59: dtkt.core.v1.DeleteFlowResponse
+	(*ListIntegrationsResponse)(nil),        // 60: dtkt.core.v1.ListIntegrationsResponse
+	(*GetIntegrationResponse)(nil),          // 61: dtkt.core.v1.GetIntegrationResponse
+	(*CreateIntegrationResponse)(nil),       // 62: dtkt.core.v1.CreateIntegrationResponse
+	(*UpdateIntegrationResponse)(nil),       // 63: dtkt.core.v1.UpdateIntegrationResponse
+	(*DeleteIntegrationResponse)(nil),       // 64: dtkt.core.v1.DeleteIntegrationResponse
+	(*GetDescriptorsResponse)(nil),          // 65: dtkt.core.v1.GetDescriptorsResponse
+	(*GetServiceResponse)(nil),              // 66: dtkt.core.v1.GetServiceResponse
+	(*GetMethodResponse)(nil),               // 67: dtkt.core.v1.GetMethodResponse
+	(*GetTypeResponse)(nil),                 // 68: dtkt.core.v1.GetTypeResponse
+	(*ListServicesResponse)(nil),            // 69: dtkt.core.v1.ListServicesResponse
+	(*ListMethodsResponse)(nil),             // 70: dtkt.core.v1.ListMethodsResponse
+	(*ListTypesResponse)(nil),               // 71: dtkt.core.v1.ListTypesResponse
+	(*ListSearchResultsResponse)(nil),       // 72: dtkt.core.v1.ListSearchResultsResponse
+	(*EncryptResponse)(nil),                 // 73: dtkt.core.v1.EncryptResponse
+	(*DecryptResponse)(nil),                 // 74: dtkt.core.v1.DecryptResponse
 }
 var file_dtkt_core_v1_services_proto_depIdxs = []int32{
 	0,  // 0: dtkt.core.v1.AutomationService.ListAutomations:input_type -> dtkt.core.v1.ListAutomationsRequest
@@ -206,50 +210,52 @@ var file_dtkt_core_v1_services_proto_depIdxs = []int32{
 	35, // 35: dtkt.core.v1.ReflectService.ListServices:input_type -> dtkt.core.v1.ListServicesRequest
 	36, // 36: dtkt.core.v1.ReflectService.ListMethods:input_type -> dtkt.core.v1.ListMethodsRequest
 	37, // 37: dtkt.core.v1.ReflectService.ListTypes:input_type -> dtkt.core.v1.ListTypesRequest
-	38, // 38: dtkt.core.v1.EncryptionService.Encrypt:input_type -> dtkt.core.v1.EncryptRequest
-	39, // 39: dtkt.core.v1.EncryptionService.Decrypt:input_type -> dtkt.core.v1.DecryptRequest
-	40, // 40: dtkt.core.v1.AutomationService.ListAutomations:output_type -> dtkt.core.v1.ListAutomationsResponse
-	41, // 41: dtkt.core.v1.AutomationService.GetAutomation:output_type -> dtkt.core.v1.GetAutomationResponse
-	42, // 42: dtkt.core.v1.AutomationService.CreateAutomation:output_type -> google.longrunning.Operation
-	42, // 43: dtkt.core.v1.AutomationService.UpdateAutomation:output_type -> google.longrunning.Operation
-	42, // 44: dtkt.core.v1.AutomationService.DeleteAutomation:output_type -> google.longrunning.Operation
-	43, // 45: dtkt.core.v1.AutomationService.ReceiveAutomationEvents:output_type -> dtkt.core.v1.ReceiveAutomationEventsResponse
-	44, // 46: dtkt.core.v1.AutomationService.SendAutomationEvent:output_type -> google.protobuf.Empty
-	45, // 47: dtkt.core.v1.AutomationService.StreamAutomationEvents:output_type -> dtkt.core.v1.StreamAutomationEventsResponse
-	46, // 48: dtkt.core.v1.ConnectionService.DialConnection:output_type -> dtkt.core.v1.DialConnectionResponse
-	47, // 49: dtkt.core.v1.ConnectionService.ListConnections:output_type -> dtkt.core.v1.ListConnectionsResponse
-	48, // 50: dtkt.core.v1.ConnectionService.GetConnection:output_type -> dtkt.core.v1.GetConnectionResponse
-	49, // 51: dtkt.core.v1.ConnectionService.CreateConnection:output_type -> dtkt.core.v1.CreateConnectionResponse
-	50, // 52: dtkt.core.v1.ConnectionService.UpdateConnection:output_type -> dtkt.core.v1.UpdateConnectionResponse
-	51, // 53: dtkt.core.v1.ConnectionService.DeleteConnection:output_type -> dtkt.core.v1.DeleteConnectionResponse
-	52, // 54: dtkt.core.v1.DeploymentService.ListDeployments:output_type -> dtkt.core.v1.ListDeploymentsResponse
-	53, // 55: dtkt.core.v1.DeploymentService.GetDeployment:output_type -> dtkt.core.v1.GetDeploymentResponse
-	42, // 56: dtkt.core.v1.DeploymentService.CreateDeployment:output_type -> google.longrunning.Operation
-	42, // 57: dtkt.core.v1.DeploymentService.UpdateDeployment:output_type -> google.longrunning.Operation
-	42, // 58: dtkt.core.v1.DeploymentService.DeleteDeployment:output_type -> google.longrunning.Operation
-	54, // 59: dtkt.core.v1.FlowService.ListFlows:output_type -> dtkt.core.v1.ListFlowsResponse
-	55, // 60: dtkt.core.v1.FlowService.GetFlow:output_type -> dtkt.core.v1.GetFlowResponse
-	56, // 61: dtkt.core.v1.FlowService.CreateFlow:output_type -> dtkt.core.v1.CreateFlowResponse
-	57, // 62: dtkt.core.v1.FlowService.UpdateFlow:output_type -> dtkt.core.v1.UpdateFlowResponse
-	58, // 63: dtkt.core.v1.FlowService.DeleteFlow:output_type -> dtkt.core.v1.DeleteFlowResponse
-	59, // 64: dtkt.core.v1.IntegrationService.ListIntegrations:output_type -> dtkt.core.v1.ListIntegrationsResponse
-	60, // 65: dtkt.core.v1.IntegrationService.GetIntegration:output_type -> dtkt.core.v1.GetIntegrationResponse
-	61, // 66: dtkt.core.v1.IntegrationService.CreateIntegration:output_type -> dtkt.core.v1.CreateIntegrationResponse
-	62, // 67: dtkt.core.v1.IntegrationService.UpdateIntegration:output_type -> dtkt.core.v1.UpdateIntegrationResponse
-	63, // 68: dtkt.core.v1.IntegrationService.DeleteIntegration:output_type -> dtkt.core.v1.DeleteIntegrationResponse
-	42, // 69: dtkt.core.v1.IntegrationService.BuildIntegration:output_type -> google.longrunning.Operation
-	64, // 70: dtkt.core.v1.ReflectService.GetDescriptors:output_type -> dtkt.core.v1.GetDescriptorsResponse
-	42, // 71: dtkt.core.v1.ReflectService.SyncDescriptors:output_type -> google.longrunning.Operation
-	65, // 72: dtkt.core.v1.ReflectService.GetService:output_type -> dtkt.core.v1.GetServiceResponse
-	66, // 73: dtkt.core.v1.ReflectService.GetMethod:output_type -> dtkt.core.v1.GetMethodResponse
-	67, // 74: dtkt.core.v1.ReflectService.GetType:output_type -> dtkt.core.v1.GetTypeResponse
-	68, // 75: dtkt.core.v1.ReflectService.ListServices:output_type -> dtkt.core.v1.ListServicesResponse
-	69, // 76: dtkt.core.v1.ReflectService.ListMethods:output_type -> dtkt.core.v1.ListMethodsResponse
-	70, // 77: dtkt.core.v1.ReflectService.ListTypes:output_type -> dtkt.core.v1.ListTypesResponse
-	71, // 78: dtkt.core.v1.EncryptionService.Encrypt:output_type -> dtkt.core.v1.EncryptResponse
-	72, // 79: dtkt.core.v1.EncryptionService.Decrypt:output_type -> dtkt.core.v1.DecryptResponse
-	40, // [40:80] is the sub-list for method output_type
-	0,  // [0:40] is the sub-list for method input_type
+	38, // 38: dtkt.core.v1.SearchService.ListSearchResults:input_type -> dtkt.core.v1.ListSearchResultsRequest
+	39, // 39: dtkt.core.v1.EncryptionService.Encrypt:input_type -> dtkt.core.v1.EncryptRequest
+	40, // 40: dtkt.core.v1.EncryptionService.Decrypt:input_type -> dtkt.core.v1.DecryptRequest
+	41, // 41: dtkt.core.v1.AutomationService.ListAutomations:output_type -> dtkt.core.v1.ListAutomationsResponse
+	42, // 42: dtkt.core.v1.AutomationService.GetAutomation:output_type -> dtkt.core.v1.GetAutomationResponse
+	43, // 43: dtkt.core.v1.AutomationService.CreateAutomation:output_type -> google.longrunning.Operation
+	43, // 44: dtkt.core.v1.AutomationService.UpdateAutomation:output_type -> google.longrunning.Operation
+	43, // 45: dtkt.core.v1.AutomationService.DeleteAutomation:output_type -> google.longrunning.Operation
+	44, // 46: dtkt.core.v1.AutomationService.ReceiveAutomationEvents:output_type -> dtkt.core.v1.ReceiveAutomationEventsResponse
+	45, // 47: dtkt.core.v1.AutomationService.SendAutomationEvent:output_type -> google.protobuf.Empty
+	46, // 48: dtkt.core.v1.AutomationService.StreamAutomationEvents:output_type -> dtkt.core.v1.StreamAutomationEventsResponse
+	47, // 49: dtkt.core.v1.ConnectionService.DialConnection:output_type -> dtkt.core.v1.DialConnectionResponse
+	48, // 50: dtkt.core.v1.ConnectionService.ListConnections:output_type -> dtkt.core.v1.ListConnectionsResponse
+	49, // 51: dtkt.core.v1.ConnectionService.GetConnection:output_type -> dtkt.core.v1.GetConnectionResponse
+	50, // 52: dtkt.core.v1.ConnectionService.CreateConnection:output_type -> dtkt.core.v1.CreateConnectionResponse
+	51, // 53: dtkt.core.v1.ConnectionService.UpdateConnection:output_type -> dtkt.core.v1.UpdateConnectionResponse
+	52, // 54: dtkt.core.v1.ConnectionService.DeleteConnection:output_type -> dtkt.core.v1.DeleteConnectionResponse
+	53, // 55: dtkt.core.v1.DeploymentService.ListDeployments:output_type -> dtkt.core.v1.ListDeploymentsResponse
+	54, // 56: dtkt.core.v1.DeploymentService.GetDeployment:output_type -> dtkt.core.v1.GetDeploymentResponse
+	43, // 57: dtkt.core.v1.DeploymentService.CreateDeployment:output_type -> google.longrunning.Operation
+	43, // 58: dtkt.core.v1.DeploymentService.UpdateDeployment:output_type -> google.longrunning.Operation
+	43, // 59: dtkt.core.v1.DeploymentService.DeleteDeployment:output_type -> google.longrunning.Operation
+	55, // 60: dtkt.core.v1.FlowService.ListFlows:output_type -> dtkt.core.v1.ListFlowsResponse
+	56, // 61: dtkt.core.v1.FlowService.GetFlow:output_type -> dtkt.core.v1.GetFlowResponse
+	57, // 62: dtkt.core.v1.FlowService.CreateFlow:output_type -> dtkt.core.v1.CreateFlowResponse
+	58, // 63: dtkt.core.v1.FlowService.UpdateFlow:output_type -> dtkt.core.v1.UpdateFlowResponse
+	59, // 64: dtkt.core.v1.FlowService.DeleteFlow:output_type -> dtkt.core.v1.DeleteFlowResponse
+	60, // 65: dtkt.core.v1.IntegrationService.ListIntegrations:output_type -> dtkt.core.v1.ListIntegrationsResponse
+	61, // 66: dtkt.core.v1.IntegrationService.GetIntegration:output_type -> dtkt.core.v1.GetIntegrationResponse
+	62, // 67: dtkt.core.v1.IntegrationService.CreateIntegration:output_type -> dtkt.core.v1.CreateIntegrationResponse
+	63, // 68: dtkt.core.v1.IntegrationService.UpdateIntegration:output_type -> dtkt.core.v1.UpdateIntegrationResponse
+	64, // 69: dtkt.core.v1.IntegrationService.DeleteIntegration:output_type -> dtkt.core.v1.DeleteIntegrationResponse
+	43, // 70: dtkt.core.v1.IntegrationService.BuildIntegration:output_type -> google.longrunning.Operation
+	65, // 71: dtkt.core.v1.ReflectService.GetDescriptors:output_type -> dtkt.core.v1.GetDescriptorsResponse
+	43, // 72: dtkt.core.v1.ReflectService.SyncDescriptors:output_type -> google.longrunning.Operation
+	66, // 73: dtkt.core.v1.ReflectService.GetService:output_type -> dtkt.core.v1.GetServiceResponse
+	67, // 74: dtkt.core.v1.ReflectService.GetMethod:output_type -> dtkt.core.v1.GetMethodResponse
+	68, // 75: dtkt.core.v1.ReflectService.GetType:output_type -> dtkt.core.v1.GetTypeResponse
+	69, // 76: dtkt.core.v1.ReflectService.ListServices:output_type -> dtkt.core.v1.ListServicesResponse
+	70, // 77: dtkt.core.v1.ReflectService.ListMethods:output_type -> dtkt.core.v1.ListMethodsResponse
+	71, // 78: dtkt.core.v1.ReflectService.ListTypes:output_type -> dtkt.core.v1.ListTypesResponse
+	72, // 79: dtkt.core.v1.SearchService.ListSearchResults:output_type -> dtkt.core.v1.ListSearchResultsResponse
+	73, // 80: dtkt.core.v1.EncryptionService.Encrypt:output_type -> dtkt.core.v1.EncryptResponse
+	74, // 81: dtkt.core.v1.EncryptionService.Decrypt:output_type -> dtkt.core.v1.DecryptResponse
+	41, // [41:82] is the sub-list for method output_type
+	0,  // [0:41] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
@@ -269,7 +275,7 @@ func file_dtkt_core_v1_services_proto_init() {
 			NumEnums:      0,
 			NumMessages:   0,
 			NumExtensions: 0,
-			NumServices:   7,
+			NumServices:   8,
 		},
 		GoTypes:           file_dtkt_core_v1_services_proto_goTypes,
 		DependencyIndexes: file_dtkt_core_v1_services_proto_depIdxs,

@@ -7,8 +7,8 @@ import "google/protobuf/descriptor.proto";
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protostore/v1beta1";
 
 extend google.protobuf.MessageOptions {
-  // repeated Index
   repeated Edge edges = 50006;
+  SearchIndex search_index = 50007;
 }
 
 extend google.protobuf.FieldOptions {
@@ -31,4 +31,12 @@ message Edge {
   optional string ref = 2;
   optional bool required = 3;
   optional string field = 4;
+}
+
+message SearchIndex {
+  // CEL expression which must resolve to a string value containing text
+  // contents to be indexed for full-text and/or semantic search.
+  // The message of the declared option is `this` in the CEL expression context.
+  // Example: contents_expr: "this.title + ' ' + this.description"
+  optional string contents_expr = 1;
 }

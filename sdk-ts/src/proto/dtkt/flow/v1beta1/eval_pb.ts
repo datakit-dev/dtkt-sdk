@@ -5,10 +5,10 @@
 import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_buf_validate_validate } from "../../../buf/validate/validate_pb";
-import type { Value, ValueValid } from "../../../cel/expr/value_pb";
-import { file_cel_expr_value } from "../../../cel/expr/value_pb";
 import type { Action, ActionValid, Connection, ConnectionValid, Input, InputValid, Output, OutputValid, Stream, StreamValid, Var, VarValid } from "./spec_pb";
 import { file_dtkt_flow_v1beta1_spec } from "./spec_pb";
+import type { Any } from "../../../google/protobuf/any_pb";
+import { file_google_protobuf_any } from "../../../google/protobuf/any_pb";
 import type { Timestamp } from "../../../google/protobuf/timestamp_pb";
 import { file_google_protobuf_timestamp } from "../../../google/protobuf/timestamp_pb";
 import type { Status, StatusValid } from "../../../google/rpc/status_pb";
@@ -19,7 +19,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dtkt/flow/v1beta1/eval.proto.
  */
 export const file_dtkt_flow_v1beta1_eval: GenFile = /*@__PURE__*/
-  fileDesc("ChxkdGt0L2Zsb3cvdjFiZXRhMS9ldmFsLnByb3RvEhFkdGt0LmZsb3cudjFiZXRhMSLYBgoHUnVudGltZRJACgtjb25uZWN0aW9ucxgBIAMoCzIrLmR0a3QuZmxvdy52MWJldGExLlJ1bnRpbWUuQ29ubmVjdGlvbnNFbnRyeRI2CgZpbnB1dHMYAiADKAsyJi5kdGt0LmZsb3cudjFiZXRhMS5SdW50aW1lLklucHV0c0VudHJ5EjIKBHZhcnMYAyADKAsyJC5kdGt0LmZsb3cudjFiZXRhMS5SdW50aW1lLlZhcnNFbnRyeRI4CgdhY3Rpb25zGAUgAygLMicuZHRrdC5mbG93LnYxYmV0YTEuUnVudGltZS5BY3Rpb25zRW50cnkSOAoHc3RyZWFtcxgIIAMoCzInLmR0a3QuZmxvdy52MWJldGExLlJ1bnRpbWUuU3RyZWFtc0VudHJ5EjgKB291dHB1dHMYByADKAsyJy5kdGt0LmZsb3cudjFiZXRhMS5SdW50aW1lLk91dHB1dHNFbnRyeRo0CgREb25lEgoKAmlkGAEgASgJEg4KBnJlYXNvbhgCIAEoCRIQCghpc19lcnJvchgDIAEoCBoFCgNFT0YaSwoQQ29ubmVjdGlvbnNFbnRyeRILCgNrZXkYASABKAkSJgoFdmFsdWUYAiABKAsyFy5kdGt0LmZsb3cudjFiZXRhMS5Ob2RlOgI4ARpGCgtJbnB1dHNFbnRyeRILCgNrZXkYASABKAkSJgoFdmFsdWUYAiABKAsyFy5kdGt0LmZsb3cudjFiZXRhMS5Ob2RlOgI4ARpECglWYXJzRW50cnkSCwoDa2V5GAEgASgJEiYKBXZhbHVlGAIgASgLMhcuZHRrdC5mbG93LnYxYmV0YTEuTm9kZToCOAEaRwoMQWN0aW9uc0VudHJ5EgsKA2tleRgBIAEoCRImCgV2YWx1ZRgCIAEoCzIXLmR0a3QuZmxvdy52MWJldGExLk5vZGU6AjgBGkcKDFN0cmVhbXNFbnRyeRILCgNrZXkYASABKAkSJgoFdmFsdWUYAiABKAsyFy5kdGt0LmZsb3cudjFiZXRhMS5Ob2RlOgI4ARpHCgxPdXRwdXRzRW50cnkSCwoDa2V5GAEgASgJEiYKBXZhbHVlGAIgASgLMhcuZHRrdC5mbG93LnYxYmV0YTEuTm9kZToCOAEiVwoFR3JhcGgSJgoFbm9kZXMYASADKAsyFy5kdGt0LmZsb3cudjFiZXRhMS5Ob2RlEiYKBWVkZ2VzGAIgAygLMhcuZHRrdC5mbG93LnYxYmV0YTEuRWRnZSLSAQoERWRnZRJkCgZzb3VyY2UYASABKAlCVLpIUcgBAXJMMkpeKGNvbm5lY3Rpb25zfGlucHV0c3x2YXJzfHN0cmVhbXN8YWN0aW9uc3xvdXRwdXRzKVwuW2EtekEtWl1bYS16QS1aMC05X10rJBJkCgZ0YXJnZXQYAiABKAlCVLpIUcgBAXJMMkpeKGNvbm5lY3Rpb25zfGlucHV0c3x2YXJzfHN0cmVhbXN8YWN0aW9uc3xvdXRwdXRzKVwuW2EtekEtWl1bYS16QS1aMC05X10rJCL3BQoETm9kZRJgCgJpZBgBIAEoCUJUukhRyAEBckwySl4oY29ubmVjdGlvbnN8aW5wdXRzfHZhcnN8c3RyZWFtc3xhY3Rpb25zfG91dHB1dHMpXC5bYS16QS1aXVthLXpBLVowLTlfXSskEiwKBXN0YXRlGAIgASgOMh0uZHRrdC5mbG93LnYxYmV0YTEuTm9kZS5TdGF0ZRINCgVjb3VudBgDIAEoBBIjCgpwcmV2X3ZhbHVlGAQgASgLMg8uY2VsLmV4cHIuVmFsdWUSIAoFdmFsdWUYBSABKAsyDy5jZWwuZXhwci5WYWx1ZUgAEiMKBWVycm9yGAYgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXNIABIuCgpzdGFydF90aW1lGBQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIvCgtmaW5pc2hfdGltZRgVIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMwoKY29ubmVjdGlvbhgHIAEoCzIdLmR0a3QuZmxvdy52MWJldGExLkNvbm5lY3Rpb25IARIpCgVpbnB1dBgIIAEoCzIYLmR0a3QuZmxvdy52MWJldGExLklucHV0SAESJQoDdmFyGAkgASgLMhYuZHRrdC5mbG93LnYxYmV0YTEuVmFySAESKwoGYWN0aW9uGAsgASgLMhkuZHRrdC5mbG93LnYxYmV0YTEuQWN0aW9uSAESKwoGb3V0cHV0GA0gASgLMhkuZHRrdC5mbG93LnYxYmV0YTEuT3V0cHV0SAESKwoGc3RyZWFtGA4gASgLMhkuZHRrdC5mbG93LnYxYmV0YTEuU3RyZWFtSAEiVQoFU3RhdGUSFQoRU1RBVEVfVU5TUEVDSUZJRUQQABIRCg1TVEFURV9QRU5ESU5HEAESEQoNU1RBVEVfU1VDQ0VTUxACEg8KC1NUQVRFX0VSUk9SEANCDwoGcmVzdWx0EgW6SAIIAUINCgR0eXBlEgW6SAIIAULWAQoXcHJvdG8uZHRrdC5mbG93LnYxYmV0YTFCCUV2YWxQcm90b1ABWkpnaXRodWIuY29tL2RhdGFraXQtZGV2L2R0a3Qtc2RrL3Nkay1nby9wcm90by9kdGt0L2Zsb3cvdjFiZXRhMTtmbG93djFiZXRhMaICA0RGWKoCEUR0a3QuRmxvdy5WMWJldGExygIRRHRrdFxGbG93XFYxYmV0YTHiAh1EdGt0XEZsb3dcVjFiZXRhMVxHUEJNZXRhZGF0YeoCE0R0a3Q6OkZsb3c6OlYxYmV0YTFiBnByb3RvMw", [file_buf_validate_validate, file_cel_expr_value, file_dtkt_flow_v1beta1_spec, file_google_protobuf_timestamp, file_google_rpc_status]);
+  fileDesc("ChxkdGt0L2Zsb3cvdjFiZXRhMS9ldmFsLnByb3RvEhFkdGt0LmZsb3cudjFiZXRhMSLsCAoHUnVudGltZRJyCgtjb25uZWN0aW9ucxgBIAMoCzIrLmR0a3QuZmxvdy52MWJldGExLlJ1bnRpbWUuQ29ubmVjdGlvbnNFbnRyeUIwukgtmgEqIihyJjIkXmNvbm5lY3Rpb25zXC5bYS16QS1aXVthLXpBLVowLTlfXSskEmMKBmlucHV0cxgCIAMoCzImLmR0a3QuZmxvdy52MWJldGExLlJ1bnRpbWUuSW5wdXRzRW50cnlCK7pIKJoBJSIjciEyH15pbnB1dHNcLlthLXpBLVpdW2EtekEtWjAtOV9dKyQSXQoEdmFycxgDIAMoCzIkLmR0a3QuZmxvdy52MWJldGExLlJ1bnRpbWUuVmFyc0VudHJ5Qim6SCaaASMiIXIfMh1edmFyc1wuW2EtekEtWl1bYS16QS1aMC05X10rJBJmCgdhY3Rpb25zGAUgAygLMicuZHRrdC5mbG93LnYxYmV0YTEuUnVudGltZS5BY3Rpb25zRW50cnlCLLpIKZoBJiIkciIyIF5hY3Rpb25zXC5bYS16QS1aXVthLXpBLVowLTlfXSskEmYKB3N0cmVhbXMYCCADKAsyJy5kdGt0LmZsb3cudjFiZXRhMS5SdW50aW1lLlN0cmVhbXNFbnRyeUIsukgpmgEmIiRyIjIgXnN0cmVhbXNcLlthLXpBLVpdW2EtekEtWjAtOV9dKyQSZgoHb3V0cHV0cxgHIAMoCzInLmR0a3QuZmxvdy52MWJldGExLlJ1bnRpbWUuT3V0cHV0c0VudHJ5Qiy6SCmaASYiJHIiMiBeb3V0cHV0c1wuW2EtekEtWl1bYS16QS1aMC05X10rJBo0CgREb25lEgoKAmlkGAEgASgJEg4KBnJlYXNvbhgCIAEoCRIQCghpc19lcnJvchgDIAEoCBoFCgNFT0YaSwoQQ29ubmVjdGlvbnNFbnRyeRILCgNrZXkYASABKAkSJgoFdmFsdWUYAiABKAsyFy5kdGt0LmZsb3cudjFiZXRhMS5Ob2RlOgI4ARpGCgtJbnB1dHNFbnRyeRILCgNrZXkYASABKAkSJgoFdmFsdWUYAiABKAsyFy5kdGt0LmZsb3cudjFiZXRhMS5Ob2RlOgI4ARpECglWYXJzRW50cnkSCwoDa2V5GAEgASgJEiYKBXZhbHVlGAIgASgLMhcuZHRrdC5mbG93LnYxYmV0YTEuTm9kZToCOAEaRwoMQWN0aW9uc0VudHJ5EgsKA2tleRgBIAEoCRImCgV2YWx1ZRgCIAEoCzIXLmR0a3QuZmxvdy52MWJldGExLk5vZGU6AjgBGkcKDFN0cmVhbXNFbnRyeRILCgNrZXkYASABKAkSJgoFdmFsdWUYAiABKAsyFy5kdGt0LmZsb3cudjFiZXRhMS5Ob2RlOgI4ARpHCgxPdXRwdXRzRW50cnkSCwoDa2V5GAEgASgJEiYKBXZhbHVlGAIgASgLMhcuZHRrdC5mbG93LnYxYmV0YTEuTm9kZToCOAEipQMKBUdyYXBoEiwKBW5vZGVzGAEgAygLMh0uZHRrdC5mbG93LnYxYmV0YTEuR3JhcGguTm9kZRIsCgVlZGdlcxgCIAMoCzIdLmR0a3QuZmxvdy52MWJldGExLkdyYXBoLkVkZ2UaawoETm9kZRJjCgVpZGVudBgBIAEoCUJUukhRyAEBckwySl4oY29ubmVjdGlvbnN8aW5wdXRzfHZhcnN8c3RyZWFtc3xhY3Rpb25zfG91dHB1dHMpXC5bYS16QS1aXVthLXpBLVowLTlfXSskGtIBCgRFZGdlEmQKBnNvdXJjZRgBIAEoCUJUukhRyAEBckwySl4oY29ubmVjdGlvbnN8aW5wdXRzfHZhcnN8c3RyZWFtc3xhY3Rpb25zfG91dHB1dHMpXC5bYS16QS1aXVthLXpBLVowLTlfXSskEmQKBnRhcmdldBgCIAEoCUJUukhRyAEBckwySl4oY29ubmVjdGlvbnN8aW5wdXRzfHZhcnN8c3RyZWFtc3xhY3Rpb25zfG91dHB1dHMpXC5bYS16QS1aXVthLXpBLVowLTlfXSskIoEGCgROb2RlEmAKAmlkGAEgASgJQlS6SFHIAQFyTDJKXihjb25uZWN0aW9uc3xpbnB1dHN8dmFyc3xzdHJlYW1zfGFjdGlvbnN8b3V0cHV0cylcLlthLXpBLVpdW2EtekEtWjAtOV9dKyQSLAoFc3RhdGUYAiABKA4yHS5kdGt0LmZsb3cudjFiZXRhMS5Ob2RlLlN0YXRlEg0KBWNvdW50GAMgASgEEigKCnByZXZfdmFsdWUYBCABKAsyFC5nb29nbGUucHJvdG9idWYuQW55EiUKBXZhbHVlGAUgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueUgAEiMKBWVycm9yGAYgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXNIABIuCgpzdGFydF90aW1lGBQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIvCgtmaW5pc2hfdGltZRgVIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMwoKY29ubmVjdGlvbhgHIAEoCzIdLmR0a3QuZmxvdy52MWJldGExLkNvbm5lY3Rpb25IARIpCgVpbnB1dBgIIAEoCzIYLmR0a3QuZmxvdy52MWJldGExLklucHV0SAESJQoDdmFyGAkgASgLMhYuZHRrdC5mbG93LnYxYmV0YTEuVmFySAESKwoGYWN0aW9uGAsgASgLMhkuZHRrdC5mbG93LnYxYmV0YTEuQWN0aW9uSAESKwoGb3V0cHV0GA0gASgLMhkuZHRrdC5mbG93LnYxYmV0YTEuT3V0cHV0SAESKwoGc3RyZWFtGA4gASgLMhkuZHRrdC5mbG93LnYxYmV0YTEuU3RyZWFtSAEiVQoFU3RhdGUSFQoRU1RBVEVfVU5TUEVDSUZJRUQQABIRCg1TVEFURV9QRU5ESU5HEAESEQoNU1RBVEVfU1VDQ0VTUxACEg8KC1NUQVRFX0VSUk9SEANCDwoGcmVzdWx0EgW6SAIIAUINCgR0eXBlEgW6SAIIAULWAQoXcHJvdG8uZHRrdC5mbG93LnYxYmV0YTFCCUV2YWxQcm90b1ABWkpnaXRodWIuY29tL2RhdGFraXQtZGV2L2R0a3Qtc2RrL3Nkay1nby9wcm90by9kdGt0L2Zsb3cvdjFiZXRhMTtmbG93djFiZXRhMaICA0RGWKoCEUR0a3QuRmxvdy5WMWJldGExygIRRHRrdFxGbG93XFYxYmV0YTHiAh1EdGt0XEZsb3dcVjFiZXRhMVxHUEJNZXRhZGF0YeoCE0R0a3Q6OkZsb3c6OlYxYmV0YTFiBnByb3RvMw", [file_buf_validate_validate, file_dtkt_flow_v1beta1_spec, file_google_protobuf_any, file_google_protobuf_timestamp, file_google_rpc_status]);
 
 /**
  * @generated from message dtkt.flow.v1beta1.Runtime
@@ -147,14 +147,14 @@ export const Runtime_EOFSchema: GenMessage<Runtime_EOF, {validType: Runtime_EOFV
  */
 export type Graph = Message<"dtkt.flow.v1beta1.Graph"> & {
   /**
-   * @generated from field: repeated dtkt.flow.v1beta1.Node nodes = 1;
+   * @generated from field: repeated dtkt.flow.v1beta1.Graph.Node nodes = 1;
    */
-  nodes: Node[];
+  nodes: Graph_Node[];
 
   /**
-   * @generated from field: repeated dtkt.flow.v1beta1.Edge edges = 2;
+   * @generated from field: repeated dtkt.flow.v1beta1.Graph.Edge edges = 2;
    */
-  edges: Edge[];
+  edges: Graph_Edge[];
 };
 
 /**
@@ -162,14 +162,14 @@ export type Graph = Message<"dtkt.flow.v1beta1.Graph"> & {
  */
 export type GraphValid = Message<"dtkt.flow.v1beta1.Graph"> & {
   /**
-   * @generated from field: repeated dtkt.flow.v1beta1.Node nodes = 1;
+   * @generated from field: repeated dtkt.flow.v1beta1.Graph.Node nodes = 1;
    */
-  nodes: NodeValid[];
+  nodes: Graph_NodeValid[];
 
   /**
-   * @generated from field: repeated dtkt.flow.v1beta1.Edge edges = 2;
+   * @generated from field: repeated dtkt.flow.v1beta1.Graph.Edge edges = 2;
    */
-  edges: EdgeValid[];
+  edges: Graph_EdgeValid[];
 };
 
 /**
@@ -180,9 +180,36 @@ export const GraphSchema: GenMessage<Graph, {validType: GraphValid}> = /*@__PURE
   messageDesc(file_dtkt_flow_v1beta1_eval, 1);
 
 /**
- * @generated from message dtkt.flow.v1beta1.Edge
+ * @generated from message dtkt.flow.v1beta1.Graph.Node
  */
-export type Edge = Message<"dtkt.flow.v1beta1.Edge"> & {
+export type Graph_Node = Message<"dtkt.flow.v1beta1.Graph.Node"> & {
+  /**
+   * @generated from field: string ident = 1;
+   */
+  ident: string;
+};
+
+/**
+ * @generated from message dtkt.flow.v1beta1.Graph.Node
+ */
+export type Graph_NodeValid = Message<"dtkt.flow.v1beta1.Graph.Node"> & {
+  /**
+   * @generated from field: string ident = 1;
+   */
+  ident: string;
+};
+
+/**
+ * Describes the message dtkt.flow.v1beta1.Graph.Node.
+ * Use `create(Graph_NodeSchema)` to create a new message.
+ */
+export const Graph_NodeSchema: GenMessage<Graph_Node, {validType: Graph_NodeValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta1_eval, 1, 0);
+
+/**
+ * @generated from message dtkt.flow.v1beta1.Graph.Edge
+ */
+export type Graph_Edge = Message<"dtkt.flow.v1beta1.Graph.Edge"> & {
   /**
    * @generated from field: string source = 1;
    */
@@ -195,9 +222,9 @@ export type Edge = Message<"dtkt.flow.v1beta1.Edge"> & {
 };
 
 /**
- * @generated from message dtkt.flow.v1beta1.Edge
+ * @generated from message dtkt.flow.v1beta1.Graph.Edge
  */
-export type EdgeValid = Message<"dtkt.flow.v1beta1.Edge"> & {
+export type Graph_EdgeValid = Message<"dtkt.flow.v1beta1.Graph.Edge"> & {
   /**
    * @generated from field: string source = 1;
    */
@@ -210,11 +237,11 @@ export type EdgeValid = Message<"dtkt.flow.v1beta1.Edge"> & {
 };
 
 /**
- * Describes the message dtkt.flow.v1beta1.Edge.
- * Use `create(EdgeSchema)` to create a new message.
+ * Describes the message dtkt.flow.v1beta1.Graph.Edge.
+ * Use `create(Graph_EdgeSchema)` to create a new message.
  */
-export const EdgeSchema: GenMessage<Edge, {validType: EdgeValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_eval, 2);
+export const Graph_EdgeSchema: GenMessage<Graph_Edge, {validType: Graph_EdgeValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta1_eval, 1, 1);
 
 /**
  * @generated from message dtkt.flow.v1beta1.Node
@@ -236,18 +263,18 @@ export type Node = Message<"dtkt.flow.v1beta1.Node"> & {
   count: bigint;
 
   /**
-   * @generated from field: cel.expr.Value prev_value = 4;
+   * @generated from field: google.protobuf.Any prev_value = 4;
    */
-  prevValue?: Value;
+  prevValue?: Any;
 
   /**
    * @generated from oneof dtkt.flow.v1beta1.Node.result
    */
   result: {
     /**
-     * @generated from field: cel.expr.Value value = 5;
+     * @generated from field: google.protobuf.Any value = 5;
      */
-    value: Value;
+    value: Any;
     case: "value";
   } | {
     /**
@@ -329,18 +356,18 @@ export type NodeValid = Message<"dtkt.flow.v1beta1.Node"> & {
   count: bigint;
 
   /**
-   * @generated from field: cel.expr.Value prev_value = 4;
+   * @generated from field: google.protobuf.Any prev_value = 4;
    */
-  prevValue?: ValueValid;
+  prevValue?: Any;
 
   /**
    * @generated from oneof dtkt.flow.v1beta1.Node.result
    */
   result: {
     /**
-     * @generated from field: cel.expr.Value value = 5;
+     * @generated from field: google.protobuf.Any value = 5;
      */
-    value: ValueValid;
+    value: Any;
     case: "value";
   } | {
     /**
@@ -407,7 +434,7 @@ export type NodeValid = Message<"dtkt.flow.v1beta1.Node"> & {
  * Use `create(NodeSchema)` to create a new message.
  */
 export const NodeSchema: GenMessage<Node, {validType: NodeValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_eval, 3);
+  messageDesc(file_dtkt_flow_v1beta1_eval, 2);
 
 /**
  * @generated from enum dtkt.flow.v1beta1.Node.State
@@ -446,5 +473,5 @@ export enum Node_State {
  * Describes the enum dtkt.flow.v1beta1.Node.State.
  */
 export const Node_StateSchema: GenEnum<Node_State> = /*@__PURE__*/
-  enumDesc(file_dtkt_flow_v1beta1_eval, 3, 0);
+  enumDesc(file_dtkt_flow_v1beta1_eval, 2, 0);
 

@@ -49,8 +49,8 @@ func NewTypeSchemaFor[T any](registry *TypeRegistry, typeName string) (_ *TypeSc
 	var (
 		value      T
 		jsonSchema *common.JSONSchema[T]
-		jsonOpts   = []common.JSONSchemaOpt{
-			common.WithSchemaCompiler(registry.compiler),
+		jsonOpts   = []common.JSONSchemaOption{
+			// common.WithJSONSchemaCompiler(registry.compiler),
 		}
 		isEmpty bool
 	)
@@ -76,13 +76,13 @@ func NewTypeSchemaFor[T any](registry *TypeRegistry, typeName string) (_ *TypeSc
 		if registry.protoGen {
 			typeName = protoschema.SanitizeMessageName(typeName)
 			jsonOpts = append(jsonOpts,
-				common.WithSchemaID(registry.baseUri.JoinPath(
+				common.WithJSONSchemaID(registry.baseUri.JoinPath(
 					string(protoreflect.FullName(registry.protoPkg).Append(protoreflect.Name(typeName)))+JSONSchemaFileExt,
 				).String()),
 			)
 		} else {
 			jsonOpts = append(jsonOpts,
-				common.WithSchemaID(registry.baseUri.JoinPath(typeName+JSONSchemaFileExt).String()),
+				common.WithJSONSchemaID(registry.baseUri.JoinPath(typeName+JSONSchemaFileExt).String()),
 			)
 		}
 
@@ -130,7 +130,7 @@ func NewTypeSchemaFor[T any](registry *TypeRegistry, typeName string) (_ *TypeSc
 				typeProto = &emptypb.Empty{}
 				isEmpty = true
 			default:
-				isEmpty = jsonSchema.JSONSchema().Properties == nil || jsonSchema.JSONSchema().Properties.Len() == 0
+				isEmpty = jsonSchema.Schema().Properties == nil || len(jsonSchema.Schema().Properties) == 0
 
 				refType := reflect.TypeOf(value)
 				if refType != nil {
@@ -164,7 +164,7 @@ func NewTypeSchemaFor[T any](registry *TypeRegistry, typeName string) (_ *TypeSc
 
 	typeSchema := &sharedv1beta1.TypeSchema{
 		Uri:        registry.baseUri.JoinPath(typeName).String(),
-		JsonSchema: jsonSchema.ToProto(),
+		JsonSchema: jsonSchema.Proto(),
 		ProtoName:  string(typeProto.ProtoReflect().Descriptor().FullName()),
 		ModTime:    timestamppb.Now(),
 	}

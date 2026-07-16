@@ -176,6 +176,10 @@ service ReflectService {
   rpc ListTypes(ListTypesRequest) returns (ListTypesResponse);
 }
 
+service SearchService {
+  rpc ListSearchResults(ListSearchResultsRequest) returns (ListSearchResultsResponse);
+}
+
 // EncryptionService provides data encryption and decryption operations.
 service EncryptionService {
   // Encrypt data.
