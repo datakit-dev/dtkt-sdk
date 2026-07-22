@@ -23,6 +23,7 @@ import (
 	"google.golang.org/protobuf/reflect/protorange"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 var _ types.Adapter = (*CELTypes)(nil)
@@ -93,8 +94,8 @@ func (t *CELTypes) RegisterType(types ...ref.Type) error {
 }
 
 func (t *CELTypes) ExprValueToNative(exprVal *expr.ExprValue) (any, error) {
-	if errs := exprVal.GetError(); errs != nil {
-		err := errors.Join(util.SliceMap(errs.GetErrors(), func(e *expr.Status) error {
+	if exprErr := exprVal.GetError(); exprErr != nil {
+		err := errors.Join(util.SliceMap(exprErr.GetErrors(), func(e *expr.Status) error {
 			return status.FromProto(&spb.Status{
 				Code:    e.Code,
 				Message: e.Message,
@@ -111,11 +112,11 @@ func (t *CELTypes) ExprValueToNative(exprVal *expr.ExprValue) (any, error) {
 	value := exprVal.GetValue()
 	if value == nil {
 		return nil, nil
-	} else if _, val := value.GetKind().(*expr.Value_NullValue); val {
-		return nil, nil
 	}
 
 	switch value.GetKind().(type) {
+	case *expr.Value_NullValue:
+		return structpb.NewNullValue(), nil
 	case *expr.Value_ObjectValue:
 		return anypb.UnmarshalNew(value.GetObjectValue(), proto.UnmarshalOptions{
 			DiscardUnknown: true,
@@ -186,7 +187,9 @@ func (t *CELTypes) ValueToExprValue(refVal ref.Val) *expr.ExprValue {
 		return &expr.ExprValue{
 			Kind: &expr.ExprValue_Value{
 				Value: &expr.Value{
-					Kind: &expr.Value_NullValue{},
+					Kind: &expr.Value_NullValue{
+						NullValue: structpb.NullValue_NULL_VALUE,
+					},
 				},
 			},
 		}
@@ -316,14 +319,14 @@ func (t *CELTypes) NativeToValue(val any) ref.Val {
 	case error:
 		return types.WrapErr(val)
 	case *anypb.Any:
-		msg, err := anypb.UnmarshalNew(val, proto.UnmarshalOptions{
+		v, err := ProtoOptions{
 			Resolver: t.resolver,
-		})
+		}.UnwrapAny(val)
 		if err != nil {
 			return types.NewErr("failed to unmarshal dynamic type %q: %v", val.GetTypeUrl(), err)
 		}
 
-		return t.NativeToValue(msg)
+		return t.NativeToValue(v)
 	case proto.Message:
 		if err := t.RegisterMessage(val); err != nil {
 			return types.WrapErr(err)

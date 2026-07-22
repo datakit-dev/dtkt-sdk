@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package dtkt.flow.v1beta1;
+
+import "buf/validate/validate.proto";
+import "dtkt/flow/v1beta1/spec.proto";
+import "google/api/expr/v1alpha1/checked.proto";
+import "google/api/expr/v1alpha1/syntax.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+import "google/rpc/status.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1";
+
+// Env represents the runtime state (snapshot) of a Flow execution.
+message Env {
+  // Result represents the runtime state (snapshot) emitted by a Node.
+  message Result {
+    google.protobuf.Timestamp start_time = 1;
+    google.protobuf.Timestamp finish_time = 2;
+
+    oneof type {
+      option (buf.validate.oneof).required = true;
+      google.rpc.Status error = 5;
+      google.protobuf.Any value = 6;
+    }
+  }
+
+  // Node contains its total number of results emitted, its previous, and
+  // current value.
+  message Node {
+    string ident = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+$"
+    ];
+    uint64 result_count = 3;
+    Result result_prev = 4;
+    Result result_curr = 5;
+  }
+
+  // All nodes within Env.
+  repeated Node nodes = 1;
+}
+
+// Graph represents a fully parsed and/or checked Flow spec:
+// 1. Parsed: all nodes with expressions are parsed;
+// 2. Checked: all nodes with expressions are checked making Graph executable.
+message Graph {
+  message Edge {
+    // Source identifier of an Edge is a fully qualified Node identifier + field
+    // selection (if any).
+    string source = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+"
+    ];
+    // Target identifier of an Edge is a fully qualified Node + Expr identifier:
+    // "{node.ident}.{expr.id}".
+    string target = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+"
+    ];
+  }
+
+  message Expr {
+    // Expression identifier within the scope of a Node (without ident prefix).
+    string id = 1 [(buf.validate.field).required = true];
+    // Parsed expression (required to produce a valid edge).
+    google.api.expr.v1alpha1.ParsedExpr parsed = 2 [(buf.validate.field).required = true];
+    // Checked expression (only required for execution).
+    google.api.expr.v1alpha1.CheckedExpr checked = 3;
+  }
+
+  message Node {
+    // Node identifier as a concatenation of a Flow spec node's type + id, e.g.:
+    // "inputs.foo" or "vars.name". Constitutes an Edge's source prefix when
+    // referenced within an expression.
+    string ident = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+$"
+    ];
+    // Map of "{node.ident}.{expr.id}" to Expr making this node the target of
+    // an Edge.
+    map<string, Expr> exprs = 3 [(buf.validate.field).map.keys.string.pattern = "^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+\\."];
+  }
+
+  Flow spec = 1 [(buf.validate.field).required = true];
+  repeated Node nodes = 2;
+  repeated Edge edges = 3;
+}
+
+// Sentinel values used within flow execution.
+message Skip {}
+message EOF {}
+message Done {
+  string id = 1;
+  string reason = 2;
+  bool is_error = 3;
+}

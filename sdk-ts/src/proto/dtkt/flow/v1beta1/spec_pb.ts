@@ -23,7 +23,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dtkt/flow/v1beta1/spec.proto.
  */
 export const file_dtkt_flow_v1beta1_spec: GenFile = /*@__PURE__*/
-  fileDesc("ChxkdGt0L2Zsb3cvdjFiZXRhMS9zcGVjLnByb3RvEhFkdGt0LmZsb3cudjFiZXRhMSLDAgoERmxvdxIUCgRuYW1lGAEgASgJQga6SAPIAQESHQoLZGVzY3JpcHRpb24YAiABKAlCCIK1GAQqAggBEjIKC2Nvbm5lY3Rpb25zGAMgAygLMh0uZHRrdC5mbG93LnYxYmV0YTEuQ29ubmVjdGlvbhIoCgZpbnB1dHMYBCADKAsyGC5kdGt0LmZsb3cudjFiZXRhMS5JbnB1dBIkCgR2YXJzGAUgAygLMhYuZHRrdC5mbG93LnYxYmV0YTEuVmFyEioKB2FjdGlvbnMYByADKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5BY3Rpb24SKgoHb3V0cHV0cxgJIAMoCzIZLmR0a3QuZmxvdy52MWJldGExLk91dHB1dBIqCgdzdHJlYW1zGAogAygLMhkuZHRrdC5mbG93LnYxYmV0YTEuU3RyZWFtIqEBCgpDb25uZWN0aW9uEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSNgoHcGFja2FnZRgCIAEoCzIlLmR0a3Quc2hhcmVkLnYxYmV0YTEuUGFja2FnZS5JZGVudGl0eRIQCghzZXJ2aWNlcxgDIAMoCToaukgXIhUKB3BhY2thZ2UKCHNlcnZpY2VzEAEi6wQKBUlucHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSEgoFY2FjaGUYAiABKAhIAYgBARInCgRib29sGAMgASgLMhcuZHRrdC5mbG93LnYxYmV0YTEuQm9vbEgAEikKBWJ5dGVzGAQgASgLMhguZHRrdC5mbG93LnYxYmV0YTEuQnl0ZXNIABIrCgZkb3VibGUYBSABKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5Eb3VibGVIABIpCgVmbG9hdBgGIAEoCzIYLmR0a3QuZmxvdy52MWJldGExLkZsb2F0SAASKQoFaW50NjQYByABKAsyGC5kdGt0LmZsb3cudjFiZXRhMS5JbnQ2NEgAEisKBnVpbnQ2NBgIIAEoCzIZLmR0a3QuZmxvdy52MWJldGExLlVpbnQ2NEgAEikKBWludDMyGAkgASgLMhguZHRrdC5mbG93LnYxYmV0YTEuSW50MzJIABIrCgZ1aW50MzIYCiABKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5VaW50MzJIABIrCgZzdHJpbmcYCyABKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5TdHJpbmdIABInCgRsaXN0GAwgASgLMhcuZHRrdC5mbG93LnYxYmV0YTEuTGlzdEgAEiUKA21hcBgNIAEoCzIWLmR0a3QuZmxvdy52MWJldGExLk1hcEgAEi0KB21lc3NhZ2UYDiABKAsyGi5kdGt0LmZsb3cudjFiZXRhMS5NZXNzYWdlSABCDQoEdHlwZRIFukgCCAFCCAoGX2NhY2hlItIDCgZBY3Rpb24SLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10rJBISCgVjYWNoZRgCIAEoCEgAiAEBEjIKBGNhbGwYBSABKAsyJC5kdGt0LmZsb3cudjFiZXRhMS5BY3Rpb24uTWV0aG9kQ2FsbBIrCgR1c2VyGAYgASgLMh0uZHRrdC5mbG93LnYxYmV0YTEuVXNlckFjdGlvbhqEAgoKTWV0aG9kQ2FsbBI1Cgpjb25uZWN0aW9uGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSJgoGbWV0aG9kGAIgASgJQha6SBPIAQFyDjIMW2EtekEtWi5fL10rEicKB3JlcXVlc3QYAyABKAsyFi5nb29nbGUucHJvdG9idWYuVmFsdWUSKQoLaW52b2tlX3doZW4YBCABKAlCD7pIDHIKMgheXHM/PVxzP0gAiAEBEiYKCG9uX2Vycm9yGAUgASgJQg+6SAxyCjIIXlxzPz1ccz9IAYgBAUIOCgxfaW52b2tlX3doZW5CCwoJX29uX2Vycm9yOhO6SBAiDgoEY2FsbAoEdXNlchABQggKBl9jYWNoZSK/BQoGU3RyZWFtEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSKAoKc3RhcnRfd2hlbhgCIAEoCUIPukgMcgoyCF5ccz89XHM/SACIAQESJwoJc3RvcF93aGVuGAMgASgJQg+6SAxyCjIIXlxzPz1ccz9IAYgBARIyCgRjYWxsGAQgASgLMiQuZHRrdC5mbG93LnYxYmV0YTEuU3RyZWFtLk1ldGhvZENhbGwSNQoIZ2VuZXJhdGUYBSABKAsyIy5kdGt0LmZsb3cudjFiZXRhMS5TdHJlYW0uR2VuZXJhdG9yGoICCgpNZXRob2RDYWxsEjUKCmNvbm5lY3Rpb24YASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10rJBImCgZtZXRob2QYAiABKAlCFrpIE8gBAXIOMgxbYS16QS1aLl8vXSsSJwoHcmVxdWVzdBgDIAEoCzIWLmdvb2dsZS5wcm90b2J1Zi5WYWx1ZRInCglzZW5kX3doZW4YBCABKAlCD7pIDHIKMgheXHM/PVxzP0gAiAEBEicKCXJlY3Zfd2hlbhgFIAEoCUIPukgMcgoyCF5ccz89XHM/SAGIAQFCDAoKX3NlbmRfd2hlbkIMCgpfcmVjdl93aGVuGowBCglHZW5lcmF0b3ISMAoFZXZlcnkYASABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CBrpIA8gBARIqCgdpbml0aWFsGAIgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEiEKBXZhbHVlGAMgASgJQhK6SA/YAQFyCjIIXlxzPz1ccz86F7pIFCISCgRjYWxsCghnZW5lcmF0ZRABQg0KC19zdGFydF93aGVuQgwKCl9zdG9wX3doZW4ipwYKClVzZXJBY3Rpb24SMwoGaW5wdXRzGAEgAygLMiMuZHRrdC5mbG93LnYxYmV0YTEuVXNlckFjdGlvbi5JbnB1dBo5Cg5Db25maXJtQmluZGluZxInCgV2YWx1ZRgBIAEoCEIYgrUYFCISCgdBcHByb3ZlEgdEZWNsaW5lGiUKDElucHV0QmluZGluZxIVCgV2YWx1ZRgBIAEoCUIGgrUYAioAGiQKC0ZpbGVCaW5kaW5nEhUKBXZhbHVlGAEgASgMQgaCtRgCMgAaPAoNU2VsZWN0QmluZGluZxIrCgV2YWx1ZRgBIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnlCBoK1GAI6ABpBChJNdWx0aVNlbGVjdEJpbmRpbmcSKwoFdmFsdWUYASADKAsyFC5nb29nbGUucHJvdG9idWYuQW55QgaCtRgCQgAa2gMKBUlucHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSKQoFdGl0bGUYAiABKAlCGrpIF8gBAXISMhBeXHM/KD0pP1xzPyguKikkEjEKC2Rlc2NyaXB0aW9uGAMgASgJQhe6SBRyEjIQXlxzPyg9KT9ccz8oLiopJEgBiAEBEjkKB2NvbmZpcm0YBCABKAsyJi5kdGt0LnByb3RvZm9ybS52MWJldGExLkNvbmZpcm1FbGVtZW50SAASNQoFaW5wdXQYBSABKAsyJC5kdGt0LnByb3RvZm9ybS52MWJldGExLklucHV0RWxlbWVudEgAEjMKBGZpbGUYBiABKAsyIy5kdGt0LnByb3RvZm9ybS52MWJldGExLkZpbGVFbGVtZW50SAASNwoGc2VsZWN0GAcgASgLMiUuZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5TZWxlY3RFbGVtZW50SAASQgoMbXVsdGlfc2VsZWN0GAggASgLMiouZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5NdWx0aVNlbGVjdEVsZW1lbnRIAEIQCgdlbGVtZW50EgW6SAIIAUIOCgxfZGVzY3JpcHRpb24iqAMKA1ZhchItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSskEhIKBWNhY2hlGAIgASgISACIAQESOQoFdmFsdWUYAyABKAlCKrpIJ3IlMgheXHM/PVxzP5ICGCA9IGlucHV0cy5mb28uZ2V0VmFsdWUoKRItCgZzd2l0Y2gYBCABKAsyHS5kdGt0LmZsb3cudjFiZXRhMS5WYXIuU3dpdGNoGtEBCgZTd2l0Y2gSIQoFdmFsdWUYASABKAlCErpID8gBAXIKMgheXHM/PVxzPxIwCgRjYXNlGAIgAygLMiIuZHRrdC5mbG93LnYxYmV0YTEuVmFyLlN3aXRjaC5DYXNlEiMKB2RlZmF1bHQYAyABKAlCErpID8gBAXIKMgheXHM/PVxzPxpNCgRDYXNlEiEKBXZhbHVlGAEgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8SIgoGcmV0dXJuGAIgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz86FrpIEyIRCgV2YWx1ZQoGc3dpdGNoEAFCCAoGX2NhY2hlIloKBk91dHB1dBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSskEiEKBXZhbHVlGAIgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz9C1gEKF3Byb3RvLmR0a3QuZmxvdy52MWJldGExQglTcGVjUHJvdG9QAVpKZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9mbG93L3YxYmV0YTE7Zmxvd3YxYmV0YTGiAgNERliqAhFEdGt0LkZsb3cuVjFiZXRhMcoCEUR0a3RcRmxvd1xWMWJldGEx4gIdRHRrdFxGbG93XFYxYmV0YTFcR1BCTWV0YWRhdGHqAhNEdGt0OjpGbG93OjpWMWJldGExYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_flow_v1beta1_type, file_dtkt_protoform_v1beta1_protoform, file_dtkt_shared_v1beta1_messages, file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_struct]);
+  fileDesc("ChxkdGt0L2Zsb3cvdjFiZXRhMS9zcGVjLnByb3RvEhFkdGt0LmZsb3cudjFiZXRhMSLqAwoERmxvdxIUCgRuYW1lGAEgASgJQga6SAPIAQESHQoLZGVzY3JpcHRpb24YAiABKAlCCIK1GAQqAggBEjIKC2Nvbm5lY3Rpb25zGAMgAygLMh0uZHRrdC5mbG93LnYxYmV0YTEuQ29ubmVjdGlvbhIoCgZpbnB1dHMYBCADKAsyGC5kdGt0LmZsb3cudjFiZXRhMS5JbnB1dBIkCgR2YXJzGAUgAygLMhYuZHRrdC5mbG93LnYxYmV0YTEuVmFyEioKB2FjdGlvbnMYByADKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5BY3Rpb24SKgoHb3V0cHV0cxgJIAMoCzIZLmR0a3QuZmxvdy52MWJldGExLk91dHB1dBIqCgdzdHJlYW1zGAogAygLMhkuZHRrdC5mbG93LnYxYmV0YTEuU3RyZWFtEloKB21ldHJpY3MYCyADKAsyJC5kdGt0LmZsb3cudjFiZXRhMS5GbG93Lk1ldHJpY3NFbnRyeUIjukggmgEdIhtyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQaSQoMTWV0cmljc0VudHJ5EgsKA2tleRgBIAEoCRIoCgV2YWx1ZRgCIAEoCzIZLmR0a3QuZmxvdy52MWJldGExLk1ldHJpYzoCOAEiZQoGTWV0cmljEjgKCGludGVydmFsGAEgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uQgu6SAjIAQGqAQIqABIhCgV2YWx1ZRgCIAEoCUISukgPyAEBcgoyCF5ccz89XHM/IqEBCgpDb25uZWN0aW9uEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSNgoHcGFja2FnZRgCIAEoCzIlLmR0a3Quc2hhcmVkLnYxYmV0YTEuUGFja2FnZS5JZGVudGl0eRIQCghzZXJ2aWNlcxgDIAMoCToaukgXIhUKB3BhY2thZ2UKCHNlcnZpY2VzEAEi6wQKBUlucHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSEgoFY2FjaGUYAiABKAhIAYgBARInCgRib29sGAMgASgLMhcuZHRrdC5mbG93LnYxYmV0YTEuQm9vbEgAEikKBWJ5dGVzGAQgASgLMhguZHRrdC5mbG93LnYxYmV0YTEuQnl0ZXNIABIrCgZkb3VibGUYBSABKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5Eb3VibGVIABIpCgVmbG9hdBgGIAEoCzIYLmR0a3QuZmxvdy52MWJldGExLkZsb2F0SAASKQoFaW50NjQYByABKAsyGC5kdGt0LmZsb3cudjFiZXRhMS5JbnQ2NEgAEisKBnVpbnQ2NBgIIAEoCzIZLmR0a3QuZmxvdy52MWJldGExLlVpbnQ2NEgAEikKBWludDMyGAkgASgLMhguZHRrdC5mbG93LnYxYmV0YTEuSW50MzJIABIrCgZ1aW50MzIYCiABKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5VaW50MzJIABIrCgZzdHJpbmcYCyABKAsyGS5kdGt0LmZsb3cudjFiZXRhMS5TdHJpbmdIABInCgRsaXN0GAwgASgLMhcuZHRrdC5mbG93LnYxYmV0YTEuTGlzdEgAEiUKA21hcBgNIAEoCzIWLmR0a3QuZmxvdy52MWJldGExLk1hcEgAEi0KB21lc3NhZ2UYDiABKAsyGi5kdGt0LmZsb3cudjFiZXRhMS5NZXNzYWdlSABCDQoEdHlwZRIFukgCCAFCCAoGX2NhY2hlItIDCgZBY3Rpb24SLQoCaWQYASABKAlCIbpIHsgBAXIZMhdeW2EtekEtWl1bYS16QS1aMC05X10rJBISCgVjYWNoZRgCIAEoCEgAiAEBEjIKBGNhbGwYBSABKAsyJC5kdGt0LmZsb3cudjFiZXRhMS5BY3Rpb24uTWV0aG9kQ2FsbBIrCgR1c2VyGAYgASgLMh0uZHRrdC5mbG93LnYxYmV0YTEuVXNlckFjdGlvbhqEAgoKTWV0aG9kQ2FsbBI1Cgpjb25uZWN0aW9uGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSJgoGbWV0aG9kGAIgASgJQha6SBPIAQFyDjIMW2EtekEtWi5fL10rEicKB3JlcXVlc3QYAyABKAsyFi5nb29nbGUucHJvdG9idWYuVmFsdWUSKQoLaW52b2tlX3doZW4YBCABKAlCD7pIDHIKMgheXHM/PVxzP0gAiAEBEiYKCG9uX2Vycm9yGAUgASgJQg+6SAxyCjIIXlxzPz1ccz9IAYgBAUIOCgxfaW52b2tlX3doZW5CCwoJX29uX2Vycm9yOhO6SBAiDgoEY2FsbAoEdXNlchABQggKBl9jYWNoZSKYCAoGU3RyZWFtEi0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSKAoKc3RhcnRfd2hlbhgCIAEoCUIPukgMcgoyCF5ccz89XHM/SACIAQESJwoJc3RvcF93aGVuGAMgASgJQg+6SAxyCjIIXlxzPz1ccz9IAYgBARIyCgRjYWxsGAQgASgLMiQuZHRrdC5mbG93LnYxYmV0YTEuU3RyZWFtLk1ldGhvZENhbGwSNQoIZ2VuZXJhdGUYBSABKAsyIy5kdGt0LmZsb3cudjFiZXRhMS5TdHJlYW0uR2VuZXJhdG9yEjAKBndpbmRvdxgHIAEoCzIgLmR0a3QuZmxvdy52MWJldGExLlN0cmVhbS5XaW5kb3caggIKCk1ldGhvZENhbGwSNQoKY29ubmVjdGlvbhgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSskEiYKBm1ldGhvZBgCIAEoCUIWukgTyAEBcg4yDFthLXpBLVouXy9dKxInCgdyZXF1ZXN0GAMgASgLMhYuZ29vZ2xlLnByb3RvYnVmLlZhbHVlEicKCXNlbmRfd2hlbhgEIAEoCUIPukgMcgoyCF5ccz89XHM/SACIAQESJwoJcmVjdl93aGVuGAUgASgJQg+6SAxyCjIIXlxzPz1ccz9IAYgBAUIMCgpfc2VuZF93aGVuQgwKCl9yZWN2X3doZW4ajAEKCUdlbmVyYXRvchIwCgVldmVyeRgBIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIGukgDyAEBEioKB2luaXRpYWwYAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SIQoFdmFsdWUYAyABKAlCErpID9gBAXIKMgheXHM/PVxzPxqcAgoGV2luZG93EjsKCHR1bWJsaW5nGAEgASgLMikuZHRrdC5mbG93LnYxYmV0YTEuU3RyZWFtLldpbmRvdy5UdW1ibGluZxI5CgdzbGlkaW5nGAIgASgLMiguZHRrdC5mbG93LnYxYmV0YTEuU3RyZWFtLldpbmRvdy5TbGlkaW5nEiIKBnNvdXJjZRgDIAEoCUISukgPyAEBcgoyCF5ccz89XHM/GiEKCFR1bWJsaW5nEhUKBHNpemUYASABKA1CB7pIBCoCIAAaNwoHU2xpZGluZxIVCgRzaXplGAEgASgNQge6SAQqAiAAEhUKBHN0ZXAYAiABKA1CB7pIBCoCIAA6GrpIFyIVCgh0dW1ibGluZwoHc2xpZGluZxABOh+6SBwiGgoEY2FsbAoIZ2VuZXJhdGUKBndpbmRvdxABQg0KC19zdGFydF93aGVuQgwKCl9zdG9wX3doZW4ipwYKClVzZXJBY3Rpb24SMwoGaW5wdXRzGAEgAygLMiMuZHRrdC5mbG93LnYxYmV0YTEuVXNlckFjdGlvbi5JbnB1dBo5Cg5Db25maXJtQmluZGluZxInCgV2YWx1ZRgBIAEoCEIYgrUYFCISCgdBcHByb3ZlEgdEZWNsaW5lGiUKDElucHV0QmluZGluZxIVCgV2YWx1ZRgBIAEoCUIGgrUYAioAGiQKC0ZpbGVCaW5kaW5nEhUKBXZhbHVlGAEgASgMQgaCtRgCMgAaPAoNU2VsZWN0QmluZGluZxIrCgV2YWx1ZRgBIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnlCBoK1GAI6ABpBChJNdWx0aVNlbGVjdEJpbmRpbmcSKwoFdmFsdWUYASADKAsyFC5nb29nbGUucHJvdG9idWYuQW55QgaCtRgCQgAa2gMKBUlucHV0Ei0KAmlkGAEgASgJQiG6SB7IAQFyGTIXXlthLXpBLVpdW2EtekEtWjAtOV9dKyQSKQoFdGl0bGUYAiABKAlCGrpIF8gBAXISMhBeXHM/KD0pP1xzPyguKikkEjEKC2Rlc2NyaXB0aW9uGAMgASgJQhe6SBRyEjIQXlxzPyg9KT9ccz8oLiopJEgBiAEBEjkKB2NvbmZpcm0YBCABKAsyJi5kdGt0LnByb3RvZm9ybS52MWJldGExLkNvbmZpcm1FbGVtZW50SAASNQoFaW5wdXQYBSABKAsyJC5kdGt0LnByb3RvZm9ybS52MWJldGExLklucHV0RWxlbWVudEgAEjMKBGZpbGUYBiABKAsyIy5kdGt0LnByb3RvZm9ybS52MWJldGExLkZpbGVFbGVtZW50SAASNwoGc2VsZWN0GAcgASgLMiUuZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5TZWxlY3RFbGVtZW50SAASQgoMbXVsdGlfc2VsZWN0GAggASgLMiouZHRrdC5wcm90b2Zvcm0udjFiZXRhMS5NdWx0aVNlbGVjdEVsZW1lbnRIAEIQCgdlbGVtZW50EgW6SAIIAUIOCgxfZGVzY3JpcHRpb24iqAMKA1ZhchItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSskEhIKBWNhY2hlGAIgASgISACIAQESOQoFdmFsdWUYAyABKAlCKrpIJ3IlMgheXHM/PVxzP5ICGCA9IGlucHV0cy5mb28uZ2V0VmFsdWUoKRItCgZzd2l0Y2gYBCABKAsyHS5kdGt0LmZsb3cudjFiZXRhMS5WYXIuU3dpdGNoGtEBCgZTd2l0Y2gSIQoFdmFsdWUYASABKAlCErpID8gBAXIKMgheXHM/PVxzPxIwCgRjYXNlGAIgAygLMiIuZHRrdC5mbG93LnYxYmV0YTEuVmFyLlN3aXRjaC5DYXNlEiMKB2RlZmF1bHQYAyABKAlCErpID8gBAXIKMgheXHM/PVxzPxpNCgRDYXNlEiEKBXZhbHVlGAEgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz8SIgoGcmV0dXJuGAIgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz86FrpIEyIRCgV2YWx1ZQoGc3dpdGNoEAFCCAoGX2NhY2hlIloKBk91dHB1dBItCgJpZBgBIAEoCUIhukgeyAEBchkyF15bYS16QS1aXVthLXpBLVowLTlfXSskEiEKBXZhbHVlGAIgASgJQhK6SA/IAQFyCjIIXlxzPz1ccz9C1gEKF3Byb3RvLmR0a3QuZmxvdy52MWJldGExQglTcGVjUHJvdG9QAVpKZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9mbG93L3YxYmV0YTE7Zmxvd3YxYmV0YTGiAgNERliqAhFEdGt0LkZsb3cuVjFiZXRhMcoCEUR0a3RcRmxvd1xWMWJldGEx4gIdRHRrdFxGbG93XFYxYmV0YTFcR1BCTWV0YWRhdGHqAhNEdGt0OjpGbG93OjpWMWJldGExYgZwcm90bzM", [file_buf_validate_validate, file_dtkt_flow_v1beta1_type, file_dtkt_protoform_v1beta1_protoform, file_dtkt_shared_v1beta1_messages, file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_struct]);
 
 /**
  * @generated from message dtkt.flow.v1beta1.Flow
@@ -68,6 +68,11 @@ export type Flow = Message<"dtkt.flow.v1beta1.Flow"> & {
    * @generated from field: repeated dtkt.flow.v1beta1.Stream streams = 10;
    */
   streams: Stream[];
+
+  /**
+   * @generated from field: map<string, dtkt.flow.v1beta1.Metric> metrics = 11;
+   */
+  metrics: { [key: string]: Metric };
 };
 
 /**
@@ -113,6 +118,11 @@ export type FlowValid = Message<"dtkt.flow.v1beta1.Flow"> & {
    * @generated from field: repeated dtkt.flow.v1beta1.Stream streams = 10;
    */
   streams: StreamValid[];
+
+  /**
+   * @generated from field: map<string, dtkt.flow.v1beta1.Metric> metrics = 11;
+   */
+  metrics: { [key: string]: MetricValid };
 };
 
 /**
@@ -121,6 +131,43 @@ export type FlowValid = Message<"dtkt.flow.v1beta1.Flow"> & {
  */
 export const FlowSchema: GenMessage<Flow, {validType: FlowValid}> = /*@__PURE__*/
   messageDesc(file_dtkt_flow_v1beta1_spec, 0);
+
+/**
+ * @generated from message dtkt.flow.v1beta1.Metric
+ */
+export type Metric = Message<"dtkt.flow.v1beta1.Metric"> & {
+  /**
+   * @generated from field: google.protobuf.Duration interval = 1;
+   */
+  interval?: Duration;
+
+  /**
+   * @generated from field: string value = 2;
+   */
+  value: string;
+};
+
+/**
+ * @generated from message dtkt.flow.v1beta1.Metric
+ */
+export type MetricValid = Message<"dtkt.flow.v1beta1.Metric"> & {
+  /**
+   * @generated from field: google.protobuf.Duration interval = 1;
+   */
+  interval: Duration;
+
+  /**
+   * @generated from field: string value = 2;
+   */
+  value: string;
+};
+
+/**
+ * Describes the message dtkt.flow.v1beta1.Metric.
+ * Use `create(MetricSchema)` to create a new message.
+ */
+export const MetricSchema: GenMessage<Metric, {validType: MetricValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta1_spec, 1);
 
 /**
  * @generated from message dtkt.flow.v1beta1.Connection
@@ -175,7 +222,7 @@ export type ConnectionValid = Message<"dtkt.flow.v1beta1.Connection"> & {
  * Use `create(ConnectionSchema)` to create a new message.
  */
 export const ConnectionSchema: GenMessage<Connection, {validType: ConnectionValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 1);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 2);
 
 /**
  * @generated from message dtkt.flow.v1beta1.Input
@@ -370,7 +417,7 @@ export type InputValid = Message<"dtkt.flow.v1beta1.Input"> & {
  * Use `create(InputSchema)` to create a new message.
  */
 export const InputSchema: GenMessage<Input, {validType: InputValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 2);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 3);
 
 /**
  * @generated from message dtkt.flow.v1beta1.Action
@@ -431,7 +478,7 @@ export type ActionValid = Message<"dtkt.flow.v1beta1.Action"> & {
  * Use `create(ActionSchema)` to create a new message.
  */
 export const ActionSchema: GenMessage<Action, {validType: ActionValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 3);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 4);
 
 /**
  * @generated from message dtkt.flow.v1beta1.Action.MethodCall
@@ -508,7 +555,7 @@ export type Action_MethodCallValid = Message<"dtkt.flow.v1beta1.Action.MethodCal
  * Use `create(Action_MethodCallSchema)` to create a new message.
  */
 export const Action_MethodCallSchema: GenMessage<Action_MethodCall, {validType: Action_MethodCallValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 3, 0);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 4, 0);
 
 /**
  * @generated from message dtkt.flow.v1beta1.Stream
@@ -539,11 +586,14 @@ export type Stream = Message<"dtkt.flow.v1beta1.Stream"> & {
   call?: Stream_MethodCall;
 
   /**
-   * Reducer reduce = 6;
-   *
    * @generated from field: dtkt.flow.v1beta1.Stream.Generator generate = 5;
    */
   generate?: Stream_Generator;
+
+  /**
+   * @generated from field: dtkt.flow.v1beta1.Stream.Window window = 7;
+   */
+  window?: Stream_Window;
 };
 
 /**
@@ -575,11 +625,14 @@ export type StreamValid = Message<"dtkt.flow.v1beta1.Stream"> & {
   call?: Stream_MethodCallValid;
 
   /**
-   * Reducer reduce = 6;
-   *
    * @generated from field: dtkt.flow.v1beta1.Stream.Generator generate = 5;
    */
   generate?: Stream_GeneratorValid;
+
+  /**
+   * @generated from field: dtkt.flow.v1beta1.Stream.Window window = 7;
+   */
+  window?: Stream_WindowValid;
 };
 
 /**
@@ -587,7 +640,7 @@ export type StreamValid = Message<"dtkt.flow.v1beta1.Stream"> & {
  * Use `create(StreamSchema)` to create a new message.
  */
 export const StreamSchema: GenMessage<Stream, {validType: StreamValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 4);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 5);
 
 /**
  * @generated from message dtkt.flow.v1beta1.Stream.MethodCall
@@ -662,7 +715,7 @@ export type Stream_MethodCallValid = Message<"dtkt.flow.v1beta1.Stream.MethodCal
  * Use `create(Stream_MethodCallSchema)` to create a new message.
  */
 export const Stream_MethodCallSchema: GenMessage<Stream_MethodCall, {validType: Stream_MethodCallValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 4, 0);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 0);
 
 /**
  * @generated from message dtkt.flow.v1beta1.Stream.Generator
@@ -709,7 +762,107 @@ export type Stream_GeneratorValid = Message<"dtkt.flow.v1beta1.Stream.Generator"
  * Use `create(Stream_GeneratorSchema)` to create a new message.
  */
 export const Stream_GeneratorSchema: GenMessage<Stream_Generator, {validType: Stream_GeneratorValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 4, 1);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 1);
+
+/**
+ * @generated from message dtkt.flow.v1beta1.Stream.Window
+ */
+export type Stream_Window = Message<"dtkt.flow.v1beta1.Stream.Window"> & {
+  /**
+   * @generated from field: dtkt.flow.v1beta1.Stream.Window.Tumbling tumbling = 1;
+   */
+  tumbling?: Stream_Window_Tumbling;
+
+  /**
+   * @generated from field: dtkt.flow.v1beta1.Stream.Window.Sliding sliding = 2;
+   */
+  sliding?: Stream_Window_Sliding;
+
+  /**
+   * CEL expression selecting the element to buffer on each round.
+   *
+   * @generated from field: string source = 3;
+   */
+  source: string;
+};
+
+/**
+ * @generated from message dtkt.flow.v1beta1.Stream.Window
+ */
+export type Stream_WindowValid = Message<"dtkt.flow.v1beta1.Stream.Window"> & {
+  /**
+   * @generated from field: dtkt.flow.v1beta1.Stream.Window.Tumbling tumbling = 1;
+   */
+  tumbling?: Stream_Window_TumblingValid;
+
+  /**
+   * @generated from field: dtkt.flow.v1beta1.Stream.Window.Sliding sliding = 2;
+   */
+  sliding?: Stream_Window_SlidingValid;
+
+  /**
+   * CEL expression selecting the element to buffer on each round.
+   *
+   * @generated from field: string source = 3;
+   */
+  source: string;
+};
+
+/**
+ * Describes the message dtkt.flow.v1beta1.Stream.Window.
+ * Use `create(Stream_WindowSchema)` to create a new message.
+ */
+export const Stream_WindowSchema: GenMessage<Stream_Window, {validType: Stream_WindowValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 2);
+
+/**
+ * @generated from message dtkt.flow.v1beta1.Stream.Window.Tumbling
+ */
+export type Stream_Window_Tumbling = Message<"dtkt.flow.v1beta1.Stream.Window.Tumbling"> & {
+  /**
+   * Number of elements buffered before the window is emitted.
+   *
+   * @generated from field: uint32 size = 1;
+   */
+  size: number;
+};
+
+export type Stream_Window_TumblingValid = Stream_Window_Tumbling;
+
+/**
+ * Describes the message dtkt.flow.v1beta1.Stream.Window.Tumbling.
+ * Use `create(Stream_Window_TumblingSchema)` to create a new message.
+ */
+export const Stream_Window_TumblingSchema: GenMessage<Stream_Window_Tumbling, {validType: Stream_Window_TumblingValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 2, 0);
+
+/**
+ * @generated from message dtkt.flow.v1beta1.Stream.Window.Sliding
+ */
+export type Stream_Window_Sliding = Message<"dtkt.flow.v1beta1.Stream.Window.Sliding"> & {
+  /**
+   * Number of elements buffered before the window is emitted.
+   *
+   * @generated from field: uint32 size = 1;
+   */
+  size: number;
+
+  /**
+   * Number of elements to advance between successive window emissions.
+   *
+   * @generated from field: uint32 step = 2;
+   */
+  step: number;
+};
+
+export type Stream_Window_SlidingValid = Stream_Window_Sliding;
+
+/**
+ * Describes the message dtkt.flow.v1beta1.Stream.Window.Sliding.
+ * Use `create(Stream_Window_SlidingSchema)` to create a new message.
+ */
+export const Stream_Window_SlidingSchema: GenMessage<Stream_Window_Sliding, {validType: Stream_Window_SlidingValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 2, 1);
 
 /**
  * @generated from message dtkt.flow.v1beta1.UserAction
@@ -736,7 +889,7 @@ export type UserActionValid = Message<"dtkt.flow.v1beta1.UserAction"> & {
  * Use `create(UserActionSchema)` to create a new message.
  */
 export const UserActionSchema: GenMessage<UserAction, {validType: UserActionValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 5);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 6);
 
 /**
  * @generated from message dtkt.flow.v1beta1.UserAction.ConfirmBinding
@@ -755,7 +908,7 @@ export type UserAction_ConfirmBindingValid = UserAction_ConfirmBinding;
  * Use `create(UserAction_ConfirmBindingSchema)` to create a new message.
  */
 export const UserAction_ConfirmBindingSchema: GenMessage<UserAction_ConfirmBinding, {validType: UserAction_ConfirmBindingValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 0);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 6, 0);
 
 /**
  * @generated from message dtkt.flow.v1beta1.UserAction.InputBinding
@@ -774,7 +927,7 @@ export type UserAction_InputBindingValid = UserAction_InputBinding;
  * Use `create(UserAction_InputBindingSchema)` to create a new message.
  */
 export const UserAction_InputBindingSchema: GenMessage<UserAction_InputBinding, {validType: UserAction_InputBindingValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 1);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 6, 1);
 
 /**
  * @generated from message dtkt.flow.v1beta1.UserAction.FileBinding
@@ -793,7 +946,7 @@ export type UserAction_FileBindingValid = UserAction_FileBinding;
  * Use `create(UserAction_FileBindingSchema)` to create a new message.
  */
 export const UserAction_FileBindingSchema: GenMessage<UserAction_FileBinding, {validType: UserAction_FileBindingValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 2);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 6, 2);
 
 /**
  * @generated from message dtkt.flow.v1beta1.UserAction.SelectBinding
@@ -812,7 +965,7 @@ export type UserAction_SelectBindingValid = UserAction_SelectBinding;
  * Use `create(UserAction_SelectBindingSchema)` to create a new message.
  */
 export const UserAction_SelectBindingSchema: GenMessage<UserAction_SelectBinding, {validType: UserAction_SelectBindingValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 3);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 6, 3);
 
 /**
  * @generated from message dtkt.flow.v1beta1.UserAction.MultiSelectBinding
@@ -831,7 +984,7 @@ export type UserAction_MultiSelectBindingValid = UserAction_MultiSelectBinding;
  * Use `create(UserAction_MultiSelectBindingSchema)` to create a new message.
  */
 export const UserAction_MultiSelectBindingSchema: GenMessage<UserAction_MultiSelectBinding, {validType: UserAction_MultiSelectBindingValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 4);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 6, 4);
 
 /**
  * @generated from message dtkt.flow.v1beta1.UserAction.Input
@@ -948,7 +1101,7 @@ export type UserAction_InputValid = Message<"dtkt.flow.v1beta1.UserAction.Input"
  * Use `create(UserAction_InputSchema)` to create a new message.
  */
 export const UserAction_InputSchema: GenMessage<UserAction_Input, {validType: UserAction_InputValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 5, 5);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 6, 5);
 
 /**
  * Var is an intermediate value in a Flow used to transform and/or memoize the result of a computation for reuse.
@@ -1021,7 +1174,7 @@ export type VarValid = Message<"dtkt.flow.v1beta1.Var"> & {
  * Use `create(VarSchema)` to create a new message.
  */
 export const VarSchema: GenMessage<Var, {validType: VarValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 6);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 7);
 
 /**
  * @generated from message dtkt.flow.v1beta1.Var.Switch
@@ -1068,7 +1221,7 @@ export type Var_SwitchValid = Message<"dtkt.flow.v1beta1.Var.Switch"> & {
  * Use `create(Var_SwitchSchema)` to create a new message.
  */
 export const Var_SwitchSchema: GenMessage<Var_Switch, {validType: Var_SwitchValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 6, 0);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 7, 0);
 
 /**
  * @generated from message dtkt.flow.v1beta1.Var.Switch.Case
@@ -1105,7 +1258,7 @@ export type Var_Switch_CaseValid = Message<"dtkt.flow.v1beta1.Var.Switch.Case"> 
  * Use `create(Var_Switch_CaseSchema)` to create a new message.
  */
 export const Var_Switch_CaseSchema: GenMessage<Var_Switch_Case, {validType: Var_Switch_CaseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 6, 0, 0);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 7, 0, 0);
 
 /**
  * @generated from message dtkt.flow.v1beta1.Output
@@ -1146,5 +1299,5 @@ export type OutputValid = Message<"dtkt.flow.v1beta1.Output"> & {
  * Use `create(OutputSchema)` to create a new message.
  */
 export const OutputSchema: GenMessage<Output, {validType: OutputValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_spec, 7);
+  messageDesc(file_dtkt_flow_v1beta1_spec, 8);
 

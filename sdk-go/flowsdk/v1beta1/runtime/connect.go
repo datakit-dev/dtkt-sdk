@@ -3,10 +3,10 @@ package runtime
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
-	sharedv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
 )
 
 var _ ConnectorProvider = Connectors{}
@@ -15,44 +15,54 @@ var _ shared.Connector = (*Connector)(nil)
 type (
 	Connectors map[string]*Connector
 	Connector  struct {
-		ctx  context.Context
-		node *flowv1beta1.Connection
+		ctx   context.Context
+		ident string
 
 		client   shared.Client
 		resolver shared.Resolver
 	}
 
-	Connection        = shared.Connection[*sharedv1beta1.Package_Identity]
-	ConnectorProvider = shared.ConnectorProvider[*sharedv1beta1.Package_Identity]
+	ConnectorProvider interface {
+		// GetConnector returns a Connector for a connection node with the given id.
+		// It must match the given package (name & version) or implement the given
+		// list of services.
+		GetConnector(ident string) (shared.Connector, error)
+	}
+	GetConnectorFunc func(ident string) (shared.Connector, error)
 )
 
 func NewConnector(ctx context.Context, node *flowv1beta1.Connection, opts ...Option) *Connector {
 	conn := &Connector{
-		ctx:  ctx,
-		node: node,
+		ctx:   ctx,
+		ident: shared.GetNodeIdent(node),
 	}
 	conn.applyOptions(opts...)
 	return conn
 }
 
-func (c Connectors) GetConnector(node Connection) (shared.Connector, error) {
-	conn, ok := c[node.GetId()]
-	if !ok {
-		return nil, fmt.Errorf("connections.%s: not found", node.GetId())
+func (c Connectors) GetConnector(ident string) (shared.Connector, error) {
+	conn, ok := c[ident]
+	if !ok && shared.IsNodeIdent(ident) {
+		id := strings.TrimPrefix(ident, shared.ConnectionPrefix+".")
+		conn, ok = c[id]
+		if !ok {
+			return nil, fmt.Errorf("connector not found: %s", ident)
+		}
 	}
+
 	return conn, nil
 }
 
 func (c *Connector) GetResolver(context.Context) (shared.Resolver, error) {
 	if c.resolver == nil {
-		return nil, fmt.Errorf("connections.%s: resolver not found", c.node.Id)
+		return nil, fmt.Errorf("%s: resolver not found", c.ident)
 	}
 	return c.resolver, nil
 }
 
 func (c *Connector) GetClient(context.Context) (context.Context, shared.Client, error) {
 	if c.ctx == nil || c.client == nil {
-		return nil, nil, fmt.Errorf("connections.%s: client not found", c.node.Id)
+		return nil, nil, fmt.Errorf("%s: client not found", c.ident)
 	}
 	return c.ctx, c.client, nil
 }
@@ -63,4 +73,8 @@ func (c *Connector) applyOptions(opts ...Option) {
 			opt(c)
 		}
 	}
+}
+
+func (f GetConnectorFunc) GetConnector(ident string) (shared.Connector, error) {
+	return f(ident)
 }

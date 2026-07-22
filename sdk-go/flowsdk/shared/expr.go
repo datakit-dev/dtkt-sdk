@@ -20,115 +20,29 @@ var validExpr = regexp.MustCompile(`^\s?=\s?`)
 var _ error = (*ExprErr)(nil)
 
 type (
-	ExprOrVal struct {
+	ExprTree struct {
+		id       string
 		expr     *cel.Ast
 		exprList ExprList
 		exprMap  ExprMap
 
 		value any
 	}
-	ExprMap  map[string]*ExprOrVal
-	ExprList []*ExprOrVal
+	ExprMap  map[string]*ExprTree
+	ExprList []*ExprTree
 	ExprErr  struct {
-		msg string
+		error
 	}
 	ExprVisitor func(expr *cel.Ast)
-
-	Program interface {
-		Eval(context.Context, Env) ref.Val
+	programID   struct {
+		Program
+		id string
 	}
-	ProgramFunc func(context.Context, Env) ref.Val
 )
 
-func ParseExprOrValue(env Env, val *structpb.Value, visitor ExprVisitor, path string) (*ExprOrVal, error) {
-	switch val := val.GetKind().(type) {
-	case *structpb.Value_StringValue:
-		_, ok := IsValidExpr(val.StringValue)
-		if ok {
-			expr, err := ParseExpr(env, val.StringValue, visitor)
-			if err != nil {
-				return nil, fmt.Errorf("%s: %s", path, err)
-			}
-
-			return &ExprOrVal{
-				expr: expr,
-			}, nil
-		}
-	case *structpb.Value_ListValue:
-		exprList := make(ExprList, len(val.ListValue.GetValues()))
-		for idx, val := range val.ListValue.GetValues() {
-			exprOrVal, err := ParseExprOrValue(env, val, visitor, fmt.Sprintf("%s[%d]", path, idx))
-			if err != nil {
-				return nil, err
-			}
-			exprList[idx] = exprOrVal
-		}
-
-		return &ExprOrVal{
-			exprList: exprList,
-		}, nil
-	case *structpb.Value_StructValue:
-		exprMap := make(ExprMap)
-		for key, val := range val.StructValue.GetFields() {
-			exprOrVal, err := ParseExprOrValue(env, val, visitor, fmt.Sprintf("%s.%s", path, key))
-			if err != nil {
-				return nil, err
-			}
-			exprMap[key] = exprOrVal
-		}
-
-		return &ExprOrVal{
-			exprMap: exprMap,
-		}, nil
-	}
-
-	return &ExprOrVal{
-		value: val.AsInterface(),
-	}, nil
-}
-
-func ParseExpr(env Env, expr string, visitor ExprVisitor) (*cel.Ast, error) {
-	expr, valid := IsValidExpr(expr)
-	if !valid {
-		return nil, NewExprError(fmt.Sprintf("%s: %s", InvalidExprErrPrefix, expr))
-	}
-
-	ast, iss := env.Parse(expr)
-	if iss.Err() != nil {
-		return nil, iss.Err()
-	}
-
-	ast, iss = env.Check(ast)
-	if iss.Err() != nil {
-		return nil, iss.Err()
-	}
-
-	if visitor != nil {
-		visitor(ast)
-	}
-
-	return ast, nil
-}
-
-func CompileExpr(env Env, expr string, opts ...cel.ProgramOption) (cel.Program, error) {
-	expr, valid := IsValidExpr(expr)
-	if !valid {
-		return nil, NewExprError(fmt.Sprintf("%s: %s", InvalidExprErrPrefix, expr))
-	}
-
-	opts = append(opts, cel.InterruptCheckFrequency(1))
-
-	ast, iss := env.Compile(expr)
-	if iss.Err() != nil {
-		return nil, iss.Err()
-	}
-
-	return env.Program(ast, opts...)
-}
-
-func NewExprError(msg string) *ExprErr {
+func NewExprError(format string, a ...any) *ExprErr {
 	return &ExprErr{
-		msg: msg,
+		error: fmt.Errorf(format, a...),
 	}
 }
 
@@ -153,48 +67,85 @@ func IsValidExpr(expr string) (string, bool) {
 	return celExpr, true
 }
 
-func (e *ExprOrVal) Compile(env Env, path string, opts ...cel.ProgramOption) (Program, error) {
-	if e.expr != nil {
-		prog, err := env.Program(e.expr, opts...)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %s", path, err)
+func ParseExprTree(env Env, id string, val *structpb.Value, visitor ExprVisitor) (*ExprTree, error) {
+	switch val := val.GetKind().(type) {
+	case *structpb.Value_StringValue:
+		_, ok := IsValidExpr(val.StringValue)
+		if ok {
+			expr, err := env.ParseExpr(id, val.StringValue, visitor)
+			if err != nil {
+				return nil, fmt.Errorf("%s: %s", id, err)
+			}
+
+			return &ExprTree{
+				id:   id,
+				expr: expr,
+			}, nil
+		}
+	case *structpb.Value_ListValue:
+		exprList := make(ExprList, len(val.ListValue.GetValues()))
+		for idx, val := range val.ListValue.GetValues() {
+			exprOrVal, err := ParseExprTree(env, fmt.Sprintf("%s.%d", id, idx), val, visitor)
+			if err != nil {
+				return nil, err
+			}
+			exprList[idx] = exprOrVal
 		}
 
-		return ProgramFunc(func(ctx context.Context, env Env) ref.Val {
-			vars, err := env.Vars(ctx)
+		return &ExprTree{
+			id:       id,
+			exprList: exprList,
+		}, nil
+	case *structpb.Value_StructValue:
+		exprMap := make(ExprMap)
+		for key, val := range val.StructValue.GetFields() {
+			exprOrVal, err := ParseExprTree(env, fmt.Sprintf("%s.%s", id, key), val, visitor)
 			if err != nil {
-				return types.WrapErr(err)
+				return nil, err
 			}
+			exprMap[key] = exprOrVal
+		}
 
-			val, _, err := prog.ContextEval(ctx, vars)
-			if err != nil {
-				return types.WrapErr(err)
-			}
-			return val
-		}), nil
+		return &ExprTree{
+			id:      id,
+			exprMap: exprMap,
+		}, nil
+	}
+
+	return &ExprTree{
+		id:    id,
+		value: val.AsInterface(),
+	}, nil
+}
+
+func (e *ExprTree) Compile(env Env) (Program, error) {
+	if e.expr != nil {
+		return env.CompileExpr(e.id, e.expr)
 	} else if e.exprList != nil {
-		return e.exprList.compile(env, path, opts...)
+		return e.exprList.compile(env)
 	} else if e.exprMap != nil {
-		return e.exprMap.compile(env, path, opts...)
+		return e.exprMap.compile(env)
 	}
 
 	return ProgramFunc(func(ctx context.Context, env Env) ref.Val {
-		if e.value != nil {
-			return env.Types().NativeToValue(e.value)
+		if e.value == nil {
+			return types.NullValue
 		}
-
-		return types.NullValue
+		return env.Types().NativeToValue(e.value)
 	}), nil
 }
 
-func (e ExprList) compile(env Env, path string, opts ...cel.ProgramOption) (Program, error) {
-	progList := make([]Program, len(e))
+func (e ExprList) compile(env Env) (Program, error) {
+	progList := make([]programID, len(e))
 	for i, expr := range e {
-		prog, err := expr.Compile(env, path, opts...)
+		prog, err := expr.Compile(env)
 		if err != nil {
 			return nil, err
 		}
-		progList[i] = prog
+		progList[i] = programID{
+			Program: prog,
+			id:      expr.id,
+		}
 	}
 
 	return ProgramFunc(func(ctx context.Context, env Env) ref.Val {
@@ -202,12 +153,12 @@ func (e ExprList) compile(env Env, path string, opts ...cel.ProgramOption) (Prog
 		for i, prog := range progList {
 			val := prog.Eval(ctx, env)
 			if err, ok := val.Value().(error); ok {
-				return types.WrapErr(fmt.Errorf("%s: %s", path, err))
+				return types.WrapErr(fmt.Errorf("%s: %s", prog.id, err))
 			}
 
 			nativeVal, err := env.Types().ValueToNative(val)
 			if err != nil {
-				return types.WrapErr(fmt.Errorf("%s: %s", path, err))
+				return types.WrapErr(fmt.Errorf("%s: %s", prog.id, err))
 			}
 
 			result[i] = nativeVal
@@ -217,14 +168,17 @@ func (e ExprList) compile(env Env, path string, opts ...cel.ProgramOption) (Prog
 	}), nil
 }
 
-func (e ExprMap) compile(env Env, path string, opts ...cel.ProgramOption) (Program, error) {
-	progMap := make(map[string]Program)
+func (e ExprMap) compile(env Env) (Program, error) {
+	progMap := make(map[string]programID)
 	for key, expr := range e {
-		prog, err := expr.Compile(env, path, opts...)
+		prog, err := expr.Compile(env)
 		if err != nil {
 			return nil, err
 		}
-		progMap[key] = prog
+		progMap[key] = programID{
+			Program: prog,
+			id:      expr.id,
+		}
 	}
 
 	return ProgramFunc(func(ctx context.Context, env Env) ref.Val {
@@ -232,11 +186,11 @@ func (e ExprMap) compile(env Env, path string, opts ...cel.ProgramOption) (Progr
 		for key, prog := range progMap {
 			val := prog.Eval(ctx, env)
 			if err, ok := val.Value().(error); ok {
-				return types.WrapErr(fmt.Errorf("%s: %s", path, err))
+				return types.WrapErr(fmt.Errorf("%s: %s", prog.id, err))
 			} else {
 				nativeVal, err := env.Types().ValueToNative(val)
 				if err != nil {
-					return types.WrapErr(fmt.Errorf("%s: %s", path, err))
+					return types.WrapErr(fmt.Errorf("%s: %s", prog.id, err))
 				}
 
 				result[key] = nativeVal
@@ -249,18 +203,4 @@ func (e ExprMap) compile(env Env, path string, opts ...cel.ProgramOption) (Progr
 
 func (e *ExprErr) Is(err error) bool {
 	return IsInvalidExprError(err)
-}
-
-func (e *ExprErr) Error() string {
-	return e.msg
-}
-
-func (f NodeVisitor) ExprVisitor(id string) ExprVisitor {
-	return func(expr *cel.Ast) {
-		f(id, expr)
-	}
-}
-
-func (f ProgramFunc) Eval(ctx context.Context, env Env) ref.Val {
-	return f(ctx, env)
 }

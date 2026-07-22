@@ -10,7 +10,7 @@ import (
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta1/spec"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta1/impl"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk/v1beta1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/lib/protoschema"
 	corev1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1"
@@ -120,7 +120,7 @@ func (o *SpecOptions) extendNodeSchema(nodeType string, nodeSchema *jsonschema.S
 		switch nodeType {
 		case string(connectionNode.ProtoReflect().Descriptor().FullName()):
 			if services, ok := nodeSchema.Properties["services"]; ok && services.Items != nil {
-				services.Items.Enum = util.AnySlice(spec.ValidConnectionServices(o.Resolver))
+				services.Items.Enum = util.AnySlice(impl.ValidConnectionServices(o.Resolver))
 			}
 		case string(actionCallNode.ProtoReflect().Descriptor().FullName()):
 			return o.extendCallNodeSchema(actionNode, nodeSchema, opts)
@@ -137,7 +137,7 @@ func (o *SpecOptions) extendCallNodeSchema(node shared.SpecNode, schema *jsonsch
 	}
 
 	defs = map[string]*jsonschema.Schema{}
-	spec.RangeCallNodeMethods(o.Resolver, node, func(md protoreflect.MethodDescriptor) bool {
+	impl.RangeCallNodeMethods(o.Resolver, node, func(md protoreflect.MethodDescriptor) bool {
 		resolved, err := protoschema.ResolvedJSONSchemaWithOptions(md.Input(), opts)
 		if err != nil {
 			return true

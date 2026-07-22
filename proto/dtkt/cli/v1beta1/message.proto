@@ -3,7 +3,7 @@ syntax = "proto3";
 package dtkt.cli.v1beta1;
 
 import "buf/validate/validate.proto";
-import "dtkt/core/v1/messages.proto";
+import "dtkt/core/v1/common.proto";
 import "dtkt/protoui/v1beta1/protoui.proto";
 import "google/protobuf/timestamp.proto";
 

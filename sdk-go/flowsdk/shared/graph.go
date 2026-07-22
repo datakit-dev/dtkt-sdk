@@ -6,7 +6,6 @@ import (
 	"maps"
 	"slices"
 
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	graphlib "github.com/dominikbraun/graph"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/ast"
@@ -20,8 +19,8 @@ type (
 		traits graphlib.Traits
 		store  graphlib.Store[string, T]
 
-		nodes map[string]T
-		edges []*Edge[T]
+		nodes Nodes[T]
+		edges Edges
 
 		groups  [][]string
 		forward map[string][]string
@@ -35,7 +34,6 @@ type (
 
 func NewGraph[T Node](opts ...GraphOption[T]) *Graph[T] {
 	graph := &Graph[T]{
-		nodes:   map[string]T{},
 		forward: map[string][]string{},
 		reverse: map[string][]string{},
 	}
@@ -71,6 +69,18 @@ func WithNodeHash[T Node](hash graphlib.Hash[string, T]) GraphOption[T] {
 	}
 }
 
+func WithNodes[T Node](nodes []T) GraphOption[T] {
+	return func(g *Graph[T]) {
+		g.nodes = nodes
+	}
+}
+
+func WithEdges[T Node](edges []*Edge) GraphOption[T] {
+	return func(g *Graph[T]) {
+		g.edges = edges
+	}
+}
+
 func WithDAG[T Node]() GraphOption[T] {
 	return func(g *Graph[T]) {
 		graphlib.Directed()(&g.traits)
@@ -94,19 +104,19 @@ func WithStore[T Node](store graphlib.Store[string, T]) GraphOption[T] {
 	}
 }
 
-func (g *Graph[T]) Build(parse NodeParser[T], nodes ...T) (err error) {
+func (g *Graph[T]) Parse(nodes []SpecNode, parser NodeParser[T]) (err error) {
 	for _, node := range nodes {
+		node, err := parser(node, g.Visitor)
+		if err != nil {
+			return fmt.Errorf("parse node: %w", err)
+		}
+
 		err = g.AddVertex(node)
 		if err != nil {
-			return err
+			return fmt.Errorf("add vertex: %w", err)
 		}
-	}
 
-	for _, node := range nodes {
-		err = parse(node, g.visitNode)
-		if err != nil {
-			return err
-		}
+		g.nodes = append(g.nodes, node)
 	}
 
 	err = errors.Join(g.errors...)
@@ -114,82 +124,101 @@ func (g *Graph[T]) Build(parse NodeParser[T], nodes ...T) (err error) {
 		return err
 	}
 
+	for _, edge := range g.edges {
+		err = g.AddEdge(edge.SourceNode(), edge.TargetNode())
+		if err != nil {
+			return err
+		}
+	}
+
 	err = g.computePreds()
 	if err != nil {
-		return err
+		return fmt.Errorf("compute preds: %w", err)
 	}
 
 	err = g.computeGroups()
 	if err != nil {
-		return err
+		return fmt.Errorf("compute groups: %w", err)
 	}
 
 	if g.traits.IsAcyclic && g.traits.IsDirected {
 		g.Graph, err = graphlib.TransitiveReduction(g.Graph)
-	}
-
-	edges, err := g.Graph.Edges()
-	if err != nil {
-		return err
-	}
-
-	g.edges = make([]*Edge[T], len(edges))
-	for idx, edge := range edges {
-		source, err := g.Vertex(edge.Source)
 		if err != nil {
-			return err
+			return fmt.Errorf("transitive reduction: %w", err)
 		}
-
-		target, err := g.Vertex(edge.Target)
-		if err != nil {
-			return err
-		}
-
-		g.edges[idx] = NewEdge(source, target)
-	}
-
-	for _, node := range nodes {
-		g.nodes[node.Ident()] = node
 	}
 
 	return
 }
 
-func (g *Graph[T]) Nodes() []T {
-	return util.MapVals(g.nodes)
+func (g *Graph[T]) Visitor(target string, expr *cel.Ast) {
+	ast.PreOrderVisit(
+		ast.NavigateAST(expr.NativeRep()),
+		ast.NewExprVisitor(func(expr ast.Expr) {
+			switch expr.Kind() {
+			case ast.SelectKind:
+				if expr.AsSelect().Operand().Kind() == ast.IdentKind {
+					source := expr.AsSelect().Operand().AsIdent() + "." + expr.AsSelect().FieldName()
+					if IsExprIdent(source) {
+						err := IsValidEdge(source, target)
+						if err != nil {
+							g.addError(err)
+						} else {
+							g.addEdge(source, target)
+						}
+					}
+				}
+			}
+		}),
+	)
 }
 
-func (g *Graph[T]) Edges() []*Edge[T] {
+func (g *Graph[T]) addEdge(source, target string) {
+	if !g.edges.Contains(source, target) {
+		if edge, ok := NewEdge(source, target); ok {
+			g.edges = append(g.edges, edge)
+		}
+	}
+}
+
+func (g *Graph[T]) Nodes() Nodes[T] {
+	return g.nodes
+}
+
+func (g *Graph[T]) Edges() Edges {
 	return g.edges
 }
 
 func (g *Graph[T]) Node(ident string) (node T, ok bool) {
-	node, ok = g.nodes[ident]
+	node, err := g.Vertex(ident)
+	ok = err == nil
 	return
 }
 
-func (g *Graph[T]) Edge(source, target string) (edge *Edge[T], err error) {
+func (g *Graph[T]) Edge(source, target string) (edge *Edge, ok bool) {
 	for _, edge = range g.edges {
-		if edge.src.Ident() == source && edge.dst.Ident() == target {
+		// if strings.HasPrefix(edge.source, source) && strings.HasPrefix(edge.target, target) {
+		if edge.source == source && edge.target == target {
 			return
 		}
 	}
-	err = fmt.Errorf("edge not found for source=%q target=%q", source, target)
 	return
 }
 
-func (g *Graph[T]) Inbound(target string) (edges []*Edge[T]) {
+func (g *Graph[T]) Inbound(target string) (edges []*Edge) {
 	for _, edge := range g.edges {
-		if edge.dst.Ident() == target {
+		// if strings.HasPrefix(edge.target, target) {
+		if edge.target == target {
 			edges = append(edges, edge)
 		}
 	}
 	return
 }
 
-func (g *Graph[T]) Outbound(source string) (edges []*Edge[T]) {
+func (g *Graph[T]) Outbound(source string) (edges []*Edge) {
 	for _, edge := range g.edges {
-		if edge.src.Ident() == source {
+		// if strings.HasPrefix(edge.source, source) {
+		if edge.source == source {
 			edges = append(edges, edge)
 		}
 	}
@@ -203,7 +232,7 @@ func (g *Graph[T]) Groups() (groups [][]T, _ error) {
 		for idx, id := range ids {
 			node, err := g.Vertex(id)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("groups: %w", err)
 			}
 			group[idx] = node
 		}
@@ -252,7 +281,7 @@ func (g *Graph[T]) Starts() (nodes []T, _ error) {
 		if len(g.forward[source]) == 0 {
 			node, err := g.Vertex(source)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("starts: %w", err)
 			}
 
 			nodes = append(nodes, node)
@@ -267,7 +296,7 @@ func (g *Graph[T]) Ends() (nodes []T, _ error) {
 		if len(g.reverse[target]) == 0 {
 			node, err := g.Vertex(target)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("ends: %w", err)
 			}
 
 			nodes = append(nodes, node)
@@ -296,28 +325,6 @@ func (g *Graph[T]) computePreds() error {
 	}
 
 	return nil
-}
-
-func (g *Graph[T]) visitNode(target string, expr *cel.Ast) {
-	ast.PreOrderVisit(
-		ast.NavigateAST(expr.NativeRep()),
-		ast.NewExprVisitor(func(expr ast.Expr) {
-			switch expr.Kind() {
-			case ast.SelectKind:
-				if expr.AsSelect().Operand().Kind() == ast.IdentKind {
-					source := expr.AsSelect().Operand().AsIdent()
-					if IsNodeID(source) {
-						if err := IsValidEdge(source, target); err != nil {
-							g.addError(err)
-						} else if err = g.AddEdge(source, target); err != nil {
-							if !errors.Is(err, graphlib.ErrEdgeAlreadyExists) {
-								g.addError(err)
-							}
-						}
-					}
-				}
-			}
-		}))
 }
 
 func (g *Graph[T]) computeGroups() error {
@@ -360,7 +367,7 @@ func (g *Graph[T]) computeGroups() error {
 			if allDepsProcessed {
 				_, err := g.Vertex(nodeID)
 				if err != nil {
-					return err
+					return fmt.Errorf("compute groups: %w", err)
 				}
 
 				nodeIDs = append(nodeIDs, nodeID)

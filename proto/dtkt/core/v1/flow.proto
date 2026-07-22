@@ -1,0 +1,185 @@
+syntax = "proto3";
+
+package dtkt.core.v1;
+
+import "buf/validate/validate.proto";
+import "dtkt/flow/v1beta1/runtime.proto";
+import "dtkt/flow/v1beta1/spec.proto";
+import "dtkt/protoform/v1beta1/protoform.proto";
+import "dtkt/protostore/v1beta1/protostore.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1";
+
+// FlowService provides operations for managing automation flow specs.
+service FlowService {
+  // List flow specs.
+  rpc ListFlows(ListFlowsRequest) returns (ListFlowsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Get a single flow spec by name.
+  rpc GetFlow(GetFlowRequest) returns (GetFlowResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create a new flow spec.
+  rpc CreateFlow(CreateFlowRequest) returns (CreateFlowResponse);
+  // Update an existing flow spec.
+  rpc UpdateFlow(UpdateFlowRequest) returns (UpdateFlowResponse);
+  // Delete a flow spec by name.
+  rpc DeleteFlow(DeleteFlowRequest) returns (DeleteFlowResponse);
+}
+
+// Flow is a versioned workflow spec with parsed graph representation.
+message Flow {
+  option (google.api.resource) = {
+    type: "Flow"
+    singular: "flow"
+    plural: "flows"
+    pattern: "organizations/{organization}/flows/{flow}"
+    pattern: "users/{user}/flows/{flow}"
+  };
+
+  option (dtkt.protostore.v1beta1.search_index) = {contents_expr: "has(this.spec.v1beta1) ? this.spec.v1beta1.name + ' ' + this.spec.v1beta1.description : ''"};
+
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Flow spec URI (optional).
+  optional string spec_uri = 3 [(buf.validate.field).string.uri = true];
+
+  // Flow spec checksum for concurrency control.
+  string spec_etag = 4 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Flow spec metadata (versioned).
+  FlowSpecMetadata spec = 5 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = INPUT_ONLY
+  ];
+
+  // Flow graph (parsed spec) metadata (versioned).
+  FlowGraphMetadata graph = 6 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Flow create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Flow update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+// FlowSpecMetadata wraps versioned flow specification.
+message FlowSpecMetadata {
+  oneof version {
+    option (buf.validate.oneof).required = true;
+    dtkt.flow.v1beta1.Flow v1beta1 = 1;
+  }
+}
+
+// FlowGraphMetadata wraps versioned flow graph representation.
+message FlowGraphMetadata {
+  oneof version {
+    option (buf.validate.oneof).required = true;
+    dtkt.flow.v1beta1.Graph v1beta1 = 1;
+  }
+}
+
+message ListFlowsRequest {
+  // Maximum number of flows to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name: `organizations/{organization}` or `users/{user}`.
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListFlowsResponse {
+  // The list of flows.
+  repeated Flow flows = 1;
+
+  // Token for retrieving the next page.
+  string next_page_token = 2;
+}
+
+message GetFlowRequest {
+  // Flow resource name, one of.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetFlowResponse {
+  // The requested flow.
+  Flow flow = 1 [(buf.validate.field).required = true];
+}
+
+message CreateFlowRequest {
+  // Parent resource name.
+  string parent = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Client-provided ID for flow resource.
+  string flow_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-z0-9-]+$"
+  ];
+
+  // Flow to create.
+  Flow flow = 3 [(buf.validate.field).required = true];
+}
+
+message CreateFlowResponse {
+  // The created flow.
+  Flow flow = 1 [(buf.validate.field).required = true];
+}
+
+message UpdateFlowRequest {
+  // Flow with updated fields. Must include `name`.
+  Flow flow = 1 [(buf.validate.field).required = true];
+
+  // Fields to update (e.g., "spec").
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message UpdateFlowResponse {
+  // The updated flow.
+  Flow flow = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteFlowRequest {
+  // Name of flow to delete.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteFlowResponse {}

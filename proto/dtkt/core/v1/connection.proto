@@ -1,0 +1,275 @@
+syntax = "proto3";
+
+package dtkt.core.v1;
+
+import "buf/validate/validate.proto";
+import "dtkt/core/v1/common.proto";
+import "dtkt/protoform/v1beta1/protoform.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1";
+
+// ConnectionService provides operations for managing connections.
+service ConnectionService {
+  // Dial a connection to validate connectivity.
+  rpc DialConnection(DialConnectionRequest) returns (DialConnectionResponse);
+  // List connections.
+  rpc ListConnections(ListConnectionsRequest) returns (ListConnectionsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Get a single connection by name.
+  rpc GetConnection(GetConnectionRequest) returns (GetConnectionResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create a new connection.
+  rpc CreateConnection(CreateConnectionRequest) returns (CreateConnectionResponse);
+  // Update an existing connection.
+  rpc UpdateConnection(UpdateConnectionRequest) returns (UpdateConnectionResponse);
+  // Delete a connection by name.
+  rpc DeleteConnection(DeleteConnectionRequest) returns (DeleteConnectionResponse);
+}
+
+// Connection combines necessary components of a configured client to one of:
+// - Deployment server with first-class configuration support using a DataKit SDK
+// - Any reachable gRPC server with DIY configuration, one of:
+//   - Custom proto file descriptors as a URI resolving to source .proto files
+//   - Custom proto file descriptors using gRPC reflection (must be enabled on server)
+message Connection {
+  option (google.api.resource) = {
+    type: "Connection"
+    singular: "connection"
+    plural: "connections"
+    pattern: "organizations/{organization}/connections/{connection}"
+    pattern: "users/{user}/connections/{connection}"
+  };
+
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  oneof type {
+    option (buf.validate.oneof).required = true;
+
+    // Name of a deployment resource.
+    string deployment = 3 [
+      (google.api.resource_reference).type = "Deployment",
+      (dtkt.protoform.v1beta1.field).title = "Deployment",
+      (dtkt.protoform.v1beta1.field).description = "Select a deployment.",
+      (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.core.v1.DeploymentService.ListDeployments",
+      (dtkt.protoform.v1beta1.field).select.response_field = "deployments",
+      (dtkt.protoform.v1beta1.field).select.label_expr = "this.name",
+      (dtkt.protoform.v1beta1.field).select.value_expr = "this.name"
+    ];
+
+    // Custom proto descriptors URI.
+    string custom_protos = 4 [
+      (buf.validate.field).string.uri = true,
+      (dtkt.protoform.v1beta1.field).title = "Custom Proto Descriptors",
+      (dtkt.protoform.v1beta1.field).description = "Custom connection to a server using a file path or URI to .proto source files.",
+      (dtkt.protoform.v1beta1.field).input = {}
+    ];
+
+    // Custom using gRPC reflection.
+    bool custom_grpc = 5 [
+      (dtkt.protoform.v1beta1.field).title = "Custom gRPC Reflection",
+      (dtkt.protoform.v1beta1.field).description = "Custom connection to a server with gRPC reflection service.",
+      (dtkt.protoform.v1beta1.field).confirm = {
+        approve: "Yes"
+        decline: "No/Unsure (check for me)"
+        default_selected: true
+      }
+    ];
+  }
+
+  // Address of gRPC server.
+  Address address = 6;
+  option (buf.validate.message).cel_expression = "(has(this.custom_protos) || has(this.custom_grpc)) ? has(this.address) : has(this.deployment)";
+
+  oneof config {
+    // Config data compatible with deployment config schema.
+    google.protobuf.Any decrypted_config = 7 [
+      (google.api.field_behavior) = INPUT_ONLY,
+      debug_redact = true
+    ];
+    // Encrypted config data.
+    EncryptedAny encrypted_config = 8 [
+      (google.api.field_behavior) = OUTPUT_ONLY,
+      (dtkt.protoform.v1beta1.field).hidden = true
+    ];
+  }
+  option (buf.validate.message).cel_expression = "has(this.deployment) ? has(this.decrypted_config) || has(this.encrypted_config) : true";
+
+  // Hash of config data.
+  string config_hash = 11 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true,
+    debug_redact = true
+  ];
+
+  // Generation of config data.
+  uint64 config_gen = 12 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true,
+    debug_redact = true
+  ];
+
+  // Config source uri (optional).
+  optional string config_uri = 13 [
+    (buf.validate.field).string.uri = true,
+    (google.api.field_behavior) = INPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).description = "Config data URI (optional)",
+    (dtkt.protoform.v1beta1.field).file = {}
+  ];
+
+  oneof auth {
+    // Decrypted auth data.
+    google.protobuf.Any decrypted_auth = 9 [
+      (google.api.field_behavior) = INPUT_ONLY,
+      debug_redact = true
+    ];
+    // Encrypted auth data.
+    EncryptedAny encrypted_auth = 10 [
+      (google.api.field_behavior) = OUTPUT_ONLY,
+      (dtkt.protoform.v1beta1.field).hidden = true
+    ];
+  }
+
+  // Headers applied when dialing connection (only valid for custom connections).
+  map<string, string> headers = 14 [debug_redact = true];
+  option (buf.validate.message).cel_expression = "has(this.headers) ? has(this.custom_protos) || has(this.custom_grpc) : false";
+
+  // Connection create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Connection update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+}
+
+message ListConnectionsRequest {
+  // Maximum number of connections to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name: `organizations/{organization}` or `users/{user}`.
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListConnectionsResponse {
+  // The list of connections.
+  repeated Connection connections = 1;
+
+  // Token for retrieving the next page.
+  string next_page_token = 2;
+}
+
+message GetConnectionRequest {
+  // Name of connection to get.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetConnectionResponse {
+  // The requested connection.
+  Connection connection = 1 [(buf.validate.field).required = true];
+}
+
+message CreateConnectionRequest {
+  // Parent resource name.
+  string parent = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Client-provided ID for connection resource.
+  string connection_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-z0-9-]+$",
+    (dtkt.protoform.v1beta1.field).description = "Connection ID"
+  ];
+
+  // Connection to create.
+  Connection connection = 3 [(buf.validate.field).required = true];
+}
+
+message CreateConnectionResponse {
+  // The created connection.
+  Connection connection = 1 [(buf.validate.field).required = true];
+}
+
+message UpdateConnectionRequest {
+  // The connection with updated fields. Must include `name`.
+  Connection connection = 1 [(buf.validate.field).required = true];
+
+  // Fields to update (e.g., "config_data,integration").
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message UpdateConnectionResponse {
+  // The updated connection.
+  Connection connection = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteConnectionRequest {
+  // Name of connection to delete.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteConnectionResponse {}
+
+message DialConnectionRequest {
+  oneof target {
+    // Name of connection to dial.
+    string name = 1;
+    // Address of connection to dial.
+    string address = 2 [(buf.validate.field).string.uri = true];
+  }
+}
+
+message DialConnectionResponse {
+  // Dial metadata.
+  DialMetadata dial = 1 [(buf.validate.field).required = true];
+}
+
+message DialMetadata {
+  enum State {
+    STATE_UNSPECIFIED = 0;
+    STATE_CONNECTED = 1;
+    STATE_FAILED = 2;
+  }
+
+  // Connection dial state.
+  State state = 1;
+
+  // Connection dial message.
+  string message = 2;
+
+  // Connection dial time.
+  google.protobuf.Timestamp time = 3;
+}

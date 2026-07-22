@@ -9,8 +9,8 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func SliceOf[T any](t ...T) []T {
-	return append([]T{}, t...)
+func SliceOf[T any](t ...T) (v []T) {
+	return append(v, t...)
 }
 
 func AnySlice[T any](s []T) []any {
@@ -59,20 +59,29 @@ func SliceReduceError[T, V any](ts []T, fn func(T) (V, bool, error)) (s []V, _ e
 	return
 }
 
-func ReduceSliceToMap[T, V any, K comparable](ts []T, fn func(T) (K, V, bool)) (m map[K]V) {
+func SliceToMap[T, V any, K comparable](slice []T, fn func(int, T) (K, V)) (m map[K]V) {
 	m = map[K]V{}
-	for _, t := range ts {
-		if k, v, ok := fn(t); ok {
+	for idx, v := range slice {
+		k, v := fn(idx, v)
+		m[k] = v
+	}
+	return
+}
+
+func ReduceSliceToMap[T, V any, K comparable](slice []T, fn func(int, T) (K, V, bool)) (m map[K]V) {
+	m = map[K]V{}
+	for idx, v := range slice {
+		if k, v, ok := fn(idx, v); ok {
 			m[k] = v
 		}
 	}
 	return
 }
 
-func ReduceSliceToMapErr[T, V any, K comparable](ts []T, fn func(T) (K, V, bool, error)) (m map[K]V, _ error) {
+func ReduceSliceToMapErr[T, V any, K comparable](slice []T, fn func(T) (K, V, bool, error)) (m map[K]V, _ error) {
 	m = map[K]V{}
-	for _, t := range ts {
-		k, v, ok, err := fn(t)
+	for _, v := range slice {
+		k, v, ok, err := fn(v)
 		if err != nil {
 			return nil, err
 		} else if ok {
@@ -128,13 +137,37 @@ func SliceWithout[T comparable](collection []T, elems ...T) []T {
 	return result
 }
 
-func MapParallelCancelableErr[T any, R any](ctx context.Context, slice []T, fn func(ctx context.Context, t T) (R, error)) ([]R, error) {
+func SliceGroups[T comparable](elems ...T) [][]T {
+	groups := map[T][]T{}
+	for _, a := range elems {
+		groups[a] = append(groups[a], a)
+	}
+	return MapVals(groups)
+}
+
+func SliceGroupsFunc[T any](elems []T, eq func(T, T) bool) [][]T {
+	var groups [][]T
+	for _, a := range elems {
+		found := false
+		for i, g := range groups {
+			if eq(a, g[0]) {
+				groups[i] = append(groups[i], a)
+				found = true
+				break
+			}
+		}
+		if !found {
+			groups = append(groups, []T{a})
+		}
+	}
+	return groups
+}
+
+func ContextMapParallelErr[T any, R any](ctx context.Context, slice []T, fn func(ctx context.Context, t T) (R, error)) ([]R, error) {
 	g, ctx := errgroup.WithContext(ctx)
 
 	results := make([]R, len(slice))
 	for idx, item := range slice {
-		idx, item := idx, item
-
 		g.Go(func() error {
 			result, err := fn(ctx, item)
 			if err != nil {
@@ -154,24 +187,16 @@ func MapParallelCancelableErr[T any, R any](ctx context.Context, slice []T, fn f
 	return results, nil
 }
 
-func MapParallelErr[T any, R any](slice []T, fn func(T) (R, error)) ([]R, error) {
-	var (
-		g   sync.WaitGroup
-		mut sync.Mutex
+func ContextMapParallelErrs[T any, R any](ctx context.Context, slice []T, fn func(context.Context, T) (R, error)) (results []R, errs []error) {
+	var g sync.WaitGroup
 
-		errs []error
-	)
-
-	results := make([]R, len(slice))
+	results = make([]R, len(slice))
+	errs = make([]error, len(slice))
 	for idx, item := range slice {
-		idx, item := idx, item
-
 		g.Go(func() {
-			result, err := fn(item)
+			result, err := fn(ctx, item)
 			if err != nil {
-				mut.Lock()
-				errs = append(errs, err)
-				mut.Unlock()
+				errs[idx] = err
 				return
 			}
 
@@ -180,22 +205,24 @@ func MapParallelErr[T any, R any](slice []T, fn func(T) (R, error)) ([]R, error)
 	}
 	g.Wait()
 
+	return results, errs
+}
+
+func MapParallelErr[T any, R any](slice []T, fn func(T) (R, error)) ([]R, error) {
+	results, errs := MapParallelErrs(slice, fn)
 	err := errors.Join(errs...)
 	if err != nil {
 		return nil, err
 	}
-
 	return results, nil
 }
 
-func MapParallelErrs[T any, R any](slice []T, fn func(T) (R, error)) ([]R, []error) {
+func MapParallelErrs[T any, R any](slice []T, fn func(T) (R, error)) (results []R, errs []error) {
 	var g sync.WaitGroup
 
-	results := make([]R, len(slice))
-	errs := make([]error, len(slice))
+	results = make([]R, len(slice))
+	errs = make([]error, len(slice))
 	for idx, item := range slice {
-		idx, item := idx, item
-
 		g.Go(func() {
 			result, err := fn(item)
 			if err != nil {

@@ -3,67 +3,109 @@ package shared
 import (
 	"fmt"
 	"slices"
-	"sync"
+	"strings"
 )
 
 // invalidEdges is a map of target -> source prefixes which are not supported
 var invalidEdges = map[string][]string{
-	ActionPrefix: {ConnectionPrefix, OutputPrefix},
-	OutputPrefix: {ConnectionPrefix},
-	StreamPrefix: {ConnectionPrefix, OutputPrefix},
-	VarPrefix:    {ConnectionPrefix, OutputPrefix},
+	ActionPrefix: {ConnectionPrefix, OutputPrefix, MetricPrefix},
+	OutputPrefix: {ConnectionPrefix, MetricPrefix},
+	StreamPrefix: {ConnectionPrefix, OutputPrefix, MetricPrefix},
+	VarPrefix:    {ConnectionPrefix, OutputPrefix, MetricPrefix},
 }
 
-type Edge[T Node] struct {
-	src,
-	dst T
-	buf chan any
-	mut sync.Mutex
-}
-
-func NewEdge[T Node](source, target T) *Edge[T] {
-	return &Edge[T]{
-		src: source,
-		dst: target,
-		buf: make(chan any),
+type (
+	Edge struct {
+		source,
+		target string
+		buf chan any
 	}
-}
+	Edges []*Edge
+)
 
-func IsValidEdge(sourceIdent, targetIdent string) error {
-	sourcePrefix, ok := ParseNodePrefix(sourceIdent)
-	if !ok {
-		return fmt.Errorf("invalid source node ident: %s", sourceIdent)
+func NewEdge(source, target string) (*Edge, bool) {
+	if !IsExprIdent(source) || !IsExprIdent(target) {
+		return nil, false
 	}
 
-	targetPrefix, ok := ParseNodePrefix(targetIdent)
+	return &Edge{
+		source: source,
+		target: target,
+		buf:    make(chan any),
+	}, true
+}
+
+func IsValidEdge(source, target string) error {
+	sourcePrefix, ok := ParseExprNodePrefix(source)
 	if !ok {
-		return fmt.Errorf("invalid target node ident: %s", targetIdent)
+		return fmt.Errorf("invalid source node ident: %s", source)
+	}
+
+	targetPrefix, ok := ParseExprNodePrefix(target)
+	if !ok {
+		return fmt.Errorf("invalid target node ident: %s", target)
 	}
 
 	invalidSources, ok := invalidEdges[targetPrefix]
 	if ok && slices.Contains(invalidSources, sourcePrefix) {
-		return fmt.Errorf("invalid edge: %s -> %s", sourceIdent, targetIdent)
+		return fmt.Errorf("invalid edge: %s -> %s", source, target)
 	}
 
 	return nil
 }
 
-func (e *Edge[T]) In() chan<- any {
-	e.mut.Lock()
-	defer e.mut.Unlock()
+func ParseExprNodePrefix(id string) (string, bool) {
+	if IsExprIdent(id) {
+		return strings.Split(id, ".")[0], true
+	}
+	return "", false
+}
+
+func ParseExprNodeIdent(id string) (string, bool) {
+	if IsExprIdent(id) {
+		return strings.Join(strings.Split(id, ".")[0:2], "."), true
+	}
+	return "", false
+}
+
+func IsExprIdent(id string) bool {
+	return slices.ContainsFunc(validNodePrefixes, func(prefix string) bool {
+		return strings.HasPrefix(id, prefix+".")
+	}) && len(strings.Split(id, ".")) >= 2
+}
+
+func (e Edge) In() chan<- any {
 	return e.buf
 }
 
-func (e *Edge[T]) Out() <-chan any {
-	e.mut.Lock()
-	defer e.mut.Unlock()
+func (e Edge) Out() <-chan any {
 	return e.buf
 }
 
-func (e *Edge[T]) Source() T {
-	return e.src
+func (e Edge) SourceNode() (ident string) {
+	ident, _ = ParseExprNodeIdent(e.source)
+	return
 }
 
-func (e *Edge[T]) Target() T {
-	return e.dst
+func (e Edge) TargetNode() (ident string) {
+	ident, _ = ParseExprNodeIdent(e.target)
+	return
+}
+
+func (e Edge) Source() string {
+	return e.source
+}
+
+func (e Edge) Target() string {
+	return e.target
+}
+
+func (e Edge) String() string {
+	return fmt.Sprintf("%s->%s", e.source, e.target)
+}
+
+func (e Edges) Contains(source, target string) bool {
+	return slices.ContainsFunc(e, func(e *Edge) bool {
+		return e.source == source && e.target == target
+	})
 }

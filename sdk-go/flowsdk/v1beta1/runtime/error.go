@@ -9,12 +9,12 @@ import (
 )
 
 type Done struct {
-	proto *flowv1beta1.Runtime_Done
+	proto *flowv1beta1.Done
 }
 
-func NewDone(proto *flowv1beta1.Runtime_Done) *Done {
+func NewDone(proto *flowv1beta1.Done) *Done {
 	if proto == nil {
-		proto = new(flowv1beta1.Runtime_Done)
+		proto = new(flowv1beta1.Done)
 	}
 	return &Done{
 		proto: proto,
@@ -31,18 +31,30 @@ func IsDoneError(err error) (*Done, bool) {
 	return nil, false
 }
 
-func (e *Done) Proto() *flowv1beta1.Runtime_Done {
+func (e *Done) Proto() *flowv1beta1.Done {
+	if e.proto == nil {
+		e.proto = new(flowv1beta1.Done)
+	}
 	return proto.CloneOf(e.proto)
 }
 
+func (e *Done) IsError() bool {
+	return e.Proto().GetIsError()
+}
+
 func (e *Done) Error() string {
-	if e.proto.Reason == "" {
-		e.proto.Reason = "reason unknown"
+	return e.String()
+}
+
+func (e *Done) String() string {
+	reason := e.Proto().GetReason()
+	if reason == "" {
+		reason = "unknown"
 	}
 
-	if e.proto.Id != "" {
-		return fmt.Sprintf("%s: %s", e.proto.GetId(), e.proto.GetReason())
+	if e.Proto().GetId() != "" {
+		return fmt.Sprintf("%s: %s", e.Proto().GetId(), reason)
 	}
 
-	return e.proto.Reason
+	return reason
 }

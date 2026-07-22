@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
+	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
 )
 
 type (
@@ -13,26 +14,34 @@ type (
 	ExecutorOption = shared.ExecutorOption[*Node]
 )
 
-func WithConnectors(conns ConnectorProvider) Option {
+func WithEnv(proto *flowv1beta1.Env) Option {
 	return func(recv OptionReceiver) {
-		if run, ok := recv.(*Env); ok {
-			run.conns = conns
+		if env, ok := recv.(*Env); ok {
+			env.proto = proto
 		}
 	}
 }
 
-func WithNodes(nodes NodeMap) Option {
+func WithVars(vars EnvVars) Option {
 	return func(recv OptionReceiver) {
 		if env, ok := recv.(*Env); ok {
-			env.nodes = nodes
+			env.vars = vars
+		}
+	}
+}
+
+func WithConnectors(conns ConnectorProvider) Option {
+	return func(recv OptionReceiver) {
+		if env, ok := recv.(*Env); ok {
+			env.conns = conns
 		}
 	}
 }
 
 func WithClient(client shared.Client) Option {
 	return func(recv OptionReceiver) {
-		if c, ok := recv.(*Connector); ok {
-			c.client = client
+		if conn, ok := recv.(*Connector); ok {
+			conn.client = client
 		}
 	}
 }

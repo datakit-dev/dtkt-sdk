@@ -1234,7 +1234,7 @@ var File_dtkt_cli_v1beta1_message_proto protoreflect.FileDescriptor
 
 const file_dtkt_cli_v1beta1_message_proto_rawDesc = "" +
 	"\n" +
-	"\x1edtkt/cli/v1beta1/message.proto\x12\x10dtkt.cli.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1bdtkt/core/v1/messages.proto\x1a\"dtkt/protoui/v1beta1/protoui.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"d\n" +
+	"\x1edtkt/cli/v1beta1/message.proto\x12\x10dtkt.cli.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x19dtkt/core/v1/common.proto\x1a\"dtkt/protoui/v1beta1/protoui.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"d\n" +
 	"\x05Legal\x12G\n" +
 	"\x0fbsl_accepted_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\rbslAcceptedAt\x88\x01\x01B\x12\n" +
 	"\x10_bsl_accepted_at\"\xf6\x06\n" +

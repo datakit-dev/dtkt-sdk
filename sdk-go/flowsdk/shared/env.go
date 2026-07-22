@@ -3,23 +3,49 @@ package shared
 import (
 	"context"
 
+	"buf.build/go/protovalidate"
 	"cel.dev/expr"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/network"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 )
 
 type (
 	Env interface {
-		Check(*cel.Ast) (*cel.Ast, *cel.Issues)
-		Compile(expr string) (*cel.Ast, *cel.Issues)
 		Connector(ident string) (Connector, error)
-		Parse(expr string) (*cel.Ast, *cel.Issues)
-		Program(*cel.Ast, ...cel.ProgramOption) (cel.Program, error)
 		Resolver() Resolver
 		Types() Types
+
+		ParseExpr(id string, expr string, visitor ExprVisitor) (*cel.Ast, error)
+		CompileExpr(id string, ast *cel.Ast) (Program, error)
+
 		Vars(context.Context) (cel.Activation, error)
-		Extend(opts ...cel.EnvOption) (Env, error)
+		Extend(...cel.EnvOption) (Env, error)
+	}
+	Client interface {
+		common.DynamicClient
+		Address() network.Address
+	}
+	Connector interface {
+		GetResolver(context.Context) (Resolver, error)
+		GetClient(context.Context) (context.Context, Client, error)
+	}
+	Program interface {
+		Eval(context.Context, Env) ref.Val
+	}
+	ProgramFunc func(context.Context, Env) ref.Val
+	Resolver    interface {
+		protoregistry.ExtensionTypeResolver
+		protoregistry.MessageTypeResolver
+		RangeServices(func(protoreflect.ServiceDescriptor) bool)
+		RangeMethods(func(protoreflect.MethodDescriptor) bool)
+		FindMethodByName(protoreflect.FullName) (protoreflect.MethodDescriptor, error)
+		RangeFiles(func(protoreflect.FileDescriptor) bool)
+		GetValidator() (protovalidate.Validator, error)
 	}
 	Types interface {
 		types.Adapter
@@ -29,3 +55,7 @@ type (
 		ExprValueToNative(*expr.ExprValue) (any, error)
 	}
 )
+
+func (f ProgramFunc) Eval(ctx context.Context, env Env) ref.Val {
+	return f(ctx, env)
+}

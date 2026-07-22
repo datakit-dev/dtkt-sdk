@@ -22,6 +22,27 @@ message Flow {
   repeated Action actions = 7;
   repeated Output outputs = 9;
   repeated Stream streams = 10;
+
+  map<string, Metric> metrics = 11 [(buf.validate.field).map = {
+    keys: {
+      string: {pattern: "^[a-zA-Z][a-zA-Z0-9_]+$"}
+    }
+  }];
+}
+
+message Metric {
+  google.protobuf.Duration interval = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).duration.gt = {
+      seconds: 0
+      nanos: 0
+    }
+  ];
+
+  string value = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+  ];
 }
 
 message Connection {
@@ -118,8 +139,8 @@ message Stream {
   option (buf.validate.message).oneof = {
     fields: [
       "call",
-      "generate"
-      // "reduce"
+      "generate",
+      "window"
     ]
     required: true
   };
@@ -153,7 +174,37 @@ message Stream {
     ];
   }
 
-  // message Reducer {}
+  message Window {
+    option (buf.validate.message).oneof = {
+      fields: [
+        "tumbling",
+        "sliding"
+      ]
+      required: true
+    };
+
+    message Tumbling {
+      // Number of elements buffered before the window is emitted.
+      uint32 size = 1 [(buf.validate.field).uint32.gt = 0];
+    }
+
+    message Sliding {
+      // Number of elements buffered before the window is emitted.
+      uint32 size = 1 [(buf.validate.field).uint32.gt = 0];
+
+      // Number of elements to advance between successive window emissions.
+      uint32 step = 2 [(buf.validate.field).uint32.gt = 0];
+    }
+
+    Tumbling tumbling = 1;
+    Sliding sliding = 2;
+
+    // CEL expression selecting the element to buffer on each round.
+    string source = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^\\s?=\\s?"
+    ];
+  }
 
   string id = 1 [
     (buf.validate.field).required = true,
@@ -168,7 +219,7 @@ message Stream {
 
   MethodCall call = 4;
   Generator generate = 5;
-  // Reducer reduce = 6;
+  Window window = 7;
 }
 
 message UserAction {
@@ -256,16 +307,6 @@ message Var {
     ];
   }
 
-  // message Step {
-  //   message Filter {
-  //     string target = 1;
-  //   }
-
-  //   oneof kind {
-  //     Filter filter = 1;
-  //   }
-  // }
-
   string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
@@ -282,9 +323,6 @@ message Var {
 
   // Var evaluates to given switch statement's first matching case (otherwise default).
   Switch switch = 4;
-
-  // Var executes steps in the provided order and emits the final value.
-  // repeated Step steps = 5;
 }
 
 message Output {

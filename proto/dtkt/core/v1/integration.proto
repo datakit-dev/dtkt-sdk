@@ -1,0 +1,232 @@
+syntax = "proto3";
+
+package dtkt.core.v1;
+
+import "buf/validate/validate.proto";
+import "dtkt/core/v1/common.proto";
+import "dtkt/protoform/v1beta1/protoform.proto";
+import "dtkt/protostore/v1beta1/protostore.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/longrunning/operations.proto";
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1";
+
+// IntegrationService provides operations for managing integration specs.
+service IntegrationService {
+  // List integrations.
+  rpc ListIntegrations(ListIntegrationsRequest) returns (ListIntegrationsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Get a single integration by name.
+  rpc GetIntegration(GetIntegrationRequest) returns (GetIntegrationResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  // Create a new integration.
+  rpc CreateIntegration(CreateIntegrationRequest) returns (CreateIntegrationResponse);
+  // Update an existing integration.
+  rpc UpdateIntegration(UpdateIntegrationRequest) returns (UpdateIntegrationResponse);
+  // Delete an integration by name.
+  rpc DeleteIntegration(DeleteIntegrationRequest) returns (DeleteIntegrationResponse);
+  // Build an integration.
+  rpc BuildIntegration(BuildIntegrationRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      metadata_type: "BuildOperationMetadata"
+      response_type: "BuildIntegrationResponse"
+    };
+  }
+  // TODO: Batch build integrations.
+  // rpc BatchBuildIntegrations(BatchBuildIntegrationsRequest) returns (google.longrunning.Operation) {
+  //   option (google.longrunning.operation_info) = {
+  //     metadata_type: "BuildOperationMetadata"
+  //     response_type: "BuildIntegrationResponse"
+  //   };
+  // }
+}
+
+// Integration describes a software package which uses the DataKit SDK and can
+// be deployed to a runtime environment using a Deployment resource. An Integration
+// can represent a software package in development with a local runtime environment
+// or a released software package in a registry with a remote runtime environment.
+// Integrations provide a way to manage software packages and their deployment
+// lifecycle within the DataKit ecosystem, enabling users to easily deploy and
+// run their software packages in compatible runtime environments.
+message Integration {
+  option (google.api.resource) = {
+    type: "Integration"
+    singular: "integration"
+    plural: "integrations"
+    pattern: "organizations/{organization}/integrations/{integration}"
+    pattern: "users/{user}/integrations/{integration}"
+  };
+
+  option (dtkt.protostore.v1beta1.search_index).contents_expr = "has(this.spec.v1beta1) ? this.spec.v1beta1.identity.name + ' ' + this.spec.v1beta1.description : ''";
+
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Package spec metadata.
+  PackageSpecMetadata spec = 3 [(buf.validate.field).required = true];
+
+  // Package spec checksum for concurrency control.
+  string spec_etag = 4 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Package source URI (only present after successful build & update).
+  optional string source_uri = 5 [(buf.validate.field).string.uri = true];
+
+  // Package source checksum or git commit hash for concurrency control
+  // (only present after successful build & update).
+  optional string source_etag = 6;
+
+  // Integration create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Integration update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+// BuildOperationMetadata contains metadata for build operations.
+message BuildOperationMetadata {
+  enum State {
+    STATE_UNSPECIFIED = 0;
+    STATE_PENDING = 1;
+    STATE_RUNNING = 2;
+    STATE_SUCCEEDED = 3;
+    STATE_FAILED = 4;
+  }
+
+  // Build state.
+  State state = 1 [(buf.validate.field).required = true];
+
+  // Build status message.
+  string message = 2;
+
+  // Build start time.
+  google.protobuf.Timestamp start_time = 20;
+
+  // Build finish time.
+  google.protobuf.Timestamp finish_time = 21;
+}
+
+message ListIntegrationsRequest {
+  // Maximum number of integrations to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name: `organizations/{organization}` or `users/{user}`.
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListIntegrationsResponse {
+  repeated Integration integrations = 1;
+
+  string next_page_token = 2;
+}
+
+message GetIntegrationRequest {
+  // Integration resource name, one of:
+  // - `organizations/{organization}/integrations/{integration}`
+  // - `users/{user}/integrations/{integration}`
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetIntegrationResponse {
+  // The requested integration.
+  Integration integration = 1 [(buf.validate.field).required = true];
+}
+
+message CreateIntegrationRequest {
+  // Parent resource name.
+  string parent = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Client-provided ID for integration resource.
+  string integration_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-z0-9-]+$"
+  ];
+
+  // Integration to create.
+  Integration integration = 3 [(buf.validate.field).required = true];
+}
+
+message CreateIntegrationResponse {
+  // The created integration.
+  Integration integration = 1 [(buf.validate.field).required = true];
+}
+
+message BuildIntegrationRequest {
+  // Name of integration resource to build.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // URI of package source to build integration from (e.g. git://repo_url or file://path/to/source).
+  string source_uri = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uri = true
+  ];
+
+  // Package source checksum or git commit hash.
+  string source_etag = 3 [(buf.validate.field).required = true];
+
+  // Build metadata for this build operation.
+  PackageBuildMetadata build = 4 [(buf.validate.field).required = true];
+}
+
+message BuildIntegrationResponse {
+  // Integration resource of build.
+  Integration integration = 1 [(buf.validate.field).required = true];
+
+  // Package build metadata (must include artifact etag for a successful build).
+  PackageBuildMetadata build = 2 [(buf.validate.field).required = true];
+  option (buf.validate.message).cel_expression = "has(this.build.artifact_etag) && this.build.artifact_etag != ''";
+}
+
+message UpdateIntegrationRequest {
+  // Integration with updated fields. Must include `name`.
+  Integration integration = 1 [(buf.validate.field).required = true];
+
+  // Fields to update (e.g., "config,spec").
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message UpdateIntegrationResponse {
+  // The updated integration.
+  Integration integration = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteIntegrationRequest {
+  // Name of integration to delete.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteIntegrationResponse {}

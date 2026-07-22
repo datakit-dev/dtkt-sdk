@@ -5,197 +5,122 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"maps"
-	"slices"
+	"log/slog"
 	"sync"
 
-	"cel.dev/expr"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/v1beta1/spec"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/lib/log"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/interpreter"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/dynamicpb"
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+var _ shared.Env = (*Node)(nil)
 var _ shared.Node = (*Node)(nil)
 
 type (
 	Node struct {
-		id    string
-		proto *flowv1beta1.Node
+		*GraphNode
+		proto *flowv1beta1.Env_Node
 
-		spec shared.SpecNode
-		exec shared.ExecNode
-
-		prevValue,
-		currValue any
-
-		pipe *Pipe
 		send,
 		recv chan any
+		pipe *Pipe[any, any]
 
+		prev,
+		curr any
 		err error
-		mut sync.Mutex
+
+		mut sync.RWMutex
 	}
-	NodeMap map[string]*Node
+	Nodes []*Node
 )
 
-func NewNode(proto *flowv1beta1.Node) *Node {
-	in := make(chan any)
-	out := make(chan any)
+func newNode(graphNode *GraphNode, proto *flowv1beta1.Env_Node) (_ *Node, err error) {
+	if proto == nil {
+		return nil, fmt.Errorf("node proto cannot be nil")
+	}
+
+	recv := make(chan any)
+	send := make(chan any)
+
+	var curr any
+	if proto.ResultCurr == nil {
+		proto.ResultCurr = &flowv1beta1.Env_Result{}
+	} else if proto.ResultCurr.GetValue() != nil {
+		curr, err = common.ProtoOptions{
+			Resolver: graphNode.Env.Resolver(),
+		}.UnwrapAny(proto.ResultCurr.GetValue())
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var prev any
+	if proto.ResultPrev != nil && proto.ResultPrev.GetValue() != nil {
+		prev, err = common.ProtoOptions{
+			Resolver: graphNode.Env.Resolver(),
+		}.UnwrapAny(proto.ResultPrev.GetValue())
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return &Node{
-		id:    proto.Id,
-		proto: proto,
-		spec:  specNodeFromNode(proto),
+		GraphNode: graphNode,
+		proto:     proto,
 
-		pipe: NewPipe(in, out),
-		send: out,
-		recv: in,
-	}
+		send: send,
+		recv: recv,
+		pipe: NewPipe(recv, send),
+
+		prev: prev,
+		curr: curr,
+	}, nil
 }
 
-func NewNodeMap(protoMaps ...map[string]*flowv1beta1.Node) (nodeMap NodeMap) {
-	nodeMap = make(NodeMap)
-	for _, protoMap := range protoMaps {
-		for _, proto := range protoMap {
-			node := NewNode(proto)
-			nodeMap[node.id] = node
-		}
+func (n *Node) Vars(ctx context.Context) (cel.Activation, error) {
+	base, err := n.Env.Vars(ctx)
+	if err != nil {
+		return nil, err
 	}
-	return
-}
 
-func specNodesMap[T shared.SpecNode](specNodes []T) (nodeMap map[string]*flowv1beta1.Node) {
-	nodeMap = make(map[string]*flowv1beta1.Node)
-	for _, specNode := range specNodes {
-		nodeMap[specNode.GetId()] = nodeFromSpecNode(specNode)
-	}
-	return
-}
+	self, err := cel.NewActivation(map[string]any{
+		"self": func() ref.Val {
+			vars, err := n.vars()
+			if err != nil {
+				return types.WrapErr(err)
+			}
 
-func specNodeFromNode(node *flowv1beta1.Node) shared.SpecNode {
-	switch node.Type.(type) {
-	case *flowv1beta1.Node_Action:
-		return node.GetAction()
-	case *flowv1beta1.Node_Connection:
-		return node.GetConnection()
-	case *flowv1beta1.Node_Input:
-		return node.GetInput()
-	case *flowv1beta1.Node_Output:
-		return node.GetOutput()
-	case *flowv1beta1.Node_Stream:
-		return node.GetStream()
-	case *flowv1beta1.Node_Var:
-		return node.GetVar()
-	}
-	return nil
-}
-
-func nodeFromSpecNode(specNode shared.SpecNode) *flowv1beta1.Node {
-	proto := new(flowv1beta1.Node{
-		Id: spec.GetNodeIdent(specNode),
+			return n.Env.Types().NativeToValue(vars)
+		},
 	})
-	switch specNode := specNode.(type) {
-	case *flowv1beta1.Connection:
-		proto.Type = &flowv1beta1.Node_Connection{
-			Connection: specNode,
-		}
-	case *flowv1beta1.Input:
-		proto.Type = &flowv1beta1.Node_Input{
-			Input: specNode,
-		}
-	case *flowv1beta1.Var:
-		proto.Type = &flowv1beta1.Node_Var{
-			Var: specNode,
-		}
-	case *flowv1beta1.Action:
-		proto.Type = &flowv1beta1.Node_Action{
-			Action: specNode,
-		}
-	case *flowv1beta1.Stream:
-		proto.Type = &flowv1beta1.Node_Stream{
-			Stream: specNode,
-		}
-	case *flowv1beta1.Output:
-		proto.Type = &flowv1beta1.Node_Output{
-			Output: specNode,
-		}
+	if err != nil {
+		return nil, err
 	}
-	return proto
-}
-func (m NodeMap) Protos() (protos []*flowv1beta1.Node) {
-	protos = make([]*flowv1beta1.Node, len(m))
-	for idx, node := range m.Values() {
-		protos[idx] = node.proto
-	}
-	return
+
+	return interpreter.NewHierarchicalActivation(base, self), nil
 }
 
-func (m NodeMap) Load(id string) (node *Node, ok bool) {
-	node, ok = m[id]
-	return
-}
-
-func (m NodeMap) Values() []*Node {
-	return slices.Collect(maps.Values(m))
-}
-
-func (m NodeMap) Range(f func(string, *Node) bool) {
-	for id, node := range m {
-		if !f(id, node) {
-			return
-		}
-	}
-}
-
-func (m NodeMap) Vars(types *common.CELTypes) map[string]any {
-	return util.MapToMap(m, func(id string, node *Node) any {
-		return func() ref.Val {
-			return node.Vars(types)
-		}
-	})
-}
-
-func (n *Node) Vars(types shared.Types) ref.Val {
-	n.mut.Lock()
-	defer n.mut.Unlock()
-
-	return types.NativeToValue(map[string]any{
-		"value":       n.currValue,
-		"prev":        n.prevValue,
-		"count":       n.proto.GetCount(),
-		"start_time":  n.proto.GetStartTime(),
-		"finish_time": n.proto.GetFinishTime(),
-	})
-}
-
-func (n *Node) Proto() *flowv1beta1.Node {
-	n.mut.Lock()
-	defer n.mut.Unlock()
+func (n *Node) Proto() *flowv1beta1.Env_Node {
+	n.mut.RLock()
+	defer n.mut.RUnlock()
 
 	return proto.CloneOf(n.proto)
 }
 
 func (n *Node) Ident() string {
-	return n.id
-}
-
-func (n *Node) Spec() shared.SpecNode {
-	return n.spec
-}
-
-func (n *Node) Exec() shared.ExecNode {
-	return n.exec
+	return n.ident
 }
 
 func (n *Node) Pipe() shared.Pipe {
@@ -210,129 +135,61 @@ func (n *Node) Recv() <-chan any {
 	return n.recv
 }
 
-func (n *Node) Parse(env shared.Env, visitor shared.NodeVisitor) (err error) {
-	if n.exec != nil {
-		return
+func (n *Node) Run(ctx context.Context) error {
+	if n.Env == nil {
+		return fmt.Errorf("node %q must be parsed before running", n.ident)
+	} else if n.parsed == nil {
+		return fmt.Errorf("node %q must be compiled before running", n.ident)
 	}
 
-	env, err = n.withSelf(env)
-	if err != nil {
-		return err
-	}
+	ctx = log.NewCtx(ctx, log.FromCtx(ctx).With(slog.String("ident", n.ident)))
 
-	exec, err := spec.ParseNode(env, n.spec, visitor)
-	if err != nil {
-		return err
-	}
-
-	n.exec = exec
-
-	return nil
-}
-
-func (n *Node) Compile(ctx context.Context, env shared.Env) error {
-	if n.exec == nil {
-		return fmt.Errorf("node %q must be parsed before compilation", n.id)
-	}
-
-	env, err := n.withSelf(env)
-	if err != nil {
-		return err
-	}
-
-	return n.exec.Compile(ctx, env)
-}
-
-// withSelf returns env extended with a "self" variable bound to this node's
-// own state (value, prev, count, start_time, finish_time), if this node's
-// type supports self-reference. This enables rolling accumulator patterns
-// (Reduce/Fold) on Var nodes, e.g.:
-//
-//	value: = self.prev == null ? streams.tick.value : self.prev + streams.tick.value
-//
-// "self" is deliberately not a real node ident (it doesn't match IsNodeID),
-// so referencing it does not introduce a graph self-edge or cycle.
-//
-// Only Var nodes support this today: other node types either have no
-// meaningful prior state (Connection, Input) or already expose their
-// dependency data through normal node idents.
-func (n *Node) withSelf(env shared.Env) (shared.Env, error) {
-	if _, ok := n.spec.(*flowv1beta1.Var); !ok {
-		return env, nil
-	}
-
-	extended, err := env.Extend(cel.Variable("self", shared.NodeVarsType))
-	if err != nil {
-		return nil, err
-	}
-
-	return &selfEnv{Env: extended, node: n}, nil
-}
-
-// selfEnv overlays a "self" binding onto an underlying env's activation,
-// resolving to the owning node's own Vars() snapshot on every evaluation.
-type selfEnv struct {
-	shared.Env
-	node *Node
-}
-
-func (e *selfEnv) Vars(ctx context.Context) (cel.Activation, error) {
-	base, err := e.Env.Vars(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	self, err := cel.NewActivation(map[string]any{
-		"self": func() ref.Val {
-			return e.node.Vars(e.Env.Types())
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return interpreter.NewHierarchicalActivation(base, self), nil
+	return n.parsed.Run(ctx, n, n.pipe)
 }
 
 func (n *Node) Value() any {
+	n.mut.RLock()
+	defer n.mut.RUnlock()
+
+	return n.curr
+}
+
+func (n *Node) Reset() {
 	n.mut.Lock()
 	defer n.mut.Unlock()
 
-	return n.currValue
+	n.prev = n.curr
+	n.curr = nil
+
+	n.proto.ResultPrev = proto.CloneOf(n.proto.ResultCurr)
+	proto.Reset(n.proto.ResultCurr)
 }
 
-func (m NodeMap) reset() {
-	m.Range(func(_ string, n *Node) bool {
-		n.reset()
-		return true
-	})
-}
+func (n *Node) vars() (map[string]any, error) {
+	n.mut.RLock()
+	defer n.mut.RUnlock()
 
-func (n *Node) reset() {
-	n.mut.Lock()
-	defer n.mut.Unlock()
-
-	n.proto.State = flowv1beta1.Node_STATE_UNSPECIFIED
-	if n.proto.GetValue() != nil {
-		n.proto.PrevValue = n.proto.GetValue()
+	if n.err != nil {
+		return nil, n.err
 	}
 
-	n.prevValue = n.currValue
-	n.currValue = nil
-	n.proto.Result = nil
-	n.proto.StartTime = nil
-	n.proto.FinishTime = nil
+	return map[string]any{
+		"value":       n.curr,
+		"prev":        n.prev,
+		"count":       n.proto.GetResultCount(),
+		"start_time":  n.proto.GetResultCurr().GetStartTime(),
+		"finish_time": n.proto.GetResultCurr().GetFinishTime(),
+	}, nil
 }
 
 func (n *Node) setPending() {
 	n.mut.Lock()
 	defer n.mut.Unlock()
 
-	n.proto.State = flowv1beta1.Node_STATE_PENDING
-	n.proto.StartTime = timestamppb.Now()
+	n.proto.ResultCurr.StartTime = timestamppb.Now()
 }
 
-func (n *Node) setValue(ctx context.Context, env shared.Env, value any) (_ any, err error) {
+func (n *Node) setValue(value any) (_ any, err error) {
 	n.mut.Lock()
 	defer n.mut.Unlock()
 
@@ -340,90 +197,115 @@ func (n *Node) setValue(ctx context.Context, env shared.Env, value any) (_ any, 
 		value = types.NullValue
 	}
 
-	if future, ok := value.(shared.Future); ok {
-		value, ok, err = future.Value(ctx)
-		if err != nil {
-			value = types.WrapErr(err)
-		} else if !ok {
-			value = types.NullValue
-		}
-	}
-
-	var exprVal *expr.ExprValue
 	switch v := value.(type) {
 	case *types.Err:
 		_, err = v.ConvertToNative(nil)
-		return nil, n.setError(err)
+		value, err = n.maybeSetError(err)
+		if err != nil {
+			return
+		}
 	case error:
-		return nil, n.setError(v)
+		value, err = n.maybeSetError(err)
+		if err != nil {
+			return
+		}
 	case ref.Val:
-		exprVal = env.Types().ValueToExprValue(v)
-	default:
-		exprVal = env.Types().ValueToExprValue(env.Types().NativeToValue(v))
-	}
+		value, err = n.Env.Types().ValueToNative(v)
+		if err != nil {
+			value, err = n.maybeSetError(err)
+			if err != nil {
+				return
+			}
+		}
+	case *dynamicpb.Message:
+		switch v.ProtoReflect().Descriptor().FullName() {
+		case doneMsg.ProtoReflect().Descriptor().FullName():
+			done := doneMsg.ProtoReflect().New().Interface()
+			err = mergeMessage(n.Env.Resolver(), done, v)
+			if err != nil {
+				value, err = n.maybeSetError(err)
+				if err != nil {
+					return
+				}
+			}
 
-	value, err = env.Types().ExprValueToNative(exprVal)
-	if err != nil {
-		return nil, n.setError(err)
+			value = done
+		case eofMsg.ProtoReflect().Descriptor().FullName():
+			value = eofMsg.ProtoReflect().New().Interface()
+		case skipMsg.ProtoReflect().Descriptor().FullName():
+			value = skipMsg.ProtoReflect().New().Interface()
+		}
 	}
 
 	switch v := value.(type) {
-	case *flowv1beta1.Runtime_Done:
+	case *flowv1beta1.Done:
 		if v != nil && v.Id == "" {
-			v.Id = n.proto.Id
+			v.Id = n.proto.Ident
 		}
 	}
 
 	proto, err := common.ProtoOptions{
-		Resolver: env.Resolver(),
+		Resolver: n.Env.Resolver(),
 	}.WrapAny(value)
 	if err != nil {
-		return nil, n.setError(err)
+		return nil, err
 	}
 
-	n.currValue = value
-	n.setSuccess(proto)
+	n.curr = value
+	n.setResultValue(proto)
 
 	return value, nil
 }
 
-func (n *Node) setSuccess(value *anypb.Any) {
-	n.proto.State = flowv1beta1.Node_STATE_SUCCESS
-	n.proto.Result = &flowv1beta1.Node_Value{
+func (n *Node) setResultValue(value *anypb.Any) {
+	n.proto.ResultCurr.Type = &flowv1beta1.Env_Result_Value{
 		Value: value,
 	}
-	n.proto.FinishTime = timestamppb.Now()
-	n.proto.Count++
+	n.proto.ResultCurr.FinishTime = timestamppb.Now()
+	n.proto.ResultCount++
 }
 
-func (n *Node) setError(err error) error {
-	statusErr, ok := status.FromError(err)
-	if !ok {
-		doneErr, ok := IsDoneError(err)
-		if ok && doneErr.proto.GetIsError() {
-			statusErr = status.New(codes.Aborted, doneErr.Error())
-		} else {
-			statusErr = status.Newf(codes.Canceled, "%s: %s", n.proto.GetId(), err.Error())
-		}
-	}
-
+func (n *Node) maybeSetError(err error) (any, error) {
+	statusErr, isStatusErr := status.FromError(err)
 	if errors.Is(err, io.EOF) {
-		statusErr = status.New(codes.OK, err.Error())
+		return eofMsg.ProtoReflect().New().Interface(), nil
+	} else if done, ok := IsDoneError(err); ok && !done.IsError() {
+		return done.Proto(), nil
+	} else if ok && !isStatusErr {
+		statusErr = status.New(codes.Aborted, done.Error())
+	} else if !isStatusErr {
+		statusErr = status.Newf(codes.Canceled, "%s: %s", n.proto.GetIdent(), err.Error())
 	}
 
 	switch statusErr.Code() {
 	case codes.OK:
-		eof, _ := anypb.New(&flowv1beta1.Runtime_EOF{})
-		n.setSuccess(eof)
-		return nil
+		return eofMsg.ProtoReflect().New().Interface(), nil
 	}
 
 	n.err = statusErr.Err()
-	n.proto.State = flowv1beta1.Node_STATE_ERROR
-	n.proto.Result = &flowv1beta1.Node_Error{
+	n.proto.ResultCurr.Type = &flowv1beta1.Env_Result_Error{
 		Error: statusErr.Proto(),
 	}
-	n.proto.FinishTime = timestamppb.Now()
+	n.proto.ResultCurr.FinishTime = timestamppb.Now()
+	n.proto.ResultCount++
 
-	return n.err
+	return nil, n.err
+}
+
+func mergeMessage(resolver shared.Resolver, dst, src proto.Message) error {
+	if src.ProtoReflect().Descriptor() == dst.ProtoReflect().Descriptor() {
+		proto.Merge(dst, src)
+		return nil
+	}
+
+	b, err := proto.Marshal(src)
+	if err != nil {
+		return err
+	}
+
+	return proto.UnmarshalOptions{
+		Resolver:       resolver,
+		DiscardUnknown: true,
+		Merge:          true,
+	}.Unmarshal(b, dst)
 }

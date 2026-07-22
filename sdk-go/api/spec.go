@@ -124,7 +124,7 @@ func NewSpecLoader[T SpecType](schemaOpts ...common.JSONSchemaOption) *SpecLoade
 		}
 
 		loader.specVersions = util.ReduceSliceToMap(versions,
-			func(v SpecVersion) (name string, version SpecVersion, ok bool) {
+			func(_ int, v SpecVersion) (name string, version SpecVersion, ok bool) {
 				name = v.String()
 				version = v
 				ok = slices.Contains(loader.apiVersions, name)

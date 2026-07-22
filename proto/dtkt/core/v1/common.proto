@@ -1,0 +1,156 @@
+syntax = "proto3";
+
+package dtkt.core.v1;
+
+import "buf/validate/validate.proto";
+import "dtkt/shared/v1beta1/enums.proto";
+import "dtkt/shared/v1beta1/messages.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1";
+
+// Address contains a supported network and compatible target.
+message Address {
+  // Network protocol (e.g., "tcp", "unix").
+  string network = 1 [(buf.validate.field).required = true];
+
+  // Target address for the network.
+  string target = 2 [(buf.validate.field).required = true];
+}
+
+// Auth contains authentication information for API requests.
+message Auth {
+  // Authentication method used.
+  enum AuthMethod {
+    AUTH_METHOD_UNSPECIFIED = 0;
+    AUTH_METHOD_OAUTH = 1; // OAuth 2.1 (Auth Code + PKCE)
+    AUTH_METHOD_DEVICE = 2; // Device Authorization (RFC 8628)
+    AUTH_METHOD_BEARER = 3; // Static bearer token (CI/CD)
+  }
+
+  // Authentication method used.
+  AuthMethod method = 1 [(buf.validate.field).required = true];
+
+  // Access token (JWT) or Personal Access Token (PAT).
+  string access_token = 2 [debug_redact = true];
+
+  // Refresh token (for token renewal).
+  string refresh_token = 3 [debug_redact = true];
+
+  // Token expiration timestamp.
+  google.protobuf.Timestamp expires_at = 4;
+
+  // TODO REMOVE?
+
+  // Scope requests to an organization (if applicable).
+  optional string org = 5 [(buf.validate.field).string.min_len = 1];
+
+  // Scope requests to a space (if applicable).
+  optional string space = 6 [(buf.validate.field).string.min_len = 1];
+}
+
+// Context provides the name and address of a control plane for client
+// construction and resource tracing across network boundaries. Context is used
+// to resolve resources by name and provide necessary information for
+// authentication, encryption, auditing, tracing, and observability when sending
+// data across network boundaries.
+message Context {
+  // Name of root control plane resource (e.g., "users/bob" or "organizations/acme").
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Address of control plane.
+  Address address = 2 [(buf.validate.field).required = true];
+
+  // Authentication information for control plane.
+  Auth auth = 3;
+}
+
+// Resource is a named reference to a resource message from a context with optional
+// address and associated data payload. Resource is used for tracing data origin
+// across network boundaries and can represent resources such as connections,
+// deployments, etc. which may contain encrypted or decrypted data payloads
+// related to the resource (such as data plane message payloads, config data,
+// secret data, metrics data, etc.).
+message Resource {
+  // Context of resource for tracing data origin.
+  Context context = 1 [(buf.validate.field).required = true];
+
+  // Name of resource within context where data originated.
+  string name = 2 [(buf.validate.field).required = true];
+
+  // Address of resource (optional; may be used for direct access to resource
+  // across network boundaries when available).
+  Address address = 3;
+
+  // Data payload, either encrypted or decrypted.
+  // Notes:
+  //  - data is not the resource itself, but a payload related to or originating
+  //    from the resource. (e.g. config data, secret data, metrics data, etc.)
+  //  - information about the type of data is provided by a field of this type.
+  //    (e.g. Deployment cloud field indicates data originated from a cloud deployment)
+  oneof data {
+    option (buf.validate.oneof).required = true;
+    EncryptedAny encrypted = 10 [debug_redact = true];
+    google.protobuf.Any decrypted = 11 [debug_redact = true];
+  }
+}
+
+// EncryptedAny is an encrypted representation of google.protobuf.Any.
+message EncryptedAny {
+  // Type URL of the encrypted message.
+  string type_url = 1 [(buf.validate.field).required = true];
+
+  // Encrypted message value.
+  bytes value = 2 [(buf.validate.field).required = true];
+}
+
+// PackageSpecMetadata wraps versioned package specification.
+message PackageSpecMetadata {
+  oneof version {
+    option (buf.validate.oneof).required = true;
+    dtkt.shared.v1beta1.Package v1beta1 = 1;
+  }
+}
+
+// PackageBuildMetadata contains build metadata for a software package, which
+// may be used to build a deployment artifact for a compatible runtime environment.
+message PackageBuildMetadata {
+  message Runtime {
+    oneof version {
+      option (buf.validate.oneof).required = true;
+      dtkt.shared.v1beta1.Runtime v1beta1 = 1;
+    }
+  }
+
+  message Platform {
+    oneof version {
+      option (buf.validate.oneof).required = true;
+      dtkt.shared.v1beta1.Platform v1beta1 = 1;
+    }
+  }
+
+  // Target runtime of build artifact.
+  Runtime runtime = 1 [(buf.validate.field).required = true];
+
+  // Target platform of build artifact.
+  Platform platform = 2 [(buf.validate.field).required = true];
+
+  // Build environment variables.
+  map<string, string> env = 3 [debug_redact = true];
+
+  // URI of build artifact. (e.g. file://path/to/artifact or docker://image:tag)
+  string artifact_uri = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uri = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Checksum of build artifact (present if build is successful).
+  string artifact_etag = 5 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}

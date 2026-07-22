@@ -18,8 +18,8 @@ type (
 		onEnds   []OnEnd[T]
 
 		// Node flow callbacks
-		beforeSends []OnSend[T]
-		afterRecvs  []OnRecv[T]
+		onSends []OnSend[T]
+		onRecvs []OnRecv[T]
 
 		// Start and end nodes
 		starts,
@@ -33,15 +33,18 @@ type (
 		initOnce sync.Once
 		runErr error
 	}
-	ExecutorOption[T Node] func(*Executor[T])
-	OnStart[T Node]        func(context.Context, ...T) (map[string]any, error)
-	OnEnd[T Node]          func(context.Context, ...T) error
-	OnSend[T Node]         func(context.Context, T, any) error
-	OnRecv[T Node]         func(context.Context, T, any) error
-	NodeValue[T Node]      struct {
-		Node  T
-		Value any
+	Pipe                 = PipeOf[any, any]
+	PipeOf[I any, O any] interface {
+		In() chan<- I
+		Out() <-chan O
+		Run(context.Context, ExecFunc[O, I]) error
 	}
+	ExecFunc[I any, O any] func(context.Context, I) (O, error)
+	OnStart[T Node]        func(context.Context, Nodes[T]) (map[string]any, error)
+	OnEnd[T Node]          func(context.Context, Nodes[T]) error
+	OnSend[T Node]         func(context.Context, T, any) error
+	OnRecv[T Node]         func(context.Context, T, any) (any, error)
+	ExecutorOption[T Node] func(*Executor[T])
 )
 
 func NewExecutor[T Node](graph *Graph[T], opts ...ExecutorOption[T]) *Executor[T] {
@@ -60,9 +63,9 @@ func NewExecutor[T Node](graph *Graph[T], opts ...ExecutorOption[T]) *Executor[T
 	return e
 }
 
-// WithInitCycle is an option for setting the initial values of start nodes
+// WithInitStart is an option for setting the initial values of start nodes
 // (without inbound edges) and is ran exactly once before the first start cycle.
-func WithInitCycle[T Node](onInit OnStart[T]) ExecutorOption[T] {
+func WithInitStart[T Node](onInit OnStart[T]) ExecutorOption[T] {
 	return func(e *Executor[T]) {
 		e.onInit = onInit
 	}
@@ -88,7 +91,7 @@ func WithAfterEnd[T Node](onEnd OnEnd[T]) ExecutorOption[T] {
 // its next value.
 func WithBeforeSend[T Node](onSend OnSend[T]) ExecutorOption[T] {
 	return func(e *Executor[T]) {
-		e.beforeSends = append(e.beforeSends, onSend)
+		e.onSends = append(e.onSends, onSend)
 	}
 }
 
@@ -96,15 +99,15 @@ func WithBeforeSend[T Node](onSend OnSend[T]) ExecutorOption[T] {
 // has been received.
 func WithAfterRecv[T Node](onRecv OnRecv[T]) ExecutorOption[T] {
 	return func(e *Executor[T]) {
-		e.afterRecvs = append(e.afterRecvs, onRecv)
+		e.onRecvs = append(e.onRecvs, onRecv)
 	}
 }
 
-func (e *Executor[T]) Run(ctx context.Context, env Env) error {
+func (e *Executor[T]) Run(ctx context.Context) (err error) {
 	e.runOnce.Do(func() {
 		var (
-			errGroup  errgroup.Group
-			nodeFuncs [][2]func() error
+			group errgroup.Group
+			execs [][2]func() error
 		)
 		for _, node := range e.graph.Nodes() {
 			var (
@@ -127,9 +130,9 @@ func (e *Executor[T]) Run(ctx context.Context, env Env) error {
 				e.endsCh[node.Ident()] = endCh
 			}
 
-			nodeFuncs = append(nodeFuncs, [2]func() error{
+			execs = append(execs, [2]func() error{
 				func() error {
-					err := node.Exec().Run(ctx, env, node.Pipe())
+					err := node.Run(ctx)
 					if err != nil {
 						return fmt.Errorf("%q: %w", node.Ident(), err)
 					}
@@ -144,115 +147,103 @@ func (e *Executor[T]) Run(ctx context.Context, env Env) error {
 				},
 			})
 		}
-
-		for _, nodeFunc := range nodeFuncs {
-			errGroup.Go(nodeFunc[0])
-			errGroup.Go(nodeFunc[1])
+		if err != nil {
+			e.runErr = err
+			return
 		}
 
-		errGroup.Go(func() error {
+		for _, exec := range execs {
+			group.Go(exec[0])
+			group.Go(exec[1])
+		}
+
+		group.Go(func() error {
 			return e.runControlFlow(ctx)
 		})
-		e.runErr = errGroup.Wait()
+
+		e.runErr = group.Wait()
 	})
 	return e.runErr
 }
 
 func (e *Executor[T]) runControlFlow(ctx context.Context) (err error) {
 	for {
-		err = e.runStarts(ctx)
-		if err != nil {
-			return
-		}
-
-		err = e.runEnds(ctx)
-		if err != nil {
-			return
-		}
-	}
-}
-
-func (e *Executor[T]) runStarts(ctx context.Context) (err error) {
-	var (
-		starts map[string]any
-		isInit bool
-	)
-	if e.onInit != nil {
-		e.initOnce.Do(func() {
-			isInit = true
-			starts, err = e.onInit(ctx, e.starts...)
-		})
-		if err != nil {
-			return
-		}
-	}
-
-	if starts == nil {
-		starts = map[string]any{}
-	}
-
-	for _, onStart := range e.onStarts {
-		if onStart != nil {
-			vals, err := onStart(ctx, e.starts...)
+		var (
+			isInit bool
+			starts map[string]any
+		)
+		if e.onInit != nil {
+			e.initOnce.Do(func() {
+				isInit = true
+				starts, err = e.onInit(ctx, e.starts)
+			})
 			if err != nil {
-				return err
+				return
 			}
+		}
 
-			for ident, val := range vals {
-				if _, ok := starts[ident]; ok && isInit {
-					continue
+		if starts == nil {
+			starts = map[string]any{}
+		}
+
+		if !isInit {
+			for _, onStart := range e.onStarts {
+				if onStart != nil {
+					values, err := onStart(ctx, e.starts)
+					if err != nil {
+						return err
+					}
+
+					for ident, value := range values {
+						if _, ok := starts[ident]; ok {
+							continue
+						}
+
+						starts[ident] = value
+					}
 				}
+			}
+		}
 
-				starts[ident] = val
+		for ident, startCh := range e.startsCh {
+			select {
+			case <-ctx.Done():
+				return context.Cause(ctx)
+			case startCh <- starts[ident]:
+			}
+		}
+
+		var nodes []T
+		for ident, endCh := range e.endsCh {
+			select {
+			case <-ctx.Done():
+				return context.Cause(ctx)
+			case <-endCh:
+				if node, ok := e.graph.Node(ident); ok {
+					nodes = append(nodes, node)
+				}
+			}
+		}
+
+		for _, onEnd := range e.onEnds {
+			if onEnd != nil {
+				err = onEnd(ctx, nodes)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
-
-	for ident, startCh := range e.startsCh {
-		select {
-		case <-ctx.Done():
-			return context.Cause(ctx)
-		case startCh <- starts[ident]:
-		}
-	}
-
-	return
 }
 
-func (e *Executor[T]) runEnds(ctx context.Context) (err error) {
-	var ends []T
-	for ident, endCh := range e.endsCh {
-		select {
-		case <-ctx.Done():
-			return context.Cause(ctx)
-		case <-endCh:
-			node, ok := e.graph.nodes[ident]
-			if ok {
-				ends = append(ends, node)
-			}
-		}
-	}
-
-	for _, onEnd := range e.onEnds {
-		if onEnd != nil {
-			err = onEnd(ctx, ends...)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	return
-}
-
-func (e *Executor[T]) runNodeFlow(ctx context.Context, node T, startCh, endCh chan any, inbound, outbound []*Edge[T]) (err error) {
+func (e *Executor[T]) runNodeFlow(ctx context.Context, node T, startCh, endCh chan any, inbound, outbound []*Edge) (err error) {
 	for {
-		var value any
+		var send any
 		if startCh != nil {
 			select {
 			case <-ctx.Done():
 				return context.Cause(ctx)
-			case value = <-startCh:
+			case send = <-startCh:
 			}
 		} else {
 			for _, edge := range inbound {
@@ -264,9 +255,9 @@ func (e *Executor[T]) runNodeFlow(ctx context.Context, node T, startCh, endCh ch
 			}
 		}
 
-		for _, beforeSend := range e.beforeSends {
-			if beforeSend != nil {
-				err := beforeSend(ctx, node, value)
+		for _, onSend := range e.onSends {
+			if onSend != nil {
+				err := onSend(ctx, node, send)
 				if err != nil {
 					return err
 				}
@@ -276,16 +267,17 @@ func (e *Executor[T]) runNodeFlow(ctx context.Context, node T, startCh, endCh ch
 		select {
 		case <-ctx.Done():
 			return context.Cause(ctx)
-		case node.Send() <- value:
+		case node.Send() <- send:
 		}
 
+		var recv any
 		select {
 		case <-ctx.Done():
 			return context.Cause(ctx)
-		case value = <-node.Recv():
-			for _, afterRecv := range e.afterRecvs {
-				if afterRecv != nil {
-					err := afterRecv(ctx, node, value)
+		case recv = <-node.Recv():
+			for _, onRecv := range e.onRecvs {
+				if onRecv != nil {
+					recv, err = onRecv(ctx, node, recv)
 					if err != nil {
 						return err
 					}
@@ -297,14 +289,14 @@ func (e *Executor[T]) runNodeFlow(ctx context.Context, node T, startCh, endCh ch
 			select {
 			case <-ctx.Done():
 				return context.Cause(ctx)
-			case endCh <- value:
+			case endCh <- recv:
 			}
 		} else {
 			for _, edge := range outbound {
 				select {
 				case <-ctx.Done():
 					return context.Cause(ctx)
-				case edge.In() <- value:
+				case edge.In() <- recv:
 				}
 			}
 		}

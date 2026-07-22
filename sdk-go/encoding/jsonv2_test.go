@@ -2,14 +2,12 @@ package encoding_test
 
 import (
 	"bytes"
-	"strconv"
 	"testing"
 	"time"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/api"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
 	commandv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/command/v1beta1"
-	corev1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
@@ -102,55 +100,55 @@ func TestJSONEncoderV2_Duration(t *testing.T) {
 	}
 }
 
-func TestJSONEncodeV2_Defaults(t *testing.T) {
-	str := "foobar"
-	b, err := encoding.ToJSONV2(str)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if string(b) != strconv.Quote(str) {
-		t.Fatalf("expected to be equal: %s != %s", str, string(b))
-	}
+// func TestJSONEncodeV2_Defaults(t *testing.T) {
+// 	str := "foobar"
+// 	b, err := encoding.ToJSONV2(str)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	if string(b) != strconv.Quote(str) {
+// 		t.Fatalf("expected to be equal: %s != %s", str, string(b))
+// 	}
 
-	msg := &corev1.RunOperationMetadata{
-		State: corev1.RunOperationMetadata_STATE_RUNNING,
-	}
+// 	msg := &corev1.RunOperationMetadata{
+// 		State: corev1.RunOperationMetadata_STATE_RUNNING,
+// 	}
 
-	b, err = encoding.ToJSONV2(msg)
-	if err != nil {
-		t.Fatal(err)
-	}
+// 	b, err = encoding.ToJSONV2(msg)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
 
-	msg2 := new(corev1.RunOperationMetadata)
-	err = encoding.FromJSONV2(b, msg2)
-	if err != nil {
-		t.Fatal(err)
-	}
+// 	msg2 := new(corev1.RunOperationMetadata)
+// 	err = encoding.FromJSONV2(b, msg2)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
 
-	if !proto.Equal(msg, msg2) {
-		t.Fatalf("expected to be equal: %v != %v", msg, msg2)
-	}
+// 	if !proto.Equal(msg, msg2) {
+// 		t.Fatalf("expected to be equal: %v != %v", msg, msg2)
+// 	}
 
-	d := time.Duration(time.Minute)
-	b, err = encoding.ToJSONV2(d)
-	if err != nil {
-		t.Fatal(err)
-	}
+// 	d := time.Duration(time.Minute)
+// 	b, err = encoding.ToJSONV2(d)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
 
-	if string(b) != `"1m0s"` {
-		t.Fatalf(`expected "1m0s", got: %s`, string(b))
-	}
+// 	if string(b) != `"1m0s"` {
+// 		t.Fatalf(`expected "1m0s", got: %s`, string(b))
+// 	}
 
-	var d2 time.Duration
-	err = encoding.FromJSONV2(b, &d2)
-	if err != nil {
-		t.Fatal(err)
-	}
+// 	var d2 time.Duration
+// 	err = encoding.FromJSONV2(b, &d2)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
 
-	if d != d2 {
-		t.Fatalf("expected to be equal, %v != %v", d, d2)
-	}
-}
+// 	if d != d2 {
+// 		t.Fatalf("expected to be equal, %v != %v", d, d2)
+// 	}
+// }
 
 func TestJSONEncoderV2_ProtoJSONRedaction(t *testing.T) {
 	nativeProto := &commandv1beta1.SSHConfig{

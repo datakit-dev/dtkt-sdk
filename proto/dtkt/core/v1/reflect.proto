@@ -1,0 +1,411 @@
+syntax = "proto3";
+
+package dtkt.core.v1;
+
+import "buf/validate/validate.proto";
+import "dtkt/protoform/v1beta1/protoform.proto";
+import "dtkt/protostore/v1beta1/protostore.proto";
+import "dtkt/shared/v1beta1/messages.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/longrunning/operations.proto";
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1";
+
+// ReflectService provides operations for reflecting on protobuf descriptors, services, methods, and types.
+service ReflectService {
+  // Get file descriptors for a connection or deployment resource.
+  rpc GetDescriptors(GetDescriptorsRequest) returns (GetDescriptorsResponse);
+  // Sync file descriptors for a connection or deployment resource. This can be
+  // used to update descriptors after changes.
+  rpc SyncDescriptors(SyncDescriptorsRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      response_type: "SyncDescriptorsResponse"
+      metadata_type: "SyncDescriptorsMetadata"
+    };
+  }
+  // Get a service descriptor.
+  rpc GetService(GetServiceRequest) returns (GetServiceResponse);
+  // Get a method descriptor.
+  rpc GetMethod(GetMethodRequest) returns (GetMethodResponse);
+  // Get a type descriptor.
+  rpc GetType(GetTypeRequest) returns (GetTypeResponse);
+  // List service descriptors.
+  rpc ListServices(ListServicesRequest) returns (ListServicesResponse);
+  // List method descriptors.
+  rpc ListMethods(ListMethodsRequest) returns (ListMethodsResponse);
+  // List type descriptors.
+  rpc ListTypes(ListTypesRequest) returns (ListTypesResponse);
+}
+
+// File represents runtime artifacts related to a Connection or Deployment, such
+// as proto file descriptors used for dynamic client construction and reflection.
+message File {
+  option (google.api.resource) = {
+    type: "File"
+    singular: "file"
+    plural: "files"
+    pattern: "organizations/{organization}/connections/{connection}/files/{file}"
+    pattern: "users/{user}/connections/{connection}/files/{file}"
+    pattern: "organizations/{organization}/deployments/{deployment}/files/{file}"
+    pattern: "users/{user}/deployments/{deployment}/files/{file}"
+  };
+
+  // File resource name.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Checksum of file contents for concurrency control.
+  string etag = 3 [(buf.validate.field).required = true];
+
+  // URI of file contents (e.g. source .proto files for proto descriptors).
+  optional string uri = 4 [(buf.validate.field).string.uri = true];
+
+  oneof type {
+    option (buf.validate.oneof).required = true;
+
+    // Proto file descriptor set.
+    google.protobuf.FileDescriptorSet protos = 10;
+
+    // Potentially support other file types in the future (e.g. OpenAPI specs, etc.)
+  }
+
+  // File create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // File update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+// Service message for documentation and reflection indexing.
+message Service {
+  option (google.api.resource) = {
+    type: "Service"
+    singular: "service"
+    plural: "services"
+    pattern: "services/{service}"
+    pattern: "organizations/{organization}/connections/{connection}/services/{service}"
+    pattern: "users/{user}/connections/{connection}/services/{service}"
+    pattern: "organizations/{organization}/deployments/{deployment}/services/{service}"
+    pattern: "users/{user}/deployments/{deployment}/services/{service}"
+  };
+
+  option (dtkt.protostore.v1beta1.search_index).contents_expr = "size(this.description) > 0 ? this.name + ' ' + this.description : this.name";
+
+  // Service resource name.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 10 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Service description.
+  string description = 2;
+
+  // Service create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Service update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+// Method message for documentation and reflection indexing.
+message Method {
+  option (google.api.resource) = {
+    type: "Method"
+    singular: "method"
+    plural: "methods"
+    pattern: "methods/{method}"
+    pattern: "organizations/{organization}/connections/{connection}/methods/{method}"
+    pattern: "users/{user}/connections/{connection}/methods/{method}"
+    pattern: "organizations/{organization}/deployments/{deployment}/methods/{method}"
+    pattern: "users/{user}/deployments/{deployment}/methods/{method}"
+  };
+
+  option (dtkt.protostore.v1beta1.search_index).contents_expr = "size(this.description) > 0 ? this.name + ' ' + this.description : this.name";
+
+  // Method resource name.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 10 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Method description.
+  string description = 2;
+
+  // Request message type.
+  string request = 3 [(buf.validate.field).required = true];
+
+  // Response message type.
+  string response = 4 [(buf.validate.field).required = true];
+
+  // Whether request is streaming.
+  bool request_streaming = 5;
+
+  // Whether response is streaming.
+  bool response_streaming = 6;
+
+  // Method create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Method update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+// Type message for documentation and reflection indexing.
+message Type {
+  option (google.api.resource) = {
+    type: "Type"
+    singular: "type"
+    plural: "types"
+    pattern: "types/{type}"
+    pattern: "organizations/{organization}/connections/{connection}/types/{type}"
+    pattern: "users/{user}/connections/{connection}/types/{type}"
+    pattern: "organizations/{organization}/deployments/{deployment}/types/{type}"
+    pattern: "users/{user}/deployments/{deployment}/types/{type}"
+  };
+
+  option (dtkt.protostore.v1beta1.search_index).contents_expr = "size(this.description) > 0 ? this.name + ' ' + this.description : this.name";
+
+  // Type resource name.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Type schema.
+  TypeSchema schema = 2 [(buf.validate.field).required = true];
+
+  // Type description.
+  string description = 3;
+
+  // Type create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Type update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+// TypeSchema wraps versioned type schema definitions.
+message TypeSchema {
+  oneof version {
+    option (buf.validate.oneof).required = true;
+    dtkt.shared.v1beta1.TypeSchema v1beta1 = 1;
+  }
+}
+
+message SyncDescriptorsRequest {
+  // Name of parent resource.
+  string parent = 1 [(buf.validate.field).required = true];
+
+  // Build etag must match current file etag for idempotent syncs and to ensure
+  // descriptors are up-to-date with the latest connection or deployment config/build.
+  // May be an empty string if no descriptors have been synced yet.
+  string etag = 2;
+}
+
+message SyncDescriptorsResponse {
+  // File containing descriptors.
+  File file = 1 [(buf.validate.field).required = true];
+}
+
+message GetDescriptorsRequest {
+  // Name of parent resource.
+  string parent = 1 [(buf.validate.field).required = true];
+}
+
+message GetDescriptorsResponse {
+  // File containing descriptors.
+  File file = 1 [(buf.validate.field).required = true];
+}
+
+message GetTypeRequest {
+  // Type resource name, one of:
+  // - System: "types/{type}"
+  // - Organization/User: e.g. "organizations/bar/types/{type}" or "users/foo/types/{type}"
+  // - Connection: e.g. "users/foo/connections/foobar/types/{type}"
+  // - Deployment: e.g. "users/foo/deployments/default/types/{type}"
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetTypeResponse {
+  // The requested type.
+  Type type = 1 [(buf.validate.field).required = true];
+}
+
+message ListTypesRequest {
+  // Maximum number of types to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name, one of:
+  // - System (no parent): nil | ""
+  // - Organization/User: e.g. "organizations/bar" or "users/foo"
+  // - Connection: e.g. "users/foo/connections/foobar"
+  // - Deployment: e.g. "users/foo/deployments/default"
+  // - Integration (aggregates deployments): e.g. "users/foo/integrations/bar"
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListTypesResponse {
+  // The list of types.
+  repeated Type types = 1;
+
+  // Token for retrieving the next page.
+  string next_page_token = 2;
+}
+
+message GetMethodRequest {
+  // Method resource name, one of:
+  // - System: "methods/{method}"
+  // - Organization/User: e.g. "organizations/bar/methods/{method}" or "users/foo/methods/{method}"
+  // - Connection: e.g. "users/foo/connections/foobar/methods/{method}"
+  // - Deployment: e.g. "users/foo/deployments/default/methods/{method}"
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetMethodResponse {
+  // The requested method.
+  Method method = 1 [(buf.validate.field).required = true];
+}
+
+message GetServiceRequest {
+  // Service resource name, one of:
+  // - System: "services/{service}"
+  // - Organization/User: e.g. "organizations/bar/services/{service}" or "users/foo/services/{service}"
+  // - Connection: e.g. "users/foo/connections/foobar/services/{service}"
+  // - Deployment: e.g. "users/foo/deployments/default/services/{service}"
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetServiceResponse {
+  // The requested service.
+  Service service = 1 [(buf.validate.field).required = true];
+}
+
+message ListServicesRequest {
+  // Maximum number of services to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name, one of (blank will return all):
+  // - Return all: nil
+  // - Organization/User: e.g. "organizations/bar" or "users/foo"
+  // - Connection: e.g. "users/foo/connections/foobar"
+  // - Deployment: e.g. "users/foo/deployments/default"
+  // - Integration (aggregates deployments): e.g. "users/foo/integrations/bar"
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListServicesResponse {
+  repeated Service services = 1;
+
+  string next_page_token = 2;
+}
+
+message ListMethodsRequest {
+  // Maximum number of methods to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name, one of (blank will return all):
+  // - Return all: nil
+  // - Organization/User: e.g. "organizations/bar" or "users/foo"
+  // - Connection: e.g. "users/foo/connections/foobar"
+  // - Deployment: e.g. "users/foo/deployments/default"
+  // - Integration (aggregates deployments): e.g. "users/foo/integrations/bar"
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListMethodsResponse {
+  repeated Method methods = 1;
+
+  string next_page_token = 2;
+}
+
+// SyncDescriptorsMetadata contains metadata for syncing descriptors.
+message SyncDescriptorsMetadata {
+  enum State {
+    STATE_UNSPECIFIED = 0;
+    STATE_PENDING = 1;
+    STATE_RUNNING = 2;
+    STATE_SUCCEEDED = 3;
+    STATE_FAILED = 4;
+  }
+
+  // Sync state.
+  State state = 1 [(buf.validate.field).required = true];
+
+  // Sync status message.
+  string message = 2;
+
+  int64 services_count = 9;
+  int64 methods_count = 10;
+  int64 types_count = 11;
+
+  // Sync start time.
+  google.protobuf.Timestamp start_time = 20;
+
+  // Sync stop time.
+  google.protobuf.Timestamp stop_time = 21;
+}
