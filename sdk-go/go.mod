@@ -17,15 +17,15 @@ tool (
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.10-20250912141014-52f32327d4b0.1
 	buf.build/go/protovalidate v1.0.0
-	buf.build/go/protoyaml v0.6.0
+	buf.build/go/protoyaml v0.7.0
 	cel.dev/expr v0.25.1
 	cloud.google.com/go/longrunning v0.8.0
 	connectrpc.com/connect v1.19.1
 	entgo.io/ent v0.14.5
 	github.com/Khan/genqlient v0.8.1
 	github.com/charmbracelet/log v0.4.2
+	github.com/datakit-dev/grpc-proxy v0.0.0-20250812181120-d2a33c10eab0
 	github.com/dominikbraun/graph v0.23.0
-	github.com/fivetran/go-fivetran v1.2.9
 	github.com/google/cel-go v0.26.1
 	github.com/google/jsonschema-go v0.3.0
 	github.com/google/uuid v1.6.0
@@ -85,7 +85,6 @@ require (
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/cloudflare/circl v1.6.1 // indirect
 	github.com/cyphar/filepath-securejoin v0.4.1 // indirect
-	github.com/datakit-dev/grpc-proxy v0.0.0-20250812181120-d2a33c10eab0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
