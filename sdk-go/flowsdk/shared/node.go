@@ -35,25 +35,25 @@ var (
 )
 
 type (
-	Node interface {
-		Ident() string
-		Send() chan<- any
-		Recv() <-chan any
-		Run(context.Context) error
-		Value() any
-		Reset()
-	}
 	SpecNode interface {
 		proto.Message
 		GetId() string
 	}
 	ParsedNode interface {
+		Metadata() map[string]any
 		Compile(context.Context, Env) error
 		Run(context.Context, Env, Pipe) error
 	}
-	Nodes[T Node]      []T
-	NodeParser[T Node] func(target SpecNode, visitor NodeVisitor) (T, error)
-	NodeVisitor        func(target string, ast *cel.Ast)
+	GraphNode interface {
+		Ident() string
+		Send() chan<- any
+		Recv() <-chan any
+		Run(context.Context) error
+		Value() any
+	}
+	GraphNodes[T GraphNode] []T
+	NodeParser[T GraphNode] func(target SpecNode, visitor NodeVisitor) (T, error)
+	NodeVisitor             func(target string, ast *cel.Ast)
 )
 
 func GetNodeIdent(node SpecNode) string {
@@ -97,7 +97,7 @@ func ParseNodePrefix(ident string) (string, bool) {
 	return "", false
 }
 
-func (n Nodes[T]) Load(ident string) (node T, ok bool) {
+func (n GraphNodes[T]) Load(ident string) (node T, ok bool) {
 	idx := slices.IndexFunc(n, func(n T) bool {
 		return n.Ident() == ident
 	})
@@ -108,13 +108,13 @@ func (n Nodes[T]) Load(ident string) (node T, ok bool) {
 	return
 }
 
-func (n Nodes[T]) Idents() []string {
-	return util.SliceMap(n, func(n T) string {
-		return n.Ident()
+func (n GraphNodes[T]) Idents() []string {
+	return util.SliceMap(n, func(node T) string {
+		return node.Ident()
 	})
 }
 
-func (n Nodes[T]) Range(f func(string, T) bool) {
+func (n GraphNodes[T]) Range(f func(string, T) bool) {
 	for _, node := range n {
 		if !f(node.Ident(), node) {
 			return
@@ -122,7 +122,7 @@ func (n Nodes[T]) Range(f func(string, T) bool) {
 	}
 }
 
-func (n Nodes[T]) RangeErr(f func(string, T) error) (err error) {
+func (n GraphNodes[T]) RangeErr(f func(string, T) error) (err error) {
 	for _, node := range n {
 		err = f(node.Ident(), node)
 		if err != nil {
@@ -132,16 +132,9 @@ func (n Nodes[T]) RangeErr(f func(string, T) error) (err error) {
 	return
 }
 
-func (n Nodes[T]) Reset() {
-	n.Range(func(_ string, n T) bool {
-		n.Reset()
-		return true
-	})
-}
-
-func (n Nodes[T]) Values() map[string]any {
-	return util.ReduceSliceToMap(n, func(_ int, node T) (string, any, bool) {
-		return node.Ident(), node.Value(), true
+func (n GraphNodes[T]) Values() map[string]any {
+	return util.SliceToMap(n, func(_ int, node T) (string, any) {
+		return node.Ident(), node.Value()
 	})
 }
 

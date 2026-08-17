@@ -151,6 +151,8 @@ export const ListSearchResultsResponse_SearchResultSchema: GenMessage<ListSearch
  */
 export const SearchService: GenService<{
   /**
+   * List search results.
+   *
    * @generated from rpc dtkt.core.v1.SearchService.ListSearchResults
    */
   listSearchResults: {

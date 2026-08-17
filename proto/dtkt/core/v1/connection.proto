@@ -18,18 +18,23 @@ option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;c
 service ConnectionService {
   // Dial a connection to validate connectivity.
   rpc DialConnection(DialConnectionRequest) returns (DialConnectionResponse);
+
   // List connections.
   rpc ListConnections(ListConnectionsRequest) returns (ListConnectionsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // Get a single connection by name.
+
+  // Get a connection by name.
   rpc GetConnection(GetConnectionRequest) returns (GetConnectionResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
   // Create a new connection.
   rpc CreateConnection(CreateConnectionRequest) returns (CreateConnectionResponse);
+
   // Update an existing connection.
   rpc UpdateConnection(UpdateConnectionRequest) returns (UpdateConnectionResponse);
+
   // Delete a connection by name.
   rpc DeleteConnection(DeleteConnectionRequest) returns (DeleteConnectionResponse);
 }

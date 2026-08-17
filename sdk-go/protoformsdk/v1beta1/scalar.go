@@ -5,6 +5,7 @@ import (
 	"slices"
 	"strconv"
 
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
@@ -61,10 +62,12 @@ func NewScalarField(parent *Message, field protoreflect.FieldDescriptor) (*Scala
 		}
 	case protoreflect.EnumKind:
 		scalar = &Scalar[protoreflect.EnumNumber]{
-			Getter:     GetterFunc[protoreflect.EnumNumber](func() protoreflect.EnumNumber { return parent.GetField(field).Enum() }),
-			Setter:     SetterFunc[protoreflect.EnumNumber](func(v protoreflect.EnumNumber) { parent.SetField(field, protoreflect.ValueOfEnum(v)) }),
-			Parser:     ParserFunc[protoreflect.EnumNumber](func(s string) (protoreflect.EnumNumber, error) { return util.EnumNumberFromString(field, s) }),
-			Stringer:   StringerFunc[protoreflect.EnumNumber](func(v protoreflect.EnumNumber) string { return util.EnumNumberToString(field, v) }),
+			Getter: GetterFunc[protoreflect.EnumNumber](func() protoreflect.EnumNumber { return parent.GetField(field).Enum() }),
+			Setter: SetterFunc[protoreflect.EnumNumber](func(v protoreflect.EnumNumber) { parent.SetField(field, protoreflect.ValueOfEnum(v)) }),
+			Parser: ParserFunc[protoreflect.EnumNumber](func(s string) (protoreflect.EnumNumber, error) {
+				return common.ProtoEnumNumberFromString(field.Enum(), s), nil
+			}),
+			Stringer:   StringerFunc[protoreflect.EnumNumber](func(v protoreflect.EnumNumber) string { return common.ProtoEnumNumberToString(field.Enum(), v) }),
 			parent:     parent,
 			descriptor: field,
 		}

@@ -5,35 +5,35 @@
 import { FlowService } from "./flow_pb";
 
 /**
- * List flow specs.
+ * List flows.
  *
  * @generated from rpc dtkt.core.v1.FlowService.ListFlows
  */
 export const listFlows = FlowService.method.listFlows;
 
 /**
- * Get a single flow spec by name.
+ * Get a flow by name.
  *
  * @generated from rpc dtkt.core.v1.FlowService.GetFlow
  */
 export const getFlow = FlowService.method.getFlow;
 
 /**
- * Create a new flow spec.
+ * Create a new flow.
  *
  * @generated from rpc dtkt.core.v1.FlowService.CreateFlow
  */
 export const createFlow = FlowService.method.createFlow;
 
 /**
- * Update an existing flow spec.
+ * Update an existing flow.
  *
  * @generated from rpc dtkt.core.v1.FlowService.UpdateFlow
  */
 export const updateFlow = FlowService.method.updateFlow;
 
 /**
- * Delete a flow spec by name.
+ * Delete a flow by name.
  *
  * @generated from rpc dtkt.core.v1.FlowService.DeleteFlow
  */

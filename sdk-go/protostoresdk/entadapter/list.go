@@ -55,7 +55,7 @@ func ListScanner[S []V, V any](field *fieldType[S]) entfield.TypeValueScanner[S]
 	return entfield.ValueScannerFunc[S, *sql.Null[[]byte]]{
 		V: func(list S) (driver.Value, error) {
 			b, err := encoding.ToJSONV2(list, encoding.WithEncodeProtoJSONOptions(protojson.MarshalOptions{
-				Resolver: protostore.GetResolver(),
+				Resolver: protostore.Resolver,
 			}))
 			if err != nil {
 				return nil, fmt.Errorf("field: %s: %w", field.desc.Name, err)
@@ -66,7 +66,7 @@ func ListScanner[S []V, V any](field *fieldType[S]) entfield.TypeValueScanner[S]
 		S: func(ns *sql.Null[[]byte]) (list S, err error) {
 			if ns.Valid {
 				err = encoding.FromJSONV2(ns.V, &list, encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
-					Resolver: protostore.GetResolver(),
+					Resolver: protostore.Resolver,
 				}))
 				if err != nil {
 					return nil, fmt.Errorf("field: %s: %w", field.desc.Name, err)

@@ -12,36 +12,72 @@ import "google/protobuf/struct.proto";
 
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1";
 
+// Flow is a declarative workflow spec for a directed acyclic graph of typed
+// nodes and edges formed by parsing CEL expressions refer to (source) nodes.
 message Flow {
+  // Name of flow.
   string name = 1 [(buf.validate.field).required = true];
+
+  // Description of flow.
   string description = 2 [(dtkt.protoform.v1beta1.field).input.multiline_text = true];
 
-  repeated Connection connections = 3;
-  repeated Input inputs = 4;
-  repeated Var vars = 5;
-  repeated Action actions = 7;
-  repeated Output outputs = 9;
-  repeated Stream streams = 10;
+  // Control declares flow, execution, and lifecycle configuration.
+  Control control = 3;
 
-  map<string, Metric> metrics = 11 [(buf.validate.field).map = {
+  // Metrics report analytics at runtime without impacting execution.
+  // Note: metrics are not represented as a node in the DAG and therefore not
+  // referenceable by CEL expressions within typed nodes below.
+  map<string, Metric> metrics = 4 [(buf.validate.field).map = {
     keys: {
       string: {pattern: "^[a-zA-Z][a-zA-Z0-9_]+$"}
     }
   }];
+
+  // Connections declare dependent packages and services used by gRPC method
+  // calls in actions and streams.
+  repeated Connection connections = 5;
+
+  // Inputs declare named and typed values that can be injected at runtime.
+  repeated Input inputs = 6;
+
+  // Vars declare intermediate and transformed values in flow execution.
+  repeated Var vars = 7;
+
+  // Actions declare unary gRPC method calls and user elicitation interactions.
+  repeated Action actions = 8;
+
+  // Streams declare streaming gRPC method calls and value generators.
+  repeated Stream streams = 9;
+
+  // Outputs declare named values evaluated and emitted at runtime.
+  repeated Output outputs = 10;
+}
+
+message Control {
+  // Start flow execution when expression evaluates to true.
+  optional string start_when = 1 [(buf.validate.field).string.pattern = "^\\s?=\\s?"];
+
+  // Stop flow execution when expression evaluates to true.
+  optional string stop_when = 2 [(buf.validate.field).string.pattern = "^\\s?=\\s?"];
 }
 
 message Metric {
+  // Interval declares the frequency this metric will produce a value.
   google.protobuf.Duration interval = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).duration.gt = {
       seconds: 0
       nanos: 0
-    }
+    },
+    (buf.validate.field).duration.example = {seconds: 5}
   ];
 
+  // Value expression to be evaluated.
   string value = 2 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+    (buf.validate.field).string.pattern = "^\\s?=\\s?",
+    (buf.validate.field).string.example = "= streams.reader.count",
+    (buf.validate.field).string.example = "= streams.writer.count"
   ];
 }
 
@@ -59,10 +95,10 @@ message Connection {
     (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
   ];
 
-  // Connection must resolve to an integration with the given package identity.
+  // Declares connection is an integration with given package name and version.
   dtkt.shared.v1beta1.Package.Identity package = 2;
 
-  // Connection must resolve to a server which implements the given services.
+  // Declares connection implements the given gRPC services.
   repeated string services = 3;
 }
 

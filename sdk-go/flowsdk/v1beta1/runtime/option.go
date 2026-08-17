@@ -14,6 +14,12 @@ type (
 	ExecutorOption = shared.ExecutorOption[*Node]
 )
 
+var WithInitStart = shared.WithInitStart[*Node]
+var WithBeforeStart = shared.WithBeforeStart[*Node]
+var WithAfterEnd = shared.WithAfterEnd[*Node]
+var WithBeforeSend = shared.WithBeforeSend[*Node]
+var WithAfterRecv = shared.WithAfterRecv[*Node]
+
 func WithEnv(proto *flowv1beta1.Env) Option {
 	return func(recv OptionReceiver) {
 		if env, ok := recv.(*Env); ok {
@@ -22,7 +28,7 @@ func WithEnv(proto *flowv1beta1.Env) Option {
 	}
 }
 
-func WithVars(vars EnvVars) Option {
+func WithVars(vars Vars) Option {
 	return func(recv OptionReceiver) {
 		if env, ok := recv.(*Env); ok {
 			env.vars = vars

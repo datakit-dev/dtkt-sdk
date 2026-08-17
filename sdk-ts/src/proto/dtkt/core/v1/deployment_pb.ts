@@ -886,7 +886,7 @@ export const DeploymentService: GenService<{
     output: typeof ListDeploymentsResponseSchema;
   },
   /**
-   * Get a single deployment by name.
+   * Get a deployment by name.
    *
    * @generated from rpc dtkt.core.v1.DeploymentService.GetDeployment
    */

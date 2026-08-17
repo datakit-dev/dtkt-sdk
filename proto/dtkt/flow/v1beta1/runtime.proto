@@ -8,6 +8,7 @@ import "google/api/expr/v1alpha1/checked.proto";
 import "google/api/expr/v1alpha1/syntax.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
+import "google/rpc/code.proto";
 import "google/rpc/status.proto";
 
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1";
@@ -18,6 +19,7 @@ message Env {
   message Result {
     google.protobuf.Timestamp start_time = 1;
     google.protobuf.Timestamp finish_time = 2;
+    map<string, google.protobuf.Any> metadata = 3;
 
     oneof type {
       option (buf.validate.oneof).required = true;
@@ -42,9 +44,9 @@ message Env {
   repeated Node nodes = 1;
 }
 
-// Graph represents a fully parsed and/or checked Flow spec:
-// 1. Parsed: all nodes with expressions are parsed;
-// 2. Checked: all nodes with expressions are checked making Graph executable.
+// Graph represents a fully parsed and/or checked (executable) Flow spec:
+//  - Parsed when all node expressions (if any) are parsed;
+//  - Checked (executable) when all node expressions (if any) are checked.
 message Graph {
   message Edge {
     // Source identifier of an Edge is a fully qualified Node identifier + field
@@ -53,6 +55,7 @@ message Graph {
       (buf.validate.field).required = true,
       (buf.validate.field).string.pattern = "^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+"
     ];
+
     // Target identifier of an Edge is a fully qualified Node + Expr identifier:
     // "{node.ident}.{expr.id}".
     string target = 2 [
@@ -62,11 +65,10 @@ message Graph {
   }
 
   message Expr {
-    // Expression identifier within the scope of a Node (without ident prefix).
-    string id = 1 [(buf.validate.field).required = true];
     // Parsed expression (required to produce a valid edge).
     google.api.expr.v1alpha1.ParsedExpr parsed = 2 [(buf.validate.field).required = true];
-    // Checked expression (only required for execution).
+
+    // Checked expression (required to be executable).
     google.api.expr.v1alpha1.CheckedExpr checked = 3;
   }
 
@@ -78,9 +80,9 @@ message Graph {
       (buf.validate.field).required = true,
       (buf.validate.field).string.pattern = "^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+$"
     ];
-    // Map of "{node.ident}.{expr.id}" to Expr making this node the target of
-    // an Edge.
-    map<string, Expr> exprs = 3 [(buf.validate.field).map.keys.string.pattern = "^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+\\."];
+
+    // Map containing unique expression ID to Expr.
+    map<string, Expr> exprs = 3;
   }
 
   Flow spec = 1 [(buf.validate.field).required = true];
@@ -88,11 +90,18 @@ message Graph {
   repeated Edge edges = 3;
 }
 
-// Sentinel values used within flow execution.
-message Skip {}
-message EOF {}
+// Done is a sentinel value used for control flow and internal error wrapping.
 message Done {
-  string id = 1;
-  string reason = 2;
-  bool is_error = 3;
+  // The status code:
+  //  - OK/EOF: treated as non-error;
+  //  - All others treated as error.
+  google.rpc.Code code = 1;
+
+  // A developer-facing status message.
+  string message = 2;
+
+  // Node identifier for tracing, if any.
+  optional string ident = 3;
 }
+
+message Skip {}

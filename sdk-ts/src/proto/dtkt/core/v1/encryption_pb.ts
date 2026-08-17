@@ -156,13 +156,13 @@ export const DecryptResponseSchema: GenMessage<DecryptResponse, {validType: Decr
   messageDesc(file_dtkt_core_v1_encryption, 3);
 
 /**
- * EncryptionService provides data encryption and decryption operations.
+ * EncryptionService provides resource encryption and decryption operations.
  *
  * @generated from service dtkt.core.v1.EncryptionService
  */
 export const EncryptionService: GenService<{
   /**
-   * Encrypt data.
+   * Encrypt resource.
    *
    * @generated from rpc dtkt.core.v1.EncryptionService.Encrypt
    */
@@ -172,7 +172,7 @@ export const EncryptionService: GenService<{
     output: typeof EncryptResponseSchema;
   },
   /**
-   * Decrypt data.
+   * Decrypt resource.
    *
    * @generated from rpc dtkt.core.v1.EncryptionService.Decrypt
    */

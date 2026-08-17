@@ -5,14 +5,14 @@
 import { EncryptionService } from "./encryption_pb";
 
 /**
- * Encrypt data.
+ * Encrypt resource.
  *
  * @generated from rpc dtkt.core.v1.EncryptionService.Encrypt
  */
 export const encrypt = EncryptionService.method.encrypt;
 
 /**
- * Decrypt data.
+ * Decrypt resource.
  *
  * @generated from rpc dtkt.core.v1.EncryptionService.Decrypt
  */

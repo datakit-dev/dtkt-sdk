@@ -36,8 +36,8 @@ func TestParsePageTokenUUIDV7(t *testing.T) {
 				t.Fatalf("failed to parse test %s: %v", tt.name, err)
 			}
 
-			pageToken := NextPageTokenUUIDV7(uid)
-			parsedUID, err := ParsePageTokenUUIDV7(pageToken)
+			pageToken := NextPageTokenUUID(uid)
+			parsedUID, err := ParsePageTokenUUID(pageToken)
 			if tt.expectErr {
 				if err == nil {
 					t.Errorf("expected error but got none")
@@ -54,7 +54,7 @@ func TestParsePageTokenUUIDV7(t *testing.T) {
 				t.Errorf("expected UID %v, got %v", uid, parsedUID)
 			}
 
-			pageToken2 := NextPageTokenUUIDV7(parsedUID)
+			pageToken2 := NextPageTokenUUID(parsedUID)
 			if pageToken != pageToken2 {
 				t.Errorf("expected page token %s, got %s", pageToken, pageToken2)
 			}
@@ -77,7 +77,7 @@ func (r testPageTokenRequest) GetPageToken() string {
 
 func TestParsePageTokenRequestUUIDV7(t *testing.T) {
 	uid, _ := uuid.NewV7()
-	pageToken := NextPageTokenUUIDV7(uid)
+	pageToken := NextPageTokenUUID(uid)
 
 	tests := []struct {
 		name        string
@@ -128,7 +128,7 @@ func TestParsePageTokenRequestUUIDV7(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parsedUID, size, err := ParsePageTokenRequestUUIDV7(tt.req, tt.defaultSize, tt.minSize, tt.maxSize)
+			parsedUID, size, err := ParsePageTokenRequestUUID(tt.req, tt.defaultSize, tt.minSize, tt.maxSize)
 			if tt.expectErr {
 				if err == nil {
 					t.Errorf("expected error but got none")

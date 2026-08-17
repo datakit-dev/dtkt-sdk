@@ -55,7 +55,7 @@ const (
 type DeploymentServiceClient interface {
 	// List deployments.
 	ListDeployments(context.Context, *connect.Request[v1.ListDeploymentsRequest]) (*connect.Response[v1.ListDeploymentsResponse], error)
-	// Get a single deployment by name.
+	// Get a deployment by name.
 	GetDeployment(context.Context, *connect.Request[v1.GetDeploymentRequest]) (*connect.Response[v1.GetDeploymentResponse], error)
 	// Create a new deployment.
 	CreateDeployment(context.Context, *connect.Request[v1.CreateDeploymentRequest]) (*connect.Response[longrunningpb.Operation], error)
@@ -149,7 +149,7 @@ func (c *deploymentServiceClient) DeleteDeployment(ctx context.Context, req *con
 type DeploymentServiceHandler interface {
 	// List deployments.
 	ListDeployments(context.Context, *connect.Request[v1.ListDeploymentsRequest]) (*connect.Response[v1.ListDeploymentsResponse], error)
-	// Get a single deployment by name.
+	// Get a deployment by name.
 	GetDeployment(context.Context, *connect.Request[v1.GetDeploymentRequest]) (*connect.Response[v1.GetDeploymentResponse], error)
 	// Create a new deployment.
 	CreateDeployment(context.Context, *connect.Request[v1.CreateDeploymentRequest]) (*connect.Response[longrunningpb.Operation], error)

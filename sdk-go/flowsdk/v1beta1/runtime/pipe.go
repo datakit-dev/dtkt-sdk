@@ -27,7 +27,7 @@ func (p *Pipe[I, O]) Out() <-chan O {
 	return p.outCh
 }
 
-func (p *Pipe[I, O]) Run(ctx context.Context, exec shared.ExecFunc[O, I]) (err error) {
+func (p *Pipe[I, O]) Run(ctx context.Context, exec shared.RunFunc[O, I]) (err error) {
 	for {
 		var (
 			in  I

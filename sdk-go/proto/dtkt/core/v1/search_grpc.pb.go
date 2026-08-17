@@ -26,6 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SearchServiceClient interface {
+	// List search results.
 	ListSearchResults(ctx context.Context, in *ListSearchResultsRequest, opts ...grpc.CallOption) (*ListSearchResultsResponse, error)
 }
 
@@ -51,6 +52,7 @@ func (c *searchServiceClient) ListSearchResults(ctx context.Context, in *ListSea
 // All implementations must embed UnimplementedSearchServiceServer
 // for forward compatibility.
 type SearchServiceServer interface {
+	// List search results.
 	ListSearchResults(context.Context, *ListSearchResultsRequest) (*ListSearchResultsResponse, error)
 	mustEmbedUnimplementedSearchServiceServer()
 }

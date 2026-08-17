@@ -11,16 +11,25 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-type PageTokenRequest interface {
-	GetPageSize() int32
-	GetPageToken() string
-}
+type (
+	PageFilterRequest interface {
+		PageRequest
+		FilterRequest
+	}
+	PageRequest interface {
+		GetPageSize() int32
+		GetPageToken() string
+	}
+	FilterRequest interface {
+		GetFilter() string
+	}
+)
 
-func NextPageTokenUUIDV7(uid uuid.UUID) string {
+func NextPageTokenUUID(uid uuid.UUID) string {
 	return base64.StdEncoding.EncodeToString(uid[:])
 }
 
-func ParsePageTokenUUIDV7(pageToken string) (uid uuid.UUID, err error) {
+func ParsePageTokenUUID(pageToken string) (uid uuid.UUID, err error) {
 	if pageToken == "" {
 		return
 	}
@@ -36,20 +45,20 @@ func ParsePageTokenUUIDV7(pageToken string) (uid uuid.UUID, err error) {
 	}
 
 	if uid.Version() != 7 {
-		err = fmt.Errorf("invalid UUID version: %d", uid.Version())
+		err = fmt.Errorf("expected UUID version 7, got: %d", uid.Version())
 		return
 	}
 
 	return
 }
 
-func ParsePageTokenRequestUUIDV7(req PageTokenRequest, defaultSize, minSize, maxSize int32) (uid uuid.UUID, s int32, err error) {
-	uid, err = ParsePageTokenUUIDV7(req.GetPageToken())
+func ParsePageTokenRequestUUID(req PageRequest, defaultSize, minSize, maxSize int32) (uid uuid.UUID, s int32, err error) {
+	uid, err = ParsePageTokenUUID(req.GetPageToken())
 	if err != nil {
 		return
 	}
 
-	s = GetPageSizeRequest(req, defaultSize, minSize, maxSize)
+	s = GetRequestPageSize(req, defaultSize, minSize, maxSize)
 
 	return
 }
@@ -66,15 +75,15 @@ func NextPageToken(id int64, time time.Time) (string, error) {
 	return base64.StdEncoding.EncodeToString(b), nil
 }
 
-func GetPageSizeRequest(req PageTokenRequest, defaultSize, minSize, maxSize int32) int32 {
+func GetRequestPageSize(req PageRequest, defaultSize, minSize, maxSize int32) int32 {
 	if req.GetPageSize() == 0 {
 		return defaultSize
 	}
 	return max(min(req.GetPageSize(), maxSize), minSize)
 }
 
-func ParsePageTokenRequest(req PageTokenRequest, defaultSize, minSize, maxSize int32) (id int64, time time.Time, size int32, err error) {
-	size = GetPageSizeRequest(req, defaultSize, minSize, maxSize)
+func ParsePageTokenRequest(req PageRequest, defaultSize, minSize, maxSize int32) (id int64, time time.Time, size int32, err error) {
+	size = GetRequestPageSize(req, defaultSize, minSize, maxSize)
 	id, time, err = ParsePageToken(req.GetPageToken())
 	return
 }

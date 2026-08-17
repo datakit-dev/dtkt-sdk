@@ -43,9 +43,9 @@ const (
 
 // EncryptionServiceClient is a client for the dtkt.core.v1.EncryptionService service.
 type EncryptionServiceClient interface {
-	// Encrypt data.
+	// Encrypt resource.
 	Encrypt(context.Context, *connect.Request[v1.EncryptRequest]) (*connect.Response[v1.EncryptResponse], error)
-	// Decrypt data.
+	// Decrypt resource.
 	Decrypt(context.Context, *connect.Request[v1.DecryptRequest]) (*connect.Response[v1.DecryptResponse], error)
 }
 
@@ -93,9 +93,9 @@ func (c *encryptionServiceClient) Decrypt(ctx context.Context, req *connect.Requ
 
 // EncryptionServiceHandler is an implementation of the dtkt.core.v1.EncryptionService service.
 type EncryptionServiceHandler interface {
-	// Encrypt data.
+	// Encrypt resource.
 	Encrypt(context.Context, *connect.Request[v1.EncryptRequest]) (*connect.Response[v1.EncryptResponse], error)
-	// Decrypt data.
+	// Decrypt resource.
 	Decrypt(context.Context, *connect.Request[v1.DecryptRequest]) (*connect.Response[v1.DecryptResponse], error)
 }
 

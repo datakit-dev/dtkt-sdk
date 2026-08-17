@@ -16,12 +16,6 @@ var _ Binding[protoreflect.Message] = (*MessageField)(nil)
 var _ FieldType = (*MessageField)(nil)
 
 type (
-	MessageField struct {
-		*Message
-		element    *Element
-		parent     *Message
-		descriptor protoreflect.FieldDescriptor
-	}
 	Message struct {
 		Parser[protoreflect.Message]
 		Stringer[protoreflect.Message]
@@ -33,6 +27,12 @@ type (
 
 		depth int
 		mut   sync.Mutex
+	}
+	MessageField struct {
+		*Message
+		element    *Element
+		parent     *Message
+		descriptor protoreflect.FieldDescriptor
 	}
 )
 
@@ -46,11 +46,21 @@ func NewMessage(value protoreflect.Message) *Message {
 	}
 }
 
-func NewNestedMessage(parent *Message, field protoreflect.FieldDescriptor, value protoreflect.Message) *Message {
+func NewListMessage(parent *Message, field protoreflect.FieldDescriptor, value protoreflect.Message) *Message {
 	return &Message{
 		value: value,
 		validate: func(env Env) error {
-			return parent.ValidateField(env, field, protoreflect.ValueOfMessage(value))
+			return ValidateMessage(env, value)
+		},
+		depth: parent.depth + 1,
+	}
+}
+
+func NewMapMessage(parent *Message, field protoreflect.FieldDescriptor, value protoreflect.Message) *Message {
+	return &Message{
+		value: value,
+		validate: func(env Env) error {
+			return ValidateMessage(env, value)
 		},
 		depth: parent.depth + 1,
 	}
@@ -167,21 +177,21 @@ func (m *Message) FieldGroup() *FieldGroup {
 	return m.group
 }
 
-func (m *Message) ValidateField(env Env, desc protoreflect.FieldDescriptor, value protoreflect.Value) error {
+func (m *Message) ValidateField(env Env, field protoreflect.FieldDescriptor, value protoreflect.Value) error {
+	env.Logger().Info("Message.ValidateField",
+		slog.String("msg", string(m.value.Descriptor().FullName())),
+		slog.String("field", string(field.FullName())),
+		slog.Int("depth", m.depth),
+	)
+
 	if m.validate != nil {
 		return m.validate(env)
 	}
 
-	env.Logger().Info("Message.ValidateField",
-		slog.String("msg", string(m.value.Descriptor().FullName())),
-		slog.String("field", string(desc.FullName())),
-		slog.Int("depth", m.depth),
-	)
-
 	msg := proto.Clone(m.Get().Interface())
-	msg.ProtoReflect().Set(desc, value)
+	msg.ProtoReflect().Set(field, value)
 
-	return ValidateField(env, msg.ProtoReflect(), desc)
+	return ValidateField(env, msg.ProtoReflect(), field)
 }
 
 func (f *MessageField) Validate(env Env) error {

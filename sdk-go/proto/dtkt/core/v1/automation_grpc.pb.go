@@ -39,7 +39,7 @@ const (
 type AutomationServiceClient interface {
 	// List automations with filtering options.
 	ListAutomations(ctx context.Context, in *ListAutomationsRequest, opts ...grpc.CallOption) (*ListAutomationsResponse, error)
-	// Get a single automation by name.
+	// Get an automation by name.
 	GetAutomation(ctx context.Context, in *GetAutomationRequest, opts ...grpc.CallOption) (*GetAutomationResponse, error)
 	// Create a new automation.
 	CreateAutomation(ctx context.Context, in *CreateAutomationRequest, opts ...grpc.CallOption) (*longrunningpb.Operation, error)
@@ -163,7 +163,7 @@ type AutomationService_StreamAutomationEventsClient = grpc.BidiStreamingClient[S
 type AutomationServiceServer interface {
 	// List automations with filtering options.
 	ListAutomations(context.Context, *ListAutomationsRequest) (*ListAutomationsResponse, error)
-	// Get a single automation by name.
+	// Get an automation by name.
 	GetAutomation(context.Context, *GetAutomationRequest) (*GetAutomationResponse, error)
 	// Create a new automation.
 	CreateAutomation(context.Context, *CreateAutomationRequest) (*longrunningpb.Operation, error)

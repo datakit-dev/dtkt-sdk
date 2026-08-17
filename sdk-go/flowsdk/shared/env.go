@@ -19,12 +19,9 @@ type (
 		Connector(ident string) (Connector, error)
 		Resolver() Resolver
 		Types() Types
-
+		Vars() (cel.Activation, error)
 		ParseExpr(id string, expr string, visitor ExprVisitor) (*cel.Ast, error)
 		CompileExpr(id string, ast *cel.Ast) (Program, error)
-
-		Vars(context.Context) (cel.Activation, error)
-		Extend(...cel.EnvOption) (Env, error)
 	}
 	Client interface {
 		common.DynamicClient

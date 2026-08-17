@@ -27,17 +27,33 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Flow is a declarative workflow spec for a directed acyclic graph of typed
+// nodes and edges formed by parsing CEL expressions refer to (source) nodes.
 type Flow struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Connections   []*Connection          `protobuf:"bytes,3,rep,name=connections,proto3" json:"connections,omitempty"`
-	Inputs        []*Input               `protobuf:"bytes,4,rep,name=inputs,proto3" json:"inputs,omitempty"`
-	Vars          []*Var                 `protobuf:"bytes,5,rep,name=vars,proto3" json:"vars,omitempty"`
-	Actions       []*Action              `protobuf:"bytes,7,rep,name=actions,proto3" json:"actions,omitempty"`
-	Outputs       []*Output              `protobuf:"bytes,9,rep,name=outputs,proto3" json:"outputs,omitempty"`
-	Streams       []*Stream              `protobuf:"bytes,10,rep,name=streams,proto3" json:"streams,omitempty"`
-	Metrics       map[string]*Metric     `protobuf:"bytes,11,rep,name=metrics,proto3" json:"metrics,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Name of flow.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Description of flow.
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// Control declares flow, execution, and lifecycle configuration.
+	Control *Control `protobuf:"bytes,3,opt,name=control,proto3" json:"control,omitempty"`
+	// Metrics report analytics at runtime without impacting execution.
+	// Note: metrics are not represented as a node in the DAG and therefore not
+	// referenceable by CEL expressions within typed nodes below.
+	Metrics map[string]*Metric `protobuf:"bytes,4,rep,name=metrics,proto3" json:"metrics,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// Connections declare dependent packages and services used by gRPC method
+	// calls in actions and streams.
+	Connections []*Connection `protobuf:"bytes,5,rep,name=connections,proto3" json:"connections,omitempty"`
+	// Inputs declare named and typed values that can be injected at runtime.
+	Inputs []*Input `protobuf:"bytes,6,rep,name=inputs,proto3" json:"inputs,omitempty"`
+	// Vars declare intermediate and transformed values in flow execution.
+	Vars []*Var `protobuf:"bytes,7,rep,name=vars,proto3" json:"vars,omitempty"`
+	// Actions declare unary gRPC method calls and user elicitation interactions.
+	Actions []*Action `protobuf:"bytes,8,rep,name=actions,proto3" json:"actions,omitempty"`
+	// Streams declare streaming gRPC method calls and value generators.
+	Streams []*Stream `protobuf:"bytes,9,rep,name=streams,proto3" json:"streams,omitempty"`
+	// Outputs declare named values evaluated and emitted at runtime.
+	Outputs       []*Output `protobuf:"bytes,10,rep,name=outputs,proto3" json:"outputs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -86,6 +102,20 @@ func (x *Flow) GetDescription() string {
 	return ""
 }
 
+func (x *Flow) GetControl() *Control {
+	if x != nil {
+		return x.Control
+	}
+	return nil
+}
+
+func (x *Flow) GetMetrics() map[string]*Metric {
+	if x != nil {
+		return x.Metrics
+	}
+	return nil
+}
+
 func (x *Flow) GetConnections() []*Connection {
 	if x != nil {
 		return x.Connections
@@ -114,13 +144,6 @@ func (x *Flow) GetActions() []*Action {
 	return nil
 }
 
-func (x *Flow) GetOutputs() []*Output {
-	if x != nil {
-		return x.Outputs
-	}
-	return nil
-}
-
 func (x *Flow) GetStreams() []*Stream {
 	if x != nil {
 		return x.Streams
@@ -128,24 +151,80 @@ func (x *Flow) GetStreams() []*Stream {
 	return nil
 }
 
-func (x *Flow) GetMetrics() map[string]*Metric {
+func (x *Flow) GetOutputs() []*Output {
 	if x != nil {
-		return x.Metrics
+		return x.Outputs
 	}
 	return nil
 }
 
+type Control struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Start flow execution when expression evaluates to true.
+	StartWhen *string `protobuf:"bytes,1,opt,name=start_when,json=startWhen,proto3,oneof" json:"start_when,omitempty"`
+	// Stop flow execution when expression evaluates to true.
+	StopWhen      *string `protobuf:"bytes,2,opt,name=stop_when,json=stopWhen,proto3,oneof" json:"stop_when,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Control) Reset() {
+	*x = Control{}
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Control) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Control) ProtoMessage() {}
+
+func (x *Control) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Control.ProtoReflect.Descriptor instead.
+func (*Control) Descriptor() ([]byte, []int) {
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Control) GetStartWhen() string {
+	if x != nil && x.StartWhen != nil {
+		return *x.StartWhen
+	}
+	return ""
+}
+
+func (x *Control) GetStopWhen() string {
+	if x != nil && x.StopWhen != nil {
+		return *x.StopWhen
+	}
+	return ""
+}
+
 type Metric struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Interval      *durationpb.Duration   `protobuf:"bytes,1,opt,name=interval,proto3" json:"interval,omitempty"`
-	Value         string                 `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Interval declares the frequency this metric will produce a value.
+	Interval *durationpb.Duration `protobuf:"bytes,1,opt,name=interval,proto3" json:"interval,omitempty"`
+	// Value expression to be evaluated.
+	Value         string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Metric) Reset() {
 	*x = Metric{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[1]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -157,7 +236,7 @@ func (x *Metric) String() string {
 func (*Metric) ProtoMessage() {}
 
 func (x *Metric) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[1]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -170,7 +249,7 @@ func (x *Metric) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Metric.ProtoReflect.Descriptor instead.
 func (*Metric) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{1}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Metric) GetInterval() *durationpb.Duration {
@@ -190,9 +269,9 @@ func (x *Metric) GetValue() string {
 type Connection struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// Connection must resolve to an integration with the given package identity.
+	// Declares connection is an integration with given package name and version.
 	Package *v1beta1.Package_Identity `protobuf:"bytes,2,opt,name=package,proto3" json:"package,omitempty"`
-	// Connection must resolve to a server which implements the given services.
+	// Declares connection implements the given gRPC services.
 	Services      []string `protobuf:"bytes,3,rep,name=services,proto3" json:"services,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -200,7 +279,7 @@ type Connection struct {
 
 func (x *Connection) Reset() {
 	*x = Connection{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[2]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -212,7 +291,7 @@ func (x *Connection) String() string {
 func (*Connection) ProtoMessage() {}
 
 func (x *Connection) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[2]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -225,7 +304,7 @@ func (x *Connection) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Connection.ProtoReflect.Descriptor instead.
 func (*Connection) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{2}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Connection) GetId() string {
@@ -275,7 +354,7 @@ type Input struct {
 
 func (x *Input) Reset() {
 	*x = Input{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[3]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -287,7 +366,7 @@ func (x *Input) String() string {
 func (*Input) ProtoMessage() {}
 
 func (x *Input) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[3]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -300,7 +379,7 @@ func (x *Input) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Input.ProtoReflect.Descriptor instead.
 func (*Input) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{3}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Input) GetId() string {
@@ -521,7 +600,7 @@ type Action struct {
 
 func (x *Action) Reset() {
 	*x = Action{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[4]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -533,7 +612,7 @@ func (x *Action) String() string {
 func (*Action) ProtoMessage() {}
 
 func (x *Action) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[4]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -546,7 +625,7 @@ func (x *Action) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Action.ProtoReflect.Descriptor instead.
 func (*Action) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{4}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Action) GetId() string {
@@ -593,7 +672,7 @@ type Stream struct {
 
 func (x *Stream) Reset() {
 	*x = Stream{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[5]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -605,7 +684,7 @@ func (x *Stream) String() string {
 func (*Stream) ProtoMessage() {}
 
 func (x *Stream) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[5]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -618,7 +697,7 @@ func (x *Stream) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Stream.ProtoReflect.Descriptor instead.
 func (*Stream) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{5}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Stream) GetId() string {
@@ -672,7 +751,7 @@ type UserAction struct {
 
 func (x *UserAction) Reset() {
 	*x = UserAction{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[6]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -684,7 +763,7 @@ func (x *UserAction) String() string {
 func (*UserAction) ProtoMessage() {}
 
 func (x *UserAction) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[6]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -697,7 +776,7 @@ func (x *UserAction) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserAction.ProtoReflect.Descriptor instead.
 func (*UserAction) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UserAction) GetInputs() []*UserAction_Input {
@@ -723,7 +802,7 @@ type Var struct {
 
 func (x *Var) Reset() {
 	*x = Var{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[7]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -735,7 +814,7 @@ func (x *Var) String() string {
 func (*Var) ProtoMessage() {}
 
 func (x *Var) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[7]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -748,7 +827,7 @@ func (x *Var) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Var.ProtoReflect.Descriptor instead.
 func (*Var) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{7}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *Var) GetId() string {
@@ -790,7 +869,7 @@ type Output struct {
 
 func (x *Output) Reset() {
 	*x = Output{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[8]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -802,7 +881,7 @@ func (x *Output) String() string {
 func (*Output) ProtoMessage() {}
 
 func (x *Output) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[8]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -815,7 +894,7 @@ func (x *Output) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Output.ProtoReflect.Descriptor instead.
 func (*Output) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{8}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *Output) GetId() string {
@@ -848,7 +927,7 @@ type Action_MethodCall struct {
 
 func (x *Action_MethodCall) Reset() {
 	*x = Action_MethodCall{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[10]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -860,7 +939,7 @@ func (x *Action_MethodCall) String() string {
 func (*Action_MethodCall) ProtoMessage() {}
 
 func (x *Action_MethodCall) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[10]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -873,7 +952,7 @@ func (x *Action_MethodCall) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Action_MethodCall.ProtoReflect.Descriptor instead.
 func (*Action_MethodCall) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{4, 0}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{5, 0}
 }
 
 func (x *Action_MethodCall) GetConnection() string {
@@ -926,7 +1005,7 @@ type Stream_MethodCall struct {
 
 func (x *Stream_MethodCall) Reset() {
 	*x = Stream_MethodCall{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[11]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -938,7 +1017,7 @@ func (x *Stream_MethodCall) String() string {
 func (*Stream_MethodCall) ProtoMessage() {}
 
 func (x *Stream_MethodCall) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[11]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -951,7 +1030,7 @@ func (x *Stream_MethodCall) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Stream_MethodCall.ProtoReflect.Descriptor instead.
 func (*Stream_MethodCall) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{5, 0}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6, 0}
 }
 
 func (x *Stream_MethodCall) GetConnection() string {
@@ -1000,7 +1079,7 @@ type Stream_Generator struct {
 
 func (x *Stream_Generator) Reset() {
 	*x = Stream_Generator{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[12]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1012,7 +1091,7 @@ func (x *Stream_Generator) String() string {
 func (*Stream_Generator) ProtoMessage() {}
 
 func (x *Stream_Generator) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[12]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1025,7 +1104,7 @@ func (x *Stream_Generator) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Stream_Generator.ProtoReflect.Descriptor instead.
 func (*Stream_Generator) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{5, 1}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6, 1}
 }
 
 func (x *Stream_Generator) GetEvery() *durationpb.Duration {
@@ -1061,7 +1140,7 @@ type Stream_Window struct {
 
 func (x *Stream_Window) Reset() {
 	*x = Stream_Window{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[13]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1073,7 +1152,7 @@ func (x *Stream_Window) String() string {
 func (*Stream_Window) ProtoMessage() {}
 
 func (x *Stream_Window) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[13]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1086,7 +1165,7 @@ func (x *Stream_Window) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Stream_Window.ProtoReflect.Descriptor instead.
 func (*Stream_Window) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{5, 2}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6, 2}
 }
 
 func (x *Stream_Window) GetTumbling() *Stream_Window_Tumbling {
@@ -1120,7 +1199,7 @@ type Stream_Window_Tumbling struct {
 
 func (x *Stream_Window_Tumbling) Reset() {
 	*x = Stream_Window_Tumbling{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[14]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1132,7 +1211,7 @@ func (x *Stream_Window_Tumbling) String() string {
 func (*Stream_Window_Tumbling) ProtoMessage() {}
 
 func (x *Stream_Window_Tumbling) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[14]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1145,7 +1224,7 @@ func (x *Stream_Window_Tumbling) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Stream_Window_Tumbling.ProtoReflect.Descriptor instead.
 func (*Stream_Window_Tumbling) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{5, 2, 0}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6, 2, 0}
 }
 
 func (x *Stream_Window_Tumbling) GetSize() uint32 {
@@ -1167,7 +1246,7 @@ type Stream_Window_Sliding struct {
 
 func (x *Stream_Window_Sliding) Reset() {
 	*x = Stream_Window_Sliding{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[15]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1179,7 +1258,7 @@ func (x *Stream_Window_Sliding) String() string {
 func (*Stream_Window_Sliding) ProtoMessage() {}
 
 func (x *Stream_Window_Sliding) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[15]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1192,7 +1271,7 @@ func (x *Stream_Window_Sliding) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Stream_Window_Sliding.ProtoReflect.Descriptor instead.
 func (*Stream_Window_Sliding) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{5, 2, 1}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6, 2, 1}
 }
 
 func (x *Stream_Window_Sliding) GetSize() uint32 {
@@ -1218,7 +1297,7 @@ type UserAction_ConfirmBinding struct {
 
 func (x *UserAction_ConfirmBinding) Reset() {
 	*x = UserAction_ConfirmBinding{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[16]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1230,7 +1309,7 @@ func (x *UserAction_ConfirmBinding) String() string {
 func (*UserAction_ConfirmBinding) ProtoMessage() {}
 
 func (x *UserAction_ConfirmBinding) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[16]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1243,7 +1322,7 @@ func (x *UserAction_ConfirmBinding) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserAction_ConfirmBinding.ProtoReflect.Descriptor instead.
 func (*UserAction_ConfirmBinding) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6, 0}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{7, 0}
 }
 
 func (x *UserAction_ConfirmBinding) GetValue() bool {
@@ -1262,7 +1341,7 @@ type UserAction_InputBinding struct {
 
 func (x *UserAction_InputBinding) Reset() {
 	*x = UserAction_InputBinding{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[17]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1274,7 +1353,7 @@ func (x *UserAction_InputBinding) String() string {
 func (*UserAction_InputBinding) ProtoMessage() {}
 
 func (x *UserAction_InputBinding) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[17]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1287,7 +1366,7 @@ func (x *UserAction_InputBinding) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserAction_InputBinding.ProtoReflect.Descriptor instead.
 func (*UserAction_InputBinding) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6, 1}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{7, 1}
 }
 
 func (x *UserAction_InputBinding) GetValue() string {
@@ -1306,7 +1385,7 @@ type UserAction_FileBinding struct {
 
 func (x *UserAction_FileBinding) Reset() {
 	*x = UserAction_FileBinding{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[18]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1318,7 +1397,7 @@ func (x *UserAction_FileBinding) String() string {
 func (*UserAction_FileBinding) ProtoMessage() {}
 
 func (x *UserAction_FileBinding) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[18]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1331,7 +1410,7 @@ func (x *UserAction_FileBinding) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserAction_FileBinding.ProtoReflect.Descriptor instead.
 func (*UserAction_FileBinding) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6, 2}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{7, 2}
 }
 
 func (x *UserAction_FileBinding) GetValue() []byte {
@@ -1350,7 +1429,7 @@ type UserAction_SelectBinding struct {
 
 func (x *UserAction_SelectBinding) Reset() {
 	*x = UserAction_SelectBinding{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[19]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1362,7 +1441,7 @@ func (x *UserAction_SelectBinding) String() string {
 func (*UserAction_SelectBinding) ProtoMessage() {}
 
 func (x *UserAction_SelectBinding) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[19]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1375,7 +1454,7 @@ func (x *UserAction_SelectBinding) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserAction_SelectBinding.ProtoReflect.Descriptor instead.
 func (*UserAction_SelectBinding) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6, 3}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{7, 3}
 }
 
 func (x *UserAction_SelectBinding) GetValue() *anypb.Any {
@@ -1394,7 +1473,7 @@ type UserAction_MultiSelectBinding struct {
 
 func (x *UserAction_MultiSelectBinding) Reset() {
 	*x = UserAction_MultiSelectBinding{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[20]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1406,7 +1485,7 @@ func (x *UserAction_MultiSelectBinding) String() string {
 func (*UserAction_MultiSelectBinding) ProtoMessage() {}
 
 func (x *UserAction_MultiSelectBinding) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[20]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1419,7 +1498,7 @@ func (x *UserAction_MultiSelectBinding) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserAction_MultiSelectBinding.ProtoReflect.Descriptor instead.
 func (*UserAction_MultiSelectBinding) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6, 4}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{7, 4}
 }
 
 func (x *UserAction_MultiSelectBinding) GetValue() []*anypb.Any {
@@ -1448,7 +1527,7 @@ type UserAction_Input struct {
 
 func (x *UserAction_Input) Reset() {
 	*x = UserAction_Input{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[21]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1460,7 +1539,7 @@ func (x *UserAction_Input) String() string {
 func (*UserAction_Input) ProtoMessage() {}
 
 func (x *UserAction_Input) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[21]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1473,7 +1552,7 @@ func (x *UserAction_Input) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserAction_Input.ProtoReflect.Descriptor instead.
 func (*UserAction_Input) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{6, 5}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{7, 5}
 }
 
 func (x *UserAction_Input) GetId() string {
@@ -1594,7 +1673,7 @@ type Var_Switch struct {
 
 func (x *Var_Switch) Reset() {
 	*x = Var_Switch{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[22]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1606,7 +1685,7 @@ func (x *Var_Switch) String() string {
 func (*Var_Switch) ProtoMessage() {}
 
 func (x *Var_Switch) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[22]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1619,7 +1698,7 @@ func (x *Var_Switch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Var_Switch.ProtoReflect.Descriptor instead.
 func (*Var_Switch) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{7, 0}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{8, 0}
 }
 
 func (x *Var_Switch) GetValue() string {
@@ -1653,7 +1732,7 @@ type Var_Switch_Case struct {
 
 func (x *Var_Switch_Case) Reset() {
 	*x = Var_Switch_Case{}
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[23]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1665,7 +1744,7 @@ func (x *Var_Switch_Case) String() string {
 func (*Var_Switch_Case) ProtoMessage() {}
 
 func (x *Var_Switch_Case) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[23]
+	mi := &file_dtkt_flow_v1beta1_spec_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1678,7 +1757,7 @@ func (x *Var_Switch_Case) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Var_Switch_Case.ProtoReflect.Descriptor instead.
 func (*Var_Switch_Case) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{7, 0, 0}
+	return file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP(), []int{8, 0, 0}
 }
 
 func (x *Var_Switch_Case) GetValue() string {
@@ -1699,25 +1778,34 @@ var File_dtkt_flow_v1beta1_spec_proto protoreflect.FileDescriptor
 
 const file_dtkt_flow_v1beta1_spec_proto_rawDesc = "" +
 	"\n" +
-	"\x1cdtkt/flow/v1beta1/spec.proto\x12\x11dtkt.flow.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1cdtkt/flow/v1beta1/type.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\"dtkt/shared/v1beta1/messages.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xc8\x04\n" +
+	"\x1cdtkt/flow/v1beta1/spec.proto\x12\x11dtkt.flow.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1cdtkt/flow/v1beta1/type.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\"dtkt/shared/v1beta1/messages.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xfe\x04\n" +
 	"\x04Flow\x12\x1a\n" +
 	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12*\n" +
-	"\vdescription\x18\x02 \x01(\tB\b\x82\xb5\x18\x04*\x02\b\x01R\vdescription\x12?\n" +
-	"\vconnections\x18\x03 \x03(\v2\x1d.dtkt.flow.v1beta1.ConnectionR\vconnections\x120\n" +
-	"\x06inputs\x18\x04 \x03(\v2\x18.dtkt.flow.v1beta1.InputR\x06inputs\x12*\n" +
-	"\x04vars\x18\x05 \x03(\v2\x16.dtkt.flow.v1beta1.VarR\x04vars\x123\n" +
-	"\aactions\x18\a \x03(\v2\x19.dtkt.flow.v1beta1.ActionR\aactions\x123\n" +
-	"\aoutputs\x18\t \x03(\v2\x19.dtkt.flow.v1beta1.OutputR\aoutputs\x123\n" +
-	"\astreams\x18\n" +
-	" \x03(\v2\x19.dtkt.flow.v1beta1.StreamR\astreams\x12c\n" +
-	"\ametrics\x18\v \x03(\v2$.dtkt.flow.v1beta1.Flow.MetricsEntryB#\xbaH \x9a\x01\x1d\"\x1br\x192\x17^[a-zA-Z][a-zA-Z0-9_]+$R\ametrics\x1aU\n" +
+	"\vdescription\x18\x02 \x01(\tB\b\x82\xb5\x18\x04*\x02\b\x01R\vdescription\x124\n" +
+	"\acontrol\x18\x03 \x01(\v2\x1a.dtkt.flow.v1beta1.ControlR\acontrol\x12c\n" +
+	"\ametrics\x18\x04 \x03(\v2$.dtkt.flow.v1beta1.Flow.MetricsEntryB#\xbaH \x9a\x01\x1d\"\x1br\x192\x17^[a-zA-Z][a-zA-Z0-9_]+$R\ametrics\x12?\n" +
+	"\vconnections\x18\x05 \x03(\v2\x1d.dtkt.flow.v1beta1.ConnectionR\vconnections\x120\n" +
+	"\x06inputs\x18\x06 \x03(\v2\x18.dtkt.flow.v1beta1.InputR\x06inputs\x12*\n" +
+	"\x04vars\x18\a \x03(\v2\x16.dtkt.flow.v1beta1.VarR\x04vars\x123\n" +
+	"\aactions\x18\b \x03(\v2\x19.dtkt.flow.v1beta1.ActionR\aactions\x123\n" +
+	"\astreams\x18\t \x03(\v2\x19.dtkt.flow.v1beta1.StreamR\astreams\x123\n" +
+	"\aoutputs\x18\n" +
+	" \x03(\v2\x19.dtkt.flow.v1beta1.OutputR\aoutputs\x1aU\n" +
 	"\fMetricsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12/\n" +
-	"\x05value\x18\x02 \x01(\v2\x19.dtkt.flow.v1beta1.MetricR\x05value:\x028\x01\"v\n" +
-	"\x06Metric\x12B\n" +
-	"\binterval\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\v\xbaH\b\xc8\x01\x01\xaa\x01\x02*\x00R\binterval\x12(\n" +
-	"\x05value\x18\x02 \x01(\tB\x12\xbaH\x0f\xc8\x01\x01r\n" +
-	"2\b^\\s?=\\s?R\x05value\"\xb8\x01\n" +
+	"\x05value\x18\x02 \x01(\v2\x19.dtkt.flow.v1beta1.MetricR\x05value:\x028\x01\"\x8e\x01\n" +
+	"\aControl\x123\n" +
+	"\n" +
+	"start_when\x18\x01 \x01(\tB\x0f\xbaH\fr\n" +
+	"2\b^\\s?=\\s?H\x00R\tstartWhen\x88\x01\x01\x121\n" +
+	"\tstop_when\x18\x02 \x01(\tB\x0f\xbaH\fr\n" +
+	"2\b^\\s?=\\s?H\x01R\bstopWhen\x88\x01\x01B\r\n" +
+	"\v_start_whenB\f\n" +
+	"\n" +
+	"_stop_when\"\xac\x01\n" +
+	"\x06Metric\x12F\n" +
+	"\binterval\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\x0f\xbaH\f\xc8\x01\x01\xaa\x01\x06J\x02\b\x05*\x00R\binterval\x12Z\n" +
+	"\x05value\x18\x02 \x01(\tBD\xbaHA\xc8\x01\x01r<2\b^\\s?=\\s?\x92\x02\x16= streams.reader.count\x92\x02\x16= streams.writer.countR\x05value\"\xb8\x01\n" +
 	"\n" +
 	"Connection\x121\n" +
 	"\x02id\x18\x01 \x01(\tB!\xbaH\x1e\xc8\x01\x01r\x192\x17^[a-zA-Z][a-zA-Z0-9_]+$R\x02id\x12?\n" +
@@ -1875,103 +1963,105 @@ func file_dtkt_flow_v1beta1_spec_proto_rawDescGZIP() []byte {
 	return file_dtkt_flow_v1beta1_spec_proto_rawDescData
 }
 
-var file_dtkt_flow_v1beta1_spec_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_dtkt_flow_v1beta1_spec_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
 var file_dtkt_flow_v1beta1_spec_proto_goTypes = []any{
 	(*Flow)(nil),                          // 0: dtkt.flow.v1beta1.Flow
-	(*Metric)(nil),                        // 1: dtkt.flow.v1beta1.Metric
-	(*Connection)(nil),                    // 2: dtkt.flow.v1beta1.Connection
-	(*Input)(nil),                         // 3: dtkt.flow.v1beta1.Input
-	(*Action)(nil),                        // 4: dtkt.flow.v1beta1.Action
-	(*Stream)(nil),                        // 5: dtkt.flow.v1beta1.Stream
-	(*UserAction)(nil),                    // 6: dtkt.flow.v1beta1.UserAction
-	(*Var)(nil),                           // 7: dtkt.flow.v1beta1.Var
-	(*Output)(nil),                        // 8: dtkt.flow.v1beta1.Output
-	nil,                                   // 9: dtkt.flow.v1beta1.Flow.MetricsEntry
-	(*Action_MethodCall)(nil),             // 10: dtkt.flow.v1beta1.Action.MethodCall
-	(*Stream_MethodCall)(nil),             // 11: dtkt.flow.v1beta1.Stream.MethodCall
-	(*Stream_Generator)(nil),              // 12: dtkt.flow.v1beta1.Stream.Generator
-	(*Stream_Window)(nil),                 // 13: dtkt.flow.v1beta1.Stream.Window
-	(*Stream_Window_Tumbling)(nil),        // 14: dtkt.flow.v1beta1.Stream.Window.Tumbling
-	(*Stream_Window_Sliding)(nil),         // 15: dtkt.flow.v1beta1.Stream.Window.Sliding
-	(*UserAction_ConfirmBinding)(nil),     // 16: dtkt.flow.v1beta1.UserAction.ConfirmBinding
-	(*UserAction_InputBinding)(nil),       // 17: dtkt.flow.v1beta1.UserAction.InputBinding
-	(*UserAction_FileBinding)(nil),        // 18: dtkt.flow.v1beta1.UserAction.FileBinding
-	(*UserAction_SelectBinding)(nil),      // 19: dtkt.flow.v1beta1.UserAction.SelectBinding
-	(*UserAction_MultiSelectBinding)(nil), // 20: dtkt.flow.v1beta1.UserAction.MultiSelectBinding
-	(*UserAction_Input)(nil),              // 21: dtkt.flow.v1beta1.UserAction.Input
-	(*Var_Switch)(nil),                    // 22: dtkt.flow.v1beta1.Var.Switch
-	(*Var_Switch_Case)(nil),               // 23: dtkt.flow.v1beta1.Var.Switch.Case
-	(*durationpb.Duration)(nil),           // 24: google.protobuf.Duration
-	(*v1beta1.Package_Identity)(nil),      // 25: dtkt.shared.v1beta1.Package.Identity
-	(*Bool)(nil),                          // 26: dtkt.flow.v1beta1.Bool
-	(*Bytes)(nil),                         // 27: dtkt.flow.v1beta1.Bytes
-	(*Double)(nil),                        // 28: dtkt.flow.v1beta1.Double
-	(*Float)(nil),                         // 29: dtkt.flow.v1beta1.Float
-	(*Int64)(nil),                         // 30: dtkt.flow.v1beta1.Int64
-	(*Uint64)(nil),                        // 31: dtkt.flow.v1beta1.Uint64
-	(*Int32)(nil),                         // 32: dtkt.flow.v1beta1.Int32
-	(*Uint32)(nil),                        // 33: dtkt.flow.v1beta1.Uint32
-	(*String)(nil),                        // 34: dtkt.flow.v1beta1.String
-	(*List)(nil),                          // 35: dtkt.flow.v1beta1.List
-	(*Map)(nil),                           // 36: dtkt.flow.v1beta1.Map
-	(*Message)(nil),                       // 37: dtkt.flow.v1beta1.Message
-	(*structpb.Value)(nil),                // 38: google.protobuf.Value
-	(*anypb.Any)(nil),                     // 39: google.protobuf.Any
-	(*v1beta11.ConfirmElement)(nil),       // 40: dtkt.protoform.v1beta1.ConfirmElement
-	(*v1beta11.InputElement)(nil),         // 41: dtkt.protoform.v1beta1.InputElement
-	(*v1beta11.FileElement)(nil),          // 42: dtkt.protoform.v1beta1.FileElement
-	(*v1beta11.SelectElement)(nil),        // 43: dtkt.protoform.v1beta1.SelectElement
-	(*v1beta11.MultiSelectElement)(nil),   // 44: dtkt.protoform.v1beta1.MultiSelectElement
+	(*Control)(nil),                       // 1: dtkt.flow.v1beta1.Control
+	(*Metric)(nil),                        // 2: dtkt.flow.v1beta1.Metric
+	(*Connection)(nil),                    // 3: dtkt.flow.v1beta1.Connection
+	(*Input)(nil),                         // 4: dtkt.flow.v1beta1.Input
+	(*Action)(nil),                        // 5: dtkt.flow.v1beta1.Action
+	(*Stream)(nil),                        // 6: dtkt.flow.v1beta1.Stream
+	(*UserAction)(nil),                    // 7: dtkt.flow.v1beta1.UserAction
+	(*Var)(nil),                           // 8: dtkt.flow.v1beta1.Var
+	(*Output)(nil),                        // 9: dtkt.flow.v1beta1.Output
+	nil,                                   // 10: dtkt.flow.v1beta1.Flow.MetricsEntry
+	(*Action_MethodCall)(nil),             // 11: dtkt.flow.v1beta1.Action.MethodCall
+	(*Stream_MethodCall)(nil),             // 12: dtkt.flow.v1beta1.Stream.MethodCall
+	(*Stream_Generator)(nil),              // 13: dtkt.flow.v1beta1.Stream.Generator
+	(*Stream_Window)(nil),                 // 14: dtkt.flow.v1beta1.Stream.Window
+	(*Stream_Window_Tumbling)(nil),        // 15: dtkt.flow.v1beta1.Stream.Window.Tumbling
+	(*Stream_Window_Sliding)(nil),         // 16: dtkt.flow.v1beta1.Stream.Window.Sliding
+	(*UserAction_ConfirmBinding)(nil),     // 17: dtkt.flow.v1beta1.UserAction.ConfirmBinding
+	(*UserAction_InputBinding)(nil),       // 18: dtkt.flow.v1beta1.UserAction.InputBinding
+	(*UserAction_FileBinding)(nil),        // 19: dtkt.flow.v1beta1.UserAction.FileBinding
+	(*UserAction_SelectBinding)(nil),      // 20: dtkt.flow.v1beta1.UserAction.SelectBinding
+	(*UserAction_MultiSelectBinding)(nil), // 21: dtkt.flow.v1beta1.UserAction.MultiSelectBinding
+	(*UserAction_Input)(nil),              // 22: dtkt.flow.v1beta1.UserAction.Input
+	(*Var_Switch)(nil),                    // 23: dtkt.flow.v1beta1.Var.Switch
+	(*Var_Switch_Case)(nil),               // 24: dtkt.flow.v1beta1.Var.Switch.Case
+	(*durationpb.Duration)(nil),           // 25: google.protobuf.Duration
+	(*v1beta1.Package_Identity)(nil),      // 26: dtkt.shared.v1beta1.Package.Identity
+	(*Bool)(nil),                          // 27: dtkt.flow.v1beta1.Bool
+	(*Bytes)(nil),                         // 28: dtkt.flow.v1beta1.Bytes
+	(*Double)(nil),                        // 29: dtkt.flow.v1beta1.Double
+	(*Float)(nil),                         // 30: dtkt.flow.v1beta1.Float
+	(*Int64)(nil),                         // 31: dtkt.flow.v1beta1.Int64
+	(*Uint64)(nil),                        // 32: dtkt.flow.v1beta1.Uint64
+	(*Int32)(nil),                         // 33: dtkt.flow.v1beta1.Int32
+	(*Uint32)(nil),                        // 34: dtkt.flow.v1beta1.Uint32
+	(*String)(nil),                        // 35: dtkt.flow.v1beta1.String
+	(*List)(nil),                          // 36: dtkt.flow.v1beta1.List
+	(*Map)(nil),                           // 37: dtkt.flow.v1beta1.Map
+	(*Message)(nil),                       // 38: dtkt.flow.v1beta1.Message
+	(*structpb.Value)(nil),                // 39: google.protobuf.Value
+	(*anypb.Any)(nil),                     // 40: google.protobuf.Any
+	(*v1beta11.ConfirmElement)(nil),       // 41: dtkt.protoform.v1beta1.ConfirmElement
+	(*v1beta11.InputElement)(nil),         // 42: dtkt.protoform.v1beta1.InputElement
+	(*v1beta11.FileElement)(nil),          // 43: dtkt.protoform.v1beta1.FileElement
+	(*v1beta11.SelectElement)(nil),        // 44: dtkt.protoform.v1beta1.SelectElement
+	(*v1beta11.MultiSelectElement)(nil),   // 45: dtkt.protoform.v1beta1.MultiSelectElement
 }
 var file_dtkt_flow_v1beta1_spec_proto_depIdxs = []int32{
-	2,  // 0: dtkt.flow.v1beta1.Flow.connections:type_name -> dtkt.flow.v1beta1.Connection
-	3,  // 1: dtkt.flow.v1beta1.Flow.inputs:type_name -> dtkt.flow.v1beta1.Input
-	7,  // 2: dtkt.flow.v1beta1.Flow.vars:type_name -> dtkt.flow.v1beta1.Var
-	4,  // 3: dtkt.flow.v1beta1.Flow.actions:type_name -> dtkt.flow.v1beta1.Action
-	8,  // 4: dtkt.flow.v1beta1.Flow.outputs:type_name -> dtkt.flow.v1beta1.Output
-	5,  // 5: dtkt.flow.v1beta1.Flow.streams:type_name -> dtkt.flow.v1beta1.Stream
-	9,  // 6: dtkt.flow.v1beta1.Flow.metrics:type_name -> dtkt.flow.v1beta1.Flow.MetricsEntry
-	24, // 7: dtkt.flow.v1beta1.Metric.interval:type_name -> google.protobuf.Duration
-	25, // 8: dtkt.flow.v1beta1.Connection.package:type_name -> dtkt.shared.v1beta1.Package.Identity
-	26, // 9: dtkt.flow.v1beta1.Input.bool:type_name -> dtkt.flow.v1beta1.Bool
-	27, // 10: dtkt.flow.v1beta1.Input.bytes:type_name -> dtkt.flow.v1beta1.Bytes
-	28, // 11: dtkt.flow.v1beta1.Input.double:type_name -> dtkt.flow.v1beta1.Double
-	29, // 12: dtkt.flow.v1beta1.Input.float:type_name -> dtkt.flow.v1beta1.Float
-	30, // 13: dtkt.flow.v1beta1.Input.int64:type_name -> dtkt.flow.v1beta1.Int64
-	31, // 14: dtkt.flow.v1beta1.Input.uint64:type_name -> dtkt.flow.v1beta1.Uint64
-	32, // 15: dtkt.flow.v1beta1.Input.int32:type_name -> dtkt.flow.v1beta1.Int32
-	33, // 16: dtkt.flow.v1beta1.Input.uint32:type_name -> dtkt.flow.v1beta1.Uint32
-	34, // 17: dtkt.flow.v1beta1.Input.string:type_name -> dtkt.flow.v1beta1.String
-	35, // 18: dtkt.flow.v1beta1.Input.list:type_name -> dtkt.flow.v1beta1.List
-	36, // 19: dtkt.flow.v1beta1.Input.map:type_name -> dtkt.flow.v1beta1.Map
-	37, // 20: dtkt.flow.v1beta1.Input.message:type_name -> dtkt.flow.v1beta1.Message
-	10, // 21: dtkt.flow.v1beta1.Action.call:type_name -> dtkt.flow.v1beta1.Action.MethodCall
-	6,  // 22: dtkt.flow.v1beta1.Action.user:type_name -> dtkt.flow.v1beta1.UserAction
-	11, // 23: dtkt.flow.v1beta1.Stream.call:type_name -> dtkt.flow.v1beta1.Stream.MethodCall
-	12, // 24: dtkt.flow.v1beta1.Stream.generate:type_name -> dtkt.flow.v1beta1.Stream.Generator
-	13, // 25: dtkt.flow.v1beta1.Stream.window:type_name -> dtkt.flow.v1beta1.Stream.Window
-	21, // 26: dtkt.flow.v1beta1.UserAction.inputs:type_name -> dtkt.flow.v1beta1.UserAction.Input
-	22, // 27: dtkt.flow.v1beta1.Var.switch:type_name -> dtkt.flow.v1beta1.Var.Switch
-	1,  // 28: dtkt.flow.v1beta1.Flow.MetricsEntry.value:type_name -> dtkt.flow.v1beta1.Metric
-	38, // 29: dtkt.flow.v1beta1.Action.MethodCall.request:type_name -> google.protobuf.Value
-	38, // 30: dtkt.flow.v1beta1.Stream.MethodCall.request:type_name -> google.protobuf.Value
-	24, // 31: dtkt.flow.v1beta1.Stream.Generator.every:type_name -> google.protobuf.Duration
-	24, // 32: dtkt.flow.v1beta1.Stream.Generator.initial:type_name -> google.protobuf.Duration
-	14, // 33: dtkt.flow.v1beta1.Stream.Window.tumbling:type_name -> dtkt.flow.v1beta1.Stream.Window.Tumbling
-	15, // 34: dtkt.flow.v1beta1.Stream.Window.sliding:type_name -> dtkt.flow.v1beta1.Stream.Window.Sliding
-	39, // 35: dtkt.flow.v1beta1.UserAction.SelectBinding.value:type_name -> google.protobuf.Any
-	39, // 36: dtkt.flow.v1beta1.UserAction.MultiSelectBinding.value:type_name -> google.protobuf.Any
-	40, // 37: dtkt.flow.v1beta1.UserAction.Input.confirm:type_name -> dtkt.protoform.v1beta1.ConfirmElement
-	41, // 38: dtkt.flow.v1beta1.UserAction.Input.input:type_name -> dtkt.protoform.v1beta1.InputElement
-	42, // 39: dtkt.flow.v1beta1.UserAction.Input.file:type_name -> dtkt.protoform.v1beta1.FileElement
-	43, // 40: dtkt.flow.v1beta1.UserAction.Input.select:type_name -> dtkt.protoform.v1beta1.SelectElement
-	44, // 41: dtkt.flow.v1beta1.UserAction.Input.multi_select:type_name -> dtkt.protoform.v1beta1.MultiSelectElement
-	23, // 42: dtkt.flow.v1beta1.Var.Switch.case:type_name -> dtkt.flow.v1beta1.Var.Switch.Case
-	43, // [43:43] is the sub-list for method output_type
-	43, // [43:43] is the sub-list for method input_type
-	43, // [43:43] is the sub-list for extension type_name
-	43, // [43:43] is the sub-list for extension extendee
-	0,  // [0:43] is the sub-list for field type_name
+	1,  // 0: dtkt.flow.v1beta1.Flow.control:type_name -> dtkt.flow.v1beta1.Control
+	10, // 1: dtkt.flow.v1beta1.Flow.metrics:type_name -> dtkt.flow.v1beta1.Flow.MetricsEntry
+	3,  // 2: dtkt.flow.v1beta1.Flow.connections:type_name -> dtkt.flow.v1beta1.Connection
+	4,  // 3: dtkt.flow.v1beta1.Flow.inputs:type_name -> dtkt.flow.v1beta1.Input
+	8,  // 4: dtkt.flow.v1beta1.Flow.vars:type_name -> dtkt.flow.v1beta1.Var
+	5,  // 5: dtkt.flow.v1beta1.Flow.actions:type_name -> dtkt.flow.v1beta1.Action
+	6,  // 6: dtkt.flow.v1beta1.Flow.streams:type_name -> dtkt.flow.v1beta1.Stream
+	9,  // 7: dtkt.flow.v1beta1.Flow.outputs:type_name -> dtkt.flow.v1beta1.Output
+	25, // 8: dtkt.flow.v1beta1.Metric.interval:type_name -> google.protobuf.Duration
+	26, // 9: dtkt.flow.v1beta1.Connection.package:type_name -> dtkt.shared.v1beta1.Package.Identity
+	27, // 10: dtkt.flow.v1beta1.Input.bool:type_name -> dtkt.flow.v1beta1.Bool
+	28, // 11: dtkt.flow.v1beta1.Input.bytes:type_name -> dtkt.flow.v1beta1.Bytes
+	29, // 12: dtkt.flow.v1beta1.Input.double:type_name -> dtkt.flow.v1beta1.Double
+	30, // 13: dtkt.flow.v1beta1.Input.float:type_name -> dtkt.flow.v1beta1.Float
+	31, // 14: dtkt.flow.v1beta1.Input.int64:type_name -> dtkt.flow.v1beta1.Int64
+	32, // 15: dtkt.flow.v1beta1.Input.uint64:type_name -> dtkt.flow.v1beta1.Uint64
+	33, // 16: dtkt.flow.v1beta1.Input.int32:type_name -> dtkt.flow.v1beta1.Int32
+	34, // 17: dtkt.flow.v1beta1.Input.uint32:type_name -> dtkt.flow.v1beta1.Uint32
+	35, // 18: dtkt.flow.v1beta1.Input.string:type_name -> dtkt.flow.v1beta1.String
+	36, // 19: dtkt.flow.v1beta1.Input.list:type_name -> dtkt.flow.v1beta1.List
+	37, // 20: dtkt.flow.v1beta1.Input.map:type_name -> dtkt.flow.v1beta1.Map
+	38, // 21: dtkt.flow.v1beta1.Input.message:type_name -> dtkt.flow.v1beta1.Message
+	11, // 22: dtkt.flow.v1beta1.Action.call:type_name -> dtkt.flow.v1beta1.Action.MethodCall
+	7,  // 23: dtkt.flow.v1beta1.Action.user:type_name -> dtkt.flow.v1beta1.UserAction
+	12, // 24: dtkt.flow.v1beta1.Stream.call:type_name -> dtkt.flow.v1beta1.Stream.MethodCall
+	13, // 25: dtkt.flow.v1beta1.Stream.generate:type_name -> dtkt.flow.v1beta1.Stream.Generator
+	14, // 26: dtkt.flow.v1beta1.Stream.window:type_name -> dtkt.flow.v1beta1.Stream.Window
+	22, // 27: dtkt.flow.v1beta1.UserAction.inputs:type_name -> dtkt.flow.v1beta1.UserAction.Input
+	23, // 28: dtkt.flow.v1beta1.Var.switch:type_name -> dtkt.flow.v1beta1.Var.Switch
+	2,  // 29: dtkt.flow.v1beta1.Flow.MetricsEntry.value:type_name -> dtkt.flow.v1beta1.Metric
+	39, // 30: dtkt.flow.v1beta1.Action.MethodCall.request:type_name -> google.protobuf.Value
+	39, // 31: dtkt.flow.v1beta1.Stream.MethodCall.request:type_name -> google.protobuf.Value
+	25, // 32: dtkt.flow.v1beta1.Stream.Generator.every:type_name -> google.protobuf.Duration
+	25, // 33: dtkt.flow.v1beta1.Stream.Generator.initial:type_name -> google.protobuf.Duration
+	15, // 34: dtkt.flow.v1beta1.Stream.Window.tumbling:type_name -> dtkt.flow.v1beta1.Stream.Window.Tumbling
+	16, // 35: dtkt.flow.v1beta1.Stream.Window.sliding:type_name -> dtkt.flow.v1beta1.Stream.Window.Sliding
+	40, // 36: dtkt.flow.v1beta1.UserAction.SelectBinding.value:type_name -> google.protobuf.Any
+	40, // 37: dtkt.flow.v1beta1.UserAction.MultiSelectBinding.value:type_name -> google.protobuf.Any
+	41, // 38: dtkt.flow.v1beta1.UserAction.Input.confirm:type_name -> dtkt.protoform.v1beta1.ConfirmElement
+	42, // 39: dtkt.flow.v1beta1.UserAction.Input.input:type_name -> dtkt.protoform.v1beta1.InputElement
+	43, // 40: dtkt.flow.v1beta1.UserAction.Input.file:type_name -> dtkt.protoform.v1beta1.FileElement
+	44, // 41: dtkt.flow.v1beta1.UserAction.Input.select:type_name -> dtkt.protoform.v1beta1.SelectElement
+	45, // 42: dtkt.flow.v1beta1.UserAction.Input.multi_select:type_name -> dtkt.protoform.v1beta1.MultiSelectElement
+	24, // 43: dtkt.flow.v1beta1.Var.Switch.case:type_name -> dtkt.flow.v1beta1.Var.Switch.Case
+	44, // [44:44] is the sub-list for method output_type
+	44, // [44:44] is the sub-list for method input_type
+	44, // [44:44] is the sub-list for extension type_name
+	44, // [44:44] is the sub-list for extension extendee
+	0,  // [0:44] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_flow_v1beta1_spec_proto_init() }
@@ -1980,7 +2070,8 @@ func file_dtkt_flow_v1beta1_spec_proto_init() {
 		return
 	}
 	file_dtkt_flow_v1beta1_type_proto_init()
-	file_dtkt_flow_v1beta1_spec_proto_msgTypes[3].OneofWrappers = []any{
+	file_dtkt_flow_v1beta1_spec_proto_msgTypes[1].OneofWrappers = []any{}
+	file_dtkt_flow_v1beta1_spec_proto_msgTypes[4].OneofWrappers = []any{
 		(*Input_Bool)(nil),
 		(*Input_Bytes)(nil),
 		(*Input_Double)(nil),
@@ -1994,12 +2085,12 @@ func file_dtkt_flow_v1beta1_spec_proto_init() {
 		(*Input_Map)(nil),
 		(*Input_Message)(nil),
 	}
-	file_dtkt_flow_v1beta1_spec_proto_msgTypes[4].OneofWrappers = []any{}
 	file_dtkt_flow_v1beta1_spec_proto_msgTypes[5].OneofWrappers = []any{}
-	file_dtkt_flow_v1beta1_spec_proto_msgTypes[7].OneofWrappers = []any{}
-	file_dtkt_flow_v1beta1_spec_proto_msgTypes[10].OneofWrappers = []any{}
+	file_dtkt_flow_v1beta1_spec_proto_msgTypes[6].OneofWrappers = []any{}
+	file_dtkt_flow_v1beta1_spec_proto_msgTypes[8].OneofWrappers = []any{}
 	file_dtkt_flow_v1beta1_spec_proto_msgTypes[11].OneofWrappers = []any{}
-	file_dtkt_flow_v1beta1_spec_proto_msgTypes[21].OneofWrappers = []any{
+	file_dtkt_flow_v1beta1_spec_proto_msgTypes[12].OneofWrappers = []any{}
+	file_dtkt_flow_v1beta1_spec_proto_msgTypes[22].OneofWrappers = []any{
 		(*UserAction_Input_Confirm)(nil),
 		(*UserAction_Input_Input)(nil),
 		(*UserAction_Input_File)(nil),
@@ -2012,7 +2103,7 @@ func file_dtkt_flow_v1beta1_spec_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_flow_v1beta1_spec_proto_rawDesc), len(file_dtkt_flow_v1beta1_spec_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   24,
+			NumMessages:   25,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

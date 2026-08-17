@@ -35,7 +35,7 @@ const (
 type DeploymentServiceClient interface {
 	// List deployments.
 	ListDeployments(ctx context.Context, in *ListDeploymentsRequest, opts ...grpc.CallOption) (*ListDeploymentsResponse, error)
-	// Get a single deployment by name.
+	// Get a deployment by name.
 	GetDeployment(ctx context.Context, in *GetDeploymentRequest, opts ...grpc.CallOption) (*GetDeploymentResponse, error)
 	// Create a new deployment.
 	CreateDeployment(ctx context.Context, in *CreateDeploymentRequest, opts ...grpc.CallOption) (*longrunningpb.Operation, error)
@@ -111,7 +111,7 @@ func (c *deploymentServiceClient) DeleteDeployment(ctx context.Context, in *Dele
 type DeploymentServiceServer interface {
 	// List deployments.
 	ListDeployments(context.Context, *ListDeploymentsRequest) (*ListDeploymentsResponse, error)
-	// Get a single deployment by name.
+	// Get a deployment by name.
 	GetDeployment(context.Context, *GetDeploymentRequest) (*GetDeploymentResponse, error)
 	// Create a new deployment.
 	CreateDeployment(context.Context, *CreateDeploymentRequest) (*longrunningpb.Operation, error)

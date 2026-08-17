@@ -12,7 +12,7 @@ func Test_CELUUID(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ast, iss := env.Compile("[uuid.new(), uuid.new_v7()]")
+	ast, iss := env.Compile("[uuid.new(), uuid.new(7)]")
 	if iss.Err() != nil {
 		t.Fatal(iss.Err())
 	}

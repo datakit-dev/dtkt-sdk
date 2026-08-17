@@ -3,8 +3,7 @@ package runtime
 import (
 	"context"
 	"fmt"
-	"sync"
-	"time"
+	"reflect"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/api"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
@@ -21,27 +20,23 @@ import (
 
 var _ shared.Env = (*Env)(nil)
 
-var doneMsg *flowv1beta1.Done
-var eofMsg *flowv1beta1.EOF
-var skipMsg *flowv1beta1.Skip
-
-var nodeVarsType = cel.MapType(cel.StringType, cel.DynType)
+var (
+	varsCELType = cel.MapType(cel.StringType, cel.DynType)
+	varsMapType = reflect.TypeFor[map[string]any]()
+)
 
 type (
 	Env struct {
 		*cel.Env
 
 		proto *flowv1beta1.Env
-		vars  EnvVars
+		vars  Vars
 
 		conns    ConnectorProvider
 		resolver shared.Resolver
 		types    *common.CELTypes
-
-		mut sync.RWMutex
 	}
-	EnvVars   func(context.Context, shared.Env) (cel.Activation, error)
-	EnvOption func(*Env)
+	Vars func(shared.Env) (cel.Activation, error)
 )
 
 func NewEnv(opts ...Option) (_ *Env, err error) {
@@ -57,7 +52,7 @@ func NewEnv(opts ...Option) (_ *Env, err error) {
 	}
 
 	if env.vars == nil {
-		env.vars = func(context.Context, shared.Env) (cel.Activation, error) {
+		env.vars = func(shared.Env) (cel.Activation, error) {
 			return nil, fmt.Errorf("env vars not set")
 		}
 	}
@@ -79,30 +74,41 @@ func NewEnv(opts ...Option) (_ *Env, err error) {
 		cel.CustomTypeProvider(celTypes),
 		cel.CustomTypeAdapter(celTypes),
 		cel.Abbrevs(
-			string(doneMsg.ProtoReflect().Descriptor().FullName()),
-			string(eofMsg.ProtoReflect().Descriptor().FullName()),
-			string(skipMsg.ProtoReflect().Descriptor().FullName()),
+			string(doneProto.ProtoReflect().Descriptor().FullName()),
+			string(skipProto.ProtoReflect().Descriptor().FullName()),
 		),
 		cel.VariableDecls(util.SliceMap(env.proto.GetNodes(), func(node *flowv1beta1.Env_Node) *decls.VariableDecl {
-			return decls.NewVariable(node.GetIdent(), nodeVarsType)
+			return decls.NewVariable(node.GetIdent(), varsCELType)
 		})...),
-		cel.Function("now",
-			cel.SingletonFunctionBinding(
-				func(...ref.Val) ref.Val {
-					return celtypes.Timestamp{
-						Time: time.Now(),
-					}
-				},
-			),
-			cel.Overload("now", nil, cel.TimestampType),
-		),
 		cel.Function("isEOF",
 			cel.Overload("isEOF_dyn", []*cel.Type{cel.DynType}, cel.BoolType),
 			cel.SingletonFunctionBinding(
 				func(args ...ref.Val) ref.Val {
-					switch args[0].Value().(type) {
-					case *flowv1beta1.EOF:
+					if done, ok := IsDone(args[0].Value()); ok && done.IsEOF() {
 						return celtypes.True
+					} else if vars, err := args[0].ConvertToNative(varsMapType); err == nil {
+						if vars, ok := vars.(map[string]any); ok {
+							if _, ok := vars["value"].(*flowv1beta1.Done); ok {
+								return celtypes.True
+							}
+						}
+					}
+					return celtypes.False
+				},
+			),
+		),
+		cel.Function("isSkip",
+			cel.Overload("isSkip_dyn", []*cel.Type{cel.DynType}, cel.BoolType),
+			cel.SingletonFunctionBinding(
+				func(args ...ref.Val) ref.Val {
+					if _, ok := IsSkip(args[0].Value()); ok {
+						return celtypes.True
+					} else if vars, err := args[0].ConvertToNative(varsMapType); err == nil {
+						if vars, ok := vars.(map[string]any); ok {
+							if _, ok := vars["value"].(*flowv1beta1.Skip); ok {
+								return celtypes.True
+							}
+						}
 					}
 					return celtypes.False
 				},
@@ -119,9 +125,6 @@ func NewEnv(opts ...Option) (_ *Env, err error) {
 }
 
 func (e *Env) Proto() *flowv1beta1.Env {
-	e.mut.RLock()
-	defer e.mut.RUnlock()
-
 	return proto.CloneOf(e.proto)
 }
 
@@ -129,8 +132,8 @@ func (e *Env) Extend(opts ...cel.EnvOption) (shared.Env, error) {
 	return e.extend(opts...)
 }
 
-func (e *Env) Vars(ctx context.Context) (cel.Activation, error) {
-	return e.vars(ctx, e)
+func (e *Env) Vars() (cel.Activation, error) {
+	return e.vars(e)
 }
 
 func (e *Env) Resolver() shared.Resolver {
@@ -175,7 +178,7 @@ func (e *Env) CompileExpr(id string, ast *cel.Ast) (shared.Program, error) {
 	}
 
 	return shared.ProgramFunc(func(ctx context.Context, env shared.Env) ref.Val {
-		vars, err := env.Vars(ctx)
+		vars, err := env.Vars()
 		if err != nil {
 			return types.WrapErr(err)
 		}

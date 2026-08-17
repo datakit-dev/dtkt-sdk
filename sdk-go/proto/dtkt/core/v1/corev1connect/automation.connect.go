@@ -65,7 +65,7 @@ const (
 type AutomationServiceClient interface {
 	// List automations with filtering options.
 	ListAutomations(context.Context, *connect.Request[v1.ListAutomationsRequest]) (*connect.Response[v1.ListAutomationsResponse], error)
-	// Get a single automation by name.
+	// Get an automation by name.
 	GetAutomation(context.Context, *connect.Request[v1.GetAutomationRequest]) (*connect.Response[v1.GetAutomationResponse], error)
 	// Create a new automation.
 	CreateAutomation(context.Context, *connect.Request[v1.CreateAutomationRequest]) (*connect.Response[longrunningpb.Operation], error)
@@ -201,7 +201,7 @@ func (c *automationServiceClient) StreamAutomationEvents(ctx context.Context) *c
 type AutomationServiceHandler interface {
 	// List automations with filtering options.
 	ListAutomations(context.Context, *connect.Request[v1.ListAutomationsRequest]) (*connect.Response[v1.ListAutomationsResponse], error)
-	// Get a single automation by name.
+	// Get an automation by name.
 	GetAutomation(context.Context, *connect.Request[v1.GetAutomationRequest]) (*connect.Response[v1.GetAutomationResponse], error)
 	// Create a new automation.
 	CreateAutomation(context.Context, *connect.Request[v1.CreateAutomationRequest]) (*connect.Response[longrunningpb.Operation], error)

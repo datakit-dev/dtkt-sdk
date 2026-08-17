@@ -13,6 +13,8 @@ import (
 
 	// Well-known types
 	_ "cloud.google.com/go/longrunning/autogen/longrunningpb"
+	_ "google.golang.org/genproto/googleapis/rpc/http"
+	_ "google.golang.org/genproto/googleapis/rpc/status"
 	_ "google.golang.org/protobuf/types/known/anypb"
 	_ "google.golang.org/protobuf/types/known/durationpb"
 	_ "google.golang.org/protobuf/types/known/emptypb"
@@ -41,6 +43,7 @@ import (
 	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protostore/v1beta1"
 	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/replication/v1beta1"
 	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
+	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/sql/v1beta1"
 
 	// V1Beta2
 	_ "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta2"

@@ -28,8 +28,8 @@ type (
 
 		value any
 	}
-	ExprMap  map[string]*ExprTree
 	ExprList []*ExprTree
+	ExprMap  map[string]*ExprTree
 	ExprErr  struct {
 		error
 	}

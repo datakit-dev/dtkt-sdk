@@ -12,7 +12,7 @@ import { DeploymentService } from "./deployment_pb";
 export const listDeployments = DeploymentService.method.listDeployments;
 
 /**
- * Get a single deployment by name.
+ * Get a deployment by name.
  *
  * @generated from rpc dtkt.core.v1.DeploymentService.GetDeployment
  */

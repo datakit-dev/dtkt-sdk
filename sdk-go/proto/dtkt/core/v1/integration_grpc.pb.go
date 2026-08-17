@@ -32,11 +32,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// IntegrationService provides operations for managing integration specs.
+// IntegrationService provides operations for managing integrations.
 type IntegrationServiceClient interface {
 	// List integrations.
 	ListIntegrations(ctx context.Context, in *ListIntegrationsRequest, opts ...grpc.CallOption) (*ListIntegrationsResponse, error)
-	// Get a single integration by name.
+	// Get an integration by name.
 	GetIntegration(ctx context.Context, in *GetIntegrationRequest, opts ...grpc.CallOption) (*GetIntegrationResponse, error)
 	// Create a new integration.
 	CreateIntegration(ctx context.Context, in *CreateIntegrationRequest, opts ...grpc.CallOption) (*CreateIntegrationResponse, error)
@@ -120,11 +120,11 @@ func (c *integrationServiceClient) BuildIntegration(ctx context.Context, in *Bui
 // All implementations must embed UnimplementedIntegrationServiceServer
 // for forward compatibility.
 //
-// IntegrationService provides operations for managing integration specs.
+// IntegrationService provides operations for managing integrations.
 type IntegrationServiceServer interface {
 	// List integrations.
 	ListIntegrations(context.Context, *ListIntegrationsRequest) (*ListIntegrationsResponse, error)
-	// Get a single integration by name.
+	// Get an integration by name.
 	GetIntegration(context.Context, *GetIntegrationRequest) (*GetIntegrationResponse, error)
 	// Create a new integration.
 	CreateIntegration(context.Context, *CreateIntegrationRequest) (*CreateIntegrationResponse, error)

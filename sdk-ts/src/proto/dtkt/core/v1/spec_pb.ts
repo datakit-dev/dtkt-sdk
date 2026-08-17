@@ -21,8 +21,8 @@ export const file_dtkt_core_v1_spec: GenFile = /*@__PURE__*/
   fileDesc("ChdkdGt0L2NvcmUvdjEvc3BlYy5wcm90bxIMZHRrdC5jb3JlLnYxIsgBCghGbG93U3BlYxIfCgRraW5kGAEgASgJOgRGbG93Qgu6SAhyBgoERmxvdxIsCgthcGlfdmVyc2lvbhgCIAEoCToHdjFiZXRhMUIOukgLcglSB3YxYmV0YTESKgoEc3BlYxgDIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3RCA+BBBBIvCgd2MWJldGExGAQgASgLMhcuZHRrdC5mbG93LnYxYmV0YTEuRmxvd0ID4EEDSABCEAoHdmVyc2lvbhIFukgCCAEi0QEKC1BhY2thZ2VTcGVjEiUKBGtpbmQYASABKAk6B1BhY2thZ2VCDrpIC3IJCgdQYWNrYWdlEiwKC2FwaV92ZXJzaW9uGAIgASgJOgd2MWJldGExQg66SAtyCVIHdjFiZXRhMRIqCgRzcGVjGAMgASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdEID4EEEEi8KB3YxYmV0YTEYBCABKAsyHC5kdGt0LnNoYXJlZC52MWJldGExLlBhY2thZ2VIAEIQCgd2ZXJzaW9uEgW6SAIIAUK7AQoScHJvdG8uZHRrdC5jb3JlLnYxQglTcGVjUHJvdG9QAVpAZ2l0aHViLmNvbS9kYXRha2l0LWRldi9kdGt0LXNkay9zZGstZ28vcHJvdG8vZHRrdC9jb3JlL3YxO2NvcmV2MaICA0RDWKoCDER0a3QuQ29yZS5WMcoCDER0a3RcQ29yZVxWMeICGER0a3RcQ29yZVxWMVxHUEJNZXRhZGF0YeoCDkR0a3Q6OkNvcmU6OlYxkgMF0j4CEANiCGVkaXRpb25zcOgH", [file_buf_validate_validate, file_dtkt_flow_v1beta1_spec, file_dtkt_shared_v1beta1_messages, file_google_api_field_behavior, file_google_protobuf_go_features, file_google_protobuf_struct]);
 
 /**
- * FlowSpec is a versioned Flow specification wrapper and implements
- * api.SpecLoader interface which handles encoding, decoding, and validation.
+ * FlowSpec is a versioned Flow spec wrapper implementing api.SpecLoader
+ * interface which handles encoding, decoding, and validation.
  *
  * @generated from message dtkt.core.v1.FlowSpec
  */
@@ -55,8 +55,8 @@ export type FlowSpec = Message<"dtkt.core.v1.FlowSpec"> & {
 };
 
 /**
- * FlowSpec is a versioned Flow specification wrapper and implements
- * api.SpecLoader interface which handles encoding, decoding, and validation.
+ * FlowSpec is a versioned Flow spec wrapper implementing api.SpecLoader
+ * interface which handles encoding, decoding, and validation.
  *
  * @generated from message dtkt.core.v1.FlowSpec
  */
@@ -96,8 +96,8 @@ export const FlowSpecSchema: GenMessage<FlowSpec, {validType: FlowSpecValid}> = 
   messageDesc(file_dtkt_core_v1_spec, 0);
 
 /**
- * PackageSpec is a versioned Package specification wrapper and implements
- * api.SpecLoader interface which handles encoding, decoding, and validation.
+ * PackageSpec is a versioned Package spec wrapper implementing api.SpecLoader
+ * interface which handles encoding, decoding, and validation.
  *
  * @generated from message dtkt.core.v1.PackageSpec
  */
@@ -130,8 +130,8 @@ export type PackageSpec = Message<"dtkt.core.v1.PackageSpec"> & {
 };
 
 /**
- * PackageSpec is a versioned Package specification wrapper and implements
- * api.SpecLoader interface which handles encoding, decoding, and validation.
+ * PackageSpec is a versioned Package spec wrapper implementing api.SpecLoader
+ * interface which handles encoding, decoding, and validation.
  *
  * @generated from message dtkt.core.v1.PackageSpec
  */

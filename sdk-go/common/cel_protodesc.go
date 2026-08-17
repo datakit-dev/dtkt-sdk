@@ -10,32 +10,23 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-var _ cel.Library = (*celProtoDescLib)(nil)
+var _ cel.Library = (*celDescriptorLib)(nil)
 
 type (
-	celProtoDescLib struct {
+	celDescriptorLib struct {
 		printer protoprint.Printer
 	}
-	celProtoDescLibOption func(*celProtoDescLib)
 )
 
-func CELProtoDescLib(opts ...celProtoDescLibOption) cel.EnvOption {
-	lib := &celProtoDescLib{}
-
-	for _, opt := range opts {
-		if opt != nil {
-			opt(lib)
-		}
-	}
-
-	return cel.Lib(lib)
+func CELDescriptorLib() cel.EnvOption {
+	return cel.Lib(&celDescriptorLib{})
 }
 
-func (l *celProtoDescLib) LibraryName() string {
+func (l *celDescriptorLib) LibraryName() string {
 	return "protodesc"
 }
 
-func (l *celProtoDescLib) CompileOptions() []cel.EnvOption {
+func (l *celDescriptorLib) CompileOptions() []cel.EnvOption {
 	return []cel.EnvOption{
 		cel.Function("protodesc.print",
 			cel.Overload("protodesc.print_string",
@@ -47,7 +38,7 @@ func (l *celProtoDescLib) CompileOptions() []cel.EnvOption {
 	}
 }
 
-func (l *celProtoDescLib) protoPrint(value ref.Val) ref.Val {
+func (l *celDescriptorLib) protoPrint(value ref.Val) ref.Val {
 	var desc protoreflect.Descriptor
 	switch value := value.(type) {
 	case *celEnum:
@@ -66,4 +57,4 @@ func (l *celProtoDescLib) protoPrint(value ref.Val) ref.Val {
 	return types.String(str)
 }
 
-func (l *celProtoDescLib) ProgramOptions() []cel.ProgramOption { return nil }
+func (l *celDescriptorLib) ProgramOptions() []cel.ProgramOption { return nil }

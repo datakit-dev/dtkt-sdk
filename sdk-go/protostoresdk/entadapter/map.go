@@ -56,7 +56,7 @@ func MapScanner[M map[K]V, K protostore.MapKeyType, V any](field *fieldType[M]) 
 	return entfield.ValueScannerFunc[M, *sql.Null[[]byte]]{
 		V: func(m M) (driver.Value, error) {
 			b, err := encoding.ToJSONV2(m, encoding.WithEncodeProtoJSONOptions(protojson.MarshalOptions{
-				Resolver: protostore.GetResolver(),
+				Resolver: protostore.Resolver,
 			}))
 			if err != nil {
 				return nil, fmt.Errorf("field: %s: %w", field.desc.Name, err)
@@ -67,7 +67,7 @@ func MapScanner[M map[K]V, K protostore.MapKeyType, V any](field *fieldType[M]) 
 		S: func(ns *sql.Null[[]byte]) (m M, err error) {
 			if ns.Valid {
 				err = encoding.FromJSONV2(ns.V, &m, encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
-					Resolver: protostore.GetResolver(),
+					Resolver: protostore.Resolver,
 				}))
 				if err != nil {
 					return nil, fmt.Errorf("field: %s: %w", field.desc.Name, err)

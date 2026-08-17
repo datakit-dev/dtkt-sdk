@@ -15,22 +15,27 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1";
 
-// IntegrationService provides operations for managing integration specs.
+// IntegrationService provides operations for managing integrations.
 service IntegrationService {
   // List integrations.
   rpc ListIntegrations(ListIntegrationsRequest) returns (ListIntegrationsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // Get a single integration by name.
+
+  // Get an integration by name.
   rpc GetIntegration(GetIntegrationRequest) returns (GetIntegrationResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
   // Create a new integration.
   rpc CreateIntegration(CreateIntegrationRequest) returns (CreateIntegrationResponse);
+
   // Update an existing integration.
   rpc UpdateIntegration(UpdateIntegrationRequest) returns (UpdateIntegrationResponse);
+
   // Delete an integration by name.
   rpc DeleteIntegration(DeleteIntegrationRequest) returns (DeleteIntegrationResponse);
+
   // Build an integration.
   rpc BuildIntegration(BuildIntegrationRequest) returns (google.longrunning.Operation) {
     option (google.longrunning.operation_info) = {
@@ -38,6 +43,7 @@ service IntegrationService {
       response_type: "BuildIntegrationResponse"
     };
   }
+
   // TODO: Batch build integrations.
   // rpc BatchBuildIntegrations(BatchBuildIntegrationsRequest) returns (google.longrunning.Operation) {
   //   option (google.longrunning.operation_info) = {

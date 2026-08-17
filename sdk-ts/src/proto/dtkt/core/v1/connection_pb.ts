@@ -833,7 +833,7 @@ export const ConnectionService: GenService<{
     output: typeof ListConnectionsResponseSchema;
   },
   /**
-   * Get a single connection by name.
+   * Get a connection by name.
    *
    * @generated from rpc dtkt.core.v1.ConnectionService.GetConnection
    */

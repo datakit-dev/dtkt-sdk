@@ -280,6 +280,9 @@ message ReadBlobLinesRequest {
 message ReadBlobLinesResponse {
   // Line data read from blob content in the requested format.
   LineData data = 1;
+
+  // Line index relative to start of blob content.
+  int64 index = 2;
 }
 
 message WriteBlobLinesRequest {

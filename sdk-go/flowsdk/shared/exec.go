@@ -9,7 +9,7 @@ import (
 )
 
 type (
-	Executor[T Node] struct {
+	Executor[T GraphNode] struct {
 		graph *Graph[T]
 
 		// Control flow callbacks
@@ -37,17 +37,17 @@ type (
 	PipeOf[I any, O any] interface {
 		In() chan<- I
 		Out() <-chan O
-		Run(context.Context, ExecFunc[O, I]) error
+		Run(context.Context, RunFunc[O, I]) error
 	}
-	ExecFunc[I any, O any] func(context.Context, I) (O, error)
-	OnStart[T Node]        func(context.Context, Nodes[T]) (map[string]any, error)
-	OnEnd[T Node]          func(context.Context, Nodes[T]) error
-	OnSend[T Node]         func(context.Context, T, any) error
-	OnRecv[T Node]         func(context.Context, T, any) (any, error)
-	ExecutorOption[T Node] func(*Executor[T])
+	RunFunc[I any, O any]       func(context.Context, I) (O, error)
+	OnStart[T GraphNode]        func(context.Context, GraphNodes[T]) (map[string]any, error)
+	OnEnd[T GraphNode]          func(context.Context, GraphNodes[T]) error
+	OnSend[T GraphNode]         func(context.Context, T, any) error
+	OnRecv[T GraphNode]         func(context.Context, T, any) (any, error)
+	ExecutorOption[T GraphNode] func(*Executor[T])
 )
 
-func NewExecutor[T Node](graph *Graph[T], opts ...ExecutorOption[T]) *Executor[T] {
+func NewExecutor[T GraphNode](graph *Graph[T], opts ...ExecutorOption[T]) *Executor[T] {
 	e := &Executor[T]{
 		graph:    graph,
 		startsCh: map[string]chan any{},
@@ -65,7 +65,7 @@ func NewExecutor[T Node](graph *Graph[T], opts ...ExecutorOption[T]) *Executor[T
 
 // WithInitStart is an option for setting the initial values of start nodes
 // (without inbound edges) and is ran exactly once before the first start cycle.
-func WithInitStart[T Node](onInit OnStart[T]) ExecutorOption[T] {
+func WithInitStart[T GraphNode](onInit OnStart[T]) ExecutorOption[T] {
 	return func(e *Executor[T]) {
 		e.onInit = onInit
 	}
@@ -73,33 +73,41 @@ func WithInitStart[T Node](onInit OnStart[T]) ExecutorOption[T] {
 
 // WithBeforeStart is an option for setting the values of start nodes (without
 // inbound edges) and is ran before each cycle.
-func WithBeforeStart[T Node](onStart OnStart[T]) ExecutorOption[T] {
+func WithBeforeStart[T GraphNode](onStart OnStart[T]) ExecutorOption[T] {
 	return func(e *Executor[T]) {
-		e.onStarts = append(e.onStarts, onStart)
+		if onStart != nil {
+			e.onStarts = append(e.onStarts, onStart)
+		}
 	}
 }
 
 // WithAfterEnd is an option for receiving the values of end nodes (without
 // outbound edges) and is ran after each cycle.
-func WithAfterEnd[T Node](onEnd OnEnd[T]) ExecutorOption[T] {
+func WithAfterEnd[T GraphNode](onEnd OnEnd[T]) ExecutorOption[T] {
 	return func(e *Executor[T]) {
-		e.onEnds = append(e.onEnds, onEnd)
+		if onEnd != nil {
+			e.onEnds = append(e.onEnds, onEnd)
+		}
 	}
 }
 
 // WithBeforeSend is an option for a callback to be called before a node is sent
 // its next value.
-func WithBeforeSend[T Node](onSend OnSend[T]) ExecutorOption[T] {
+func WithBeforeSend[T GraphNode](onSend OnSend[T]) ExecutorOption[T] {
 	return func(e *Executor[T]) {
-		e.onSends = append(e.onSends, onSend)
+		if onSend != nil {
+			e.onSends = append(e.onSends, onSend)
+		}
 	}
 }
 
 // WithAfterRecv is an option for a callback to receive a node's value after it
 // has been received.
-func WithAfterRecv[T Node](onRecv OnRecv[T]) ExecutorOption[T] {
+func WithAfterRecv[T GraphNode](onRecv OnRecv[T]) ExecutorOption[T] {
 	return func(e *Executor[T]) {
-		e.onRecvs = append(e.onRecvs, onRecv)
+		if onRecv != nil {
+			e.onRecvs = append(e.onRecvs, onRecv)
+		}
 	}
 }
 
@@ -109,6 +117,7 @@ func (e *Executor[T]) Run(ctx context.Context) (err error) {
 			group errgroup.Group
 			execs [][2]func() error
 		)
+
 		for _, node := range e.graph.Nodes() {
 			var (
 				inbound        = e.graph.Inbound(node.Ident())
@@ -134,14 +143,14 @@ func (e *Executor[T]) Run(ctx context.Context) (err error) {
 				func() error {
 					err := node.Run(ctx)
 					if err != nil {
-						return fmt.Errorf("%q: %w", node.Ident(), err)
+						return fmt.Errorf("%s: %w", node.Ident(), err)
 					}
 					return nil
 				},
 				func() error {
 					err := e.runNodeFlow(ctx, node, startCh, endCh, inbound, outbound)
 					if err != nil {
-						return fmt.Errorf("%q: %w", node.Ident(), err)
+						return fmt.Errorf("%s: %w", node.Ident(), err)
 					}
 					return nil
 				},
@@ -163,6 +172,7 @@ func (e *Executor[T]) Run(ctx context.Context) (err error) {
 
 		e.runErr = group.Wait()
 	})
+
 	return e.runErr
 }
 
@@ -188,19 +198,17 @@ func (e *Executor[T]) runControlFlow(ctx context.Context) (err error) {
 
 		if !isInit {
 			for _, onStart := range e.onStarts {
-				if onStart != nil {
-					values, err := onStart(ctx, e.starts)
-					if err != nil {
-						return err
+				values, err := onStart(ctx, e.starts)
+				if err != nil {
+					return err
+				}
+
+				for ident, value := range values {
+					if _, ok := starts[ident]; ok {
+						continue
 					}
 
-					for ident, value := range values {
-						if _, ok := starts[ident]; ok {
-							continue
-						}
-
-						starts[ident] = value
-					}
+					starts[ident] = value
 				}
 			}
 		}
@@ -213,7 +221,7 @@ func (e *Executor[T]) runControlFlow(ctx context.Context) (err error) {
 			}
 		}
 
-		var nodes []T
+		var nodes GraphNodes[T]
 		for ident, endCh := range e.endsCh {
 			select {
 			case <-ctx.Done():
@@ -226,11 +234,9 @@ func (e *Executor[T]) runControlFlow(ctx context.Context) (err error) {
 		}
 
 		for _, onEnd := range e.onEnds {
-			if onEnd != nil {
-				err = onEnd(ctx, nodes)
-				if err != nil {
-					return err
-				}
+			err = onEnd(ctx, nodes)
+			if err != nil {
+				return err
 			}
 		}
 	}
@@ -251,16 +257,15 @@ func (e *Executor[T]) runNodeFlow(ctx context.Context, node T, startCh, endCh ch
 				case <-ctx.Done():
 					return context.Cause(ctx)
 				case <-edge.Out():
+					// log.FromCtx(ctx).Info(edge.String(), slog.Any("value", out))
 				}
 			}
 		}
 
 		for _, onSend := range e.onSends {
-			if onSend != nil {
-				err := onSend(ctx, node, send)
-				if err != nil {
-					return err
-				}
+			err := onSend(ctx, node, send)
+			if err != nil {
+				return err
 			}
 		}
 
@@ -276,11 +281,9 @@ func (e *Executor[T]) runNodeFlow(ctx context.Context, node T, startCh, endCh ch
 			return context.Cause(ctx)
 		case recv = <-node.Recv():
 			for _, onRecv := range e.onRecvs {
-				if onRecv != nil {
-					recv, err = onRecv(ctx, node, recv)
-					if err != nil {
-						return err
-					}
+				recv, err = onRecv(ctx, node, recv)
+				if err != nil {
+					return err
 				}
 			}
 		}

@@ -2,216 +2,147 @@ package entadapter
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/proto"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 )
 
-type (
-	PaginateOptions[T any, R PaginateRecord, O, P ~func(*sql.Selector)] struct {
-		IDField   string
-		TimeField string
-		UUIDV7    bool
-		GetUUID   func(R) uuid.UUID
-		GetID     func(R) int64
-		GetTime   func(R) time.Time
-		DefaultPageSize,
-		MinPageSize,
-		MaxPageSize int32
-	}
-	PaginateQuery[T any, R PaginateRecord, O, P ~func(*sql.Selector)] interface {
-		Where(...P) T
-		Limit(int) T
-		Order(...O) T
-		All(context.Context) ([]R, error)
-	}
-	PaginateRecord interface {
-		Value(string) (ent.Value, error)
-	}
+const (
+	defaultPageSize    = 10
+	defaultMinPageSize = 1
+	defaultMaxPageSize = 100
 )
 
-func GetNextPage[T any, R PaginateRecord, P, O ~func(*sql.Selector), Q PaginateQuery[T, R, O, P]](ctx context.Context, req util.PageTokenRequest, query Q) (nextPageToken string, records []R, _ error) {
-	return PaginateOptions[T, R, O, P]{}.GetNextPage(ctx, req, query)
-}
+type (
+	Paginator[R Record, M proto.Message] struct {
+		defPageSize,
+		minPageSize,
+		maxPageSize int32
 
-func (o PaginateOptions[T, R, O, P]) GetNextPage(ctx context.Context, req util.PageTokenRequest, query PaginateQuery[T, R, O, P]) (nextPageToken string, records []R, _ error) {
-	if o.UUIDV7 {
-		return o.getNextPageUUIDV7(ctx, req, query)
+		toProto ToProtoFunc[R, M]
+
+		idField string
+		getID   GetIDFunc[R]
+		getUUID GetUUIDFunc[R]
+		isUUID  bool
+
+		timeField string
+		getTime   GetTimeFunc[R]
 	}
-	return o.getNextPage(ctx, req, query)
-}
-
-func (o PaginateOptions[T, R, O, P]) getNextPageUUIDV7(ctx context.Context, req util.PageTokenRequest, query PaginateQuery[T, R, O, P]) (nextPageToken string, records []R, _ error) {
-	lastUUID, pageSize, err := util.ParsePageTokenRequestUUIDV7(req, o.GetDefaultPageSize(), o.GetMinPageSize(), o.GetMaxPageSize())
-	if err != nil {
-		return "", nil, err
+	PaginatorOption[R Record, M proto.Message] func(*Paginator[R, M])
+	Record                                     interface {
+		Value(string) (ent.Value, error)
 	}
-
-	var preds []P
-	if lastUUID != uuid.Nil {
-		preds = append(preds,
-			sql.FieldLT(o.GetIDField(), lastUUID),
-		)
+	GetUUIDFunc[R Record] func(R) uuid.UUID
+	GetIDFunc[R Record]   func(R) int64
+	GetTimeFunc[R Record] func(R) time.Time
+	GetRecordID           interface {
+		GetID() int64
 	}
-
-	query.Where(preds...)
-	query.Limit(int(pageSize))
-	query.Order(
-		sql.OrderByField(o.GetIDField(), sql.OrderDesc()).ToFunc(),
-	)
-
-	records, err = query.All(ctx)
-	if err != nil {
-		return "", nil, err
+	GetRecordUUID interface {
+		GetID() uuid.UUID
 	}
+	ToProtoFunc[R Record, M proto.Message] func(context.Context, R) (M, error)
+)
 
-	if len(records) == int(pageSize) {
-		last := records[len(records)-1]
-
-		var lastId uuid.UUID
-		if o.GetUUID != nil {
-			lastId = o.GetUUID(last)
-		} else if getter, ok := any(last).(interface {
-			GetID() uuid.UUID
-		}); ok {
-			lastId = getter.GetID()
-		} else {
-			idValue, err := last.Value(o.GetIDField())
-			if err != nil {
-				return "", nil, fmt.Errorf("%s value: %w", o.GetIDField(), err)
-			}
-
-			if v, ok := idValue.(uuid.UUID); ok {
-				lastId = v
-			} else {
-				return "", nil, fmt.Errorf("%s invalid", o.GetIDField())
-			}
-		}
-
-		nextPageToken = util.NextPageTokenUUIDV7(lastId)
+func NewPaginator[R Record, M proto.Message](toProto ToProtoFunc[R, M], opts ...PaginatorOption[R, M]) Paginator[R, M] {
+	pager := Paginator[R, M]{
+		toProto: toProto,
 	}
 
-	return
-}
-
-func (o PaginateOptions[T, R, O, P]) getNextPage(ctx context.Context, req util.PageTokenRequest, query PaginateQuery[T, R, O, P]) (nextPageToken string, records []R, _ error) {
-	lastIdx, updateTime, pageSize, err := util.ParsePageTokenRequest(req, o.GetDefaultPageSize(), o.GetMinPageSize(), o.GetMaxPageSize())
-	if err != nil {
-		return "", nil, err
-	}
-
-	var preds []P
-	if lastIdx > 0 && !updateTime.IsZero() {
-		preds = append(preds,
-			sql.OrPredicates[P](
-				sql.FieldLT(o.GetIDField(), updateTime),
-				sql.AndPredicates[P](
-					sql.FieldEQ(o.GetTimeField(), updateTime),
-					sql.FieldLT(o.GetIDField(), lastIdx),
-				),
-			),
-		)
-	}
-
-	query.Where(preds...)
-	query.Limit(int(pageSize))
-	query.Order(
-		sql.OrderByField(o.GetIDField(), sql.OrderDesc()).ToFunc(),
-		sql.OrderByField(o.GetTimeField(), sql.OrderDesc()).ToFunc(),
-	)
-
-	records, err = query.All(ctx)
-	if err != nil {
-		return "", nil, err
-	}
-
-	if len(records) == int(pageSize) {
-		last := records[len(records)-1]
-
-		var (
-			lastId   int64
-			lastTime time.Time
-		)
-
-		if o.GetID != nil {
-			lastId = o.GetID(last)
-		} else if getter, ok := any(last).(interface {
-			GetID() int64
-		}); ok {
-			lastId = getter.GetID()
-		} else {
-			idValue, err := last.Value(o.GetIDField())
-			if err != nil {
-				return "", nil, fmt.Errorf("%s value: %w", o.GetIDField(), err)
-			}
-
-			if v, ok := idValue.(int64); ok {
-				lastId = v
-			} else {
-				return "", nil, fmt.Errorf("%s invalid", o.GetIDField())
-			}
-		}
-
-		if o.GetTime != nil {
-			lastTime = o.GetTime(last)
-		} else {
-			timeValue, err := last.Value(o.GetTimeField())
-			if err != nil {
-				return "", nil, fmt.Errorf("%s value: %w", o.GetTimeField(), err)
-			}
-
-			if v, ok := timeValue.(*sql.NullTime); ok && v.Valid {
-				lastTime = v.Time
-			} else {
-				return "", nil, fmt.Errorf("%s invalid", o.GetTimeField())
-			}
-		}
-
-		nextPageToken, err = util.NextPageToken(lastId, lastTime)
-		if err != nil {
-			return "", nil, fmt.Errorf("next page token: %w", err)
+	for _, opt := range opts {
+		if opt != nil {
+			opt(&pager)
 		}
 	}
 
-	return
+	return pager
 }
 
-func (o PaginateOptions[T, R, O, P]) GetIDField() string {
-	if o.IDField == "" {
-		return "row_id"
+func WithPaginatorDefaultPageSize[R Record, M proto.Message](defPageSize int32) PaginatorOption[R, M] {
+	return func(p *Paginator[R, M]) {
+		p.defPageSize = defPageSize
 	}
-	return o.IDField
 }
 
-func (o PaginateOptions[T, R, O, P]) GetTimeField() string {
-	if o.TimeField == "" {
+func WithPaginatorMinPageSize[R Record, M proto.Message](minPageSize int32) PaginatorOption[R, M] {
+	return func(p *Paginator[R, M]) {
+		p.minPageSize = minPageSize
+	}
+}
+func WithPaginatorMaxPageSize[R Record, M proto.Message](maxPageSize int32) PaginatorOption[R, M] {
+	return func(p *Paginator[R, M]) {
+		p.maxPageSize = maxPageSize
+	}
+}
+
+func WithPaginatorUUIDField[R Record, M proto.Message](idField string, getUUID GetUUIDFunc[R]) PaginatorOption[R, M] {
+	return func(p *Paginator[R, M]) {
+		p.idField = idField
+		p.getUUID = getUUID
+		p.isUUID = true
+	}
+}
+
+func WithPaginatorIDField[R Record, M proto.Message](idField string, getID GetIDFunc[R]) PaginatorOption[R, M] {
+	return func(p *Paginator[R, M]) {
+		p.idField = idField
+		p.getID = getID
+	}
+}
+
+func WithPaginatorTimeField[R Record, M proto.Message](timeField string, getTime GetTimeFunc[R]) PaginatorOption[R, M] {
+	return func(p *Paginator[R, M]) {
+		p.timeField = timeField
+		p.getTime = getTime
+	}
+}
+
+func (p Paginator[R, M]) GetNextPage[Q Query[Q, R, P, O], P, O ~func(*sql.Selector)](ctx context.Context, req util.PageRequest, q Q) (_ string, _ []R, err error) {
+	query, err := NewPageQuery(p, q, req)
+	if err != nil {
+		return
+	}
+
+	return query.getNextPage(ctx)
+}
+
+func (p Paginator[R, M]) GetIDField() string {
+	if p.idField == "" {
+		return "id"
+	}
+	return p.idField
+}
+
+func (p Paginator[R, M]) GetTimeField() string {
+	if p.timeField == "" {
 		return "updated_at"
 	}
-	return o.TimeField
+	return p.timeField
 }
 
-func (o PaginateOptions[T, R, O, P]) GetDefaultPageSize() int32 {
-	if o.DefaultPageSize == 0 {
-		return 10
+func (p Paginator[R, M]) GetDefaultPageSize() int32 {
+	if p.defPageSize == 0 {
+		return defaultPageSize
 	}
-	return o.DefaultPageSize
+	return p.defPageSize
 }
 
-func (o PaginateOptions[T, R, O, P]) GetMinPageSize() int32 {
-	if o.MinPageSize == 0 {
-		return 1
+func (p Paginator[R, M]) GetMinPageSize() int32 {
+	if p.minPageSize <= 0 {
+		return defaultMinPageSize
 	}
-	return o.MinPageSize
+	return p.minPageSize
 }
 
-func (o PaginateOptions[T, R, O, P]) GetMaxPageSize() int32 {
-	if o.MaxPageSize == 0 {
-		return 100
+func (p Paginator[R, M]) GetMaxPageSize() int32 {
+	if p.maxPageSize == 0 {
+		return defaultMaxPageSize
 	}
-	return o.MaxPageSize
+	return p.maxPageSize
 }

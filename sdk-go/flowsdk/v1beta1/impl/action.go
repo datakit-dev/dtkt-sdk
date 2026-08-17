@@ -39,7 +39,6 @@ func NewAction(env shared.Env, node *flowv1beta1.Action, visitor shared.NodeVisi
 
 	return action, nil
 }
-
 func (a *Action) Caller() (*ActionCaller, bool) {
 	if a.ParsedNode == nil {
 		return nil, false

@@ -23,16 +23,18 @@ type (
 	Edges []*Edge
 )
 
-func NewEdge(source, target string) (*Edge, bool) {
-	if !IsExprIdent(source) || !IsExprIdent(target) {
-		return nil, false
+func NewEdge(source, target string) (*Edge, error) {
+	if !IsExprIdent(source) {
+		return nil, fmt.Errorf("invalid source edge: %s", source)
+	} else if !IsExprIdent(target) {
+		return nil, fmt.Errorf("invalid target edge: %s", target)
 	}
 
 	return &Edge{
 		source: source,
 		target: target,
 		buf:    make(chan any),
-	}, true
+	}, nil
 }
 
 func IsValidEdge(source, target string) error {

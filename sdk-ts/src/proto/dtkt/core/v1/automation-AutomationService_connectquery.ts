@@ -12,7 +12,7 @@ import { AutomationService } from "./automation_pb";
 export const listAutomations = AutomationService.method.listAutomations;
 
 /**
- * Get a single automation by name.
+ * Get an automation by name.
  *
  * @generated from rpc dtkt.core.v1.AutomationService.GetAutomation
  */

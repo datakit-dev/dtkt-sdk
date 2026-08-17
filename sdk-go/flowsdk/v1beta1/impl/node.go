@@ -5,7 +5,10 @@ import (
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
+	"google.golang.org/protobuf/proto"
 )
+
+var doneEOF = &flowv1beta1.Done{Message: "EOF"}
 
 func NewNode(env shared.Env, node shared.SpecNode, visitor shared.NodeVisitor) (shared.ParsedNode, error) {
 	switch node := node.(type) {
@@ -23,4 +26,8 @@ func NewNode(env shared.Env, node shared.SpecNode, visitor shared.NodeVisitor) (
 		return NewVar(env, node, visitor)
 	}
 	return nil, fmt.Errorf("unknown node type: %T: %s", node, node.GetId())
+}
+
+func EOF() *flowv1beta1.Done {
+	return proto.CloneOf(doneEOF)
 }

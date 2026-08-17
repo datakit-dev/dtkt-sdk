@@ -51,6 +51,10 @@ func (v *Var) Ident() string {
 	return v.ident
 }
 
+func (o *Var) Metadata() map[string]any {
+	return nil
+}
+
 func (v *Var) Compile(ctx context.Context, env shared.Env) error {
 	switch {
 	case v.switch_ != nil:

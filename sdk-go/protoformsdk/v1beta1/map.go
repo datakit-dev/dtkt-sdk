@@ -134,7 +134,7 @@ func NewMapField(parent *Message, field protoreflect.FieldDescriptor) (*MapField
 func newMapOf[K MapKey](parent *Message, field protoreflect.FieldDescriptor, keyParser func(string) K, keyStringer func(K) string, getKey func(protoreflect.MapKey) K, setKey func(K) protoreflect.Value) MapType {
 	if field.MapValue().Message() != nil {
 		return &Map[K, *Message]{
-			Getter:      mapGetter(parent, field, getKey, func(v protoreflect.Value) *Message { return NewNestedMessage(parent, field, v.Message()) }),
+			Getter:      mapGetter(parent, field, getKey, func(v protoreflect.Value) *Message { return NewMapMessage(parent, field, v.Message()) }),
 			Setter:      mapSetter(parent, field, setKey, func(m *Message) protoreflect.Value { return protoreflect.ValueOfMessage(m.Get()) }),
 			Stringer:    messageMapStringer(keyStringer),
 			parent:      parent,
@@ -142,7 +142,7 @@ func newMapOf[K MapKey](parent *Message, field protoreflect.FieldDescriptor, key
 			keyParser:   keyParser,
 			keyStringer: keyStringer,
 			newValue: func() *Message {
-				return NewNestedMessage(parent, field, parent.Get().NewField(field).Map().NewValue().Message())
+				return NewMapMessage(parent, field, parent.Get().NewField(field).Map().NewValue().Message())
 			},
 		}
 	} else {

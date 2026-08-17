@@ -85,7 +85,7 @@ func (x AutomationRuntime_State) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use AutomationRuntime_State.Descriptor instead.
 func (AutomationRuntime_State) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{2, 0}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{1, 0}
 }
 
 // Automation is a runnable instance of a Flow with a tagged spec version and
@@ -252,70 +252,6 @@ func (x *Automation) GetUpdateTime() *timestamppb.Timestamp {
 	return nil
 }
 
-// AutomationMetadata contains metadata for automation operations.
-type AutomationMetadata struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Status message.
-	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
-	// Start time.
-	StartTime *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	// Stop time.
-	StopTime      *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=stop_time,json=stopTime,proto3" json:"stop_time,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AutomationMetadata) Reset() {
-	*x = AutomationMetadata{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AutomationMetadata) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AutomationMetadata) ProtoMessage() {}
-
-func (x *AutomationMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AutomationMetadata.ProtoReflect.Descriptor instead.
-func (*AutomationMetadata) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *AutomationMetadata) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
-func (x *AutomationMetadata) GetStartTime() *timestamppb.Timestamp {
-	if x != nil {
-		return x.StartTime
-	}
-	return nil
-}
-
-func (x *AutomationMetadata) GetStopTime() *timestamppb.Timestamp {
-	if x != nil {
-		return x.StopTime
-	}
-	return nil
-}
-
 // AutomationRuntime contains execution state, environment, and final result.
 type AutomationRuntime struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -335,7 +271,7 @@ type AutomationRuntime struct {
 
 func (x *AutomationRuntime) Reset() {
 	*x = AutomationRuntime{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[2]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -347,7 +283,7 @@ func (x *AutomationRuntime) String() string {
 func (*AutomationRuntime) ProtoMessage() {}
 
 func (x *AutomationRuntime) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[2]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -360,7 +296,7 @@ func (x *AutomationRuntime) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AutomationRuntime.ProtoReflect.Descriptor instead.
 func (*AutomationRuntime) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{2}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *AutomationRuntime) GetState() AutomationRuntime_State {
@@ -408,7 +344,7 @@ type GetAutomationRequest struct {
 
 func (x *GetAutomationRequest) Reset() {
 	*x = GetAutomationRequest{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[3]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -420,7 +356,7 @@ func (x *GetAutomationRequest) String() string {
 func (*GetAutomationRequest) ProtoMessage() {}
 
 func (x *GetAutomationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[3]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -433,7 +369,7 @@ func (x *GetAutomationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAutomationRequest.ProtoReflect.Descriptor instead.
 func (*GetAutomationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{3}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GetAutomationRequest) GetName() string {
@@ -453,7 +389,7 @@ type GetAutomationResponse struct {
 
 func (x *GetAutomationResponse) Reset() {
 	*x = GetAutomationResponse{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[4]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -465,7 +401,7 @@ func (x *GetAutomationResponse) String() string {
 func (*GetAutomationResponse) ProtoMessage() {}
 
 func (x *GetAutomationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[4]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -478,7 +414,7 @@ func (x *GetAutomationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAutomationResponse.ProtoReflect.Descriptor instead.
 func (*GetAutomationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{4}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetAutomationResponse) GetAutomation() *Automation {
@@ -501,7 +437,7 @@ type CreateAutomationRequest struct {
 
 func (x *CreateAutomationRequest) Reset() {
 	*x = CreateAutomationRequest{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[5]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -513,7 +449,7 @@ func (x *CreateAutomationRequest) String() string {
 func (*CreateAutomationRequest) ProtoMessage() {}
 
 func (x *CreateAutomationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[5]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -526,7 +462,7 @@ func (x *CreateAutomationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAutomationRequest.ProtoReflect.Descriptor instead.
 func (*CreateAutomationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{5}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CreateAutomationRequest) GetParent() string {
@@ -560,7 +496,7 @@ type CreateAutomationResponse struct {
 
 func (x *CreateAutomationResponse) Reset() {
 	*x = CreateAutomationResponse{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[6]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -572,7 +508,7 @@ func (x *CreateAutomationResponse) String() string {
 func (*CreateAutomationResponse) ProtoMessage() {}
 
 func (x *CreateAutomationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[6]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -585,7 +521,7 @@ func (x *CreateAutomationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAutomationResponse.ProtoReflect.Descriptor instead.
 func (*CreateAutomationResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{6}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CreateAutomationResponse) GetAutomation() *Automation {
@@ -609,7 +545,7 @@ type UpdateAutomationRequest struct {
 
 func (x *UpdateAutomationRequest) Reset() {
 	*x = UpdateAutomationRequest{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[7]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -621,7 +557,7 @@ func (x *UpdateAutomationRequest) String() string {
 func (*UpdateAutomationRequest) ProtoMessage() {}
 
 func (x *UpdateAutomationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[7]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -634,7 +570,7 @@ func (x *UpdateAutomationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAutomationRequest.ProtoReflect.Descriptor instead.
 func (*UpdateAutomationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{7}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UpdateAutomationRequest) GetAutomation() *Automation {
@@ -671,7 +607,7 @@ type DeleteAutomationRequest struct {
 
 func (x *DeleteAutomationRequest) Reset() {
 	*x = DeleteAutomationRequest{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[8]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -683,7 +619,7 @@ func (x *DeleteAutomationRequest) String() string {
 func (*DeleteAutomationRequest) ProtoMessage() {}
 
 func (x *DeleteAutomationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[8]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -696,7 +632,7 @@ func (x *DeleteAutomationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAutomationRequest.ProtoReflect.Descriptor instead.
 func (*DeleteAutomationRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{8}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *DeleteAutomationRequest) GetName() string {
@@ -724,7 +660,7 @@ type BatchCreateAutomationsRequest struct {
 
 func (x *BatchCreateAutomationsRequest) Reset() {
 	*x = BatchCreateAutomationsRequest{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[9]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -736,7 +672,7 @@ func (x *BatchCreateAutomationsRequest) String() string {
 func (*BatchCreateAutomationsRequest) ProtoMessage() {}
 
 func (x *BatchCreateAutomationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[9]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -749,7 +685,7 @@ func (x *BatchCreateAutomationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BatchCreateAutomationsRequest.ProtoReflect.Descriptor instead.
 func (*BatchCreateAutomationsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{9}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *BatchCreateAutomationsRequest) GetParent() string {
@@ -776,7 +712,7 @@ type BatchCreateAutomationsResponse struct {
 
 func (x *BatchCreateAutomationsResponse) Reset() {
 	*x = BatchCreateAutomationsResponse{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[10]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -788,7 +724,7 @@ func (x *BatchCreateAutomationsResponse) String() string {
 func (*BatchCreateAutomationsResponse) ProtoMessage() {}
 
 func (x *BatchCreateAutomationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[10]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -801,7 +737,7 @@ func (x *BatchCreateAutomationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BatchCreateAutomationsResponse.ProtoReflect.Descriptor instead.
 func (*BatchCreateAutomationsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{10}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *BatchCreateAutomationsResponse) GetAutomations() []*Automation {
@@ -827,7 +763,7 @@ type ListAutomationsRequest struct {
 
 func (x *ListAutomationsRequest) Reset() {
 	*x = ListAutomationsRequest{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[11]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -839,7 +775,7 @@ func (x *ListAutomationsRequest) String() string {
 func (*ListAutomationsRequest) ProtoMessage() {}
 
 func (x *ListAutomationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[11]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -852,7 +788,7 @@ func (x *ListAutomationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAutomationsRequest.ProtoReflect.Descriptor instead.
 func (*ListAutomationsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{11}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ListAutomationsRequest) GetPageSize() int32 {
@@ -895,7 +831,7 @@ type ListAutomationsResponse struct {
 
 func (x *ListAutomationsResponse) Reset() {
 	*x = ListAutomationsResponse{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[12]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -907,7 +843,7 @@ func (x *ListAutomationsResponse) String() string {
 func (*ListAutomationsResponse) ProtoMessage() {}
 
 func (x *ListAutomationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[12]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -920,7 +856,7 @@ func (x *ListAutomationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAutomationsResponse.ProtoReflect.Descriptor instead.
 func (*ListAutomationsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{12}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ListAutomationsResponse) GetAutomations() []*Automation {
@@ -951,7 +887,7 @@ type SendAutomationEvent struct {
 
 func (x *SendAutomationEvent) Reset() {
 	*x = SendAutomationEvent{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[13]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -963,7 +899,7 @@ func (x *SendAutomationEvent) String() string {
 func (*SendAutomationEvent) ProtoMessage() {}
 
 func (x *SendAutomationEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[13]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -976,7 +912,7 @@ func (x *SendAutomationEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendAutomationEvent.ProtoReflect.Descriptor instead.
 func (*SendAutomationEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{13}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *SendAutomationEvent) GetType() isSendAutomationEvent_Type {
@@ -1035,7 +971,7 @@ type ReceiveAutomationEvent struct {
 
 func (x *ReceiveAutomationEvent) Reset() {
 	*x = ReceiveAutomationEvent{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[14]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1047,7 +983,7 @@ func (x *ReceiveAutomationEvent) String() string {
 func (*ReceiveAutomationEvent) ProtoMessage() {}
 
 func (x *ReceiveAutomationEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[14]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1060,7 +996,7 @@ func (x *ReceiveAutomationEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReceiveAutomationEvent.ProtoReflect.Descriptor instead.
 func (*ReceiveAutomationEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{14}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *ReceiveAutomationEvent) GetType() isReceiveAutomationEvent_Type {
@@ -1131,7 +1067,7 @@ type SendAutomationEventRequest struct {
 
 func (x *SendAutomationEventRequest) Reset() {
 	*x = SendAutomationEventRequest{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[15]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1143,7 +1079,7 @@ func (x *SendAutomationEventRequest) String() string {
 func (*SendAutomationEventRequest) ProtoMessage() {}
 
 func (x *SendAutomationEventRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[15]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1156,7 +1092,7 @@ func (x *SendAutomationEventRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendAutomationEventRequest.ProtoReflect.Descriptor instead.
 func (*SendAutomationEventRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{15}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *SendAutomationEventRequest) GetName() string {
@@ -1183,7 +1119,7 @@ type ReceiveAutomationEventsRequest struct {
 
 func (x *ReceiveAutomationEventsRequest) Reset() {
 	*x = ReceiveAutomationEventsRequest{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[16]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1195,7 +1131,7 @@ func (x *ReceiveAutomationEventsRequest) String() string {
 func (*ReceiveAutomationEventsRequest) ProtoMessage() {}
 
 func (x *ReceiveAutomationEventsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[16]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1208,7 +1144,7 @@ func (x *ReceiveAutomationEventsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReceiveAutomationEventsRequest.ProtoReflect.Descriptor instead.
 func (*ReceiveAutomationEventsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{16}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *ReceiveAutomationEventsRequest) GetName() string {
@@ -1228,7 +1164,7 @@ type ReceiveAutomationEventsResponse struct {
 
 func (x *ReceiveAutomationEventsResponse) Reset() {
 	*x = ReceiveAutomationEventsResponse{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[17]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1240,7 +1176,7 @@ func (x *ReceiveAutomationEventsResponse) String() string {
 func (*ReceiveAutomationEventsResponse) ProtoMessage() {}
 
 func (x *ReceiveAutomationEventsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[17]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1253,7 +1189,7 @@ func (x *ReceiveAutomationEventsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReceiveAutomationEventsResponse.ProtoReflect.Descriptor instead.
 func (*ReceiveAutomationEventsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{17}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ReceiveAutomationEventsResponse) GetEvent() *ReceiveAutomationEvent {
@@ -1275,7 +1211,7 @@ type StreamAutomationEventsRequest struct {
 
 func (x *StreamAutomationEventsRequest) Reset() {
 	*x = StreamAutomationEventsRequest{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[18]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1287,7 +1223,7 @@ func (x *StreamAutomationEventsRequest) String() string {
 func (*StreamAutomationEventsRequest) ProtoMessage() {}
 
 func (x *StreamAutomationEventsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[18]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1300,7 +1236,7 @@ func (x *StreamAutomationEventsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamAutomationEventsRequest.ProtoReflect.Descriptor instead.
 func (*StreamAutomationEventsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{18}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *StreamAutomationEventsRequest) GetName() string {
@@ -1327,7 +1263,7 @@ type StreamAutomationEventsResponse struct {
 
 func (x *StreamAutomationEventsResponse) Reset() {
 	*x = StreamAutomationEventsResponse{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[19]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1339,7 +1275,7 @@ func (x *StreamAutomationEventsResponse) String() string {
 func (*StreamAutomationEventsResponse) ProtoMessage() {}
 
 func (x *StreamAutomationEventsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[19]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1352,7 +1288,7 @@ func (x *StreamAutomationEventsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamAutomationEventsResponse.ProtoReflect.Descriptor instead.
 func (*StreamAutomationEventsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{19}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *StreamAutomationEventsResponse) GetEvent() *ReceiveAutomationEvent {
@@ -1376,7 +1312,7 @@ type Automation_ConnectionConfig struct {
 
 func (x *Automation_ConnectionConfig) Reset() {
 	*x = Automation_ConnectionConfig{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[20]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1388,7 +1324,7 @@ func (x *Automation_ConnectionConfig) String() string {
 func (*Automation_ConnectionConfig) ProtoMessage() {}
 
 func (x *Automation_ConnectionConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[20]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1430,7 +1366,7 @@ type AutomationRuntime_Env struct {
 
 func (x *AutomationRuntime_Env) Reset() {
 	*x = AutomationRuntime_Env{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[23]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1442,7 +1378,7 @@ func (x *AutomationRuntime_Env) String() string {
 func (*AutomationRuntime_Env) ProtoMessage() {}
 
 func (x *AutomationRuntime_Env) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[23]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1455,7 +1391,7 @@ func (x *AutomationRuntime_Env) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AutomationRuntime_Env.ProtoReflect.Descriptor instead.
 func (*AutomationRuntime_Env) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{2, 0}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{1, 0}
 }
 
 func (x *AutomationRuntime_Env) GetVersion() isAutomationRuntime_Env_Version {
@@ -1494,7 +1430,7 @@ type AutomationRuntime_Result struct {
 
 func (x *AutomationRuntime_Result) Reset() {
 	*x = AutomationRuntime_Result{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[24]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1506,7 +1442,7 @@ func (x *AutomationRuntime_Result) String() string {
 func (*AutomationRuntime_Result) ProtoMessage() {}
 
 func (x *AutomationRuntime_Result) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[24]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1519,7 +1455,7 @@ func (x *AutomationRuntime_Result) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AutomationRuntime_Result.ProtoReflect.Descriptor instead.
 func (*AutomationRuntime_Result) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{2, 1}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{1, 1}
 }
 
 func (x *AutomationRuntime_Result) GetError() *status.Status {
@@ -1547,7 +1483,7 @@ type SendAutomationEvent_InputsEvent struct {
 
 func (x *SendAutomationEvent_InputsEvent) Reset() {
 	*x = SendAutomationEvent_InputsEvent{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[26]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1559,7 +1495,7 @@ func (x *SendAutomationEvent_InputsEvent) String() string {
 func (*SendAutomationEvent_InputsEvent) ProtoMessage() {}
 
 func (x *SendAutomationEvent_InputsEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[26]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1572,7 +1508,7 @@ func (x *SendAutomationEvent_InputsEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendAutomationEvent_InputsEvent.ProtoReflect.Descriptor instead.
 func (*SendAutomationEvent_InputsEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{13, 0}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{12, 0}
 }
 
 func (x *SendAutomationEvent_InputsEvent) GetValues() map[string]*anypb.Any {
@@ -1595,7 +1531,7 @@ type SendAutomationEvent_UserResponseEvent struct {
 
 func (x *SendAutomationEvent_UserResponseEvent) Reset() {
 	*x = SendAutomationEvent_UserResponseEvent{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[27]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1607,7 +1543,7 @@ func (x *SendAutomationEvent_UserResponseEvent) String() string {
 func (*SendAutomationEvent_UserResponseEvent) ProtoMessage() {}
 
 func (x *SendAutomationEvent_UserResponseEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[27]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1620,7 +1556,7 @@ func (x *SendAutomationEvent_UserResponseEvent) ProtoReflect() protoreflect.Mess
 
 // Deprecated: Use SendAutomationEvent_UserResponseEvent.ProtoReflect.Descriptor instead.
 func (*SendAutomationEvent_UserResponseEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{13, 1}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{12, 1}
 }
 
 func (x *SendAutomationEvent_UserResponseEvent) GetId() string {
@@ -1648,7 +1584,7 @@ type ReceiveAutomationEvent_OutputsEvent struct {
 
 func (x *ReceiveAutomationEvent_OutputsEvent) Reset() {
 	*x = ReceiveAutomationEvent_OutputsEvent{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[30]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1660,7 +1596,7 @@ func (x *ReceiveAutomationEvent_OutputsEvent) String() string {
 func (*ReceiveAutomationEvent_OutputsEvent) ProtoMessage() {}
 
 func (x *ReceiveAutomationEvent_OutputsEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[30]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1673,7 +1609,7 @@ func (x *ReceiveAutomationEvent_OutputsEvent) ProtoReflect() protoreflect.Messag
 
 // Deprecated: Use ReceiveAutomationEvent_OutputsEvent.ProtoReflect.Descriptor instead.
 func (*ReceiveAutomationEvent_OutputsEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{14, 0}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{13, 0}
 }
 
 func (x *ReceiveAutomationEvent_OutputsEvent) GetValues() map[string]*anypb.Any {
@@ -1696,7 +1632,7 @@ type ReceiveAutomationEvent_UserRequestEvent struct {
 
 func (x *ReceiveAutomationEvent_UserRequestEvent) Reset() {
 	*x = ReceiveAutomationEvent_UserRequestEvent{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[31]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1708,7 +1644,7 @@ func (x *ReceiveAutomationEvent_UserRequestEvent) String() string {
 func (*ReceiveAutomationEvent_UserRequestEvent) ProtoMessage() {}
 
 func (x *ReceiveAutomationEvent_UserRequestEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[31]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1721,7 +1657,7 @@ func (x *ReceiveAutomationEvent_UserRequestEvent) ProtoReflect() protoreflect.Me
 
 // Deprecated: Use ReceiveAutomationEvent_UserRequestEvent.ProtoReflect.Descriptor instead.
 func (*ReceiveAutomationEvent_UserRequestEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{14, 1}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{13, 1}
 }
 
 func (x *ReceiveAutomationEvent_UserRequestEvent) GetId() string {
@@ -1749,7 +1685,7 @@ type ReceiveAutomationEvent_MetricsEvent struct {
 
 func (x *ReceiveAutomationEvent_MetricsEvent) Reset() {
 	*x = ReceiveAutomationEvent_MetricsEvent{}
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[32]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1761,7 +1697,7 @@ func (x *ReceiveAutomationEvent_MetricsEvent) String() string {
 func (*ReceiveAutomationEvent_MetricsEvent) ProtoMessage() {}
 
 func (x *ReceiveAutomationEvent_MetricsEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_automation_proto_msgTypes[32]
+	mi := &file_dtkt_core_v1_automation_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1774,7 +1710,7 @@ func (x *ReceiveAutomationEvent_MetricsEvent) ProtoReflect() protoreflect.Messag
 
 // Deprecated: Use ReceiveAutomationEvent_MetricsEvent.ProtoReflect.Descriptor instead.
 func (*ReceiveAutomationEvent_MetricsEvent) Descriptor() ([]byte, []int) {
-	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{14, 2}
+	return file_dtkt_core_v1_automation_proto_rawDescGZIP(), []int{13, 2}
 }
 
 func (x *ReceiveAutomationEvent_MetricsEvent) GetValues() map[string]*anypb.Any {
@@ -1825,13 +1761,7 @@ const file_dtkt_core_v1_automation_proto_rawDesc = "" +
 	"\n" +
 	"Automation\x125organizations/{organization}/automations/{automation}\x12%users/{user}/automations/{automation}*\vautomations2\n" +
 	"automationB\b\n" +
-	"\x06_batch\"\xa2\x01\n" +
-	"\x12AutomationMetadata\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\x129\n" +
-	"\n" +
-	"start_time\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x127\n" +
-	"\tstop_time\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\bstopTime\"\xda\x05\n" +
+	"\x06_batch\"\xda\x05\n" +
 	"\x11AutomationRuntime\x12H\n" +
 	"\x05state\x18\x01 \x01(\x0e2%.dtkt.core.v1.AutomationRuntime.StateB\v\xbaH\b\xc8\x01\x01\x82\x01\x02\x10\x01R\x05state\x12=\n" +
 	"\x03env\x18\x02 \x01(\v2#.dtkt.core.v1.AutomationRuntime.EnvB\x06\xbaH\x03\xc8\x01\x01R\x03env\x129\n" +
@@ -1947,18 +1877,18 @@ const file_dtkt_core_v1_automation_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x127\n" +
 	"\x05event\x18\x02 \x01(\v2!.dtkt.core.v1.SendAutomationEventR\x05event\"d\n" +
 	"\x1eStreamAutomationEventsResponse\x12B\n" +
-	"\x05event\x18\x01 \x01(\v2$.dtkt.core.v1.ReceiveAutomationEventB\x06\xbaH\x03\xc8\x01\x01R\x05event2\xac\a\n" +
+	"\x05event\x18\x01 \x01(\v2$.dtkt.core.v1.ReceiveAutomationEventB\x06\xbaH\x03\xc8\x01\x01R\x05event2\xa9\a\n" +
 	"\x11AutomationService\x12c\n" +
 	"\x0fListAutomations\x12$.dtkt.core.v1.ListAutomationsRequest\x1a%.dtkt.core.v1.ListAutomationsResponse\"\x03\x90\x02\x01\x12]\n" +
-	"\rGetAutomation\x12\".dtkt.core.v1.GetAutomationRequest\x1a#.dtkt.core.v1.GetAutomationResponse\"\x03\x90\x02\x01\x12}\n" +
-	"\x10CreateAutomation\x12%.dtkt.core.v1.CreateAutomationRequest\x1a\x1d.google.longrunning.Operation\"#\xcaA \n" +
+	"\rGetAutomation\x12\".dtkt.core.v1.GetAutomationRequest\x1a#.dtkt.core.v1.GetAutomationResponse\"\x03\x90\x02\x01\x12|\n" +
+	"\x10CreateAutomation\x12%.dtkt.core.v1.CreateAutomationRequest\x1a\x1d.google.longrunning.Operation\"\"\xcaA\x1f\n" +
 	"\n" +
-	"Automation\x12\x12AutomationMetadata\x12}\n" +
-	"\x10UpdateAutomation\x12%.dtkt.core.v1.UpdateAutomationRequest\x1a\x1d.google.longrunning.Operation\"#\xcaA \n" +
+	"Automation\x12\x11AutomationRuntime\x12|\n" +
+	"\x10UpdateAutomation\x12%.dtkt.core.v1.UpdateAutomationRequest\x1a\x1d.google.longrunning.Operation\"\"\xcaA\x1f\n" +
 	"\n" +
-	"Automation\x12\x12AutomationMetadata\x12\x88\x01\n" +
-	"\x10DeleteAutomation\x12%.dtkt.core.v1.DeleteAutomationRequest\x1a\x1d.google.longrunning.Operation\".\xcaA+\n" +
-	"\x15google.protobuf.Empty\x12\x12AutomationMetadata\x12x\n" +
+	"Automation\x12\x11AutomationRuntime\x12\x87\x01\n" +
+	"\x10DeleteAutomation\x12%.dtkt.core.v1.DeleteAutomationRequest\x1a\x1d.google.longrunning.Operation\"-\xcaA*\n" +
+	"\x15google.protobuf.Empty\x12\x11AutomationRuntime\x12x\n" +
 	"\x17ReceiveAutomationEvents\x12,.dtkt.core.v1.ReceiveAutomationEventsRequest\x1a-.dtkt.core.v1.ReceiveAutomationEventsResponse0\x01\x12W\n" +
 	"\x13SendAutomationEvent\x12(.dtkt.core.v1.SendAutomationEventRequest\x1a\x16.google.protobuf.Empty\x12w\n" +
 	"\x16StreamAutomationEvents\x12+.dtkt.core.v1.StreamAutomationEventsRequest\x1a,.dtkt.core.v1.StreamAutomationEventsResponse(\x010\x01B\xb9\x01\n" +
@@ -1977,124 +1907,121 @@ func file_dtkt_core_v1_automation_proto_rawDescGZIP() []byte {
 }
 
 var file_dtkt_core_v1_automation_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_dtkt_core_v1_automation_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
+var file_dtkt_core_v1_automation_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
 var file_dtkt_core_v1_automation_proto_goTypes = []any{
 	(AutomationRuntime_State)(0),                  // 0: dtkt.core.v1.AutomationRuntime.State
 	(*Automation)(nil),                            // 1: dtkt.core.v1.Automation
-	(*AutomationMetadata)(nil),                    // 2: dtkt.core.v1.AutomationMetadata
-	(*AutomationRuntime)(nil),                     // 3: dtkt.core.v1.AutomationRuntime
-	(*GetAutomationRequest)(nil),                  // 4: dtkt.core.v1.GetAutomationRequest
-	(*GetAutomationResponse)(nil),                 // 5: dtkt.core.v1.GetAutomationResponse
-	(*CreateAutomationRequest)(nil),               // 6: dtkt.core.v1.CreateAutomationRequest
-	(*CreateAutomationResponse)(nil),              // 7: dtkt.core.v1.CreateAutomationResponse
-	(*UpdateAutomationRequest)(nil),               // 8: dtkt.core.v1.UpdateAutomationRequest
-	(*DeleteAutomationRequest)(nil),               // 9: dtkt.core.v1.DeleteAutomationRequest
-	(*BatchCreateAutomationsRequest)(nil),         // 10: dtkt.core.v1.BatchCreateAutomationsRequest
-	(*BatchCreateAutomationsResponse)(nil),        // 11: dtkt.core.v1.BatchCreateAutomationsResponse
-	(*ListAutomationsRequest)(nil),                // 12: dtkt.core.v1.ListAutomationsRequest
-	(*ListAutomationsResponse)(nil),               // 13: dtkt.core.v1.ListAutomationsResponse
-	(*SendAutomationEvent)(nil),                   // 14: dtkt.core.v1.SendAutomationEvent
-	(*ReceiveAutomationEvent)(nil),                // 15: dtkt.core.v1.ReceiveAutomationEvent
-	(*SendAutomationEventRequest)(nil),            // 16: dtkt.core.v1.SendAutomationEventRequest
-	(*ReceiveAutomationEventsRequest)(nil),        // 17: dtkt.core.v1.ReceiveAutomationEventsRequest
-	(*ReceiveAutomationEventsResponse)(nil),       // 18: dtkt.core.v1.ReceiveAutomationEventsResponse
-	(*StreamAutomationEventsRequest)(nil),         // 19: dtkt.core.v1.StreamAutomationEventsRequest
-	(*StreamAutomationEventsResponse)(nil),        // 20: dtkt.core.v1.StreamAutomationEventsResponse
-	(*Automation_ConnectionConfig)(nil),           // 21: dtkt.core.v1.Automation.ConnectionConfig
-	nil,                                           // 22: dtkt.core.v1.Automation.ConnectionsEntry
-	nil,                                           // 23: dtkt.core.v1.Automation.InputsEntry
-	(*AutomationRuntime_Env)(nil),                 // 24: dtkt.core.v1.AutomationRuntime.Env
-	(*AutomationRuntime_Result)(nil),              // 25: dtkt.core.v1.AutomationRuntime.Result
-	nil,                                           // 26: dtkt.core.v1.AutomationRuntime.Result.ValuesEntry
-	(*SendAutomationEvent_InputsEvent)(nil),       // 27: dtkt.core.v1.SendAutomationEvent.InputsEvent
-	(*SendAutomationEvent_UserResponseEvent)(nil), // 28: dtkt.core.v1.SendAutomationEvent.UserResponseEvent
-	nil, // 29: dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry
-	nil, // 30: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry
-	(*ReceiveAutomationEvent_OutputsEvent)(nil),     // 31: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent
-	(*ReceiveAutomationEvent_UserRequestEvent)(nil), // 32: dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent
-	(*ReceiveAutomationEvent_MetricsEvent)(nil),     // 33: dtkt.core.v1.ReceiveAutomationEvent.MetricsEvent
-	nil,                             // 34: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry
-	nil,                             // 35: dtkt.core.v1.ReceiveAutomationEvent.MetricsEvent.ValuesEntry
-	(*durationpb.Duration)(nil),     // 36: google.protobuf.Duration
-	(*timestamppb.Timestamp)(nil),   // 37: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil),   // 38: google.protobuf.FieldMask
-	(*Context)(nil),                 // 39: dtkt.core.v1.Context
-	(*anypb.Any)(nil),               // 40: google.protobuf.Any
-	(*v1beta1.Env)(nil),             // 41: dtkt.flow.v1beta1.Env
-	(*status.Status)(nil),           // 42: google.rpc.Status
-	(*v1beta1.UserAction)(nil),      // 43: dtkt.flow.v1beta1.UserAction
-	(*longrunningpb.Operation)(nil), // 44: google.longrunning.Operation
-	(*emptypb.Empty)(nil),           // 45: google.protobuf.Empty
+	(*AutomationRuntime)(nil),                     // 2: dtkt.core.v1.AutomationRuntime
+	(*GetAutomationRequest)(nil),                  // 3: dtkt.core.v1.GetAutomationRequest
+	(*GetAutomationResponse)(nil),                 // 4: dtkt.core.v1.GetAutomationResponse
+	(*CreateAutomationRequest)(nil),               // 5: dtkt.core.v1.CreateAutomationRequest
+	(*CreateAutomationResponse)(nil),              // 6: dtkt.core.v1.CreateAutomationResponse
+	(*UpdateAutomationRequest)(nil),               // 7: dtkt.core.v1.UpdateAutomationRequest
+	(*DeleteAutomationRequest)(nil),               // 8: dtkt.core.v1.DeleteAutomationRequest
+	(*BatchCreateAutomationsRequest)(nil),         // 9: dtkt.core.v1.BatchCreateAutomationsRequest
+	(*BatchCreateAutomationsResponse)(nil),        // 10: dtkt.core.v1.BatchCreateAutomationsResponse
+	(*ListAutomationsRequest)(nil),                // 11: dtkt.core.v1.ListAutomationsRequest
+	(*ListAutomationsResponse)(nil),               // 12: dtkt.core.v1.ListAutomationsResponse
+	(*SendAutomationEvent)(nil),                   // 13: dtkt.core.v1.SendAutomationEvent
+	(*ReceiveAutomationEvent)(nil),                // 14: dtkt.core.v1.ReceiveAutomationEvent
+	(*SendAutomationEventRequest)(nil),            // 15: dtkt.core.v1.SendAutomationEventRequest
+	(*ReceiveAutomationEventsRequest)(nil),        // 16: dtkt.core.v1.ReceiveAutomationEventsRequest
+	(*ReceiveAutomationEventsResponse)(nil),       // 17: dtkt.core.v1.ReceiveAutomationEventsResponse
+	(*StreamAutomationEventsRequest)(nil),         // 18: dtkt.core.v1.StreamAutomationEventsRequest
+	(*StreamAutomationEventsResponse)(nil),        // 19: dtkt.core.v1.StreamAutomationEventsResponse
+	(*Automation_ConnectionConfig)(nil),           // 20: dtkt.core.v1.Automation.ConnectionConfig
+	nil,                                           // 21: dtkt.core.v1.Automation.ConnectionsEntry
+	nil,                                           // 22: dtkt.core.v1.Automation.InputsEntry
+	(*AutomationRuntime_Env)(nil),                 // 23: dtkt.core.v1.AutomationRuntime.Env
+	(*AutomationRuntime_Result)(nil),              // 24: dtkt.core.v1.AutomationRuntime.Result
+	nil,                                           // 25: dtkt.core.v1.AutomationRuntime.Result.ValuesEntry
+	(*SendAutomationEvent_InputsEvent)(nil),       // 26: dtkt.core.v1.SendAutomationEvent.InputsEvent
+	(*SendAutomationEvent_UserResponseEvent)(nil), // 27: dtkt.core.v1.SendAutomationEvent.UserResponseEvent
+	nil, // 28: dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry
+	nil, // 29: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry
+	(*ReceiveAutomationEvent_OutputsEvent)(nil),     // 30: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent
+	(*ReceiveAutomationEvent_UserRequestEvent)(nil), // 31: dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent
+	(*ReceiveAutomationEvent_MetricsEvent)(nil),     // 32: dtkt.core.v1.ReceiveAutomationEvent.MetricsEvent
+	nil,                             // 33: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry
+	nil,                             // 34: dtkt.core.v1.ReceiveAutomationEvent.MetricsEvent.ValuesEntry
+	(*durationpb.Duration)(nil),     // 35: google.protobuf.Duration
+	(*timestamppb.Timestamp)(nil),   // 36: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),   // 37: google.protobuf.FieldMask
+	(*Context)(nil),                 // 38: dtkt.core.v1.Context
+	(*anypb.Any)(nil),               // 39: google.protobuf.Any
+	(*v1beta1.Env)(nil),             // 40: dtkt.flow.v1beta1.Env
+	(*status.Status)(nil),           // 41: google.rpc.Status
+	(*v1beta1.UserAction)(nil),      // 42: dtkt.flow.v1beta1.UserAction
+	(*longrunningpb.Operation)(nil), // 43: google.longrunning.Operation
+	(*emptypb.Empty)(nil),           // 44: google.protobuf.Empty
 }
 var file_dtkt_core_v1_automation_proto_depIdxs = []int32{
-	22, // 0: dtkt.core.v1.Automation.connections:type_name -> dtkt.core.v1.Automation.ConnectionsEntry
-	23, // 1: dtkt.core.v1.Automation.inputs:type_name -> dtkt.core.v1.Automation.InputsEntry
-	36, // 2: dtkt.core.v1.Automation.timeout:type_name -> google.protobuf.Duration
-	3,  // 3: dtkt.core.v1.Automation.runtime:type_name -> dtkt.core.v1.AutomationRuntime
-	37, // 4: dtkt.core.v1.Automation.create_time:type_name -> google.protobuf.Timestamp
-	37, // 5: dtkt.core.v1.Automation.update_time:type_name -> google.protobuf.Timestamp
-	37, // 6: dtkt.core.v1.AutomationMetadata.start_time:type_name -> google.protobuf.Timestamp
-	37, // 7: dtkt.core.v1.AutomationMetadata.stop_time:type_name -> google.protobuf.Timestamp
-	0,  // 8: dtkt.core.v1.AutomationRuntime.state:type_name -> dtkt.core.v1.AutomationRuntime.State
-	24, // 9: dtkt.core.v1.AutomationRuntime.env:type_name -> dtkt.core.v1.AutomationRuntime.Env
-	37, // 10: dtkt.core.v1.AutomationRuntime.start_time:type_name -> google.protobuf.Timestamp
-	37, // 11: dtkt.core.v1.AutomationRuntime.stop_time:type_name -> google.protobuf.Timestamp
-	25, // 12: dtkt.core.v1.AutomationRuntime.result:type_name -> dtkt.core.v1.AutomationRuntime.Result
-	1,  // 13: dtkt.core.v1.GetAutomationResponse.automation:type_name -> dtkt.core.v1.Automation
-	1,  // 14: dtkt.core.v1.CreateAutomationRequest.automation:type_name -> dtkt.core.v1.Automation
-	1,  // 15: dtkt.core.v1.CreateAutomationResponse.automation:type_name -> dtkt.core.v1.Automation
-	1,  // 16: dtkt.core.v1.UpdateAutomationRequest.automation:type_name -> dtkt.core.v1.Automation
-	38, // 17: dtkt.core.v1.UpdateAutomationRequest.update_mask:type_name -> google.protobuf.FieldMask
-	0,  // 18: dtkt.core.v1.UpdateAutomationRequest.desired_state:type_name -> dtkt.core.v1.AutomationRuntime.State
-	6,  // 19: dtkt.core.v1.BatchCreateAutomationsRequest.requests:type_name -> dtkt.core.v1.CreateAutomationRequest
-	1,  // 20: dtkt.core.v1.BatchCreateAutomationsResponse.automations:type_name -> dtkt.core.v1.Automation
-	1,  // 21: dtkt.core.v1.ListAutomationsResponse.automations:type_name -> dtkt.core.v1.Automation
-	27, // 22: dtkt.core.v1.SendAutomationEvent.inputs_event:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent
-	28, // 23: dtkt.core.v1.SendAutomationEvent.user_response_event:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent
-	31, // 24: dtkt.core.v1.ReceiveAutomationEvent.outputs_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent
-	32, // 25: dtkt.core.v1.ReceiveAutomationEvent.user_request_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent
-	33, // 26: dtkt.core.v1.ReceiveAutomationEvent.metrics_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.MetricsEvent
-	14, // 27: dtkt.core.v1.SendAutomationEventRequest.event:type_name -> dtkt.core.v1.SendAutomationEvent
-	15, // 28: dtkt.core.v1.ReceiveAutomationEventsResponse.event:type_name -> dtkt.core.v1.ReceiveAutomationEvent
-	14, // 29: dtkt.core.v1.StreamAutomationEventsRequest.event:type_name -> dtkt.core.v1.SendAutomationEvent
-	15, // 30: dtkt.core.v1.StreamAutomationEventsResponse.event:type_name -> dtkt.core.v1.ReceiveAutomationEvent
-	39, // 31: dtkt.core.v1.Automation.ConnectionConfig.context:type_name -> dtkt.core.v1.Context
-	21, // 32: dtkt.core.v1.Automation.ConnectionsEntry.value:type_name -> dtkt.core.v1.Automation.ConnectionConfig
-	40, // 33: dtkt.core.v1.Automation.InputsEntry.value:type_name -> google.protobuf.Any
-	41, // 34: dtkt.core.v1.AutomationRuntime.Env.v1beta1:type_name -> dtkt.flow.v1beta1.Env
-	42, // 35: dtkt.core.v1.AutomationRuntime.Result.error:type_name -> google.rpc.Status
-	26, // 36: dtkt.core.v1.AutomationRuntime.Result.values:type_name -> dtkt.core.v1.AutomationRuntime.Result.ValuesEntry
-	40, // 37: dtkt.core.v1.AutomationRuntime.Result.ValuesEntry.value:type_name -> google.protobuf.Any
-	29, // 38: dtkt.core.v1.SendAutomationEvent.InputsEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry
-	30, // 39: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry
-	40, // 40: dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
-	40, // 41: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry.value:type_name -> google.protobuf.Any
-	34, // 42: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.values:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry
-	43, // 43: dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent.user_action:type_name -> dtkt.flow.v1beta1.UserAction
-	35, // 44: dtkt.core.v1.ReceiveAutomationEvent.MetricsEvent.values:type_name -> dtkt.core.v1.ReceiveAutomationEvent.MetricsEvent.ValuesEntry
-	40, // 45: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
-	40, // 46: dtkt.core.v1.ReceiveAutomationEvent.MetricsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
-	12, // 47: dtkt.core.v1.AutomationService.ListAutomations:input_type -> dtkt.core.v1.ListAutomationsRequest
-	4,  // 48: dtkt.core.v1.AutomationService.GetAutomation:input_type -> dtkt.core.v1.GetAutomationRequest
-	6,  // 49: dtkt.core.v1.AutomationService.CreateAutomation:input_type -> dtkt.core.v1.CreateAutomationRequest
-	8,  // 50: dtkt.core.v1.AutomationService.UpdateAutomation:input_type -> dtkt.core.v1.UpdateAutomationRequest
-	9,  // 51: dtkt.core.v1.AutomationService.DeleteAutomation:input_type -> dtkt.core.v1.DeleteAutomationRequest
-	17, // 52: dtkt.core.v1.AutomationService.ReceiveAutomationEvents:input_type -> dtkt.core.v1.ReceiveAutomationEventsRequest
-	16, // 53: dtkt.core.v1.AutomationService.SendAutomationEvent:input_type -> dtkt.core.v1.SendAutomationEventRequest
-	19, // 54: dtkt.core.v1.AutomationService.StreamAutomationEvents:input_type -> dtkt.core.v1.StreamAutomationEventsRequest
-	13, // 55: dtkt.core.v1.AutomationService.ListAutomations:output_type -> dtkt.core.v1.ListAutomationsResponse
-	5,  // 56: dtkt.core.v1.AutomationService.GetAutomation:output_type -> dtkt.core.v1.GetAutomationResponse
-	44, // 57: dtkt.core.v1.AutomationService.CreateAutomation:output_type -> google.longrunning.Operation
-	44, // 58: dtkt.core.v1.AutomationService.UpdateAutomation:output_type -> google.longrunning.Operation
-	44, // 59: dtkt.core.v1.AutomationService.DeleteAutomation:output_type -> google.longrunning.Operation
-	18, // 60: dtkt.core.v1.AutomationService.ReceiveAutomationEvents:output_type -> dtkt.core.v1.ReceiveAutomationEventsResponse
-	45, // 61: dtkt.core.v1.AutomationService.SendAutomationEvent:output_type -> google.protobuf.Empty
-	20, // 62: dtkt.core.v1.AutomationService.StreamAutomationEvents:output_type -> dtkt.core.v1.StreamAutomationEventsResponse
-	55, // [55:63] is the sub-list for method output_type
-	47, // [47:55] is the sub-list for method input_type
-	47, // [47:47] is the sub-list for extension type_name
-	47, // [47:47] is the sub-list for extension extendee
-	0,  // [0:47] is the sub-list for field type_name
+	21, // 0: dtkt.core.v1.Automation.connections:type_name -> dtkt.core.v1.Automation.ConnectionsEntry
+	22, // 1: dtkt.core.v1.Automation.inputs:type_name -> dtkt.core.v1.Automation.InputsEntry
+	35, // 2: dtkt.core.v1.Automation.timeout:type_name -> google.protobuf.Duration
+	2,  // 3: dtkt.core.v1.Automation.runtime:type_name -> dtkt.core.v1.AutomationRuntime
+	36, // 4: dtkt.core.v1.Automation.create_time:type_name -> google.protobuf.Timestamp
+	36, // 5: dtkt.core.v1.Automation.update_time:type_name -> google.protobuf.Timestamp
+	0,  // 6: dtkt.core.v1.AutomationRuntime.state:type_name -> dtkt.core.v1.AutomationRuntime.State
+	23, // 7: dtkt.core.v1.AutomationRuntime.env:type_name -> dtkt.core.v1.AutomationRuntime.Env
+	36, // 8: dtkt.core.v1.AutomationRuntime.start_time:type_name -> google.protobuf.Timestamp
+	36, // 9: dtkt.core.v1.AutomationRuntime.stop_time:type_name -> google.protobuf.Timestamp
+	24, // 10: dtkt.core.v1.AutomationRuntime.result:type_name -> dtkt.core.v1.AutomationRuntime.Result
+	1,  // 11: dtkt.core.v1.GetAutomationResponse.automation:type_name -> dtkt.core.v1.Automation
+	1,  // 12: dtkt.core.v1.CreateAutomationRequest.automation:type_name -> dtkt.core.v1.Automation
+	1,  // 13: dtkt.core.v1.CreateAutomationResponse.automation:type_name -> dtkt.core.v1.Automation
+	1,  // 14: dtkt.core.v1.UpdateAutomationRequest.automation:type_name -> dtkt.core.v1.Automation
+	37, // 15: dtkt.core.v1.UpdateAutomationRequest.update_mask:type_name -> google.protobuf.FieldMask
+	0,  // 16: dtkt.core.v1.UpdateAutomationRequest.desired_state:type_name -> dtkt.core.v1.AutomationRuntime.State
+	5,  // 17: dtkt.core.v1.BatchCreateAutomationsRequest.requests:type_name -> dtkt.core.v1.CreateAutomationRequest
+	1,  // 18: dtkt.core.v1.BatchCreateAutomationsResponse.automations:type_name -> dtkt.core.v1.Automation
+	1,  // 19: dtkt.core.v1.ListAutomationsResponse.automations:type_name -> dtkt.core.v1.Automation
+	26, // 20: dtkt.core.v1.SendAutomationEvent.inputs_event:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent
+	27, // 21: dtkt.core.v1.SendAutomationEvent.user_response_event:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent
+	30, // 22: dtkt.core.v1.ReceiveAutomationEvent.outputs_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent
+	31, // 23: dtkt.core.v1.ReceiveAutomationEvent.user_request_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent
+	32, // 24: dtkt.core.v1.ReceiveAutomationEvent.metrics_event:type_name -> dtkt.core.v1.ReceiveAutomationEvent.MetricsEvent
+	13, // 25: dtkt.core.v1.SendAutomationEventRequest.event:type_name -> dtkt.core.v1.SendAutomationEvent
+	14, // 26: dtkt.core.v1.ReceiveAutomationEventsResponse.event:type_name -> dtkt.core.v1.ReceiveAutomationEvent
+	13, // 27: dtkt.core.v1.StreamAutomationEventsRequest.event:type_name -> dtkt.core.v1.SendAutomationEvent
+	14, // 28: dtkt.core.v1.StreamAutomationEventsResponse.event:type_name -> dtkt.core.v1.ReceiveAutomationEvent
+	38, // 29: dtkt.core.v1.Automation.ConnectionConfig.context:type_name -> dtkt.core.v1.Context
+	20, // 30: dtkt.core.v1.Automation.ConnectionsEntry.value:type_name -> dtkt.core.v1.Automation.ConnectionConfig
+	39, // 31: dtkt.core.v1.Automation.InputsEntry.value:type_name -> google.protobuf.Any
+	40, // 32: dtkt.core.v1.AutomationRuntime.Env.v1beta1:type_name -> dtkt.flow.v1beta1.Env
+	41, // 33: dtkt.core.v1.AutomationRuntime.Result.error:type_name -> google.rpc.Status
+	25, // 34: dtkt.core.v1.AutomationRuntime.Result.values:type_name -> dtkt.core.v1.AutomationRuntime.Result.ValuesEntry
+	39, // 35: dtkt.core.v1.AutomationRuntime.Result.ValuesEntry.value:type_name -> google.protobuf.Any
+	28, // 36: dtkt.core.v1.SendAutomationEvent.InputsEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry
+	29, // 37: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.values:type_name -> dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry
+	39, // 38: dtkt.core.v1.SendAutomationEvent.InputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
+	39, // 39: dtkt.core.v1.SendAutomationEvent.UserResponseEvent.ValuesEntry.value:type_name -> google.protobuf.Any
+	33, // 40: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.values:type_name -> dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry
+	42, // 41: dtkt.core.v1.ReceiveAutomationEvent.UserRequestEvent.user_action:type_name -> dtkt.flow.v1beta1.UserAction
+	34, // 42: dtkt.core.v1.ReceiveAutomationEvent.MetricsEvent.values:type_name -> dtkt.core.v1.ReceiveAutomationEvent.MetricsEvent.ValuesEntry
+	39, // 43: dtkt.core.v1.ReceiveAutomationEvent.OutputsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
+	39, // 44: dtkt.core.v1.ReceiveAutomationEvent.MetricsEvent.ValuesEntry.value:type_name -> google.protobuf.Any
+	11, // 45: dtkt.core.v1.AutomationService.ListAutomations:input_type -> dtkt.core.v1.ListAutomationsRequest
+	3,  // 46: dtkt.core.v1.AutomationService.GetAutomation:input_type -> dtkt.core.v1.GetAutomationRequest
+	5,  // 47: dtkt.core.v1.AutomationService.CreateAutomation:input_type -> dtkt.core.v1.CreateAutomationRequest
+	7,  // 48: dtkt.core.v1.AutomationService.UpdateAutomation:input_type -> dtkt.core.v1.UpdateAutomationRequest
+	8,  // 49: dtkt.core.v1.AutomationService.DeleteAutomation:input_type -> dtkt.core.v1.DeleteAutomationRequest
+	16, // 50: dtkt.core.v1.AutomationService.ReceiveAutomationEvents:input_type -> dtkt.core.v1.ReceiveAutomationEventsRequest
+	15, // 51: dtkt.core.v1.AutomationService.SendAutomationEvent:input_type -> dtkt.core.v1.SendAutomationEventRequest
+	18, // 52: dtkt.core.v1.AutomationService.StreamAutomationEvents:input_type -> dtkt.core.v1.StreamAutomationEventsRequest
+	12, // 53: dtkt.core.v1.AutomationService.ListAutomations:output_type -> dtkt.core.v1.ListAutomationsResponse
+	4,  // 54: dtkt.core.v1.AutomationService.GetAutomation:output_type -> dtkt.core.v1.GetAutomationResponse
+	43, // 55: dtkt.core.v1.AutomationService.CreateAutomation:output_type -> google.longrunning.Operation
+	43, // 56: dtkt.core.v1.AutomationService.UpdateAutomation:output_type -> google.longrunning.Operation
+	43, // 57: dtkt.core.v1.AutomationService.DeleteAutomation:output_type -> google.longrunning.Operation
+	17, // 58: dtkt.core.v1.AutomationService.ReceiveAutomationEvents:output_type -> dtkt.core.v1.ReceiveAutomationEventsResponse
+	44, // 59: dtkt.core.v1.AutomationService.SendAutomationEvent:output_type -> google.protobuf.Empty
+	19, // 60: dtkt.core.v1.AutomationService.StreamAutomationEvents:output_type -> dtkt.core.v1.StreamAutomationEventsResponse
+	53, // [53:61] is the sub-list for method output_type
+	45, // [45:53] is the sub-list for method input_type
+	45, // [45:45] is the sub-list for extension type_name
+	45, // [45:45] is the sub-list for extension extendee
+	0,  // [0:45] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_core_v1_automation_proto_init() }
@@ -2104,18 +2031,18 @@ func file_dtkt_core_v1_automation_proto_init() {
 	}
 	file_dtkt_core_v1_common_proto_init()
 	file_dtkt_core_v1_automation_proto_msgTypes[0].OneofWrappers = []any{}
-	file_dtkt_core_v1_automation_proto_msgTypes[7].OneofWrappers = []any{}
-	file_dtkt_core_v1_automation_proto_msgTypes[11].OneofWrappers = []any{}
-	file_dtkt_core_v1_automation_proto_msgTypes[13].OneofWrappers = []any{
+	file_dtkt_core_v1_automation_proto_msgTypes[6].OneofWrappers = []any{}
+	file_dtkt_core_v1_automation_proto_msgTypes[10].OneofWrappers = []any{}
+	file_dtkt_core_v1_automation_proto_msgTypes[12].OneofWrappers = []any{
 		(*SendAutomationEvent_InputsEvent_)(nil),
 		(*SendAutomationEvent_UserResponseEvent_)(nil),
 	}
-	file_dtkt_core_v1_automation_proto_msgTypes[14].OneofWrappers = []any{
+	file_dtkt_core_v1_automation_proto_msgTypes[13].OneofWrappers = []any{
 		(*ReceiveAutomationEvent_OutputsEvent_)(nil),
 		(*ReceiveAutomationEvent_UserRequestEvent_)(nil),
 		(*ReceiveAutomationEvent_MetricsEvent_)(nil),
 	}
-	file_dtkt_core_v1_automation_proto_msgTypes[23].OneofWrappers = []any{
+	file_dtkt_core_v1_automation_proto_msgTypes[22].OneofWrappers = []any{
 		(*AutomationRuntime_Env_V1Beta1)(nil),
 	}
 	type x struct{}
@@ -2124,7 +2051,7 @@ func file_dtkt_core_v1_automation_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_core_v1_automation_proto_rawDesc), len(file_dtkt_core_v1_automation_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   35,
+			NumMessages:   34,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -1,7 +1,11 @@
 package common
 
 import (
+	"time"
+
 	"github.com/google/cel-go/cel"
+	"github.com/google/cel-go/common/types"
+	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/ext"
 	"k8s.io/apiserver/pkg/cel/library"
 )
@@ -14,10 +18,21 @@ func NewCELEnv(opts ...cel.EnvOption) (*cel.Env, error) {
 		ext.Protos(),
 		ext.Strings(),
 		ext.TwoVarComprehensions(),
+		CELLocaleLib(),
 		CELEnumLib(),
 		CELJSONLib(),
 		CELUUIDLib(),
-		CELProtoDescLib(),
+		CELDescriptorLib(),
+		cel.Function("now",
+			cel.SingletonFunctionBinding(
+				func(...ref.Val) ref.Val {
+					return types.Timestamp{
+						Time: time.Now(),
+					}
+				},
+			),
+			cel.Overload("now", nil, cel.TimestampType),
+		),
 	}, opts...)...)
 }
 

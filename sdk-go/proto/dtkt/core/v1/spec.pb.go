@@ -26,8 +26,8 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// FlowSpec is a versioned Flow specification wrapper and implements
-// api.SpecLoader interface which handles encoding, decoding, and validation.
+// FlowSpec is a versioned Flow spec wrapper implementing api.SpecLoader
+// interface which handles encoding, decoding, and validation.
 type FlowSpec struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Kind        *string                `protobuf:"bytes,1,opt,name=kind,def=Flow"`
@@ -256,8 +256,8 @@ type flowSpec_V1Beta1 struct {
 
 func (*flowSpec_V1Beta1) isFlowSpec_Version() {}
 
-// PackageSpec is a versioned Package specification wrapper and implements
-// api.SpecLoader interface which handles encoding, decoding, and validation.
+// PackageSpec is a versioned Package spec wrapper implementing api.SpecLoader
+// interface which handles encoding, decoding, and validation.
 type PackageSpec struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Kind        *string                `protobuf:"bytes,1,opt,name=kind,def=Package"`

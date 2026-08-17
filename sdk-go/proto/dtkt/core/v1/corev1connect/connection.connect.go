@@ -59,7 +59,7 @@ type ConnectionServiceClient interface {
 	DialConnection(context.Context, *connect.Request[v1.DialConnectionRequest]) (*connect.Response[v1.DialConnectionResponse], error)
 	// List connections.
 	ListConnections(context.Context, *connect.Request[v1.ListConnectionsRequest]) (*connect.Response[v1.ListConnectionsResponse], error)
-	// Get a single connection by name.
+	// Get a connection by name.
 	GetConnection(context.Context, *connect.Request[v1.GetConnectionRequest]) (*connect.Response[v1.GetConnectionResponse], error)
 	// Create a new connection.
 	CreateConnection(context.Context, *connect.Request[v1.CreateConnectionRequest]) (*connect.Response[v1.CreateConnectionResponse], error)
@@ -167,7 +167,7 @@ type ConnectionServiceHandler interface {
 	DialConnection(context.Context, *connect.Request[v1.DialConnectionRequest]) (*connect.Response[v1.DialConnectionResponse], error)
 	// List connections.
 	ListConnections(context.Context, *connect.Request[v1.ListConnectionsRequest]) (*connect.Response[v1.ListConnectionsResponse], error)
-	// Get a single connection by name.
+	// Get a connection by name.
 	GetConnection(context.Context, *connect.Request[v1.GetConnectionRequest]) (*connect.Response[v1.GetConnectionResponse], error)
 	// Create a new connection.
 	CreateConnection(context.Context, *connect.Request[v1.CreateConnectionRequest]) (*connect.Response[v1.CreateConnectionResponse], error)

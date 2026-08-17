@@ -7,11 +7,12 @@ import "dtkt/core/v1/common.proto";
 
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1";
 
-// EncryptionService provides data encryption and decryption operations.
+// EncryptionService provides resource encryption and decryption operations.
 service EncryptionService {
-  // Encrypt data.
+  // Encrypt resource.
   rpc Encrypt(EncryptRequest) returns (EncryptResponse);
-  // Decrypt data.
+
+  // Decrypt resource.
   rpc Decrypt(DecryptRequest) returns (DecryptResponse);
 }
 

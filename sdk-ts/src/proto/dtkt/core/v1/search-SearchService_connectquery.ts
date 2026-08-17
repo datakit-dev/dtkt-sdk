@@ -5,6 +5,8 @@
 import { SearchService } from "./search_pb";
 
 /**
+ * List search results.
+ *
  * @generated from rpc dtkt.core.v1.SearchService.ListSearchResults
  */
 export const listSearchResults = SearchService.method.listSearchResults;

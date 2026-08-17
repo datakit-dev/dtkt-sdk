@@ -37,7 +37,7 @@ type ConnectionServiceClient interface {
 	DialConnection(ctx context.Context, in *DialConnectionRequest, opts ...grpc.CallOption) (*DialConnectionResponse, error)
 	// List connections.
 	ListConnections(ctx context.Context, in *ListConnectionsRequest, opts ...grpc.CallOption) (*ListConnectionsResponse, error)
-	// Get a single connection by name.
+	// Get a connection by name.
 	GetConnection(ctx context.Context, in *GetConnectionRequest, opts ...grpc.CallOption) (*GetConnectionResponse, error)
 	// Create a new connection.
 	CreateConnection(ctx context.Context, in *CreateConnectionRequest, opts ...grpc.CallOption) (*CreateConnectionResponse, error)
@@ -125,7 +125,7 @@ type ConnectionServiceServer interface {
 	DialConnection(context.Context, *DialConnectionRequest) (*DialConnectionResponse, error)
 	// List connections.
 	ListConnections(context.Context, *ListConnectionsRequest) (*ListConnectionsResponse, error)
-	// Get a single connection by name.
+	// Get a connection by name.
 	GetConnection(context.Context, *GetConnectionRequest) (*GetConnectionResponse, error)
 	// Create a new connection.
 	CreateConnection(context.Context, *CreateConnectionRequest) (*CreateConnectionResponse, error)

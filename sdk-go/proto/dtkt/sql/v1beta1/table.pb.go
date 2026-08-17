@@ -33,6 +33,7 @@ type Table struct {
 	xxx_hidden_Columns     *[]*Column             `protobuf:"bytes,4,rep,name=columns"`
 	xxx_hidden_Indexes     *[]*Index              `protobuf:"bytes,5,rep,name=indexes"`
 	xxx_hidden_ForeignKeys *[]*ForeignKey         `protobuf:"bytes,6,rep,name=foreign_keys,json=foreignKeys"`
+	xxx_hidden_Stats       *Table_Stats           `protobuf:"bytes,7,opt,name=stats"`
 	xxx_hidden_Metadata    map[string]string      `protobuf:"bytes,10,rep,name=metadata" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
@@ -102,6 +103,13 @@ func (x *Table) GetForeignKeys() []*ForeignKey {
 	return nil
 }
 
+func (x *Table) GetStats() *Table_Stats {
+	if x != nil {
+		return x.xxx_hidden_Stats
+	}
+	return nil
+}
+
 func (x *Table) GetMetadata() map[string]string {
 	if x != nil {
 		return x.xxx_hidden_Metadata
@@ -111,7 +119,7 @@ func (x *Table) GetMetadata() map[string]string {
 
 func (x *Table) SetName(v string) {
 	x.xxx_hidden_Name = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 5)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 6)
 }
 
 func (x *Table) SetColumns(v []*Column) {
@@ -126,6 +134,10 @@ func (x *Table) SetForeignKeys(v []*ForeignKey) {
 	x.xxx_hidden_ForeignKeys = &v
 }
 
+func (x *Table) SetStats(v *Table_Stats) {
+	x.xxx_hidden_Stats = v
+}
+
 func (x *Table) SetMetadata(v map[string]string) {
 	x.xxx_hidden_Metadata = v
 }
@@ -137,9 +149,20 @@ func (x *Table) HasName() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
+func (x *Table) HasStats() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Stats != nil
+}
+
 func (x *Table) ClearName() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_Name = nil
+}
+
+func (x *Table) ClearStats() {
+	x.xxx_hidden_Stats = nil
 }
 
 type Table_builder struct {
@@ -153,6 +176,8 @@ type Table_builder struct {
 	Indexes []*Index
 	// List of foreign keys within the table.
 	ForeignKeys []*ForeignKey
+	// Stats contains statistics about a table.
+	Stats *Table_Stats
 	// Additional metadata, if any.
 	Metadata map[string]string
 }
@@ -162,12 +187,13 @@ func (b0 Table_builder) Build() *Table {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Name != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 5)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 6)
 		x.xxx_hidden_Name = b.Name
 	}
 	x.xxx_hidden_Columns = &b.Columns
 	x.xxx_hidden_Indexes = &b.Indexes
 	x.xxx_hidden_ForeignKeys = &b.ForeignKeys
+	x.xxx_hidden_Stats = b.Stats
 	x.xxx_hidden_Metadata = b.Metadata
 	return m0
 }
@@ -1555,18 +1581,131 @@ func (b0 WriteTableRowsResponse_builder) Build() *WriteTableRowsResponse {
 	return m0
 }
 
+type Table_Stats struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_TotalRows   int64                  `protobuf:"varint,1,opt,name=total_rows,json=totalRows"`
+	xxx_hidden_TotalBytes  int64                  `protobuf:"varint,2,opt,name=total_bytes,json=totalBytes"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *Table_Stats) Reset() {
+	*x = Table_Stats{}
+	mi := &file_dtkt_sql_v1beta1_table_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Table_Stats) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Table_Stats) ProtoMessage() {}
+
+func (x *Table_Stats) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_sql_v1beta1_table_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *Table_Stats) GetTotalRows() int64 {
+	if x != nil {
+		return x.xxx_hidden_TotalRows
+	}
+	return 0
+}
+
+func (x *Table_Stats) GetTotalBytes() int64 {
+	if x != nil {
+		return x.xxx_hidden_TotalBytes
+	}
+	return 0
+}
+
+func (x *Table_Stats) SetTotalRows(v int64) {
+	x.xxx_hidden_TotalRows = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
+func (x *Table_Stats) SetTotalBytes(v int64) {
+	x.xxx_hidden_TotalBytes = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *Table_Stats) HasTotalRows() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Table_Stats) HasTotalBytes() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Table_Stats) ClearTotalRows() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_TotalRows = 0
+}
+
+func (x *Table_Stats) ClearTotalBytes() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_TotalBytes = 0
+}
+
+type Table_Stats_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The total number of rows in the table.
+	TotalRows *int64
+	// The total size of the table in bytes.
+	TotalBytes *int64
+}
+
+func (b0 Table_Stats_builder) Build() *Table_Stats {
+	m0 := &Table_Stats{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.TotalRows != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		x.xxx_hidden_TotalRows = *b.TotalRows
+	}
+	if b.TotalBytes != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_TotalBytes = *b.TotalBytes
+	}
+	return m0
+}
+
 var File_dtkt_sql_v1beta1_table_proto protoreflect.FileDescriptor
 
 const file_dtkt_sql_v1beta1_table_proto_rawDesc = "" +
 	"\n" +
-	"\x1cdtkt/sql/v1beta1/table.proto\x12\x10dtkt.sql.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\x1ddtkt/sql/v1beta1/column.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a google/protobuf/field_mask.proto\x1a!google/protobuf/go_features.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xdb\x02\n" +
+	"\x1cdtkt/sql/v1beta1/table.proto\x12\x10dtkt.sql.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\x1ddtkt/sql/v1beta1/column.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a google/protobuf/field_mask.proto\x1a!google/protobuf/go_features.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xde\x03\n" +
 	"\x05Table\x12\x1d\n" +
 	"\x04name\x18\x01 \x01(\tB\t\xe0A\b\xbaH\x03\xc8\x01\x01R\x04name\x12?\n" +
 	"\acolumns\x18\x04 \x03(\v2\x18.dtkt.sql.v1beta1.ColumnB\v\xbaH\b\xc8\x01\x01\x92\x01\x02\b\x01R\acolumns\x121\n" +
 	"\aindexes\x18\x05 \x03(\v2\x17.dtkt.sql.v1beta1.IndexR\aindexes\x12?\n" +
-	"\fforeign_keys\x18\x06 \x03(\v2\x1c.dtkt.sql.v1beta1.ForeignKeyR\vforeignKeys\x12A\n" +
+	"\fforeign_keys\x18\x06 \x03(\v2\x1c.dtkt.sql.v1beta1.ForeignKeyR\vforeignKeys\x128\n" +
+	"\x05stats\x18\a \x01(\v2\x1d.dtkt.sql.v1beta1.Table.StatsB\x03\xe0A\x03R\x05stats\x12A\n" +
 	"\bmetadata\x18\n" +
-	" \x03(\v2%.dtkt.sql.v1beta1.Table.MetadataEntryR\bmetadata\x1a;\n" +
+	" \x03(\v2%.dtkt.sql.v1beta1.Table.MetadataEntryR\bmetadata\x1aG\n" +
+	"\x05Stats\x12\x1d\n" +
+	"\n" +
+	"total_rows\x18\x01 \x01(\x03R\ttotalRows\x12\x1f\n" +
+	"\vtotal_bytes\x18\x02 \x01(\x03R\n" +
+	"totalBytes\x1a;\n" +
 	"\rMetadataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x7f\n" +
@@ -1630,7 +1769,7 @@ const file_dtkt_sql_v1beta1_table_proto_rawDesc = "" +
 	"\x16proto.dtkt.sql.v1beta1B\n" +
 	"TableProtoP\x01ZHgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/sql/v1beta1;sqlv1beta1\xa2\x02\x03DSX\xaa\x02\x10Dtkt.Sql.V1beta1\xca\x02\x10Dtkt\\Sql\\V1beta1\xe2\x02\x1cDtkt\\Sql\\V1beta1\\GPBMetadata\xea\x02\x12Dtkt::Sql::V1beta1\x92\x03\x05\xd2>\x02\x10\x03b\beditionsp\xe8\a"
 
-var file_dtkt_sql_v1beta1_table_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_dtkt_sql_v1beta1_table_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_dtkt_sql_v1beta1_table_proto_goTypes = []any{
 	(*Table)(nil),                  // 0: dtkt.sql.v1beta1.Table
 	(*ListTablesRequest)(nil),      // 1: dtkt.sql.v1beta1.ListTablesRequest
@@ -1647,48 +1786,50 @@ var file_dtkt_sql_v1beta1_table_proto_goTypes = []any{
 	(*ReadTableRowsResponse)(nil),  // 12: dtkt.sql.v1beta1.ReadTableRowsResponse
 	(*WriteTableRowsRequest)(nil),  // 13: dtkt.sql.v1beta1.WriteTableRowsRequest
 	(*WriteTableRowsResponse)(nil), // 14: dtkt.sql.v1beta1.WriteTableRowsResponse
-	nil,                            // 15: dtkt.sql.v1beta1.Table.MetadataEntry
-	nil,                            // 16: dtkt.sql.v1beta1.WriteTableRowsResponse.RowsWrittenEntry
-	(*Column)(nil),                 // 17: dtkt.sql.v1beta1.Column
-	(*Index)(nil),                  // 18: dtkt.sql.v1beta1.Index
-	(*ForeignKey)(nil),             // 19: dtkt.sql.v1beta1.ForeignKey
-	(*fieldmaskpb.FieldMask)(nil),  // 20: google.protobuf.FieldMask
-	(*structpb.Struct)(nil),        // 21: google.protobuf.Struct
+	(*Table_Stats)(nil),            // 15: dtkt.sql.v1beta1.Table.Stats
+	nil,                            // 16: dtkt.sql.v1beta1.Table.MetadataEntry
+	nil,                            // 17: dtkt.sql.v1beta1.WriteTableRowsResponse.RowsWrittenEntry
+	(*Column)(nil),                 // 18: dtkt.sql.v1beta1.Column
+	(*Index)(nil),                  // 19: dtkt.sql.v1beta1.Index
+	(*ForeignKey)(nil),             // 20: dtkt.sql.v1beta1.ForeignKey
+	(*fieldmaskpb.FieldMask)(nil),  // 21: google.protobuf.FieldMask
+	(*structpb.Struct)(nil),        // 22: google.protobuf.Struct
 }
 var file_dtkt_sql_v1beta1_table_proto_depIdxs = []int32{
-	17, // 0: dtkt.sql.v1beta1.Table.columns:type_name -> dtkt.sql.v1beta1.Column
-	18, // 1: dtkt.sql.v1beta1.Table.indexes:type_name -> dtkt.sql.v1beta1.Index
-	19, // 2: dtkt.sql.v1beta1.Table.foreign_keys:type_name -> dtkt.sql.v1beta1.ForeignKey
-	15, // 3: dtkt.sql.v1beta1.Table.metadata:type_name -> dtkt.sql.v1beta1.Table.MetadataEntry
-	0,  // 4: dtkt.sql.v1beta1.ListTablesResponse.tables:type_name -> dtkt.sql.v1beta1.Table
-	0,  // 5: dtkt.sql.v1beta1.GetTableResponse.table:type_name -> dtkt.sql.v1beta1.Table
-	0,  // 6: dtkt.sql.v1beta1.CreateTableRequest.table:type_name -> dtkt.sql.v1beta1.Table
-	0,  // 7: dtkt.sql.v1beta1.CreateTableResponse.table:type_name -> dtkt.sql.v1beta1.Table
-	0,  // 8: dtkt.sql.v1beta1.UpdateTableRequest.table:type_name -> dtkt.sql.v1beta1.Table
-	20, // 9: dtkt.sql.v1beta1.UpdateTableRequest.update_mask:type_name -> google.protobuf.FieldMask
-	0,  // 10: dtkt.sql.v1beta1.UpdateTableResponse.table:type_name -> dtkt.sql.v1beta1.Table
-	21, // 11: dtkt.sql.v1beta1.ReadTableRowsResponse.row:type_name -> google.protobuf.Struct
-	21, // 12: dtkt.sql.v1beta1.WriteTableRowsRequest.row:type_name -> google.protobuf.Struct
-	16, // 13: dtkt.sql.v1beta1.WriteTableRowsResponse.rows_written:type_name -> dtkt.sql.v1beta1.WriteTableRowsResponse.RowsWrittenEntry
-	1,  // 14: dtkt.sql.v1beta1.TableService.ListTables:input_type -> dtkt.sql.v1beta1.ListTablesRequest
-	3,  // 15: dtkt.sql.v1beta1.TableService.GetTable:input_type -> dtkt.sql.v1beta1.GetTableRequest
-	5,  // 16: dtkt.sql.v1beta1.TableService.CreateTable:input_type -> dtkt.sql.v1beta1.CreateTableRequest
-	7,  // 17: dtkt.sql.v1beta1.TableService.UpdateTable:input_type -> dtkt.sql.v1beta1.UpdateTableRequest
-	9,  // 18: dtkt.sql.v1beta1.TableService.DeleteTable:input_type -> dtkt.sql.v1beta1.DeleteTableRequest
-	11, // 19: dtkt.sql.v1beta1.TableService.ReadTableRows:input_type -> dtkt.sql.v1beta1.ReadTableRowsRequest
-	13, // 20: dtkt.sql.v1beta1.TableService.WriteTableRows:input_type -> dtkt.sql.v1beta1.WriteTableRowsRequest
-	2,  // 21: dtkt.sql.v1beta1.TableService.ListTables:output_type -> dtkt.sql.v1beta1.ListTablesResponse
-	4,  // 22: dtkt.sql.v1beta1.TableService.GetTable:output_type -> dtkt.sql.v1beta1.GetTableResponse
-	6,  // 23: dtkt.sql.v1beta1.TableService.CreateTable:output_type -> dtkt.sql.v1beta1.CreateTableResponse
-	8,  // 24: dtkt.sql.v1beta1.TableService.UpdateTable:output_type -> dtkt.sql.v1beta1.UpdateTableResponse
-	10, // 25: dtkt.sql.v1beta1.TableService.DeleteTable:output_type -> dtkt.sql.v1beta1.DeleteTableResponse
-	12, // 26: dtkt.sql.v1beta1.TableService.ReadTableRows:output_type -> dtkt.sql.v1beta1.ReadTableRowsResponse
-	14, // 27: dtkt.sql.v1beta1.TableService.WriteTableRows:output_type -> dtkt.sql.v1beta1.WriteTableRowsResponse
-	21, // [21:28] is the sub-list for method output_type
-	14, // [14:21] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	18, // 0: dtkt.sql.v1beta1.Table.columns:type_name -> dtkt.sql.v1beta1.Column
+	19, // 1: dtkt.sql.v1beta1.Table.indexes:type_name -> dtkt.sql.v1beta1.Index
+	20, // 2: dtkt.sql.v1beta1.Table.foreign_keys:type_name -> dtkt.sql.v1beta1.ForeignKey
+	15, // 3: dtkt.sql.v1beta1.Table.stats:type_name -> dtkt.sql.v1beta1.Table.Stats
+	16, // 4: dtkt.sql.v1beta1.Table.metadata:type_name -> dtkt.sql.v1beta1.Table.MetadataEntry
+	0,  // 5: dtkt.sql.v1beta1.ListTablesResponse.tables:type_name -> dtkt.sql.v1beta1.Table
+	0,  // 6: dtkt.sql.v1beta1.GetTableResponse.table:type_name -> dtkt.sql.v1beta1.Table
+	0,  // 7: dtkt.sql.v1beta1.CreateTableRequest.table:type_name -> dtkt.sql.v1beta1.Table
+	0,  // 8: dtkt.sql.v1beta1.CreateTableResponse.table:type_name -> dtkt.sql.v1beta1.Table
+	0,  // 9: dtkt.sql.v1beta1.UpdateTableRequest.table:type_name -> dtkt.sql.v1beta1.Table
+	21, // 10: dtkt.sql.v1beta1.UpdateTableRequest.update_mask:type_name -> google.protobuf.FieldMask
+	0,  // 11: dtkt.sql.v1beta1.UpdateTableResponse.table:type_name -> dtkt.sql.v1beta1.Table
+	22, // 12: dtkt.sql.v1beta1.ReadTableRowsResponse.row:type_name -> google.protobuf.Struct
+	22, // 13: dtkt.sql.v1beta1.WriteTableRowsRequest.row:type_name -> google.protobuf.Struct
+	17, // 14: dtkt.sql.v1beta1.WriteTableRowsResponse.rows_written:type_name -> dtkt.sql.v1beta1.WriteTableRowsResponse.RowsWrittenEntry
+	1,  // 15: dtkt.sql.v1beta1.TableService.ListTables:input_type -> dtkt.sql.v1beta1.ListTablesRequest
+	3,  // 16: dtkt.sql.v1beta1.TableService.GetTable:input_type -> dtkt.sql.v1beta1.GetTableRequest
+	5,  // 17: dtkt.sql.v1beta1.TableService.CreateTable:input_type -> dtkt.sql.v1beta1.CreateTableRequest
+	7,  // 18: dtkt.sql.v1beta1.TableService.UpdateTable:input_type -> dtkt.sql.v1beta1.UpdateTableRequest
+	9,  // 19: dtkt.sql.v1beta1.TableService.DeleteTable:input_type -> dtkt.sql.v1beta1.DeleteTableRequest
+	11, // 20: dtkt.sql.v1beta1.TableService.ReadTableRows:input_type -> dtkt.sql.v1beta1.ReadTableRowsRequest
+	13, // 21: dtkt.sql.v1beta1.TableService.WriteTableRows:input_type -> dtkt.sql.v1beta1.WriteTableRowsRequest
+	2,  // 22: dtkt.sql.v1beta1.TableService.ListTables:output_type -> dtkt.sql.v1beta1.ListTablesResponse
+	4,  // 23: dtkt.sql.v1beta1.TableService.GetTable:output_type -> dtkt.sql.v1beta1.GetTableResponse
+	6,  // 24: dtkt.sql.v1beta1.TableService.CreateTable:output_type -> dtkt.sql.v1beta1.CreateTableResponse
+	8,  // 25: dtkt.sql.v1beta1.TableService.UpdateTable:output_type -> dtkt.sql.v1beta1.UpdateTableResponse
+	10, // 26: dtkt.sql.v1beta1.TableService.DeleteTable:output_type -> dtkt.sql.v1beta1.DeleteTableResponse
+	12, // 27: dtkt.sql.v1beta1.TableService.ReadTableRows:output_type -> dtkt.sql.v1beta1.ReadTableRowsResponse
+	14, // 28: dtkt.sql.v1beta1.TableService.WriteTableRows:output_type -> dtkt.sql.v1beta1.WriteTableRowsResponse
+	22, // [22:29] is the sub-list for method output_type
+	15, // [15:22] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_sql_v1beta1_table_proto_init() }
@@ -1703,7 +1844,7 @@ func file_dtkt_sql_v1beta1_table_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_sql_v1beta1_table_proto_rawDesc), len(file_dtkt_sql_v1beta1_table_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   17,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

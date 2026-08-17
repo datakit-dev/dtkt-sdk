@@ -26,35 +26,42 @@ service AutomationService {
   rpc ListAutomations(ListAutomationsRequest) returns (ListAutomationsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // Get a single automation by name.
+
+  // Get an automation by name.
   rpc GetAutomation(GetAutomationRequest) returns (GetAutomationResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
   // Create a new automation.
   rpc CreateAutomation(CreateAutomationRequest) returns (google.longrunning.Operation) {
     option (google.longrunning.operation_info) = {
-      metadata_type: "AutomationMetadata"
+      metadata_type: "AutomationRuntime"
       response_type: "Automation"
     };
   }
+
   // Update an automation.
   rpc UpdateAutomation(UpdateAutomationRequest) returns (google.longrunning.Operation) {
     option (google.longrunning.operation_info) = {
-      metadata_type: "AutomationMetadata"
+      metadata_type: "AutomationRuntime"
       response_type: "Automation"
     };
   }
+
   // Delete an automation.
   rpc DeleteAutomation(DeleteAutomationRequest) returns (google.longrunning.Operation) {
     option (google.longrunning.operation_info) = {
-      metadata_type: "AutomationMetadata"
+      metadata_type: "AutomationRuntime"
       response_type: "google.protobuf.Empty"
     };
   }
+
   // Receive a stream of output/user action events (for environments with server streaming but not client streaming, e.g. web browsers).
   rpc ReceiveAutomationEvents(ReceiveAutomationEventsRequest) returns (stream ReceiveAutomationEventsResponse);
+
   // Send an input/user action event (for environments without client streaming, e.g. web browsers).
   rpc SendAutomationEvent(SendAutomationEventRequest) returns (google.protobuf.Empty);
+
   // Send input/user action events and receive output/user action events bi-directionally.
   rpc StreamAutomationEvents(stream StreamAutomationEventsRequest) returns (stream StreamAutomationEventsResponse);
 }
@@ -179,18 +186,6 @@ message Automation {
     (google.api.field_behavior) = OUTPUT_ONLY,
     (dtkt.protoform.v1beta1.field).hidden = true
   ];
-}
-
-// AutomationMetadata contains metadata for automation operations.
-message AutomationMetadata {
-  // Status message.
-  string message = 1;
-
-  // Start time.
-  google.protobuf.Timestamp start_time = 10;
-
-  // Stop time.
-  google.protobuf.Timestamp stop_time = 11;
 }
 
 // AutomationRuntime contains execution state, environment, and final result.

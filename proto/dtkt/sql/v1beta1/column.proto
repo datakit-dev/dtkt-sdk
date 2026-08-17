@@ -23,6 +23,7 @@ message Column {
   oneof default {
     // Specifies the column's default value as an expression such as: "uuid()".
     string expr = 4;
+
     // Specifies the column's default value as a literal such as: 1 or 'foobar'.
     // Note: Strings are usually single or double quoted (depending on db).
     string literal = 5;

@@ -75,6 +75,10 @@ func (w *Window) Ident() string {
 	return w.ident
 }
 
+func (w *Window) Metadata() map[string]any {
+	return nil
+}
+
 func (w *Window) Compile(ctx context.Context, env shared.Env) error {
 	prog, err := env.CompileExpr("window.source", w.sourceExpr)
 	if err != nil {

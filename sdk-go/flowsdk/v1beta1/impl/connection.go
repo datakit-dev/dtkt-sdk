@@ -42,6 +42,10 @@ func (c *Connection) Ident() string {
 	return c.ident
 }
 
+func (c *Connection) Metadata() map[string]any {
+	return nil
+}
+
 func (c *Connection) Compile(ctx context.Context, env shared.Env) error {
 	conn, err := env.Connector(c.ident)
 	if err != nil {

@@ -15,6 +15,8 @@ import type { Any } from "../../../google/protobuf/any_pb";
 import { file_google_protobuf_any } from "../../../google/protobuf/any_pb";
 import type { Timestamp } from "../../../google/protobuf/timestamp_pb";
 import { file_google_protobuf_timestamp } from "../../../google/protobuf/timestamp_pb";
+import type { Code } from "../../../google/rpc/code_pb";
+import { file_google_rpc_code } from "../../../google/rpc/code_pb";
 import type { Status } from "../../../google/rpc/status_pb";
 import { file_google_rpc_status } from "../../../google/rpc/status_pb";
 import type { Message } from "@bufbuild/protobuf";
@@ -23,7 +25,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dtkt/flow/v1beta1/runtime.proto.
  */
 export const file_dtkt_flow_v1beta1_runtime: GenFile = /*@__PURE__*/
-  fileDesc("Ch9kdGt0L2Zsb3cvdjFiZXRhMS9ydW50aW1lLnByb3RvEhFkdGt0LmZsb3cudjFiZXRhMSLsAwoDRW52EioKBW5vZGVzGAEgAygLMhsuZHRrdC5mbG93LnYxYmV0YTEuRW52Lk5vZGUaxAEKBlJlc3VsdBIuCgpzdGFydF90aW1lGAEgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIvCgtmaW5pc2hfdGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASIwoFZXJyb3IYBSABKAsyEi5nb29nbGUucnBjLlN0YXR1c0gAEiUKBXZhbHVlGAYgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueUgAQg0KBHR5cGUSBbpIAggBGvEBCgROb2RlEmsKBWlkZW50GAEgASgJQly6SFnIAQFyVDJSXihjb25uZWN0aW9uc3xpbnB1dHN8dmFyc3xzdHJlYW1zfGFjdGlvbnN8b3V0cHV0c3xtZXRyaWNzKVwuW2EtekEtWl1bYS16QS1aMC05X10rJBIUCgxyZXN1bHRfY291bnQYAyABKAQSMgoLcmVzdWx0X3ByZXYYBCABKAsyHS5kdGt0LmZsb3cudjFiZXRhMS5FbnYuUmVzdWx0EjIKC3Jlc3VsdF9jdXJyGAUgASgLMh0uZHRrdC5mbG93LnYxYmV0YTEuRW52LlJlc3VsdCLmBgoFR3JhcGgSLQoEc3BlYxgBIAEoCzIXLmR0a3QuZmxvdy52MWJldGExLkZsb3dCBrpIA8gBARIsCgVub2RlcxgCIAMoCzIdLmR0a3QuZmxvdy52MWJldGExLkdyYXBoLk5vZGUSLAoFZWRnZXMYAyADKAsyHS5kdGt0LmZsb3cudjFiZXRhMS5HcmFwaC5FZGdlGuABCgRFZGdlEmsKBnNvdXJjZRgBIAEoCUJbukhYyAEBclMyUV4oY29ubmVjdGlvbnN8aW5wdXRzfHZhcnN8c3RyZWFtc3xhY3Rpb25zfG91dHB1dHN8bWV0cmljcylcLlthLXpBLVpdW2EtekEtWjAtOV9dKxJrCgZ0YXJnZXQYAiABKAlCW7pIWMgBAXJTMlFeKGNvbm5lY3Rpb25zfGlucHV0c3x2YXJzfHN0cmVhbXN8YWN0aW9uc3xvdXRwdXRzfG1ldHJpY3MpXC5bYS16QS1aXVthLXpBLVowLTlfXSsakAEKBEV4cHISEgoCaWQYASABKAlCBrpIA8gBARI8CgZwYXJzZWQYAiABKAsyJC5nb29nbGUuYXBpLmV4cHIudjFhbHBoYTEuUGFyc2VkRXhwckIGukgDyAEBEjYKB2NoZWNrZWQYAyABKAsyJS5nb29nbGUuYXBpLmV4cHIudjFhbHBoYTEuQ2hlY2tlZEV4cHIa2wIKBE5vZGUSawoFaWRlbnQYASABKAlCXLpIWcgBAXJUMlJeKGNvbm5lY3Rpb25zfGlucHV0c3x2YXJzfHN0cmVhbXN8YWN0aW9uc3xvdXRwdXRzfG1ldHJpY3MpXC5bYS16QS1aXVthLXpBLVowLTlfXSskEpgBCgVleHBycxgDIAMoCzIoLmR0a3QuZmxvdy52MWJldGExLkdyYXBoLk5vZGUuRXhwcnNFbnRyeUJfukhcmgFZIldyVTJTXihjb25uZWN0aW9uc3xpbnB1dHN8dmFyc3xzdHJlYW1zfGFjdGlvbnN8b3V0cHV0c3xtZXRyaWNzKVwuW2EtekEtWl1bYS16QS1aMC05X10rXC4aSwoKRXhwcnNFbnRyeRILCgNrZXkYASABKAkSLAoFdmFsdWUYAiABKAsyHS5kdGt0LmZsb3cudjFiZXRhMS5HcmFwaC5FeHByOgI4ASIGCgRTa2lwIgUKA0VPRiI0CgREb25lEgoKAmlkGAEgASgJEg4KBnJlYXNvbhgCIAEoCRIQCghpc19lcnJvchgDIAEoCELZAQoXcHJvdG8uZHRrdC5mbG93LnYxYmV0YTFCDFJ1bnRpbWVQcm90b1ABWkpnaXRodWIuY29tL2RhdGFraXQtZGV2L2R0a3Qtc2RrL3Nkay1nby9wcm90by9kdGt0L2Zsb3cvdjFiZXRhMTtmbG93djFiZXRhMaICA0RGWKoCEUR0a3QuRmxvdy5WMWJldGExygIRRHRrdFxGbG93XFYxYmV0YTHiAh1EdGt0XEZsb3dcVjFiZXRhMVxHUEJNZXRhZGF0YeoCE0R0a3Q6OkZsb3c6OlYxYmV0YTFiBnByb3RvMw", [file_buf_validate_validate, file_dtkt_flow_v1beta1_spec, file_google_api_expr_v1alpha1_checked, file_google_api_expr_v1alpha1_syntax, file_google_protobuf_any, file_google_protobuf_timestamp, file_google_rpc_status]);
+  fileDesc("Ch9kdGt0L2Zsb3cvdjFiZXRhMS9ydW50aW1lLnByb3RvEhFkdGt0LmZsb3cudjFiZXRhMSLyBAoDRW52EioKBW5vZGVzGAEgAygLMhsuZHRrdC5mbG93LnYxYmV0YTEuRW52Lk5vZGUaygIKBlJlc3VsdBIuCgpzdGFydF90aW1lGAEgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIvCgtmaW5pc2hfdGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASPQoIbWV0YWRhdGEYAyADKAsyKy5kdGt0LmZsb3cudjFiZXRhMS5FbnYuUmVzdWx0Lk1ldGFkYXRhRW50cnkSIwoFZXJyb3IYBSABKAsyEi5nb29nbGUucnBjLlN0YXR1c0gAEiUKBXZhbHVlGAYgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueUgAGkUKDU1ldGFkYXRhRW50cnkSCwoDa2V5GAEgASgJEiMKBXZhbHVlGAIgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueToCOAFCDQoEdHlwZRIFukgCCAEa8QEKBE5vZGUSawoFaWRlbnQYASABKAlCXLpIWcgBAXJUMlJeKGNvbm5lY3Rpb25zfGlucHV0c3x2YXJzfHN0cmVhbXN8YWN0aW9uc3xvdXRwdXRzfG1ldHJpY3MpXC5bYS16QS1aXVthLXpBLVowLTlfXSskEhQKDHJlc3VsdF9jb3VudBgDIAEoBBIyCgtyZXN1bHRfcHJldhgEIAEoCzIdLmR0a3QuZmxvdy52MWJldGExLkVudi5SZXN1bHQSMgoLcmVzdWx0X2N1cnIYBSABKAsyHS5kdGt0LmZsb3cudjFiZXRhMS5FbnYuUmVzdWx0Iu8FCgVHcmFwaBItCgRzcGVjGAEgASgLMhcuZHRrdC5mbG93LnYxYmV0YTEuRmxvd0IGukgDyAEBEiwKBW5vZGVzGAIgAygLMh0uZHRrdC5mbG93LnYxYmV0YTEuR3JhcGguTm9kZRIsCgVlZGdlcxgDIAMoCzIdLmR0a3QuZmxvdy52MWJldGExLkdyYXBoLkVkZ2Ua4AEKBEVkZ2USawoGc291cmNlGAEgASgJQlu6SFjIAQFyUzJRXihjb25uZWN0aW9uc3xpbnB1dHN8dmFyc3xzdHJlYW1zfGFjdGlvbnN8b3V0cHV0c3xtZXRyaWNzKVwuW2EtekEtWl1bYS16QS1aMC05X10rEmsKBnRhcmdldBgCIAEoCUJbukhYyAEBclMyUV4oY29ubmVjdGlvbnN8aW5wdXRzfHZhcnN8c3RyZWFtc3xhY3Rpb25zfG91dHB1dHN8bWV0cmljcylcLlthLXpBLVpdW2EtekEtWjAtOV9dKxp8CgRFeHByEjwKBnBhcnNlZBgCIAEoCzIkLmdvb2dsZS5hcGkuZXhwci52MWFscGhhMS5QYXJzZWRFeHByQga6SAPIAQESNgoHY2hlY2tlZBgDIAEoCzIlLmdvb2dsZS5hcGkuZXhwci52MWFscGhhMS5DaGVja2VkRXhwchr5AQoETm9kZRJrCgVpZGVudBgBIAEoCUJcukhZyAEBclQyUl4oY29ubmVjdGlvbnN8aW5wdXRzfHZhcnN8c3RyZWFtc3xhY3Rpb25zfG91dHB1dHN8bWV0cmljcylcLlthLXpBLVpdW2EtekEtWjAtOV9dKyQSNwoFZXhwcnMYAyADKAsyKC5kdGt0LmZsb3cudjFiZXRhMS5HcmFwaC5Ob2RlLkV4cHJzRW50cnkaSwoKRXhwcnNFbnRyeRILCgNrZXkYASABKAkSLAoFdmFsdWUYAiABKAsyHS5kdGt0LmZsb3cudjFiZXRhMS5HcmFwaC5FeHByOgI4ASJVCgREb25lEh4KBGNvZGUYASABKA4yEC5nb29nbGUucnBjLkNvZGUSDwoHbWVzc2FnZRgCIAEoCRISCgVpZGVudBgDIAEoCUgAiAEBQggKBl9pZGVudCIGCgRTa2lwQtkBChdwcm90by5kdGt0LmZsb3cudjFiZXRhMUIMUnVudGltZVByb3RvUAFaSmdpdGh1Yi5jb20vZGF0YWtpdC1kZXYvZHRrdC1zZGsvc2RrLWdvL3Byb3RvL2R0a3QvZmxvdy92MWJldGExO2Zsb3d2MWJldGExogIDREZYqgIRRHRrdC5GbG93LlYxYmV0YTHKAhFEdGt0XEZsb3dcVjFiZXRhMeICHUR0a3RcRmxvd1xWMWJldGExXEdQQk1ldGFkYXRh6gITRHRrdDo6Rmxvdzo6VjFiZXRhMWIGcHJvdG8z", [file_buf_validate_validate, file_dtkt_flow_v1beta1_spec, file_google_api_expr_v1alpha1_checked, file_google_api_expr_v1alpha1_syntax, file_google_protobuf_any, file_google_protobuf_timestamp, file_google_rpc_code, file_google_rpc_status]);
 
 /**
  * Env represents the runtime state (snapshot) of a Flow execution.
@@ -75,6 +77,11 @@ export type Env_Result = Message<"dtkt.flow.v1beta1.Env.Result"> & {
    * @generated from field: google.protobuf.Timestamp finish_time = 2;
    */
   finishTime?: Timestamp;
+
+  /**
+   * @generated from field: map<string, google.protobuf.Any> metadata = 3;
+   */
+  metadata: { [key: string]: Any };
 
   /**
    * @generated from oneof dtkt.flow.v1beta1.Env.Result.type
@@ -167,9 +174,9 @@ export const Env_NodeSchema: GenMessage<Env_Node, {validType: Env_NodeValid}> = 
   messageDesc(file_dtkt_flow_v1beta1_runtime, 0, 1);
 
 /**
- * Graph represents a fully parsed and/or checked Flow spec:
- * 1. Parsed: all nodes with expressions are parsed;
- * 2. Checked: all nodes with expressions are checked making Graph executable.
+ * Graph represents a fully parsed and/or checked (executable) Flow spec:
+ *  - Parsed when all node expressions (if any) are parsed;
+ *  - Checked (executable) when all node expressions (if any) are checked.
  *
  * @generated from message dtkt.flow.v1beta1.Graph
  */
@@ -191,9 +198,9 @@ export type Graph = Message<"dtkt.flow.v1beta1.Graph"> & {
 };
 
 /**
- * Graph represents a fully parsed and/or checked Flow spec:
- * 1. Parsed: all nodes with expressions are parsed;
- * 2. Checked: all nodes with expressions are checked making Graph executable.
+ * Graph represents a fully parsed and/or checked (executable) Flow spec:
+ *  - Parsed when all node expressions (if any) are parsed;
+ *  - Checked (executable) when all node expressions (if any) are checked.
  *
  * @generated from message dtkt.flow.v1beta1.Graph
  */
@@ -275,13 +282,6 @@ export const Graph_EdgeSchema: GenMessage<Graph_Edge, {validType: Graph_EdgeVali
  */
 export type Graph_Expr = Message<"dtkt.flow.v1beta1.Graph.Expr"> & {
   /**
-   * Expression identifier within the scope of a Node (without ident prefix).
-   *
-   * @generated from field: string id = 1;
-   */
-  id: string;
-
-  /**
    * Parsed expression (required to produce a valid edge).
    *
    * @generated from field: google.api.expr.v1alpha1.ParsedExpr parsed = 2;
@@ -289,7 +289,7 @@ export type Graph_Expr = Message<"dtkt.flow.v1beta1.Graph.Expr"> & {
   parsed?: ParsedExpr;
 
   /**
-   * Checked expression (only required for execution).
+   * Checked expression (required to be executable).
    *
    * @generated from field: google.api.expr.v1alpha1.CheckedExpr checked = 3;
    */
@@ -301,13 +301,6 @@ export type Graph_Expr = Message<"dtkt.flow.v1beta1.Graph.Expr"> & {
  */
 export type Graph_ExprValid = Message<"dtkt.flow.v1beta1.Graph.Expr"> & {
   /**
-   * Expression identifier within the scope of a Node (without ident prefix).
-   *
-   * @generated from field: string id = 1;
-   */
-  id: string;
-
-  /**
    * Parsed expression (required to produce a valid edge).
    *
    * @generated from field: google.api.expr.v1alpha1.ParsedExpr parsed = 2;
@@ -315,7 +308,7 @@ export type Graph_ExprValid = Message<"dtkt.flow.v1beta1.Graph.Expr"> & {
   parsed: ParsedExprValid;
 
   /**
-   * Checked expression (only required for execution).
+   * Checked expression (required to be executable).
    *
    * @generated from field: google.api.expr.v1alpha1.CheckedExpr checked = 3;
    */
@@ -343,8 +336,7 @@ export type Graph_Node = Message<"dtkt.flow.v1beta1.Graph.Node"> & {
   ident: string;
 
   /**
-   * Map of "{node.ident}.{expr.id}" to Expr making this node the target of
-   * an Edge.
+   * Map containing unique expression ID to Expr.
    *
    * @generated from field: map<string, dtkt.flow.v1beta1.Graph.Expr> exprs = 3;
    */
@@ -365,8 +357,7 @@ export type Graph_NodeValid = Message<"dtkt.flow.v1beta1.Graph.Node"> & {
   ident: string;
 
   /**
-   * Map of "{node.ident}.{expr.id}" to Expr making this node the target of
-   * an Edge.
+   * Map containing unique expression ID to Expr.
    *
    * @generated from field: map<string, dtkt.flow.v1beta1.Graph.Expr> exprs = 3;
    */
@@ -381,8 +372,45 @@ export const Graph_NodeSchema: GenMessage<Graph_Node, {validType: Graph_NodeVali
   messageDesc(file_dtkt_flow_v1beta1_runtime, 1, 2);
 
 /**
- * Sentinel values used within flow execution.
+ * Done is a sentinel value used for control flow and internal error wrapping.
  *
+ * @generated from message dtkt.flow.v1beta1.Done
+ */
+export type Done = Message<"dtkt.flow.v1beta1.Done"> & {
+  /**
+   * The status code:
+   *  - OK/EOF: treated as non-error;
+   *  - All others treated as error.
+   *
+   * @generated from field: google.rpc.Code code = 1;
+   */
+  code: Code;
+
+  /**
+   * A developer-facing status message.
+   *
+   * @generated from field: string message = 2;
+   */
+  message: string;
+
+  /**
+   * Node identifier for tracing, if any.
+   *
+   * @generated from field: optional string ident = 3;
+   */
+  ident?: string;
+};
+
+export type DoneValid = Done;
+
+/**
+ * Describes the message dtkt.flow.v1beta1.Done.
+ * Use `create(DoneSchema)` to create a new message.
+ */
+export const DoneSchema: GenMessage<Done, {validType: DoneValid}> = /*@__PURE__*/
+  messageDesc(file_dtkt_flow_v1beta1_runtime, 2);
+
+/**
  * @generated from message dtkt.flow.v1beta1.Skip
  */
 export type Skip = Message<"dtkt.flow.v1beta1.Skip"> & {
@@ -395,49 +423,5 @@ export type SkipValid = Skip;
  * Use `create(SkipSchema)` to create a new message.
  */
 export const SkipSchema: GenMessage<Skip, {validType: SkipValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_runtime, 2);
-
-/**
- * @generated from message dtkt.flow.v1beta1.EOF
- */
-export type EOF = Message<"dtkt.flow.v1beta1.EOF"> & {
-};
-
-export type EOFValid = EOF;
-
-/**
- * Describes the message dtkt.flow.v1beta1.EOF.
- * Use `create(EOFSchema)` to create a new message.
- */
-export const EOFSchema: GenMessage<EOF, {validType: EOFValid}> = /*@__PURE__*/
   messageDesc(file_dtkt_flow_v1beta1_runtime, 3);
-
-/**
- * @generated from message dtkt.flow.v1beta1.Done
- */
-export type Done = Message<"dtkt.flow.v1beta1.Done"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
-
-  /**
-   * @generated from field: string reason = 2;
-   */
-  reason: string;
-
-  /**
-   * @generated from field: bool is_error = 3;
-   */
-  isError: boolean;
-};
-
-export type DoneValid = Done;
-
-/**
- * Describes the message dtkt.flow.v1beta1.Done.
- * Use `create(DoneSchema)` to create a new message.
- */
-export const DoneSchema: GenMessage<Done, {validType: DoneValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_flow_v1beta1_runtime, 4);
 

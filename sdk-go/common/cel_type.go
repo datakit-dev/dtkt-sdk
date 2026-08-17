@@ -57,6 +57,10 @@ func NewCELTypes(resolver CELResolver) (*CELTypes, error) {
 	}
 
 	resolver.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
+		if fd == nil {
+			return true
+		}
+
 		err = registry.RegisterDescriptor(fd)
 		if err != nil {
 			return false
@@ -70,7 +74,6 @@ func NewCELTypes(resolver CELResolver) (*CELTypes, error) {
 	return &CELTypes{
 		resolver: resolver,
 		registry: registry,
-		// fieldAliases: map[string]map[string]string{},
 	}, nil
 }
 
@@ -448,11 +451,6 @@ func (t *CELTypes) wrapProtoMessage(val ref.Val, msg proto.Message) ref.Val {
 		return val
 	}
 
-	// aliases := t.aliasMap(msg.ProtoReflect().Descriptor())
-	// if len(aliases) == 0 {
-	// 	return val
-	// }
-
 	fieldTester, _ := val.(traits.FieldTester)
 
 	return &celMessage{
@@ -461,32 +459,8 @@ func (t *CELTypes) wrapProtoMessage(val ref.Val, msg proto.Message) ref.Val {
 		refVal:      val,
 		indexer:     indexer,
 		fieldTester: fieldTester,
-		// aliases:     aliases,
 	}
 }
-
-// func (t *CELTypes) aliasMap(desc protoreflect.MessageDescriptor) map[string]string {
-// 	fullName := string(desc.FullName())
-// 	if cached, ok := t.fieldAliases[fullName]; ok {
-// 		return cached
-// 	}
-
-// 	fields := desc.Fields()
-// 	aliases := make(map[string]string, fields.Len()*2)
-// 	for i := 0; i < fields.Len(); i++ {
-// 		fd := fields.Get(i)
-// 		protoName := string(fd.Name())
-// 		jsonName := fd.JSONName()
-// 		aliases[protoName] = protoName
-// 		aliases[jsonName] = protoName
-// 	}
-
-// 	t.mut.Lock()
-// 	t.fieldAliases[fullName] = aliases
-// 	t.mut.Unlock()
-
-// 	return aliases
-// }
 
 func (t *CELTypes) wrapIterator(iter traits.Iterator) traits.Iterator {
 	if iter == nil {

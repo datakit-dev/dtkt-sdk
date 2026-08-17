@@ -34,6 +34,10 @@ func (i *Input) Ident() string {
 	return i.ident
 }
 
+func (i *Input) Metadata() map[string]any {
+	return nil
+}
+
 func (i *Input) Compile(ctx context.Context, env shared.Env) (err error) {
 	i.typ, err = NewInputTypeWithResolver(i.node, env.Resolver())
 	if err != nil {

@@ -37,6 +37,10 @@ func NewGraph(proto *flowv1beta1.Graph, opts ...Option) (*Graph, error) {
 
 	graphNodes := proto.GetNodes()
 	specNodes := getSpecNodes(proto.GetSpec())
+	if len(graphNodes) != len(specNodes) {
+		return nil, fmt.Errorf("graphNodes(%d) != specNodes(%d)", len(graphNodes), len(specNodes))
+	}
+
 	opts = append([]Option{
 		WithEnv(&flowv1beta1.Env{
 			Nodes: util.SliceMap(specNodes, func(node shared.SpecNode) *flowv1beta1.Env_Node {
@@ -45,7 +49,7 @@ func NewGraph(proto *flowv1beta1.Graph, opts ...Option) (*Graph, error) {
 				}
 			}),
 		}),
-		WithVars(func(ctx context.Context, env shared.Env) (cel.Activation, error) {
+		WithVars(func(env shared.Env) (cel.Activation, error) {
 			return cel.NewActivation(util.SliceToMap(graph.Nodes(), func(_ int, node *Node) (string, any) {
 				return node.ident, func() ref.Val {
 					vars, err := node.vars()
@@ -67,22 +71,15 @@ func NewGraph(proto *flowv1beta1.Graph, opts ...Option) (*Graph, error) {
 
 	var nodes []*Node
 	for _, specNode := range specNodes {
-		var (
-			ident = shared.GetNodeIdent(specNode)
-			proto *flowv1beta1.Graph_Node
-		)
+		ident := shared.GetNodeIdent(specNode)
 		idx := slices.IndexFunc(graphNodes, func(node *flowv1beta1.Graph_Node) bool {
 			return node.Ident == ident
 		})
-		if idx != -1 {
-			proto = graphNodes[idx]
-		} else {
-			proto = &flowv1beta1.Graph_Node{
-				Ident: ident,
-			}
+		if idx == -1 {
+			return nil, fmt.Errorf("node not found in graph: %q", ident)
 		}
 
-		node, err := hydrateNode(env, specNode, proto)
+		node, err := hydrateNode(env, specNode, graphNodes[idx])
 		if err != nil {
 			return nil, err
 		}
@@ -90,23 +87,33 @@ func NewGraph(proto *flowv1beta1.Graph, opts ...Option) (*Graph, error) {
 		nodes = append(nodes, node)
 	}
 
-	graph.Graph = shared.NewGraph(
-		shared.WithDAG[*Node](),
-		shared.WithNodes(nodes),
-		shared.WithEdges[*Node](edgesFromProto(proto.GetEdges())),
+	edges, err := edgesFromProto(proto.GetEdges())
+	if err != nil {
+		return nil, err
+	}
+
+	graph.Graph, err = shared.NewGraph(
+		shared.WithGraphNodes(nodes),
+		shared.WithGraphEdges[*Node](edges),
+		shared.WithGraphTraits[*Node](shared.DAGTraits()),
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	return graph, nil
 }
 
-func ParseGraph(spec *flowv1beta1.Flow, opts ...Option) (*Graph, error) {
+func ParseGraph(spec *flowv1beta1.Flow, opts ...Option) (_ *Graph, err error) {
 	graph := &Graph{
-		Graph: shared.NewGraph(
-			shared.WithDAG[*Node](),
-		),
 		proto: &flowv1beta1.Graph{
 			Spec: spec,
 		},
+	}
+
+	graph.Graph, err = shared.NewGraph(shared.WithGraphTraits[*Node](shared.DAGTraits()))
+	if err != nil {
+		return nil, err
 	}
 
 	specNodes := getSpecNodes(spec)
@@ -119,7 +126,7 @@ func ParseGraph(spec *flowv1beta1.Flow, opts ...Option) (*Graph, error) {
 				}
 			}),
 		}),
-		WithVars(func(ctx context.Context, env shared.Env) (cel.Activation, error) {
+		WithVars(func(env shared.Env) (cel.Activation, error) {
 			return cel.NewActivation(util.SliceToMap(graph.Nodes(), func(_ int, node *Node) (string, any) {
 				return node.ident, func() ref.Val {
 					vars, err := node.vars()
@@ -244,7 +251,6 @@ func (n *GraphNode) ParseExpr(id string, expr string, visitor shared.ExprVisitor
 	}
 
 	n.proto.Exprs[id] = &flowv1beta1.Graph_Expr{
-		Id:     id,
 		Parsed: parsed,
 	}
 
@@ -277,7 +283,7 @@ func (n *GraphNode) CompileExpr(id string, ast *cel.Ast) (shared.Program, error)
 	}
 
 	return shared.ProgramFunc(func(ctx context.Context, env shared.Env) ref.Val {
-		vars, err := env.Vars(ctx)
+		vars, err := env.Vars()
 		if err != nil {
 			return types.WrapErr(err)
 		}
@@ -358,14 +364,18 @@ func edgesToProto(edges []*shared.Edge) []*flowv1beta1.Graph_Edge {
 	})
 }
 
-func edgesFromProto(edges []*flowv1beta1.Graph_Edge) []*shared.Edge {
-	return util.SliceReduce(edges, func(edge *flowv1beta1.Graph_Edge) (*shared.Edge, bool) {
-		return shared.NewEdge(edge.GetSource(), edge.GetTarget())
+func edgesFromProto(edges []*flowv1beta1.Graph_Edge) ([]*shared.Edge, error) {
+	return util.SliceReduceError(edges, func(proto *flowv1beta1.Graph_Edge) (*shared.Edge, bool, error) {
+		edge, err := shared.NewEdge(proto.GetSource(), proto.GetTarget())
+		if err != nil {
+			return nil, false, err
+		}
+		return edge, true, nil
 	})
 }
 
 func specNodeEnvOpts(node shared.SpecNode) (opts []cel.EnvOption) {
-	opts = append(opts, cel.Variable("self", nodeVarsType))
+	opts = append(opts, cel.Variable("self", varsCELType))
 	switch node := node.(type) {
 	case *flowv1beta1.Action:
 		if name, ok := callNodeContainer(node); ok {
@@ -387,6 +397,7 @@ func callNodeContainer[T impl.Call](node impl.CallNode[T]) (protoreflect.FullNam
 	name := protoreflect.FullName(node.GetCall().GetMethod()).
 		Parent(). // Parent is service
 		Parent()  // Parent is package
+
 	return name, name.IsValid()
 }
 

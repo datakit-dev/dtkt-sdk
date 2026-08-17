@@ -18,6 +18,7 @@ option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;c
 service ReflectService {
   // Get file descriptors for a connection or deployment resource.
   rpc GetDescriptors(GetDescriptorsRequest) returns (GetDescriptorsResponse);
+
   // Sync file descriptors for a connection or deployment resource. This can be
   // used to update descriptors after changes.
   rpc SyncDescriptors(SyncDescriptorsRequest) returns (google.longrunning.Operation) {
@@ -26,16 +27,22 @@ service ReflectService {
       metadata_type: "SyncDescriptorsMetadata"
     };
   }
+
   // Get a service descriptor.
   rpc GetService(GetServiceRequest) returns (GetServiceResponse);
+
   // Get a method descriptor.
   rpc GetMethod(GetMethodRequest) returns (GetMethodResponse);
+
   // Get a type descriptor.
   rpc GetType(GetTypeRequest) returns (GetTypeResponse);
+
   // List service descriptors.
   rpc ListServices(ListServicesRequest) returns (ListServicesResponse);
+
   // List method descriptors.
   rpc ListMethods(ListMethodsRequest) returns (ListMethodsResponse);
+
   // List type descriptors.
   rpc ListTypes(ListTypesRequest) returns (ListTypesResponse);
 }

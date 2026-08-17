@@ -32,15 +32,15 @@ const (
 //
 // FlowService provides operations for managing automation flow specs.
 type FlowServiceClient interface {
-	// List flow specs.
+	// List flows.
 	ListFlows(ctx context.Context, in *ListFlowsRequest, opts ...grpc.CallOption) (*ListFlowsResponse, error)
-	// Get a single flow spec by name.
+	// Get a flow by name.
 	GetFlow(ctx context.Context, in *GetFlowRequest, opts ...grpc.CallOption) (*GetFlowResponse, error)
-	// Create a new flow spec.
+	// Create a new flow.
 	CreateFlow(ctx context.Context, in *CreateFlowRequest, opts ...grpc.CallOption) (*CreateFlowResponse, error)
-	// Update an existing flow spec.
+	// Update an existing flow.
 	UpdateFlow(ctx context.Context, in *UpdateFlowRequest, opts ...grpc.CallOption) (*UpdateFlowResponse, error)
-	// Delete a flow spec by name.
+	// Delete a flow by name.
 	DeleteFlow(ctx context.Context, in *DeleteFlowRequest, opts ...grpc.CallOption) (*DeleteFlowResponse, error)
 }
 
@@ -108,15 +108,15 @@ func (c *flowServiceClient) DeleteFlow(ctx context.Context, in *DeleteFlowReques
 //
 // FlowService provides operations for managing automation flow specs.
 type FlowServiceServer interface {
-	// List flow specs.
+	// List flows.
 	ListFlows(context.Context, *ListFlowsRequest) (*ListFlowsResponse, error)
-	// Get a single flow spec by name.
+	// Get a flow by name.
 	GetFlow(context.Context, *GetFlowRequest) (*GetFlowResponse, error)
-	// Create a new flow spec.
+	// Create a new flow.
 	CreateFlow(context.Context, *CreateFlowRequest) (*CreateFlowResponse, error)
-	// Update an existing flow spec.
+	// Update an existing flow.
 	UpdateFlow(context.Context, *UpdateFlowRequest) (*UpdateFlowResponse, error)
-	// Delete a flow spec by name.
+	// Delete a flow by name.
 	DeleteFlow(context.Context, *DeleteFlowRequest) (*DeleteFlowResponse, error)
 	mustEmbedUnimplementedFlowServiceServer()
 }

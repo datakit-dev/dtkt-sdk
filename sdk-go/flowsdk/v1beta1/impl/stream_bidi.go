@@ -20,9 +20,10 @@ var _ shared.ParsedNode = (*BidiStream)(nil)
 // request, while responses arrive independently and are emitted as events.
 // When the response loop terminates (EOF or error), the request loop also exits.
 type BidiStream struct {
-	ident  string
-	method *Method
-	stream common.DynamicBidiStream
+	ident    string
+	method   *Method
+	stream   common.DynamicBidiStream
+	metadata CallMetadata
 
 	shouldStart,
 	shouldStop func(ctx context.Context, env shared.Env) (bool, error)
@@ -41,6 +42,10 @@ func NewBidiStream(node *flowv1beta1.Stream, stream *Stream, method *Method) *Bi
 		shouldStart: stream.ShouldStart,
 		shouldStop:  stream.ShouldStop,
 	}
+}
+
+func (s *BidiStream) Metadata() map[string]any {
+	return s.metadata.AsMap()
 }
 
 func (s *BidiStream) Ident() string {
@@ -81,6 +86,8 @@ func (s *BidiStream) Compile(ctx context.Context, env shared.Env) error {
 				log.FromCtx(ctx).Info("BidiStream send EOF.", slog.String("id", s.ident))
 				return
 			}
+
+			s.metadata.IncrReqCount()
 		}
 	})
 
@@ -97,22 +104,31 @@ func (s *BidiStream) Run(ctx context.Context, env shared.Env, pipe shared.Pipe) 
 
 	go s.runSend()
 
-	var started, closed bool
+	var started, stopped bool
 
 	return pipe.Run(ctx, func(ctx context.Context, value any) (any, error) {
-		if closed {
-			return &flowv1beta1.EOF{}, nil
+		if stopped {
+			return EOF(), nil
 		} else if !started {
 			shouldStart, err := s.shouldStart(ctx, env)
 			if err != nil {
 				return nil, err
 			} else if !shouldStart {
-				return nil, nil
+				return &flowv1beta1.Skip{}, nil
 			}
 
 			started = true
+		}
 
-			log.FromCtx(ctx).Info("BidiStream send started...", slog.String("id", s.ident))
+		shouldStop, err := s.shouldStop(ctx, env)
+		if err != nil {
+			return nil, err
+		} else if shouldStop {
+			s.cancel(nil)
+
+			stopped = true
+
+			return EOF(), nil
 		}
 
 		res, err := s.stream.RecvMsg()
@@ -120,14 +136,15 @@ func (s *BidiStream) Run(ctx context.Context, env shared.Env, pipe shared.Pipe) 
 			s.cancel(err)
 
 			if errors.Is(err, io.EOF) {
-				log.FromCtx(ctx).Info("BidiStream recv EOF.", slog.String("id", s.ident))
+				stopped = true
 
-				closed = true
-				return &flowv1beta1.EOF{}, nil
+				return EOF(), nil
 			}
 
 			return nil, err
 		}
+
+		s.metadata.IncrResCount()
 
 		return res, nil
 	})

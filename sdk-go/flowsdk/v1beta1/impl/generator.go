@@ -69,6 +69,10 @@ func (g *Generator) Ident() string {
 	return g.ident
 }
 
+func (g *Generator) Metadata() map[string]any {
+	return nil
+}
+
 func (g *Generator) Compile(ctx context.Context, env shared.Env) (err error) {
 	if g.getValueExpr != nil {
 		prog, err := env.CompileExpr("generate.value", g.getValueExpr)

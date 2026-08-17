@@ -1,6 +1,6 @@
 module github.com/datakit-dev/dtkt-sdk/templates
 
-go 1.26.0
+go 1.27rc3
 
 replace github.com/datakit-dev/dtkt-sdk/sdk-go => ../sdk-go
 
@@ -68,7 +68,7 @@ require (
 	github.com/go-resty/resty/v2 v2.16.5 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
-	github.com/google/cel-go v0.29.2 // indirect
+	github.com/google/cel-go v0.31.0 // indirect
 	github.com/google/jsonschema-go v0.4.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect

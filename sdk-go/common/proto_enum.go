@@ -12,11 +12,40 @@ type ProtoEnum interface {
 	String() string
 }
 
-func AddProtoEnumPrefixFor[T protoreflect.Enum](name string) string {
+func ProtoEnumNumberFromString(desc protoreflect.EnumDescriptor, name string) protoreflect.EnumNumber {
+	var value protoreflect.EnumValueDescriptor
+	for idx := range desc.Values().Len() {
+		value = desc.Values().Get(idx)
+		if value.Name() == protoreflect.Name(name) {
+			return value.Number()
+		}
+	}
+	return 0
+}
+
+func ProtoEnumNumberToString(desc protoreflect.EnumDescriptor, number protoreflect.EnumNumber) string {
+	var value protoreflect.EnumValueDescriptor
+	for idx := range desc.Values().Len() {
+		value = desc.Values().Get(idx)
+		if number == value.Number() {
+			return string(value.Name())
+		}
+	}
+	return ""
+}
+
+func ProtoEnumToString[T ProtoEnum](enum T, trimPrefix bool) string {
+	if trimPrefix {
+		return TrimProtoEnumPrefixFor[T](enum.String())
+	}
+	return enum.String()
+}
+
+func AddProtoEnumPrefixFor[T ProtoEnum](name string) string {
 	return ProtoEnumPrefixFor[T]() + name
 }
 
-func TrimProtoEnumPrefixFor[T protoreflect.Enum](name string) string {
+func TrimProtoEnumPrefixFor[T ProtoEnum](name string) string {
 	var e T
 
 	desc := e.Descriptor()
@@ -34,7 +63,7 @@ func TrimProtoEnumPrefixFor[T protoreflect.Enum](name string) string {
 	return ""
 }
 
-func ProtoEnumPrefixFor[T protoreflect.Enum]() string {
+func ProtoEnumPrefixFor[T ProtoEnum]() string {
 	var e T
 	desc := e.Descriptor()
 	if desc.Values().Len() == 0 {
@@ -59,7 +88,7 @@ func ProtoEnumPrefix(desc protoreflect.EnumDescriptor) string {
 	return strings.TrimSuffix(string(desc.Values().ByNumber(0).Name()), "UNSPECIFIED")
 }
 
-func ProtoEnumStringsFor[T protoreflect.Enum]() (values []string) {
+func ProtoEnumStringsFor[T ProtoEnum]() (values []string) {
 	var e T
 	for idx := range e.Descriptor().Values().Len() {
 		if idx > 0 {
@@ -79,7 +108,7 @@ func ProtoEnumFromStringFor[T ProtoEnum](val string) (enum T) {
 	return
 }
 
-func TrimProtoEnumStringsFor[T protoreflect.Enum]() (values []string) {
+func TrimProtoEnumStringsFor[T ProtoEnum]() (values []string) {
 	var e T
 	for idx := range e.Descriptor().Values().Len() {
 		if idx > 0 {

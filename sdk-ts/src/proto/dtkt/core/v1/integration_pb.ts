@@ -758,7 +758,7 @@ export const DeleteIntegrationResponseSchema: GenMessage<DeleteIntegrationRespon
   messageDesc(file_dtkt_core_v1_integration, 13);
 
 /**
- * IntegrationService provides operations for managing integration specs.
+ * IntegrationService provides operations for managing integrations.
  *
  * @generated from service dtkt.core.v1.IntegrationService
  */
@@ -774,7 +774,7 @@ export const IntegrationService: GenService<{
     output: typeof ListIntegrationsResponseSchema;
   },
   /**
-   * Get a single integration by name.
+   * Get an integration by name.
    *
    * @generated from rpc dtkt.core.v1.IntegrationService.GetIntegration
    */

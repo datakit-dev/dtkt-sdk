@@ -71,7 +71,7 @@ func MessageScanner[M protostore.MessageType[T], T any](field *fieldType[M]) ent
 		V: func(msg M) (driver.Value, error) {
 			data, err := encoding.ToJSONV2(msg,
 				encoding.WithEncodeProtoJSONOptions(protojson.MarshalOptions{
-					Resolver: protostore.GetResolver(),
+					Resolver: protostore.Resolver,
 				}),
 				encoding.WithEncodeDurationString(),
 			)
@@ -89,7 +89,7 @@ func MessageScanner[M protostore.MessageType[T], T any](field *fieldType[M]) ent
 			if ns.Valid {
 				err = encoding.FromJSONV2(ns.V, msg,
 					encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
-						Resolver: protostore.GetResolver(),
+						Resolver: protostore.Resolver,
 					}),
 					encoding.WithDecodeDurationString(),
 				)
@@ -106,7 +106,7 @@ func EncryptedMessageScanner[T any, M protostore.MessageType[T]](field *fieldTyp
 	return entfield.ValueScannerFunc[M, *sql.Null[[]byte]]{
 		V: func(msg M) (driver.Value, error) {
 			data, err := encoding.ToJSONV2(msg, encoding.WithEncodeProtoJSONOptions(protojson.MarshalOptions{
-				Resolver: protostore.GetResolver(),
+				Resolver: protostore.Resolver,
 			}))
 			if err != nil {
 				return nil, fmt.Errorf("field: %s: %w", field.desc.Name, err)
@@ -128,7 +128,7 @@ func EncryptedMessageScanner[T any, M protostore.MessageType[T]](field *fieldTyp
 
 				msg := new(T)
 				err = encoding.FromJSONV2(data, msg, encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
-					Resolver: protostore.GetResolver(),
+					Resolver: protostore.Resolver,
 				}))
 				if err != nil {
 					return nil, fmt.Errorf("field: %s: %w", field.desc.Name, err)

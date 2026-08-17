@@ -8,6 +8,7 @@ import "google/protobuf/any.proto";
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1";
 
 service SearchService {
+  // List search results.
   rpc ListSearchResults(ListSearchResultsRequest) returns (ListSearchResultsResponse);
 }
 

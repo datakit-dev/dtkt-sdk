@@ -19,7 +19,7 @@ export const dialConnection = ConnectionService.method.dialConnection;
 export const listConnections = ConnectionService.method.listConnections;
 
 /**
- * Get a single connection by name.
+ * Get a connection by name.
  *
  * @generated from rpc dtkt.core.v1.ConnectionService.GetConnection
  */

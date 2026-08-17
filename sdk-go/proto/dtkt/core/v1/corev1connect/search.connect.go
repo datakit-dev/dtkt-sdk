@@ -40,6 +40,7 @@ const (
 
 // SearchServiceClient is a client for the dtkt.core.v1.SearchService service.
 type SearchServiceClient interface {
+	// List search results.
 	ListSearchResults(context.Context, *connect.Request[v1.ListSearchResultsRequest]) (*connect.Response[v1.ListSearchResultsResponse], error)
 }
 
@@ -75,6 +76,7 @@ func (c *searchServiceClient) ListSearchResults(ctx context.Context, req *connec
 
 // SearchServiceHandler is an implementation of the dtkt.core.v1.SearchService service.
 type SearchServiceHandler interface {
+	// List search results.
 	ListSearchResults(context.Context, *connect.Request[v1.ListSearchResultsRequest]) (*connect.Response[v1.ListSearchResultsResponse], error)
 }
 

@@ -12,7 +12,7 @@ import { IntegrationService } from "./integration_pb";
 export const listIntegrations = IntegrationService.method.listIntegrations;
 
 /**
- * Get a single integration by name.
+ * Get an integration by name.
  *
  * @generated from rpc dtkt.core.v1.IntegrationService.GetIntegration
  */

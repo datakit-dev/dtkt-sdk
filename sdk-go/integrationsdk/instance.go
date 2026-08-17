@@ -51,6 +51,7 @@ func NewInstance[C any, I v1beta1.InstanceType](intgr *Integration[C, I], check 
 
 	req := middleware.NewRequest(check.Connection, check.ConfigHash, check.ConfigGen)
 	root := filepath.Join(intgr.root, util.HashShort(req.ResourceName()))
+
 	err = os.MkdirAll(root, 0o700)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeFailedPrecondition, fmt.Errorf("create data root failed: %w", err))

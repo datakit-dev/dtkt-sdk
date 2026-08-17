@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"sync/atomic"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/flowsdk/shared"
 	flowv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1"
@@ -16,11 +17,17 @@ import (
 
 var boolType = reflect.TypeFor[bool]()
 
+const (
+	CallRequestCount  = "request_count"
+	CallResponseCount = "response_count"
+)
+
 type (
 	ActionCaller struct {
-		ident  string
-		node   *flowv1beta1.Action
-		method *Method
+		ident    string
+		node     *flowv1beta1.Action
+		method   *Method
+		metadata CallMetadata
 
 		invokeWhenExpr,
 		onErrorExpr *cel.Ast
@@ -45,6 +52,9 @@ type (
 		GetConnection() string
 		GetMethod() string
 		GetRequest() *structpb.Value
+	}
+	CallMetadata struct {
+		reqCount, resCount atomic.Int64
 	}
 )
 
@@ -100,6 +110,10 @@ func NewStreamCaller(
 		stream: stream,
 		method: method,
 	}, nil
+}
+
+func (a *ActionCaller) Metadata() map[string]any {
+	return a.metadata.AsMap()
 }
 
 func (m *ActionCaller) Compile(ctx context.Context, env shared.Env) (err error) {
@@ -169,6 +183,9 @@ func (m *ActionCaller) Eval(ctx context.Context, env shared.Env) ref.Val {
 		return types.WrapErr(err)
 	}
 
+	m.metadata.IncrReqCount()
+	m.metadata.IncrResCount()
+
 	return env.Types().NativeToValue(res)
 }
 
@@ -223,4 +240,19 @@ func (m *ActionCaller) Run(ctx context.Context, env shared.Env, pipe shared.Pipe
 	return pipe.Run(ctx, func(ctx context.Context, value any) (any, error) {
 		return m.cache.Eval(ctx, env), nil
 	})
+}
+
+func (m *CallMetadata) IncrReqCount() {
+	m.reqCount.Add(1)
+}
+
+func (m *CallMetadata) IncrResCount() {
+	m.resCount.Add(1)
+}
+
+func (m *CallMetadata) AsMap() map[string]any {
+	return map[string]any{
+		CallRequestCount:  m.reqCount.Load(),
+		CallResponseCount: m.resCount.Load(),
+	}
 }

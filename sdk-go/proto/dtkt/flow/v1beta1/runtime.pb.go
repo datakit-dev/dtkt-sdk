@@ -9,6 +9,7 @@ package flowv1beta1
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	v1alpha1 "google.golang.org/genproto/googleapis/api/expr/v1alpha1"
+	code "google.golang.org/genproto/googleapis/rpc/code"
 	status "google.golang.org/genproto/googleapis/rpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -72,9 +73,9 @@ func (x *Env) GetNodes() []*Env_Node {
 	return nil
 }
 
-// Graph represents a fully parsed and/or checked Flow spec:
-// 1. Parsed: all nodes with expressions are parsed;
-// 2. Checked: all nodes with expressions are checked making Graph executable.
+// Graph represents a fully parsed and/or checked (executable) Flow spec:
+//   - Parsed when all node expressions (if any) are parsed;
+//   - Checked (executable) when all node expressions (if any) are checked.
 type Graph struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Spec          *Flow                  `protobuf:"bytes,1,opt,name=spec,proto3" json:"spec,omitempty"`
@@ -135,91 +136,24 @@ func (x *Graph) GetEdges() []*Graph_Edge {
 	return nil
 }
 
-// Sentinel values used within flow execution.
-type Skip struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Skip) Reset() {
-	*x = Skip{}
-	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Skip) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Skip) ProtoMessage() {}
-
-func (x *Skip) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Skip.ProtoReflect.Descriptor instead.
-func (*Skip) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_runtime_proto_rawDescGZIP(), []int{2}
-}
-
-type EOF struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *EOF) Reset() {
-	*x = EOF{}
-	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *EOF) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*EOF) ProtoMessage() {}
-
-func (x *EOF) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use EOF.ProtoReflect.Descriptor instead.
-func (*EOF) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_runtime_proto_rawDescGZIP(), []int{3}
-}
-
+// Done is a sentinel value used for control flow and internal error wrapping.
 type Done struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
-	IsError       bool                   `protobuf:"varint,3,opt,name=is_error,json=isError,proto3" json:"is_error,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The status code:
+	//   - OK/EOF: treated as non-error;
+	//   - All others treated as error.
+	Code code.Code `protobuf:"varint,1,opt,name=code,proto3,enum=google.rpc.Code" json:"code,omitempty"`
+	// A developer-facing status message.
+	Message string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	// Node identifier for tracing, if any.
+	Ident         *string `protobuf:"bytes,3,opt,name=ident,proto3,oneof" json:"ident,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Done) Reset() {
 	*x = Done{}
-	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[4]
+	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -231,7 +165,7 @@ func (x *Done) String() string {
 func (*Done) ProtoMessage() {}
 
 func (x *Done) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[4]
+	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -244,28 +178,64 @@ func (x *Done) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Done.ProtoReflect.Descriptor instead.
 func (*Done) Descriptor() ([]byte, []int) {
-	return file_dtkt_flow_v1beta1_runtime_proto_rawDescGZIP(), []int{4}
+	return file_dtkt_flow_v1beta1_runtime_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *Done) GetId() string {
+func (x *Done) GetCode() code.Code {
 	if x != nil {
-		return x.Id
+		return x.Code
+	}
+	return code.Code(0)
+}
+
+func (x *Done) GetMessage() string {
+	if x != nil {
+		return x.Message
 	}
 	return ""
 }
 
-func (x *Done) GetReason() string {
-	if x != nil {
-		return x.Reason
+func (x *Done) GetIdent() string {
+	if x != nil && x.Ident != nil {
+		return *x.Ident
 	}
 	return ""
 }
 
-func (x *Done) GetIsError() bool {
+type Skip struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Skip) Reset() {
+	*x = Skip{}
+	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Skip) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Skip) ProtoMessage() {}
+
+func (x *Skip) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[3]
 	if x != nil {
-		return x.IsError
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
 	}
-	return false
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Skip.ProtoReflect.Descriptor instead.
+func (*Skip) Descriptor() ([]byte, []int) {
+	return file_dtkt_flow_v1beta1_runtime_proto_rawDescGZIP(), []int{3}
 }
 
 // Result represents the runtime state (snapshot) emitted by a Node.
@@ -273,6 +243,7 @@ type Env_Result struct {
 	state      protoimpl.MessageState `protogen:"open.v1"`
 	StartTime  *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	FinishTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=finish_time,json=finishTime,proto3" json:"finish_time,omitempty"`
+	Metadata   map[string]*anypb.Any  `protobuf:"bytes,3,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Types that are valid to be assigned to Type:
 	//
 	//	*Env_Result_Error
@@ -284,7 +255,7 @@ type Env_Result struct {
 
 func (x *Env_Result) Reset() {
 	*x = Env_Result{}
-	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[5]
+	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -296,7 +267,7 @@ func (x *Env_Result) String() string {
 func (*Env_Result) ProtoMessage() {}
 
 func (x *Env_Result) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[5]
+	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -322,6 +293,13 @@ func (x *Env_Result) GetStartTime() *timestamppb.Timestamp {
 func (x *Env_Result) GetFinishTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.FinishTime
+	}
+	return nil
+}
+
+func (x *Env_Result) GetMetadata() map[string]*anypb.Any {
+	if x != nil {
+		return x.Metadata
 	}
 	return nil
 }
@@ -381,7 +359,7 @@ type Env_Node struct {
 
 func (x *Env_Node) Reset() {
 	*x = Env_Node{}
-	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[6]
+	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -393,7 +371,7 @@ func (x *Env_Node) String() string {
 func (*Env_Node) ProtoMessage() {}
 
 func (x *Env_Node) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[6]
+	mi := &file_dtkt_flow_v1beta1_runtime_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -495,11 +473,9 @@ func (x *Graph_Edge) GetTarget() string {
 
 type Graph_Expr struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Expression identifier within the scope of a Node (without ident prefix).
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Parsed expression (required to produce a valid edge).
 	Parsed *v1alpha1.ParsedExpr `protobuf:"bytes,2,opt,name=parsed,proto3" json:"parsed,omitempty"`
-	// Checked expression (only required for execution).
+	// Checked expression (required to be executable).
 	Checked       *v1alpha1.CheckedExpr `protobuf:"bytes,3,opt,name=checked,proto3" json:"checked,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -535,13 +511,6 @@ func (*Graph_Expr) Descriptor() ([]byte, []int) {
 	return file_dtkt_flow_v1beta1_runtime_proto_rawDescGZIP(), []int{1, 1}
 }
 
-func (x *Graph_Expr) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
 func (x *Graph_Expr) GetParsed() *v1alpha1.ParsedExpr {
 	if x != nil {
 		return x.Parsed
@@ -562,8 +531,7 @@ type Graph_Node struct {
 	// "inputs.foo" or "vars.name". Constitutes an Edge's source prefix when
 	// referenced within an expression.
 	Ident string `protobuf:"bytes,1,opt,name=ident,proto3" json:"ident,omitempty"`
-	// Map of "{node.ident}.{expr.id}" to Expr making this node the target of
-	// an Edge.
+	// Map containing unique expression ID to Expr.
 	Exprs         map[string]*Graph_Expr `protobuf:"bytes,3,rep,name=exprs,proto3" json:"exprs,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -617,16 +585,20 @@ var File_dtkt_flow_v1beta1_runtime_proto protoreflect.FileDescriptor
 
 const file_dtkt_flow_v1beta1_runtime_proto_rawDesc = "" +
 	"\n" +
-	"\x1fdtkt/flow/v1beta1/runtime.proto\x12\x11dtkt.flow.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a&google/api/expr/v1alpha1/checked.proto\x1a%google/api/expr/v1alpha1/syntax.proto\x1a\x19google/protobuf/any.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\"\xc4\x04\n" +
+	"\x1fdtkt/flow/v1beta1/runtime.proto\x12\x11dtkt.flow.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a&google/api/expr/v1alpha1/checked.proto\x1a%google/api/expr/v1alpha1/syntax.proto\x1a\x19google/protobuf/any.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x15google/rpc/code.proto\x1a\x17google/rpc/status.proto\"\xe0\x05\n" +
 	"\x03Env\x121\n" +
-	"\x05nodes\x18\x01 \x03(\v2\x1b.dtkt.flow.v1beta1.Env.NodeR\x05nodes\x1a\xe9\x01\n" +
+	"\x05nodes\x18\x01 \x03(\v2\x1b.dtkt.flow.v1beta1.Env.NodeR\x05nodes\x1a\x85\x03\n" +
 	"\x06Result\x129\n" +
 	"\n" +
 	"start_time\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x12;\n" +
 	"\vfinish_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"finishTime\x12*\n" +
+	"finishTime\x12G\n" +
+	"\bmetadata\x18\x03 \x03(\v2+.dtkt.flow.v1beta1.Env.Result.MetadataEntryR\bmetadata\x12*\n" +
 	"\x05error\x18\x05 \x01(\v2\x12.google.rpc.StatusH\x00R\x05error\x12,\n" +
-	"\x05value\x18\x06 \x01(\v2\x14.google.protobuf.AnyH\x00R\x05valueB\r\n" +
+	"\x05value\x18\x06 \x01(\v2\x14.google.protobuf.AnyH\x00R\x05value\x1aQ\n" +
+	"\rMetadataEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12*\n" +
+	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyR\x05value:\x028\x01B\r\n" +
 	"\x04type\x12\x05\xbaH\x02\b\x01\x1a\x9d\x02\n" +
 	"\x04Node\x12r\n" +
 	"\x05ident\x18\x01 \x01(\tB\\\xbaHY\xc8\x01\x01rT2R^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x05ident\x12!\n" +
@@ -634,31 +606,30 @@ const file_dtkt_flow_v1beta1_runtime_proto_rawDesc = "" +
 	"\vresult_prev\x18\x04 \x01(\v2\x1d.dtkt.flow.v1beta1.Env.ResultR\n" +
 	"resultPrev\x12>\n" +
 	"\vresult_curr\x18\x05 \x01(\v2\x1d.dtkt.flow.v1beta1.Env.ResultR\n" +
-	"resultCurr\"\xb9\a\n" +
+	"resultCurr\"\xbf\x06\n" +
 	"\x05Graph\x123\n" +
 	"\x04spec\x18\x01 \x01(\v2\x17.dtkt.flow.v1beta1.FlowB\x06\xbaH\x03\xc8\x01\x01R\x04spec\x123\n" +
 	"\x05nodes\x18\x02 \x03(\v2\x1d.dtkt.flow.v1beta1.Graph.NodeR\x05nodes\x123\n" +
 	"\x05edges\x18\x03 \x03(\v2\x1d.dtkt.flow.v1beta1.Graph.EdgeR\x05edges\x1a\xf0\x01\n" +
 	"\x04Edge\x12s\n" +
 	"\x06source\x18\x01 \x01(\tB[\xbaHX\xc8\x01\x01rS2Q^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+R\x06source\x12s\n" +
-	"\x06target\x18\x02 \x01(\tB[\xbaHX\xc8\x01\x01rS2Q^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+R\x06target\x1a\xa5\x01\n" +
-	"\x04Expr\x12\x16\n" +
-	"\x02id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x02id\x12D\n" +
+	"\x06target\x18\x02 \x01(\tB[\xbaHX\xc8\x01\x01rS2Q^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+R\x06target\x1a\x8d\x01\n" +
+	"\x04Expr\x12D\n" +
 	"\x06parsed\x18\x02 \x01(\v2$.google.api.expr.v1alpha1.ParsedExprB\x06\xbaH\x03\xc8\x01\x01R\x06parsed\x12?\n" +
-	"\achecked\x18\x03 \x01(\v2%.google.api.expr.v1alpha1.CheckedExprR\achecked\x1a\xf5\x02\n" +
+	"\achecked\x18\x03 \x01(\v2%.google.api.expr.v1alpha1.CheckedExprR\achecked\x1a\x93\x02\n" +
 	"\x04Node\x12r\n" +
-	"\x05ident\x18\x01 \x01(\tB\\\xbaHY\xc8\x01\x01rT2R^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x05ident\x12\x9f\x01\n" +
-	"\x05exprs\x18\x03 \x03(\v2(.dtkt.flow.v1beta1.Graph.Node.ExprsEntryB_\xbaH\\\x9a\x01Y\"WrU2S^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+\\.R\x05exprs\x1aW\n" +
+	"\x05ident\x18\x01 \x01(\tB\\\xbaHY\xc8\x01\x01rT2R^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+$R\x05ident\x12>\n" +
+	"\x05exprs\x18\x03 \x03(\v2(.dtkt.flow.v1beta1.Graph.Node.ExprsEntryR\x05exprs\x1aW\n" +
 	"\n" +
 	"ExprsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x123\n" +
-	"\x05value\x18\x02 \x01(\v2\x1d.dtkt.flow.v1beta1.Graph.ExprR\x05value:\x028\x01\"\x06\n" +
-	"\x04Skip\"\x05\n" +
-	"\x03EOF\"I\n" +
-	"\x04Done\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
-	"\x06reason\x18\x02 \x01(\tR\x06reason\x12\x19\n" +
-	"\bis_error\x18\x03 \x01(\bR\aisErrorB\xd9\x01\n" +
+	"\x05value\x18\x02 \x01(\v2\x1d.dtkt.flow.v1beta1.Graph.ExprR\x05value:\x028\x01\"k\n" +
+	"\x04Done\x12$\n" +
+	"\x04code\x18\x01 \x01(\x0e2\x10.google.rpc.CodeR\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x19\n" +
+	"\x05ident\x18\x03 \x01(\tH\x00R\x05ident\x88\x01\x01B\b\n" +
+	"\x06_ident\"\x06\n" +
+	"\x04SkipB\xd9\x01\n" +
 	"\x17proto.dtkt.flow.v1beta1B\fRuntimeProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1;flowv1beta1\xa2\x02\x03DFX\xaa\x02\x11Dtkt.Flow.V1beta1\xca\x02\x11Dtkt\\Flow\\V1beta1\xe2\x02\x1dDtkt\\Flow\\V1beta1\\GPBMetadata\xea\x02\x13Dtkt::Flow::V1beta1b\x06proto3"
 
 var (
@@ -677,42 +648,46 @@ var file_dtkt_flow_v1beta1_runtime_proto_msgTypes = make([]protoimpl.MessageInfo
 var file_dtkt_flow_v1beta1_runtime_proto_goTypes = []any{
 	(*Env)(nil),                   // 0: dtkt.flow.v1beta1.Env
 	(*Graph)(nil),                 // 1: dtkt.flow.v1beta1.Graph
-	(*Skip)(nil),                  // 2: dtkt.flow.v1beta1.Skip
-	(*EOF)(nil),                   // 3: dtkt.flow.v1beta1.EOF
-	(*Done)(nil),                  // 4: dtkt.flow.v1beta1.Done
-	(*Env_Result)(nil),            // 5: dtkt.flow.v1beta1.Env.Result
-	(*Env_Node)(nil),              // 6: dtkt.flow.v1beta1.Env.Node
+	(*Done)(nil),                  // 2: dtkt.flow.v1beta1.Done
+	(*Skip)(nil),                  // 3: dtkt.flow.v1beta1.Skip
+	(*Env_Result)(nil),            // 4: dtkt.flow.v1beta1.Env.Result
+	(*Env_Node)(nil),              // 5: dtkt.flow.v1beta1.Env.Node
+	nil,                           // 6: dtkt.flow.v1beta1.Env.Result.MetadataEntry
 	(*Graph_Edge)(nil),            // 7: dtkt.flow.v1beta1.Graph.Edge
 	(*Graph_Expr)(nil),            // 8: dtkt.flow.v1beta1.Graph.Expr
 	(*Graph_Node)(nil),            // 9: dtkt.flow.v1beta1.Graph.Node
 	nil,                           // 10: dtkt.flow.v1beta1.Graph.Node.ExprsEntry
 	(*Flow)(nil),                  // 11: dtkt.flow.v1beta1.Flow
-	(*timestamppb.Timestamp)(nil), // 12: google.protobuf.Timestamp
-	(*status.Status)(nil),         // 13: google.rpc.Status
-	(*anypb.Any)(nil),             // 14: google.protobuf.Any
-	(*v1alpha1.ParsedExpr)(nil),   // 15: google.api.expr.v1alpha1.ParsedExpr
-	(*v1alpha1.CheckedExpr)(nil),  // 16: google.api.expr.v1alpha1.CheckedExpr
+	(code.Code)(0),                // 12: google.rpc.Code
+	(*timestamppb.Timestamp)(nil), // 13: google.protobuf.Timestamp
+	(*status.Status)(nil),         // 14: google.rpc.Status
+	(*anypb.Any)(nil),             // 15: google.protobuf.Any
+	(*v1alpha1.ParsedExpr)(nil),   // 16: google.api.expr.v1alpha1.ParsedExpr
+	(*v1alpha1.CheckedExpr)(nil),  // 17: google.api.expr.v1alpha1.CheckedExpr
 }
 var file_dtkt_flow_v1beta1_runtime_proto_depIdxs = []int32{
-	6,  // 0: dtkt.flow.v1beta1.Env.nodes:type_name -> dtkt.flow.v1beta1.Env.Node
+	5,  // 0: dtkt.flow.v1beta1.Env.nodes:type_name -> dtkt.flow.v1beta1.Env.Node
 	11, // 1: dtkt.flow.v1beta1.Graph.spec:type_name -> dtkt.flow.v1beta1.Flow
 	9,  // 2: dtkt.flow.v1beta1.Graph.nodes:type_name -> dtkt.flow.v1beta1.Graph.Node
 	7,  // 3: dtkt.flow.v1beta1.Graph.edges:type_name -> dtkt.flow.v1beta1.Graph.Edge
-	12, // 4: dtkt.flow.v1beta1.Env.Result.start_time:type_name -> google.protobuf.Timestamp
-	12, // 5: dtkt.flow.v1beta1.Env.Result.finish_time:type_name -> google.protobuf.Timestamp
-	13, // 6: dtkt.flow.v1beta1.Env.Result.error:type_name -> google.rpc.Status
-	14, // 7: dtkt.flow.v1beta1.Env.Result.value:type_name -> google.protobuf.Any
-	5,  // 8: dtkt.flow.v1beta1.Env.Node.result_prev:type_name -> dtkt.flow.v1beta1.Env.Result
-	5,  // 9: dtkt.flow.v1beta1.Env.Node.result_curr:type_name -> dtkt.flow.v1beta1.Env.Result
-	15, // 10: dtkt.flow.v1beta1.Graph.Expr.parsed:type_name -> google.api.expr.v1alpha1.ParsedExpr
-	16, // 11: dtkt.flow.v1beta1.Graph.Expr.checked:type_name -> google.api.expr.v1alpha1.CheckedExpr
-	10, // 12: dtkt.flow.v1beta1.Graph.Node.exprs:type_name -> dtkt.flow.v1beta1.Graph.Node.ExprsEntry
-	8,  // 13: dtkt.flow.v1beta1.Graph.Node.ExprsEntry.value:type_name -> dtkt.flow.v1beta1.Graph.Expr
-	14, // [14:14] is the sub-list for method output_type
-	14, // [14:14] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	12, // 4: dtkt.flow.v1beta1.Done.code:type_name -> google.rpc.Code
+	13, // 5: dtkt.flow.v1beta1.Env.Result.start_time:type_name -> google.protobuf.Timestamp
+	13, // 6: dtkt.flow.v1beta1.Env.Result.finish_time:type_name -> google.protobuf.Timestamp
+	6,  // 7: dtkt.flow.v1beta1.Env.Result.metadata:type_name -> dtkt.flow.v1beta1.Env.Result.MetadataEntry
+	14, // 8: dtkt.flow.v1beta1.Env.Result.error:type_name -> google.rpc.Status
+	15, // 9: dtkt.flow.v1beta1.Env.Result.value:type_name -> google.protobuf.Any
+	4,  // 10: dtkt.flow.v1beta1.Env.Node.result_prev:type_name -> dtkt.flow.v1beta1.Env.Result
+	4,  // 11: dtkt.flow.v1beta1.Env.Node.result_curr:type_name -> dtkt.flow.v1beta1.Env.Result
+	15, // 12: dtkt.flow.v1beta1.Env.Result.MetadataEntry.value:type_name -> google.protobuf.Any
+	16, // 13: dtkt.flow.v1beta1.Graph.Expr.parsed:type_name -> google.api.expr.v1alpha1.ParsedExpr
+	17, // 14: dtkt.flow.v1beta1.Graph.Expr.checked:type_name -> google.api.expr.v1alpha1.CheckedExpr
+	10, // 15: dtkt.flow.v1beta1.Graph.Node.exprs:type_name -> dtkt.flow.v1beta1.Graph.Node.ExprsEntry
+	8,  // 16: dtkt.flow.v1beta1.Graph.Node.ExprsEntry.value:type_name -> dtkt.flow.v1beta1.Graph.Expr
+	17, // [17:17] is the sub-list for method output_type
+	17, // [17:17] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_flow_v1beta1_runtime_proto_init() }
@@ -721,7 +696,8 @@ func file_dtkt_flow_v1beta1_runtime_proto_init() {
 		return
 	}
 	file_dtkt_flow_v1beta1_spec_proto_init()
-	file_dtkt_flow_v1beta1_runtime_proto_msgTypes[5].OneofWrappers = []any{
+	file_dtkt_flow_v1beta1_runtime_proto_msgTypes[2].OneofWrappers = []any{}
+	file_dtkt_flow_v1beta1_runtime_proto_msgTypes[4].OneofWrappers = []any{
 		(*Env_Result_Error)(nil),
 		(*Env_Result_Value)(nil),
 	}

@@ -35,6 +35,10 @@ func (o *Output) Ident() string {
 	return o.ident
 }
 
+func (o *Output) Metadata() map[string]any {
+	return nil
+}
+
 func (o *Output) Compile(ctx context.Context, env shared.Env) (err error) {
 	prog, err := env.CompileExpr("value", o.expr)
 	if err != nil {

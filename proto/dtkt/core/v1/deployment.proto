@@ -21,10 +21,12 @@ service DeploymentService {
   rpc ListDeployments(ListDeploymentsRequest) returns (ListDeploymentsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // Get a single deployment by name.
+
+  // Get a deployment by name.
   rpc GetDeployment(GetDeploymentRequest) returns (GetDeploymentResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
   // Create a new deployment.
   rpc CreateDeployment(CreateDeploymentRequest) returns (google.longrunning.Operation) {
     option (google.longrunning.operation_info) = {
@@ -32,6 +34,7 @@ service DeploymentService {
       response_type: "Deployment"
     };
   }
+
   // Update an existing deployment.
   rpc UpdateDeployment(UpdateDeploymentRequest) returns (google.longrunning.Operation) {
     option (google.longrunning.operation_info) = {
@@ -39,6 +42,7 @@ service DeploymentService {
       response_type: "Deployment"
     };
   }
+
   // Delete a deployment.
   rpc DeleteDeployment(DeleteDeploymentRequest) returns (google.longrunning.Operation) {
     option (google.longrunning.operation_info) = {

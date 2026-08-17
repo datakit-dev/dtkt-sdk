@@ -20,9 +20,9 @@ type (
 	}
 )
 
-func NewRequest(addrName, configHash string, configGen uint64) *Request {
+func NewRequest(resourceName, configHash string, configGen uint64) *Request {
 	return &Request{
-		resourceName: addrName,
+		resourceName: resourceName,
 		configHash:   configHash,
 		configGen:    configGen,
 	}
@@ -49,12 +49,12 @@ func (r *Request) IsValid() error {
 	return nil
 }
 
-func (r *Request) PrevSHA256() string {
-	return util.HashSHA256(fmt.Sprintf("%s|gen=%d", r.resourceName, r.configGen-1))
-}
-
 func (r *Request) HashShort() string {
 	return util.HashShort(r.String())
+}
+
+func (r *Request) PrevSHA256() string {
+	return util.HashSHA256(r.genString(r.configGen - 1))
 }
 
 func (r *Request) HashSHA256() string {
@@ -66,7 +66,7 @@ func (r *Request) ConfigHash() string   { return r.configHash }
 func (r *Request) ConfigGen() uint64    { return r.configGen }
 
 func (r *Request) String() string {
-	return fmt.Sprintf("%s|gen=%d", r.resourceName, r.configGen)
+	return r.genString(r.configGen)
 }
 
 func (r *Request) SetHeader(req *http.Request) {
@@ -75,4 +75,8 @@ func (r *Request) SetHeader(req *http.Request) {
 			req.Header.Set(key, val)
 		}
 	}
+}
+
+func (r *Request) genString(configGen uint64) string {
+	return fmt.Sprintf("%s|gen=%d", r.resourceName, configGen)
 }

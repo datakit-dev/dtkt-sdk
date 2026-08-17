@@ -35,7 +35,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dtkt/core/v1/automation.proto.
  */
 export const file_dtkt_core_v1_automation: GenFile = /*@__PURE__*/
-  fileDesc("Ch1kdGt0L2NvcmUvdjEvYXV0b21hdGlvbi5wcm90bxIMZHRrdC5jb3JlLnYxIt0JCgpBdXRvbWF0aW9uEh0KBG5hbWUYASABKAlCD+BBCLpIA8gBAYK1GAIYARIhCgN1aWQYAiABKAlCFOBBA7pICMgBAXIDsAEBgrUYAhgBEq4BCgRmbG93GAMgASgJQp8B+kEGCgRGbG93ukgDyAEBgrUYiwEKBEZsb3cSDlNlbGVjdCBhIGZsb3cuOnMKImR0a3QuY29yZS52MS5GbG93U2VydmljZS5MaXN0Rmxvd3MSBWZsb3dzGjtoYXModGhpcy5zcGVjLnYxYmV0YTEpID8gdGhpcy5zcGVjLnYxYmV0YTEubmFtZSA6IHRoaXMubmFtZSIJdGhpcy5uYW1lEiIKCXNwZWNfZXRhZxgEIAEoCUIP4EEEukgDyAEBgrUYAhgBEj4KC2Nvbm5lY3Rpb25zGAUgAygLMikuZHRrdC5jb3JlLnYxLkF1dG9tYXRpb24uQ29ubmVjdGlvbnNFbnRyeRI0CgZpbnB1dHMYBiADKAsyJC5kdGt0LmNvcmUudjEuQXV0b21hdGlvbi5JbnB1dHNFbnRyeRIqCgd0aW1lb3V0GAcgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEjsKB3J1bnRpbWUYCCABKAsyHy5kdGt0LmNvcmUudjEuQXV0b21hdGlvblJ1bnRpbWVCCeBBA7pIA8gBARIgCgRldGFnGAogASgJQhKAAQHgQQO6SAPIAQGCtRgCGAESGgoFYmF0Y2gYCyABKAlCBoK1GAIYAUgAiAEBEkAKC2NyZWF0ZV90aW1lGBQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEIP4EEDukgDyAEBgrUYAhgBEkAKC3VwZGF0ZV90aW1lGBUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEIP4EEDukgDyAEBgrUYAhgBGt4BChBDb25uZWN0aW9uQ29uZmlnEqEBCgRuYW1lGAEgASgJQpIBukgUyAEBcg9KDS9jb25uZWN0aW9ucy+CtRh3CgpDb25uZWN0aW9uEhRTZWxlY3QgYSBjb25uZWN0aW9uLjpTCi5kdGt0LmNvcmUudjEuQ29ubmVjdGlvblNlcnZpY2UuTGlzdENvbm5lY3Rpb25zEgtjb25uZWN0aW9ucxoJdGhpcy5uYW1lIgl0aGlzLm5hbWUSJgoHY29udGV4dBgCIAEoCzIVLmR0a3QuY29yZS52MS5Db250ZXh0Gl0KEENvbm5lY3Rpb25zRW50cnkSCwoDa2V5GAEgASgJEjgKBXZhbHVlGAIgASgLMikuZHRrdC5jb3JlLnYxLkF1dG9tYXRpb24uQ29ubmVjdGlvbkNvbmZpZzoCOAEaQwoLSW5wdXRzRW50cnkSCwoDa2V5GAEgASgJEiMKBXZhbHVlGAIgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueToCOAE6hwHqQYMBCgpBdXRvbWF0aW9uEjVvcmdhbml6YXRpb25zL3tvcmdhbml6YXRpb259L2F1dG9tYXRpb25zL3thdXRvbWF0aW9ufRIldXNlcnMve3VzZXJ9L2F1dG9tYXRpb25zL3thdXRvbWF0aW9ufSoLYXV0b21hdGlvbnMyCmF1dG9tYXRpb25CCAoGX2JhdGNoIoQBChJBdXRvbWF0aW9uTWV0YWRhdGESDwoHbWVzc2FnZRgBIAEoCRIuCgpzdGFydF90aW1lGAogASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBItCglzdG9wX3RpbWUYCyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIo0FChFBdXRvbWF0aW9uUnVudGltZRJBCgVzdGF0ZRgBIAEoDjIlLmR0a3QuY29yZS52MS5BdXRvbWF0aW9uUnVudGltZS5TdGF0ZUILukgIyAEBggECEAESOAoDZW52GAIgASgLMiMuZHRrdC5jb3JlLnYxLkF1dG9tYXRpb25SdW50aW1lLkVudkIGukgDyAEBEi4KCnN0YXJ0X3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi0KCXN0b3BfdGltZRgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASNgoGcmVzdWx0GAUgASgLMiYuZHRrdC5jb3JlLnYxLkF1dG9tYXRpb25SdW50aW1lLlJlc3VsdBpCCgNFbnYSKQoHdjFiZXRhMRgBIAEoCzIWLmR0a3QuZmxvdy52MWJldGExLkVudkgAQhAKB3ZlcnNpb24SBbpIAggBGswBCgZSZXN1bHQSIQoFZXJyb3IYASABKAsyEi5nb29nbGUucnBjLlN0YXR1cxJCCgZ2YWx1ZXMYAiADKAsyMi5kdGt0LmNvcmUudjEuQXV0b21hdGlvblJ1bnRpbWUuUmVzdWx0LlZhbHVlc0VudHJ5GkMKC1ZhbHVlc0VudHJ5EgsKA2tleRgBIAEoCRIjCgV2YWx1ZRgCIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5Bbnk6AjgBOha6SBMiEQoFZXJyb3IKBnZhbHVlcxABIlEKBVN0YXRlEhUKEVNUQVRFX1VOU1BFQ0lGSUVEEAASCwoHUEVORElORxABEgsKB1JVTk5JTkcQAhILCgdTVE9QUEVEEAMSCgoGRkFJTEVEEAQiLAoUR2V0QXV0b21hdGlvblJlcXVlc3QSFAoEbmFtZRgBIAEoCUIGukgDyAEBIk0KFUdldEF1dG9tYXRpb25SZXNwb25zZRI0CgphdXRvbWF0aW9uGAEgASgLMhguZHRrdC5jb3JlLnYxLkF1dG9tYXRpb25CBrpIA8gBASKvAQoXQ3JlYXRlQXV0b21hdGlvblJlcXVlc3QSHAoGcGFyZW50GAEgASgJQgy6SAPIAQGCtRgCGAESQAoNYXV0b21hdGlvbl9pZBgCIAEoCUIpukgTyAEBcg4yDF5bYS16MC05LV0rJIK1GA8SDUF1dG9tYXRpb24gSUQSNAoKYXV0b21hdGlvbhgDIAEoCzIYLmR0a3QuY29yZS52MS5BdXRvbWF0aW9uQga6SAPIAQEiUAoYQ3JlYXRlQXV0b21hdGlvblJlc3BvbnNlEjQKCmF1dG9tYXRpb24YASABKAsyGC5kdGt0LmNvcmUudjEuQXV0b21hdGlvbkIGukgDyAEBIuEBChdVcGRhdGVBdXRvbWF0aW9uUmVxdWVzdBI0CgphdXRvbWF0aW9uGAEgASgLMhguZHRrdC5jb3JlLnYxLkF1dG9tYXRpb25CBrpIA8gBARIvCgt1cGRhdGVfbWFzaxgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5GaWVsZE1hc2sSTQoNZGVzaXJlZF9zdGF0ZRgDIAEoDjIlLmR0a3QuY29yZS52MS5BdXRvbWF0aW9uUnVudGltZS5TdGF0ZUIKukgHggEEGAIYA0gAiAEBQhAKDl9kZXNpcmVkX3N0YXRlIkUKF0RlbGV0ZUF1dG9tYXRpb25SZXF1ZXN0EhQKBG5hbWUYASABKAlCBrpIA8gBARIUCgRldGFnGAIgASgJQga6SAPIAQEinwIKHUJhdGNoQ3JlYXRlQXV0b21hdGlvbnNSZXF1ZXN0EhwKBnBhcmVudBgBIAEoCUIMukgDyAEBgrUYAhgBEkEKCHJlcXVlc3RzGAIgAygLMiUuZHRrdC5jb3JlLnYxLkNyZWF0ZUF1dG9tYXRpb25SZXF1ZXN0Qgi6SAWSAQIIAjqcAbpImAEalQEKIWJhdGNoX2NyZWF0ZV9hdXRvbWF0aW9ucy5yZXF1ZXN0cxIhcmVxdWVzdHMgbXVzdCB1c2UgdGhlIHNhbWUgcGFyZW50Gk1zaXplKHRoaXMucmVxdWVzdHMuZmlsdGVyKHIsIHIucGFyZW50ID09IHRoaXMucGFyZW50KSkgPT0gc2l6ZSh0aGlzLnJlcXVlc3RzKSJXCh5CYXRjaENyZWF0ZUF1dG9tYXRpb25zUmVzcG9uc2USNQoLYXV0b21hdGlvbnMYASADKAsyGC5kdGt0LmNvcmUudjEuQXV0b21hdGlvbkIGukgDyAEBIn8KFkxpc3RBdXRvbWF0aW9uc1JlcXVlc3QSEQoJcGFnZV9zaXplGAEgASgFEhIKCnBhZ2VfdG9rZW4YAiABKAkSEwoGcGFyZW50GAMgASgJSACIAQESEwoGZmlsdGVyGAQgASgJSAGIAQFCCQoHX3BhcmVudEIJCgdfZmlsdGVyImkKF0xpc3RBdXRvbWF0aW9uc1Jlc3BvbnNlEjUKC2F1dG9tYXRpb25zGAEgAygLMhguZHRrdC5jb3JlLnYxLkF1dG9tYXRpb25CBrpIA8gBARIXCg9uZXh0X3BhZ2VfdG9rZW4YAiABKAkioAQKE1NlbmRBdXRvbWF0aW9uRXZlbnQSRQoMaW5wdXRzX2V2ZW50GAEgASgLMi0uZHRrdC5jb3JlLnYxLlNlbmRBdXRvbWF0aW9uRXZlbnQuSW5wdXRzRXZlbnRIABJSChN1c2VyX3Jlc3BvbnNlX2V2ZW50GAIgASgLMjMuZHRrdC5jb3JlLnYxLlNlbmRBdXRvbWF0aW9uRXZlbnQuVXNlclJlc3BvbnNlRXZlbnRIABqdAQoLSW5wdXRzRXZlbnQSSQoGdmFsdWVzGAEgAygLMjkuZHRrdC5jb3JlLnYxLlNlbmRBdXRvbWF0aW9uRXZlbnQuSW5wdXRzRXZlbnQuVmFsdWVzRW50cnkaQwoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEiMKBXZhbHVlGAIgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueToCOAEaxQEKEVVzZXJSZXNwb25zZUV2ZW50EhIKAmlkGAEgASgJQga6SAPIAQESVwoGdmFsdWVzGAIgAygLMj8uZHRrdC5jb3JlLnYxLlNlbmRBdXRvbWF0aW9uRXZlbnQuVXNlclJlc3BvbnNlRXZlbnQuVmFsdWVzRW50cnlCBrpIA8gBARpDCgtWYWx1ZXNFbnRyeRILCgNrZXkYASABKAkSIwoFdmFsdWUYAiABKAsyFC5nb29nbGUucHJvdG9idWYuQW55OgI4AUIGCgR0eXBlIssFChZSZWNlaXZlQXV0b21hdGlvbkV2ZW50EkoKDW91dHB1dHNfZXZlbnQYASABKAsyMS5kdGt0LmNvcmUudjEuUmVjZWl2ZUF1dG9tYXRpb25FdmVudC5PdXRwdXRzRXZlbnRIABJTChJ1c2VyX3JlcXVlc3RfZXZlbnQYAiABKAsyNS5kdGt0LmNvcmUudjEuUmVjZWl2ZUF1dG9tYXRpb25FdmVudC5Vc2VyUmVxdWVzdEV2ZW50SAASSgoNbWV0cmljc19ldmVudBgDIAEoCzIxLmR0a3QuY29yZS52MS5SZWNlaXZlQXV0b21hdGlvbkV2ZW50Lk1ldHJpY3NFdmVudEgAGqoBCgxPdXRwdXRzRXZlbnQSVQoGdmFsdWVzGAEgAygLMj0uZHRrdC5jb3JlLnYxLlJlY2VpdmVBdXRvbWF0aW9uRXZlbnQuT3V0cHV0c0V2ZW50LlZhbHVlc0VudHJ5Qga6SAPIAQEaQwoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEiMKBXZhbHVlGAIgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueToCOAEaYgoQVXNlclJlcXVlc3RFdmVudBISCgJpZBgBIAEoCUIGukgDyAEBEjoKC3VzZXJfYWN0aW9uGAIgASgLMh0uZHRrdC5mbG93LnYxYmV0YTEuVXNlckFjdGlvbkIGukgDyAEBGqoBCgxNZXRyaWNzRXZlbnQSVQoGdmFsdWVzGAEgAygLMj0uZHRrdC5jb3JlLnYxLlJlY2VpdmVBdXRvbWF0aW9uRXZlbnQuTWV0cmljc0V2ZW50LlZhbHVlc0VudHJ5Qga6SAPIAQEaQwoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEiMKBXZhbHVlGAIgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueToCOAFCBgoEdHlwZSJkChpTZW5kQXV0b21hdGlvbkV2ZW50UmVxdWVzdBIUCgRuYW1lGAEgASgJQga6SAPIAQESMAoFZXZlbnQYAiABKAsyIS5kdGt0LmNvcmUudjEuU2VuZEF1dG9tYXRpb25FdmVudCI2Ch5SZWNlaXZlQXV0b21hdGlvbkV2ZW50c1JlcXVlc3QSFAoEbmFtZRgBIAEoCUIGukgDyAEBIl4KH1JlY2VpdmVBdXRvbWF0aW9uRXZlbnRzUmVzcG9uc2USOwoFZXZlbnQYAiABKAsyJC5kdGt0LmNvcmUudjEuUmVjZWl2ZUF1dG9tYXRpb25FdmVudEIGukgDyAEBImcKHVN0cmVhbUF1dG9tYXRpb25FdmVudHNSZXF1ZXN0EhQKBG5hbWUYASABKAlCBrpIA8gBARIwCgVldmVudBgCIAEoCzIhLmR0a3QuY29yZS52MS5TZW5kQXV0b21hdGlvbkV2ZW50Il0KHlN0cmVhbUF1dG9tYXRpb25FdmVudHNSZXNwb25zZRI7CgVldmVudBgBIAEoCzIkLmR0a3QuY29yZS52MS5SZWNlaXZlQXV0b21hdGlvbkV2ZW50Qga6SAPIAQEyrAcKEUF1dG9tYXRpb25TZXJ2aWNlEmMKD0xpc3RBdXRvbWF0aW9ucxIkLmR0a3QuY29yZS52MS5MaXN0QXV0b21hdGlvbnNSZXF1ZXN0GiUuZHRrdC5jb3JlLnYxLkxpc3RBdXRvbWF0aW9uc1Jlc3BvbnNlIgOQAgESXQoNR2V0QXV0b21hdGlvbhIiLmR0a3QuY29yZS52MS5HZXRBdXRvbWF0aW9uUmVxdWVzdBojLmR0a3QuY29yZS52MS5HZXRBdXRvbWF0aW9uUmVzcG9uc2UiA5ACARJ9ChBDcmVhdGVBdXRvbWF0aW9uEiUuZHRrdC5jb3JlLnYxLkNyZWF0ZUF1dG9tYXRpb25SZXF1ZXN0Gh0uZ29vZ2xlLmxvbmdydW5uaW5nLk9wZXJhdGlvbiIjykEgCgpBdXRvbWF0aW9uEhJBdXRvbWF0aW9uTWV0YWRhdGESfQoQVXBkYXRlQXV0b21hdGlvbhIlLmR0a3QuY29yZS52MS5VcGRhdGVBdXRvbWF0aW9uUmVxdWVzdBodLmdvb2dsZS5sb25ncnVubmluZy5PcGVyYXRpb24iI8pBIAoKQXV0b21hdGlvbhISQXV0b21hdGlvbk1ldGFkYXRhEogBChBEZWxldGVBdXRvbWF0aW9uEiUuZHRrdC5jb3JlLnYxLkRlbGV0ZUF1dG9tYXRpb25SZXF1ZXN0Gh0uZ29vZ2xlLmxvbmdydW5uaW5nLk9wZXJhdGlvbiIuykErChVnb29nbGUucHJvdG9idWYuRW1wdHkSEkF1dG9tYXRpb25NZXRhZGF0YRJ4ChdSZWNlaXZlQXV0b21hdGlvbkV2ZW50cxIsLmR0a3QuY29yZS52MS5SZWNlaXZlQXV0b21hdGlvbkV2ZW50c1JlcXVlc3QaLS5kdGt0LmNvcmUudjEuUmVjZWl2ZUF1dG9tYXRpb25FdmVudHNSZXNwb25zZTABElcKE1NlbmRBdXRvbWF0aW9uRXZlbnQSKC5kdGt0LmNvcmUudjEuU2VuZEF1dG9tYXRpb25FdmVudFJlcXVlc3QaFi5nb29nbGUucHJvdG9idWYuRW1wdHkSdwoWU3RyZWFtQXV0b21hdGlvbkV2ZW50cxIrLmR0a3QuY29yZS52MS5TdHJlYW1BdXRvbWF0aW9uRXZlbnRzUmVxdWVzdBosLmR0a3QuY29yZS52MS5TdHJlYW1BdXRvbWF0aW9uRXZlbnRzUmVzcG9uc2UoATABQrkBChJwcm90by5kdGt0LmNvcmUudjFCD0F1dG9tYXRpb25Qcm90b1ABWkBnaXRodWIuY29tL2RhdGFraXQtZGV2L2R0a3Qtc2RrL3Nkay1nby9wcm90by9kdGt0L2NvcmUvdjE7Y29yZXYxogIDRENYqgIMRHRrdC5Db3JlLlYxygIMRHRrdFxDb3JlXFYx4gIYRHRrdFxDb3JlXFYxXEdQQk1ldGFkYXRh6gIORHRrdDo6Q29yZTo6VjFiBnByb3RvMw", [file_buf_validate_validate, file_dtkt_core_v1_common, file_dtkt_flow_v1beta1_runtime, file_dtkt_flow_v1beta1_spec, file_dtkt_protoform_v1beta1_protoform, file_google_api_field_behavior, file_google_api_resource, file_google_longrunning_operations, file_google_protobuf_any, file_google_protobuf_descriptor, file_google_protobuf_duration, file_google_protobuf_empty, file_google_protobuf_field_mask, file_google_protobuf_timestamp, file_google_rpc_status]);
+  fileDesc("Ch1kdGt0L2NvcmUvdjEvYXV0b21hdGlvbi5wcm90bxIMZHRrdC5jb3JlLnYxIt0JCgpBdXRvbWF0aW9uEh0KBG5hbWUYASABKAlCD+BBCLpIA8gBAYK1GAIYARIhCgN1aWQYAiABKAlCFOBBA7pICMgBAXIDsAEBgrUYAhgBEq4BCgRmbG93GAMgASgJQp8B+kEGCgRGbG93ukgDyAEBgrUYiwEKBEZsb3cSDlNlbGVjdCBhIGZsb3cuOnMKImR0a3QuY29yZS52MS5GbG93U2VydmljZS5MaXN0Rmxvd3MSBWZsb3dzGjtoYXModGhpcy5zcGVjLnYxYmV0YTEpID8gdGhpcy5zcGVjLnYxYmV0YTEubmFtZSA6IHRoaXMubmFtZSIJdGhpcy5uYW1lEiIKCXNwZWNfZXRhZxgEIAEoCUIP4EEEukgDyAEBgrUYAhgBEj4KC2Nvbm5lY3Rpb25zGAUgAygLMikuZHRrdC5jb3JlLnYxLkF1dG9tYXRpb24uQ29ubmVjdGlvbnNFbnRyeRI0CgZpbnB1dHMYBiADKAsyJC5kdGt0LmNvcmUudjEuQXV0b21hdGlvbi5JbnB1dHNFbnRyeRIqCgd0aW1lb3V0GAcgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEjsKB3J1bnRpbWUYCCABKAsyHy5kdGt0LmNvcmUudjEuQXV0b21hdGlvblJ1bnRpbWVCCeBBA7pIA8gBARIgCgRldGFnGAogASgJQhKAAQHgQQO6SAPIAQGCtRgCGAESGgoFYmF0Y2gYCyABKAlCBoK1GAIYAUgAiAEBEkAKC2NyZWF0ZV90aW1lGBQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEIP4EEDukgDyAEBgrUYAhgBEkAKC3VwZGF0ZV90aW1lGBUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEIP4EEDukgDyAEBgrUYAhgBGt4BChBDb25uZWN0aW9uQ29uZmlnEqEBCgRuYW1lGAEgASgJQpIBukgUyAEBcg9KDS9jb25uZWN0aW9ucy+CtRh3CgpDb25uZWN0aW9uEhRTZWxlY3QgYSBjb25uZWN0aW9uLjpTCi5kdGt0LmNvcmUudjEuQ29ubmVjdGlvblNlcnZpY2UuTGlzdENvbm5lY3Rpb25zEgtjb25uZWN0aW9ucxoJdGhpcy5uYW1lIgl0aGlzLm5hbWUSJgoHY29udGV4dBgCIAEoCzIVLmR0a3QuY29yZS52MS5Db250ZXh0Gl0KEENvbm5lY3Rpb25zRW50cnkSCwoDa2V5GAEgASgJEjgKBXZhbHVlGAIgASgLMikuZHRrdC5jb3JlLnYxLkF1dG9tYXRpb24uQ29ubmVjdGlvbkNvbmZpZzoCOAEaQwoLSW5wdXRzRW50cnkSCwoDa2V5GAEgASgJEiMKBXZhbHVlGAIgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueToCOAE6hwHqQYMBCgpBdXRvbWF0aW9uEjVvcmdhbml6YXRpb25zL3tvcmdhbml6YXRpb259L2F1dG9tYXRpb25zL3thdXRvbWF0aW9ufRIldXNlcnMve3VzZXJ9L2F1dG9tYXRpb25zL3thdXRvbWF0aW9ufSoLYXV0b21hdGlvbnMyCmF1dG9tYXRpb25CCAoGX2JhdGNoIo0FChFBdXRvbWF0aW9uUnVudGltZRJBCgVzdGF0ZRgBIAEoDjIlLmR0a3QuY29yZS52MS5BdXRvbWF0aW9uUnVudGltZS5TdGF0ZUILukgIyAEBggECEAESOAoDZW52GAIgASgLMiMuZHRrdC5jb3JlLnYxLkF1dG9tYXRpb25SdW50aW1lLkVudkIGukgDyAEBEi4KCnN0YXJ0X3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi0KCXN0b3BfdGltZRgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASNgoGcmVzdWx0GAUgASgLMiYuZHRrdC5jb3JlLnYxLkF1dG9tYXRpb25SdW50aW1lLlJlc3VsdBpCCgNFbnYSKQoHdjFiZXRhMRgBIAEoCzIWLmR0a3QuZmxvdy52MWJldGExLkVudkgAQhAKB3ZlcnNpb24SBbpIAggBGswBCgZSZXN1bHQSIQoFZXJyb3IYASABKAsyEi5nb29nbGUucnBjLlN0YXR1cxJCCgZ2YWx1ZXMYAiADKAsyMi5kdGt0LmNvcmUudjEuQXV0b21hdGlvblJ1bnRpbWUuUmVzdWx0LlZhbHVlc0VudHJ5GkMKC1ZhbHVlc0VudHJ5EgsKA2tleRgBIAEoCRIjCgV2YWx1ZRgCIAEoCzIULmdvb2dsZS5wcm90b2J1Zi5Bbnk6AjgBOha6SBMiEQoFZXJyb3IKBnZhbHVlcxABIlEKBVN0YXRlEhUKEVNUQVRFX1VOU1BFQ0lGSUVEEAASCwoHUEVORElORxABEgsKB1JVTk5JTkcQAhILCgdTVE9QUEVEEAMSCgoGRkFJTEVEEAQiLAoUR2V0QXV0b21hdGlvblJlcXVlc3QSFAoEbmFtZRgBIAEoCUIGukgDyAEBIk0KFUdldEF1dG9tYXRpb25SZXNwb25zZRI0CgphdXRvbWF0aW9uGAEgASgLMhguZHRrdC5jb3JlLnYxLkF1dG9tYXRpb25CBrpIA8gBASKvAQoXQ3JlYXRlQXV0b21hdGlvblJlcXVlc3QSHAoGcGFyZW50GAEgASgJQgy6SAPIAQGCtRgCGAESQAoNYXV0b21hdGlvbl9pZBgCIAEoCUIpukgTyAEBcg4yDF5bYS16MC05LV0rJIK1GA8SDUF1dG9tYXRpb24gSUQSNAoKYXV0b21hdGlvbhgDIAEoCzIYLmR0a3QuY29yZS52MS5BdXRvbWF0aW9uQga6SAPIAQEiUAoYQ3JlYXRlQXV0b21hdGlvblJlc3BvbnNlEjQKCmF1dG9tYXRpb24YASABKAsyGC5kdGt0LmNvcmUudjEuQXV0b21hdGlvbkIGukgDyAEBIuEBChdVcGRhdGVBdXRvbWF0aW9uUmVxdWVzdBI0CgphdXRvbWF0aW9uGAEgASgLMhguZHRrdC5jb3JlLnYxLkF1dG9tYXRpb25CBrpIA8gBARIvCgt1cGRhdGVfbWFzaxgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5GaWVsZE1hc2sSTQoNZGVzaXJlZF9zdGF0ZRgDIAEoDjIlLmR0a3QuY29yZS52MS5BdXRvbWF0aW9uUnVudGltZS5TdGF0ZUIKukgHggEEGAIYA0gAiAEBQhAKDl9kZXNpcmVkX3N0YXRlIkUKF0RlbGV0ZUF1dG9tYXRpb25SZXF1ZXN0EhQKBG5hbWUYASABKAlCBrpIA8gBARIUCgRldGFnGAIgASgJQga6SAPIAQEinwIKHUJhdGNoQ3JlYXRlQXV0b21hdGlvbnNSZXF1ZXN0EhwKBnBhcmVudBgBIAEoCUIMukgDyAEBgrUYAhgBEkEKCHJlcXVlc3RzGAIgAygLMiUuZHRrdC5jb3JlLnYxLkNyZWF0ZUF1dG9tYXRpb25SZXF1ZXN0Qgi6SAWSAQIIAjqcAbpImAEalQEKIWJhdGNoX2NyZWF0ZV9hdXRvbWF0aW9ucy5yZXF1ZXN0cxIhcmVxdWVzdHMgbXVzdCB1c2UgdGhlIHNhbWUgcGFyZW50Gk1zaXplKHRoaXMucmVxdWVzdHMuZmlsdGVyKHIsIHIucGFyZW50ID09IHRoaXMucGFyZW50KSkgPT0gc2l6ZSh0aGlzLnJlcXVlc3RzKSJXCh5CYXRjaENyZWF0ZUF1dG9tYXRpb25zUmVzcG9uc2USNQoLYXV0b21hdGlvbnMYASADKAsyGC5kdGt0LmNvcmUudjEuQXV0b21hdGlvbkIGukgDyAEBIn8KFkxpc3RBdXRvbWF0aW9uc1JlcXVlc3QSEQoJcGFnZV9zaXplGAEgASgFEhIKCnBhZ2VfdG9rZW4YAiABKAkSEwoGcGFyZW50GAMgASgJSACIAQESEwoGZmlsdGVyGAQgASgJSAGIAQFCCQoHX3BhcmVudEIJCgdfZmlsdGVyImkKF0xpc3RBdXRvbWF0aW9uc1Jlc3BvbnNlEjUKC2F1dG9tYXRpb25zGAEgAygLMhguZHRrdC5jb3JlLnYxLkF1dG9tYXRpb25CBrpIA8gBARIXCg9uZXh0X3BhZ2VfdG9rZW4YAiABKAkioAQKE1NlbmRBdXRvbWF0aW9uRXZlbnQSRQoMaW5wdXRzX2V2ZW50GAEgASgLMi0uZHRrdC5jb3JlLnYxLlNlbmRBdXRvbWF0aW9uRXZlbnQuSW5wdXRzRXZlbnRIABJSChN1c2VyX3Jlc3BvbnNlX2V2ZW50GAIgASgLMjMuZHRrdC5jb3JlLnYxLlNlbmRBdXRvbWF0aW9uRXZlbnQuVXNlclJlc3BvbnNlRXZlbnRIABqdAQoLSW5wdXRzRXZlbnQSSQoGdmFsdWVzGAEgAygLMjkuZHRrdC5jb3JlLnYxLlNlbmRBdXRvbWF0aW9uRXZlbnQuSW5wdXRzRXZlbnQuVmFsdWVzRW50cnkaQwoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEiMKBXZhbHVlGAIgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueToCOAEaxQEKEVVzZXJSZXNwb25zZUV2ZW50EhIKAmlkGAEgASgJQga6SAPIAQESVwoGdmFsdWVzGAIgAygLMj8uZHRrdC5jb3JlLnYxLlNlbmRBdXRvbWF0aW9uRXZlbnQuVXNlclJlc3BvbnNlRXZlbnQuVmFsdWVzRW50cnlCBrpIA8gBARpDCgtWYWx1ZXNFbnRyeRILCgNrZXkYASABKAkSIwoFdmFsdWUYAiABKAsyFC5nb29nbGUucHJvdG9idWYuQW55OgI4AUIGCgR0eXBlIssFChZSZWNlaXZlQXV0b21hdGlvbkV2ZW50EkoKDW91dHB1dHNfZXZlbnQYASABKAsyMS5kdGt0LmNvcmUudjEuUmVjZWl2ZUF1dG9tYXRpb25FdmVudC5PdXRwdXRzRXZlbnRIABJTChJ1c2VyX3JlcXVlc3RfZXZlbnQYAiABKAsyNS5kdGt0LmNvcmUudjEuUmVjZWl2ZUF1dG9tYXRpb25FdmVudC5Vc2VyUmVxdWVzdEV2ZW50SAASSgoNbWV0cmljc19ldmVudBgDIAEoCzIxLmR0a3QuY29yZS52MS5SZWNlaXZlQXV0b21hdGlvbkV2ZW50Lk1ldHJpY3NFdmVudEgAGqoBCgxPdXRwdXRzRXZlbnQSVQoGdmFsdWVzGAEgAygLMj0uZHRrdC5jb3JlLnYxLlJlY2VpdmVBdXRvbWF0aW9uRXZlbnQuT3V0cHV0c0V2ZW50LlZhbHVlc0VudHJ5Qga6SAPIAQEaQwoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEiMKBXZhbHVlGAIgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueToCOAEaYgoQVXNlclJlcXVlc3RFdmVudBISCgJpZBgBIAEoCUIGukgDyAEBEjoKC3VzZXJfYWN0aW9uGAIgASgLMh0uZHRrdC5mbG93LnYxYmV0YTEuVXNlckFjdGlvbkIGukgDyAEBGqoBCgxNZXRyaWNzRXZlbnQSVQoGdmFsdWVzGAEgAygLMj0uZHRrdC5jb3JlLnYxLlJlY2VpdmVBdXRvbWF0aW9uRXZlbnQuTWV0cmljc0V2ZW50LlZhbHVlc0VudHJ5Qga6SAPIAQEaQwoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEiMKBXZhbHVlGAIgASgLMhQuZ29vZ2xlLnByb3RvYnVmLkFueToCOAFCBgoEdHlwZSJkChpTZW5kQXV0b21hdGlvbkV2ZW50UmVxdWVzdBIUCgRuYW1lGAEgASgJQga6SAPIAQESMAoFZXZlbnQYAiABKAsyIS5kdGt0LmNvcmUudjEuU2VuZEF1dG9tYXRpb25FdmVudCI2Ch5SZWNlaXZlQXV0b21hdGlvbkV2ZW50c1JlcXVlc3QSFAoEbmFtZRgBIAEoCUIGukgDyAEBIl4KH1JlY2VpdmVBdXRvbWF0aW9uRXZlbnRzUmVzcG9uc2USOwoFZXZlbnQYAiABKAsyJC5kdGt0LmNvcmUudjEuUmVjZWl2ZUF1dG9tYXRpb25FdmVudEIGukgDyAEBImcKHVN0cmVhbUF1dG9tYXRpb25FdmVudHNSZXF1ZXN0EhQKBG5hbWUYASABKAlCBrpIA8gBARIwCgVldmVudBgCIAEoCzIhLmR0a3QuY29yZS52MS5TZW5kQXV0b21hdGlvbkV2ZW50Il0KHlN0cmVhbUF1dG9tYXRpb25FdmVudHNSZXNwb25zZRI7CgVldmVudBgBIAEoCzIkLmR0a3QuY29yZS52MS5SZWNlaXZlQXV0b21hdGlvbkV2ZW50Qga6SAPIAQEyqQcKEUF1dG9tYXRpb25TZXJ2aWNlEmMKD0xpc3RBdXRvbWF0aW9ucxIkLmR0a3QuY29yZS52MS5MaXN0QXV0b21hdGlvbnNSZXF1ZXN0GiUuZHRrdC5jb3JlLnYxLkxpc3RBdXRvbWF0aW9uc1Jlc3BvbnNlIgOQAgESXQoNR2V0QXV0b21hdGlvbhIiLmR0a3QuY29yZS52MS5HZXRBdXRvbWF0aW9uUmVxdWVzdBojLmR0a3QuY29yZS52MS5HZXRBdXRvbWF0aW9uUmVzcG9uc2UiA5ACARJ8ChBDcmVhdGVBdXRvbWF0aW9uEiUuZHRrdC5jb3JlLnYxLkNyZWF0ZUF1dG9tYXRpb25SZXF1ZXN0Gh0uZ29vZ2xlLmxvbmdydW5uaW5nLk9wZXJhdGlvbiIiykEfCgpBdXRvbWF0aW9uEhFBdXRvbWF0aW9uUnVudGltZRJ8ChBVcGRhdGVBdXRvbWF0aW9uEiUuZHRrdC5jb3JlLnYxLlVwZGF0ZUF1dG9tYXRpb25SZXF1ZXN0Gh0uZ29vZ2xlLmxvbmdydW5uaW5nLk9wZXJhdGlvbiIiykEfCgpBdXRvbWF0aW9uEhFBdXRvbWF0aW9uUnVudGltZRKHAQoQRGVsZXRlQXV0b21hdGlvbhIlLmR0a3QuY29yZS52MS5EZWxldGVBdXRvbWF0aW9uUmVxdWVzdBodLmdvb2dsZS5sb25ncnVubmluZy5PcGVyYXRpb24iLcpBKgoVZ29vZ2xlLnByb3RvYnVmLkVtcHR5EhFBdXRvbWF0aW9uUnVudGltZRJ4ChdSZWNlaXZlQXV0b21hdGlvbkV2ZW50cxIsLmR0a3QuY29yZS52MS5SZWNlaXZlQXV0b21hdGlvbkV2ZW50c1JlcXVlc3QaLS5kdGt0LmNvcmUudjEuUmVjZWl2ZUF1dG9tYXRpb25FdmVudHNSZXNwb25zZTABElcKE1NlbmRBdXRvbWF0aW9uRXZlbnQSKC5kdGt0LmNvcmUudjEuU2VuZEF1dG9tYXRpb25FdmVudFJlcXVlc3QaFi5nb29nbGUucHJvdG9idWYuRW1wdHkSdwoWU3RyZWFtQXV0b21hdGlvbkV2ZW50cxIrLmR0a3QuY29yZS52MS5TdHJlYW1BdXRvbWF0aW9uRXZlbnRzUmVxdWVzdBosLmR0a3QuY29yZS52MS5TdHJlYW1BdXRvbWF0aW9uRXZlbnRzUmVzcG9uc2UoATABQrkBChJwcm90by5kdGt0LmNvcmUudjFCD0F1dG9tYXRpb25Qcm90b1ABWkBnaXRodWIuY29tL2RhdGFraXQtZGV2L2R0a3Qtc2RrL3Nkay1nby9wcm90by9kdGt0L2NvcmUvdjE7Y29yZXYxogIDRENYqgIMRHRrdC5Db3JlLlYxygIMRHRrdFxDb3JlXFYx4gIYRHRrdFxDb3JlXFYxXEdQQk1ldGFkYXRh6gIORHRrdDo6Q29yZTo6VjFiBnByb3RvMw", [file_buf_validate_validate, file_dtkt_core_v1_common, file_dtkt_flow_v1beta1_runtime, file_dtkt_flow_v1beta1_spec, file_dtkt_protoform_v1beta1_protoform, file_google_api_field_behavior, file_google_api_resource, file_google_longrunning_operations, file_google_protobuf_any, file_google_protobuf_descriptor, file_google_protobuf_duration, file_google_protobuf_empty, file_google_protobuf_field_mask, file_google_protobuf_timestamp, file_google_rpc_status]);
 
 /**
  * Automation is a runnable instance of a Flow with a tagged spec version and
@@ -312,43 +312,6 @@ export const Automation_ConnectionConfigSchema: GenMessage<Automation_Connection
   messageDesc(file_dtkt_core_v1_automation, 0, 0);
 
 /**
- * AutomationMetadata contains metadata for automation operations.
- *
- * @generated from message dtkt.core.v1.AutomationMetadata
- */
-export type AutomationMetadata = Message<"dtkt.core.v1.AutomationMetadata"> & {
-  /**
-   * Status message.
-   *
-   * @generated from field: string message = 1;
-   */
-  message: string;
-
-  /**
-   * Start time.
-   *
-   * @generated from field: google.protobuf.Timestamp start_time = 10;
-   */
-  startTime?: Timestamp;
-
-  /**
-   * Stop time.
-   *
-   * @generated from field: google.protobuf.Timestamp stop_time = 11;
-   */
-  stopTime?: Timestamp;
-};
-
-export type AutomationMetadataValid = AutomationMetadata;
-
-/**
- * Describes the message dtkt.core.v1.AutomationMetadata.
- * Use `create(AutomationMetadataSchema)` to create a new message.
- */
-export const AutomationMetadataSchema: GenMessage<AutomationMetadata, {validType: AutomationMetadataValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 1);
-
-/**
  * AutomationRuntime contains execution state, environment, and final result.
  *
  * @generated from message dtkt.core.v1.AutomationRuntime
@@ -437,7 +400,7 @@ export type AutomationRuntimeValid = Message<"dtkt.core.v1.AutomationRuntime"> &
  * Use `create(AutomationRuntimeSchema)` to create a new message.
  */
 export const AutomationRuntimeSchema: GenMessage<AutomationRuntime, {validType: AutomationRuntimeValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 2);
+  messageDesc(file_dtkt_core_v1_automation, 1);
 
 /**
  * @generated from message dtkt.core.v1.AutomationRuntime.Env
@@ -476,7 +439,7 @@ export type AutomationRuntime_EnvValid = Message<"dtkt.core.v1.AutomationRuntime
  * Use `create(AutomationRuntime_EnvSchema)` to create a new message.
  */
 export const AutomationRuntime_EnvSchema: GenMessage<AutomationRuntime_Env, {validType: AutomationRuntime_EnvValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 2, 0);
+  messageDesc(file_dtkt_core_v1_automation, 1, 0);
 
 /**
  * @generated from message dtkt.core.v1.AutomationRuntime.Result
@@ -500,7 +463,7 @@ export type AutomationRuntime_ResultValid = AutomationRuntime_Result;
  * Use `create(AutomationRuntime_ResultSchema)` to create a new message.
  */
 export const AutomationRuntime_ResultSchema: GenMessage<AutomationRuntime_Result, {validType: AutomationRuntime_ResultValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 2, 1);
+  messageDesc(file_dtkt_core_v1_automation, 1, 1);
 
 /**
  * @generated from enum dtkt.core.v1.AutomationRuntime.State
@@ -536,7 +499,7 @@ export enum AutomationRuntime_State {
  * Describes the enum dtkt.core.v1.AutomationRuntime.State.
  */
 export const AutomationRuntime_StateSchema: GenEnum<AutomationRuntime_State> = /*@__PURE__*/
-  enumDesc(file_dtkt_core_v1_automation, 2, 0);
+  enumDesc(file_dtkt_core_v1_automation, 1, 0);
 
 /**
  * @generated from message dtkt.core.v1.GetAutomationRequest
@@ -567,7 +530,7 @@ export type GetAutomationRequestValid = Message<"dtkt.core.v1.GetAutomationReque
  * Use `create(GetAutomationRequestSchema)` to create a new message.
  */
 export const GetAutomationRequestSchema: GenMessage<GetAutomationRequest, {validType: GetAutomationRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 3);
+  messageDesc(file_dtkt_core_v1_automation, 2);
 
 /**
  * @generated from message dtkt.core.v1.GetAutomationResponse
@@ -598,7 +561,7 @@ export type GetAutomationResponseValid = Message<"dtkt.core.v1.GetAutomationResp
  * Use `create(GetAutomationResponseSchema)` to create a new message.
  */
 export const GetAutomationResponseSchema: GenMessage<GetAutomationResponse, {validType: GetAutomationResponseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 4);
+  messageDesc(file_dtkt_core_v1_automation, 3);
 
 /**
  * @generated from message dtkt.core.v1.CreateAutomationRequest
@@ -653,7 +616,7 @@ export type CreateAutomationRequestValid = Message<"dtkt.core.v1.CreateAutomatio
  * Use `create(CreateAutomationRequestSchema)` to create a new message.
  */
 export const CreateAutomationRequestSchema: GenMessage<CreateAutomationRequest, {validType: CreateAutomationRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 5);
+  messageDesc(file_dtkt_core_v1_automation, 4);
 
 /**
  * @generated from message dtkt.core.v1.CreateAutomationResponse
@@ -684,7 +647,7 @@ export type CreateAutomationResponseValid = Message<"dtkt.core.v1.CreateAutomati
  * Use `create(CreateAutomationResponseSchema)` to create a new message.
  */
 export const CreateAutomationResponseSchema: GenMessage<CreateAutomationResponse, {validType: CreateAutomationResponseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 6);
+  messageDesc(file_dtkt_core_v1_automation, 5);
 
 /**
  * @generated from message dtkt.core.v1.UpdateAutomationRequest
@@ -743,7 +706,7 @@ export type UpdateAutomationRequestValid = Message<"dtkt.core.v1.UpdateAutomatio
  * Use `create(UpdateAutomationRequestSchema)` to create a new message.
  */
 export const UpdateAutomationRequestSchema: GenMessage<UpdateAutomationRequest, {validType: UpdateAutomationRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 7);
+  messageDesc(file_dtkt_core_v1_automation, 6);
 
 /**
  * @generated from message dtkt.core.v1.DeleteAutomationRequest
@@ -790,7 +753,7 @@ export type DeleteAutomationRequestValid = Message<"dtkt.core.v1.DeleteAutomatio
  * Use `create(DeleteAutomationRequestSchema)` to create a new message.
  */
 export const DeleteAutomationRequestSchema: GenMessage<DeleteAutomationRequest, {validType: DeleteAutomationRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 8);
+  messageDesc(file_dtkt_core_v1_automation, 7);
 
 /**
  * @generated from message dtkt.core.v1.BatchCreateAutomationsRequest
@@ -831,7 +794,7 @@ export type BatchCreateAutomationsRequestValid = Message<"dtkt.core.v1.BatchCrea
  * Use `create(BatchCreateAutomationsRequestSchema)` to create a new message.
  */
 export const BatchCreateAutomationsRequestSchema: GenMessage<BatchCreateAutomationsRequest, {validType: BatchCreateAutomationsRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 9);
+  messageDesc(file_dtkt_core_v1_automation, 8);
 
 /**
  * @generated from message dtkt.core.v1.BatchCreateAutomationsResponse
@@ -862,7 +825,7 @@ export type BatchCreateAutomationsResponseValid = Message<"dtkt.core.v1.BatchCre
  * Use `create(BatchCreateAutomationsResponseSchema)` to create a new message.
  */
 export const BatchCreateAutomationsResponseSchema: GenMessage<BatchCreateAutomationsResponse, {validType: BatchCreateAutomationsResponseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 10);
+  messageDesc(file_dtkt_core_v1_automation, 9);
 
 /**
  * @generated from message dtkt.core.v1.ListAutomationsRequest
@@ -904,7 +867,7 @@ export type ListAutomationsRequestValid = ListAutomationsRequest;
  * Use `create(ListAutomationsRequestSchema)` to create a new message.
  */
 export const ListAutomationsRequestSchema: GenMessage<ListAutomationsRequest, {validType: ListAutomationsRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 11);
+  messageDesc(file_dtkt_core_v1_automation, 10);
 
 /**
  * @generated from message dtkt.core.v1.ListAutomationsResponse
@@ -949,7 +912,7 @@ export type ListAutomationsResponseValid = Message<"dtkt.core.v1.ListAutomations
  * Use `create(ListAutomationsResponseSchema)` to create a new message.
  */
 export const ListAutomationsResponseSchema: GenMessage<ListAutomationsResponse, {validType: ListAutomationsResponseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 12);
+  messageDesc(file_dtkt_core_v1_automation, 11);
 
 /**
  * SendAutomationEvent represents an event sent to an automation.
@@ -1004,7 +967,7 @@ export type SendAutomationEventValid = Message<"dtkt.core.v1.SendAutomationEvent
  * Use `create(SendAutomationEventSchema)` to create a new message.
  */
 export const SendAutomationEventSchema: GenMessage<SendAutomationEvent, {validType: SendAutomationEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 13);
+  messageDesc(file_dtkt_core_v1_automation, 12);
 
 /**
  * InputsEvent provides initial input values for a flow.
@@ -1027,7 +990,7 @@ export type SendAutomationEvent_InputsEventValid = SendAutomationEvent_InputsEve
  * Use `create(SendAutomationEvent_InputsEventSchema)` to create a new message.
  */
 export const SendAutomationEvent_InputsEventSchema: GenMessage<SendAutomationEvent_InputsEvent, {validType: SendAutomationEvent_InputsEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 13, 0);
+  messageDesc(file_dtkt_core_v1_automation, 12, 0);
 
 /**
  * UserResponseEvent is received upon a fulfilled user elicitation.
@@ -1076,7 +1039,7 @@ export type SendAutomationEvent_UserResponseEventValid = Message<"dtkt.core.v1.S
  * Use `create(SendAutomationEvent_UserResponseEventSchema)` to create a new message.
  */
 export const SendAutomationEvent_UserResponseEventSchema: GenMessage<SendAutomationEvent_UserResponseEvent, {validType: SendAutomationEvent_UserResponseEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 13, 1);
+  messageDesc(file_dtkt_core_v1_automation, 12, 1);
 
 /**
  * ReceiveAutomationEvent represents an event received from an automation.
@@ -1143,7 +1106,7 @@ export type ReceiveAutomationEventValid = Message<"dtkt.core.v1.ReceiveAutomatio
  * Use `create(ReceiveAutomationEventSchema)` to create a new message.
  */
 export const ReceiveAutomationEventSchema: GenMessage<ReceiveAutomationEvent, {validType: ReceiveAutomationEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 14);
+  messageDesc(file_dtkt_core_v1_automation, 13);
 
 /**
  * OutputsEvent provides output values from a running flow.
@@ -1178,7 +1141,7 @@ export type ReceiveAutomationEvent_OutputsEventValid = Message<"dtkt.core.v1.Rec
  * Use `create(ReceiveAutomationEvent_OutputsEventSchema)` to create a new message.
  */
 export const ReceiveAutomationEvent_OutputsEventSchema: GenMessage<ReceiveAutomationEvent_OutputsEvent, {validType: ReceiveAutomationEvent_OutputsEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 14, 0);
+  messageDesc(file_dtkt_core_v1_automation, 13, 0);
 
 /**
  * UserRequestEvent is emitted upon execution requiring elicitation from a user.
@@ -1227,7 +1190,7 @@ export type ReceiveAutomationEvent_UserRequestEventValid = Message<"dtkt.core.v1
  * Use `create(ReceiveAutomationEvent_UserRequestEventSchema)` to create a new message.
  */
 export const ReceiveAutomationEvent_UserRequestEventSchema: GenMessage<ReceiveAutomationEvent_UserRequestEvent, {validType: ReceiveAutomationEvent_UserRequestEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 14, 1);
+  messageDesc(file_dtkt_core_v1_automation, 13, 1);
 
 /**
  * MetricsEvent provides metrics from a running flow.
@@ -1262,7 +1225,7 @@ export type ReceiveAutomationEvent_MetricsEventValid = Message<"dtkt.core.v1.Rec
  * Use `create(ReceiveAutomationEvent_MetricsEventSchema)` to create a new message.
  */
 export const ReceiveAutomationEvent_MetricsEventSchema: GenMessage<ReceiveAutomationEvent_MetricsEvent, {validType: ReceiveAutomationEvent_MetricsEventValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 14, 2);
+  messageDesc(file_dtkt_core_v1_automation, 13, 2);
 
 /**
  * @generated from message dtkt.core.v1.SendAutomationEventRequest
@@ -1307,7 +1270,7 @@ export type SendAutomationEventRequestValid = Message<"dtkt.core.v1.SendAutomati
  * Use `create(SendAutomationEventRequestSchema)` to create a new message.
  */
 export const SendAutomationEventRequestSchema: GenMessage<SendAutomationEventRequest, {validType: SendAutomationEventRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 15);
+  messageDesc(file_dtkt_core_v1_automation, 14);
 
 /**
  * @generated from message dtkt.core.v1.ReceiveAutomationEventsRequest
@@ -1338,7 +1301,7 @@ export type ReceiveAutomationEventsRequestValid = Message<"dtkt.core.v1.ReceiveA
  * Use `create(ReceiveAutomationEventsRequestSchema)` to create a new message.
  */
 export const ReceiveAutomationEventsRequestSchema: GenMessage<ReceiveAutomationEventsRequest, {validType: ReceiveAutomationEventsRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 16);
+  messageDesc(file_dtkt_core_v1_automation, 15);
 
 /**
  * @generated from message dtkt.core.v1.ReceiveAutomationEventsResponse
@@ -1369,7 +1332,7 @@ export type ReceiveAutomationEventsResponseValid = Message<"dtkt.core.v1.Receive
  * Use `create(ReceiveAutomationEventsResponseSchema)` to create a new message.
  */
 export const ReceiveAutomationEventsResponseSchema: GenMessage<ReceiveAutomationEventsResponse, {validType: ReceiveAutomationEventsResponseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 17);
+  messageDesc(file_dtkt_core_v1_automation, 16);
 
 /**
  * @generated from message dtkt.core.v1.StreamAutomationEventsRequest
@@ -1414,7 +1377,7 @@ export type StreamAutomationEventsRequestValid = Message<"dtkt.core.v1.StreamAut
  * Use `create(StreamAutomationEventsRequestSchema)` to create a new message.
  */
 export const StreamAutomationEventsRequestSchema: GenMessage<StreamAutomationEventsRequest, {validType: StreamAutomationEventsRequestValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 18);
+  messageDesc(file_dtkt_core_v1_automation, 17);
 
 /**
  * @generated from message dtkt.core.v1.StreamAutomationEventsResponse
@@ -1445,7 +1408,7 @@ export type StreamAutomationEventsResponseValid = Message<"dtkt.core.v1.StreamAu
  * Use `create(StreamAutomationEventsResponseSchema)` to create a new message.
  */
 export const StreamAutomationEventsResponseSchema: GenMessage<StreamAutomationEventsResponse, {validType: StreamAutomationEventsResponseValid}> = /*@__PURE__*/
-  messageDesc(file_dtkt_core_v1_automation, 19);
+  messageDesc(file_dtkt_core_v1_automation, 18);
 
 /**
  * AutomationService provides operations for managing and running automations.
@@ -1464,7 +1427,7 @@ export const AutomationService: GenService<{
     output: typeof ListAutomationsResponseSchema;
   },
   /**
-   * Get a single automation by name.
+   * Get an automation by name.
    *
    * @generated from rpc dtkt.core.v1.AutomationService.GetAutomation
    */

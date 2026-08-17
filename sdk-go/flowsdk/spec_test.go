@@ -35,6 +35,50 @@ spec:
       value: = vars.foo.getValue()
 `
 
+var nestedCallRequestFlowSpec = `
+apiVersion: v1beta1
+kind: Flow
+spec:
+  name: read-lines-from-csv
+
+  connections:
+    - id: blob
+      services:
+        - dtkt.blob.v1beta1.BlobService
+
+  inputs:
+    - id: bucket
+      cache: true
+      string:
+        nullable: false
+    - id: blob
+      cache: true
+      string:
+        nullable: false
+    - id: fields
+      cache: true
+      list:
+        items: string
+        nullable: false
+    - id: lineOffset
+      cache: true
+      uint32:
+        default: 1
+
+  streams:
+    - id: readLines
+      call:
+        connection: blob
+        method: dtkt.blob.v1beta1.BlobService.ReadBlobLines
+        request:
+          bucket: = inputs.bucket.value
+          key: = inputs.blob.value
+          offset: = inputs.lineOffset.value
+          format:
+            csv:
+              fields: = inputs.fields.value
+`
+
 var bareFlowSpec = `
 spec:
   name: User Action
@@ -96,6 +140,40 @@ func TestSpec_Schema(t *testing.T) {
 	err = loader.Validate(spec)
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+// TestSpec_CallNodeNestedRequestExpression covers a CEL expression at
+// arbitrary request nesting depth, e.g. request.format.csv.fields, which is
+// several levels below the call node's request root.
+func TestSpec_CallNodeNestedRequestExpression(t *testing.T) {
+	registry := v1beta1.NewTypeRegistry(v1beta1.NewMemoryTypeSyncer(), &url.URL{
+		Scheme: "mem",
+		Path:   "/types",
+	})
+	specOpts := flowsdk.SpecOptions{
+		Resolver: api.GlobalResolver(),
+		Syncer:   registry.Syncer(),
+	}
+	loader := api.NewSpecLoader[*corev1.FlowSpec](
+		common.WithJSONSchemaBaseURI(registry.BaseUri().String()),
+		common.WithJSONSchemaID(registry.BaseUri().JoinPath(flowsdk.SpecSchemaFilename).String()),
+		common.WithJSONSchemaLoader(registry.SchemaLoader()),
+		common.WithJSONSchemaCallback(specOpts.ExtendSchema),
+	)
+
+	schema, err := loader.TypedSchema()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var raw any
+	if err := encoding.FromYAMLV2([]byte(nestedCallRequestFlowSpec), &raw); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := schema.ValidateAny(raw); err != nil {
+		t.Fatalf("expected nested request.format.csv.fields expression to validate: %v", err)
 	}
 }
 

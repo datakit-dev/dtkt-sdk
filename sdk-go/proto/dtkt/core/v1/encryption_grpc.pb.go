@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// EncryptionService provides data encryption and decryption operations.
+// EncryptionService provides resource encryption and decryption operations.
 type EncryptionServiceClient interface {
-	// Encrypt data.
+	// Encrypt resource.
 	Encrypt(ctx context.Context, in *EncryptRequest, opts ...grpc.CallOption) (*EncryptResponse, error)
-	// Decrypt data.
+	// Decrypt resource.
 	Decrypt(ctx context.Context, in *DecryptRequest, opts ...grpc.CallOption) (*DecryptResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *encryptionServiceClient) Decrypt(ctx context.Context, in *DecryptReques
 // All implementations must embed UnimplementedEncryptionServiceServer
 // for forward compatibility.
 //
-// EncryptionService provides data encryption and decryption operations.
+// EncryptionService provides resource encryption and decryption operations.
 type EncryptionServiceServer interface {
-	// Encrypt data.
+	// Encrypt resource.
 	Encrypt(context.Context, *EncryptRequest) (*EncryptResponse, error)
-	// Decrypt data.
+	// Decrypt resource.
 	Decrypt(context.Context, *DecryptRequest) (*DecryptResponse, error)
 	mustEmbedUnimplementedEncryptionServiceServer()
 }

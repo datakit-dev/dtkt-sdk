@@ -38,6 +38,14 @@ service TableService {
 
 // A table within a schema.
 message Table {
+  message Stats {
+    // The total number of rows in the table.
+    int64 total_rows = 1;
+
+    // The total size of the table in bytes.
+    int64 total_bytes = 2;
+  }
+
   // Fully qualified table name, format: `{schema}.{table}`.
   string name = 1 [
     (buf.validate.field).required = true,
@@ -55,6 +63,9 @@ message Table {
 
   // List of foreign keys within the table.
   repeated ForeignKey foreign_keys = 6;
+
+  // Stats contains statistics about a table.
+  Stats stats = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Additional metadata, if any.
   map<string, string> metadata = 10;
@@ -159,22 +170,6 @@ message ReadTableRowsRequest {
 
   // Offset for reading rows.
   uint64 offset = 5;
-
-  // message Filter {
-  //   message Values {
-  //     repeated Value values = 1;
-  //   }
-
-  //   oneof operator {
-  //     bool null = 1;
-  //     Value equal = 2;
-  //     Values in = 3;
-  //     Filter not = 4;
-  //   }
-  // }
-
-  // Filter rows by
-  // map<string, Filter> filters = 3;
 }
 
 // Read table rows response.

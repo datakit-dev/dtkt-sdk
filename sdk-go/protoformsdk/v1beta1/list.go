@@ -59,7 +59,7 @@ func NewListField(parent *Message, field protoreflect.FieldDescriptor) (*ListFie
 	if field.Message() != nil {
 		list = &List[*Message]{
 			Getter: listGetter(parent, field, func(v protoreflect.Value) *Message {
-				return NewNestedMessage(parent, field, v.Message())
+				return NewListMessage(parent, field, v.Message())
 			}),
 			Setter: listSetter(parent, field, func(m *Message) protoreflect.Value { return protoreflect.ValueOfMessage(m.Get()) }),
 			Parser: ParserFunc[[]*Message](func(s string) ([]*Message, error) {
@@ -78,7 +78,7 @@ func NewListField(parent *Message, field protoreflect.FieldDescriptor) (*ListFie
 						return nil, err
 					}
 
-					items[idx] = NewNestedMessage(parent, field, msg)
+					items[idx] = NewListMessage(parent, field, msg)
 				}
 
 				return items, nil
@@ -208,7 +208,6 @@ func NewListField(parent *Message, field protoreflect.FieldDescriptor) (*ListFie
 					}
 
 					selec.options = append(selec.options, util.NewMapPair(string(desc.Name()), any(protoreflect.ValueOfEnum(desc.Number()))))
-
 				}
 			})
 		}
@@ -335,7 +334,7 @@ func (l *List[T]) ParseItemsAny(s string) ([]any, error) {
 
 func (l *List[T]) NewItem() (v T) {
 	if msg, ok := any(v).(*Message); ok {
-		msg = NewNestedMessage(l.parent, l.descriptor, l.parent.GetField(l.descriptor).List().NewElement().Message())
+		msg = NewListMessage(l.parent, l.descriptor, l.parent.GetField(l.descriptor).List().NewElement().Message())
 		v = any(msg).(T)
 	}
 	return

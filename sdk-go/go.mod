@@ -1,6 +1,6 @@
 module github.com/datakit-dev/dtkt-sdk/sdk-go
 
-go 1.26.0
+go 1.27rc3
 
 replace github.com/michaelquigley/pfxlog => github.com/michaelquigley/pfxlog v0.6.10
 
@@ -26,7 +26,7 @@ require (
 	github.com/Khan/genqlient v0.8.1
 	github.com/datakit-dev/grpc-proxy v0.0.0-20250812181120-d2a33c10eab0
 	github.com/dominikbraun/graph v0.23.0
-	github.com/google/cel-go v0.29.2
+	github.com/google/cel-go v0.31.0
 	github.com/google/jsonschema-go v0.4.3
 	github.com/google/uuid v1.6.0
 	github.com/hairyhenderson/go-fsimpl v0.3.1
@@ -43,6 +43,7 @@ require (
 	golang.org/x/crypto v0.54.0
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sync v0.22.0
+	golang.org/x/text v0.40.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260715232425-e75dac1f907d
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260715232425-e75dac1f907d
 	google.golang.org/grpc v1.82.1
@@ -227,7 +228,6 @@ require (
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/telemetry v0.0.0-20260625142307-59b4966ccb57 // indirect
 	golang.org/x/term v0.45.0 // indirect
-	golang.org/x/text v0.40.0 // indirect
 	golang.org/x/tools v0.47.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect

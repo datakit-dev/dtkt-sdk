@@ -180,6 +180,20 @@ func (o *SpecOptions) extendCallNodeSchema(node shared.SpecNode, schema *jsonsch
 }
 
 func (o *SpecOptions) extendMessageSchema(schema *jsonschema.Schema) *jsonschema.Schema {
+	o.extendMessageSchemaDefs(schema, map[*jsonschema.Schema]bool{})
+	return schema
+}
+
+// extendMessageSchemaDefs extends schema's own fields, then recurses into
+// $defs so nested message types (arbitrary depth, e.g. request.format.csv)
+// also accept a CEL expression in place of a literal value. visited guards
+// against cycles from self- or mutually-referential message types.
+func (o *SpecOptions) extendMessageSchemaDefs(schema *jsonschema.Schema, visited map[*jsonschema.Schema]bool) {
+	if schema == nil || visited[schema] {
+		return
+	}
+	visited[schema] = true
+
 	if len(schema.Properties) > 0 {
 		props := map[string]*jsonschema.Schema{}
 		for fieldName, fieldSchema := range schema.Properties {
@@ -187,7 +201,10 @@ func (o *SpecOptions) extendMessageSchema(schema *jsonschema.Schema) *jsonschema
 		}
 		maps.Copy(schema.Properties, props)
 	}
-	return schema
+
+	for _, def := range schema.Defs {
+		o.extendMessageSchemaDefs(def, visited)
+	}
 }
 
 func (o *SpecOptions) extendFieldSchema(schema *jsonschema.Schema) *jsonschema.Schema {
@@ -198,10 +215,13 @@ func (o *SpecOptions) extendFieldSchema(schema *jsonschema.Schema) *jsonschema.S
 		if schema.Items.Ref != "" {
 			schema.Items.Ref = "#/$defs/" + o.getRefOrExprId(schema.Items)
 		} else {
-			schema.Items.AnyOf = append(schema.Items.AnyOf,
-				new(exprSchemaRef),
-				new(*schema.Items),
-			)
+			// Wrap by reference, not by value-copy: schema.Items may be a
+			// shared/self-referential node (e.g. recursive coordinate
+			// arrays), and copying it would duplicate that node at a second
+			// location in the schema tree.
+			schema.Items = &jsonschema.Schema{
+				AnyOf: []*jsonschema.Schema{new(exprSchemaRef), schema.Items},
+			}
 		}
 
 		schema.AnyOf = append(schema.AnyOf,
@@ -218,10 +238,10 @@ func (o *SpecOptions) extendFieldSchema(schema *jsonschema.Schema) *jsonschema.S
 		if schema.AdditionalProperties.Ref != "" {
 			schema.AdditionalProperties.Ref = "#/$defs/" + o.getRefOrExprId(schema.AdditionalProperties)
 		} else {
-			schema.AdditionalProperties.AnyOf = append(schema.AdditionalProperties.AnyOf,
-				new(exprSchemaRef),
-				new(*schema.AdditionalProperties),
-			)
+			// Same reference-wrap rationale as the array case above.
+			schema.AdditionalProperties = &jsonschema.Schema{
+				AnyOf: []*jsonschema.Schema{new(exprSchemaRef), schema.AdditionalProperties},
+			}
 		}
 
 		schema.AnyOf = append(schema.AnyOf,

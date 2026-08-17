@@ -58,7 +58,7 @@ const (
 type IntegrationServiceClient interface {
 	// List integrations.
 	ListIntegrations(context.Context, *connect.Request[v1.ListIntegrationsRequest]) (*connect.Response[v1.ListIntegrationsResponse], error)
-	// Get a single integration by name.
+	// Get an integration by name.
 	GetIntegration(context.Context, *connect.Request[v1.GetIntegrationRequest]) (*connect.Response[v1.GetIntegrationResponse], error)
 	// Create a new integration.
 	CreateIntegration(context.Context, *connect.Request[v1.CreateIntegrationRequest]) (*connect.Response[v1.CreateIntegrationResponse], error)
@@ -166,7 +166,7 @@ func (c *integrationServiceClient) BuildIntegration(ctx context.Context, req *co
 type IntegrationServiceHandler interface {
 	// List integrations.
 	ListIntegrations(context.Context, *connect.Request[v1.ListIntegrationsRequest]) (*connect.Response[v1.ListIntegrationsResponse], error)
-	// Get a single integration by name.
+	// Get an integration by name.
 	GetIntegration(context.Context, *connect.Request[v1.GetIntegrationRequest]) (*connect.Response[v1.GetIntegrationResponse], error)
 	// Create a new integration.
 	CreateIntegration(context.Context, *connect.Request[v1.CreateIntegrationRequest]) (*connect.Response[v1.CreateIntegrationResponse], error)

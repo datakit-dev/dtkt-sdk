@@ -17,19 +17,23 @@ option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;c
 
 // FlowService provides operations for managing automation flow specs.
 service FlowService {
-  // List flow specs.
+  // List flows.
   rpc ListFlows(ListFlowsRequest) returns (ListFlowsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // Get a single flow spec by name.
+
+  // Get a flow by name.
   rpc GetFlow(GetFlowRequest) returns (GetFlowResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  // Create a new flow spec.
+
+  // Create a new flow.
   rpc CreateFlow(CreateFlowRequest) returns (CreateFlowResponse);
-  // Update an existing flow spec.
+
+  // Update an existing flow.
   rpc UpdateFlow(UpdateFlowRequest) returns (UpdateFlowResponse);
-  // Delete a flow spec by name.
+
+  // Delete a flow by name.
   rpc DeleteFlow(DeleteFlowRequest) returns (DeleteFlowResponse);
 }
 
@@ -43,7 +47,7 @@ message Flow {
     pattern: "users/{user}/flows/{flow}"
   };
 
-  option (dtkt.protostore.v1beta1.search_index) = {contents_expr: "has(this.spec.v1beta1) ? this.spec.v1beta1.name + ' ' + this.spec.v1beta1.description : ''"};
+  option (dtkt.protostore.v1beta1.search_index) = {contents_expr: "has(this.graph.v1beta1.spec) ? this.graph.v1beta1.spec.name + ' ' + this.graph.v1beta1.spec.description : ''"};
 
   string name = 1 [
     (buf.validate.field).required = true,

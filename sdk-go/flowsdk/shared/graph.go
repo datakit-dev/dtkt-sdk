@@ -12,14 +12,14 @@ import (
 )
 
 type (
-	Graph[T Node] struct {
+	Graph[T GraphNode] struct {
 		graphlib.Graph[string, T]
 
-		hash   graphlib.Hash[string, T]
+		hasher graphlib.Hash[string, T]
 		traits graphlib.Traits
 		store  graphlib.Store[string, T]
 
-		nodes Nodes[T]
+		nodes GraphNodes[T]
 		edges Edges
 
 		groups  [][]string
@@ -28,11 +28,11 @@ type (
 
 		errors []error
 	}
-	GraphOption[T Node] func(*Graph[T])
-	GraphTrait          func(*graphlib.Traits)
+	GraphOption[T GraphNode] func(*Graph[T])
+	GraphTrait               func(*graphlib.Traits)
 )
 
-func NewGraph[T Node](opts ...GraphOption[T]) *Graph[T] {
+func NewGraph[T GraphNode](opts ...GraphOption[T]) (*Graph[T], error) {
 	graph := &Graph[T]{
 		forward: map[string][]string{},
 		reverse: map[string][]string{},
@@ -44,51 +44,70 @@ func NewGraph[T Node](opts ...GraphOption[T]) *Graph[T] {
 		}
 	}
 
-	if graph.hash == nil {
-		graph.hash = func(node T) string {
+	if graph.hasher == nil {
+		graph.hasher = func(node T) string {
 			return node.Ident()
 		}
 	}
 
 	if graph.store != nil {
-		graph.Graph = graphlib.NewWithStore(graph.hash, graph.store, func(traits *graphlib.Traits) {
+		graph.Graph = graphlib.NewWithStore(graph.hasher, graph.store, func(traits *graphlib.Traits) {
 			*traits = graph.traits
 		})
 	} else {
-		graph.Graph = graphlib.New(graph.hash, func(traits *graphlib.Traits) {
+		graph.Graph = graphlib.New(graph.hasher, func(traits *graphlib.Traits) {
 			*traits = graph.traits
 		})
 	}
 
-	return graph
+	if len(graph.nodes) > 0 {
+		for _, node := range graph.nodes {
+			err := graph.AddVertex(node)
+			if err != nil {
+				return nil, fmt.Errorf("add vertex: %w", err)
+			}
+		}
+	}
+
+	if len(graph.edges) > 0 {
+		for _, edge := range graph.edges {
+			err := graph.addEdge(edge.source, edge.target)
+			if err != nil {
+				return nil, fmt.Errorf("add vertex: %w", err)
+			}
+		}
+	}
+
+	return graph, nil
 }
 
-func WithNodeHash[T Node](hash graphlib.Hash[string, T]) GraphOption[T] {
-	return func(g *Graph[T]) {
-		g.hash = hash
+func DAGTraits() GraphTrait {
+	return func(t *graphlib.Traits) {
+		t.IsDirected = true
+		t.PreventCycles = true
+		t.IsAcyclic = true
 	}
 }
 
-func WithNodes[T Node](nodes []T) GraphOption[T] {
+func WithGraphHasher[T GraphNode](hash graphlib.Hash[string, T]) GraphOption[T] {
+	return func(g *Graph[T]) {
+		g.hasher = hash
+	}
+}
+
+func WithGraphNodes[T GraphNode](nodes []T) GraphOption[T] {
 	return func(g *Graph[T]) {
 		g.nodes = nodes
 	}
 }
 
-func WithEdges[T Node](edges []*Edge) GraphOption[T] {
+func WithGraphEdges[T GraphNode](edges []*Edge) GraphOption[T] {
 	return func(g *Graph[T]) {
 		g.edges = edges
 	}
 }
 
-func WithDAG[T Node]() GraphOption[T] {
-	return func(g *Graph[T]) {
-		graphlib.Directed()(&g.traits)
-		graphlib.PreventCycles()(&g.traits)
-	}
-}
-
-func WithTraits[T Node](traits ...GraphTrait) GraphOption[T] {
+func WithGraphTraits[T GraphNode](traits ...GraphTrait) GraphOption[T] {
 	return func(g *Graph[T]) {
 		for _, trait := range traits {
 			if trait != nil {
@@ -98,7 +117,7 @@ func WithTraits[T Node](traits ...GraphTrait) GraphOption[T] {
 	}
 }
 
-func WithStore[T Node](store graphlib.Store[string, T]) GraphOption[T] {
+func WithGraphStore[T GraphNode](store graphlib.Store[string, T]) GraphOption[T] {
 	return func(g *Graph[T]) {
 		g.store = store
 	}
@@ -106,7 +125,7 @@ func WithStore[T Node](store graphlib.Store[string, T]) GraphOption[T] {
 
 func (g *Graph[T]) Parse(nodes []SpecNode, parser NodeParser[T]) (err error) {
 	for _, node := range nodes {
-		node, err := parser(node, g.Visitor)
+		node, err := parser(node, g.visitor)
 		if err != nil {
 			return fmt.Errorf("parse node: %w", err)
 		}
@@ -151,37 +170,7 @@ func (g *Graph[T]) Parse(nodes []SpecNode, parser NodeParser[T]) (err error) {
 	return
 }
 
-func (g *Graph[T]) Visitor(target string, expr *cel.Ast) {
-	ast.PreOrderVisit(
-		ast.NavigateAST(expr.NativeRep()),
-		ast.NewExprVisitor(func(expr ast.Expr) {
-			switch expr.Kind() {
-			case ast.SelectKind:
-				if expr.AsSelect().Operand().Kind() == ast.IdentKind {
-					source := expr.AsSelect().Operand().AsIdent() + "." + expr.AsSelect().FieldName()
-					if IsExprIdent(source) {
-						err := IsValidEdge(source, target)
-						if err != nil {
-							g.addError(err)
-						} else {
-							g.addEdge(source, target)
-						}
-					}
-				}
-			}
-		}),
-	)
-}
-
-func (g *Graph[T]) addEdge(source, target string) {
-	if !g.edges.Contains(source, target) {
-		if edge, ok := NewEdge(source, target); ok {
-			g.edges = append(g.edges, edge)
-		}
-	}
-}
-
-func (g *Graph[T]) Nodes() Nodes[T] {
+func (g *Graph[T]) Nodes() GraphNodes[T] {
 	return g.nodes
 }
 
@@ -189,15 +178,12 @@ func (g *Graph[T]) Edges() Edges {
 	return g.edges
 }
 
-func (g *Graph[T]) Node(ident string) (node T, ok bool) {
-	node, err := g.Vertex(ident)
-	ok = err == nil
-	return
+func (g *Graph[T]) Node(ident string) (T, bool) {
+	return g.nodes.Load(ident)
 }
 
 func (g *Graph[T]) Edge(source, target string) (edge *Edge, ok bool) {
 	for _, edge = range g.edges {
-		// if strings.HasPrefix(edge.source, source) && strings.HasPrefix(edge.target, target) {
 		if edge.source == source && edge.target == target {
 			return
 		}
@@ -207,7 +193,6 @@ func (g *Graph[T]) Edge(source, target string) (edge *Edge, ok bool) {
 
 func (g *Graph[T]) Inbound(target string) (edges []*Edge) {
 	for _, edge := range g.edges {
-		// if strings.HasPrefix(edge.target, target) {
 		if edge.target == target {
 			edges = append(edges, edge)
 		}
@@ -217,7 +202,6 @@ func (g *Graph[T]) Inbound(target string) (edges []*Edge) {
 
 func (g *Graph[T]) Outbound(source string) (edges []*Edge) {
 	for _, edge := range g.edges {
-		// if strings.HasPrefix(edge.source, source) {
 		if edge.source == source {
 			edges = append(edges, edge)
 		}
@@ -303,6 +287,39 @@ func (g *Graph[T]) Ends() (nodes []T, _ error) {
 		}
 	}
 	return
+}
+
+func (g *Graph[T]) visitor(target string, expr *cel.Ast) {
+	ast.PreOrderVisit(
+		ast.NavigateAST(expr.NativeRep()),
+		ast.NewExprVisitor(func(expr ast.Expr) {
+			switch expr.Kind() {
+			case ast.SelectKind:
+				if expr.AsSelect().Operand().Kind() == ast.IdentKind {
+					source := expr.AsSelect().Operand().AsIdent() + "." + expr.AsSelect().FieldName()
+					if IsExprIdent(source) {
+						err := IsValidEdge(source, target)
+						if err != nil {
+							g.addError(err)
+						} else if err = g.addEdge(source, target); err != nil {
+							g.addError(err)
+						}
+					}
+				}
+			}
+		}),
+	)
+}
+
+func (g *Graph[T]) addEdge(source, target string) error {
+	if !g.edges.Contains(source, target) {
+		if edge, err := NewEdge(source, target); err != nil {
+			return err
+		} else {
+			g.edges = append(g.edges, edge)
+		}
+	}
+	return nil
 }
 
 func (g *Graph[T]) addError(err error) {

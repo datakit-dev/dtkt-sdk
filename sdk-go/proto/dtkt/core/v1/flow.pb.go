@@ -41,7 +41,7 @@ type Flow struct {
 	SpecEtag string `protobuf:"bytes,4,opt,name=spec_etag,json=specEtag,proto3" json:"spec_etag,omitempty"`
 	// Flow spec metadata (versioned).
 	Spec *FlowSpecMetadata `protobuf:"bytes,5,opt,name=spec,proto3" json:"spec,omitempty"`
-	// Flow graph metadata (versioned).
+	// Flow graph (parsed spec) metadata (versioned).
 	Graph *FlowGraphMetadata `protobuf:"bytes,6,opt,name=graph,proto3" json:"graph,omitempty"`
 	// Flow create time.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
@@ -779,20 +779,20 @@ var File_dtkt_core_v1_flow_proto protoreflect.FileDescriptor
 
 const file_dtkt_core_v1_flow_proto_rawDesc = "" +
 	"\n" +
-	"\x17dtkt/core/v1/flow.proto\x12\fdtkt.core.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fdtkt/flow/v1beta1/runtime.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a(dtkt/protostore/v1beta1/protostore.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a google/protobuf/descriptor.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x85\x05\n" +
+	"\x17dtkt/core/v1/flow.proto\x12\fdtkt.core.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fdtkt/flow/v1beta1/runtime.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a(dtkt/protostore/v1beta1/protostore.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a google/protobuf/descriptor.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9a\x05\n" +
 	"\x04Flow\x12#\n" +
 	"\x04name\x18\x01 \x01(\tB\x0f\xe0A\b\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x04name\x12&\n" +
 	"\x03uid\x18\x02 \x01(\tB\x14\xe0A\x03\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01\x82\xb5\x18\x02\x18\x01R\x03uid\x12(\n" +
 	"\bspec_uri\x18\x03 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01H\x00R\aspecUri\x88\x01\x01\x12&\n" +
-	"\tspec_etag\x18\x04 \x01(\tB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\bspecEtag\x12:\n" +
-	"\x04spec\x18\x05 \x01(\v2\x1e.dtkt.core.v1.FlowSpecMetadataB\x06\xbaH\x03\xc8\x01\x01R\x04spec\x12F\n" +
+	"\tspec_etag\x18\x04 \x01(\tB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\bspecEtag\x12=\n" +
+	"\x04spec\x18\x05 \x01(\v2\x1e.dtkt.core.v1.FlowSpecMetadataB\t\xe0A\x04\xbaH\x03\xc8\x01\x01R\x04spec\x12F\n" +
 	"\x05graph\x18\x06 \x01(\v2\x1f.dtkt.core.v1.FlowGraphMetadataB\x0f\xe0A\x03\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x05graph\x12F\n" +
 	"\vcreate_time\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\n" +
 	"createTime\x12F\n" +
 	"\vupdate_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\n" +
-	"updateTime:\xbc\x01\xeaAY\n" +
-	"\x04Flow\x12)organizations/{organization}/flows/{flow}\x12\x19users/{user}/flows/{flow}*\x05flows2\x04flow\xba\xb5\x18\\\n" +
-	"Zhas(this.spec.v1beta1) ? this.spec.v1beta1.name + ' ' + this.spec.v1beta1.description : ''B\v\n" +
+	"updateTime:\xce\x01\xeaAY\n" +
+	"\x04Flow\x12)organizations/{organization}/flows/{flow}\x12\x19users/{user}/flows/{flow}*\x05flows2\x04flow\xba\xb5\x18n\n" +
+	"lhas(this.graph.v1beta1.spec) ? this.graph.v1beta1.spec.name + ' ' + this.graph.v1beta1.spec.description : ''B\v\n" +
 	"\t_spec_uri\"Y\n" +
 	"\x10FlowSpecMetadata\x123\n" +
 	"\av1beta1\x18\x01 \x01(\v2\x17.dtkt.flow.v1beta1.FlowH\x00R\av1beta1B\x10\n" +

@@ -47,15 +47,15 @@ const (
 
 // FlowServiceClient is a client for the dtkt.core.v1.FlowService service.
 type FlowServiceClient interface {
-	// List flow specs.
+	// List flows.
 	ListFlows(context.Context, *connect.Request[v1.ListFlowsRequest]) (*connect.Response[v1.ListFlowsResponse], error)
-	// Get a single flow spec by name.
+	// Get a flow by name.
 	GetFlow(context.Context, *connect.Request[v1.GetFlowRequest]) (*connect.Response[v1.GetFlowResponse], error)
-	// Create a new flow spec.
+	// Create a new flow.
 	CreateFlow(context.Context, *connect.Request[v1.CreateFlowRequest]) (*connect.Response[v1.CreateFlowResponse], error)
-	// Update an existing flow spec.
+	// Update an existing flow.
 	UpdateFlow(context.Context, *connect.Request[v1.UpdateFlowRequest]) (*connect.Response[v1.UpdateFlowResponse], error)
-	// Delete a flow spec by name.
+	// Delete a flow by name.
 	DeleteFlow(context.Context, *connect.Request[v1.DeleteFlowRequest]) (*connect.Response[v1.DeleteFlowResponse], error)
 }
 
@@ -141,15 +141,15 @@ func (c *flowServiceClient) DeleteFlow(ctx context.Context, req *connect.Request
 
 // FlowServiceHandler is an implementation of the dtkt.core.v1.FlowService service.
 type FlowServiceHandler interface {
-	// List flow specs.
+	// List flows.
 	ListFlows(context.Context, *connect.Request[v1.ListFlowsRequest]) (*connect.Response[v1.ListFlowsResponse], error)
-	// Get a single flow spec by name.
+	// Get a flow by name.
 	GetFlow(context.Context, *connect.Request[v1.GetFlowRequest]) (*connect.Response[v1.GetFlowResponse], error)
-	// Create a new flow spec.
+	// Create a new flow.
 	CreateFlow(context.Context, *connect.Request[v1.CreateFlowRequest]) (*connect.Response[v1.CreateFlowResponse], error)
-	// Update an existing flow spec.
+	// Update an existing flow.
 	UpdateFlow(context.Context, *connect.Request[v1.UpdateFlowRequest]) (*connect.Response[v1.UpdateFlowResponse], error)
-	// Delete a flow spec by name.
+	// Delete a flow by name.
 	DeleteFlow(context.Context, *connect.Request[v1.DeleteFlowRequest]) (*connect.Response[v1.DeleteFlowResponse], error)
 }
 
