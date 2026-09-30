@@ -4,6 +4,8 @@ import (
 	"io"
 )
 
+var _ io.ReadWriteCloser = (*IOPipe)(nil)
+
 // IOPipe wraps an [io.Pipe] and implements [io.ReadWriteCloser].
 // Reads consume data written to the same pipe, making it suitable as a
 // drop-in for stdin/stdout/stderr buffers that require proper blocking

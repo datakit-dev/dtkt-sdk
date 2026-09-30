@@ -5,6 +5,7 @@ package dtkt.sql.v1beta1;
 import "buf/validate/validate.proto";
 import "dtkt/protoform/v1beta1/protoform.proto";
 import "dtkt/sql/v1beta1/column.proto";
+import "dtkt/sql/v1beta1/value.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/go_features.proto";
@@ -29,24 +30,16 @@ service TableService {
   // Delete a table.
   rpc DeleteTable(DeleteTableRequest) returns (DeleteTableResponse);
 
-  // Read rows from a table.
-  rpc ReadTableRows(ReadTableRowsRequest) returns (stream ReadTableRowsResponse);
+  // Read data from a table as a stream.
+  rpc ReadTable(ReadTableRequest) returns (stream ReadTableResponse);
 
-  // Write rows to a table.
-  rpc WriteTableRows(stream WriteTableRowsRequest) returns (WriteTableRowsResponse);
+  // Write data to a table as a stream.
+  rpc WriteTable(stream WriteTableRequest) returns (WriteTableResponse);
 }
 
 // A table within a schema.
 message Table {
-  message Stats {
-    // The total number of rows in the table.
-    int64 total_rows = 1;
-
-    // The total size of the table in bytes.
-    int64 total_bytes = 2;
-  }
-
-  // Fully qualified table name, format: `{schema}.{table}`.
+  // Fully qualified table name, format: `[{catalog}.]{db/schema}.{table}`.
   string name = 1 [
     (buf.validate.field).required = true,
     (google.api.field_behavior) = IDENTIFIER
@@ -64,6 +57,14 @@ message Table {
   // List of foreign keys within the table.
   repeated ForeignKey foreign_keys = 6;
 
+  message Stats {
+    // The total number of rows in the table.
+    int64 total_rows = 1;
+
+    // The total size of the table in bytes.
+    int64 total_bytes = 2;
+  }
+
   // Stats contains statistics about a table.
   Stats stats = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -79,7 +80,8 @@ message ListTablesRequest {
   // Token from a previous response to retrieve the next page.
   string page_token = 2;
 
-  // Optional parent schema name. When not set, returns all tables across schemas.
+  // Optional fully qualified schema name, format: `[{catalog}.]{db/schema}`.
+  // When not set, returns all tables across schemas.
   string parent = 3;
 
   // Optional filter expression to narrow results.
@@ -96,7 +98,7 @@ message ListTablesResponse {
 
 // Get table request.
 message GetTableRequest {
-  // Fully-qualified table name to retrieve.
+  // Fully qualified table name, format: `[{catalog}.]{db/schema}.{table}`.
   string name = 1 [(buf.validate.field).required = true];
 }
 
@@ -108,7 +110,7 @@ message GetTableResponse {
 
 // Create table request.
 message CreateTableRequest {
-  // Parent schema name.
+  // Fully qualified parent schema name, format: `[{catalog}.]{db/schema}`.
   string parent = 1 [(buf.validate.field).required = true];
 
   // Table identifier (unqualified), example: "sales".
@@ -148,55 +150,92 @@ message UpdateTableResponse {
 
 // Delete table request.
 message DeleteTableRequest {
-  // Fully-qualified table name to delete, format: `{schema}.{table}`.
+  // Fully qualified table name, format: `[{catalog}.]{db/schema}.{table}`.
   string name = 1 [(buf.validate.field).required = true];
 }
 
 // Delete table response.
 message DeleteTableResponse {}
 
-// Read table rows request.
-message ReadTableRowsRequest {
-  // Fully-qualified table name, format: `{schema}.{table}`.
-  string table = 1 [(buf.validate.field).required = true];
+// Read table request.
+message ReadTableRequest {
+  // Fully qualified table name, format: `[{catalog}.]{db/schema}.{table}`.
+  string name = 1 [(buf.validate.field).required = true];
 
-  // Columns to read from the table; when empty, returns all columns.
+  // The columns to include in the returned payload:
+  //  - If not specified all columns are included.
   repeated string columns = 2;
 
-  // Maximum number of rows to read from the table:
+  // The total number of rows to read from the table:
   //  - if unset or 0, reads all rows relative to offset;
   //  - if > 0, reads at most this number of rows relative to offset.
   uint64 limit = 4;
 
-  // Offset for reading rows.
+  // The index of the first row to read.
   uint64 offset = 5;
+
+  // The sort order of rows to read from the table.
+  repeated OrderBy order_by = 7;
+
+  // Format of data returned in responses.
+  DataFormat format = 6 [
+    (buf.validate.field).enum.defined_only = true,
+    default = DATA_FORMAT_STRUCT_BATCH
+  ];
 }
 
-// Read table rows response.
-message ReadTableRowsResponse {
-  // A row read from the table.
-  google.protobuf.Struct row = 1;
+// Read table response.
+message ReadTableResponse {
+  option (buf.validate.message).oneof = {
+    fields: [
+      "arrow_batch",
+      "struct_batch",
+      "json_batch"
+    ]
+    required: true
+  };
+
+  bytes arrow_batch = 1;
+  repeated Struct struct_batch = 2;
+  repeated google.protobuf.Struct json_batch = 3;
 }
 
-// Write table rows request.
-message WriteTableRowsRequest {
-  // Fully-qualified table name, format: `{schema}.{table}`.
-  string table = 1 [(buf.validate.field).required = true];
-
-  // The row to write to the table.
-  google.protobuf.Struct row = 2;
-
-  // The number of rows to be written at a time. When not set or zero, service
-  // will use a default size of its choosing and may also have an upper limit.
-  uint32 batch_size = 3;
+// Write table request.
+message WriteTableRequest {
+  // Fully qualified table name, format: `[{catalog}.]{db/schema}.{table}`.
+  string name = 1 [(buf.validate.field).required = true];
 
   // When set to true errors are ignored, otherwise stream is closed when an
   // error is encountered while attempting to write row.
-  bool ignore_errors = 4;
+  bool ignore_errors = 2;
+
+  option (buf.validate.message).oneof = {
+    fields: [
+      "arrow_batch",
+      "struct_batch",
+      "json_batch"
+    ]
+    required: true
+  };
+
+  bytes arrow_batch = 3;
+  repeated Struct struct_batch = 4;
+  repeated google.protobuf.Struct json_batch = 5;
 }
 
-// Write table rows response.
-message WriteTableRowsResponse {
-  // Number of rows written for each fully-qualified table name.
+// Write table response.
+message WriteTableResponse {
+  // Map of fully-qualified table name to total number of rows written.
   map<string, int64> rows_written = 1;
+}
+
+message OrderBy {
+  enum Direction {
+    UNSPECIFIED = 0;
+    ASC = 1;
+    DESC = 2;
+  }
+
+  string column = 1 [(buf.validate.field).required = true];
+  Direction direction = 2 [default = ASC];
 }

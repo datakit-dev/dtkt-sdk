@@ -8,6 +8,7 @@ package sqlv1beta1
 
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	_ "google.golang.org/protobuf/types/gofeaturespb"
@@ -27,7 +28,6 @@ const (
 type Schema struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Name        *string                `protobuf:"bytes,1,opt,name=name"`
-	xxx_hidden_Catalog     *string                `protobuf:"bytes,2,opt,name=catalog"`
 	xxx_hidden_Metadata    map[string]string      `protobuf:"bytes,4,rep,name=metadata" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
@@ -70,16 +70,6 @@ func (x *Schema) GetName() string {
 	return ""
 }
 
-func (x *Schema) GetCatalog() string {
-	if x != nil {
-		if x.xxx_hidden_Catalog != nil {
-			return *x.xxx_hidden_Catalog
-		}
-		return ""
-	}
-	return ""
-}
-
 func (x *Schema) GetMetadata() map[string]string {
 	if x != nil {
 		return x.xxx_hidden_Metadata
@@ -89,12 +79,7 @@ func (x *Schema) GetMetadata() map[string]string {
 
 func (x *Schema) SetName(v string) {
 	x.xxx_hidden_Name = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
-}
-
-func (x *Schema) SetCatalog(v string) {
-	x.xxx_hidden_Catalog = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
 }
 
 func (x *Schema) SetMetadata(v map[string]string) {
@@ -108,31 +93,16 @@ func (x *Schema) HasName() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *Schema) HasCatalog() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
 func (x *Schema) ClearName() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_Name = nil
 }
 
-func (x *Schema) ClearCatalog() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_Catalog = nil
-}
-
 type Schema_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Schema name.
+	// Fully qualified schema name, format: `[{catalog}.]{schema}`.
 	Name *string
-	// Optional catalog name for engines that support three-tiered hierarchy.
-	// Examples: Postgres (database), BigQuery (project), etc.
-	Catalog *string
 	// Additional metadata, if any.
 	Metadata map[string]string
 }
@@ -142,12 +112,8 @@ func (b0 Schema_builder) Build() *Schema {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Name != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
 		x.xxx_hidden_Name = b.Name
-	}
-	if b.Catalog != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
-		x.xxx_hidden_Catalog = b.Catalog
 	}
 	x.xxx_hidden_Metadata = b.Metadata
 	return m0
@@ -158,7 +124,8 @@ type ListSchemasRequest struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_PageSize    int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize"`
 	xxx_hidden_PageToken   *string                `protobuf:"bytes,2,opt,name=page_token,json=pageToken"`
-	xxx_hidden_Filter      *string                `protobuf:"bytes,3,opt,name=filter"`
+	xxx_hidden_Parent      *string                `protobuf:"bytes,3,opt,name=parent"`
+	xxx_hidden_Filter      *string                `protobuf:"bytes,4,opt,name=filter"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -207,6 +174,16 @@ func (x *ListSchemasRequest) GetPageToken() string {
 	return ""
 }
 
+func (x *ListSchemasRequest) GetParent() string {
+	if x != nil {
+		if x.xxx_hidden_Parent != nil {
+			return *x.xxx_hidden_Parent
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *ListSchemasRequest) GetFilter() string {
 	if x != nil {
 		if x.xxx_hidden_Filter != nil {
@@ -219,17 +196,22 @@ func (x *ListSchemasRequest) GetFilter() string {
 
 func (x *ListSchemasRequest) SetPageSize(v int32) {
 	x.xxx_hidden_PageSize = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
 }
 
 func (x *ListSchemasRequest) SetPageToken(v string) {
 	x.xxx_hidden_PageToken = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
+}
+
+func (x *ListSchemasRequest) SetParent(v string) {
+	x.xxx_hidden_Parent = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
 }
 
 func (x *ListSchemasRequest) SetFilter(v string) {
 	x.xxx_hidden_Filter = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 4)
 }
 
 func (x *ListSchemasRequest) HasPageSize() bool {
@@ -246,11 +228,18 @@ func (x *ListSchemasRequest) HasPageToken() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
-func (x *ListSchemasRequest) HasFilter() bool {
+func (x *ListSchemasRequest) HasParent() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *ListSchemasRequest) HasFilter() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
 }
 
 func (x *ListSchemasRequest) ClearPageSize() {
@@ -263,8 +252,13 @@ func (x *ListSchemasRequest) ClearPageToken() {
 	x.xxx_hidden_PageToken = nil
 }
 
-func (x *ListSchemasRequest) ClearFilter() {
+func (x *ListSchemasRequest) ClearParent() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_Parent = nil
+}
+
+func (x *ListSchemasRequest) ClearFilter() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
 	x.xxx_hidden_Filter = nil
 }
 
@@ -275,6 +269,8 @@ type ListSchemasRequest_builder struct {
 	PageSize *int32
 	// Token from a previous response to retrieve the next page.
 	PageToken *string
+	// Optional parent catalog name. When not set, returns all schemas across catalogs.
+	Parent *string
 	// Optional filter expression to narrow results.
 	Filter *string
 }
@@ -284,15 +280,19 @@ func (b0 ListSchemasRequest_builder) Build() *ListSchemasRequest {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.PageSize != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
 		x.xxx_hidden_PageSize = *b.PageSize
 	}
 	if b.PageToken != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 4)
 		x.xxx_hidden_PageToken = b.PageToken
 	}
+	if b.Parent != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 4)
+		x.xxx_hidden_Parent = b.Parent
+	}
 	if b.Filter != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 4)
 		x.xxx_hidden_Filter = b.Filter
 	}
 	return m0
@@ -458,7 +458,7 @@ func (x *GetSchemaRequest) ClearName() {
 type GetSchemaRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Schema resource name to retrieve.
+	// Fully qualified schema name, format: `[{catalog}.]{schema}`.
 	Name *string
 }
 
@@ -546,9 +546,9 @@ func (b0 GetSchemaResponse_builder) Build() *GetSchemaResponse {
 // Create Schema request.
 type CreateSchemaRequest struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_SchemaId    *string                `protobuf:"bytes,1,opt,name=schema_id,json=schemaId"`
-	xxx_hidden_Schema      *Schema                `protobuf:"bytes,2,opt,name=schema"`
-	xxx_hidden_Metadata    map[string]string      `protobuf:"bytes,3,rep,name=metadata" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	xxx_hidden_Parent      *string                `protobuf:"bytes,1,opt,name=parent"`
+	xxx_hidden_SchemaId    *string                `protobuf:"bytes,2,opt,name=schema_id,json=schemaId"`
+	xxx_hidden_Schema      *Schema                `protobuf:"bytes,3,opt,name=schema"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -580,6 +580,16 @@ func (x *CreateSchemaRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
+func (x *CreateSchemaRequest) GetParent() string {
+	if x != nil {
+		if x.xxx_hidden_Parent != nil {
+			return *x.xxx_hidden_Parent
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *CreateSchemaRequest) GetSchemaId() string {
 	if x != nil {
 		if x.xxx_hidden_SchemaId != nil {
@@ -597,31 +607,32 @@ func (x *CreateSchemaRequest) GetSchema() *Schema {
 	return nil
 }
 
-func (x *CreateSchemaRequest) GetMetadata() map[string]string {
-	if x != nil {
-		return x.xxx_hidden_Metadata
-	}
-	return nil
+func (x *CreateSchemaRequest) SetParent(v string) {
+	x.xxx_hidden_Parent = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
 }
 
 func (x *CreateSchemaRequest) SetSchemaId(v string) {
 	x.xxx_hidden_SchemaId = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
 }
 
 func (x *CreateSchemaRequest) SetSchema(v *Schema) {
 	x.xxx_hidden_Schema = v
 }
 
-func (x *CreateSchemaRequest) SetMetadata(v map[string]string) {
-	x.xxx_hidden_Metadata = v
+func (x *CreateSchemaRequest) HasParent() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
 func (x *CreateSchemaRequest) HasSchemaId() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
 func (x *CreateSchemaRequest) HasSchema() bool {
@@ -631,8 +642,13 @@ func (x *CreateSchemaRequest) HasSchema() bool {
 	return x.xxx_hidden_Schema != nil
 }
 
-func (x *CreateSchemaRequest) ClearSchemaId() {
+func (x *CreateSchemaRequest) ClearParent() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Parent = nil
+}
+
+func (x *CreateSchemaRequest) ClearSchemaId() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
 	x.xxx_hidden_SchemaId = nil
 }
 
@@ -643,24 +659,28 @@ func (x *CreateSchemaRequest) ClearSchema() {
 type CreateSchemaRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
+	// Optional parent catalog for engines that support three-tiered hierarchy.
+	// Examples: Postgres (database), BigQuery (project), etc.
+	Parent *string
 	// Unqualified schema identifier, example: "dev".
 	SchemaId *string
 	// Schema to create.
 	Schema *Schema
-	// Schema metadata, if any.
-	Metadata map[string]string
 }
 
 func (b0 CreateSchemaRequest_builder) Build() *CreateSchemaRequest {
 	m0 := &CreateSchemaRequest{}
 	b, x := &b0, m0
 	_, _ = b, x
-	if b.SchemaId != nil {
+	if b.Parent != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
+		x.xxx_hidden_Parent = b.Parent
+	}
+	if b.SchemaId != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
 		x.xxx_hidden_SchemaId = b.SchemaId
 	}
 	x.xxx_hidden_Schema = b.Schema
-	x.xxx_hidden_Metadata = b.Metadata
 	return m0
 }
 
@@ -990,7 +1010,7 @@ func (x *DeleteSchemaRequest) ClearForce() {
 type DeleteSchemaRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Name of schema to delete.
+	// Fully qualified schema name, format: `[{catalog}.]{schema}`.
 	Name *string
 	// If set to true, any tables in this schema will also be deleted.
 	// (Otherwise, the request will only work if the schema has no tables.)
@@ -1060,33 +1080,30 @@ var File_dtkt_sql_v1beta1_schema_proto protoreflect.FileDescriptor
 
 const file_dtkt_sql_v1beta1_schema_proto_rawDesc = "" +
 	"\n" +
-	"\x1ddtkt/sql/v1beta1/schema.proto\x12\x10dtkt.sql.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a google/protobuf/field_mask.proto\x1a!google/protobuf/go_features.proto\"\xb7\x01\n" +
-	"\x06Schema\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
-	"\acatalog\x18\x02 \x01(\tR\acatalog\x12B\n" +
+	"\x1ddtkt/sql/v1beta1/schema.proto\x12\x10dtkt.sql.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a google/protobuf/field_mask.proto\x1a!google/protobuf/go_features.proto\"\xa8\x01\n" +
+	"\x06Schema\x12\x1d\n" +
+	"\x04name\x18\x01 \x01(\tB\t\xe0A\b\xbaH\x03\xc8\x01\x01R\x04name\x12B\n" +
 	"\bmetadata\x18\x04 \x03(\v2&.dtkt.sql.v1beta1.Schema.MetadataEntryR\bmetadata\x1a;\n" +
 	"\rMetadataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"h\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x80\x01\n" +
 	"\x12ListSchemasRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x16\n" +
-	"\x06filter\x18\x03 \x01(\tR\x06filter\"q\n" +
+	"\x06parent\x18\x03 \x01(\tR\x06parent\x12\x16\n" +
+	"\x06filter\x18\x04 \x01(\tR\x06filter\"q\n" +
 	"\x13ListSchemasResponse\x122\n" +
 	"\aschemas\x18\x01 \x03(\v2\x18.dtkt.sql.v1beta1.SchemaR\aschemas\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\".\n" +
 	"\x10GetSchemaRequest\x12\x1a\n" +
 	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\"E\n" +
 	"\x11GetSchemaResponse\x120\n" +
-	"\x06schema\x18\x01 \x01(\v2\x18.dtkt.sql.v1beta1.SchemaR\x06schema\"\xfa\x01\n" +
-	"\x13CreateSchemaRequest\x12#\n" +
-	"\tschema_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bschemaId\x120\n" +
-	"\x06schema\x18\x02 \x01(\v2\x18.dtkt.sql.v1beta1.SchemaR\x06schema\x12O\n" +
-	"\bmetadata\x18\x03 \x03(\v23.dtkt.sql.v1beta1.CreateSchemaRequest.MetadataEntryR\bmetadata\x1a;\n" +
-	"\rMetadataEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"H\n" +
+	"\x06schema\x18\x01 \x01(\v2\x18.dtkt.sql.v1beta1.SchemaR\x06schema\"\x84\x01\n" +
+	"\x13CreateSchemaRequest\x12\x16\n" +
+	"\x06parent\x18\x01 \x01(\tR\x06parent\x12#\n" +
+	"\tschema_id\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bschemaId\x120\n" +
+	"\x06schema\x18\x03 \x01(\v2\x18.dtkt.sql.v1beta1.SchemaR\x06schema\"H\n" +
 	"\x14CreateSchemaResponse\x120\n" +
 	"\x06schema\x18\x01 \x01(\v2\x18.dtkt.sql.v1beta1.SchemaR\x06schema\"\x8c\x01\n" +
 	"\x13UpdateSchemaRequest\x128\n" +
@@ -1107,7 +1124,7 @@ const file_dtkt_sql_v1beta1_schema_proto_rawDesc = "" +
 	"\fUpdateSchema\x12%.dtkt.sql.v1beta1.UpdateSchemaRequest\x1a&.dtkt.sql.v1beta1.UpdateSchemaResponseB\xd9\x01\n" +
 	"\x16proto.dtkt.sql.v1beta1B\vSchemaProtoP\x01ZHgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/sql/v1beta1;sqlv1beta1\xa2\x02\x03DSX\xaa\x02\x10Dtkt.Sql.V1beta1\xca\x02\x10Dtkt\\Sql\\V1beta1\xe2\x02\x1cDtkt\\Sql\\V1beta1\\GPBMetadata\xea\x02\x12Dtkt::Sql::V1beta1\x92\x03\x05\xd2>\x02\x10\x03b\beditionsp\xe8\a"
 
-var file_dtkt_sql_v1beta1_schema_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_dtkt_sql_v1beta1_schema_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_dtkt_sql_v1beta1_schema_proto_goTypes = []any{
 	(*Schema)(nil),                // 0: dtkt.sql.v1beta1.Schema
 	(*ListSchemasRequest)(nil),    // 1: dtkt.sql.v1beta1.ListSchemasRequest
@@ -1121,34 +1138,32 @@ var file_dtkt_sql_v1beta1_schema_proto_goTypes = []any{
 	(*DeleteSchemaRequest)(nil),   // 9: dtkt.sql.v1beta1.DeleteSchemaRequest
 	(*DeleteSchemaResponse)(nil),  // 10: dtkt.sql.v1beta1.DeleteSchemaResponse
 	nil,                           // 11: dtkt.sql.v1beta1.Schema.MetadataEntry
-	nil,                           // 12: dtkt.sql.v1beta1.CreateSchemaRequest.MetadataEntry
-	(*fieldmaskpb.FieldMask)(nil), // 13: google.protobuf.FieldMask
+	(*fieldmaskpb.FieldMask)(nil), // 12: google.protobuf.FieldMask
 }
 var file_dtkt_sql_v1beta1_schema_proto_depIdxs = []int32{
 	11, // 0: dtkt.sql.v1beta1.Schema.metadata:type_name -> dtkt.sql.v1beta1.Schema.MetadataEntry
 	0,  // 1: dtkt.sql.v1beta1.ListSchemasResponse.schemas:type_name -> dtkt.sql.v1beta1.Schema
 	0,  // 2: dtkt.sql.v1beta1.GetSchemaResponse.schema:type_name -> dtkt.sql.v1beta1.Schema
 	0,  // 3: dtkt.sql.v1beta1.CreateSchemaRequest.schema:type_name -> dtkt.sql.v1beta1.Schema
-	12, // 4: dtkt.sql.v1beta1.CreateSchemaRequest.metadata:type_name -> dtkt.sql.v1beta1.CreateSchemaRequest.MetadataEntry
-	0,  // 5: dtkt.sql.v1beta1.CreateSchemaResponse.schema:type_name -> dtkt.sql.v1beta1.Schema
-	0,  // 6: dtkt.sql.v1beta1.UpdateSchemaRequest.schema:type_name -> dtkt.sql.v1beta1.Schema
-	13, // 7: dtkt.sql.v1beta1.UpdateSchemaRequest.update_mask:type_name -> google.protobuf.FieldMask
-	0,  // 8: dtkt.sql.v1beta1.UpdateSchemaResponse.schema:type_name -> dtkt.sql.v1beta1.Schema
-	5,  // 9: dtkt.sql.v1beta1.SchemaService.CreateSchema:input_type -> dtkt.sql.v1beta1.CreateSchemaRequest
-	9,  // 10: dtkt.sql.v1beta1.SchemaService.DeleteSchema:input_type -> dtkt.sql.v1beta1.DeleteSchemaRequest
-	3,  // 11: dtkt.sql.v1beta1.SchemaService.GetSchema:input_type -> dtkt.sql.v1beta1.GetSchemaRequest
-	1,  // 12: dtkt.sql.v1beta1.SchemaService.ListSchemas:input_type -> dtkt.sql.v1beta1.ListSchemasRequest
-	7,  // 13: dtkt.sql.v1beta1.SchemaService.UpdateSchema:input_type -> dtkt.sql.v1beta1.UpdateSchemaRequest
-	6,  // 14: dtkt.sql.v1beta1.SchemaService.CreateSchema:output_type -> dtkt.sql.v1beta1.CreateSchemaResponse
-	10, // 15: dtkt.sql.v1beta1.SchemaService.DeleteSchema:output_type -> dtkt.sql.v1beta1.DeleteSchemaResponse
-	4,  // 16: dtkt.sql.v1beta1.SchemaService.GetSchema:output_type -> dtkt.sql.v1beta1.GetSchemaResponse
-	2,  // 17: dtkt.sql.v1beta1.SchemaService.ListSchemas:output_type -> dtkt.sql.v1beta1.ListSchemasResponse
-	8,  // 18: dtkt.sql.v1beta1.SchemaService.UpdateSchema:output_type -> dtkt.sql.v1beta1.UpdateSchemaResponse
-	14, // [14:19] is the sub-list for method output_type
-	9,  // [9:14] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	0,  // 4: dtkt.sql.v1beta1.CreateSchemaResponse.schema:type_name -> dtkt.sql.v1beta1.Schema
+	0,  // 5: dtkt.sql.v1beta1.UpdateSchemaRequest.schema:type_name -> dtkt.sql.v1beta1.Schema
+	12, // 6: dtkt.sql.v1beta1.UpdateSchemaRequest.update_mask:type_name -> google.protobuf.FieldMask
+	0,  // 7: dtkt.sql.v1beta1.UpdateSchemaResponse.schema:type_name -> dtkt.sql.v1beta1.Schema
+	5,  // 8: dtkt.sql.v1beta1.SchemaService.CreateSchema:input_type -> dtkt.sql.v1beta1.CreateSchemaRequest
+	9,  // 9: dtkt.sql.v1beta1.SchemaService.DeleteSchema:input_type -> dtkt.sql.v1beta1.DeleteSchemaRequest
+	3,  // 10: dtkt.sql.v1beta1.SchemaService.GetSchema:input_type -> dtkt.sql.v1beta1.GetSchemaRequest
+	1,  // 11: dtkt.sql.v1beta1.SchemaService.ListSchemas:input_type -> dtkt.sql.v1beta1.ListSchemasRequest
+	7,  // 12: dtkt.sql.v1beta1.SchemaService.UpdateSchema:input_type -> dtkt.sql.v1beta1.UpdateSchemaRequest
+	6,  // 13: dtkt.sql.v1beta1.SchemaService.CreateSchema:output_type -> dtkt.sql.v1beta1.CreateSchemaResponse
+	10, // 14: dtkt.sql.v1beta1.SchemaService.DeleteSchema:output_type -> dtkt.sql.v1beta1.DeleteSchemaResponse
+	4,  // 15: dtkt.sql.v1beta1.SchemaService.GetSchema:output_type -> dtkt.sql.v1beta1.GetSchemaResponse
+	2,  // 16: dtkt.sql.v1beta1.SchemaService.ListSchemas:output_type -> dtkt.sql.v1beta1.ListSchemasResponse
+	8,  // 17: dtkt.sql.v1beta1.SchemaService.UpdateSchema:output_type -> dtkt.sql.v1beta1.UpdateSchemaResponse
+	13, // [13:18] is the sub-list for method output_type
+	8,  // [8:13] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_sql_v1beta1_schema_proto_init() }
@@ -1162,7 +1177,7 @@ func file_dtkt_sql_v1beta1_schema_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_sql_v1beta1_schema_proto_rawDesc), len(file_dtkt_sql_v1beta1_schema_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

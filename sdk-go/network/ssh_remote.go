@@ -86,8 +86,8 @@ func ParseSSHRemoteURI(uri string) (*SSHRemoteURI, error) {
 	}
 
 	// Validate scheme
-	if u.Scheme != SSHSocket.String() && u.Scheme != SSHTCP.String() {
-		return nil, fmt.Errorf("invalid scheme: expected '%s' or '%s', got '%s'", SSHSocket, SSHTCP, u.Scheme)
+	if u.Scheme != SSH_Socket.String() && u.Scheme != SSH_TCP.String() {
+		return nil, fmt.Errorf("invalid scheme: expected '%s' or '%s', got '%s'", SSH_Socket, SSH_TCP, u.Scheme)
 	}
 
 	// Extract and validate remote address based on scheme

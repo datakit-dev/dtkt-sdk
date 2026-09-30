@@ -3,7 +3,8 @@ edition = "2023";
 package dtkt.sql.v1beta1;
 
 import "buf/validate/validate.proto";
-import "google/protobuf/descriptor.proto";
+import "dtkt/sql/v1beta1/type.proto";
+import "google/api/field_behavior.proto";
 import "google/protobuf/go_features.proto";
 
 option features.(pb.go).api_level = API_OPAQUE;
@@ -12,7 +13,10 @@ option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/sql/v1bet
 // A column within a table.
 message Column {
   // Name of the column.
-  string name = 1;
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER
+  ];
 
   // Type of the column.
   Type type = 2;
@@ -84,147 +88,4 @@ message ForeignKey {
 
   // Optional on update action of the foreign key.
   RefAction on_update = 6;
-}
-
-// Type is a union of common data types found in SQL databases as well as native
-// support for proto message types.
-message Type {
-  oneof kind {
-    option (buf.validate.oneof).required = true;
-
-    BoolType bool_type = 1;
-    BinaryType binary_type = 2;
-    DecimalType decimal_type = 3;
-    FloatType float_type = 4;
-    IntegerType integer_type = 5;
-    JSONType json_type = 6;
-    SpatialType spatial_type = 7;
-    StringType string_type = 8;
-    UUIDType uuid_type = 9;
-    TimeType time_type = 10;
-    EnumType enum_type = 11;
-    MessageType message_type = 12;
-    ListType list_type = 13;
-  }
-}
-
-message BoolType {
-  repeated TypeAttribute attrs = 2;
-}
-
-message BinaryType {
-  uint32 size = 1;
-  repeated TypeAttribute attrs = 2;
-}
-
-message DecimalType {
-  uint32 precision = 1;
-  uint32 scale = 2;
-  bool unsigned = 3;
-  repeated TypeAttribute attrs = 4;
-}
-
-message FloatType {
-  uint32 precision = 1;
-  bool unsigned = 2;
-  repeated TypeAttribute attrs = 3;
-}
-
-message IntegerType {
-  bool unsigned = 1;
-  repeated TypeAttribute attrs = 2;
-}
-
-message JSONType {
-  repeated TypeAttribute attrs = 1;
-}
-
-message SpatialType {
-  repeated TypeAttribute attrs = 1;
-}
-
-message StringType {
-  uint32 size = 1;
-  repeated TypeAttribute attrs = 2;
-}
-
-message UUIDType {
-  repeated TypeAttribute attrs = 1;
-}
-
-message TimeType {
-  uint32 precision = 1;
-  uint32 scale = 2;
-  repeated TypeAttribute attrs = 3;
-}
-
-message EnumType {
-  // Fully-qualified name of this enum type.
-  string name = 1 [(buf.validate.field).required = true];
-
-  // String values of this enum type.
-  repeated string values = 2 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).repeated.min_items = 1
-  ];
-
-  repeated TypeAttribute attrs = 3;
-}
-
-message MessageType {
-  enum Encoding {
-    ENCODING_UNSPECIFIED = 0;
-    // Stores the message using proto encoding.
-    ENCODING_PROTO = 1;
-    // Stores the message using JSON encoding.
-    ENCODING_JSON = 2;
-  }
-
-  // Fully-qualified name of this message type.
-  string name = 1 [(buf.validate.field).required = true];
-
-  // Specifies the encoding format to use when storing the message.
-  Encoding encoding = 2 [
-    default = ENCODING_PROTO,
-    (buf.validate.field).enum.defined_only = true
-  ];
-
-  option (buf.validate.message).cel_expression = "this.encoding < 2 || has(this.proto_uri) || has(this.proto_files)";
-
-  oneof descriptors {
-    // URI resolving to a google.protobuf.FileDescriptorSet containing the named
-    // message descriptor.
-    string proto_uri = 3 [(buf.validate.field).string.uri = true];
-
-    // A resolved google.protobuf.FileDescriptorSet containing the named
-    // message descriptor.
-    google.protobuf.FileDescriptorSet proto_files = 4;
-  }
-
-  repeated TypeAttribute attrs = 10;
-}
-
-message ListType {
-  Type item_type = 1;
-  repeated TypeAttribute attrs = 2;
-}
-
-message TypeAttribute {
-  message Check {
-    string expr = 1;
-    string name = 2;
-  }
-
-  message Generated {
-    string expr = 1;
-    string name = 2;
-  }
-
-  oneof kind {
-    string charset = 1;
-    string collation = 2;
-    Check check = 3;
-    Generated generated = 4;
-    string native_type = 5;
-  }
 }

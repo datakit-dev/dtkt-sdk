@@ -1,32 +1,32 @@
 package cloud
 
-type RequestOpt func(*Request)
+type RequestOption func(*Request)
 
-func WithApiUrl(url string) RequestOpt {
+func WithApiUrl(url string) RequestOption {
 	return func(r *Request) {
 		r.ApiUrl = url
 	}
 }
 
-func WithAuthUrl(url string) RequestOpt {
+func WithAuthUrl(url string) RequestOption {
 	return func(r *Request) {
 		r.AuthUrl = url
 	}
 }
 
-func WithToken(token string) RequestOpt {
+func WithToken(token string) RequestOption {
 	return func(r *Request) {
 		r.Token = token
 	}
 }
 
-func WithOrg(org string) RequestOpt {
+func WithOrg(org string) RequestOption {
 	return func(r *Request) {
 		r.Org = org
 	}
 }
 
-func WithSpace(space string) RequestOpt {
+func WithSpace(space string) RequestOption {
 	return func(r *Request) {
 		r.Space = space
 	}

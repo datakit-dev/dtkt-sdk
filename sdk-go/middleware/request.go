@@ -13,7 +13,7 @@ type (
 		configHash   string // sha256 hash of config
 		configGen    uint64 // bumps on config/auth changes
 	}
-	Connection interface {
+	Resource interface {
 		GetName() string
 		GetConfigGen() uint64
 		GetConfigHash() string
@@ -28,45 +28,43 @@ func NewRequest(resourceName, configHash string, configGen uint64) *Request {
 	}
 }
 
-func NewConnectionRequest(conn Connection) *Request {
+func ResourceRequest(res Resource) *Request {
 	return NewRequest(
-		conn.GetName(),
-		conn.GetConfigHash(),
-		conn.GetConfigGen(),
+		res.GetName(),
+		res.GetConfigHash(),
+		res.GetConfigGen(),
 	)
-}
-
-func (r *Request) IsValid() error {
-	if r == nil {
-		return fmt.Errorf("invalid request: nil")
-	}
-	if r.resourceName == "" {
-		return fmt.Errorf("addressable name required")
-	}
-	if r.configHash == "" {
-		return fmt.Errorf("config hash required")
-	}
-	return nil
-}
-
-func (r *Request) HashShort() string {
-	return util.HashShort(r.String())
-}
-
-func (r *Request) PrevSHA256() string {
-	return util.HashSHA256(r.genString(r.configGen - 1))
-}
-
-func (r *Request) HashSHA256() string {
-	return util.HashSHA256(r.String())
 }
 
 func (r *Request) ResourceName() string { return r.resourceName }
 func (r *Request) ConfigHash() string   { return r.configHash }
 func (r *Request) ConfigGen() uint64    { return r.configGen }
 
+func (r *Request) IsValid() error {
+	if r == nil {
+		return fmt.Errorf("invalid request: nil")
+	} else if r.resourceName == "" {
+		return fmt.Errorf("resource name required")
+	} else if r.configHash == "" {
+		return fmt.Errorf("config hash required")
+	}
+	return nil
+}
+
+func (r *Request) HashSHA256() string {
+	return util.HashSHA256(r.String())
+}
+
+func (r *Request) PrevSHA256() string {
+	configGen := r.configGen
+	if configGen > 0 {
+		configGen--
+	}
+	return util.HashSHA256(configGenSignature(r.resourceName, configGen))
+}
+
 func (r *Request) String() string {
-	return r.genString(r.configGen)
+	return configGenSignature(r.resourceName, r.configGen)
 }
 
 func (r *Request) SetHeader(req *http.Request) {
@@ -77,6 +75,6 @@ func (r *Request) SetHeader(req *http.Request) {
 	}
 }
 
-func (r *Request) genString(configGen uint64) string {
-	return fmt.Sprintf("%s|gen=%d", r.resourceName, configGen)
+func configGenSignature(resourceName string, configGen uint64) string {
+	return fmt.Sprintf("resource=%q|gen=%d", resourceName, configGen)
 }

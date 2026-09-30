@@ -1179,7 +1179,7 @@ type ReadBlobLinesRequest struct {
 	// Maximum number of lines to read relative to the offset:
 	//   - if <= 0, read remaining lines;
 	//   - if > 0, read at most this number lines.
-	Length        int64 `protobuf:"varint,5,opt,name=length,proto3" json:"length,omitempty"`
+	Limit         int64 `protobuf:"varint,5,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1242,9 +1242,9 @@ func (x *ReadBlobLinesRequest) GetOffset() int64 {
 	return 0
 }
 
-func (x *ReadBlobLinesRequest) GetLength() int64 {
+func (x *ReadBlobLinesRequest) GetLimit() int64 {
 	if x != nil {
-		return x.Length
+		return x.Limit
 	}
 	return 0
 }
@@ -1253,8 +1253,8 @@ type ReadBlobLinesResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Line data read from blob content in the requested format.
 	Data *LineData `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
-	// Line index relative to start of blob content.
-	Index         int64 `protobuf:"varint,2,opt,name=index,proto3" json:"index,omitempty"`
+	// Line offset relative to start of blob content.
+	Offset        int64 `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1296,9 +1296,9 @@ func (x *ReadBlobLinesResponse) GetData() *LineData {
 	return nil
 }
 
-func (x *ReadBlobLinesResponse) GetIndex() int64 {
+func (x *ReadBlobLinesResponse) GetOffset() int64 {
 	if x != nil {
-		return x.Index
+		return x.Offset
 	}
 	return 0
 }
@@ -2126,16 +2126,16 @@ const file_dtkt_blob_v1beta1_messages_proto_rawDesc = "" +
 	"\x06offset\x18\x06 \x01(\x03R\x06offset\x12\x12\n" +
 	"\x04data\x18\a \x01(\fR\x04data\"6\n" +
 	"\x11WriteBlobResponse\x12!\n" +
-	"\fwritten_size\x18\x02 \x01(\x03R\vwrittenSize\"\xb8\x01\n" +
+	"\fwritten_size\x18\x02 \x01(\x03R\vwrittenSize\"\xb6\x01\n" +
 	"\x14ReadBlobLinesRequest\x12\x16\n" +
 	"\x06bucket\x18\x01 \x01(\tR\x06bucket\x12\x18\n" +
 	"\x03key\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x03key\x125\n" +
 	"\x06format\x18\x03 \x01(\v2\x1d.dtkt.blob.v1beta1.LineFormatR\x06format\x12\x1f\n" +
-	"\x06offset\x18\x04 \x01(\x03B\a\xbaH\x04\"\x02(\x00R\x06offset\x12\x16\n" +
-	"\x06length\x18\x05 \x01(\x03R\x06length\"^\n" +
+	"\x06offset\x18\x04 \x01(\x03B\a\xbaH\x04\"\x02(\x00R\x06offset\x12\x14\n" +
+	"\x05limit\x18\x05 \x01(\x03R\x05limit\"`\n" +
 	"\x15ReadBlobLinesResponse\x12/\n" +
-	"\x04data\x18\x01 \x01(\v2\x1b.dtkt.blob.v1beta1.LineDataR\x04data\x12\x14\n" +
-	"\x05index\x18\x02 \x01(\x03R\x05index\"\xc8\x02\n" +
+	"\x04data\x18\x01 \x01(\v2\x1b.dtkt.blob.v1beta1.LineDataR\x04data\x12\x16\n" +
+	"\x06offset\x18\x02 \x01(\x03R\x06offset\"\xc8\x02\n" +
 	"\x15WriteBlobLinesRequest\x12\x16\n" +
 	"\x06bucket\x18\x01 \x01(\tR\x06bucket\x12\x18\n" +
 	"\x03key\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x03key\x12;\n" +

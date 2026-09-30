@@ -7,26 +7,19 @@ type (
 		Encode(any) ([]byte, error)
 	}
 	StreamEncoder interface {
-		StreamEncode(io.Writer) func(any) error
-	}
-	EncoderV2 interface {
-		Encoder
-		StreamEncoder
+		StreamEncode(io.Writer) NextFunc
 	}
 	Decoder interface {
 		Decode([]byte, any) error
 	}
 	StreamDecoder interface {
-		StreamDecode(io.Reader) func(any) error
-	}
-	DecoderV2 interface {
-		Decoder
-		StreamDecoder
+		StreamDecode(io.Reader) NextFunc
 	}
 	EncodeFunc       func(any) ([]byte, error)
 	DecodeFunc       func([]byte, any) error
 	StreamEncodeFunc func(io.Writer) func(any) error
 	StreamDecodeFunc func(io.Reader) func(any) error
+	NextFunc         func(any) error
 )
 
 func (f EncodeFunc) Encode(v any) ([]byte, error) {

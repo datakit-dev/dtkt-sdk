@@ -7,13 +7,12 @@ import (
 	"strings"
 	"unicode"
 
-	"buf.build/go/protovalidate"
+	"cel.dev/cel-go/cel"
+	"cel.dev/cel-go/common/types"
+	"cel.dev/cel-go/common/types/ref"
+	"cel.dev/cel-go/common/types/traits"
 	"cel.dev/expr"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
-	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/common/types"
-	"github.com/google/cel-go/common/types/ref"
-	"github.com/google/cel-go/common/types/traits"
 	"github.com/jhump/protoreflect/v2/protoresolve"
 	spb "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
@@ -40,7 +39,6 @@ type (
 		RangeMethods(func(protoreflect.MethodDescriptor) bool)
 		FindMethodByName(protoreflect.FullName) (protoreflect.MethodDescriptor, error)
 		RangeFiles(func(protoreflect.FileDescriptor) bool)
-		GetValidator() (protovalidate.Validator, error)
 	}
 )
 
@@ -98,7 +96,7 @@ func (t *CELTypes) RegisterType(types ...ref.Type) error {
 
 func (t *CELTypes) ExprValueToNative(exprVal *expr.ExprValue) (any, error) {
 	if exprErr := exprVal.GetError(); exprErr != nil {
-		err := errors.Join(util.SliceMap(exprErr.GetErrors(), func(e *expr.Status) error {
+		err := errors.Join(util.SliceOfFunc(exprErr.GetErrors(), func(e *expr.Status) error {
 			return status.FromProto(&spb.Status{
 				Code:    e.Code,
 				Message: e.Message,
@@ -131,7 +129,7 @@ func (t *CELTypes) ExprValueToNative(exprVal *expr.ExprValue) (any, error) {
 			return nil, fmt.Errorf("unknown map type")
 		}
 
-		keys, err := util.SliceMapError(entries, func(entry *expr.MapValue_Entry) (any, error) {
+		keys, err := util.SliceOfFuncErr(entries, func(entry *expr.MapValue_Entry) (any, error) {
 			return t.ExprValueToNative(&expr.ExprValue{
 				Kind: &expr.ExprValue_Value{
 					Value: entry.GetKey(),
@@ -142,7 +140,7 @@ func (t *CELTypes) ExprValueToNative(exprVal *expr.ExprValue) (any, error) {
 			return nil, err
 		}
 
-		values, err := util.SliceMapError(entries, func(entry *expr.MapValue_Entry) (any, error) {
+		values, err := util.SliceOfFuncErr(entries, func(entry *expr.MapValue_Entry) (any, error) {
 			return t.ExprValueToNative(&expr.ExprValue{
 				Kind: &expr.ExprValue_Value{
 					Value: entry.GetValue(),

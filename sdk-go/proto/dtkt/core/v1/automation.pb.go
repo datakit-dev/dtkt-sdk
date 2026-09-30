@@ -15,7 +15,6 @@ import (
 	status "google.golang.org/genproto/googleapis/rpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/descriptorpb"
 	anypb "google.golang.org/protobuf/types/known/anypb"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -1724,7 +1723,7 @@ var File_dtkt_core_v1_automation_proto protoreflect.FileDescriptor
 
 const file_dtkt_core_v1_automation_proto_rawDesc = "" +
 	"\n" +
-	"\x1ddtkt/core/v1/automation.proto\x12\fdtkt.core.v1\x1a\x1bbuf/validate/validate.proto\x1a\x19dtkt/core/v1/common.proto\x1a\x1fdtkt/flow/v1beta1/runtime.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a\x19google/protobuf/any.proto\x1a google/protobuf/descriptor.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\"\xeb\n" +
+	"\x1ddtkt/core/v1/automation.proto\x12\fdtkt.core.v1\x1a\x1bbuf/validate/validate.proto\x1a\x19dtkt/core/v1/common.proto\x1a\x1fdtkt/flow/v1beta1/runtime.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\"\xeb\n" +
 	"\n" +
 	"\n" +
 	"Automation\x12#\n" +

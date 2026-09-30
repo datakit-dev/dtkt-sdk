@@ -76,7 +76,7 @@ func (t *NameType) MustGetName(input string) Name {
 }
 
 func (t *NameType) Parents() []NameType {
-	return util.SliceMap(t.ns.hierarchy[t], func(t *NameType) NameType {
+	return util.SliceOfFunc(t.ns.hierarchy[t], func(t *NameType) NameType {
 		return *t
 	})
 }

@@ -14,7 +14,6 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/descriptorpb"
 	fieldmaskpb "google.golang.org/protobuf/types/known/fieldmaskpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
@@ -779,7 +778,7 @@ var File_dtkt_core_v1_flow_proto protoreflect.FileDescriptor
 
 const file_dtkt_core_v1_flow_proto_rawDesc = "" +
 	"\n" +
-	"\x17dtkt/core/v1/flow.proto\x12\fdtkt.core.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fdtkt/flow/v1beta1/runtime.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a(dtkt/protostore/v1beta1/protostore.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a google/protobuf/descriptor.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9a\x05\n" +
+	"\x17dtkt/core/v1/flow.proto\x12\fdtkt.core.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fdtkt/flow/v1beta1/runtime.proto\x1a\x1cdtkt/flow/v1beta1/spec.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a(dtkt/protostore/v1beta1/protostore.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9a\x05\n" +
 	"\x04Flow\x12#\n" +
 	"\x04name\x18\x01 \x01(\tB\x0f\xe0A\b\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x04name\x12&\n" +
 	"\x03uid\x18\x02 \x01(\tB\x14\xe0A\x03\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01\x82\xb5\x18\x02\x18\x01R\x03uid\x12(\n" +

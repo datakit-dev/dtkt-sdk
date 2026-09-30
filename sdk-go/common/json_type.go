@@ -107,7 +107,7 @@ func (JSONType) JSONSchema() *jsonschema.Schema {
 		Type:        "string",
 		Title:       "JSON Type",
 		Description: "JSON data type",
-		Enum:        util.AnySlice(JSONTypes),
+		Enum:        util.SliceOfAny(JSONTypes),
 	}
 }
 

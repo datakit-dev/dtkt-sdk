@@ -2,121 +2,184 @@ package encoding
 
 import (
 	"bufio"
+	"bytes"
 	"encoding"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 
-	"github.com/jhump/protoreflect/v2/protoresolve"
+	"google.golang.org/protobuf/encoding/protodelim"
 	"google.golang.org/protobuf/proto"
 )
 
+var _ Encoder = (*BinaryEncoder)(nil)
+var _ StreamEncoder = (*BinaryEncoder)(nil)
+var _ Decoder = (*BinaryDecoder)(nil)
+var _ StreamDecoder = (*BinaryDecoder)(nil)
+
 type (
 	BinaryEncoder struct {
-		Delim    string
-		Resolver protoresolve.SerializationResolver
+		Delim string
+		Proto protodelim.MarshalOptions
+		buf   bytes.Buffer
 	}
 	BinaryDecoder struct {
 		Delim    string
-		Resolver protoresolve.SerializationResolver
+		Proto    protodelim.UnmarshalOptions
+		buf      bytes.Buffer
+		readers  map[io.Reader]protodelim.Reader
+		scanners map[io.Reader]*bufio.Scanner
 	}
 )
 
-func (e BinaryEncoder) StreamEncode(w io.Writer) func(any) error {
+func (e BinaryEncoder) StreamEncode(w io.Writer) NextFunc {
 	return func(v any) error {
-		b, err := e.encode(v)
+		return e.encode(w, v)
+	}
+}
+
+func (e BinaryEncoder) Encode(v any) ([]byte, error) {
+	e.buf.Reset()
+
+	err := e.encode(&e.buf, v)
+	if err != nil {
+		return nil, err
+	}
+
+	return e.buf.Bytes(), nil
+}
+
+func (d BinaryDecoder) StreamDecode(r io.Reader) NextFunc {
+	return func(v any) error {
+		return d.decode(r, v)
+	}
+}
+
+func (d BinaryDecoder) Decode(b []byte, v any) error {
+	d.buf.Reset()
+	_, err := d.buf.Write(b)
+	if err != nil {
+		return err
+	}
+
+	return d.decode(&d.buf, v)
+}
+
+func (e BinaryEncoder) encode(w io.Writer, v any) (err error) {
+	var b []byte
+	switch v := v.(type) {
+	case proto.Message:
+		_, err = protodelim.MarshalTo(w, v)
+	case encoding.BinaryMarshaler:
+		b, err = v.MarshalBinary()
 		if err != nil {
 			return err
 		}
 
 		_, err = w.Write(b)
-		return err
-	}
-}
-
-func (e BinaryEncoder) Encode(v any) ([]byte, error) {
-	return e.encode(v)
-}
-
-func (d BinaryDecoder) StreamDecode(r io.Reader) func(any) error {
-	if d.Delim == "" {
-		buf := make([]byte, bufio.MaxScanTokenSize)
-		return func(v any) error {
-			n, err := r.Read(buf)
-			if n > 0 {
-				err := d.decode(buf[:n], v)
-				if err != nil {
-					return err
-				}
-			}
-			return err
-		}
-	}
-
-	scanner := bufio.NewScanner(r)
-	if d.Delim != "\n" {
-		scanner.Split(DelimSplitFunc(d.Delim))
-	}
-
-	return func(v any) error {
-		if scanner.Scan() {
-			return d.decode(scanner.Bytes(), v)
-		}
-
-		err := scanner.Err()
+	case encoding.TextMarshaler:
+		b, err = v.MarshalText()
 		if err != nil {
 			return err
 		}
 
-		return io.EOF
-	}
-}
-
-func (d BinaryDecoder) Decode(b []byte, v any) error {
-	return d.decode(b, v)
-}
-
-func (e BinaryEncoder) encode(v any) ([]byte, error) {
-	switch v := v.(type) {
-	case encoding.BinaryMarshaler:
-		return v.MarshalBinary()
-	case encoding.TextMarshaler:
-		return v.MarshalText()
+		_, err = w.Write(b)
 	case json.RawMessage:
-		return v, nil
+		_, err = w.Write(v)
 	case []byte:
-		return v, nil
+		_, err = w.Write(v)
 	case string:
-		return base64.StdEncoding.DecodeString(v)
-	case proto.Message:
-		return proto.MarshalOptions{
-			Deterministic: true,
-		}.Marshal(v)
+		b, err = base64.StdEncoding.DecodeString(v)
+		if err != nil {
+			return err
+		}
+
+		_, err = w.Write(b)
+	default:
+		return fmt.Errorf("cannot encode %T to bytes", v)
 	}
-	return nil, fmt.Errorf("cannot encode %T to bytes", v)
+	return
 }
 
-func (d BinaryDecoder) decode(b []byte, v any) error {
+func (d BinaryDecoder) decode(r io.Reader, v any) error {
+	if msg, ok := v.(proto.Message); ok {
+		return d.Proto.UnmarshalFrom(d.getReader(r), msg)
+	} else if d.Delim == "" {
+		return fmt.Errorf("cannot decode binary without a delimiter")
+		// 	buf := make([]byte, bufio.MaxScanTokenSize)
+		// return func(v any) error {
+		// 	n, err := r.Read(buf)
+		// 	if n > 0 {
+		// 		err := d.decode(buf[:n], v)
+		// 		if err != nil {
+		// 			return err
+		// 		}
+		// 	}
+		// 	return err
+		// }
+	}
+
+	scanner := d.getScanner(r)
+	if !scanner.Scan() {
+		return io.EOF
+	} else if err := scanner.Err(); err != nil {
+		return err
+	}
+
 	switch v := v.(type) {
 	case encoding.BinaryUnmarshaler:
-		return v.UnmarshalBinary(b)
+		return v.UnmarshalBinary(scanner.Bytes())
 	case encoding.TextUnmarshaler:
-		return v.UnmarshalText(b)
+		return v.UnmarshalText(scanner.Bytes())
 	case *any:
-		*v = b
+		*v = scanner.Bytes()
 	case *json.RawMessage:
-		*v = b
+		*v = scanner.Bytes()
 	case *[]byte:
-		*v = b
+		*v = scanner.Bytes()
 	case *string:
-		*v = base64.StdEncoding.EncodeToString(b)
-	case proto.Message:
-		return proto.UnmarshalOptions{
-			Resolver: d.Resolver,
-		}.Unmarshal(b, v)
+		*v = base64.StdEncoding.EncodeToString(scanner.Bytes())
 	default:
 		return fmt.Errorf("cannot decode bytes to %T", v)
 	}
+
 	return nil
+}
+
+func (d *BinaryDecoder) getReader(r io.Reader) protodelim.Reader {
+	reader, ok := r.(protodelim.Reader)
+	if ok {
+		return reader
+	}
+
+	if d.readers == nil {
+		d.readers = map[io.Reader]protodelim.Reader{}
+	}
+
+	reader, ok = d.readers[r]
+	if !ok {
+		reader = bufio.NewReader(r)
+		d.readers[r] = reader
+	}
+
+	return reader
+}
+
+func (d *BinaryDecoder) getScanner(r io.Reader) *bufio.Scanner {
+	if d.scanners == nil {
+		d.scanners = map[io.Reader]*bufio.Scanner{}
+	}
+
+	scanner, ok := d.scanners[r]
+	if !ok {
+		scanner = bufio.NewScanner(r)
+		if d.Delim != "\n" {
+			scanner.Split(DelimSplitFunc(d.Delim))
+		}
+
+		d.scanners[r] = scanner
+	}
+
+	return scanner
 }

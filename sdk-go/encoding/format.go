@@ -6,13 +6,17 @@ import (
 	"log"
 	"maps"
 	"mime"
+	"net/url"
+	"path"
 	"path/filepath"
 	"slices"
 	"strings"
 )
 
 var _ Encoder = (Format)("")
+var _ StreamEncoder = (Format)("")
 var _ Decoder = (Format)("")
+var _ StreamDecoder = (Format)("")
 
 const (
 	Binary = Format("binary")
@@ -31,20 +35,32 @@ var formatters = map[Format]Formatter{
 			".msu",
 			".msp",
 		},
-		encoder: BinaryEncoder{},
-		decoder: BinaryDecoder{},
+		getEncoder: func(...EncoderOption) FormatEncoder {
+			return BinaryEncoder{}
+		},
+		getDecoder: func(...DecoderOption) FormatDecoder {
+			return BinaryDecoder{}
+		},
 	},
 	CSV: {
-		mime:    "text/csv; charset=utf-8",
-		ext:     ".csv",
-		encoder: NewCSVEncoder(),
-		decoder: NewCSVDecoder(),
+		mime: "text/csv; charset=utf-8",
+		ext:  ".csv",
+		getEncoder: func(...EncoderOption) FormatEncoder {
+			return NewCSVEncoder()
+		},
+		getDecoder: func(do ...DecoderOption) FormatDecoder {
+			return NewCSVDecoder()
+		},
 	},
 	JSON: {
-		mime:    "application/json",
-		ext:     ".json",
-		encoder: NewJSONEncoderV2(),
-		decoder: NewJSONDecoderV2(),
+		mime: "application/json",
+		ext:  ".json",
+		getEncoder: func(opts ...EncoderOption) FormatEncoder {
+			return NewJSONEncoder(opts...)
+		},
+		getDecoder: func(opts ...DecoderOption) FormatDecoder {
+			return NewJSONDecoder(opts...)
+		},
 	},
 	JSONL: {
 		mime: "application/jsonl",
@@ -52,8 +68,12 @@ var formatters = map[Format]Formatter{
 		altExts: []string{
 			".ndjson",
 		},
-		encoder: NewJSONEncoderV2(),
-		decoder: NewJSONDecoderV2(),
+		getEncoder: func(opts ...EncoderOption) FormatEncoder {
+			return NewJSONEncoder(opts...)
+		},
+		getDecoder: func(opts ...DecoderOption) FormatDecoder {
+			return NewJSONDecoder(opts...)
+		},
 	},
 	YAML: {
 		mime: "application/yaml",
@@ -61,19 +81,31 @@ var formatters = map[Format]Formatter{
 		altExts: []string{
 			".yml",
 		},
-		encoder: NewYAMLEncoderV2(),
-		decoder: NewYAMLDecoderV2(),
+		getEncoder: func(opts ...EncoderOption) FormatEncoder {
+			return NewYAMLEncoder(opts...)
+		},
+		getDecoder: func(opts ...DecoderOption) FormatDecoder {
+			return NewYAMLDecoder(opts...)
+		},
 	},
 }
 
 type (
 	Format    string
 	Formatter struct {
-		mime    string
-		ext     string
-		altExts []string
-		encoder EncoderV2
-		decoder DecoderV2
+		mime       string
+		ext        string
+		altExts    []string
+		getEncoder func(...EncoderOption) FormatEncoder
+		getDecoder func(...DecoderOption) FormatDecoder
+	}
+	FormatEncoder interface {
+		Encoder
+		StreamEncoder
+	}
+	FormatDecoder interface {
+		Decoder
+		StreamDecoder
 	}
 )
 
@@ -90,7 +122,16 @@ func init() {
 	}
 }
 
-func FormatByExt(ext string) (Format, bool) {
+func FormatForUri(uri string) (Format, bool) {
+	for format := range formatters {
+		if format.HasExt(uri) {
+			return format, true
+		}
+	}
+	return "", false
+}
+
+func FormatForExt(ext string) (Format, bool) {
 	for format := range formatters {
 		if format.IsExt(ext) {
 			return format, true
@@ -99,7 +140,7 @@ func FormatByExt(ext string) (Format, bool) {
 	return "", false
 }
 
-func FormatByMimeType(mime string) (Format, bool) {
+func FormatForMimeType(mime string) (Format, bool) {
 	for format := range formatters {
 		if format.IsMimeType(mime) {
 			return format, true
@@ -108,12 +149,26 @@ func FormatByMimeType(mime string) (Format, bool) {
 	return "", false
 }
 
+func (f Format) DelimDefault() string {
+	switch f {
+	case YAML:
+		return DefaultYAMLDelim
+	case CSV, JSON, JSONL:
+		return DefaultJSONDelim
+	}
+	return ""
+}
+
 func Formats() []Format {
 	return slices.Collect(maps.Keys(formatters))
 }
 
-func (f Format) HasExt(path string) bool {
-	return f.IsExt(filepath.Ext(path))
+func (f Format) HasExt(uri string) bool {
+	url, err := url.Parse(uri)
+	if err == nil {
+		return f.IsExt(path.Ext(url.Path))
+	}
+	return f.IsExt(filepath.Ext(uri))
 }
 
 func (f Format) IsExt(ext string) bool {
@@ -142,12 +197,12 @@ func (f Format) String() string {
 	return string(f)
 }
 
-func (f Format) Encoder() (EncoderV2, bool) {
+func (f Format) Encoder(opts ...EncoderOption) (FormatEncoder, bool) {
 	formatter, ok := formatters[f]
-	if !ok || formatter.encoder == nil {
+	if !ok || formatter.getEncoder == nil {
 		return nil, false
 	}
-	return formatter.encoder, true
+	return formatter.getEncoder(opts...), true
 }
 
 func (f Format) Encode(v any) ([]byte, error) {
@@ -157,7 +212,7 @@ func (f Format) Encode(v any) ([]byte, error) {
 	return nil, fmt.Errorf("unknown format: %s", f)
 }
 
-func (f Format) StreamEncode(w io.Writer) func(any) error {
+func (f Format) StreamEncode(w io.Writer) NextFunc {
 	if enc, ok := f.Encoder(); ok {
 		return enc.StreamEncode(w)
 	}
@@ -166,12 +221,12 @@ func (f Format) StreamEncode(w io.Writer) func(any) error {
 	}
 }
 
-func (f Format) Decoder() (DecoderV2, bool) {
+func (f Format) Decoder(opts ...DecoderOption) (FormatDecoder, bool) {
 	formatter, ok := formatters[f]
-	if !ok || formatter.decoder == nil {
+	if !ok || formatter.getDecoder == nil {
 		return nil, false
 	}
-	return formatter.decoder, true
+	return formatter.getDecoder(opts...), true
 }
 
 func (f Format) Decode(b []byte, v any) error {
@@ -181,7 +236,7 @@ func (f Format) Decode(b []byte, v any) error {
 	return fmt.Errorf("unknown format: %s", f)
 }
 
-func (f Format) StreamDecode(r io.Reader) func(any) error {
+func (f Format) StreamDecode(r io.Reader) NextFunc {
 	if dec, ok := f.Decoder(); ok {
 		return dec.StreamDecode(r)
 	}

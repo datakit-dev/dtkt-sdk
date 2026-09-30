@@ -62,27 +62,4 @@ service BaseService {
   // in the request and (if valid) atomically removes it from the integration.
   // NOTE: Close is implemented by the Integration SDK (not by authors).
   rpc Close(CloseRequest) returns (CloseResponse);
-
-  // Opens a bidirectional IO stream between the caller and an active instance.
-  //
-  // The FIRST message must carry a valid instance_id (obtained after a
-  // successful CheckConfig call) and may optionally include an initial stdin
-  // payload.  All subsequent client messages carry additional stdin bytes;
-  // instance_id must still be set on every message due to proto validation
-  // requirements, but only the value in the first message is used for instance
-  // lookup.
-  //
-  // The server streams stdout and stderr frames back to the client as they are
-  // produced.  A terminal exit_code frame is sent before the stream closes to
-  // signal how the underlying operation ended.
-  //
-  // Client half-close (CloseSend) signals EOF to the instance stdin, allowing
-  // the underlying subprocess to detect end-of-input and terminate naturally.
-  // The server continues streaming output until both stdout and stderr are
-  // exhausted before closing the stream.
-  //
-  // Errors:
-  //   NOT_FOUND          – instance_id does not correspond to an active instance.
-  //   RESOURCE_EXHAUSTED – the instance already has an active IO stream.
-  rpc StreamIO(stream StreamIORequest) returns (stream StreamIOResponse);
 }

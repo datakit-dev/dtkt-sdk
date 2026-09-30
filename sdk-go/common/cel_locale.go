@@ -3,11 +3,12 @@ package common
 import (
 	"reflect"
 
-	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/common/types"
-	"github.com/google/cel-go/common/types/ref"
+	"cel.dev/cel-go/cel"
+	"cel.dev/cel-go/common/types"
+	"cel.dev/cel-go/common/types/ref"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
+	"google.golang.org/protobuf/proto"
 )
 
 var _ cel.Library = (*celLocaleLib)(nil)
@@ -15,32 +16,45 @@ var anySlice = reflect.TypeFor[[]any]()
 
 type (
 	celLocaleLib struct {
-		lang    language.Tag
-		printer *message.Printer
+		FormatProtoOptions
 	}
 	celLocaleOpt func(*celLocaleLib)
 )
 
 func CELLocaleLib(opts ...celLocaleOpt) cel.EnvOption {
-	lib := &celLocaleLib{}
+	return cel.Lib(NewCELLocal(opts...))
+}
+
+func NewCELLocal(opts ...celLocaleOpt) *celLocaleLib {
+	lib := &celLocaleLib{
+		FormatProtoOptions: defaultFormatProtoOptions,
+	}
 	for _, opt := range opts {
 		if opt != nil {
 			opt(lib)
 		}
 	}
 
-	if lib.lang == language.Und {
-		lib.lang = language.AmericanEnglish
+	if lib.locale == language.Und {
+		lib.locale = language.AmericanEnglish
 	}
 
-	lib.printer = message.NewPrinter(lib.lang)
+	if lib.printer == nil {
+		lib.printer = message.NewPrinter(lib.locale)
+	}
 
-	return cel.Lib(lib)
+	return lib
 }
 
 func WithCELLocaleTag(tag language.Tag) celLocaleOpt {
 	return func(lib *celLocaleLib) {
-		lib.lang = tag
+		lib.locale = tag
+	}
+}
+
+func WithCELLocalePrinter(printer *message.Printer) celLocaleOpt {
+	return func(lib *celLocaleLib) {
+		lib.printer = printer
 	}
 }
 
@@ -48,7 +62,7 @@ func WithCELLocale(locale string) celLocaleOpt {
 	return func(lib *celLocaleLib) {
 		tag, err := language.Parse(locale)
 		if err == nil {
-			lib.lang = tag
+			lib.locale = tag
 		}
 	}
 }
@@ -73,11 +87,24 @@ func (l *celLocaleLib) CompileOptions() []cel.EnvOption {
 						return types.WrapErr(err)
 					}
 
-					return types.String(l.printer.Sprintf(args[0].Value(), vals.([]any)...))
+					return types.String(l.Sprintf(args[0].Value(), vals.([]any)...))
 				}),
 			),
 		),
 	}
+}
+
+func (l *celLocaleLib) Sprintf(key message.Reference, vals ...any) string {
+	for idx, val := range vals {
+		if msg, ok := val.(proto.Message); ok {
+			str, err := l.Format(msg)
+			if err == nil {
+				vals[idx] = str
+			}
+		}
+	}
+
+	return l.printer.Sprintf(key, vals...)
 }
 
 func (l *celLocaleLib) ProgramOptions() []cel.ProgramOption {

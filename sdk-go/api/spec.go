@@ -118,12 +118,12 @@ func NewSpecLoader[T SpecType](schemaOpts ...common.JSONSchemaOption) *SpecLoade
 		})
 
 		if len(loader.apiVersions) == 0 {
-			loader.apiVersions = util.SliceMap(versions, func(v SpecVersion) string {
+			loader.apiVersions = util.SliceOfFunc(versions, func(v SpecVersion) string {
 				return v.String()
 			})
 		}
 
-		loader.specVersions = util.ReduceSliceToMap(versions,
+		loader.specVersions = util.SliceReduceToMap(versions,
 			func(_ int, v SpecVersion) (name string, version SpecVersion, ok bool) {
 				name = v.String()
 				version = v
@@ -310,13 +310,13 @@ func (l *SpecLoader[T]) versionToStruct(inst T) error {
 	}
 
 	if version.field.Message() != nil {
-		specData, err := encoding.ToJSONV2(inst.ProtoReflect().Get(version.field).Message().Interface())
+		specData, err := encoding.ToJSON(inst.ProtoReflect().Get(version.field).Message().Interface())
 		if err != nil {
 			return err
 		}
 
 		specStruct := new(structpb.Struct)
-		err = encoding.FromJSONV2(specData, specStruct)
+		err = encoding.FromJSON(specData, specStruct)
 		if err != nil {
 			return err
 		}
@@ -354,7 +354,7 @@ func (l *SpecLoader[T]) structToVersion(inst T) error {
 		}
 
 		specVersion := version.value.Message().New()
-		err = encoding.FromJSONV2(specData, specVersion.Interface())
+		err = encoding.FromJSON(specData, specVersion.Interface())
 		if err != nil {
 			return err
 		}

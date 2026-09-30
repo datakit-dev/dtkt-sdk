@@ -42,13 +42,6 @@ message Blob {
 
   // Time blob was created, if available.
   google.protobuf.Timestamp create_time = 8;
-
-  // oneof type {
-  //   // Detailed attributes of this blob.
-  //   Attributes attrs = 3;
-  //   // Indicates that this is a "directory" in the hierarchical namespace.
-  //   bool is_dir = 4;
-  // }
 }
 
 message BlobMetadata {
@@ -274,15 +267,15 @@ message ReadBlobLinesRequest {
   // Maximum number of lines to read relative to the offset:
   //  - if <= 0, read remaining lines;
   //  - if > 0, read at most this number lines.
-  int64 length = 5;
+  int64 limit = 5;
 }
 
 message ReadBlobLinesResponse {
   // Line data read from blob content in the requested format.
   LineData data = 1;
 
-  // Line index relative to start of blob content.
-  int64 index = 2;
+  // Line offset relative to start of blob content.
+  int64 offset = 2;
 }
 
 message WriteBlobLinesRequest {

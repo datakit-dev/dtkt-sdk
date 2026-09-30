@@ -102,6 +102,9 @@ enum PackageType {
 
   // Node package type.
   PACKAGE_TYPE_NODE = 2;
+
+  // Python package type.
+  PACKAGE_TYPE_PYTHON = 3;
 }
 
 // Supported runtimes.

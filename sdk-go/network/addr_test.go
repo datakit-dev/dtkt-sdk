@@ -252,7 +252,7 @@ func TestAddress_URL(t *testing.T) {
 		},
 		{
 			name:        "ssh unix socket",
-			addr:        network.Addr(network.SSHSocket, "nuc.local/tmp/test.sock"),
+			addr:        network.Addr(network.SSH_Socket, "nuc.local/tmp/test.sock"),
 			expectedURI: "ssh+unix://nuc.local",
 		},
 	}

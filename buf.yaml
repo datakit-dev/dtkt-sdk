@@ -12,6 +12,10 @@ lint:
   ignore_only:
     ENUM_VALUE_PREFIX:
       - proto/dtkt/core/v1
+      - proto/dtkt/sql/v1beta1
+    ENUM_ZERO_VALUE_SUFFIX:
+      - proto/dtkt/core/v1
+      - proto/dtkt/sql/v1beta1
     RPC_REQUEST_RESPONSE_UNIQUE:
       - proto/dtkt/core/v1
     RPC_RESPONSE_STANDARD_NAME:

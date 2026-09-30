@@ -124,7 +124,9 @@ message Service {
   // Server-assigned unique ID (UUID).
   string uid = 10 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.uuid = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
   ];
 
   // Service description.
@@ -164,7 +166,9 @@ message Method {
   // Server-assigned unique ID (UUID).
   string uid = 10 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.uuid = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
   ];
 
   // Method description.
@@ -216,7 +220,9 @@ message Type {
   // Server-assigned unique ID (UUID).
   string uid = 5 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
+    (buf.validate.field).string.uuid = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
   ];
 
   // Type schema.

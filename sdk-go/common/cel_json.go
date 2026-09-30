@@ -3,10 +3,10 @@ package common
 import (
 	"reflect"
 
+	"cel.dev/cel-go/cel"
+	"cel.dev/cel-go/common/types"
+	"cel.dev/cel-go/common/types/ref"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
-	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/common/types"
-	"github.com/google/cel-go/common/types/ref"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
@@ -68,7 +68,7 @@ func (l *celJSONLib) unmarshalJSON(value ref.Val) ref.Val {
 	}
 
 	result := new(structpb.Value)
-	if err := encoding.FromJSONV2(bytes, result); err != nil {
+	if err := encoding.FromJSON(bytes, result); err != nil {
 		return types.NewErr("json.unmarshal failed to parse JSON: %s", err.Error())
 	}
 
@@ -76,7 +76,7 @@ func (l *celJSONLib) unmarshalJSON(value ref.Val) ref.Val {
 }
 
 func (l *celJSONLib) marshalJSON(value ref.Val) ref.Val {
-	b, err := encoding.ToJSONV2(value.Value())
+	b, err := encoding.ToJSON(value.Value())
 	if err != nil {
 		return types.NewErr("json.marshal failed to encode value: %s", err.Error())
 	}

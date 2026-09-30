@@ -3,7 +3,8 @@ edition = "2023";
 package dtkt.sql.v1beta1;
 
 import "buf/validate/validate.proto";
-import "dtkt/sql/v1beta1/column.proto";
+import "dtkt/sql/v1beta1/type.proto";
+import "dtkt/sql/v1beta1/value.proto";
 import "google/protobuf/go_features.proto";
 import "google/protobuf/struct.proto";
 
@@ -11,17 +12,17 @@ option features.(pb.go).api_level = API_OPAQUE;
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/sql/v1beta1";
 
 service QueryService {
-  // Returns query engine with dialect, capabilities, and data types.
+  // Return query engine details with dialect, capabilities, and data types.
   rpc GetQueryEngine(GetQueryEngineRequest) returns (GetQueryEngineResponse);
 
-  // Validates the provided query.
+  // Validate the provided query.
   rpc ValidateQuery(ValidateQueryRequest) returns (ValidateQueryResponse);
 
-  // Executes a query and retrieves the results.
-  rpc ListQueryResults(ListQueryResultsRequest) returns (ListQueryResultsResponse);
+  // Execute query and return results.
+  rpc ExecuteQuery(ExecuteQueryRequest) returns (ExecuteQueryResponse);
 
-  // Streams results of a query.
-  rpc StreamQueryResults(StreamQueryResultsRequest) returns (stream StreamQueryResultsResponse);
+  // Read query results as a stream.
+  rpc ReadQuery(ReadQueryRequest) returns (stream ReadQueryResponse);
 }
 
 message GetQueryEngineRequest {}
@@ -140,116 +141,103 @@ message QueryEngine {
   repeated Type types = 3;
 }
 
-// type FormatOptions struct {
-//     // IndentStyle selects spaces or tabs.
-//     IndentStyle IndentStyle
-//     // IndentWidth is the number of spaces (or tabs) per indent level.
-//     IndentWidth int
-//     // KeywordCase controls keyword casing.
-//     KeywordCase KeywordCase
-//     // LineWidth is the target max line width. 0 means no limit (compact).
-//     LineWidth int
-//     // NewlinePerClause puts each major clause (FROM, WHERE, etc.) on its own line.
-//     NewlinePerClause bool
-//     // AddSemicolon appends a semicolon to each statement.
-//     AddSemicolon bool
-//     // Dialect specifies the target SQL dialect for rendering. When empty,
-//     // the formatter emits whatever AST fields are set (generic behavior).
-//     // Valid values match keywords.SQLDialect constants: "postgresql", "mysql",
-//     // "sqlserver", "oracle", "sqlite", "snowflake", "clickhouse", "mariadb".
-//     Dialect string
-// }
-
-message QueryParam {
-  // Value of the param.
-  google.protobuf.Value value = 1 [(buf.validate.field).required = true];
-
-  // Name of the param (not present for positional params).
-  string name = 2;
-}
-
-// Represents a valid parsed query.
-message ParsedQuery {
-  message FieldType {
-    // Name of the field.
-    string name = 1;
-
-    // Type of the field.
-    Type type = 2;
-  }
-
-  message ParamType {
-    // Type of the param, if supported by query parser.
-    Type type = 1;
-
-    // Name of the param (not present for positional params).
-    string name = 2;
-  }
-
-  // SQL query text (may be formatted/canonicalized).
+// Query is parsed, validated, and fingerprinted by a query engine.
+message Query {
+  // SQL text which may differ from user input (formatted/canonicalized).
   string sql = 1 [(buf.validate.field).required = true];
 
   // Fingerprint as receipt of validation.
   string fingerprint = 2 [(buf.validate.field).required = true];
 
-  // Params present in the query, if any.
-  repeated ParamType params = 3;
+  // Parameter types of the query, if any.
+  repeated FieldType params = 3;
 
-  // Fields returned by the query, if any.
+  // Field types returned by the query, if any.
   repeated FieldType fields = 4;
 }
 
 // Request to validate a query.
 message ValidateQueryRequest {
-  // SQL query text.
+  // SQL text to validate.
   string sql = 1 [(buf.validate.field).required = true];
+
+  // Parameter types of the query, if any.
+  repeated FieldType params = 2;
 }
 
 // Response for query validation.
 message ValidateQueryResponse {
-  // Valid query with fingerprint.
-  ParsedQuery query = 2;
+  // A validated query ready to be used for execution.
+  Query query = 1;
 }
 
 // Request to retrieve query results.
-message ListQueryResultsRequest {
-  option (buf.validate.message).cel_expression = "size(this.query.params) == size(this.params)";
-
-  // Maximum number of result rows to return.
-  int32 page_size = 1;
-
-  // Token for the desired page (empty for first page).
-  string page_token = 2;
+message ExecuteQueryRequest {
+  option (buf.validate.message).cel = {
+    id: "too_few_params"
+    message: "number of params is less than the query specifies"
+    expression: "size(this.params) < size(this.query.params)"
+  };
+  option (buf.validate.message).cel = {
+    id: "too_many_params"
+    message: "number of params greater than the query specifies"
+    expression: "size(this.params) > size(this.query.params)"
+  };
 
   // Query to execute (must be unchanged for subsequent calls).
-  ParsedQuery query = 3 [(buf.validate.field).required = true];
+  Query query = 1 [(buf.validate.field).required = true];
 
-  // Param values applied to the query (must be unchanged for subsequent calls).
-  repeated QueryParam params = 4;
+  // Query parameter values (must be unchanged for subsequent calls).
+  repeated Field params = 2;
+
+  // Maximum number of results to return.
+  //  - if unset or 0, reads all rows relative to offset;
+  //  - if > 0, reads at most this number of rows relative to offset.
+  int32 page_size = 3;
+
+  // Token for the desired page (empty for first page).
+  string page_token = 4;
 }
 
 // Response containing query results.
-message ListQueryResultsResponse {
-  // A list of query result rows with a maximum size specified in the request.
-  repeated google.protobuf.Struct rows = 1;
+message ExecuteQueryResponse {
+  // Result rows with a maximum size specified in the request.
+  repeated Struct rows = 1;
 
-  // Next page token (empty for last page)
+  // Number of rows affected (when query is DML).
+  int64 rows_affected = 2;
+
+  // Next page token (empty for last page).
   string next_page_token = 10;
 }
 
 // Request to stream query results.
-message StreamQueryResultsRequest {
-  option (buf.validate.message).cel_expression = "size(this.query.params) == size(this.params)";
-
+message ReadQueryRequest {
   // Query to execute.
-  ParsedQuery query = 1 [(buf.validate.field).required = true];
+  Query query = 1 [(buf.validate.field).required = true];
 
-  // Param values applied to the query.
-  repeated QueryParam params = 4;
+  // Query parameter values.
+  repeated Field params = 4;
+
+  // Format of query result(s) to return.
+  DataFormat format = 5 [
+    (buf.validate.field).enum.defined_only = true,
+    default = DATA_FORMAT_STRUCT_BATCH
+  ];
 }
 
 // Response containing streamed query results.
-message StreamQueryResultsResponse {
-  // A single query result row conforming to the fields defined in query.
-  google.protobuf.Struct row = 1;
+message ReadQueryResponse {
+  option (buf.validate.message).oneof = {
+    fields: [
+      "arrow_batch",
+      "struct_batch",
+      "json_batch"
+    ]
+    required: true
+  };
+
+  bytes arrow_batch = 1;
+  repeated Struct struct_batch = 2;
+  repeated google.protobuf.Struct json_batch = 3;
 }

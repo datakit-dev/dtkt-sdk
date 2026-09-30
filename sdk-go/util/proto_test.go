@@ -9,8 +9,8 @@ import (
 
 func TestProtoDiff(t *testing.T) {
 	pkgA, pkgB := new(sharedv1beta1.Package), new(sharedv1beta1.Package)
-	diff := util.ProtoDiff(pkgA, pkgB)
-	if len(diff.GetPaths()) != 0 {
+	mask := util.ProtoDiff(pkgA, pkgB)
+	if len(mask.GetPaths()) != 0 {
 		t.Fatalf("expected no difference")
 	}
 
@@ -23,10 +23,10 @@ func TestProtoDiff(t *testing.T) {
 		Version: "0.2.0",
 	}
 
-	diff = util.ProtoDiff(pkgA, pkgB)
-	if len(diff.GetPaths()) != 1 {
-		t.Fatalf("expected 1 difference, got: %d", len(diff.GetPaths()))
+	mask = util.ProtoDiff(pkgA, pkgB)
+	if len(mask.GetPaths()) != 1 {
+		t.Fatalf("expected 1 difference, got: %d", len(mask.GetPaths()))
 	} else {
-		t.Logf("diff: %v", diff.Paths)
+		t.Logf("diff: %v", mask.Paths)
 	}
 }

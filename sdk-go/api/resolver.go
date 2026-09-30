@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"sync"
 
-	"buf.build/go/protovalidate"
 	"github.com/jhump/protoreflect/v2/protoresolve"
 	"github.com/jhump/protoreflect/v2/sourceinfo"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -24,7 +23,7 @@ type (
 		protoresolve.TypeResolver
 		FindMethodByName(protoreflect.FullName) (protoreflect.MethodDescriptor, error)
 		FindServiceByName(protoreflect.FullName) (protoreflect.ServiceDescriptor, error)
-		GetValidator() (protovalidate.Validator, error)
+		GetValidator() (Validator, error)
 		RangeEnums(func(protoreflect.EnumType) bool)
 		RangeExtensionsByMessage(protoreflect.FullName, func(protoreflect.ExtensionType) bool)
 		RangeMessages(func(protoreflect.MessageType) bool)
@@ -34,7 +33,7 @@ type (
 	resolver struct {
 		protoresolve.DescriptorPool
 		protoresolve.TypePool
-		validator protovalidate.Validator
+		validator Validator
 	}
 )
 
@@ -51,7 +50,7 @@ func GlobalResolver() *resolver {
 	return getGlobalResolver()
 }
 
-func (r *resolver) GetValidator() (protovalidate.Validator, error) {
+func (r *resolver) GetValidator() (Validator, error) {
 	return r.validator, nil
 }
 

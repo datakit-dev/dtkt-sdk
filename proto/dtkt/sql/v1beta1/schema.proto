@@ -3,6 +3,7 @@ edition = "2023";
 package dtkt.sql.v1beta1;
 
 import "buf/validate/validate.proto";
+import "google/api/field_behavior.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/go_features.proto";
 
@@ -28,12 +29,11 @@ service SchemaService {
 
 // Schema resource containing tables.
 message Schema {
-  // Schema name.
-  string name = 1;
-
-  // Optional catalog name for engines that support three-tiered hierarchy.
-  // Examples: Postgres (database), BigQuery (project), etc.
-  string catalog = 2;
+  // Fully qualified schema name, format: `[{catalog}.]{schema}`.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER
+  ];
 
   // Additional metadata, if any.
   map<string, string> metadata = 4;
@@ -47,8 +47,11 @@ message ListSchemasRequest {
   // Token from a previous response to retrieve the next page.
   string page_token = 2;
 
+  // Optional parent catalog name. When not set, returns all schemas across catalogs.
+  string parent = 3;
+
   // Optional filter expression to narrow results.
-  string filter = 3;
+  string filter = 4;
 }
 
 // Response message for listing Schemas.
@@ -60,7 +63,7 @@ message ListSchemasResponse {
 
 // Get schema request.
 message GetSchemaRequest {
-  // Schema resource name to retrieve.
+  // Fully qualified schema name, format: `[{catalog}.]{schema}`.
   string name = 1 [(buf.validate.field).required = true];
 }
 
@@ -72,14 +75,15 @@ message GetSchemaResponse {
 
 // Create Schema request.
 message CreateSchemaRequest {
+  // Optional parent catalog for engines that support three-tiered hierarchy.
+  // Examples: Postgres (database), BigQuery (project), etc.
+  string parent = 1;
+
   // Unqualified schema identifier, example: "dev".
-  string schema_id = 1 [(buf.validate.field).required = true];
+  string schema_id = 2 [(buf.validate.field).required = true];
 
   // Schema to create.
-  Schema schema = 2;
-
-  // Schema metadata, if any.
-  map<string, string> metadata = 3;
+  Schema schema = 3;
 }
 
 // Create Schema response.
@@ -105,7 +109,7 @@ message UpdateSchemaResponse {
 
 // Request message for deleting a schema.
 message DeleteSchemaRequest {
-  // Name of schema to delete.
+  // Fully qualified schema name, format: `[{catalog}.]{schema}`.
   string name = 1 [(buf.validate.field).required = true];
 
   // If set to true, any tables in this schema will also be deleted.

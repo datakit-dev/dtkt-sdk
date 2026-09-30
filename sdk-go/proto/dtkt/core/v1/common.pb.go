@@ -12,7 +12,6 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/descriptorpb"
 	anypb "google.golang.org/protobuf/types/known/anypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
@@ -622,6 +621,83 @@ func (x *PackageBuildMetadata) GetArtifactEtag() string {
 	return ""
 }
 
+// TLSCertBundle holds a leaf certificate/key pair signed by a Root CA, along
+// with the metadata needed to know when it must be regenerated. Meant to be
+// persisted encrypted at rest (key_pem is sensitive) and rebuilt into a
+// tls.Config on load rather than serializing the config itself.
+type TLSCertBundle struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// PEM-encoded X.509 leaf certificate.
+	CertPem []byte `protobuf:"bytes,1,opt,name=cert_pem,json=certPem,proto3" json:"cert_pem,omitempty"`
+	// PEM-encoded PKCS8 private key; sensitive, must be encrypted at rest.
+	KeyPem []byte `protobuf:"bytes,2,opt,name=key_pem,json=keyPem,proto3" json:"key_pem,omitempty"`
+	// SHA-256 fingerprint (hex) of the Root CA certificate that signed cert_pem;
+	// regenerate the bundle if this no longer matches the current Root CA.
+	CaFingerprint string `protobuf:"bytes,3,opt,name=ca_fingerprint,json=caFingerprint,proto3" json:"ca_fingerprint,omitempty"`
+	// Certificate NotAfter; regenerate the bundle once this has passed.
+	NotAfter      *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=not_after,json=notAfter,proto3" json:"not_after,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TLSCertBundle) Reset() {
+	*x = TLSCertBundle{}
+	mi := &file_dtkt_core_v1_common_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TLSCertBundle) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TLSCertBundle) ProtoMessage() {}
+
+func (x *TLSCertBundle) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_core_v1_common_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TLSCertBundle.ProtoReflect.Descriptor instead.
+func (*TLSCertBundle) Descriptor() ([]byte, []int) {
+	return file_dtkt_core_v1_common_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *TLSCertBundle) GetCertPem() []byte {
+	if x != nil {
+		return x.CertPem
+	}
+	return nil
+}
+
+func (x *TLSCertBundle) GetKeyPem() []byte {
+	if x != nil {
+		return x.KeyPem
+	}
+	return nil
+}
+
+func (x *TLSCertBundle) GetCaFingerprint() string {
+	if x != nil {
+		return x.CaFingerprint
+	}
+	return ""
+}
+
+func (x *TLSCertBundle) GetNotAfter() *timestamppb.Timestamp {
+	if x != nil {
+		return x.NotAfter
+	}
+	return nil
+}
+
 type PackageBuildMetadata_Runtime struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Version:
@@ -634,7 +710,7 @@ type PackageBuildMetadata_Runtime struct {
 
 func (x *PackageBuildMetadata_Runtime) Reset() {
 	*x = PackageBuildMetadata_Runtime{}
-	mi := &file_dtkt_core_v1_common_proto_msgTypes[7]
+	mi := &file_dtkt_core_v1_common_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -646,7 +722,7 @@ func (x *PackageBuildMetadata_Runtime) String() string {
 func (*PackageBuildMetadata_Runtime) ProtoMessage() {}
 
 func (x *PackageBuildMetadata_Runtime) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_common_proto_msgTypes[7]
+	mi := &file_dtkt_core_v1_common_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -700,7 +776,7 @@ type PackageBuildMetadata_Platform struct {
 
 func (x *PackageBuildMetadata_Platform) Reset() {
 	*x = PackageBuildMetadata_Platform{}
-	mi := &file_dtkt_core_v1_common_proto_msgTypes[8]
+	mi := &file_dtkt_core_v1_common_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -712,7 +788,7 @@ func (x *PackageBuildMetadata_Platform) String() string {
 func (*PackageBuildMetadata_Platform) ProtoMessage() {}
 
 func (x *PackageBuildMetadata_Platform) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_core_v1_common_proto_msgTypes[8]
+	mi := &file_dtkt_core_v1_common_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -758,7 +834,7 @@ var File_dtkt_core_v1_common_proto protoreflect.FileDescriptor
 
 const file_dtkt_core_v1_common_proto_rawDesc = "" +
 	"\n" +
-	"\x19dtkt/core/v1/common.proto\x12\fdtkt.core.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fdtkt/shared/v1beta1/enums.proto\x1a\"dtkt/shared/v1beta1/messages.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/protobuf/any.proto\x1a google/protobuf/descriptor.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"K\n" +
+	"\x19dtkt/core/v1/common.proto\x12\fdtkt.core.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fdtkt/shared/v1beta1/enums.proto\x1a\"dtkt/shared/v1beta1/messages.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/protobuf/any.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"K\n" +
 	"\aAddress\x12 \n" +
 	"\anetwork\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\anetwork\x12\x1e\n" +
 	"\x06target\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06target\"\x9a\x03\n" +
@@ -810,7 +886,12 @@ const file_dtkt_core_v1_common_proto_rawDesc = "" +
 	"\aversion\x12\x05\xbaH\x02\b\x01\x1a6\n" +
 	"\bEnvEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\xb5\x01\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xc3\x01\n" +
+	"\rTLSCertBundle\x12!\n" +
+	"\bcert_pem\x18\x01 \x01(\fB\x06\xbaH\x03\xc8\x01\x01R\acertPem\x12\x1f\n" +
+	"\akey_pem\x18\x02 \x01(\fB\x06\xbaH\x03\xc8\x01\x01R\x06keyPem\x12-\n" +
+	"\x0eca_fingerprint\x18\x03 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\rcaFingerprint\x12?\n" +
+	"\tnot_after\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01R\bnotAfterB\xb5\x01\n" +
 	"\x12proto.dtkt.core.v1B\vCommonProtoP\x01Z@github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1\xa2\x02\x03DCX\xaa\x02\fDtkt.Core.V1\xca\x02\fDtkt\\Core\\V1\xe2\x02\x18Dtkt\\Core\\V1\\GPBMetadata\xea\x02\x0eDtkt::Core::V1b\x06proto3"
 
 var (
@@ -826,7 +907,7 @@ func file_dtkt_core_v1_common_proto_rawDescGZIP() []byte {
 }
 
 var file_dtkt_core_v1_common_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_dtkt_core_v1_common_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_dtkt_core_v1_common_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_dtkt_core_v1_common_proto_goTypes = []any{
 	(Auth_AuthMethod)(0),                  // 0: dtkt.core.v1.Auth.AuthMethod
 	(*Address)(nil),                       // 1: dtkt.core.v1.Address
@@ -836,35 +917,37 @@ var file_dtkt_core_v1_common_proto_goTypes = []any{
 	(*EncryptedAny)(nil),                  // 5: dtkt.core.v1.EncryptedAny
 	(*PackageSpecMetadata)(nil),           // 6: dtkt.core.v1.PackageSpecMetadata
 	(*PackageBuildMetadata)(nil),          // 7: dtkt.core.v1.PackageBuildMetadata
-	(*PackageBuildMetadata_Runtime)(nil),  // 8: dtkt.core.v1.PackageBuildMetadata.Runtime
-	(*PackageBuildMetadata_Platform)(nil), // 9: dtkt.core.v1.PackageBuildMetadata.Platform
-	nil,                                   // 10: dtkt.core.v1.PackageBuildMetadata.EnvEntry
-	(*timestamppb.Timestamp)(nil),         // 11: google.protobuf.Timestamp
-	(*anypb.Any)(nil),                     // 12: google.protobuf.Any
-	(*v1beta1.Package)(nil),               // 13: dtkt.shared.v1beta1.Package
-	(v1beta1.Runtime)(0),                  // 14: dtkt.shared.v1beta1.Runtime
-	(*v1beta1.Platform)(nil),              // 15: dtkt.shared.v1beta1.Platform
+	(*TLSCertBundle)(nil),                 // 8: dtkt.core.v1.TLSCertBundle
+	(*PackageBuildMetadata_Runtime)(nil),  // 9: dtkt.core.v1.PackageBuildMetadata.Runtime
+	(*PackageBuildMetadata_Platform)(nil), // 10: dtkt.core.v1.PackageBuildMetadata.Platform
+	nil,                                   // 11: dtkt.core.v1.PackageBuildMetadata.EnvEntry
+	(*timestamppb.Timestamp)(nil),         // 12: google.protobuf.Timestamp
+	(*anypb.Any)(nil),                     // 13: google.protobuf.Any
+	(*v1beta1.Package)(nil),               // 14: dtkt.shared.v1beta1.Package
+	(v1beta1.Runtime)(0),                  // 15: dtkt.shared.v1beta1.Runtime
+	(*v1beta1.Platform)(nil),              // 16: dtkt.shared.v1beta1.Platform
 }
 var file_dtkt_core_v1_common_proto_depIdxs = []int32{
 	0,  // 0: dtkt.core.v1.Auth.method:type_name -> dtkt.core.v1.Auth.AuthMethod
-	11, // 1: dtkt.core.v1.Auth.expires_at:type_name -> google.protobuf.Timestamp
+	12, // 1: dtkt.core.v1.Auth.expires_at:type_name -> google.protobuf.Timestamp
 	1,  // 2: dtkt.core.v1.Context.address:type_name -> dtkt.core.v1.Address
 	2,  // 3: dtkt.core.v1.Context.auth:type_name -> dtkt.core.v1.Auth
 	3,  // 4: dtkt.core.v1.Resource.context:type_name -> dtkt.core.v1.Context
 	1,  // 5: dtkt.core.v1.Resource.address:type_name -> dtkt.core.v1.Address
 	5,  // 6: dtkt.core.v1.Resource.encrypted:type_name -> dtkt.core.v1.EncryptedAny
-	12, // 7: dtkt.core.v1.Resource.decrypted:type_name -> google.protobuf.Any
-	13, // 8: dtkt.core.v1.PackageSpecMetadata.v1beta1:type_name -> dtkt.shared.v1beta1.Package
-	8,  // 9: dtkt.core.v1.PackageBuildMetadata.runtime:type_name -> dtkt.core.v1.PackageBuildMetadata.Runtime
-	9,  // 10: dtkt.core.v1.PackageBuildMetadata.platform:type_name -> dtkt.core.v1.PackageBuildMetadata.Platform
-	10, // 11: dtkt.core.v1.PackageBuildMetadata.env:type_name -> dtkt.core.v1.PackageBuildMetadata.EnvEntry
-	14, // 12: dtkt.core.v1.PackageBuildMetadata.Runtime.v1beta1:type_name -> dtkt.shared.v1beta1.Runtime
-	15, // 13: dtkt.core.v1.PackageBuildMetadata.Platform.v1beta1:type_name -> dtkt.shared.v1beta1.Platform
-	14, // [14:14] is the sub-list for method output_type
-	14, // [14:14] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	13, // 7: dtkt.core.v1.Resource.decrypted:type_name -> google.protobuf.Any
+	14, // 8: dtkt.core.v1.PackageSpecMetadata.v1beta1:type_name -> dtkt.shared.v1beta1.Package
+	9,  // 9: dtkt.core.v1.PackageBuildMetadata.runtime:type_name -> dtkt.core.v1.PackageBuildMetadata.Runtime
+	10, // 10: dtkt.core.v1.PackageBuildMetadata.platform:type_name -> dtkt.core.v1.PackageBuildMetadata.Platform
+	11, // 11: dtkt.core.v1.PackageBuildMetadata.env:type_name -> dtkt.core.v1.PackageBuildMetadata.EnvEntry
+	12, // 12: dtkt.core.v1.TLSCertBundle.not_after:type_name -> google.protobuf.Timestamp
+	15, // 13: dtkt.core.v1.PackageBuildMetadata.Runtime.v1beta1:type_name -> dtkt.shared.v1beta1.Runtime
+	16, // 14: dtkt.core.v1.PackageBuildMetadata.Platform.v1beta1:type_name -> dtkt.shared.v1beta1.Platform
+	15, // [15:15] is the sub-list for method output_type
+	15, // [15:15] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_core_v1_common_proto_init() }
@@ -880,10 +963,10 @@ func file_dtkt_core_v1_common_proto_init() {
 	file_dtkt_core_v1_common_proto_msgTypes[5].OneofWrappers = []any{
 		(*PackageSpecMetadata_V1Beta1)(nil),
 	}
-	file_dtkt_core_v1_common_proto_msgTypes[7].OneofWrappers = []any{
+	file_dtkt_core_v1_common_proto_msgTypes[8].OneofWrappers = []any{
 		(*PackageBuildMetadata_Runtime_V1Beta1)(nil),
 	}
-	file_dtkt_core_v1_common_proto_msgTypes[8].OneofWrappers = []any{
+	file_dtkt_core_v1_common_proto_msgTypes[9].OneofWrappers = []any{
 		(*PackageBuildMetadata_Platform_V1Beta1)(nil),
 	}
 	type x struct{}
@@ -892,7 +975,7 @@ func file_dtkt_core_v1_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_core_v1_common_proto_rawDesc), len(file_dtkt_core_v1_common_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   10,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

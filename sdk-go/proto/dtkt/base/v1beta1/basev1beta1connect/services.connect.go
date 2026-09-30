@@ -45,8 +45,6 @@ const (
 	BaseServiceGetTypeProcedure = "/dtkt.base.v1beta1.BaseService/GetType"
 	// BaseServiceCloseProcedure is the fully-qualified name of the BaseService's Close RPC.
 	BaseServiceCloseProcedure = "/dtkt.base.v1beta1.BaseService/Close"
-	// BaseServiceStreamIOProcedure is the fully-qualified name of the BaseService's StreamIO RPC.
-	BaseServiceStreamIOProcedure = "/dtkt.base.v1beta1.BaseService/StreamIO"
 )
 
 // BaseServiceClient is a client for the dtkt.base.v1beta1.BaseService service.
@@ -70,29 +68,6 @@ type BaseServiceClient interface {
 	// in the request and (if valid) atomically removes it from the integration.
 	// NOTE: Close is implemented by the Integration SDK (not by authors).
 	Close(context.Context, *connect.Request[v1beta1.CloseRequest]) (*connect.Response[v1beta1.CloseResponse], error)
-	// Opens a bidirectional IO stream between the caller and an active instance.
-	//
-	// The FIRST message must carry a valid instance_id (obtained after a
-	// successful CheckConfig call) and may optionally include an initial stdin
-	// payload.  All subsequent client messages carry additional stdin bytes;
-	// instance_id must still be set on every message due to proto validation
-	// requirements, but only the value in the first message is used for instance
-	// lookup.
-	//
-	// The server streams stdout and stderr frames back to the client as they are
-	// produced.  A terminal exit_code frame is sent before the stream closes to
-	// signal how the underlying operation ended.
-	//
-	// Client half-close (CloseSend) signals EOF to the instance stdin, allowing
-	// the underlying subprocess to detect end-of-input and terminate naturally.
-	// The server continues streaming output until both stdout and stderr are
-	// exhausted before closing the stream.
-	//
-	// Errors:
-	//
-	//	NOT_FOUND          – instance_id does not correspond to an active instance.
-	//	RESOURCE_EXHAUSTED – the instance already has an active IO stream.
-	StreamIO(context.Context) *connect.BidiStreamForClient[v1beta1.StreamIORequest, v1beta1.StreamIOResponse]
 }
 
 // NewBaseServiceClient constructs a client for the dtkt.base.v1beta1.BaseService service. By
@@ -142,12 +117,6 @@ func NewBaseServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(baseServiceMethods.ByName("Close")),
 			connect.WithClientOptions(opts...),
 		),
-		streamIO: connect.NewClient[v1beta1.StreamIORequest, v1beta1.StreamIOResponse](
-			httpClient,
-			baseURL+BaseServiceStreamIOProcedure,
-			connect.WithSchema(baseServiceMethods.ByName("StreamIO")),
-			connect.WithClientOptions(opts...),
-		),
 	}
 }
 
@@ -159,7 +128,6 @@ type baseServiceClient struct {
 	listTypes   *connect.Client[v1beta1.ListTypesRequest, v1beta1.ListTypesResponse]
 	getType     *connect.Client[v1beta1.GetTypeRequest, v1beta1.GetTypeResponse]
 	close       *connect.Client[v1beta1.CloseRequest, v1beta1.CloseResponse]
-	streamIO    *connect.Client[v1beta1.StreamIORequest, v1beta1.StreamIOResponse]
 }
 
 // GetPackage calls dtkt.base.v1beta1.BaseService.GetPackage.
@@ -192,11 +160,6 @@ func (c *baseServiceClient) Close(ctx context.Context, req *connect.Request[v1be
 	return c.close.CallUnary(ctx, req)
 }
 
-// StreamIO calls dtkt.base.v1beta1.BaseService.StreamIO.
-func (c *baseServiceClient) StreamIO(ctx context.Context) *connect.BidiStreamForClient[v1beta1.StreamIORequest, v1beta1.StreamIOResponse] {
-	return c.streamIO.CallBidiStream(ctx)
-}
-
 // BaseServiceHandler is an implementation of the dtkt.base.v1beta1.BaseService service.
 type BaseServiceHandler interface {
 	// Returns the embedded package manifest (package.dtkt.yaml) and metadata.
@@ -218,29 +181,6 @@ type BaseServiceHandler interface {
 	// in the request and (if valid) atomically removes it from the integration.
 	// NOTE: Close is implemented by the Integration SDK (not by authors).
 	Close(context.Context, *connect.Request[v1beta1.CloseRequest]) (*connect.Response[v1beta1.CloseResponse], error)
-	// Opens a bidirectional IO stream between the caller and an active instance.
-	//
-	// The FIRST message must carry a valid instance_id (obtained after a
-	// successful CheckConfig call) and may optionally include an initial stdin
-	// payload.  All subsequent client messages carry additional stdin bytes;
-	// instance_id must still be set on every message due to proto validation
-	// requirements, but only the value in the first message is used for instance
-	// lookup.
-	//
-	// The server streams stdout and stderr frames back to the client as they are
-	// produced.  A terminal exit_code frame is sent before the stream closes to
-	// signal how the underlying operation ended.
-	//
-	// Client half-close (CloseSend) signals EOF to the instance stdin, allowing
-	// the underlying subprocess to detect end-of-input and terminate naturally.
-	// The server continues streaming output until both stdout and stderr are
-	// exhausted before closing the stream.
-	//
-	// Errors:
-	//
-	//	NOT_FOUND          – instance_id does not correspond to an active instance.
-	//	RESOURCE_EXHAUSTED – the instance already has an active IO stream.
-	StreamIO(context.Context, *connect.BidiStream[v1beta1.StreamIORequest, v1beta1.StreamIOResponse]) error
 }
 
 // NewBaseServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -286,12 +226,6 @@ func NewBaseServiceHandler(svc BaseServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(baseServiceMethods.ByName("Close")),
 		connect.WithHandlerOptions(opts...),
 	)
-	baseServiceStreamIOHandler := connect.NewBidiStreamHandler(
-		BaseServiceStreamIOProcedure,
-		svc.StreamIO,
-		connect.WithSchema(baseServiceMethods.ByName("StreamIO")),
-		connect.WithHandlerOptions(opts...),
-	)
 	return "/dtkt.base.v1beta1.BaseService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case BaseServiceGetPackageProcedure:
@@ -306,8 +240,6 @@ func NewBaseServiceHandler(svc BaseServiceHandler, opts ...connect.HandlerOption
 			baseServiceGetTypeHandler.ServeHTTP(w, r)
 		case BaseServiceCloseProcedure:
 			baseServiceCloseHandler.ServeHTTP(w, r)
-		case BaseServiceStreamIOProcedure:
-			baseServiceStreamIOHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -339,8 +271,4 @@ func (UnimplementedBaseServiceHandler) GetType(context.Context, *connect.Request
 
 func (UnimplementedBaseServiceHandler) Close(context.Context, *connect.Request[v1beta1.CloseRequest]) (*connect.Response[v1beta1.CloseResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.base.v1beta1.BaseService.Close is not implemented"))
-}
-
-func (UnimplementedBaseServiceHandler) StreamIO(context.Context, *connect.BidiStream[v1beta1.StreamIORequest, v1beta1.StreamIOResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.base.v1beta1.BaseService.StreamIO is not implemented"))
 }

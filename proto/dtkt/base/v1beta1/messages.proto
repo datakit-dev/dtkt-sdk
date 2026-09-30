@@ -9,48 +9,6 @@ import "google/protobuf/any.proto";
 
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/base/v1beta1";
 
-// StreamIORequest is sent by the client over a bidirectional StreamIO stream.
-//
-// Protocol:
-//   - The FIRST message establishes the stream and stdin may carry an initial
-//     payload (e.g. a shell script to pipe into a subprocess).
-//   - SUBSEQUENT messages carry additional stdin bytes.
-//   - The client signals end-of-stdin by calling CloseSend (gRPC half-close),
-//     which causes the server to close the instance stdin pipe so that any
-//     blocking subprocess receives EOF.
-message StreamIORequest {
-  // Raw bytes to write to the instance stdin pipe.  Omit (or leave empty) for
-  // messages that carry no input (e.g. a keep-alive or a stream-open with no
-  // initial payload).
-  optional bytes stdin = 1;
-}
-
-// StreamIOResponse is sent by the server over a bidirectional StreamIO stream.
-//
-// Each frame carries one of: a chunk of stdout bytes, a chunk of stderr bytes,
-// or a terminal exit_code that signals how the underlying operation ended.
-// The server sends an exit_code frame before closing the stream whenever the
-// exit status is known; stream closure without an exit_code frame indicates
-// the operation was cancelled or the stream context was terminated.
-message StreamIOResponse {
-  oneof type {
-    option (buf.validate.oneof).required = true;
-
-    // A chunk of bytes written to the instance stdout.
-    bytes stdout = 1;
-
-    // A chunk of bytes written to the instance stderr.
-    bytes stderr = 2;
-
-    // Terminal frame: exit status of the underlying operation.  Sent once,
-    // immediately before the server closes the stream.  A value of 0 indicates
-    // success; non-zero values follow standard Unix exit-code conventions.
-    // Absence of this frame means the stream ended abnormally (e.g. context
-    // cancellation).
-    int32 exit_code = 3;
-  }
-}
-
 // Request for getting package spec and config schema.
 message GetPackageRequest {}
 

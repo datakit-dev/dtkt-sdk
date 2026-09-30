@@ -256,30 +256,33 @@ func (b0 QueryEngine_builder) Build() *QueryEngine {
 	return m0
 }
 
-type QueryParam struct {
+// Query is parsed, validated, and fingerprinted by a query engine.
+type Query struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Value       *structpb.Value        `protobuf:"bytes,1,opt,name=value"`
-	xxx_hidden_Name        *string                `protobuf:"bytes,2,opt,name=name"`
+	xxx_hidden_Sql         *string                `protobuf:"bytes,1,opt,name=sql"`
+	xxx_hidden_Fingerprint *string                `protobuf:"bytes,2,opt,name=fingerprint"`
+	xxx_hidden_Params      *[]*FieldType          `protobuf:"bytes,3,rep,name=params"`
+	xxx_hidden_Fields      *[]*FieldType          `protobuf:"bytes,4,rep,name=fields"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
 
-func (x *QueryParam) Reset() {
-	*x = QueryParam{}
+func (x *Query) Reset() {
+	*x = Query{}
 	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *QueryParam) String() string {
+func (x *Query) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*QueryParam) ProtoMessage() {}
+func (*Query) ProtoMessage() {}
 
-func (x *QueryParam) ProtoReflect() protoreflect.Message {
+func (x *Query) ProtoReflect() protoreflect.Message {
 	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -291,115 +294,7 @@ func (x *QueryParam) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *QueryParam) GetValue() *structpb.Value {
-	if x != nil {
-		return x.xxx_hidden_Value
-	}
-	return nil
-}
-
-func (x *QueryParam) GetName() string {
-	if x != nil {
-		if x.xxx_hidden_Name != nil {
-			return *x.xxx_hidden_Name
-		}
-		return ""
-	}
-	return ""
-}
-
-func (x *QueryParam) SetValue(v *structpb.Value) {
-	x.xxx_hidden_Value = v
-}
-
-func (x *QueryParam) SetName(v string) {
-	x.xxx_hidden_Name = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
-}
-
-func (x *QueryParam) HasValue() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Value != nil
-}
-
-func (x *QueryParam) HasName() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
-func (x *QueryParam) ClearValue() {
-	x.xxx_hidden_Value = nil
-}
-
-func (x *QueryParam) ClearName() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_Name = nil
-}
-
-type QueryParam_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	// Value of the param.
-	Value *structpb.Value
-	// Name of the param (not present for positional params).
-	Name *string
-}
-
-func (b0 QueryParam_builder) Build() *QueryParam {
-	m0 := &QueryParam{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.xxx_hidden_Value = b.Value
-	if b.Name != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
-		x.xxx_hidden_Name = b.Name
-	}
-	return m0
-}
-
-// Represents a valid parsed query.
-type ParsedQuery struct {
-	state                  protoimpl.MessageState    `protogen:"opaque.v1"`
-	xxx_hidden_Sql         *string                   `protobuf:"bytes,1,opt,name=sql"`
-	xxx_hidden_Fingerprint *string                   `protobuf:"bytes,2,opt,name=fingerprint"`
-	xxx_hidden_Params      *[]*ParsedQuery_ParamType `protobuf:"bytes,3,rep,name=params"`
-	xxx_hidden_Fields      *[]*ParsedQuery_FieldType `protobuf:"bytes,4,rep,name=fields"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
-}
-
-func (x *ParsedQuery) Reset() {
-	*x = ParsedQuery{}
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ParsedQuery) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ParsedQuery) ProtoMessage() {}
-
-func (x *ParsedQuery) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *ParsedQuery) GetSql() string {
+func (x *Query) GetSql() string {
 	if x != nil {
 		if x.xxx_hidden_Sql != nil {
 			return *x.xxx_hidden_Sql
@@ -409,7 +304,7 @@ func (x *ParsedQuery) GetSql() string {
 	return ""
 }
 
-func (x *ParsedQuery) GetFingerprint() string {
+func (x *Query) GetFingerprint() string {
 	if x != nil {
 		if x.xxx_hidden_Fingerprint != nil {
 			return *x.xxx_hidden_Fingerprint
@@ -419,7 +314,7 @@ func (x *ParsedQuery) GetFingerprint() string {
 	return ""
 }
 
-func (x *ParsedQuery) GetParams() []*ParsedQuery_ParamType {
+func (x *Query) GetParams() []*FieldType {
 	if x != nil {
 		if x.xxx_hidden_Params != nil {
 			return *x.xxx_hidden_Params
@@ -428,7 +323,7 @@ func (x *ParsedQuery) GetParams() []*ParsedQuery_ParamType {
 	return nil
 }
 
-func (x *ParsedQuery) GetFields() []*ParsedQuery_FieldType {
+func (x *Query) GetFields() []*FieldType {
 	if x != nil {
 		if x.xxx_hidden_Fields != nil {
 			return *x.xxx_hidden_Fields
@@ -437,63 +332,63 @@ func (x *ParsedQuery) GetFields() []*ParsedQuery_FieldType {
 	return nil
 }
 
-func (x *ParsedQuery) SetSql(v string) {
+func (x *Query) SetSql(v string) {
 	x.xxx_hidden_Sql = &v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
 }
 
-func (x *ParsedQuery) SetFingerprint(v string) {
+func (x *Query) SetFingerprint(v string) {
 	x.xxx_hidden_Fingerprint = &v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
 }
 
-func (x *ParsedQuery) SetParams(v []*ParsedQuery_ParamType) {
+func (x *Query) SetParams(v []*FieldType) {
 	x.xxx_hidden_Params = &v
 }
 
-func (x *ParsedQuery) SetFields(v []*ParsedQuery_FieldType) {
+func (x *Query) SetFields(v []*FieldType) {
 	x.xxx_hidden_Fields = &v
 }
 
-func (x *ParsedQuery) HasSql() bool {
+func (x *Query) HasSql() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *ParsedQuery) HasFingerprint() bool {
+func (x *Query) HasFingerprint() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
-func (x *ParsedQuery) ClearSql() {
+func (x *Query) ClearSql() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_Sql = nil
 }
 
-func (x *ParsedQuery) ClearFingerprint() {
+func (x *Query) ClearFingerprint() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
 	x.xxx_hidden_Fingerprint = nil
 }
 
-type ParsedQuery_builder struct {
+type Query_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// SQL query text (may be formatted/canonicalized).
+	// SQL text which may differ from user input (formatted/canonicalized).
 	Sql *string
 	// Fingerprint as receipt of validation.
 	Fingerprint *string
-	// Params present in the query, if any.
-	Params []*ParsedQuery_ParamType
-	// Fields returned by the query, if any.
-	Fields []*ParsedQuery_FieldType
+	// Parameter types of the query, if any.
+	Params []*FieldType
+	// Field types returned by the query, if any.
+	Fields []*FieldType
 }
 
-func (b0 ParsedQuery_builder) Build() *ParsedQuery {
-	m0 := &ParsedQuery{}
+func (b0 Query_builder) Build() *Query {
+	m0 := &Query{}
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Sql != nil {
@@ -513,6 +408,7 @@ func (b0 ParsedQuery_builder) Build() *ParsedQuery {
 type ValidateQueryRequest struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Sql         *string                `protobuf:"bytes,1,opt,name=sql"`
+	xxx_hidden_Params      *[]*FieldType          `protobuf:"bytes,2,rep,name=params"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -521,7 +417,7 @@ type ValidateQueryRequest struct {
 
 func (x *ValidateQueryRequest) Reset() {
 	*x = ValidateQueryRequest{}
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[5]
+	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -533,7 +429,7 @@ func (x *ValidateQueryRequest) String() string {
 func (*ValidateQueryRequest) ProtoMessage() {}
 
 func (x *ValidateQueryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[5]
+	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -554,9 +450,22 @@ func (x *ValidateQueryRequest) GetSql() string {
 	return ""
 }
 
+func (x *ValidateQueryRequest) GetParams() []*FieldType {
+	if x != nil {
+		if x.xxx_hidden_Params != nil {
+			return *x.xxx_hidden_Params
+		}
+	}
+	return nil
+}
+
 func (x *ValidateQueryRequest) SetSql(v string) {
 	x.xxx_hidden_Sql = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
+func (x *ValidateQueryRequest) SetParams(v []*FieldType) {
+	x.xxx_hidden_Params = &v
 }
 
 func (x *ValidateQueryRequest) HasSql() bool {
@@ -574,8 +483,10 @@ func (x *ValidateQueryRequest) ClearSql() {
 type ValidateQueryRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// SQL query text.
+	// SQL text to validate.
 	Sql *string
+	// Parameter types of the query, if any.
+	Params []*FieldType
 }
 
 func (b0 ValidateQueryRequest_builder) Build() *ValidateQueryRequest {
@@ -583,23 +494,24 @@ func (b0 ValidateQueryRequest_builder) Build() *ValidateQueryRequest {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Sql != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
 		x.xxx_hidden_Sql = b.Sql
 	}
+	x.xxx_hidden_Params = &b.Params
 	return m0
 }
 
 // Response for query validation.
 type ValidateQueryResponse struct {
 	state            protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Query *ParsedQuery           `protobuf:"bytes,2,opt,name=query"`
+	xxx_hidden_Query *Query                 `protobuf:"bytes,1,opt,name=query"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
 
 func (x *ValidateQueryResponse) Reset() {
 	*x = ValidateQueryResponse{}
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[6]
+	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -611,7 +523,7 @@ func (x *ValidateQueryResponse) String() string {
 func (*ValidateQueryResponse) ProtoMessage() {}
 
 func (x *ValidateQueryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[6]
+	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -622,14 +534,14 @@ func (x *ValidateQueryResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *ValidateQueryResponse) GetQuery() *ParsedQuery {
+func (x *ValidateQueryResponse) GetQuery() *Query {
 	if x != nil {
 		return x.xxx_hidden_Query
 	}
 	return nil
 }
 
-func (x *ValidateQueryResponse) SetQuery(v *ParsedQuery) {
+func (x *ValidateQueryResponse) SetQuery(v *Query) {
 	x.xxx_hidden_Query = v
 }
 
@@ -647,8 +559,8 @@ func (x *ValidateQueryResponse) ClearQuery() {
 type ValidateQueryResponse_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Valid query with fingerprint.
-	Query *ParsedQuery
+	// A validated query ready to be used for execution.
+	Query *Query
 }
 
 func (b0 ValidateQueryResponse_builder) Build() *ValidateQueryResponse {
@@ -660,33 +572,33 @@ func (b0 ValidateQueryResponse_builder) Build() *ValidateQueryResponse {
 }
 
 // Request to retrieve query results.
-type ListQueryResultsRequest struct {
+type ExecuteQueryRequest struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_PageSize    int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize"`
-	xxx_hidden_PageToken   *string                `protobuf:"bytes,2,opt,name=page_token,json=pageToken"`
-	xxx_hidden_Query       *ParsedQuery           `protobuf:"bytes,3,opt,name=query"`
-	xxx_hidden_Params      *[]*QueryParam         `protobuf:"bytes,4,rep,name=params"`
+	xxx_hidden_Query       *Query                 `protobuf:"bytes,1,opt,name=query"`
+	xxx_hidden_Params      *[]*Field              `protobuf:"bytes,2,rep,name=params"`
+	xxx_hidden_PageSize    int32                  `protobuf:"varint,3,opt,name=page_size,json=pageSize"`
+	xxx_hidden_PageToken   *string                `protobuf:"bytes,4,opt,name=page_token,json=pageToken"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
 
-func (x *ListQueryResultsRequest) Reset() {
-	*x = ListQueryResultsRequest{}
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[7]
+func (x *ExecuteQueryRequest) Reset() {
+	*x = ExecuteQueryRequest{}
+	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ListQueryResultsRequest) String() string {
+func (x *ExecuteQueryRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListQueryResultsRequest) ProtoMessage() {}
+func (*ExecuteQueryRequest) ProtoMessage() {}
 
-func (x *ListQueryResultsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[7]
+func (x *ExecuteQueryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -697,14 +609,30 @@ func (x *ListQueryResultsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *ListQueryResultsRequest) GetPageSize() int32 {
+func (x *ExecuteQueryRequest) GetQuery() *Query {
+	if x != nil {
+		return x.xxx_hidden_Query
+	}
+	return nil
+}
+
+func (x *ExecuteQueryRequest) GetParams() []*Field {
+	if x != nil {
+		if x.xxx_hidden_Params != nil {
+			return *x.xxx_hidden_Params
+		}
+	}
+	return nil
+}
+
+func (x *ExecuteQueryRequest) GetPageSize() int32 {
 	if x != nil {
 		return x.xxx_hidden_PageSize
 	}
 	return 0
 }
 
-func (x *ListQueryResultsRequest) GetPageToken() string {
+func (x *ExecuteQueryRequest) GetPageToken() string {
 	if x != nil {
 		if x.xxx_hidden_PageToken != nil {
 			return *x.xxx_hidden_PageToken
@@ -714,109 +642,96 @@ func (x *ListQueryResultsRequest) GetPageToken() string {
 	return ""
 }
 
-func (x *ListQueryResultsRequest) GetQuery() *ParsedQuery {
-	if x != nil {
-		return x.xxx_hidden_Query
-	}
-	return nil
-}
-
-func (x *ListQueryResultsRequest) GetParams() []*QueryParam {
-	if x != nil {
-		if x.xxx_hidden_Params != nil {
-			return *x.xxx_hidden_Params
-		}
-	}
-	return nil
-}
-
-func (x *ListQueryResultsRequest) SetPageSize(v int32) {
-	x.xxx_hidden_PageSize = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
-}
-
-func (x *ListQueryResultsRequest) SetPageToken(v string) {
-	x.xxx_hidden_PageToken = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
-}
-
-func (x *ListQueryResultsRequest) SetQuery(v *ParsedQuery) {
+func (x *ExecuteQueryRequest) SetQuery(v *Query) {
 	x.xxx_hidden_Query = v
 }
 
-func (x *ListQueryResultsRequest) SetParams(v []*QueryParam) {
+func (x *ExecuteQueryRequest) SetParams(v []*Field) {
 	x.xxx_hidden_Params = &v
 }
 
-func (x *ListQueryResultsRequest) HasPageSize() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+func (x *ExecuteQueryRequest) SetPageSize(v int32) {
+	x.xxx_hidden_PageSize = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
 }
 
-func (x *ListQueryResultsRequest) HasPageToken() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+func (x *ExecuteQueryRequest) SetPageToken(v string) {
+	x.xxx_hidden_PageToken = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 4)
 }
 
-func (x *ListQueryResultsRequest) HasQuery() bool {
+func (x *ExecuteQueryRequest) HasQuery() bool {
 	if x == nil {
 		return false
 	}
 	return x.xxx_hidden_Query != nil
 }
 
-func (x *ListQueryResultsRequest) ClearPageSize() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_PageSize = 0
+func (x *ExecuteQueryRequest) HasPageSize() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
-func (x *ListQueryResultsRequest) ClearPageToken() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_PageToken = nil
+func (x *ExecuteQueryRequest) HasPageToken() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
 }
 
-func (x *ListQueryResultsRequest) ClearQuery() {
+func (x *ExecuteQueryRequest) ClearQuery() {
 	x.xxx_hidden_Query = nil
 }
 
-type ListQueryResultsRequest_builder struct {
+func (x *ExecuteQueryRequest) ClearPageSize() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_PageSize = 0
+}
+
+func (x *ExecuteQueryRequest) ClearPageToken() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	x.xxx_hidden_PageToken = nil
+}
+
+type ExecuteQueryRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Maximum number of result rows to return.
+	// Query to execute (must be unchanged for subsequent calls).
+	Query *Query
+	// Query parameter values (must be unchanged for subsequent calls).
+	Params []*Field
+	// Maximum number of results to return.
+	//   - if unset or 0, reads all rows relative to offset;
+	//   - if > 0, reads at most this number of rows relative to offset.
 	PageSize *int32
 	// Token for the desired page (empty for first page).
 	PageToken *string
-	// Query to execute (must be unchanged for subsequent calls).
-	Query *ParsedQuery
-	// Param values applied to the query (must be unchanged for subsequent calls).
-	Params []*QueryParam
 }
 
-func (b0 ListQueryResultsRequest_builder) Build() *ListQueryResultsRequest {
-	m0 := &ListQueryResultsRequest{}
+func (b0 ExecuteQueryRequest_builder) Build() *ExecuteQueryRequest {
+	m0 := &ExecuteQueryRequest{}
 	b, x := &b0, m0
 	_, _ = b, x
+	x.xxx_hidden_Query = b.Query
+	x.xxx_hidden_Params = &b.Params
 	if b.PageSize != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 4)
 		x.xxx_hidden_PageSize = *b.PageSize
 	}
 	if b.PageToken != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 4)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 4)
 		x.xxx_hidden_PageToken = b.PageToken
 	}
-	x.xxx_hidden_Query = b.Query
-	x.xxx_hidden_Params = &b.Params
 	return m0
 }
 
 // Response containing query results.
-type ListQueryResultsResponse struct {
+type ExecuteQueryResponse struct {
 	state                    protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Rows          *[]*structpb.Struct    `protobuf:"bytes,1,rep,name=rows"`
+	xxx_hidden_Rows          *[]*Struct             `protobuf:"bytes,1,rep,name=rows"`
+	xxx_hidden_RowsAffected  int64                  `protobuf:"varint,2,opt,name=rows_affected,json=rowsAffected"`
 	xxx_hidden_NextPageToken *string                `protobuf:"bytes,10,opt,name=next_page_token,json=nextPageToken"`
 	XXX_raceDetectHookData   protoimpl.RaceDetectHookData
 	XXX_presence             [1]uint32
@@ -824,21 +739,21 @@ type ListQueryResultsResponse struct {
 	sizeCache                protoimpl.SizeCache
 }
 
-func (x *ListQueryResultsResponse) Reset() {
-	*x = ListQueryResultsResponse{}
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[8]
+func (x *ExecuteQueryResponse) Reset() {
+	*x = ExecuteQueryResponse{}
+	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ListQueryResultsResponse) String() string {
+func (x *ExecuteQueryResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListQueryResultsResponse) ProtoMessage() {}
+func (*ExecuteQueryResponse) ProtoMessage() {}
 
-func (x *ListQueryResultsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[8]
+func (x *ExecuteQueryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -849,7 +764,7 @@ func (x *ListQueryResultsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *ListQueryResultsResponse) GetRows() []*structpb.Struct {
+func (x *ExecuteQueryResponse) GetRows() []*Struct {
 	if x != nil {
 		if x.xxx_hidden_Rows != nil {
 			return *x.xxx_hidden_Rows
@@ -858,7 +773,14 @@ func (x *ListQueryResultsResponse) GetRows() []*structpb.Struct {
 	return nil
 }
 
-func (x *ListQueryResultsResponse) GetNextPageToken() string {
+func (x *ExecuteQueryResponse) GetRowsAffected() int64 {
+	if x != nil {
+		return x.xxx_hidden_RowsAffected
+	}
+	return 0
+}
+
+func (x *ExecuteQueryResponse) GetNextPageToken() string {
 	if x != nil {
 		if x.xxx_hidden_NextPageToken != nil {
 			return *x.xxx_hidden_NextPageToken
@@ -868,72 +790,103 @@ func (x *ListQueryResultsResponse) GetNextPageToken() string {
 	return ""
 }
 
-func (x *ListQueryResultsResponse) SetRows(v []*structpb.Struct) {
+func (x *ExecuteQueryResponse) SetRows(v []*Struct) {
 	x.xxx_hidden_Rows = &v
 }
 
-func (x *ListQueryResultsResponse) SetNextPageToken(v string) {
-	x.xxx_hidden_NextPageToken = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+func (x *ExecuteQueryResponse) SetRowsAffected(v int64) {
+	x.xxx_hidden_RowsAffected = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
 }
 
-func (x *ListQueryResultsResponse) HasNextPageToken() bool {
+func (x *ExecuteQueryResponse) SetNextPageToken(v string) {
+	x.xxx_hidden_NextPageToken = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
+}
+
+func (x *ExecuteQueryResponse) HasRowsAffected() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
-func (x *ListQueryResultsResponse) ClearNextPageToken() {
+func (x *ExecuteQueryResponse) HasNextPageToken() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *ExecuteQueryResponse) ClearRowsAffected() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_RowsAffected = 0
+}
+
+func (x *ExecuteQueryResponse) ClearNextPageToken() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
 	x.xxx_hidden_NextPageToken = nil
 }
 
-type ListQueryResultsResponse_builder struct {
+type ExecuteQueryResponse_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// A list of query result rows with a maximum size specified in the request.
-	Rows []*structpb.Struct
-	// Next page token (empty for last page)
+	// Result rows with a maximum size specified in the request.
+	Rows []*Struct
+	// Number of rows affected (when query is DML).
+	RowsAffected *int64
+	// Next page token (empty for last page).
 	NextPageToken *string
 }
 
-func (b0 ListQueryResultsResponse_builder) Build() *ListQueryResultsResponse {
-	m0 := &ListQueryResultsResponse{}
+func (b0 ExecuteQueryResponse_builder) Build() *ExecuteQueryResponse {
+	m0 := &ExecuteQueryResponse{}
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Rows = &b.Rows
+	if b.RowsAffected != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
+		x.xxx_hidden_RowsAffected = *b.RowsAffected
+	}
 	if b.NextPageToken != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
 		x.xxx_hidden_NextPageToken = b.NextPageToken
 	}
 	return m0
 }
 
 // Request to stream query results.
-type StreamQueryResultsRequest struct {
-	state             protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Query  *ParsedQuery           `protobuf:"bytes,1,opt,name=query"`
-	xxx_hidden_Params *[]*QueryParam         `protobuf:"bytes,4,rep,name=params"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+type ReadQueryRequest struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Query       *Query                 `protobuf:"bytes,1,opt,name=query"`
+	xxx_hidden_Params      *[]*Field              `protobuf:"bytes,4,rep,name=params"`
+	xxx_hidden_Format      DataFormat             `protobuf:"varint,5,opt,name=format,enum=dtkt.sql.v1beta1.DataFormat,def=2"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
-func (x *StreamQueryResultsRequest) Reset() {
-	*x = StreamQueryResultsRequest{}
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[9]
+// Default values for ReadQueryRequest fields.
+const (
+	Default_ReadQueryRequest_Format = DataFormat_DATA_FORMAT_STRUCT_BATCH
+)
+
+func (x *ReadQueryRequest) Reset() {
+	*x = ReadQueryRequest{}
+	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *StreamQueryResultsRequest) String() string {
+func (x *ReadQueryRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*StreamQueryResultsRequest) ProtoMessage() {}
+func (*ReadQueryRequest) ProtoMessage() {}
 
-func (x *StreamQueryResultsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[9]
+func (x *ReadQueryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -944,14 +897,14 @@ func (x *StreamQueryResultsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *StreamQueryResultsRequest) GetQuery() *ParsedQuery {
+func (x *ReadQueryRequest) GetQuery() *Query {
 	if x != nil {
 		return x.xxx_hidden_Query
 	}
 	return nil
 }
 
-func (x *StreamQueryResultsRequest) GetParams() []*QueryParam {
+func (x *ReadQueryRequest) GetParams() []*Field {
 	if x != nil {
 		if x.xxx_hidden_Params != nil {
 			return *x.xxx_hidden_Params
@@ -960,66 +913,101 @@ func (x *StreamQueryResultsRequest) GetParams() []*QueryParam {
 	return nil
 }
 
-func (x *StreamQueryResultsRequest) SetQuery(v *ParsedQuery) {
+func (x *ReadQueryRequest) GetFormat() DataFormat {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 2) {
+			return x.xxx_hidden_Format
+		}
+	}
+	return Default_ReadQueryRequest_Format
+}
+
+func (x *ReadQueryRequest) SetQuery(v *Query) {
 	x.xxx_hidden_Query = v
 }
 
-func (x *StreamQueryResultsRequest) SetParams(v []*QueryParam) {
+func (x *ReadQueryRequest) SetParams(v []*Field) {
 	x.xxx_hidden_Params = &v
 }
 
-func (x *StreamQueryResultsRequest) HasQuery() bool {
+func (x *ReadQueryRequest) SetFormat(v DataFormat) {
+	x.xxx_hidden_Format = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
+}
+
+func (x *ReadQueryRequest) HasQuery() bool {
 	if x == nil {
 		return false
 	}
 	return x.xxx_hidden_Query != nil
 }
 
-func (x *StreamQueryResultsRequest) ClearQuery() {
+func (x *ReadQueryRequest) HasFormat() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *ReadQueryRequest) ClearQuery() {
 	x.xxx_hidden_Query = nil
 }
 
-type StreamQueryResultsRequest_builder struct {
+func (x *ReadQueryRequest) ClearFormat() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+}
+
+type ReadQueryRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// Query to execute.
-	Query *ParsedQuery
-	// Param values applied to the query.
-	Params []*QueryParam
+	Query *Query
+	// Query parameter values.
+	Params []*Field
+	// Format of query result(s) to return.
+	Format *DataFormat
 }
 
-func (b0 StreamQueryResultsRequest_builder) Build() *StreamQueryResultsRequest {
-	m0 := &StreamQueryResultsRequest{}
+func (b0 ReadQueryRequest_builder) Build() *ReadQueryRequest {
+	m0 := &ReadQueryRequest{}
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Query = b.Query
 	x.xxx_hidden_Params = &b.Params
+	if b.Format != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
+		x.xxx_hidden_Format = *b.Format
+	}
 	return m0
 }
 
 // Response containing streamed query results.
-type StreamQueryResultsResponse struct {
-	state          protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Row *structpb.Struct       `protobuf:"bytes,1,opt,name=row"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+type ReadQueryResponse struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_ArrowBatch  []byte                 `protobuf:"bytes,1,opt,name=arrow_batch,json=arrowBatch"`
+	xxx_hidden_StructBatch *[]*Struct             `protobuf:"bytes,2,rep,name=struct_batch,json=structBatch"`
+	xxx_hidden_JsonBatch   *[]*structpb.Struct    `protobuf:"bytes,3,rep,name=json_batch,json=jsonBatch"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
-func (x *StreamQueryResultsResponse) Reset() {
-	*x = StreamQueryResultsResponse{}
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[10]
+func (x *ReadQueryResponse) Reset() {
+	*x = ReadQueryResponse{}
+	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *StreamQueryResultsResponse) String() string {
+func (x *ReadQueryResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*StreamQueryResultsResponse) ProtoMessage() {}
+func (*ReadQueryResponse) ProtoMessage() {}
 
-func (x *StreamQueryResultsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[10]
+func (x *ReadQueryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1030,40 +1018,77 @@ func (x *StreamQueryResultsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *StreamQueryResultsResponse) GetRow() *structpb.Struct {
+func (x *ReadQueryResponse) GetArrowBatch() []byte {
 	if x != nil {
-		return x.xxx_hidden_Row
+		return x.xxx_hidden_ArrowBatch
 	}
 	return nil
 }
 
-func (x *StreamQueryResultsResponse) SetRow(v *structpb.Struct) {
-	x.xxx_hidden_Row = v
+func (x *ReadQueryResponse) GetStructBatch() []*Struct {
+	if x != nil {
+		if x.xxx_hidden_StructBatch != nil {
+			return *x.xxx_hidden_StructBatch
+		}
+	}
+	return nil
 }
 
-func (x *StreamQueryResultsResponse) HasRow() bool {
+func (x *ReadQueryResponse) GetJsonBatch() []*structpb.Struct {
+	if x != nil {
+		if x.xxx_hidden_JsonBatch != nil {
+			return *x.xxx_hidden_JsonBatch
+		}
+	}
+	return nil
+}
+
+func (x *ReadQueryResponse) SetArrowBatch(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.xxx_hidden_ArrowBatch = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+}
+
+func (x *ReadQueryResponse) SetStructBatch(v []*Struct) {
+	x.xxx_hidden_StructBatch = &v
+}
+
+func (x *ReadQueryResponse) SetJsonBatch(v []*structpb.Struct) {
+	x.xxx_hidden_JsonBatch = &v
+}
+
+func (x *ReadQueryResponse) HasArrowBatch() bool {
 	if x == nil {
 		return false
 	}
-	return x.xxx_hidden_Row != nil
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *StreamQueryResultsResponse) ClearRow() {
-	x.xxx_hidden_Row = nil
+func (x *ReadQueryResponse) ClearArrowBatch() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_ArrowBatch = nil
 }
 
-type StreamQueryResultsResponse_builder struct {
+type ReadQueryResponse_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// A single query result row conforming to the fields defined in query.
-	Row *structpb.Struct
+	ArrowBatch  []byte
+	StructBatch []*Struct
+	JsonBatch   []*structpb.Struct
 }
 
-func (b0 StreamQueryResultsResponse_builder) Build() *StreamQueryResultsResponse {
-	m0 := &StreamQueryResultsResponse{}
+func (b0 ReadQueryResponse_builder) Build() *ReadQueryResponse {
+	m0 := &ReadQueryResponse{}
 	b, x := &b0, m0
 	_, _ = b, x
-	x.xxx_hidden_Row = b.Row
+	if b.ArrowBatch != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
+		x.xxx_hidden_ArrowBatch = b.ArrowBatch
+	}
+	x.xxx_hidden_StructBatch = &b.StructBatch
+	x.xxx_hidden_JsonBatch = &b.JsonBatch
 	return m0
 }
 
@@ -1100,7 +1125,7 @@ type QueryEngine_Capabilities struct {
 
 func (x *QueryEngine_Capabilities) Reset() {
 	*x = QueryEngine_Capabilities{}
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[11]
+	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1112,7 +1137,7 @@ func (x *QueryEngine_Capabilities) String() string {
 func (*QueryEngine_Capabilities) ProtoMessage() {}
 
 func (x *QueryEngine_Capabilities) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[11]
+	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1815,221 +1840,11 @@ func (b0 QueryEngine_Capabilities_builder) Build() *QueryEngine_Capabilities {
 	return m0
 }
 
-type ParsedQuery_FieldType struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Name        *string                `protobuf:"bytes,1,opt,name=name"`
-	xxx_hidden_Type        *Type                  `protobuf:"bytes,2,opt,name=type"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
-}
-
-func (x *ParsedQuery_FieldType) Reset() {
-	*x = ParsedQuery_FieldType{}
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ParsedQuery_FieldType) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ParsedQuery_FieldType) ProtoMessage() {}
-
-func (x *ParsedQuery_FieldType) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *ParsedQuery_FieldType) GetName() string {
-	if x != nil {
-		if x.xxx_hidden_Name != nil {
-			return *x.xxx_hidden_Name
-		}
-		return ""
-	}
-	return ""
-}
-
-func (x *ParsedQuery_FieldType) GetType() *Type {
-	if x != nil {
-		return x.xxx_hidden_Type
-	}
-	return nil
-}
-
-func (x *ParsedQuery_FieldType) SetName(v string) {
-	x.xxx_hidden_Name = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
-}
-
-func (x *ParsedQuery_FieldType) SetType(v *Type) {
-	x.xxx_hidden_Type = v
-}
-
-func (x *ParsedQuery_FieldType) HasName() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
-}
-
-func (x *ParsedQuery_FieldType) HasType() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Type != nil
-}
-
-func (x *ParsedQuery_FieldType) ClearName() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_Name = nil
-}
-
-func (x *ParsedQuery_FieldType) ClearType() {
-	x.xxx_hidden_Type = nil
-}
-
-type ParsedQuery_FieldType_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	// Name of the field.
-	Name *string
-	// Type of the field.
-	Type *Type
-}
-
-func (b0 ParsedQuery_FieldType_builder) Build() *ParsedQuery_FieldType {
-	m0 := &ParsedQuery_FieldType{}
-	b, x := &b0, m0
-	_, _ = b, x
-	if b.Name != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
-		x.xxx_hidden_Name = b.Name
-	}
-	x.xxx_hidden_Type = b.Type
-	return m0
-}
-
-type ParsedQuery_ParamType struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Type        *Type                  `protobuf:"bytes,1,opt,name=type"`
-	xxx_hidden_Name        *string                `protobuf:"bytes,2,opt,name=name"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
-}
-
-func (x *ParsedQuery_ParamType) Reset() {
-	*x = ParsedQuery_ParamType{}
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ParsedQuery_ParamType) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ParsedQuery_ParamType) ProtoMessage() {}
-
-func (x *ParsedQuery_ParamType) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_sql_v1beta1_query_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *ParsedQuery_ParamType) GetType() *Type {
-	if x != nil {
-		return x.xxx_hidden_Type
-	}
-	return nil
-}
-
-func (x *ParsedQuery_ParamType) GetName() string {
-	if x != nil {
-		if x.xxx_hidden_Name != nil {
-			return *x.xxx_hidden_Name
-		}
-		return ""
-	}
-	return ""
-}
-
-func (x *ParsedQuery_ParamType) SetType(v *Type) {
-	x.xxx_hidden_Type = v
-}
-
-func (x *ParsedQuery_ParamType) SetName(v string) {
-	x.xxx_hidden_Name = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
-}
-
-func (x *ParsedQuery_ParamType) HasType() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Type != nil
-}
-
-func (x *ParsedQuery_ParamType) HasName() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
-func (x *ParsedQuery_ParamType) ClearType() {
-	x.xxx_hidden_Type = nil
-}
-
-func (x *ParsedQuery_ParamType) ClearName() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_Name = nil
-}
-
-type ParsedQuery_ParamType_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	// Type of the param, if supported by query parser.
-	Type *Type
-	// Name of the param (not present for positional params).
-	Name *string
-}
-
-func (b0 ParsedQuery_ParamType_builder) Build() *ParsedQuery_ParamType {
-	m0 := &ParsedQuery_ParamType{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.xxx_hidden_Type = b.Type
-	if b.Name != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
-		x.xxx_hidden_Name = b.Name
-	}
-	return m0
-}
-
 var File_dtkt_sql_v1beta1_query_proto protoreflect.FileDescriptor
 
 const file_dtkt_sql_v1beta1_query_proto_rawDesc = "" +
 	"\n" +
-	"\x1cdtkt/sql/v1beta1/query.proto\x12\x10dtkt.sql.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1ddtkt/sql/v1beta1/column.proto\x1a!google/protobuf/go_features.proto\x1a\x1cgoogle/protobuf/struct.proto\"\x17\n" +
+	"\x1cdtkt/sql/v1beta1/query.proto\x12\x10dtkt.sql.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1bdtkt/sql/v1beta1/type.proto\x1a\x1cdtkt/sql/v1beta1/value.proto\x1a!google/protobuf/go_features.proto\x1a\x1cgoogle/protobuf/struct.proto\"\x17\n" +
 	"\x15GetQueryEngineRequest\"O\n" +
 	"\x16GetQueryEngineResponse\x125\n" +
 	"\x06engine\x18\x01 \x01(\v2\x1d.dtkt.sql.v1beta1.QueryEngineR\x06engine\"\xa2\n" +
@@ -2061,93 +1876,96 @@ const file_dtkt_sql_v1beta1_query_proto_rawDesc = "" +
 	"\x18supports_bracket_quoting\x18\x13 \x01(\bR\x16supportsBracketQuoting\x12:\n" +
 	"\x19supports_backtick_quoting\x18\x14 \x01(\bR\x17supportsBacktickQuoting\x12G\n" +
 	" supports_double_quote_identifier\x18\x15 \x01(\bR\x1dsupportsDoubleQuoteIdentifier\x12&\n" +
-	"\x0fsupports_i_like\x18\x16 \x01(\bR\rsupportsILike\"V\n" +
-	"\n" +
-	"QueryParam\x124\n" +
-	"\x05value\x18\x01 \x01(\v2\x16.google.protobuf.ValueB\x06\xbaH\x03\xc8\x01\x01R\x05value\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\"\xed\x02\n" +
-	"\vParsedQuery\x12\x18\n" +
+	"\x0fsupports_i_like\x18\x16 \x01(\bR\rsupportsILike\"\xb5\x01\n" +
+	"\x05Query\x12\x18\n" +
 	"\x03sql\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x03sql\x12(\n" +
-	"\vfingerprint\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vfingerprint\x12?\n" +
-	"\x06params\x18\x03 \x03(\v2'.dtkt.sql.v1beta1.ParsedQuery.ParamTypeR\x06params\x12?\n" +
-	"\x06fields\x18\x04 \x03(\v2'.dtkt.sql.v1beta1.ParsedQuery.FieldTypeR\x06fields\x1aK\n" +
-	"\tFieldType\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12*\n" +
-	"\x04type\x18\x02 \x01(\v2\x16.dtkt.sql.v1beta1.TypeR\x04type\x1aK\n" +
-	"\tParamType\x12*\n" +
-	"\x04type\x18\x01 \x01(\v2\x16.dtkt.sql.v1beta1.TypeR\x04type\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\"0\n" +
+	"\vfingerprint\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vfingerprint\x123\n" +
+	"\x06params\x18\x03 \x03(\v2\x1b.dtkt.sql.v1beta1.FieldTypeR\x06params\x123\n" +
+	"\x06fields\x18\x04 \x03(\v2\x1b.dtkt.sql.v1beta1.FieldTypeR\x06fields\"e\n" +
 	"\x14ValidateQueryRequest\x12\x18\n" +
-	"\x03sql\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x03sql\"L\n" +
-	"\x15ValidateQueryResponse\x123\n" +
-	"\x05query\x18\x02 \x01(\v2\x1d.dtkt.sql.v1beta1.ParsedQueryR\x05query\"\xfb\x01\n" +
-	"\x17ListQueryResultsRequest\x12\x1b\n" +
-	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
+	"\x03sql\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x03sql\x123\n" +
+	"\x06params\x18\x02 \x03(\v2\x1b.dtkt.sql.v1beta1.FieldTypeR\x06params\"F\n" +
+	"\x15ValidateQueryResponse\x12-\n" +
+	"\x05query\x18\x01 \x01(\v2\x17.dtkt.sql.v1beta1.QueryR\x05query\"\xa5\x03\n" +
+	"\x13ExecuteQueryRequest\x125\n" +
+	"\x05query\x18\x01 \x01(\v2\x17.dtkt.sql.v1beta1.QueryB\x06\xbaH\x03\xc8\x01\x01R\x05query\x12/\n" +
+	"\x06params\x18\x02 \x03(\v2\x17.dtkt.sql.v1beta1.FieldR\x06params\x12\x1b\n" +
+	"\tpage_size\x18\x03 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
-	"page_token\x18\x02 \x01(\tR\tpageToken\x12;\n" +
-	"\x05query\x18\x03 \x01(\v2\x1d.dtkt.sql.v1beta1.ParsedQueryB\x06\xbaH\x03\xc8\x01\x01R\x05query\x124\n" +
-	"\x06params\x18\x04 \x03(\v2\x1c.dtkt.sql.v1beta1.QueryParamR\x06params:1\xbaH.*,size(this.query.params) == size(this.params)\"o\n" +
-	"\x18ListQueryResultsResponse\x12+\n" +
-	"\x04rows\x18\x01 \x03(\v2\x17.google.protobuf.StructR\x04rows\x12&\n" +
+	"page_token\x18\x04 \x01(\tR\tpageToken:\xe9\x01\xbaH\xe5\x01\x1ap\n" +
+	"\x0etoo_few_params\x121number of params is less than the query specifies\x1a+size(this.params) < size(this.query.params)\x1aq\n" +
+	"\x0ftoo_many_params\x121number of params greater than the query specifies\x1a+size(this.params) > size(this.query.params)\"\x91\x01\n" +
+	"\x14ExecuteQueryResponse\x12,\n" +
+	"\x04rows\x18\x01 \x03(\v2\x18.dtkt.sql.v1beta1.StructR\x04rows\x12#\n" +
+	"\rrows_affected\x18\x02 \x01(\x03R\frowsAffected\x12&\n" +
 	"\x0fnext_page_token\x18\n" +
-	" \x01(\tR\rnextPageToken\"\xc1\x01\n" +
-	"\x19StreamQueryResultsRequest\x12;\n" +
-	"\x05query\x18\x01 \x01(\v2\x1d.dtkt.sql.v1beta1.ParsedQueryB\x06\xbaH\x03\xc8\x01\x01R\x05query\x124\n" +
-	"\x06params\x18\x04 \x03(\v2\x1c.dtkt.sql.v1beta1.QueryParamR\x06params:1\xbaH.*,size(this.query.params) == size(this.params)\"G\n" +
-	"\x1aStreamQueryResultsResponse\x12)\n" +
-	"\x03row\x18\x01 \x01(\v2\x17.google.protobuf.StructR\x03row2\xb3\x03\n" +
+	" \x01(\tR\rnextPageToken\"\xd4\x01\n" +
+	"\x10ReadQueryRequest\x125\n" +
+	"\x05query\x18\x01 \x01(\v2\x17.dtkt.sql.v1beta1.QueryB\x06\xbaH\x03\xc8\x01\x01R\x05query\x12/\n" +
+	"\x06params\x18\x04 \x03(\v2\x17.dtkt.sql.v1beta1.FieldR\x06params\x12X\n" +
+	"\x06format\x18\x05 \x01(\x0e2\x1c.dtkt.sql.v1beta1.DataFormat:\x18DATA_FORMAT_STRUCT_BATCHB\b\xbaH\x05\x82\x01\x02\x10\x01R\x06format\"\xd9\x01\n" +
+	"\x11ReadQueryResponse\x12\x1f\n" +
+	"\varrow_batch\x18\x01 \x01(\fR\n" +
+	"arrowBatch\x12;\n" +
+	"\fstruct_batch\x18\x02 \x03(\v2\x18.dtkt.sql.v1beta1.StructR\vstructBatch\x126\n" +
+	"\n" +
+	"json_batch\x18\x03 \x03(\v2\x17.google.protobuf.StructR\tjsonBatch:.\xbaH+\")\n" +
+	"\varrow_batch\n" +
+	"\fstruct_batch\n" +
+	"\n" +
+	"json_batch\x10\x012\x8c\x03\n" +
 	"\fQueryService\x12c\n" +
 	"\x0eGetQueryEngine\x12'.dtkt.sql.v1beta1.GetQueryEngineRequest\x1a(.dtkt.sql.v1beta1.GetQueryEngineResponse\x12`\n" +
-	"\rValidateQuery\x12&.dtkt.sql.v1beta1.ValidateQueryRequest\x1a'.dtkt.sql.v1beta1.ValidateQueryResponse\x12i\n" +
-	"\x10ListQueryResults\x12).dtkt.sql.v1beta1.ListQueryResultsRequest\x1a*.dtkt.sql.v1beta1.ListQueryResultsResponse\x12q\n" +
-	"\x12StreamQueryResults\x12+.dtkt.sql.v1beta1.StreamQueryResultsRequest\x1a,.dtkt.sql.v1beta1.StreamQueryResultsResponse0\x01B\xd8\x01\n" +
+	"\rValidateQuery\x12&.dtkt.sql.v1beta1.ValidateQueryRequest\x1a'.dtkt.sql.v1beta1.ValidateQueryResponse\x12]\n" +
+	"\fExecuteQuery\x12%.dtkt.sql.v1beta1.ExecuteQueryRequest\x1a&.dtkt.sql.v1beta1.ExecuteQueryResponse\x12V\n" +
+	"\tReadQuery\x12\".dtkt.sql.v1beta1.ReadQueryRequest\x1a#.dtkt.sql.v1beta1.ReadQueryResponse0\x01B\xd8\x01\n" +
 	"\x16proto.dtkt.sql.v1beta1B\n" +
 	"QueryProtoP\x01ZHgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/sql/v1beta1;sqlv1beta1\xa2\x02\x03DSX\xaa\x02\x10Dtkt.Sql.V1beta1\xca\x02\x10Dtkt\\Sql\\V1beta1\xe2\x02\x1cDtkt\\Sql\\V1beta1\\GPBMetadata\xea\x02\x12Dtkt::Sql::V1beta1\x92\x03\x05\xd2>\x02\x10\x03b\beditionsp\xe8\a"
 
-var file_dtkt_sql_v1beta1_query_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_dtkt_sql_v1beta1_query_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_dtkt_sql_v1beta1_query_proto_goTypes = []any{
-	(*GetQueryEngineRequest)(nil),      // 0: dtkt.sql.v1beta1.GetQueryEngineRequest
-	(*GetQueryEngineResponse)(nil),     // 1: dtkt.sql.v1beta1.GetQueryEngineResponse
-	(*QueryEngine)(nil),                // 2: dtkt.sql.v1beta1.QueryEngine
-	(*QueryParam)(nil),                 // 3: dtkt.sql.v1beta1.QueryParam
-	(*ParsedQuery)(nil),                // 4: dtkt.sql.v1beta1.ParsedQuery
-	(*ValidateQueryRequest)(nil),       // 5: dtkt.sql.v1beta1.ValidateQueryRequest
-	(*ValidateQueryResponse)(nil),      // 6: dtkt.sql.v1beta1.ValidateQueryResponse
-	(*ListQueryResultsRequest)(nil),    // 7: dtkt.sql.v1beta1.ListQueryResultsRequest
-	(*ListQueryResultsResponse)(nil),   // 8: dtkt.sql.v1beta1.ListQueryResultsResponse
-	(*StreamQueryResultsRequest)(nil),  // 9: dtkt.sql.v1beta1.StreamQueryResultsRequest
-	(*StreamQueryResultsResponse)(nil), // 10: dtkt.sql.v1beta1.StreamQueryResultsResponse
-	(*QueryEngine_Capabilities)(nil),   // 11: dtkt.sql.v1beta1.QueryEngine.Capabilities
-	(*ParsedQuery_FieldType)(nil),      // 12: dtkt.sql.v1beta1.ParsedQuery.FieldType
-	(*ParsedQuery_ParamType)(nil),      // 13: dtkt.sql.v1beta1.ParsedQuery.ParamType
-	(*Type)(nil),                       // 14: dtkt.sql.v1beta1.Type
-	(*structpb.Value)(nil),             // 15: google.protobuf.Value
-	(*structpb.Struct)(nil),            // 16: google.protobuf.Struct
+	(*GetQueryEngineRequest)(nil),    // 0: dtkt.sql.v1beta1.GetQueryEngineRequest
+	(*GetQueryEngineResponse)(nil),   // 1: dtkt.sql.v1beta1.GetQueryEngineResponse
+	(*QueryEngine)(nil),              // 2: dtkt.sql.v1beta1.QueryEngine
+	(*Query)(nil),                    // 3: dtkt.sql.v1beta1.Query
+	(*ValidateQueryRequest)(nil),     // 4: dtkt.sql.v1beta1.ValidateQueryRequest
+	(*ValidateQueryResponse)(nil),    // 5: dtkt.sql.v1beta1.ValidateQueryResponse
+	(*ExecuteQueryRequest)(nil),      // 6: dtkt.sql.v1beta1.ExecuteQueryRequest
+	(*ExecuteQueryResponse)(nil),     // 7: dtkt.sql.v1beta1.ExecuteQueryResponse
+	(*ReadQueryRequest)(nil),         // 8: dtkt.sql.v1beta1.ReadQueryRequest
+	(*ReadQueryResponse)(nil),        // 9: dtkt.sql.v1beta1.ReadQueryResponse
+	(*QueryEngine_Capabilities)(nil), // 10: dtkt.sql.v1beta1.QueryEngine.Capabilities
+	(*Type)(nil),                     // 11: dtkt.sql.v1beta1.Type
+	(*FieldType)(nil),                // 12: dtkt.sql.v1beta1.FieldType
+	(*Field)(nil),                    // 13: dtkt.sql.v1beta1.Field
+	(*Struct)(nil),                   // 14: dtkt.sql.v1beta1.Struct
+	(DataFormat)(0),                  // 15: dtkt.sql.v1beta1.DataFormat
+	(*structpb.Struct)(nil),          // 16: google.protobuf.Struct
 }
 var file_dtkt_sql_v1beta1_query_proto_depIdxs = []int32{
 	2,  // 0: dtkt.sql.v1beta1.GetQueryEngineResponse.engine:type_name -> dtkt.sql.v1beta1.QueryEngine
-	11, // 1: dtkt.sql.v1beta1.QueryEngine.capabilities:type_name -> dtkt.sql.v1beta1.QueryEngine.Capabilities
-	14, // 2: dtkt.sql.v1beta1.QueryEngine.types:type_name -> dtkt.sql.v1beta1.Type
-	15, // 3: dtkt.sql.v1beta1.QueryParam.value:type_name -> google.protobuf.Value
-	13, // 4: dtkt.sql.v1beta1.ParsedQuery.params:type_name -> dtkt.sql.v1beta1.ParsedQuery.ParamType
-	12, // 5: dtkt.sql.v1beta1.ParsedQuery.fields:type_name -> dtkt.sql.v1beta1.ParsedQuery.FieldType
-	4,  // 6: dtkt.sql.v1beta1.ValidateQueryResponse.query:type_name -> dtkt.sql.v1beta1.ParsedQuery
-	4,  // 7: dtkt.sql.v1beta1.ListQueryResultsRequest.query:type_name -> dtkt.sql.v1beta1.ParsedQuery
-	3,  // 8: dtkt.sql.v1beta1.ListQueryResultsRequest.params:type_name -> dtkt.sql.v1beta1.QueryParam
-	16, // 9: dtkt.sql.v1beta1.ListQueryResultsResponse.rows:type_name -> google.protobuf.Struct
-	4,  // 10: dtkt.sql.v1beta1.StreamQueryResultsRequest.query:type_name -> dtkt.sql.v1beta1.ParsedQuery
-	3,  // 11: dtkt.sql.v1beta1.StreamQueryResultsRequest.params:type_name -> dtkt.sql.v1beta1.QueryParam
-	16, // 12: dtkt.sql.v1beta1.StreamQueryResultsResponse.row:type_name -> google.protobuf.Struct
-	14, // 13: dtkt.sql.v1beta1.ParsedQuery.FieldType.type:type_name -> dtkt.sql.v1beta1.Type
-	14, // 14: dtkt.sql.v1beta1.ParsedQuery.ParamType.type:type_name -> dtkt.sql.v1beta1.Type
+	10, // 1: dtkt.sql.v1beta1.QueryEngine.capabilities:type_name -> dtkt.sql.v1beta1.QueryEngine.Capabilities
+	11, // 2: dtkt.sql.v1beta1.QueryEngine.types:type_name -> dtkt.sql.v1beta1.Type
+	12, // 3: dtkt.sql.v1beta1.Query.params:type_name -> dtkt.sql.v1beta1.FieldType
+	12, // 4: dtkt.sql.v1beta1.Query.fields:type_name -> dtkt.sql.v1beta1.FieldType
+	12, // 5: dtkt.sql.v1beta1.ValidateQueryRequest.params:type_name -> dtkt.sql.v1beta1.FieldType
+	3,  // 6: dtkt.sql.v1beta1.ValidateQueryResponse.query:type_name -> dtkt.sql.v1beta1.Query
+	3,  // 7: dtkt.sql.v1beta1.ExecuteQueryRequest.query:type_name -> dtkt.sql.v1beta1.Query
+	13, // 8: dtkt.sql.v1beta1.ExecuteQueryRequest.params:type_name -> dtkt.sql.v1beta1.Field
+	14, // 9: dtkt.sql.v1beta1.ExecuteQueryResponse.rows:type_name -> dtkt.sql.v1beta1.Struct
+	3,  // 10: dtkt.sql.v1beta1.ReadQueryRequest.query:type_name -> dtkt.sql.v1beta1.Query
+	13, // 11: dtkt.sql.v1beta1.ReadQueryRequest.params:type_name -> dtkt.sql.v1beta1.Field
+	15, // 12: dtkt.sql.v1beta1.ReadQueryRequest.format:type_name -> dtkt.sql.v1beta1.DataFormat
+	14, // 13: dtkt.sql.v1beta1.ReadQueryResponse.struct_batch:type_name -> dtkt.sql.v1beta1.Struct
+	16, // 14: dtkt.sql.v1beta1.ReadQueryResponse.json_batch:type_name -> google.protobuf.Struct
 	0,  // 15: dtkt.sql.v1beta1.QueryService.GetQueryEngine:input_type -> dtkt.sql.v1beta1.GetQueryEngineRequest
-	5,  // 16: dtkt.sql.v1beta1.QueryService.ValidateQuery:input_type -> dtkt.sql.v1beta1.ValidateQueryRequest
-	7,  // 17: dtkt.sql.v1beta1.QueryService.ListQueryResults:input_type -> dtkt.sql.v1beta1.ListQueryResultsRequest
-	9,  // 18: dtkt.sql.v1beta1.QueryService.StreamQueryResults:input_type -> dtkt.sql.v1beta1.StreamQueryResultsRequest
+	4,  // 16: dtkt.sql.v1beta1.QueryService.ValidateQuery:input_type -> dtkt.sql.v1beta1.ValidateQueryRequest
+	6,  // 17: dtkt.sql.v1beta1.QueryService.ExecuteQuery:input_type -> dtkt.sql.v1beta1.ExecuteQueryRequest
+	8,  // 18: dtkt.sql.v1beta1.QueryService.ReadQuery:input_type -> dtkt.sql.v1beta1.ReadQueryRequest
 	1,  // 19: dtkt.sql.v1beta1.QueryService.GetQueryEngine:output_type -> dtkt.sql.v1beta1.GetQueryEngineResponse
-	6,  // 20: dtkt.sql.v1beta1.QueryService.ValidateQuery:output_type -> dtkt.sql.v1beta1.ValidateQueryResponse
-	8,  // 21: dtkt.sql.v1beta1.QueryService.ListQueryResults:output_type -> dtkt.sql.v1beta1.ListQueryResultsResponse
-	10, // 22: dtkt.sql.v1beta1.QueryService.StreamQueryResults:output_type -> dtkt.sql.v1beta1.StreamQueryResultsResponse
+	5,  // 20: dtkt.sql.v1beta1.QueryService.ValidateQuery:output_type -> dtkt.sql.v1beta1.ValidateQueryResponse
+	7,  // 21: dtkt.sql.v1beta1.QueryService.ExecuteQuery:output_type -> dtkt.sql.v1beta1.ExecuteQueryResponse
+	9,  // 22: dtkt.sql.v1beta1.QueryService.ReadQuery:output_type -> dtkt.sql.v1beta1.ReadQueryResponse
 	19, // [19:23] is the sub-list for method output_type
 	15, // [15:19] is the sub-list for method input_type
 	15, // [15:15] is the sub-list for extension type_name
@@ -2160,14 +1978,15 @@ func file_dtkt_sql_v1beta1_query_proto_init() {
 	if File_dtkt_sql_v1beta1_query_proto != nil {
 		return
 	}
-	file_dtkt_sql_v1beta1_column_proto_init()
+	file_dtkt_sql_v1beta1_type_proto_init()
+	file_dtkt_sql_v1beta1_value_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_sql_v1beta1_query_proto_rawDesc), len(file_dtkt_sql_v1beta1_query_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

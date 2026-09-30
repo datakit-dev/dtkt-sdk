@@ -135,3 +135,11 @@ func TrimProtoEnumStrings(e protoreflect.Enum) (values []string) {
 	}
 	return
 }
+
+func TrimEnumPrefixFor[T ProtoEnum](enum T) (str string) {
+	str = TrimProtoEnumPrefix(enum.Descriptor(), enum.String())
+	if enum == 0 || str == "UNSPECIFIED" {
+		return ""
+	}
+	return
+}

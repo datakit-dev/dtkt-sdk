@@ -1,0 +1,93 @@
+edition = "2023";
+
+package dtkt.sql.v1beta1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/go_features.proto";
+
+option features.(pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/sql/v1beta1";
+
+enum DataFormat {
+  DATA_FORMAT_UNSPECIFIED = 0;
+  DATA_FORMAT_ARROW_BATCH = 1;
+  DATA_FORMAT_STRUCT_BATCH = 2;
+  DATA_FORMAT_JSON_BATCH = 3;
+}
+
+message Value {
+  // Wrapping the 'oneof' or adding 'optional' explicitly captures SQL NULLs.
+  // If the 'value' oneof is completely empty/unset, that value is evaluated as a database NULL.
+  oneof kind {
+    bool bool_value = 1;
+    bytes binary_value = 2;
+    string decimal_value = 3; // Best transmitted as string or custom packed decimal struct
+    double float_value = 4;
+    int64 int_value = 5;
+    string json_value = 6;
+    bytes spatial_value = 7; // Often Well-Known Binary (WKB)
+    string string_value = 8;
+    string uuid_value = 9 [(buf.validate.field).string.uuid = true];
+    int64 time_value_ns = 10; // Time-of-day only (TimeType): nanoseconds since midnight.
+    string enum_value = 11;
+    bytes message_value = 12; // Serialized nested sub-message bytes
+    List list_value = 13;
+    Map map_value = 14;
+    int32 date_value = 15; // Whole days since the Unix epoch (1970-01-01), UTC. Matches Arrow date32.
+    Timestamp timestamp_value = 16;
+    Interval interval_value = 17;
+    Struct struct_value = 18;
+    uint64 uint_value = 19;
+  }
+}
+
+// Field is a named value.
+message Field {
+  string name = 1;
+  Value value = 2;
+}
+
+// Struct is a repeated list of fields.
+message Struct {
+  repeated Field fields = 1;
+}
+
+// ListValue is a repeated list of values.
+message List {
+  repeated Value elements = 1;
+}
+
+// MapValue is a map of field name to value.
+message Map {
+  map<string, Value> fields = 1;
+}
+
+// A point in time (TimestampType), optionally timezone/offset-aware.
+message Timestamp {
+  // Microseconds since the Unix epoch (UTC). Deliberately microseconds, not
+  // nanoseconds: int64 nanoseconds since epoch only spans ~1677-2262 (the
+  // same overflow pandas/numpy datetime64[ns] hits), which silently breaks
+  // on ordinary far-future/past sentinel values like `9999-12-31` that are
+  // common in legacy OLTP data (e.g. SCD Type-2 "no expiration" columns).
+  // Microseconds comfortably covers the full practical SQL TIMESTAMP range.
+  int64 micros_since_epoch = 1;
+
+  // UTC offset in minutes at the moment this value was recorded. Set only
+  // when the originating TimestampType.with_timezone is true (e.g. Postgres
+  // /DuckDB TIMESTAMPTZ, SQL Server DATETIMEOFFSET); unset for naive
+  // timestamps. Preserves the originally specified offset, not just the
+  // absolute instant -- SQL Server's DATETIMEOFFSET in particular is
+  // defined to round-trip the literal input offset, which a bare absolute
+  // timestamp cannot represent.
+  int32 utc_offset_minutes = 2;
+}
+
+// A calendar interval/duration (IntervalType), e.g. "1 year 2 months 3 days".
+// Mirrors DuckDB's own internal interval representation: calendar units
+// (months, days) aren't constant-length, so a duration can't be collapsed
+// into one scalar without first anchoring it to a reference point in time.
+message Interval {
+  int32 months = 1;
+  int32 days = 2;
+  int64 nanos = 3;
+}

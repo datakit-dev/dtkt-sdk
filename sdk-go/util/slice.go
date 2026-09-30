@@ -1,19 +1,33 @@
 package util
 
 import (
-	"context"
-	"errors"
 	"slices"
-	"sync"
-
-	"golang.org/x/sync/errgroup"
 )
 
 func SliceOf[T any](t ...T) (v []T) {
 	return append(v, t...)
 }
 
-func AnySlice[T any](s []T) []any {
+func SliceOfFunc[V, T any](ts []T, fn func(T) V) []V {
+	result := make([]V, len(ts))
+	for i, t := range ts {
+		result[i] = fn(t)
+	}
+	return result
+}
+
+func SliceOfFuncErr[T, V any](ts []T, fn func(T) (V, error)) (s []V, _ error) {
+	for _, t := range ts {
+		if v, err := fn(t); err != nil {
+			return nil, err
+		} else {
+			s = append(s, v)
+		}
+	}
+	return
+}
+
+func SliceOfAny[T any](s []T) []any {
 	var result []any
 	for _, v := range s {
 		result = append(result, v)
@@ -21,18 +35,10 @@ func AnySlice[T any](s []T) []any {
 	return result
 }
 
-func StringSlice[T ~string](s []T) []string {
+func SliceOfString[T ~string](s []T) []string {
 	var result []string
 	for _, v := range s {
 		result = append(result, string(v))
-	}
-	return result
-}
-
-func SliceMap[V, T any](ts []T, fn func(T) V) []V {
-	result := make([]V, len(ts))
-	for i, t := range ts {
-		result[i] = fn(t)
 	}
 	return result
 }
@@ -48,7 +54,7 @@ func SliceReduce[T, V any](ts []T, fn func(T) (V, bool)) (s []V) {
 	return
 }
 
-func SliceReduceError[T, V any](ts []T, fn func(T) (V, bool, error)) (s []V, _ error) {
+func SliceReduceErr[T, V any](ts []T, fn func(T) (V, bool, error)) (s []V, _ error) {
 	for _, t := range ts {
 		if v, ok, err := fn(t); err != nil {
 			return nil, err
@@ -68,7 +74,7 @@ func SliceToMap[T, V any, K comparable](slice []T, fn func(int, T) (K, V)) (m ma
 	return
 }
 
-func ReduceSliceToMap[T, V any, K comparable](slice []T, fn func(int, T) (K, V, bool)) (m map[K]V) {
+func SliceReduceToMap[T, V any, K comparable](slice []T, fn func(int, T) (K, V, bool)) (m map[K]V) {
 	m = map[K]V{}
 	for idx, v := range slice {
 		if k, v, ok := fn(idx, v); ok {
@@ -78,7 +84,7 @@ func ReduceSliceToMap[T, V any, K comparable](slice []T, fn func(int, T) (K, V, 
 	return
 }
 
-func ReduceSliceToMapErr[T, V any, K comparable](slice []T, fn func(T) (K, V, bool, error)) (m map[K]V, _ error) {
+func SliceReduceToMapErr[T, V any, K comparable](slice []T, fn func(T) (K, V, bool, error)) (m map[K]V, _ error) {
 	m = map[K]V{}
 	for _, v := range slice {
 		k, v, ok, err := fn(v)
@@ -91,20 +97,9 @@ func ReduceSliceToMapErr[T, V any, K comparable](slice []T, fn func(T) (K, V, bo
 	return
 }
 
-func JoinSlices[S ~[]T, T any](ss ...S) (s S) {
+func SliceJoin[S ~[]T, T any](ss ...S) (s S) {
 	for idx := range ss {
 		s = append(s, ss[idx]...)
-	}
-	return
-}
-
-func SliceMapError[T, V any](ts []T, fn func(T) (V, error)) (s []V, _ error) {
-	for _, t := range ts {
-		if v, err := fn(t); err != nil {
-			return nil, err
-		} else {
-			s = append(s, v)
-		}
 	}
 	return
 }
@@ -163,77 +158,51 @@ func SliceGroupsFunc[T any](elems []T, eq func(T, T) bool) [][]T {
 	return groups
 }
 
-func ContextMapParallelErr[T any, R any](ctx context.Context, slice []T, fn func(ctx context.Context, t T) (R, error)) ([]R, error) {
-	g, ctx := errgroup.WithContext(ctx)
+// SliceIntersect returns a new slice containing elements present in both s1 and s2.
+func SliceIntersect[T comparable](slice1, slice2 []T) (diff []T) {
+	// Create a map to store the values of slice2.
+	set := make(map[T]struct{})
 
-	results := make([]R, len(slice))
-	for idx, item := range slice {
-		g.Go(func() error {
-			result, err := fn(ctx, item)
-			if err != nil {
-				return err
-			}
-
-			results[idx] = result
-
-			return nil
-		})
+	// Create a slice to store the result.
+	// Add the values of slice1 to the set.
+	for _, item := range slice1 {
+		set[item] = struct{}{}
 	}
 
-	if err := g.Wait(); err != nil {
-		return nil, err
+	// Iterate over the values of slice2.
+	for _, item := range slice2 {
+		// Check if the item is in the set.
+		if _, ok := set[item]; !ok {
+			// If the item is not in the set, add it to the result slice.
+			diff = append(diff, item)
+			delete(set, item)
+		}
 	}
 
-	return results, nil
+	return
 }
 
-func ContextMapParallelErrs[T any, R any](ctx context.Context, slice []T, fn func(context.Context, T) (R, error)) (results []R, errs []error) {
-	var g sync.WaitGroup
+// SliceUnion returns a new slice containing unique elements from both s1 and s2.
+func SliceUnion[T comparable](s1, s2 []T) []T {
+	// Use an empty struct to save memory in the map
+	seen := make(map[T]struct{})
+	var result []T
 
-	results = make([]R, len(slice))
-	errs = make([]error, len(slice))
-	for idx, item := range slice {
-		g.Go(func() {
-			result, err := fn(ctx, item)
-			if err != nil {
-				errs[idx] = err
-				return
-			}
-
-			results[idx] = result
-		})
+	// Add elements from the first slice
+	for _, val := range s1 {
+		if _, exists := seen[val]; !exists {
+			seen[val] = struct{}{}
+			result = append(result, val)
+		}
 	}
-	g.Wait()
 
-	return results, errs
-}
-
-func MapParallelErr[T any, R any](slice []T, fn func(T) (R, error)) ([]R, error) {
-	results, errs := MapParallelErrs(slice, fn)
-	err := errors.Join(errs...)
-	if err != nil {
-		return nil, err
+	// Add elements from the second slice
+	for _, val := range s2 {
+		if _, exists := seen[val]; !exists {
+			seen[val] = struct{}{}
+			result = append(result, val)
+		}
 	}
-	return results, nil
-}
 
-func MapParallelErrs[T any, R any](slice []T, fn func(T) (R, error)) (results []R, errs []error) {
-	var g sync.WaitGroup
-
-	results = make([]R, len(slice))
-	errs = make([]error, len(slice))
-	for idx, item := range slice {
-		g.Go(func() {
-			result, err := fn(item)
-			if err != nil {
-				errs[idx] = err
-				return
-			}
-
-			results[idx] = result
-		})
-	}
-	g.Wait()
-
-	return results, errs
+	return result
 }

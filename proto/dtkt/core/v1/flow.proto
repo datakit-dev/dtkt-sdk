@@ -9,7 +9,6 @@ import "dtkt/protoform/v1beta1/protoform.proto";
 import "dtkt/protostore/v1beta1/protostore.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
-import "google/protobuf/descriptor.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 

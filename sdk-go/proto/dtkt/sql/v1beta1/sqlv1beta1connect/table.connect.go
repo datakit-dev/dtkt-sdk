@@ -46,12 +46,10 @@ const (
 	// TableServiceDeleteTableProcedure is the fully-qualified name of the TableService's DeleteTable
 	// RPC.
 	TableServiceDeleteTableProcedure = "/dtkt.sql.v1beta1.TableService/DeleteTable"
-	// TableServiceReadTableRowsProcedure is the fully-qualified name of the TableService's
-	// ReadTableRows RPC.
-	TableServiceReadTableRowsProcedure = "/dtkt.sql.v1beta1.TableService/ReadTableRows"
-	// TableServiceWriteTableRowsProcedure is the fully-qualified name of the TableService's
-	// WriteTableRows RPC.
-	TableServiceWriteTableRowsProcedure = "/dtkt.sql.v1beta1.TableService/WriteTableRows"
+	// TableServiceReadTableProcedure is the fully-qualified name of the TableService's ReadTable RPC.
+	TableServiceReadTableProcedure = "/dtkt.sql.v1beta1.TableService/ReadTable"
+	// TableServiceWriteTableProcedure is the fully-qualified name of the TableService's WriteTable RPC.
+	TableServiceWriteTableProcedure = "/dtkt.sql.v1beta1.TableService/WriteTable"
 )
 
 // TableServiceClient is a client for the dtkt.sql.v1beta1.TableService service.
@@ -66,10 +64,10 @@ type TableServiceClient interface {
 	UpdateTable(context.Context, *connect.Request[v1beta1.UpdateTableRequest]) (*connect.Response[v1beta1.UpdateTableResponse], error)
 	// Delete a table.
 	DeleteTable(context.Context, *connect.Request[v1beta1.DeleteTableRequest]) (*connect.Response[v1beta1.DeleteTableResponse], error)
-	// Read rows from a table.
-	ReadTableRows(context.Context, *connect.Request[v1beta1.ReadTableRowsRequest]) (*connect.ServerStreamForClient[v1beta1.ReadTableRowsResponse], error)
-	// Write rows to a table.
-	WriteTableRows(context.Context) *connect.ClientStreamForClient[v1beta1.WriteTableRowsRequest, v1beta1.WriteTableRowsResponse]
+	// Read data from a table as a stream.
+	ReadTable(context.Context, *connect.Request[v1beta1.ReadTableRequest]) (*connect.ServerStreamForClient[v1beta1.ReadTableResponse], error)
+	// Write data to a table as a stream.
+	WriteTable(context.Context) *connect.ClientStreamForClient[v1beta1.WriteTableRequest, v1beta1.WriteTableResponse]
 }
 
 // NewTableServiceClient constructs a client for the dtkt.sql.v1beta1.TableService service. By
@@ -113,16 +111,16 @@ func NewTableServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(tableServiceMethods.ByName("DeleteTable")),
 			connect.WithClientOptions(opts...),
 		),
-		readTableRows: connect.NewClient[v1beta1.ReadTableRowsRequest, v1beta1.ReadTableRowsResponse](
+		readTable: connect.NewClient[v1beta1.ReadTableRequest, v1beta1.ReadTableResponse](
 			httpClient,
-			baseURL+TableServiceReadTableRowsProcedure,
-			connect.WithSchema(tableServiceMethods.ByName("ReadTableRows")),
+			baseURL+TableServiceReadTableProcedure,
+			connect.WithSchema(tableServiceMethods.ByName("ReadTable")),
 			connect.WithClientOptions(opts...),
 		),
-		writeTableRows: connect.NewClient[v1beta1.WriteTableRowsRequest, v1beta1.WriteTableRowsResponse](
+		writeTable: connect.NewClient[v1beta1.WriteTableRequest, v1beta1.WriteTableResponse](
 			httpClient,
-			baseURL+TableServiceWriteTableRowsProcedure,
-			connect.WithSchema(tableServiceMethods.ByName("WriteTableRows")),
+			baseURL+TableServiceWriteTableProcedure,
+			connect.WithSchema(tableServiceMethods.ByName("WriteTable")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -130,13 +128,13 @@ func NewTableServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 
 // tableServiceClient implements TableServiceClient.
 type tableServiceClient struct {
-	listTables     *connect.Client[v1beta1.ListTablesRequest, v1beta1.ListTablesResponse]
-	getTable       *connect.Client[v1beta1.GetTableRequest, v1beta1.GetTableResponse]
-	createTable    *connect.Client[v1beta1.CreateTableRequest, v1beta1.CreateTableResponse]
-	updateTable    *connect.Client[v1beta1.UpdateTableRequest, v1beta1.UpdateTableResponse]
-	deleteTable    *connect.Client[v1beta1.DeleteTableRequest, v1beta1.DeleteTableResponse]
-	readTableRows  *connect.Client[v1beta1.ReadTableRowsRequest, v1beta1.ReadTableRowsResponse]
-	writeTableRows *connect.Client[v1beta1.WriteTableRowsRequest, v1beta1.WriteTableRowsResponse]
+	listTables  *connect.Client[v1beta1.ListTablesRequest, v1beta1.ListTablesResponse]
+	getTable    *connect.Client[v1beta1.GetTableRequest, v1beta1.GetTableResponse]
+	createTable *connect.Client[v1beta1.CreateTableRequest, v1beta1.CreateTableResponse]
+	updateTable *connect.Client[v1beta1.UpdateTableRequest, v1beta1.UpdateTableResponse]
+	deleteTable *connect.Client[v1beta1.DeleteTableRequest, v1beta1.DeleteTableResponse]
+	readTable   *connect.Client[v1beta1.ReadTableRequest, v1beta1.ReadTableResponse]
+	writeTable  *connect.Client[v1beta1.WriteTableRequest, v1beta1.WriteTableResponse]
 }
 
 // ListTables calls dtkt.sql.v1beta1.TableService.ListTables.
@@ -164,14 +162,14 @@ func (c *tableServiceClient) DeleteTable(ctx context.Context, req *connect.Reque
 	return c.deleteTable.CallUnary(ctx, req)
 }
 
-// ReadTableRows calls dtkt.sql.v1beta1.TableService.ReadTableRows.
-func (c *tableServiceClient) ReadTableRows(ctx context.Context, req *connect.Request[v1beta1.ReadTableRowsRequest]) (*connect.ServerStreamForClient[v1beta1.ReadTableRowsResponse], error) {
-	return c.readTableRows.CallServerStream(ctx, req)
+// ReadTable calls dtkt.sql.v1beta1.TableService.ReadTable.
+func (c *tableServiceClient) ReadTable(ctx context.Context, req *connect.Request[v1beta1.ReadTableRequest]) (*connect.ServerStreamForClient[v1beta1.ReadTableResponse], error) {
+	return c.readTable.CallServerStream(ctx, req)
 }
 
-// WriteTableRows calls dtkt.sql.v1beta1.TableService.WriteTableRows.
-func (c *tableServiceClient) WriteTableRows(ctx context.Context) *connect.ClientStreamForClient[v1beta1.WriteTableRowsRequest, v1beta1.WriteTableRowsResponse] {
-	return c.writeTableRows.CallClientStream(ctx)
+// WriteTable calls dtkt.sql.v1beta1.TableService.WriteTable.
+func (c *tableServiceClient) WriteTable(ctx context.Context) *connect.ClientStreamForClient[v1beta1.WriteTableRequest, v1beta1.WriteTableResponse] {
+	return c.writeTable.CallClientStream(ctx)
 }
 
 // TableServiceHandler is an implementation of the dtkt.sql.v1beta1.TableService service.
@@ -186,10 +184,10 @@ type TableServiceHandler interface {
 	UpdateTable(context.Context, *connect.Request[v1beta1.UpdateTableRequest]) (*connect.Response[v1beta1.UpdateTableResponse], error)
 	// Delete a table.
 	DeleteTable(context.Context, *connect.Request[v1beta1.DeleteTableRequest]) (*connect.Response[v1beta1.DeleteTableResponse], error)
-	// Read rows from a table.
-	ReadTableRows(context.Context, *connect.Request[v1beta1.ReadTableRowsRequest], *connect.ServerStream[v1beta1.ReadTableRowsResponse]) error
-	// Write rows to a table.
-	WriteTableRows(context.Context, *connect.ClientStream[v1beta1.WriteTableRowsRequest]) (*connect.Response[v1beta1.WriteTableRowsResponse], error)
+	// Read data from a table as a stream.
+	ReadTable(context.Context, *connect.Request[v1beta1.ReadTableRequest], *connect.ServerStream[v1beta1.ReadTableResponse]) error
+	// Write data to a table as a stream.
+	WriteTable(context.Context, *connect.ClientStream[v1beta1.WriteTableRequest]) (*connect.Response[v1beta1.WriteTableResponse], error)
 }
 
 // NewTableServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -229,16 +227,16 @@ func NewTableServiceHandler(svc TableServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(tableServiceMethods.ByName("DeleteTable")),
 		connect.WithHandlerOptions(opts...),
 	)
-	tableServiceReadTableRowsHandler := connect.NewServerStreamHandler(
-		TableServiceReadTableRowsProcedure,
-		svc.ReadTableRows,
-		connect.WithSchema(tableServiceMethods.ByName("ReadTableRows")),
+	tableServiceReadTableHandler := connect.NewServerStreamHandler(
+		TableServiceReadTableProcedure,
+		svc.ReadTable,
+		connect.WithSchema(tableServiceMethods.ByName("ReadTable")),
 		connect.WithHandlerOptions(opts...),
 	)
-	tableServiceWriteTableRowsHandler := connect.NewClientStreamHandler(
-		TableServiceWriteTableRowsProcedure,
-		svc.WriteTableRows,
-		connect.WithSchema(tableServiceMethods.ByName("WriteTableRows")),
+	tableServiceWriteTableHandler := connect.NewClientStreamHandler(
+		TableServiceWriteTableProcedure,
+		svc.WriteTable,
+		connect.WithSchema(tableServiceMethods.ByName("WriteTable")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/dtkt.sql.v1beta1.TableService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -253,10 +251,10 @@ func NewTableServiceHandler(svc TableServiceHandler, opts ...connect.HandlerOpti
 			tableServiceUpdateTableHandler.ServeHTTP(w, r)
 		case TableServiceDeleteTableProcedure:
 			tableServiceDeleteTableHandler.ServeHTTP(w, r)
-		case TableServiceReadTableRowsProcedure:
-			tableServiceReadTableRowsHandler.ServeHTTP(w, r)
-		case TableServiceWriteTableRowsProcedure:
-			tableServiceWriteTableRowsHandler.ServeHTTP(w, r)
+		case TableServiceReadTableProcedure:
+			tableServiceReadTableHandler.ServeHTTP(w, r)
+		case TableServiceWriteTableProcedure:
+			tableServiceWriteTableHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -286,10 +284,10 @@ func (UnimplementedTableServiceHandler) DeleteTable(context.Context, *connect.Re
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.sql.v1beta1.TableService.DeleteTable is not implemented"))
 }
 
-func (UnimplementedTableServiceHandler) ReadTableRows(context.Context, *connect.Request[v1beta1.ReadTableRowsRequest], *connect.ServerStream[v1beta1.ReadTableRowsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.sql.v1beta1.TableService.ReadTableRows is not implemented"))
+func (UnimplementedTableServiceHandler) ReadTable(context.Context, *connect.Request[v1beta1.ReadTableRequest], *connect.ServerStream[v1beta1.ReadTableResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.sql.v1beta1.TableService.ReadTable is not implemented"))
 }
 
-func (UnimplementedTableServiceHandler) WriteTableRows(context.Context, *connect.ClientStream[v1beta1.WriteTableRowsRequest]) (*connect.Response[v1beta1.WriteTableRowsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.sql.v1beta1.TableService.WriteTableRows is not implemented"))
+func (UnimplementedTableServiceHandler) WriteTable(context.Context, *connect.ClientStream[v1beta1.WriteTableRequest]) (*connect.Response[v1beta1.WriteTableResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.sql.v1beta1.TableService.WriteTable is not implemented"))
 }

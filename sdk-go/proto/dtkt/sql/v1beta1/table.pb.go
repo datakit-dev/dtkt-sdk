@@ -26,6 +26,50 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type OrderBy_Direction int32
+
+const (
+	OrderBy_UNSPECIFIED OrderBy_Direction = 0
+	OrderBy_ASC         OrderBy_Direction = 1
+	OrderBy_DESC        OrderBy_Direction = 2
+)
+
+// Enum value maps for OrderBy_Direction.
+var (
+	OrderBy_Direction_name = map[int32]string{
+		0: "UNSPECIFIED",
+		1: "ASC",
+		2: "DESC",
+	}
+	OrderBy_Direction_value = map[string]int32{
+		"UNSPECIFIED": 0,
+		"ASC":         1,
+		"DESC":        2,
+	}
+)
+
+func (x OrderBy_Direction) Enum() *OrderBy_Direction {
+	p := new(OrderBy_Direction)
+	*p = x
+	return p
+}
+
+func (x OrderBy_Direction) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (OrderBy_Direction) Descriptor() protoreflect.EnumDescriptor {
+	return file_dtkt_sql_v1beta1_table_proto_enumTypes[0].Descriptor()
+}
+
+func (OrderBy_Direction) Type() protoreflect.EnumType {
+	return &file_dtkt_sql_v1beta1_table_proto_enumTypes[0]
+}
+
+func (x OrderBy_Direction) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
 // A table within a schema.
 type Table struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
@@ -168,7 +212,7 @@ func (x *Table) ClearStats() {
 type Table_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Fully qualified table name, format: `{schema}.{table}`.
+	// Fully qualified table name, format: `[{catalog}.]{db/schema}.{table}`.
 	Name *string
 	// List of columns within the table.
 	Columns []*Column
@@ -348,7 +392,8 @@ type ListTablesRequest_builder struct {
 	PageSize *int32
 	// Token from a previous response to retrieve the next page.
 	PageToken *string
-	// Optional parent schema name. When not set, returns all tables across schemas.
+	// Optional fully qualified schema name, format: `[{catalog}.]{db/schema}`.
+	// When not set, returns all tables across schemas.
 	Parent *string
 	// Optional filter expression to narrow results.
 	Filter *string
@@ -538,7 +583,7 @@ func (x *GetTableRequest) ClearName() {
 type GetTableRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Fully-qualified table name to retrieve.
+	// Fully qualified table name, format: `[{catalog}.]{db/schema}.{table}`.
 	Name *string
 }
 
@@ -739,7 +784,7 @@ func (x *CreateTableRequest) ClearTable() {
 type CreateTableRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Parent schema name.
+	// Fully qualified parent schema name, format: `[{catalog}.]{db/schema}`.
 	Parent *string
 	// Table identifier (unqualified), example: "sales".
 	TableId *string
@@ -1064,7 +1109,7 @@ func (x *DeleteTableRequest) ClearName() {
 type DeleteTableRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Fully-qualified table name to delete, format: `{schema}.{table}`.
+	// Fully qualified table name, format: `[{catalog}.]{db/schema}.{table}`.
 	Name *string
 }
 
@@ -1123,33 +1168,40 @@ func (b0 DeleteTableResponse_builder) Build() *DeleteTableResponse {
 	return m0
 }
 
-// Read table rows request.
-type ReadTableRowsRequest struct {
+// Read table request.
+type ReadTableRequest struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Table       *string                `protobuf:"bytes,1,opt,name=table"`
+	xxx_hidden_Name        *string                `protobuf:"bytes,1,opt,name=name"`
 	xxx_hidden_Columns     []string               `protobuf:"bytes,2,rep,name=columns"`
 	xxx_hidden_Limit       uint64                 `protobuf:"varint,4,opt,name=limit"`
 	xxx_hidden_Offset      uint64                 `protobuf:"varint,5,opt,name=offset"`
+	xxx_hidden_OrderBy     *[]*OrderBy            `protobuf:"bytes,7,rep,name=order_by,json=orderBy"`
+	xxx_hidden_Format      DataFormat             `protobuf:"varint,6,opt,name=format,enum=dtkt.sql.v1beta1.DataFormat,def=2"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
 
-func (x *ReadTableRowsRequest) Reset() {
-	*x = ReadTableRowsRequest{}
+// Default values for ReadTableRequest fields.
+const (
+	Default_ReadTableRequest_Format = DataFormat_DATA_FORMAT_STRUCT_BATCH
+)
+
+func (x *ReadTableRequest) Reset() {
+	*x = ReadTableRequest{}
 	mi := &file_dtkt_sql_v1beta1_table_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ReadTableRowsRequest) String() string {
+func (x *ReadTableRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ReadTableRowsRequest) ProtoMessage() {}
+func (*ReadTableRequest) ProtoMessage() {}
 
-func (x *ReadTableRowsRequest) ProtoReflect() protoreflect.Message {
+func (x *ReadTableRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_dtkt_sql_v1beta1_table_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1161,149 +1213,201 @@ func (x *ReadTableRowsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *ReadTableRowsRequest) GetTable() string {
+func (x *ReadTableRequest) GetName() string {
 	if x != nil {
-		if x.xxx_hidden_Table != nil {
-			return *x.xxx_hidden_Table
+		if x.xxx_hidden_Name != nil {
+			return *x.xxx_hidden_Name
 		}
 		return ""
 	}
 	return ""
 }
 
-func (x *ReadTableRowsRequest) GetColumns() []string {
+func (x *ReadTableRequest) GetColumns() []string {
 	if x != nil {
 		return x.xxx_hidden_Columns
 	}
 	return nil
 }
 
-func (x *ReadTableRowsRequest) GetLimit() uint64 {
+func (x *ReadTableRequest) GetLimit() uint64 {
 	if x != nil {
 		return x.xxx_hidden_Limit
 	}
 	return 0
 }
 
-func (x *ReadTableRowsRequest) GetOffset() uint64 {
+func (x *ReadTableRequest) GetOffset() uint64 {
 	if x != nil {
 		return x.xxx_hidden_Offset
 	}
 	return 0
 }
 
-func (x *ReadTableRowsRequest) SetTable(v string) {
-	x.xxx_hidden_Table = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
+func (x *ReadTableRequest) GetOrderBy() []*OrderBy {
+	if x != nil {
+		if x.xxx_hidden_OrderBy != nil {
+			return *x.xxx_hidden_OrderBy
+		}
+	}
+	return nil
 }
 
-func (x *ReadTableRowsRequest) SetColumns(v []string) {
+func (x *ReadTableRequest) GetFormat() DataFormat {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 5) {
+			return x.xxx_hidden_Format
+		}
+	}
+	return Default_ReadTableRequest_Format
+}
+
+func (x *ReadTableRequest) SetName(v string) {
+	x.xxx_hidden_Name = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 6)
+}
+
+func (x *ReadTableRequest) SetColumns(v []string) {
 	x.xxx_hidden_Columns = v
 }
 
-func (x *ReadTableRowsRequest) SetLimit(v uint64) {
+func (x *ReadTableRequest) SetLimit(v uint64) {
 	x.xxx_hidden_Limit = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 6)
 }
 
-func (x *ReadTableRowsRequest) SetOffset(v uint64) {
+func (x *ReadTableRequest) SetOffset(v uint64) {
 	x.xxx_hidden_Offset = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 4)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 6)
 }
 
-func (x *ReadTableRowsRequest) HasTable() bool {
+func (x *ReadTableRequest) SetOrderBy(v []*OrderBy) {
+	x.xxx_hidden_OrderBy = &v
+}
+
+func (x *ReadTableRequest) SetFormat(v DataFormat) {
+	x.xxx_hidden_Format = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 6)
+}
+
+func (x *ReadTableRequest) HasName() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *ReadTableRowsRequest) HasLimit() bool {
+func (x *ReadTableRequest) HasLimit() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
-func (x *ReadTableRowsRequest) HasOffset() bool {
+func (x *ReadTableRequest) HasOffset() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
 }
 
-func (x *ReadTableRowsRequest) ClearTable() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_Table = nil
+func (x *ReadTableRequest) HasFormat() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
 }
 
-func (x *ReadTableRowsRequest) ClearLimit() {
+func (x *ReadTableRequest) ClearName() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Name = nil
+}
+
+func (x *ReadTableRequest) ClearLimit() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
 	x.xxx_hidden_Limit = 0
 }
 
-func (x *ReadTableRowsRequest) ClearOffset() {
+func (x *ReadTableRequest) ClearOffset() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
 	x.xxx_hidden_Offset = 0
 }
 
-type ReadTableRowsRequest_builder struct {
+func (x *ReadTableRequest) ClearFormat() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
+}
+
+type ReadTableRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Fully-qualified table name, format: `{schema}.{table}`.
-	Table *string
-	// Columns to read from the table; when empty, returns all columns.
+	// Fully qualified table name, format: `[{catalog}.]{db/schema}.{table}`.
+	Name *string
+	// The columns to include in the returned payload:
+	//   - If not specified all columns are included.
 	Columns []string
-	// Maximum number of rows to read from the table:
+	// The total number of rows to read from the table:
 	//   - if unset or 0, reads all rows relative to offset;
 	//   - if > 0, reads at most this number of rows relative to offset.
 	Limit *uint64
-	// Offset for reading rows.
+	// The index of the first row to read.
 	Offset *uint64
+	// The sort order of rows to read from the table.
+	OrderBy []*OrderBy
+	// Format of data returned in responses.
+	Format *DataFormat
 }
 
-func (b0 ReadTableRowsRequest_builder) Build() *ReadTableRowsRequest {
-	m0 := &ReadTableRowsRequest{}
+func (b0 ReadTableRequest_builder) Build() *ReadTableRequest {
+	m0 := &ReadTableRequest{}
 	b, x := &b0, m0
 	_, _ = b, x
-	if b.Table != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
-		x.xxx_hidden_Table = b.Table
+	if b.Name != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 6)
+		x.xxx_hidden_Name = b.Name
 	}
 	x.xxx_hidden_Columns = b.Columns
 	if b.Limit != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 4)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 6)
 		x.xxx_hidden_Limit = *b.Limit
 	}
 	if b.Offset != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 4)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 6)
 		x.xxx_hidden_Offset = *b.Offset
+	}
+	x.xxx_hidden_OrderBy = &b.OrderBy
+	if b.Format != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 6)
+		x.xxx_hidden_Format = *b.Format
 	}
 	return m0
 }
 
-// Read table rows response.
-type ReadTableRowsResponse struct {
-	state          protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Row *structpb.Struct       `protobuf:"bytes,1,opt,name=row"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+// Read table response.
+type ReadTableResponse struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_ArrowBatch  []byte                 `protobuf:"bytes,1,opt,name=arrow_batch,json=arrowBatch"`
+	xxx_hidden_StructBatch *[]*Struct             `protobuf:"bytes,2,rep,name=struct_batch,json=structBatch"`
+	xxx_hidden_JsonBatch   *[]*structpb.Struct    `protobuf:"bytes,3,rep,name=json_batch,json=jsonBatch"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
-func (x *ReadTableRowsResponse) Reset() {
-	*x = ReadTableRowsResponse{}
+func (x *ReadTableResponse) Reset() {
+	*x = ReadTableResponse{}
 	mi := &file_dtkt_sql_v1beta1_table_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ReadTableRowsResponse) String() string {
+func (x *ReadTableResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ReadTableRowsResponse) ProtoMessage() {}
+func (*ReadTableResponse) ProtoMessage() {}
 
-func (x *ReadTableRowsResponse) ProtoReflect() protoreflect.Message {
+func (x *ReadTableResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_dtkt_sql_v1beta1_table_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1315,70 +1419,108 @@ func (x *ReadTableRowsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *ReadTableRowsResponse) GetRow() *structpb.Struct {
+func (x *ReadTableResponse) GetArrowBatch() []byte {
 	if x != nil {
-		return x.xxx_hidden_Row
+		return x.xxx_hidden_ArrowBatch
 	}
 	return nil
 }
 
-func (x *ReadTableRowsResponse) SetRow(v *structpb.Struct) {
-	x.xxx_hidden_Row = v
+func (x *ReadTableResponse) GetStructBatch() []*Struct {
+	if x != nil {
+		if x.xxx_hidden_StructBatch != nil {
+			return *x.xxx_hidden_StructBatch
+		}
+	}
+	return nil
 }
 
-func (x *ReadTableRowsResponse) HasRow() bool {
+func (x *ReadTableResponse) GetJsonBatch() []*structpb.Struct {
+	if x != nil {
+		if x.xxx_hidden_JsonBatch != nil {
+			return *x.xxx_hidden_JsonBatch
+		}
+	}
+	return nil
+}
+
+func (x *ReadTableResponse) SetArrowBatch(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.xxx_hidden_ArrowBatch = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+}
+
+func (x *ReadTableResponse) SetStructBatch(v []*Struct) {
+	x.xxx_hidden_StructBatch = &v
+}
+
+func (x *ReadTableResponse) SetJsonBatch(v []*structpb.Struct) {
+	x.xxx_hidden_JsonBatch = &v
+}
+
+func (x *ReadTableResponse) HasArrowBatch() bool {
 	if x == nil {
 		return false
 	}
-	return x.xxx_hidden_Row != nil
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *ReadTableRowsResponse) ClearRow() {
-	x.xxx_hidden_Row = nil
+func (x *ReadTableResponse) ClearArrowBatch() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_ArrowBatch = nil
 }
 
-type ReadTableRowsResponse_builder struct {
+type ReadTableResponse_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// A row read from the table.
-	Row *structpb.Struct
+	ArrowBatch  []byte
+	StructBatch []*Struct
+	JsonBatch   []*structpb.Struct
 }
 
-func (b0 ReadTableRowsResponse_builder) Build() *ReadTableRowsResponse {
-	m0 := &ReadTableRowsResponse{}
+func (b0 ReadTableResponse_builder) Build() *ReadTableResponse {
+	m0 := &ReadTableResponse{}
 	b, x := &b0, m0
 	_, _ = b, x
-	x.xxx_hidden_Row = b.Row
+	if b.ArrowBatch != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
+		x.xxx_hidden_ArrowBatch = b.ArrowBatch
+	}
+	x.xxx_hidden_StructBatch = &b.StructBatch
+	x.xxx_hidden_JsonBatch = &b.JsonBatch
 	return m0
 }
 
-// Write table rows request.
-type WriteTableRowsRequest struct {
+// Write table request.
+type WriteTableRequest struct {
 	state                   protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Table        *string                `protobuf:"bytes,1,opt,name=table"`
-	xxx_hidden_Row          *structpb.Struct       `protobuf:"bytes,2,opt,name=row"`
-	xxx_hidden_BatchSize    uint32                 `protobuf:"varint,3,opt,name=batch_size,json=batchSize"`
-	xxx_hidden_IgnoreErrors bool                   `protobuf:"varint,4,opt,name=ignore_errors,json=ignoreErrors"`
+	xxx_hidden_Name         *string                `protobuf:"bytes,1,opt,name=name"`
+	xxx_hidden_IgnoreErrors bool                   `protobuf:"varint,2,opt,name=ignore_errors,json=ignoreErrors"`
+	xxx_hidden_ArrowBatch   []byte                 `protobuf:"bytes,3,opt,name=arrow_batch,json=arrowBatch"`
+	xxx_hidden_StructBatch  *[]*Struct             `protobuf:"bytes,4,rep,name=struct_batch,json=structBatch"`
+	xxx_hidden_JsonBatch    *[]*structpb.Struct    `protobuf:"bytes,5,rep,name=json_batch,json=jsonBatch"`
 	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
 	XXX_presence            [1]uint32
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
 }
 
-func (x *WriteTableRowsRequest) Reset() {
-	*x = WriteTableRowsRequest{}
+func (x *WriteTableRequest) Reset() {
+	*x = WriteTableRequest{}
 	mi := &file_dtkt_sql_v1beta1_table_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *WriteTableRowsRequest) String() string {
+func (x *WriteTableRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*WriteTableRowsRequest) ProtoMessage() {}
+func (*WriteTableRequest) ProtoMessage() {}
 
-func (x *WriteTableRowsRequest) ProtoReflect() protoreflect.Message {
+func (x *WriteTableRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_dtkt_sql_v1beta1_table_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1390,160 +1532,166 @@ func (x *WriteTableRowsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *WriteTableRowsRequest) GetTable() string {
+func (x *WriteTableRequest) GetName() string {
 	if x != nil {
-		if x.xxx_hidden_Table != nil {
-			return *x.xxx_hidden_Table
+		if x.xxx_hidden_Name != nil {
+			return *x.xxx_hidden_Name
 		}
 		return ""
 	}
 	return ""
 }
 
-func (x *WriteTableRowsRequest) GetRow() *structpb.Struct {
-	if x != nil {
-		return x.xxx_hidden_Row
-	}
-	return nil
-}
-
-func (x *WriteTableRowsRequest) GetBatchSize() uint32 {
-	if x != nil {
-		return x.xxx_hidden_BatchSize
-	}
-	return 0
-}
-
-func (x *WriteTableRowsRequest) GetIgnoreErrors() bool {
+func (x *WriteTableRequest) GetIgnoreErrors() bool {
 	if x != nil {
 		return x.xxx_hidden_IgnoreErrors
 	}
 	return false
 }
 
-func (x *WriteTableRowsRequest) SetTable(v string) {
-	x.xxx_hidden_Table = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
+func (x *WriteTableRequest) GetArrowBatch() []byte {
+	if x != nil {
+		return x.xxx_hidden_ArrowBatch
+	}
+	return nil
 }
 
-func (x *WriteTableRowsRequest) SetRow(v *structpb.Struct) {
-	x.xxx_hidden_Row = v
+func (x *WriteTableRequest) GetStructBatch() []*Struct {
+	if x != nil {
+		if x.xxx_hidden_StructBatch != nil {
+			return *x.xxx_hidden_StructBatch
+		}
+	}
+	return nil
 }
 
-func (x *WriteTableRowsRequest) SetBatchSize(v uint32) {
-	x.xxx_hidden_BatchSize = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
+func (x *WriteTableRequest) GetJsonBatch() []*structpb.Struct {
+	if x != nil {
+		if x.xxx_hidden_JsonBatch != nil {
+			return *x.xxx_hidden_JsonBatch
+		}
+	}
+	return nil
 }
 
-func (x *WriteTableRowsRequest) SetIgnoreErrors(v bool) {
+func (x *WriteTableRequest) SetName(v string) {
+	x.xxx_hidden_Name = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 5)
+}
+
+func (x *WriteTableRequest) SetIgnoreErrors(v bool) {
 	x.xxx_hidden_IgnoreErrors = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 4)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 5)
 }
 
-func (x *WriteTableRowsRequest) HasTable() bool {
+func (x *WriteTableRequest) SetArrowBatch(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.xxx_hidden_ArrowBatch = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 5)
+}
+
+func (x *WriteTableRequest) SetStructBatch(v []*Struct) {
+	x.xxx_hidden_StructBatch = &v
+}
+
+func (x *WriteTableRequest) SetJsonBatch(v []*structpb.Struct) {
+	x.xxx_hidden_JsonBatch = &v
+}
+
+func (x *WriteTableRequest) HasName() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *WriteTableRowsRequest) HasRow() bool {
+func (x *WriteTableRequest) HasIgnoreErrors() bool {
 	if x == nil {
 		return false
 	}
-	return x.xxx_hidden_Row != nil
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
-func (x *WriteTableRowsRequest) HasBatchSize() bool {
+func (x *WriteTableRequest) HasArrowBatch() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
-func (x *WriteTableRowsRequest) HasIgnoreErrors() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
-}
-
-func (x *WriteTableRowsRequest) ClearTable() {
+func (x *WriteTableRequest) ClearName() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_Table = nil
+	x.xxx_hidden_Name = nil
 }
 
-func (x *WriteTableRowsRequest) ClearRow() {
-	x.xxx_hidden_Row = nil
-}
-
-func (x *WriteTableRowsRequest) ClearBatchSize() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
-	x.xxx_hidden_BatchSize = 0
-}
-
-func (x *WriteTableRowsRequest) ClearIgnoreErrors() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+func (x *WriteTableRequest) ClearIgnoreErrors() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
 	x.xxx_hidden_IgnoreErrors = false
 }
 
-type WriteTableRowsRequest_builder struct {
+func (x *WriteTableRequest) ClearArrowBatch() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_ArrowBatch = nil
+}
+
+type WriteTableRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Fully-qualified table name, format: `{schema}.{table}`.
-	Table *string
-	// The row to write to the table.
-	Row *structpb.Struct
-	// The number of rows to be written at a time. When not set or zero, service
-	// will use a default size of its choosing and may also have an upper limit.
-	BatchSize *uint32
+	// Fully qualified table name, format: `[{catalog}.]{db/schema}.{table}`.
+	Name *string
 	// When set to true errors are ignored, otherwise stream is closed when an
 	// error is encountered while attempting to write row.
 	IgnoreErrors *bool
+	ArrowBatch   []byte
+	StructBatch  []*Struct
+	JsonBatch    []*structpb.Struct
 }
 
-func (b0 WriteTableRowsRequest_builder) Build() *WriteTableRowsRequest {
-	m0 := &WriteTableRowsRequest{}
+func (b0 WriteTableRequest_builder) Build() *WriteTableRequest {
+	m0 := &WriteTableRequest{}
 	b, x := &b0, m0
 	_, _ = b, x
-	if b.Table != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
-		x.xxx_hidden_Table = b.Table
-	}
-	x.xxx_hidden_Row = b.Row
-	if b.BatchSize != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 4)
-		x.xxx_hidden_BatchSize = *b.BatchSize
+	if b.Name != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 5)
+		x.xxx_hidden_Name = b.Name
 	}
 	if b.IgnoreErrors != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 4)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 5)
 		x.xxx_hidden_IgnoreErrors = *b.IgnoreErrors
 	}
+	if b.ArrowBatch != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 5)
+		x.xxx_hidden_ArrowBatch = b.ArrowBatch
+	}
+	x.xxx_hidden_StructBatch = &b.StructBatch
+	x.xxx_hidden_JsonBatch = &b.JsonBatch
 	return m0
 }
 
-// Write table rows response.
-type WriteTableRowsResponse struct {
+// Write table response.
+type WriteTableResponse struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_RowsWritten map[string]int64       `protobuf:"bytes,1,rep,name=rows_written,json=rowsWritten" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
 
-func (x *WriteTableRowsResponse) Reset() {
-	*x = WriteTableRowsResponse{}
+func (x *WriteTableResponse) Reset() {
+	*x = WriteTableResponse{}
 	mi := &file_dtkt_sql_v1beta1_table_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *WriteTableRowsResponse) String() string {
+func (x *WriteTableResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*WriteTableRowsResponse) ProtoMessage() {}
+func (*WriteTableResponse) ProtoMessage() {}
 
-func (x *WriteTableRowsResponse) ProtoReflect() protoreflect.Message {
+func (x *WriteTableResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_dtkt_sql_v1beta1_table_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1555,29 +1703,143 @@ func (x *WriteTableRowsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *WriteTableRowsResponse) GetRowsWritten() map[string]int64 {
+func (x *WriteTableResponse) GetRowsWritten() map[string]int64 {
 	if x != nil {
 		return x.xxx_hidden_RowsWritten
 	}
 	return nil
 }
 
-func (x *WriteTableRowsResponse) SetRowsWritten(v map[string]int64) {
+func (x *WriteTableResponse) SetRowsWritten(v map[string]int64) {
 	x.xxx_hidden_RowsWritten = v
 }
 
-type WriteTableRowsResponse_builder struct {
+type WriteTableResponse_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Number of rows written for each fully-qualified table name.
+	// Map of fully-qualified table name to total number of rows written.
 	RowsWritten map[string]int64
 }
 
-func (b0 WriteTableRowsResponse_builder) Build() *WriteTableRowsResponse {
-	m0 := &WriteTableRowsResponse{}
+func (b0 WriteTableResponse_builder) Build() *WriteTableResponse {
+	m0 := &WriteTableResponse{}
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_RowsWritten = b.RowsWritten
+	return m0
+}
+
+type OrderBy struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Column      *string                `protobuf:"bytes,1,opt,name=column"`
+	xxx_hidden_Direction   OrderBy_Direction      `protobuf:"varint,2,opt,name=direction,enum=dtkt.sql.v1beta1.OrderBy_Direction,def=1"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+// Default values for OrderBy fields.
+const (
+	Default_OrderBy_Direction = OrderBy_ASC
+)
+
+func (x *OrderBy) Reset() {
+	*x = OrderBy{}
+	mi := &file_dtkt_sql_v1beta1_table_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OrderBy) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OrderBy) ProtoMessage() {}
+
+func (x *OrderBy) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_sql_v1beta1_table_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *OrderBy) GetColumn() string {
+	if x != nil {
+		if x.xxx_hidden_Column != nil {
+			return *x.xxx_hidden_Column
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *OrderBy) GetDirection() OrderBy_Direction {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 1) {
+			return x.xxx_hidden_Direction
+		}
+	}
+	return Default_OrderBy_Direction
+}
+
+func (x *OrderBy) SetColumn(v string) {
+	x.xxx_hidden_Column = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
+func (x *OrderBy) SetDirection(v OrderBy_Direction) {
+	x.xxx_hidden_Direction = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *OrderBy) HasColumn() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *OrderBy) HasDirection() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *OrderBy) ClearColumn() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Column = nil
+}
+
+func (x *OrderBy) ClearDirection() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+}
+
+type OrderBy_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Column    *string
+	Direction *OrderBy_Direction
+}
+
+func (b0 OrderBy_builder) Build() *OrderBy {
+	m0 := &OrderBy{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Column != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		x.xxx_hidden_Column = b.Column
+	}
+	if b.Direction != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_Direction = *b.Direction
+	}
 	return m0
 }
 
@@ -1593,7 +1855,7 @@ type Table_Stats struct {
 
 func (x *Table_Stats) Reset() {
 	*x = Table_Stats{}
-	mi := &file_dtkt_sql_v1beta1_table_proto_msgTypes[15]
+	mi := &file_dtkt_sql_v1beta1_table_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1605,7 +1867,7 @@ func (x *Table_Stats) String() string {
 func (*Table_Stats) ProtoMessage() {}
 
 func (x *Table_Stats) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_sql_v1beta1_table_proto_msgTypes[15]
+	mi := &file_dtkt_sql_v1beta1_table_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1692,7 +1954,7 @@ var File_dtkt_sql_v1beta1_table_proto protoreflect.FileDescriptor
 
 const file_dtkt_sql_v1beta1_table_proto_rawDesc = "" +
 	"\n" +
-	"\x1cdtkt/sql/v1beta1/table.proto\x12\x10dtkt.sql.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\x1ddtkt/sql/v1beta1/column.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a google/protobuf/field_mask.proto\x1a!google/protobuf/go_features.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xde\x03\n" +
+	"\x1cdtkt/sql/v1beta1/table.proto\x12\x10dtkt.sql.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\x1ddtkt/sql/v1beta1/column.proto\x1a\x1cdtkt/sql/v1beta1/value.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a google/protobuf/field_mask.proto\x1a!google/protobuf/go_features.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xde\x03\n" +
 	"\x05Table\x12\x1d\n" +
 	"\x04name\x18\x01 \x01(\tB\t\xe0A\b\xbaH\x03\xc8\x01\x01R\x04name\x12?\n" +
 	"\acolumns\x18\x04 \x03(\v2\x18.dtkt.sql.v1beta1.ColumnB\v\xbaH\b\xc8\x01\x01\x92\x01\x02\b\x01R\acolumns\x121\n" +
@@ -1738,98 +2000,132 @@ const file_dtkt_sql_v1beta1_table_proto_rawDesc = "" +
 	"\x05table\x18\x01 \x01(\v2\x17.dtkt.sql.v1beta1.TableR\x05table\"0\n" +
 	"\x12DeleteTableRequest\x12\x1a\n" +
 	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\"\x15\n" +
-	"\x13DeleteTableResponse\"|\n" +
-	"\x14ReadTableRowsRequest\x12\x1c\n" +
-	"\x05table\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x05table\x12\x18\n" +
+	"\x13DeleteTableResponse\"\x86\x02\n" +
+	"\x10ReadTableRequest\x12\x1a\n" +
+	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12\x18\n" +
 	"\acolumns\x18\x02 \x03(\tR\acolumns\x12\x14\n" +
 	"\x05limit\x18\x04 \x01(\x04R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x05 \x01(\x04R\x06offset\"B\n" +
-	"\x15ReadTableRowsResponse\x12)\n" +
-	"\x03row\x18\x01 \x01(\v2\x17.google.protobuf.StructR\x03row\"\xa4\x01\n" +
-	"\x15WriteTableRowsRequest\x12\x1c\n" +
-	"\x05table\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x05table\x12)\n" +
-	"\x03row\x18\x02 \x01(\v2\x17.google.protobuf.StructR\x03row\x12\x1d\n" +
+	"\x06offset\x18\x05 \x01(\x04R\x06offset\x124\n" +
+	"\border_by\x18\a \x03(\v2\x19.dtkt.sql.v1beta1.OrderByR\aorderBy\x12X\n" +
+	"\x06format\x18\x06 \x01(\x0e2\x1c.dtkt.sql.v1beta1.DataFormat:\x18DATA_FORMAT_STRUCT_BATCHB\b\xbaH\x05\x82\x01\x02\x10\x01R\x06format\"\xd9\x01\n" +
+	"\x11ReadTableResponse\x12\x1f\n" +
+	"\varrow_batch\x18\x01 \x01(\fR\n" +
+	"arrowBatch\x12;\n" +
+	"\fstruct_batch\x18\x02 \x03(\v2\x18.dtkt.sql.v1beta1.StructR\vstructBatch\x126\n" +
 	"\n" +
-	"batch_size\x18\x03 \x01(\rR\tbatchSize\x12#\n" +
-	"\rignore_errors\x18\x04 \x01(\bR\fignoreErrors\"\xb6\x01\n" +
-	"\x16WriteTableRowsResponse\x12\\\n" +
-	"\frows_written\x18\x01 \x03(\v29.dtkt.sql.v1beta1.WriteTableRowsResponse.RowsWrittenEntryR\vrowsWritten\x1a>\n" +
+	"json_batch\x18\x03 \x03(\v2\x17.google.protobuf.StructR\tjsonBatch:.\xbaH+\")\n" +
+	"\varrow_batch\n" +
+	"\fstruct_batch\n" +
+	"\n" +
+	"json_batch\x10\x01\"\x9a\x02\n" +
+	"\x11WriteTableRequest\x12\x1a\n" +
+	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12#\n" +
+	"\rignore_errors\x18\x02 \x01(\bR\fignoreErrors\x12\x1f\n" +
+	"\varrow_batch\x18\x03 \x01(\fR\n" +
+	"arrowBatch\x12;\n" +
+	"\fstruct_batch\x18\x04 \x03(\v2\x18.dtkt.sql.v1beta1.StructR\vstructBatch\x126\n" +
+	"\n" +
+	"json_batch\x18\x05 \x03(\v2\x17.google.protobuf.StructR\tjsonBatch:.\xbaH+\")\n" +
+	"\varrow_batch\n" +
+	"\fstruct_batch\n" +
+	"\n" +
+	"json_batch\x10\x01\"\xae\x01\n" +
+	"\x12WriteTableResponse\x12X\n" +
+	"\frows_written\x18\x01 \x03(\v25.dtkt.sql.v1beta1.WriteTableResponse.RowsWrittenEntryR\vrowsWritten\x1a>\n" +
 	"\x10RowsWrittenEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\x03R\x05value:\x028\x012\x99\x05\n" +
+	"\x05value\x18\x02 \x01(\x03R\x05value:\x028\x01\"\xa2\x01\n" +
+	"\aOrderBy\x12\x1e\n" +
+	"\x06column\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06column\x12F\n" +
+	"\tdirection\x18\x02 \x01(\x0e2#.dtkt.sql.v1beta1.OrderBy.Direction:\x03ASCR\tdirection\"/\n" +
+	"\tDirection\x12\x0f\n" +
+	"\vUNSPECIFIED\x10\x00\x12\a\n" +
+	"\x03ASC\x10\x01\x12\b\n" +
+	"\x04DESC\x10\x022\x81\x05\n" +
 	"\fTableService\x12W\n" +
 	"\n" +
 	"ListTables\x12#.dtkt.sql.v1beta1.ListTablesRequest\x1a$.dtkt.sql.v1beta1.ListTablesResponse\x12Q\n" +
 	"\bGetTable\x12!.dtkt.sql.v1beta1.GetTableRequest\x1a\".dtkt.sql.v1beta1.GetTableResponse\x12Z\n" +
 	"\vCreateTable\x12$.dtkt.sql.v1beta1.CreateTableRequest\x1a%.dtkt.sql.v1beta1.CreateTableResponse\x12Z\n" +
 	"\vUpdateTable\x12$.dtkt.sql.v1beta1.UpdateTableRequest\x1a%.dtkt.sql.v1beta1.UpdateTableResponse\x12Z\n" +
-	"\vDeleteTable\x12$.dtkt.sql.v1beta1.DeleteTableRequest\x1a%.dtkt.sql.v1beta1.DeleteTableResponse\x12b\n" +
-	"\rReadTableRows\x12&.dtkt.sql.v1beta1.ReadTableRowsRequest\x1a'.dtkt.sql.v1beta1.ReadTableRowsResponse0\x01\x12e\n" +
-	"\x0eWriteTableRows\x12'.dtkt.sql.v1beta1.WriteTableRowsRequest\x1a(.dtkt.sql.v1beta1.WriteTableRowsResponse(\x01B\xd8\x01\n" +
+	"\vDeleteTable\x12$.dtkt.sql.v1beta1.DeleteTableRequest\x1a%.dtkt.sql.v1beta1.DeleteTableResponse\x12V\n" +
+	"\tReadTable\x12\".dtkt.sql.v1beta1.ReadTableRequest\x1a#.dtkt.sql.v1beta1.ReadTableResponse0\x01\x12Y\n" +
+	"\n" +
+	"WriteTable\x12#.dtkt.sql.v1beta1.WriteTableRequest\x1a$.dtkt.sql.v1beta1.WriteTableResponse(\x01B\xd8\x01\n" +
 	"\x16proto.dtkt.sql.v1beta1B\n" +
 	"TableProtoP\x01ZHgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/sql/v1beta1;sqlv1beta1\xa2\x02\x03DSX\xaa\x02\x10Dtkt.Sql.V1beta1\xca\x02\x10Dtkt\\Sql\\V1beta1\xe2\x02\x1cDtkt\\Sql\\V1beta1\\GPBMetadata\xea\x02\x12Dtkt::Sql::V1beta1\x92\x03\x05\xd2>\x02\x10\x03b\beditionsp\xe8\a"
 
-var file_dtkt_sql_v1beta1_table_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_dtkt_sql_v1beta1_table_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_dtkt_sql_v1beta1_table_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_dtkt_sql_v1beta1_table_proto_goTypes = []any{
-	(*Table)(nil),                  // 0: dtkt.sql.v1beta1.Table
-	(*ListTablesRequest)(nil),      // 1: dtkt.sql.v1beta1.ListTablesRequest
-	(*ListTablesResponse)(nil),     // 2: dtkt.sql.v1beta1.ListTablesResponse
-	(*GetTableRequest)(nil),        // 3: dtkt.sql.v1beta1.GetTableRequest
-	(*GetTableResponse)(nil),       // 4: dtkt.sql.v1beta1.GetTableResponse
-	(*CreateTableRequest)(nil),     // 5: dtkt.sql.v1beta1.CreateTableRequest
-	(*CreateTableResponse)(nil),    // 6: dtkt.sql.v1beta1.CreateTableResponse
-	(*UpdateTableRequest)(nil),     // 7: dtkt.sql.v1beta1.UpdateTableRequest
-	(*UpdateTableResponse)(nil),    // 8: dtkt.sql.v1beta1.UpdateTableResponse
-	(*DeleteTableRequest)(nil),     // 9: dtkt.sql.v1beta1.DeleteTableRequest
-	(*DeleteTableResponse)(nil),    // 10: dtkt.sql.v1beta1.DeleteTableResponse
-	(*ReadTableRowsRequest)(nil),   // 11: dtkt.sql.v1beta1.ReadTableRowsRequest
-	(*ReadTableRowsResponse)(nil),  // 12: dtkt.sql.v1beta1.ReadTableRowsResponse
-	(*WriteTableRowsRequest)(nil),  // 13: dtkt.sql.v1beta1.WriteTableRowsRequest
-	(*WriteTableRowsResponse)(nil), // 14: dtkt.sql.v1beta1.WriteTableRowsResponse
-	(*Table_Stats)(nil),            // 15: dtkt.sql.v1beta1.Table.Stats
-	nil,                            // 16: dtkt.sql.v1beta1.Table.MetadataEntry
-	nil,                            // 17: dtkt.sql.v1beta1.WriteTableRowsResponse.RowsWrittenEntry
-	(*Column)(nil),                 // 18: dtkt.sql.v1beta1.Column
-	(*Index)(nil),                  // 19: dtkt.sql.v1beta1.Index
-	(*ForeignKey)(nil),             // 20: dtkt.sql.v1beta1.ForeignKey
-	(*fieldmaskpb.FieldMask)(nil),  // 21: google.protobuf.FieldMask
-	(*structpb.Struct)(nil),        // 22: google.protobuf.Struct
+	(OrderBy_Direction)(0),        // 0: dtkt.sql.v1beta1.OrderBy.Direction
+	(*Table)(nil),                 // 1: dtkt.sql.v1beta1.Table
+	(*ListTablesRequest)(nil),     // 2: dtkt.sql.v1beta1.ListTablesRequest
+	(*ListTablesResponse)(nil),    // 3: dtkt.sql.v1beta1.ListTablesResponse
+	(*GetTableRequest)(nil),       // 4: dtkt.sql.v1beta1.GetTableRequest
+	(*GetTableResponse)(nil),      // 5: dtkt.sql.v1beta1.GetTableResponse
+	(*CreateTableRequest)(nil),    // 6: dtkt.sql.v1beta1.CreateTableRequest
+	(*CreateTableResponse)(nil),   // 7: dtkt.sql.v1beta1.CreateTableResponse
+	(*UpdateTableRequest)(nil),    // 8: dtkt.sql.v1beta1.UpdateTableRequest
+	(*UpdateTableResponse)(nil),   // 9: dtkt.sql.v1beta1.UpdateTableResponse
+	(*DeleteTableRequest)(nil),    // 10: dtkt.sql.v1beta1.DeleteTableRequest
+	(*DeleteTableResponse)(nil),   // 11: dtkt.sql.v1beta1.DeleteTableResponse
+	(*ReadTableRequest)(nil),      // 12: dtkt.sql.v1beta1.ReadTableRequest
+	(*ReadTableResponse)(nil),     // 13: dtkt.sql.v1beta1.ReadTableResponse
+	(*WriteTableRequest)(nil),     // 14: dtkt.sql.v1beta1.WriteTableRequest
+	(*WriteTableResponse)(nil),    // 15: dtkt.sql.v1beta1.WriteTableResponse
+	(*OrderBy)(nil),               // 16: dtkt.sql.v1beta1.OrderBy
+	(*Table_Stats)(nil),           // 17: dtkt.sql.v1beta1.Table.Stats
+	nil,                           // 18: dtkt.sql.v1beta1.Table.MetadataEntry
+	nil,                           // 19: dtkt.sql.v1beta1.WriteTableResponse.RowsWrittenEntry
+	(*Column)(nil),                // 20: dtkt.sql.v1beta1.Column
+	(*Index)(nil),                 // 21: dtkt.sql.v1beta1.Index
+	(*ForeignKey)(nil),            // 22: dtkt.sql.v1beta1.ForeignKey
+	(*fieldmaskpb.FieldMask)(nil), // 23: google.protobuf.FieldMask
+	(DataFormat)(0),               // 24: dtkt.sql.v1beta1.DataFormat
+	(*Struct)(nil),                // 25: dtkt.sql.v1beta1.Struct
+	(*structpb.Struct)(nil),       // 26: google.protobuf.Struct
 }
 var file_dtkt_sql_v1beta1_table_proto_depIdxs = []int32{
-	18, // 0: dtkt.sql.v1beta1.Table.columns:type_name -> dtkt.sql.v1beta1.Column
-	19, // 1: dtkt.sql.v1beta1.Table.indexes:type_name -> dtkt.sql.v1beta1.Index
-	20, // 2: dtkt.sql.v1beta1.Table.foreign_keys:type_name -> dtkt.sql.v1beta1.ForeignKey
-	15, // 3: dtkt.sql.v1beta1.Table.stats:type_name -> dtkt.sql.v1beta1.Table.Stats
-	16, // 4: dtkt.sql.v1beta1.Table.metadata:type_name -> dtkt.sql.v1beta1.Table.MetadataEntry
-	0,  // 5: dtkt.sql.v1beta1.ListTablesResponse.tables:type_name -> dtkt.sql.v1beta1.Table
-	0,  // 6: dtkt.sql.v1beta1.GetTableResponse.table:type_name -> dtkt.sql.v1beta1.Table
-	0,  // 7: dtkt.sql.v1beta1.CreateTableRequest.table:type_name -> dtkt.sql.v1beta1.Table
-	0,  // 8: dtkt.sql.v1beta1.CreateTableResponse.table:type_name -> dtkt.sql.v1beta1.Table
-	0,  // 9: dtkt.sql.v1beta1.UpdateTableRequest.table:type_name -> dtkt.sql.v1beta1.Table
-	21, // 10: dtkt.sql.v1beta1.UpdateTableRequest.update_mask:type_name -> google.protobuf.FieldMask
-	0,  // 11: dtkt.sql.v1beta1.UpdateTableResponse.table:type_name -> dtkt.sql.v1beta1.Table
-	22, // 12: dtkt.sql.v1beta1.ReadTableRowsResponse.row:type_name -> google.protobuf.Struct
-	22, // 13: dtkt.sql.v1beta1.WriteTableRowsRequest.row:type_name -> google.protobuf.Struct
-	17, // 14: dtkt.sql.v1beta1.WriteTableRowsResponse.rows_written:type_name -> dtkt.sql.v1beta1.WriteTableRowsResponse.RowsWrittenEntry
-	1,  // 15: dtkt.sql.v1beta1.TableService.ListTables:input_type -> dtkt.sql.v1beta1.ListTablesRequest
-	3,  // 16: dtkt.sql.v1beta1.TableService.GetTable:input_type -> dtkt.sql.v1beta1.GetTableRequest
-	5,  // 17: dtkt.sql.v1beta1.TableService.CreateTable:input_type -> dtkt.sql.v1beta1.CreateTableRequest
-	7,  // 18: dtkt.sql.v1beta1.TableService.UpdateTable:input_type -> dtkt.sql.v1beta1.UpdateTableRequest
-	9,  // 19: dtkt.sql.v1beta1.TableService.DeleteTable:input_type -> dtkt.sql.v1beta1.DeleteTableRequest
-	11, // 20: dtkt.sql.v1beta1.TableService.ReadTableRows:input_type -> dtkt.sql.v1beta1.ReadTableRowsRequest
-	13, // 21: dtkt.sql.v1beta1.TableService.WriteTableRows:input_type -> dtkt.sql.v1beta1.WriteTableRowsRequest
-	2,  // 22: dtkt.sql.v1beta1.TableService.ListTables:output_type -> dtkt.sql.v1beta1.ListTablesResponse
-	4,  // 23: dtkt.sql.v1beta1.TableService.GetTable:output_type -> dtkt.sql.v1beta1.GetTableResponse
-	6,  // 24: dtkt.sql.v1beta1.TableService.CreateTable:output_type -> dtkt.sql.v1beta1.CreateTableResponse
-	8,  // 25: dtkt.sql.v1beta1.TableService.UpdateTable:output_type -> dtkt.sql.v1beta1.UpdateTableResponse
-	10, // 26: dtkt.sql.v1beta1.TableService.DeleteTable:output_type -> dtkt.sql.v1beta1.DeleteTableResponse
-	12, // 27: dtkt.sql.v1beta1.TableService.ReadTableRows:output_type -> dtkt.sql.v1beta1.ReadTableRowsResponse
-	14, // 28: dtkt.sql.v1beta1.TableService.WriteTableRows:output_type -> dtkt.sql.v1beta1.WriteTableRowsResponse
-	22, // [22:29] is the sub-list for method output_type
-	15, // [15:22] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	20, // 0: dtkt.sql.v1beta1.Table.columns:type_name -> dtkt.sql.v1beta1.Column
+	21, // 1: dtkt.sql.v1beta1.Table.indexes:type_name -> dtkt.sql.v1beta1.Index
+	22, // 2: dtkt.sql.v1beta1.Table.foreign_keys:type_name -> dtkt.sql.v1beta1.ForeignKey
+	17, // 3: dtkt.sql.v1beta1.Table.stats:type_name -> dtkt.sql.v1beta1.Table.Stats
+	18, // 4: dtkt.sql.v1beta1.Table.metadata:type_name -> dtkt.sql.v1beta1.Table.MetadataEntry
+	1,  // 5: dtkt.sql.v1beta1.ListTablesResponse.tables:type_name -> dtkt.sql.v1beta1.Table
+	1,  // 6: dtkt.sql.v1beta1.GetTableResponse.table:type_name -> dtkt.sql.v1beta1.Table
+	1,  // 7: dtkt.sql.v1beta1.CreateTableRequest.table:type_name -> dtkt.sql.v1beta1.Table
+	1,  // 8: dtkt.sql.v1beta1.CreateTableResponse.table:type_name -> dtkt.sql.v1beta1.Table
+	1,  // 9: dtkt.sql.v1beta1.UpdateTableRequest.table:type_name -> dtkt.sql.v1beta1.Table
+	23, // 10: dtkt.sql.v1beta1.UpdateTableRequest.update_mask:type_name -> google.protobuf.FieldMask
+	1,  // 11: dtkt.sql.v1beta1.UpdateTableResponse.table:type_name -> dtkt.sql.v1beta1.Table
+	16, // 12: dtkt.sql.v1beta1.ReadTableRequest.order_by:type_name -> dtkt.sql.v1beta1.OrderBy
+	24, // 13: dtkt.sql.v1beta1.ReadTableRequest.format:type_name -> dtkt.sql.v1beta1.DataFormat
+	25, // 14: dtkt.sql.v1beta1.ReadTableResponse.struct_batch:type_name -> dtkt.sql.v1beta1.Struct
+	26, // 15: dtkt.sql.v1beta1.ReadTableResponse.json_batch:type_name -> google.protobuf.Struct
+	25, // 16: dtkt.sql.v1beta1.WriteTableRequest.struct_batch:type_name -> dtkt.sql.v1beta1.Struct
+	26, // 17: dtkt.sql.v1beta1.WriteTableRequest.json_batch:type_name -> google.protobuf.Struct
+	19, // 18: dtkt.sql.v1beta1.WriteTableResponse.rows_written:type_name -> dtkt.sql.v1beta1.WriteTableResponse.RowsWrittenEntry
+	0,  // 19: dtkt.sql.v1beta1.OrderBy.direction:type_name -> dtkt.sql.v1beta1.OrderBy.Direction
+	2,  // 20: dtkt.sql.v1beta1.TableService.ListTables:input_type -> dtkt.sql.v1beta1.ListTablesRequest
+	4,  // 21: dtkt.sql.v1beta1.TableService.GetTable:input_type -> dtkt.sql.v1beta1.GetTableRequest
+	6,  // 22: dtkt.sql.v1beta1.TableService.CreateTable:input_type -> dtkt.sql.v1beta1.CreateTableRequest
+	8,  // 23: dtkt.sql.v1beta1.TableService.UpdateTable:input_type -> dtkt.sql.v1beta1.UpdateTableRequest
+	10, // 24: dtkt.sql.v1beta1.TableService.DeleteTable:input_type -> dtkt.sql.v1beta1.DeleteTableRequest
+	12, // 25: dtkt.sql.v1beta1.TableService.ReadTable:input_type -> dtkt.sql.v1beta1.ReadTableRequest
+	14, // 26: dtkt.sql.v1beta1.TableService.WriteTable:input_type -> dtkt.sql.v1beta1.WriteTableRequest
+	3,  // 27: dtkt.sql.v1beta1.TableService.ListTables:output_type -> dtkt.sql.v1beta1.ListTablesResponse
+	5,  // 28: dtkt.sql.v1beta1.TableService.GetTable:output_type -> dtkt.sql.v1beta1.GetTableResponse
+	7,  // 29: dtkt.sql.v1beta1.TableService.CreateTable:output_type -> dtkt.sql.v1beta1.CreateTableResponse
+	9,  // 30: dtkt.sql.v1beta1.TableService.UpdateTable:output_type -> dtkt.sql.v1beta1.UpdateTableResponse
+	11, // 31: dtkt.sql.v1beta1.TableService.DeleteTable:output_type -> dtkt.sql.v1beta1.DeleteTableResponse
+	13, // 32: dtkt.sql.v1beta1.TableService.ReadTable:output_type -> dtkt.sql.v1beta1.ReadTableResponse
+	15, // 33: dtkt.sql.v1beta1.TableService.WriteTable:output_type -> dtkt.sql.v1beta1.WriteTableResponse
+	27, // [27:34] is the sub-list for method output_type
+	20, // [20:27] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_sql_v1beta1_table_proto_init() }
@@ -1838,18 +2134,20 @@ func file_dtkt_sql_v1beta1_table_proto_init() {
 		return
 	}
 	file_dtkt_sql_v1beta1_column_proto_init()
+	file_dtkt_sql_v1beta1_value_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_sql_v1beta1_table_proto_rawDesc), len(file_dtkt_sql_v1beta1_table_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   18,
+			NumEnums:      1,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_dtkt_sql_v1beta1_table_proto_goTypes,
 		DependencyIndexes: file_dtkt_sql_v1beta1_table_proto_depIdxs,
+		EnumInfos:         file_dtkt_sql_v1beta1_table_proto_enumTypes,
 		MessageInfos:      file_dtkt_sql_v1beta1_table_proto_msgTypes,
 	}.Build()
 	File_dtkt_sql_v1beta1_table_proto = out.File

@@ -15,6 +15,7 @@ import (
 	"text/template"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/api"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/integration"
 	actionv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/action/v1beta1"
 	basev1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/base/v1beta1"
 	corev1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1"
@@ -24,7 +25,6 @@ import (
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 )
 
@@ -125,7 +125,7 @@ func GeneratePackage(config *GeneratePackageConfig) error {
 	}
 	defer pkgFile.Close()
 
-	err = integrationsdk.WriteSpec(pkgFile, encoding.YAML, config.Spec)
+	err = integration.WriteSpec(pkgFile, encoding.YAML, config.Spec)
 	if err != nil {
 		return err
 	}
@@ -383,7 +383,7 @@ func InitPackage(config *GeneratePackageConfig) error {
 }
 
 func (c *GeneratePackageConfig) SpecPath() string {
-	return path.Join(c.Path, integrationsdk.SpecFile)
+	return path.Join(c.Path, integration.SpecFile)
 }
 
 func (c *GeneratePackageConfig) Type() string {

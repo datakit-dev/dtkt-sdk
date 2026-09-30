@@ -88,7 +88,7 @@ func MapToMap[V2 any, M ~map[K]V, K comparable, V any](m1 M, fn func(K, V) V2) m
 	return result
 }
 
-func MergeMaps[M ~map[K]V, K comparable, V any](dst, src M) M {
+func MapMerge[M ~map[K]V, K comparable, V any](dst, src M) M {
 	if dst == nil {
 		return src
 	}
@@ -100,7 +100,7 @@ func MergeMaps[M ~map[K]V, K comparable, V any](dst, src M) M {
 	return dst
 }
 
-func JoinMaps[M ~map[K]V, K comparable, V any](srcs ...M) (dst M) {
+func MapJoin[M ~map[K]V, K comparable, V any](srcs ...M) (dst M) {
 	dst = M{}
 	for _, src := range srcs {
 		if src != nil {
@@ -110,8 +110,8 @@ func JoinMaps[M ~map[K]V, K comparable, V any](srcs ...M) (dst M) {
 	return
 }
 
-// ReduceMap returns a map m2 for any key/value pairs from m for which fn returns true.
-func ReduceMap[Map ~map[K]V, K comparable, V any](m Map, fn func(K, V) bool) (m2 Map) {
+// MapReduce returns a map m2 for any key/value pairs from m for which fn returns true.
+func MapReduce[Map ~map[K]V, K comparable, V any](m Map, fn func(K, V) bool) (m2 Map) {
 	m2 = maps.Clone(m)
 	maps.DeleteFunc(m2, func(k K, v V) bool {
 		return !fn(k, v)
@@ -119,8 +119,8 @@ func ReduceMap[Map ~map[K]V, K comparable, V any](m Map, fn func(K, V) bool) (m2
 	return
 }
 
-// TransformMap returns a map[K2]V2 m2 for any key/value pairs from m for which fn returns true.
-func TransformMap[K2 comparable, V2 any, Map ~map[K]V, K comparable, V any](m Map, fn func(K, V) (K2, V2, bool)) (m2 map[K2]V2) {
+// MapTransform returns a map[K2]V2 m2 for any key/value pairs from m for which fn returns true.
+func MapTransform[K2 comparable, V2 any, Map ~map[K]V, K comparable, V any](m Map, fn func(K, V) (K2, V2, bool)) (m2 map[K2]V2) {
 	m2 = map[K2]V2{}
 	for k, v := range m {
 		k2, v2, ok := fn(k, v)
@@ -131,8 +131,8 @@ func TransformMap[K2 comparable, V2 any, Map ~map[K]V, K comparable, V any](m Ma
 	return
 }
 
-// ReduceMapToSlice returns a slice r for any key/value pairs from m for which fn returns true.
-func ReduceMapToSlice[Map ~map[K]V, K comparable, V any, V2 any](m Map, fn func(K, V) (V2, bool)) (r []V2) {
+// MapReduceToSlice returns a slice r for any key/value pairs from m for which fn returns true.
+func MapReduceToSlice[Map ~map[K]V, K comparable, V any, V2 any](m Map, fn func(K, V) (V2, bool)) (r []V2) {
 	for k, v := range m {
 		if v2, ok := fn(k, v); ok {
 			r = append(r, v2)
@@ -234,11 +234,11 @@ func (m *OrderedMap[K, V]) Values() []V {
 }
 
 func (m *OrderedMap[K, V]) AnyKeys() []any {
-	return AnySlice(m.Keys())
+	return SliceOfAny(m.Keys())
 }
 
 func (m *OrderedMap[K, V]) AnyVals() []any {
-	return AnySlice(m.Values())
+	return SliceOfAny(m.Values())
 }
 
 func (m *OrderedMap[K, V]) Len() int {
@@ -336,7 +336,7 @@ func (m *OrderedMap[K, V]) MarshalJSONTo(enc *jsontext.Encoder) error {
 			return err
 		}
 
-		val, err := encoding.ToJSONV2(m.vals[idx], encoding.WithEncodeJSONOptions(enc.Options()))
+		val, err := encoding.ToJSON(m.vals[idx], encoding.WithJSONEncoderOptions(enc.Options()))
 		if err != nil {
 			return err
 		}
@@ -390,8 +390,8 @@ func (m *OrderedMap[K, V]) UnmarshalJSONFrom(dec *jsontext.Decoder) error {
 		}
 
 		var val V
-		err = encoding.FromJSONV2(raw, &val,
-			encoding.WithDecodeJSONOptions(dec.Options()),
+		err = encoding.FromJSON(raw, &val,
+			encoding.WithJSONDecoderOptions(dec.Options()),
 		)
 		if err != nil {
 			return err

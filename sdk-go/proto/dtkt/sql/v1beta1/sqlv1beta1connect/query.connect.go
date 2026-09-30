@@ -39,24 +39,23 @@ const (
 	// QueryServiceValidateQueryProcedure is the fully-qualified name of the QueryService's
 	// ValidateQuery RPC.
 	QueryServiceValidateQueryProcedure = "/dtkt.sql.v1beta1.QueryService/ValidateQuery"
-	// QueryServiceListQueryResultsProcedure is the fully-qualified name of the QueryService's
-	// ListQueryResults RPC.
-	QueryServiceListQueryResultsProcedure = "/dtkt.sql.v1beta1.QueryService/ListQueryResults"
-	// QueryServiceStreamQueryResultsProcedure is the fully-qualified name of the QueryService's
-	// StreamQueryResults RPC.
-	QueryServiceStreamQueryResultsProcedure = "/dtkt.sql.v1beta1.QueryService/StreamQueryResults"
+	// QueryServiceExecuteQueryProcedure is the fully-qualified name of the QueryService's ExecuteQuery
+	// RPC.
+	QueryServiceExecuteQueryProcedure = "/dtkt.sql.v1beta1.QueryService/ExecuteQuery"
+	// QueryServiceReadQueryProcedure is the fully-qualified name of the QueryService's ReadQuery RPC.
+	QueryServiceReadQueryProcedure = "/dtkt.sql.v1beta1.QueryService/ReadQuery"
 )
 
 // QueryServiceClient is a client for the dtkt.sql.v1beta1.QueryService service.
 type QueryServiceClient interface {
-	// Returns query engine with dialect, capabilities, and data types.
+	// Return query engine details with dialect, capabilities, and data types.
 	GetQueryEngine(context.Context, *connect.Request[v1beta1.GetQueryEngineRequest]) (*connect.Response[v1beta1.GetQueryEngineResponse], error)
-	// Validates the provided query.
+	// Validate the provided query.
 	ValidateQuery(context.Context, *connect.Request[v1beta1.ValidateQueryRequest]) (*connect.Response[v1beta1.ValidateQueryResponse], error)
-	// Executes a query and retrieves the results.
-	ListQueryResults(context.Context, *connect.Request[v1beta1.ListQueryResultsRequest]) (*connect.Response[v1beta1.ListQueryResultsResponse], error)
-	// Streams results of a query.
-	StreamQueryResults(context.Context, *connect.Request[v1beta1.StreamQueryResultsRequest]) (*connect.ServerStreamForClient[v1beta1.StreamQueryResultsResponse], error)
+	// Execute query and return results.
+	ExecuteQuery(context.Context, *connect.Request[v1beta1.ExecuteQueryRequest]) (*connect.Response[v1beta1.ExecuteQueryResponse], error)
+	// Read query results as a stream.
+	ReadQuery(context.Context, *connect.Request[v1beta1.ReadQueryRequest]) (*connect.ServerStreamForClient[v1beta1.ReadQueryResponse], error)
 }
 
 // NewQueryServiceClient constructs a client for the dtkt.sql.v1beta1.QueryService service. By
@@ -82,16 +81,16 @@ func NewQueryServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(queryServiceMethods.ByName("ValidateQuery")),
 			connect.WithClientOptions(opts...),
 		),
-		listQueryResults: connect.NewClient[v1beta1.ListQueryResultsRequest, v1beta1.ListQueryResultsResponse](
+		executeQuery: connect.NewClient[v1beta1.ExecuteQueryRequest, v1beta1.ExecuteQueryResponse](
 			httpClient,
-			baseURL+QueryServiceListQueryResultsProcedure,
-			connect.WithSchema(queryServiceMethods.ByName("ListQueryResults")),
+			baseURL+QueryServiceExecuteQueryProcedure,
+			connect.WithSchema(queryServiceMethods.ByName("ExecuteQuery")),
 			connect.WithClientOptions(opts...),
 		),
-		streamQueryResults: connect.NewClient[v1beta1.StreamQueryResultsRequest, v1beta1.StreamQueryResultsResponse](
+		readQuery: connect.NewClient[v1beta1.ReadQueryRequest, v1beta1.ReadQueryResponse](
 			httpClient,
-			baseURL+QueryServiceStreamQueryResultsProcedure,
-			connect.WithSchema(queryServiceMethods.ByName("StreamQueryResults")),
+			baseURL+QueryServiceReadQueryProcedure,
+			connect.WithSchema(queryServiceMethods.ByName("ReadQuery")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -99,10 +98,10 @@ func NewQueryServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 
 // queryServiceClient implements QueryServiceClient.
 type queryServiceClient struct {
-	getQueryEngine     *connect.Client[v1beta1.GetQueryEngineRequest, v1beta1.GetQueryEngineResponse]
-	validateQuery      *connect.Client[v1beta1.ValidateQueryRequest, v1beta1.ValidateQueryResponse]
-	listQueryResults   *connect.Client[v1beta1.ListQueryResultsRequest, v1beta1.ListQueryResultsResponse]
-	streamQueryResults *connect.Client[v1beta1.StreamQueryResultsRequest, v1beta1.StreamQueryResultsResponse]
+	getQueryEngine *connect.Client[v1beta1.GetQueryEngineRequest, v1beta1.GetQueryEngineResponse]
+	validateQuery  *connect.Client[v1beta1.ValidateQueryRequest, v1beta1.ValidateQueryResponse]
+	executeQuery   *connect.Client[v1beta1.ExecuteQueryRequest, v1beta1.ExecuteQueryResponse]
+	readQuery      *connect.Client[v1beta1.ReadQueryRequest, v1beta1.ReadQueryResponse]
 }
 
 // GetQueryEngine calls dtkt.sql.v1beta1.QueryService.GetQueryEngine.
@@ -115,26 +114,26 @@ func (c *queryServiceClient) ValidateQuery(ctx context.Context, req *connect.Req
 	return c.validateQuery.CallUnary(ctx, req)
 }
 
-// ListQueryResults calls dtkt.sql.v1beta1.QueryService.ListQueryResults.
-func (c *queryServiceClient) ListQueryResults(ctx context.Context, req *connect.Request[v1beta1.ListQueryResultsRequest]) (*connect.Response[v1beta1.ListQueryResultsResponse], error) {
-	return c.listQueryResults.CallUnary(ctx, req)
+// ExecuteQuery calls dtkt.sql.v1beta1.QueryService.ExecuteQuery.
+func (c *queryServiceClient) ExecuteQuery(ctx context.Context, req *connect.Request[v1beta1.ExecuteQueryRequest]) (*connect.Response[v1beta1.ExecuteQueryResponse], error) {
+	return c.executeQuery.CallUnary(ctx, req)
 }
 
-// StreamQueryResults calls dtkt.sql.v1beta1.QueryService.StreamQueryResults.
-func (c *queryServiceClient) StreamQueryResults(ctx context.Context, req *connect.Request[v1beta1.StreamQueryResultsRequest]) (*connect.ServerStreamForClient[v1beta1.StreamQueryResultsResponse], error) {
-	return c.streamQueryResults.CallServerStream(ctx, req)
+// ReadQuery calls dtkt.sql.v1beta1.QueryService.ReadQuery.
+func (c *queryServiceClient) ReadQuery(ctx context.Context, req *connect.Request[v1beta1.ReadQueryRequest]) (*connect.ServerStreamForClient[v1beta1.ReadQueryResponse], error) {
+	return c.readQuery.CallServerStream(ctx, req)
 }
 
 // QueryServiceHandler is an implementation of the dtkt.sql.v1beta1.QueryService service.
 type QueryServiceHandler interface {
-	// Returns query engine with dialect, capabilities, and data types.
+	// Return query engine details with dialect, capabilities, and data types.
 	GetQueryEngine(context.Context, *connect.Request[v1beta1.GetQueryEngineRequest]) (*connect.Response[v1beta1.GetQueryEngineResponse], error)
-	// Validates the provided query.
+	// Validate the provided query.
 	ValidateQuery(context.Context, *connect.Request[v1beta1.ValidateQueryRequest]) (*connect.Response[v1beta1.ValidateQueryResponse], error)
-	// Executes a query and retrieves the results.
-	ListQueryResults(context.Context, *connect.Request[v1beta1.ListQueryResultsRequest]) (*connect.Response[v1beta1.ListQueryResultsResponse], error)
-	// Streams results of a query.
-	StreamQueryResults(context.Context, *connect.Request[v1beta1.StreamQueryResultsRequest], *connect.ServerStream[v1beta1.StreamQueryResultsResponse]) error
+	// Execute query and return results.
+	ExecuteQuery(context.Context, *connect.Request[v1beta1.ExecuteQueryRequest]) (*connect.Response[v1beta1.ExecuteQueryResponse], error)
+	// Read query results as a stream.
+	ReadQuery(context.Context, *connect.Request[v1beta1.ReadQueryRequest], *connect.ServerStream[v1beta1.ReadQueryResponse]) error
 }
 
 // NewQueryServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -156,16 +155,16 @@ func NewQueryServiceHandler(svc QueryServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(queryServiceMethods.ByName("ValidateQuery")),
 		connect.WithHandlerOptions(opts...),
 	)
-	queryServiceListQueryResultsHandler := connect.NewUnaryHandler(
-		QueryServiceListQueryResultsProcedure,
-		svc.ListQueryResults,
-		connect.WithSchema(queryServiceMethods.ByName("ListQueryResults")),
+	queryServiceExecuteQueryHandler := connect.NewUnaryHandler(
+		QueryServiceExecuteQueryProcedure,
+		svc.ExecuteQuery,
+		connect.WithSchema(queryServiceMethods.ByName("ExecuteQuery")),
 		connect.WithHandlerOptions(opts...),
 	)
-	queryServiceStreamQueryResultsHandler := connect.NewServerStreamHandler(
-		QueryServiceStreamQueryResultsProcedure,
-		svc.StreamQueryResults,
-		connect.WithSchema(queryServiceMethods.ByName("StreamQueryResults")),
+	queryServiceReadQueryHandler := connect.NewServerStreamHandler(
+		QueryServiceReadQueryProcedure,
+		svc.ReadQuery,
+		connect.WithSchema(queryServiceMethods.ByName("ReadQuery")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/dtkt.sql.v1beta1.QueryService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -174,10 +173,10 @@ func NewQueryServiceHandler(svc QueryServiceHandler, opts ...connect.HandlerOpti
 			queryServiceGetQueryEngineHandler.ServeHTTP(w, r)
 		case QueryServiceValidateQueryProcedure:
 			queryServiceValidateQueryHandler.ServeHTTP(w, r)
-		case QueryServiceListQueryResultsProcedure:
-			queryServiceListQueryResultsHandler.ServeHTTP(w, r)
-		case QueryServiceStreamQueryResultsProcedure:
-			queryServiceStreamQueryResultsHandler.ServeHTTP(w, r)
+		case QueryServiceExecuteQueryProcedure:
+			queryServiceExecuteQueryHandler.ServeHTTP(w, r)
+		case QueryServiceReadQueryProcedure:
+			queryServiceReadQueryHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -195,10 +194,10 @@ func (UnimplementedQueryServiceHandler) ValidateQuery(context.Context, *connect.
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.sql.v1beta1.QueryService.ValidateQuery is not implemented"))
 }
 
-func (UnimplementedQueryServiceHandler) ListQueryResults(context.Context, *connect.Request[v1beta1.ListQueryResultsRequest]) (*connect.Response[v1beta1.ListQueryResultsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.sql.v1beta1.QueryService.ListQueryResults is not implemented"))
+func (UnimplementedQueryServiceHandler) ExecuteQuery(context.Context, *connect.Request[v1beta1.ExecuteQueryRequest]) (*connect.Response[v1beta1.ExecuteQueryResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.sql.v1beta1.QueryService.ExecuteQuery is not implemented"))
 }
 
-func (UnimplementedQueryServiceHandler) StreamQueryResults(context.Context, *connect.Request[v1beta1.StreamQueryResultsRequest], *connect.ServerStream[v1beta1.StreamQueryResultsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.sql.v1beta1.QueryService.StreamQueryResults is not implemented"))
+func (UnimplementedQueryServiceHandler) ReadQuery(context.Context, *connect.Request[v1beta1.ReadQueryRequest], *connect.ServerStream[v1beta1.ReadQueryResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.sql.v1beta1.QueryService.ReadQuery is not implemented"))
 }

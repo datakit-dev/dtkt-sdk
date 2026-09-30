@@ -13,35 +13,40 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
+var _ Encoder = (*CSVEncoder)(nil)
+var _ StreamEncoder = (*CSVEncoder)(nil)
+var _ Decoder = (*CSVDecoder)(nil)
+var _ StreamDecoder = (*CSVDecoder)(nil)
+
 type (
 	CSVEncoder struct {
-		writerOpts []CSVWriterOption
-		getWriter  func() (*bytes.Buffer, *csv.Writer)
+		getWriter func() (*bytes.Buffer, *csv.Writer)
+		opts      []CSVWriterOption
 	}
 	CSVDecoder struct {
-		opts      []CSVReaderOption
 		getReader func() (*bytes.Buffer, *csv.Reader)
+		opts      []CSVReaderOption
 	}
 )
 
-func NewCSVEncoder(opts ...CSVWriterOption) (enc CSVEncoder) {
-	enc.writerOpts = opts
-	enc.getWriter = sync.OnceValues(func() (buf *bytes.Buffer, writer *csv.Writer) {
-		buf = new(bytes.Buffer)
-		writer = NewCSVWriter(buf, opts...)
-		return
-	})
-	return
+func NewCSVEncoder(opts ...CSVWriterOption) *CSVEncoder {
+	return &CSVEncoder{
+		getWriter: sync.OnceValues(func() (*bytes.Buffer, *csv.Writer) {
+			var buf bytes.Buffer
+			return &buf, NewCSVWriter(&buf, opts...)
+		}),
+		opts: opts,
+	}
 }
 
-func NewCSVDecoder(opts ...CSVReaderOption) (dec CSVDecoder) {
-	dec.opts = opts
-	dec.getReader = sync.OnceValues(func() (buf *bytes.Buffer, reader *csv.Reader) {
-		buf = new(bytes.Buffer)
-		reader = NewCSVReader(buf, opts...)
-		return
-	})
-	return
+func NewCSVDecoder(opts ...CSVReaderOption) *CSVDecoder {
+	return &CSVDecoder{
+		getReader: sync.OnceValues(func() (*bytes.Buffer, *csv.Reader) {
+			var buf bytes.Buffer
+			return &buf, NewCSVReader(&buf, opts...)
+		}),
+		opts: opts,
+	}
 }
 
 func NewCSVWriter(w io.Writer, opts ...CSVWriterOption) *csv.Writer {
@@ -64,9 +69,8 @@ func NewCSVReader(r io.Reader, opts ...CSVReaderOption) *csv.Reader {
 	return reader
 }
 
-func (e CSVEncoder) StreamEncode(w io.Writer) func(any) error {
-	writer := NewCSVWriter(w, e.writerOpts...)
-
+func (e CSVEncoder) StreamEncode(w io.Writer) NextFunc {
+	writer := NewCSVWriter(w, e.opts...)
 	return func(v any) error {
 		return writeCSVRecord(writer, v)
 	}
@@ -85,8 +89,9 @@ func (e CSVEncoder) Encode(v any) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (d CSVDecoder) StreamDecode(r io.Reader) func(any) error {
+func (d CSVDecoder) StreamDecode(r io.Reader) NextFunc {
 	reader := NewCSVReader(r, d.opts...)
+
 	return func(v any) error {
 		return readCSVRecord(reader, v)
 	}
@@ -130,7 +135,11 @@ func readCSVRecord(reader *csv.Reader, v any) error {
 	return fromCSVRecord(record, v)
 }
 
-func fromCSVRecord(record []string, v any) (err error) {
+func fromCSVRecord(record []string, v any) error {
+	if v == nil {
+		return fmt.Errorf("decode csv row: value cannot be nil")
+	}
+
 	switch v := v.(type) {
 	case *[]string:
 		*v = record
@@ -139,24 +148,44 @@ func fromCSVRecord(record []string, v any) (err error) {
 	case *any:
 		*v = any(toAnySlice(record))
 	case *structpb.Value:
-		if v != nil {
-			list, _ := structpb.NewList(toAnySlice(record))
-			v.Kind = &structpb.Value_ListValue{
-				ListValue: list,
-			}
+		list, _ := structpb.NewList(toAnySlice(record))
+		v.Kind = &structpb.Value_ListValue{
+			ListValue: list,
 		}
 	case *structpb.ListValue:
-		if v != nil {
-			list, _ := structpb.NewList(toAnySlice(record))
-			v.Values = list.Values
+		list, err := structpb.NewList(toAnySlice(record))
+		if err != nil {
+			return err
 		}
-	case json.RawMessage:
+
+		v.Values = list.Values
+	case *json.RawMessage:
+		b, err := json.Marshal(record)
+		if err != nil {
+			return err
+		}
+
+		*v = b
+	case *[]byte:
+		b := json.RawMessage(*v)
+		err := fromCSVRecord(record, &b)
+		if err != nil {
+			return err
+		}
+
+		*v = b
+	default:
+		return fmt.Errorf("decode csv row: invalid value type: %T", v)
 	}
-	return
+	return nil
 }
 
 func toCSVRecord(v any) (_ []string, err error) {
 	switch v := v.(type) {
+	case *structpb.Value:
+		return toCSVRecord(v.AsInterface())
+	case *structpb.ListValue:
+		return toCSVRecord(v.AsSlice())
 	case []string:
 		return v, nil
 	case []any:
@@ -169,34 +198,6 @@ func toCSVRecord(v any) (_ []string, err error) {
 			}
 		}
 		return rec, nil
-	case *structpb.Value:
-		return toCSVRecord(v.AsInterface())
-	case *structpb.ListValue:
-		return toCSVRecord(v.AsSlice())
-		// case *timestamppb.Timestamp:
-		// 	return []string{v.AsTime().String()}, nil
-		// case *durationpb.Duration:
-		// 	return []string{v.AsDuration().String()}, nil
-		// case proto.Message:
-		// 	msg := v.ProtoReflect()
-		// 	rec := make([]string, msg.Descriptor().Fields().Len())
-		// 	for idx := range msg.Descriptor().Fields().Len() {
-		// 		field := msg.Descriptor().Fields().Get(idx)
-		// 		if msg.Has(field) {
-		// 			if field.Message() != nil {
-		// 				b, err := defaultJsonEncoder.Encode(msg.Get(field).Message().Interface())
-		// 				if err != nil {
-		// 					return nil, err
-		// 				}
-		// 				rec[idx] = string(b)
-		// 			} else {
-		// 				rec[idx] = msg.Get(field).String()
-		// 			}
-		// 		} else {
-		// 			rec[idx] = ""
-		// 		}
-		// 	}
-		// 	return rec, nil
 	}
 
 	b, err := defaultJsonEncoder.Encode(v)

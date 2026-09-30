@@ -221,13 +221,13 @@ func (s *JSONSchema[T]) ValidateAny(input any) (value T, err error) {
 		return
 	}
 
-	doc, err := encoding.ToJSONV2(input)
+	doc, err := encoding.ToJSON(input)
 	if err != nil {
 		return
 	}
 
 	var val any
-	err = encoding.FromJSONV2(doc, &val)
+	err = encoding.FromJSON(doc, &val)
 	if err != nil {
 		return
 	}
@@ -239,14 +239,14 @@ func (s *JSONSchema[T]) ValidateAny(input any) (value T, err error) {
 
 	if s.protoType != nil {
 		msg := s.protoType.New().Interface()
-		err = encoding.FromJSONV2(doc, msg)
+		err = encoding.FromJSON(doc, msg)
 		if err != nil {
 			return
 		}
 
 		value = msg.(T)
 	} else {
-		err = encoding.FromJSONV2(doc, &value)
+		err = encoding.FromJSON(doc, &value)
 	}
 
 	return
@@ -261,13 +261,13 @@ func (s *JSONSchema[T]) ValidateAny(input any) (value T, err error) {
 // 	value = v.(T)
 // 	return
 // } else if s.protoType != nil {
-// 	doc, err = encoding.ToJSONV2(input)
+// 	doc, err = encoding.ToJSON(input)
 // 	if err != nil {
 // 		return
 // 	}
 
 // 	msg := s.protoType.New().Interface()
-// 	err = encoding.FromJSONV2(doc, msg)
+// 	err = encoding.FromJSON(doc, msg)
 // 	if err != nil {
 // 		return
 // 	}
@@ -277,7 +277,7 @@ func (s *JSONSchema[T]) ValidateAny(input any) (value T, err error) {
 // }
 
 // msg := s.protoType.New().Interface()
-// err = encoding.FromJSONV2(doc, msg)
+// err = encoding.FromJSON(doc, msg)
 // if err != nil {
 // 	return
 // }
@@ -308,7 +308,7 @@ func (s *JSONSchema[T]) ValidateAny(input any) (value T, err error) {
 // }
 
 // if doc == nil {
-// 	doc, err = encoding.ToJSONV2(input)
+// 	doc, err = encoding.ToJSON(input)
 // 	if err != nil {
 // 		return
 // 	}
@@ -316,7 +316,7 @@ func (s *JSONSchema[T]) ValidateAny(input any) (value T, err error) {
 
 // if !useInput {
 // 	var val any
-// 	err = encoding.FromJSONV2(doc, &val)
+// 	err = encoding.FromJSON(doc, &val)
 // 	if err != nil {
 // 		return
 // 	}

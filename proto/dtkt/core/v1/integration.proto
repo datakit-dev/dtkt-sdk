@@ -9,7 +9,6 @@ import "dtkt/protostore/v1beta1/protostore.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/longrunning/operations.proto";
-import "google/protobuf/descriptor.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -53,13 +52,9 @@ service IntegrationService {
   // }
 }
 
-// Integration describes a software package which uses the DataKit SDK and can
-// be deployed to a runtime environment using a Deployment resource. An Integration
-// can represent a software package in development with a local runtime environment
-// or a released software package in a registry with a remote runtime environment.
-// Integrations provide a way to manage software packages and their deployment
-// lifecycle within the DataKit ecosystem, enabling users to easily deploy and
-// run their software packages in compatible runtime environments.
+// Integration describes a software package which uses a DataKit SDK enabling
+// managed deployment, configuration management, runtime service/type reflection,
+// and workflow automation.
 message Integration {
   option (google.api.resource) = {
     type: "Integration"

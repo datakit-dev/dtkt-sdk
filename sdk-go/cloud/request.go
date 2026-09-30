@@ -32,7 +32,7 @@ type (
 	requestCtxKey struct{}
 )
 
-func NewRequest(opts ...RequestOpt) *Request {
+func NewRequest(opts ...RequestOption) *Request {
 	req := &Request{}
 	req.SetOptions(opts...)
 
@@ -51,7 +51,7 @@ func (r *Request) GetGraphUrl() string {
 	return fmt.Sprintf("%s/graphql", r.ApiUrl)
 }
 
-func (r *Request) SetOptions(opts ...RequestOpt) {
+func (r *Request) SetOptions(opts ...RequestOption) {
 	for _, opt := range opts {
 		if opt != nil {
 			opt(r)
@@ -76,7 +76,7 @@ func (r *Request) SetHeader(req *http.Request) error {
 	return nil
 }
 
-func NewRequestContext(ctx context.Context, opts ...RequestOpt) context.Context {
+func NewRequestContext(ctx context.Context, opts ...RequestOption) context.Context {
 	return AddToContext(ctx, NewRequest(opts...))
 }
 

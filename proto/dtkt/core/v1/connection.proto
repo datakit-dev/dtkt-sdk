@@ -8,7 +8,6 @@ import "dtkt/protoform/v1beta1/protoform.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/protobuf/any.proto";
-import "google/protobuf/descriptor.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -133,7 +132,7 @@ message Connection {
     debug_redact = true
   ];
 
-  // Config source uri (optional).
+  // Config data URI (optional).
   optional string config_uri = 13 [
     (buf.validate.field).string.uri = true,
     (google.api.field_behavior) = INPUT_ONLY,
@@ -155,8 +154,11 @@ message Connection {
   }
 
   // Headers applied when dialing connection (only valid for custom connections).
-  map<string, string> headers = 14 [debug_redact = true];
-  option (buf.validate.message).cel_expression = "has(this.headers) ? has(this.custom_protos) || has(this.custom_grpc) : false";
+  map<string, string> headers = 14 [
+    (buf.validate.field).map.keys.string.well_known_regex = 1,
+    (buf.validate.field).map.values.string.well_known_regex = 2,
+    debug_redact = true
+  ];
 
   // Connection create time.
   google.protobuf.Timestamp create_time = 20 [

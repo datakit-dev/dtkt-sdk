@@ -14,7 +14,6 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/descriptorpb"
 	fieldmaskpb "google.golang.org/protobuf/types/known/fieldmaskpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
@@ -84,13 +83,9 @@ func (BuildOperationMetadata_State) EnumDescriptor() ([]byte, []int) {
 	return file_dtkt_core_v1_integration_proto_rawDescGZIP(), []int{1, 0}
 }
 
-// Integration describes a software package which uses the DataKit SDK and can
-// be deployed to a runtime environment using a Deployment resource. An Integration
-// can represent a software package in development with a local runtime environment
-// or a released software package in a registry with a remote runtime environment.
-// Integrations provide a way to manage software packages and their deployment
-// lifecycle within the DataKit ecosystem, enabling users to easily deploy and
-// run their software packages in compatible runtime environments.
+// Integration describes a software package which uses a DataKit SDK enabling
+// managed deployment, configuration management, runtime service/type reflection,
+// and workflow automation.
 type Integration struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Name  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -906,7 +901,7 @@ var File_dtkt_core_v1_integration_proto protoreflect.FileDescriptor
 
 const file_dtkt_core_v1_integration_proto_rawDesc = "" +
 	"\n" +
-	"\x1edtkt/core/v1/integration.proto\x12\fdtkt.core.v1\x1a\x1bbuf/validate/validate.proto\x1a\x19dtkt/core/v1/common.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a(dtkt/protostore/v1beta1/protostore.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/descriptor.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xbe\x05\n" +
+	"\x1edtkt/core/v1/integration.proto\x12\fdtkt.core.v1\x1a\x1bbuf/validate/validate.proto\x1a\x19dtkt/core/v1/common.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a(dtkt/protostore/v1beta1/protostore.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xbe\x05\n" +
 	"\vIntegration\x12#\n" +
 	"\x04name\x18\x01 \x01(\tB\x0f\xe0A\b\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x04name\x12&\n" +
 	"\x03uid\x18\x02 \x01(\tB\x14\xe0A\x03\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01\x82\xb5\x18\x02\x18\x01R\x03uid\x12=\n" +

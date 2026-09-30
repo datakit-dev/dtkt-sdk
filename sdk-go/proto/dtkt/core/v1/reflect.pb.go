@@ -1542,22 +1542,22 @@ const file_dtkt_core_v1_reflect_proto_rawDesc = "" +
 	"updateTime:\x87\x02\xeaA\x83\x02\n" +
 	"\x04File\x12Borganizations/{organization}/connections/{connection}/files/{file}\x122users/{user}/connections/{connection}/files/{file}\x12Borganizations/{organization}/deployments/{deployment}/files/{file}\x122users/{user}/deployments/{deployment}/files/{file}*\x05files2\x04fileB\r\n" +
 	"\x04type\x12\x05\xbaH\x02\b\x01B\x06\n" +
-	"\x04_uri\"\x86\x05\n" +
+	"\x04_uri\"\x8f\x05\n" +
 	"\aService\x12\x1a\n" +
-	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12\x1d\n" +
+	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12&\n" +
 	"\x03uid\x18\n" +
-	" \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x03uid\x12 \n" +
+	" \x01(\tB\x14\xe0A\x03\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01\x82\xb5\x18\x02\x18\x01R\x03uid\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12F\n" +
 	"\vcreate_time\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\n" +
 	"createTime\x12F\n" +
 	"\vupdate_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\n" +
 	"updateTime:\x8d\x03\xeaA\xb8\x02\n" +
 	"\aService\x12\x12services/{service}\x12Horganizations/{organization}/connections/{connection}/services/{service}\x128users/{user}/connections/{connection}/services/{service}\x12Horganizations/{organization}/deployments/{deployment}/services/{service}\x128users/{user}/deployments/{deployment}/services/{service}*\bservices2\aservice\xba\xb5\x18M\n" +
-	"Ksize(this.description) > 0 ? this.name + ' ' + this.description : this.name\"\x9a\x06\n" +
+	"Ksize(this.description) > 0 ? this.name + ' ' + this.description : this.name\"\xa3\x06\n" +
 	"\x06Method\x12\x1a\n" +
-	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12\x1d\n" +
+	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12&\n" +
 	"\x03uid\x18\n" +
-	" \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x03uid\x12 \n" +
+	" \x01(\tB\x14\xe0A\x03\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01\x82\xb5\x18\x02\x18\x01R\x03uid\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12 \n" +
 	"\arequest\x18\x03 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\arequest\x12\"\n" +
 	"\bresponse\x18\x04 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bresponse\x12+\n" +
@@ -1568,10 +1568,10 @@ const file_dtkt_core_v1_reflect_proto_rawDesc = "" +
 	"\vupdate_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\n" +
 	"updateTime:\x80\x03\xeaA\xab\x02\n" +
 	"\x06Method\x12\x10methods/{method}\x12Forganizations/{organization}/connections/{connection}/methods/{method}\x126users/{user}/connections/{connection}/methods/{method}\x12Forganizations/{organization}/deployments/{deployment}/methods/{method}\x126users/{user}/deployments/{deployment}/methods/{method}*\amethods2\x06method\xba\xb5\x18M\n" +
-	"Ksize(this.description) > 0 ? this.name + ' ' + this.description : this.name\"\x96\x05\n" +
+	"Ksize(this.description) > 0 ? this.name + ' ' + this.description : this.name\"\x9f\x05\n" +
 	"\x04Type\x12\x1a\n" +
-	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12\x1d\n" +
-	"\x03uid\x18\x05 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x03uid\x128\n" +
+	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12&\n" +
+	"\x03uid\x18\x05 \x01(\tB\x14\xe0A\x03\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01\x82\xb5\x18\x02\x18\x01R\x03uid\x128\n" +
 	"\x06schema\x18\x02 \x01(\v2\x18.dtkt.core.v1.TypeSchemaB\x06\xbaH\x03\xc8\x01\x01R\x06schema\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12F\n" +
 	"\vcreate_time\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\n" +
