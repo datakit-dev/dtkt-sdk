@@ -14,14 +14,16 @@ const (
 	ContextName    = "DTKT_CONTEXT_NAME"
 	DataRoot       = "DTKT_DATA_ROOT"
 	DeployName     = "DTKT_DEPLOY_NAME"
+	DeploySecret   = "DTKT_DEPLOY_SECRET"
 	LogFormat      = "DTKT_LOG_FORMAT"
 	LogLevel       = "DTKT_LOG_LEVEL"
 	LogSource      = "DTKT_LOG_SOURCE"
 	Network        = "DTKT_NETWORK"
 	PIDFile        = "DTKT_PID_FILE"
+	TLSCACert      = "DTKT_TLS_CA_CERT"
+	TLSBundle      = "DTKT_TLS_BUNDLE"
 )
 
-// getVars
 var getVars = sync.OnceValue(func() Vars {
 	return Vars{
 		Address:        os.Getenv(Address),
@@ -31,11 +33,14 @@ var getVars = sync.OnceValue(func() Vars {
 		ContextName:    os.Getenv(ContextName),
 		DataRoot:       os.Getenv(DataRoot),
 		DeployName:     os.Getenv(DeployName),
+		DeploySecret:   os.Getenv(DeploySecret),
 		LogFormat:      os.Getenv(LogFormat),
 		LogLevel:       os.Getenv(LogLevel),
 		LogSource:      os.Getenv(LogSource),
 		Network:        os.Getenv(Network),
 		PIDFile:        os.Getenv(PIDFile),
+		TLSCACert:      os.Getenv(TLSCACert),
+		TLSBundle:      os.Getenv(TLSBundle),
 	}
 })
 

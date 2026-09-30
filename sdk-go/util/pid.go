@@ -14,15 +14,6 @@ type (
 	PID interface{ Unlock() error }
 )
 
-func (p *pidFile) Unlock() error {
-	path := p.Name()
-	if err := p.Close(); err != nil {
-		return err
-	}
-
-	return RemovePID(path)
-}
-
 // ReadPID reads the PID from the file and checks if the process is still running.
 // Returns (pid, true) if the PID file exists and the process is alive.
 // Returns (0, false) if the file doesn't exist, can't be read, or the process is not running.
@@ -84,4 +75,13 @@ func WritePID(path string) (PID, error) {
 
 func RemovePID(path string) error {
 	return os.Remove(path)
+}
+
+func (p *pidFile) Unlock() error {
+	path := p.Name()
+	if err := p.Close(); err != nil {
+		return err
+	}
+
+	return RemovePID(path)
 }

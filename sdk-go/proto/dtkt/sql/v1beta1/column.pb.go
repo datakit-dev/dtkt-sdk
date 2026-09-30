@@ -1091,6 +1091,15 @@ func (x *Type) GetListType() *ListType {
 	return nil
 }
 
+func (x *Type) GetMapType() *MapType {
+	if x != nil {
+		if x, ok := x.xxx_hidden_Kind.(*type_MapType); ok {
+			return x.MapType
+		}
+	}
+	return nil
+}
+
 func (x *Type) SetBoolType(v *BoolType) {
 	if v == nil {
 		x.xxx_hidden_Kind = nil
@@ -1193,6 +1202,14 @@ func (x *Type) SetListType(v *ListType) {
 		return
 	}
 	x.xxx_hidden_Kind = &type_ListType{v}
+}
+
+func (x *Type) SetMapType(v *MapType) {
+	if v == nil {
+		x.xxx_hidden_Kind = nil
+		return
+	}
+	x.xxx_hidden_Kind = &type_MapType{v}
 }
 
 func (x *Type) HasKind() bool {
@@ -1306,6 +1323,14 @@ func (x *Type) HasListType() bool {
 	return ok
 }
 
+func (x *Type) HasMapType() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Kind.(*type_MapType)
+	return ok
+}
+
 func (x *Type) ClearKind() {
 	x.xxx_hidden_Kind = nil
 }
@@ -1388,6 +1413,12 @@ func (x *Type) ClearListType() {
 	}
 }
 
+func (x *Type) ClearMapType() {
+	if _, ok := x.xxx_hidden_Kind.(*type_MapType); ok {
+		x.xxx_hidden_Kind = nil
+	}
+}
+
 const Type_Kind_not_set_case case_Type_Kind = 0
 const Type_BoolType_case case_Type_Kind = 1
 const Type_BinaryType_case case_Type_Kind = 2
@@ -1402,6 +1433,7 @@ const Type_TimeType_case case_Type_Kind = 10
 const Type_EnumType_case case_Type_Kind = 11
 const Type_MessageType_case case_Type_Kind = 12
 const Type_ListType_case case_Type_Kind = 13
+const Type_MapType_case case_Type_Kind = 14
 
 func (x *Type) WhichKind() case_Type_Kind {
 	if x == nil {
@@ -1434,6 +1466,8 @@ func (x *Type) WhichKind() case_Type_Kind {
 		return Type_MessageType_case
 	case *type_ListType:
 		return Type_ListType_case
+	case *type_MapType:
+		return Type_MapType_case
 	default:
 		return Type_Kind_not_set_case
 	}
@@ -1456,6 +1490,7 @@ type Type_builder struct {
 	EnumType    *EnumType
 	MessageType *MessageType
 	ListType    *ListType
+	MapType     *MapType
 	// -- end of xxx_hidden_Kind
 }
 
@@ -1501,6 +1536,9 @@ func (b0 Type_builder) Build() *Type {
 	}
 	if b.ListType != nil {
 		x.xxx_hidden_Kind = &type_ListType{b.ListType}
+	}
+	if b.MapType != nil {
+		x.xxx_hidden_Kind = &type_MapType{b.MapType}
 	}
 	return m0
 }
@@ -1571,6 +1609,10 @@ type type_ListType struct {
 	ListType *ListType `protobuf:"bytes,13,opt,name=list_type,json=listType,oneof"`
 }
 
+type type_MapType struct {
+	MapType *MapType `protobuf:"bytes,14,opt,name=map_type,json=mapType,oneof"`
+}
+
 func (*type_BoolType) isType_Kind() {}
 
 func (*type_BinaryType) isType_Kind() {}
@@ -1596,6 +1638,8 @@ func (*type_EnumType) isType_Kind() {}
 func (*type_MessageType) isType_Kind() {}
 
 func (*type_ListType) isType_Kind() {}
+
+func (*type_MapType) isType_Kind() {}
 
 type BoolType struct {
 	state            protoimpl.MessageState `protogen:"opaque.v1"`
@@ -2957,6 +3001,115 @@ func (b0 ListType_builder) Build() *ListType {
 	return m0
 }
 
+type MapType struct {
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_KeyType *Type                  `protobuf:"bytes,1,opt,name=key_type,json=keyType"`
+	xxx_hidden_ValType *Type                  `protobuf:"bytes,2,opt,name=val_type,json=valType"`
+	xxx_hidden_Attrs   *[]*TypeAttribute      `protobuf:"bytes,3,rep,name=attrs"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *MapType) Reset() {
+	*x = MapType{}
+	mi := &file_dtkt_sql_v1beta1_column_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MapType) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MapType) ProtoMessage() {}
+
+func (x *MapType) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_sql_v1beta1_column_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *MapType) GetKeyType() *Type {
+	if x != nil {
+		return x.xxx_hidden_KeyType
+	}
+	return nil
+}
+
+func (x *MapType) GetValType() *Type {
+	if x != nil {
+		return x.xxx_hidden_ValType
+	}
+	return nil
+}
+
+func (x *MapType) GetAttrs() []*TypeAttribute {
+	if x != nil {
+		if x.xxx_hidden_Attrs != nil {
+			return *x.xxx_hidden_Attrs
+		}
+	}
+	return nil
+}
+
+func (x *MapType) SetKeyType(v *Type) {
+	x.xxx_hidden_KeyType = v
+}
+
+func (x *MapType) SetValType(v *Type) {
+	x.xxx_hidden_ValType = v
+}
+
+func (x *MapType) SetAttrs(v []*TypeAttribute) {
+	x.xxx_hidden_Attrs = &v
+}
+
+func (x *MapType) HasKeyType() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_KeyType != nil
+}
+
+func (x *MapType) HasValType() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_ValType != nil
+}
+
+func (x *MapType) ClearKeyType() {
+	x.xxx_hidden_KeyType = nil
+}
+
+func (x *MapType) ClearValType() {
+	x.xxx_hidden_ValType = nil
+}
+
+type MapType_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	KeyType *Type
+	ValType *Type
+	Attrs   []*TypeAttribute
+}
+
+func (b0 MapType_builder) Build() *MapType {
+	m0 := &MapType{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_KeyType = b.KeyType
+	x.xxx_hidden_ValType = b.ValType
+	x.xxx_hidden_Attrs = &b.Attrs
+	return m0
+}
+
 type TypeAttribute struct {
 	state           protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Kind isTypeAttribute_Kind   `protobuf_oneof:"kind"`
@@ -2966,7 +3119,7 @@ type TypeAttribute struct {
 
 func (x *TypeAttribute) Reset() {
 	*x = TypeAttribute{}
-	mi := &file_dtkt_sql_v1beta1_column_proto_msgTypes[17]
+	mi := &file_dtkt_sql_v1beta1_column_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2978,7 +3131,7 @@ func (x *TypeAttribute) String() string {
 func (*TypeAttribute) ProtoMessage() {}
 
 func (x *TypeAttribute) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_sql_v1beta1_column_proto_msgTypes[17]
+	mi := &file_dtkt_sql_v1beta1_column_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3207,7 +3360,7 @@ func (b0 TypeAttribute_builder) Build() *TypeAttribute {
 type case_TypeAttribute_Kind protoreflect.FieldNumber
 
 func (x case_TypeAttribute_Kind) String() string {
-	md := file_dtkt_sql_v1beta1_column_proto_msgTypes[17].Descriptor()
+	md := file_dtkt_sql_v1beta1_column_proto_msgTypes[18].Descriptor()
 	if x == 0 {
 		return "not set"
 	}
@@ -3260,7 +3413,7 @@ type TypeAttribute_Check struct {
 
 func (x *TypeAttribute_Check) Reset() {
 	*x = TypeAttribute_Check{}
-	mi := &file_dtkt_sql_v1beta1_column_proto_msgTypes[18]
+	mi := &file_dtkt_sql_v1beta1_column_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3272,7 +3425,7 @@ func (x *TypeAttribute_Check) String() string {
 func (*TypeAttribute_Check) ProtoMessage() {}
 
 func (x *TypeAttribute_Check) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_sql_v1beta1_column_proto_msgTypes[18]
+	mi := &file_dtkt_sql_v1beta1_column_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3371,7 +3524,7 @@ type TypeAttribute_Generated struct {
 
 func (x *TypeAttribute_Generated) Reset() {
 	*x = TypeAttribute_Generated{}
-	mi := &file_dtkt_sql_v1beta1_column_proto_msgTypes[19]
+	mi := &file_dtkt_sql_v1beta1_column_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3383,7 +3536,7 @@ func (x *TypeAttribute_Generated) String() string {
 func (*TypeAttribute_Generated) ProtoMessage() {}
 
 func (x *TypeAttribute_Generated) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_sql_v1beta1_column_proto_msgTypes[19]
+	mi := &file_dtkt_sql_v1beta1_column_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3506,7 +3659,7 @@ const file_dtkt_sql_v1beta1_column_proto_rawDesc = "" +
 	"\x13REF_ACTION_RESTRICT\x10\x02\x12\x16\n" +
 	"\x12REF_ACTION_CASCADE\x10\x03\x12\x17\n" +
 	"\x13REF_ACTION_SET_NULL\x10\x04\x12\x1a\n" +
-	"\x16REF_ACTION_SET_DEFAULT\x10\x05\"\xc7\x06\n" +
+	"\x16REF_ACTION_SET_DEFAULT\x10\x05\"\xff\x06\n" +
 	"\x04Type\x129\n" +
 	"\tbool_type\x18\x01 \x01(\v2\x1a.dtkt.sql.v1beta1.BoolTypeH\x00R\bboolType\x12?\n" +
 	"\vbinary_type\x18\x02 \x01(\v2\x1c.dtkt.sql.v1beta1.BinaryTypeH\x00R\n" +
@@ -3524,7 +3677,8 @@ const file_dtkt_sql_v1beta1_column_proto_rawDesc = "" +
 	" \x01(\v2\x1a.dtkt.sql.v1beta1.TimeTypeH\x00R\btimeType\x129\n" +
 	"\tenum_type\x18\v \x01(\v2\x1a.dtkt.sql.v1beta1.EnumTypeH\x00R\benumType\x12B\n" +
 	"\fmessage_type\x18\f \x01(\v2\x1d.dtkt.sql.v1beta1.MessageTypeH\x00R\vmessageType\x129\n" +
-	"\tlist_type\x18\r \x01(\v2\x1a.dtkt.sql.v1beta1.ListTypeH\x00R\blistTypeB\r\n" +
+	"\tlist_type\x18\r \x01(\v2\x1a.dtkt.sql.v1beta1.ListTypeH\x00R\blistType\x126\n" +
+	"\bmap_type\x18\x0e \x01(\v2\x19.dtkt.sql.v1beta1.MapTypeH\x00R\amapTypeB\r\n" +
 	"\x04kind\x12\x05\xbaH\x02\b\x01\"A\n" +
 	"\bBoolType\x125\n" +
 	"\x05attrs\x18\x02 \x03(\v2\x1f.dtkt.sql.v1beta1.TypeAttributeR\x05attrs\"W\n" +
@@ -3574,10 +3728,14 @@ const file_dtkt_sql_v1beta1_column_proto_rawDesc = "" +
 	"\x14ENCODING_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eENCODING_PROTO\x10\x01\x12\x11\n" +
 	"\rENCODING_JSON\x10\x02:F\xbaHC*Athis.encoding < 2 || has(this.proto_uri) || has(this.proto_files)B\r\n" +
-	"\vdescriptors\"v\n" +
-	"\bListType\x123\n" +
-	"\titem_type\x18\x01 \x01(\v2\x16.dtkt.sql.v1beta1.TypeR\bitemType\x125\n" +
-	"\x05attrs\x18\x02 \x03(\v2\x1f.dtkt.sql.v1beta1.TypeAttributeR\x05attrs\"\xe6\x02\n" +
+	"\vdescriptors\"~\n" +
+	"\bListType\x12;\n" +
+	"\titem_type\x18\x01 \x01(\v2\x16.dtkt.sql.v1beta1.TypeB\x06\xbaH\x03\xc8\x01\x01R\bitemType\x125\n" +
+	"\x05attrs\x18\x02 \x03(\v2\x1f.dtkt.sql.v1beta1.TypeAttributeR\x05attrs\"\x9e\x02\n" +
+	"\aMapType\x129\n" +
+	"\bkey_type\x18\x01 \x01(\v2\x16.dtkt.sql.v1beta1.TypeB\x06\xbaH\x03\xc8\x01\x01R\akeyType\x129\n" +
+	"\bval_type\x18\x02 \x01(\v2\x16.dtkt.sql.v1beta1.TypeB\x06\xbaH\x03\xc8\x01\x01R\avalType\x125\n" +
+	"\x05attrs\x18\x03 \x03(\v2\x1f.dtkt.sql.v1beta1.TypeAttributeR\x05attrs:f\xbaHc*ahas(this.key_type.bool_type) || has(this.key_type.integer_type) || has(this.key_type.string_type)\"\xe6\x02\n" +
 	"\rTypeAttribute\x12\x1a\n" +
 	"\acharset\x18\x01 \x01(\tH\x00R\acharset\x12\x1e\n" +
 	"\tcollation\x18\x02 \x01(\tH\x00R\tcollation\x12=\n" +
@@ -3595,7 +3753,7 @@ const file_dtkt_sql_v1beta1_column_proto_rawDesc = "" +
 	"\x16proto.dtkt.sql.v1beta1B\vColumnProtoP\x01ZHgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/sql/v1beta1;sqlv1beta1\xa2\x02\x03DSX\xaa\x02\x10Dtkt.Sql.V1beta1\xca\x02\x10Dtkt\\Sql\\V1beta1\xe2\x02\x1cDtkt\\Sql\\V1beta1\\GPBMetadata\xea\x02\x12Dtkt::Sql::V1beta1\x92\x03\x05\xd2>\x02\x10\x03b\beditionsp\xe8\a"
 
 var file_dtkt_sql_v1beta1_column_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_dtkt_sql_v1beta1_column_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_dtkt_sql_v1beta1_column_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_dtkt_sql_v1beta1_column_proto_goTypes = []any{
 	(ForeignKey_RefAction)(0),              // 0: dtkt.sql.v1beta1.ForeignKey.RefAction
 	(MessageType_Encoding)(0),              // 1: dtkt.sql.v1beta1.MessageType.Encoding
@@ -3616,10 +3774,11 @@ var file_dtkt_sql_v1beta1_column_proto_goTypes = []any{
 	(*EnumType)(nil),                       // 16: dtkt.sql.v1beta1.EnumType
 	(*MessageType)(nil),                    // 17: dtkt.sql.v1beta1.MessageType
 	(*ListType)(nil),                       // 18: dtkt.sql.v1beta1.ListType
-	(*TypeAttribute)(nil),                  // 19: dtkt.sql.v1beta1.TypeAttribute
-	(*TypeAttribute_Check)(nil),            // 20: dtkt.sql.v1beta1.TypeAttribute.Check
-	(*TypeAttribute_Generated)(nil),        // 21: dtkt.sql.v1beta1.TypeAttribute.Generated
-	(*descriptorpb.FileDescriptorSet)(nil), // 22: google.protobuf.FileDescriptorSet
+	(*MapType)(nil),                        // 19: dtkt.sql.v1beta1.MapType
+	(*TypeAttribute)(nil),                  // 20: dtkt.sql.v1beta1.TypeAttribute
+	(*TypeAttribute_Check)(nil),            // 21: dtkt.sql.v1beta1.TypeAttribute.Check
+	(*TypeAttribute_Generated)(nil),        // 22: dtkt.sql.v1beta1.TypeAttribute.Generated
+	(*descriptorpb.FileDescriptorSet)(nil), // 23: google.protobuf.FileDescriptorSet
 }
 var file_dtkt_sql_v1beta1_column_proto_depIdxs = []int32{
 	5,  // 0: dtkt.sql.v1beta1.Column.type:type_name -> dtkt.sql.v1beta1.Type
@@ -3638,29 +3797,33 @@ var file_dtkt_sql_v1beta1_column_proto_depIdxs = []int32{
 	16, // 13: dtkt.sql.v1beta1.Type.enum_type:type_name -> dtkt.sql.v1beta1.EnumType
 	17, // 14: dtkt.sql.v1beta1.Type.message_type:type_name -> dtkt.sql.v1beta1.MessageType
 	18, // 15: dtkt.sql.v1beta1.Type.list_type:type_name -> dtkt.sql.v1beta1.ListType
-	19, // 16: dtkt.sql.v1beta1.BoolType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
-	19, // 17: dtkt.sql.v1beta1.BinaryType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
-	19, // 18: dtkt.sql.v1beta1.DecimalType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
-	19, // 19: dtkt.sql.v1beta1.FloatType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
-	19, // 20: dtkt.sql.v1beta1.IntegerType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
-	19, // 21: dtkt.sql.v1beta1.JSONType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
-	19, // 22: dtkt.sql.v1beta1.SpatialType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
-	19, // 23: dtkt.sql.v1beta1.StringType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
-	19, // 24: dtkt.sql.v1beta1.UUIDType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
-	19, // 25: dtkt.sql.v1beta1.TimeType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
-	19, // 26: dtkt.sql.v1beta1.EnumType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
-	1,  // 27: dtkt.sql.v1beta1.MessageType.encoding:type_name -> dtkt.sql.v1beta1.MessageType.Encoding
-	22, // 28: dtkt.sql.v1beta1.MessageType.proto_files:type_name -> google.protobuf.FileDescriptorSet
-	19, // 29: dtkt.sql.v1beta1.MessageType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
-	5,  // 30: dtkt.sql.v1beta1.ListType.item_type:type_name -> dtkt.sql.v1beta1.Type
-	19, // 31: dtkt.sql.v1beta1.ListType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
-	20, // 32: dtkt.sql.v1beta1.TypeAttribute.check:type_name -> dtkt.sql.v1beta1.TypeAttribute.Check
-	21, // 33: dtkt.sql.v1beta1.TypeAttribute.generated:type_name -> dtkt.sql.v1beta1.TypeAttribute.Generated
-	34, // [34:34] is the sub-list for method output_type
-	34, // [34:34] is the sub-list for method input_type
-	34, // [34:34] is the sub-list for extension type_name
-	34, // [34:34] is the sub-list for extension extendee
-	0,  // [0:34] is the sub-list for field type_name
+	19, // 16: dtkt.sql.v1beta1.Type.map_type:type_name -> dtkt.sql.v1beta1.MapType
+	20, // 17: dtkt.sql.v1beta1.BoolType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
+	20, // 18: dtkt.sql.v1beta1.BinaryType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
+	20, // 19: dtkt.sql.v1beta1.DecimalType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
+	20, // 20: dtkt.sql.v1beta1.FloatType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
+	20, // 21: dtkt.sql.v1beta1.IntegerType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
+	20, // 22: dtkt.sql.v1beta1.JSONType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
+	20, // 23: dtkt.sql.v1beta1.SpatialType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
+	20, // 24: dtkt.sql.v1beta1.StringType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
+	20, // 25: dtkt.sql.v1beta1.UUIDType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
+	20, // 26: dtkt.sql.v1beta1.TimeType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
+	20, // 27: dtkt.sql.v1beta1.EnumType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
+	1,  // 28: dtkt.sql.v1beta1.MessageType.encoding:type_name -> dtkt.sql.v1beta1.MessageType.Encoding
+	23, // 29: dtkt.sql.v1beta1.MessageType.proto_files:type_name -> google.protobuf.FileDescriptorSet
+	20, // 30: dtkt.sql.v1beta1.MessageType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
+	5,  // 31: dtkt.sql.v1beta1.ListType.item_type:type_name -> dtkt.sql.v1beta1.Type
+	20, // 32: dtkt.sql.v1beta1.ListType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
+	5,  // 33: dtkt.sql.v1beta1.MapType.key_type:type_name -> dtkt.sql.v1beta1.Type
+	5,  // 34: dtkt.sql.v1beta1.MapType.val_type:type_name -> dtkt.sql.v1beta1.Type
+	20, // 35: dtkt.sql.v1beta1.MapType.attrs:type_name -> dtkt.sql.v1beta1.TypeAttribute
+	21, // 36: dtkt.sql.v1beta1.TypeAttribute.check:type_name -> dtkt.sql.v1beta1.TypeAttribute.Check
+	22, // 37: dtkt.sql.v1beta1.TypeAttribute.generated:type_name -> dtkt.sql.v1beta1.TypeAttribute.Generated
+	38, // [38:38] is the sub-list for method output_type
+	38, // [38:38] is the sub-list for method input_type
+	38, // [38:38] is the sub-list for extension type_name
+	38, // [38:38] is the sub-list for extension extendee
+	0,  // [0:38] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_sql_v1beta1_column_proto_init() }
@@ -3692,12 +3855,13 @@ func file_dtkt_sql_v1beta1_column_proto_init() {
 		(*type_EnumType)(nil),
 		(*type_MessageType)(nil),
 		(*type_ListType)(nil),
+		(*type_MapType)(nil),
 	}
 	file_dtkt_sql_v1beta1_column_proto_msgTypes[15].OneofWrappers = []any{
 		(*messageType_ProtoUri)(nil),
 		(*messageType_ProtoFiles)(nil),
 	}
-	file_dtkt_sql_v1beta1_column_proto_msgTypes[17].OneofWrappers = []any{
+	file_dtkt_sql_v1beta1_column_proto_msgTypes[18].OneofWrappers = []any{
 		(*typeAttribute_Charset)(nil),
 		(*typeAttribute_Collation)(nil),
 		(*typeAttribute_Check_)(nil),
@@ -3710,7 +3874,7 @@ func file_dtkt_sql_v1beta1_column_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_sql_v1beta1_column_proto_rawDesc), len(file_dtkt_sql_v1beta1_column_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   20,
+			NumMessages:   21,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

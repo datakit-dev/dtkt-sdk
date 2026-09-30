@@ -9,7 +9,6 @@
   "files.insertFinalNewline": true,
   "editor.formatOnSave": true,
   "go.toolsEnvVars": {
-    "GOEXPERIMENT": "jsonv2",
     "GODEBUG": "embedfollowsymlinks=1"
   }
 }

@@ -3,16 +3,16 @@ package common
 import (
 	"time"
 
-	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/common/types"
-	"github.com/google/cel-go/common/types/ref"
-	"github.com/google/cel-go/ext"
-	"k8s.io/apiserver/pkg/cel/library"
+	"cel.dev/cel-go/cel"
+	"cel.dev/cel-go/common/types"
+	"cel.dev/cel-go/common/types/ref"
+	"cel.dev/cel-go/ext"
+	// "k8s.io/apiserver/pkg/cel/library"
 )
 
 func NewCELEnv(opts ...cel.EnvOption) (*cel.Env, error) {
 	return cel.NewEnv(append([]cel.EnvOption{
-		library.URLs(),
+		// library.URLs(),
 		ext.Encoders(),
 		ext.Lists(),
 		ext.Protos(),

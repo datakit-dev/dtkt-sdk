@@ -1,0 +1,32 @@
+[project]
+name = "dtkt-sdk-py"
+version = "0.1.0"
+description = "DataKit Python SDK."
+readme = "README.md"
+authors = [{ name = "Jordan Fowler", email = "jordan@withdatakit.com" }]
+requires-python = ">=3.12"
+dependencies = [
+    "grpcreflect-py",
+    "jsonschema>=4.26.0",
+    "protobuf>=7.36.2",
+    "protovalidate>=2.0.0",
+    "pydantic>=2.13.5",
+    "pyvoy>=1.1.0",
+    "pyyaml>=6.0.3",
+    "singleflight>=0.1.3",
+    "starlette>=1.6.0",
+]
+
+[project.scripts]
+dtkt-serve = "dtkt_sdk.serve:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = ["dtkt_sdk"]
+module-root = ""
+
+[tool.uv.sources]
+grpcreflect-py = { git = "https://github.com/datakit-dev/grpcreflect-py.git" }

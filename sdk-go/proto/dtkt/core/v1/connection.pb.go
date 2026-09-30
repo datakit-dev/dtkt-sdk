@@ -12,7 +12,6 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/descriptorpb"
 	anypb "google.golang.org/protobuf/types/known/anypb"
 	fieldmaskpb "google.golang.org/protobuf/types/known/fieldmaskpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -104,7 +103,7 @@ type Connection struct {
 	ConfigHash string `protobuf:"bytes,11,opt,name=config_hash,json=configHash,proto3" json:"config_hash,omitempty"`
 	// Generation of config data.
 	ConfigGen uint64 `protobuf:"varint,12,opt,name=config_gen,json=configGen,proto3" json:"config_gen,omitempty"`
-	// Config source uri (optional).
+	// Config data URI (optional).
 	ConfigUri *string `protobuf:"bytes,13,opt,name=config_uri,json=configUri,proto3,oneof" json:"config_uri,omitempty"`
 	// Types that are valid to be assigned to Auth:
 	//
@@ -1059,7 +1058,7 @@ var File_dtkt_core_v1_connection_proto protoreflect.FileDescriptor
 
 const file_dtkt_core_v1_connection_proto_rawDesc = "" +
 	"\n" +
-	"\x1ddtkt/core/v1/connection.proto\x12\fdtkt.core.v1\x1a\x1bbuf/validate/validate.proto\x1a\x19dtkt/core/v1/common.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x19google/protobuf/any.proto\x1a google/protobuf/descriptor.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc4\x0e\n" +
+	"\x1ddtkt/core/v1/connection.proto\x12\fdtkt.core.v1\x1a\x1bbuf/validate/validate.proto\x1a\x19dtkt/core/v1/common.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x19google/protobuf/any.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8a\x0e\n" +
 	"\n" +
 	"Connection\x12#\n" +
 	"\x04name\x18\x01 \x01(\tB\x0f\xe0A\b\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x04name\x12&\n" +
@@ -1089,18 +1088,18 @@ const file_dtkt_core_v1_connection_proto_rawDesc = "" +
 	"config_uri\x18\r \x01(\tB-\xe0A\x04\xbaH\x05r\x03\x88\x01\x01\x82\xb5\x18\x1e\x12\x1aConfig data URI (optional)2\x00H\x03R\tconfigUri\x88\x01\x01\x12E\n" +
 	"\x0edecrypted_auth\x18\t \x01(\v2\x14.google.protobuf.AnyB\x06\xe0A\x04\x80\x01\x01H\x02R\rdecryptedAuth\x12N\n" +
 	"\x0eencrypted_auth\x18\n" +
-	" \x01(\v2\x1a.dtkt.core.v1.EncryptedAnyB\t\xe0A\x03\x82\xb5\x18\x02\x18\x01H\x02R\rencryptedAuth\x12D\n" +
-	"\aheaders\x18\x0e \x03(\v2%.dtkt.core.v1.Connection.HeadersEntryB\x03\x80\x01\x01R\aheaders\x12L\n" +
+	" \x01(\v2\x1a.dtkt.core.v1.EncryptedAnyB\t\xe0A\x03\x82\xb5\x18\x02\x18\x01H\x02R\rencryptedAuth\x12X\n" +
+	"\aheaders\x18\x0e \x03(\v2%.dtkt.core.v1.Connection.HeadersEntryB\x17\xbaH\x11\x9a\x01\x0e\"\x05r\x03\xc0\x01\x01*\x05r\x03\xc0\x01\x02\x80\x01\x01R\aheaders\x12L\n" +
 	"\vcreate_time\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampB\x0f\xe0A\x03\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\n" +
 	"createTime\x12L\n" +
 	"\vupdate_time\x18\x15 \x01(\v2\x1a.google.protobuf.TimestampB\x0f\xe0A\x03\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\n" +
 	"updateTime\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01:\x90\x03\xeaA\x83\x01\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01:\xc2\x02\xeaA\x83\x01\n" +
 	"\n" +
 	"Connection\x125organizations/{organization}/connections/{connection}\x12%users/{user}/connections/{connection}*\vconnections2\n" +
-	"connection\xbaH\x85\x02*](has(this.custom_protos) || has(this.custom_grpc)) ? has(this.address) : has(this.deployment)*Vhas(this.deployment) ? has(this.decrypted_config) || has(this.encrypted_config) : true*Lhas(this.headers) ? has(this.custom_protos) || has(this.custom_grpc) : falseB\r\n" +
+	"connection\xbaH\xb7\x01*](has(this.custom_protos) || has(this.custom_grpc)) ? has(this.address) : has(this.deployment)*Vhas(this.deployment) ? has(this.decrypted_config) || has(this.encrypted_config) : trueB\r\n" +
 	"\x04type\x12\x05\xbaH\x02\b\x01B\b\n" +
 	"\x06configB\x06\n" +
 	"\x04authB\r\n" +

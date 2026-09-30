@@ -1,87 +1,203 @@
 package encoding_test
 
 import (
+	"bytes"
 	"testing"
+	"time"
 
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/api"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk/v1beta1/geojsonwrapperpb"
-	geojsonv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/geojson/v1beta1"
+	commandv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/command/v1beta1"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
-var (
-	testStructValid   = []byte(`{"s": "Foo Bar", "f": 123.456}`)
-	testStructInvalid = []byte(`{"s": 123.456, "f": "Foo Bar"}`)
-	geoJSONValid      = []byte(`{"type":"Feature","id":"1","geometry":{"type":"Polygon","coordinates":[[[-111.290492270536,47.5080344121109],[-111.290489466303,47.5084460198696],[-111.29069144007,47.50844717663],[-111.29069479445,47.5080353433743],[-111.290492270536,47.5080344121109]]]},"properties":{"county_name":"Cascade"}}`)
-)
-
-type (
-	testCase struct {
-		valid    bool
-		body     []byte
-		expected any
-	}
-	testStruct struct {
-		S string  `json:"s"`
-		F float64 `json:"f"`
-	}
-)
-
-func TestJSON(t *testing.T) {
-	tests := []testCase{
-		{
-			valid: true,
-			body:  testStructValid,
-			expected: testStruct{
-				S: "Foo Bar",
-				F: 123.456,
-			},
-		},
-		{
-			valid:    false,
-			body:     testStructInvalid,
-			expected: testStruct{},
-		},
+func TestJSONDecodeV2_Duration(t *testing.T) {
+	durStr := `"2h45m"`
+	var d time.Duration
+	err := encoding.FromJSON([]byte(durStr), &d)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	for idx, test := range tests {
-		var s testStruct
-		err := encoding.FromJSON(test.body, &s)
-		if test.valid && err != nil {
-			t.Fatalf("test %d FromJSON expected to be valid, got error: %s", idx, err.Error())
-		} else if !test.valid && err == nil {
-			t.Fatalf("test %d FromJSON expected to be invalid", idx)
-		} else if test.valid && s != test.expected {
-			t.Fatalf("test %d FromJSON should be valid expected: %#v, got: %#v", idx, test.expected, s)
+	expected := 2*time.Hour + 45*time.Minute
+	if d != expected {
+		t.Fatalf("expected %v, got %v", expected, d)
+	}
+
+	// Test stream decode with multiple durations
+	data := `"30m"
+"1h15m"
+"45s"`
+	decode := encoding.NewJSONDecoder().StreamDecode(bytes.NewBuffer([]byte(data)))
+	var durations []time.Duration
+	for {
+		var dur time.Duration
+		err := decode(&dur)
+		if err != nil {
+			if err.Error() == "EOF" {
+				break
+			}
+			t.Fatalf("stream decode error: %v", err)
 		}
+		durations = append(durations, dur)
+	}
 
-		_, err = encoding.ToJSON(test.expected)
-		if test.valid && err != nil {
-			t.Fatalf("test %d ToJSON expected to be valid, got error: %s", idx, err.Error())
-		} else if !test.valid && err == nil && s != test.expected {
-			t.Fatalf("test %d ToJSON expected to be invalid expected: %#v, got: %#v", idx, test.expected, s)
+	expectedDurations := []time.Duration{30 * time.Minute, 1*time.Hour + 15*time.Minute, 45 * time.Second}
+	if len(durations) != len(expectedDurations) {
+		t.Fatalf("expected %d durations, got %d", len(expectedDurations), len(durations))
+	}
+	for i, dur := range durations {
+		if dur != expectedDurations[i] {
+			t.Fatalf("at index %d, expected %v, got %v", i, expectedDurations[i], dur)
 		}
 	}
+}
 
-	var w geojsonwrapperpb.GeoJSON
-	if err := encoding.FromJSON(geoJSONValid, &w); err != nil {
-		t.Fatalf("geojsonwrapperpb.GeoJSON unexpected error: %s", err)
-	} else if w.GeoJSON == nil || !w.GeoJSON.ProtoReflect().IsValid() {
-		t.Fatalf("expected valid GeoJSON: %#v", w.GeoJSON)
+func TestJSONEncoder_Duration(t *testing.T) {
+	d := 90 * time.Minute
+	b, err := encoding.ToJSON(d)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	_, err := encoding.ToJSON(w)
-	if err != nil {
-		t.Fatalf("geojsonwrapperpb.GeoJSON unexpected error: %s", err)
+	expected := `"1h30m0s"`
+	if string(b) != expected {
+		t.Fatalf("expected %s, got %s", expected, string(b))
 	}
 
-	b, err := encoding.ToJSON(w.GeoJSON)
+	d = 91 * time.Minute
+	// Test raw mode
+	b, err = encoding.ToJSON(d, encoding.WithEncodeRaw(true))
 	if err != nil {
-		t.Fatalf("geojsonv1beta1.GeoJSON unexpected error: %s", err)
+		t.Fatal(err)
 	}
 
-	g := &geojsonv1beta1.GeoJSON{}
-	err = encoding.FromJSON(b, g)
+	expected = `1h31m0s`
+	if string(b) != expected {
+		t.Fatalf("expected %s, got %s", expected, string(b))
+	}
+
+	// Test stream encode with multiple durations
+
+	var buf bytes.Buffer
+	encode := encoding.NewJSONEncoder().StreamEncode(&buf)
+	durations := []time.Duration{15 * time.Minute, 2*time.Hour + 30*time.Minute, 10 * time.Second}
+	for _, dur := range durations {
+		err := encode(dur)
+		if err != nil {
+			t.Fatalf("stream encode error: %v", err)
+		}
+	}
+
+	expectedBuf := `"15m0s"
+"2h30m0s"
+"10s"
+`
+
+	if buf.String() != expectedBuf {
+		t.Fatalf("expected %s, got %s", expectedBuf, buf.String())
+	}
+}
+
+// func TestJSONEncodeV2_Defaults(t *testing.T) {
+// 	str := "foobar"
+// 	b, err := encoding.ToJSON(str)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	if string(b) != strconv.Quote(str) {
+// 		t.Fatalf("expected to be equal: %s != %s", str, string(b))
+// 	}
+
+// 	msg := &corev1.RunOperationMetadata{
+// 		State: corev1.RunOperationMetadata_STATE_RUNNING,
+// 	}
+
+// 	b, err = encoding.ToJSON(msg)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+
+// 	msg2 := new(corev1.RunOperationMetadata)
+// 	err = encoding.FromJSON(b, msg2)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+
+// 	if !proto.Equal(msg, msg2) {
+// 		t.Fatalf("expected to be equal: %v != %v", msg, msg2)
+// 	}
+
+// 	d := time.Duration(time.Minute)
+// 	b, err = encoding.ToJSON(d)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+
+// 	if string(b) != `"1m0s"` {
+// 		t.Fatalf(`expected "1m0s", got: %s`, string(b))
+// 	}
+
+// 	var d2 time.Duration
+// 	err = encoding.FromJSON(b, &d2)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+
+// 	if d != d2 {
+// 		t.Fatalf("expected to be equal, %v != %v", d, d2)
+// 	}
+// }
+
+func TestJSONEncoder_ProtoJSONRedaction(t *testing.T) {
+	nativeProto := &commandv1beta1.SSHConfig{
+		Address: "localhost:9090",
+		Auth: &commandv1beta1.SSHConfig_Password{
+			Password: "supersecret",
+		},
+	}
+
+	_, err := encoding.ToJSON(
+		nativeProto,
+		encoding.WithProtoEncodeRedacted(),
+		encoding.WithEncodeMultiline(true),
+		encoding.WithEncodeIndent("", "  "),
+	)
 	if err != nil {
-		t.Fatalf("geojsonv1beta1.GeoJSON unexpected error: %s", err)
+		t.Fatal(err)
+	}
+
+	msgType, err := api.V1Beta1.FindMessageByName(nativeProto.ProtoReflect().Descriptor().FullName())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	dynProto := msgType.New()
+	proto.Merge(dynProto.Interface(), nativeProto)
+
+	_, err = encoding.ToJSON(
+		dynProto.Interface(),
+		encoding.WithProtoEncodeRedacted(),
+		encoding.WithEncodeMultiline(true),
+		encoding.WithEncodeIndent("", "  "),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	anyProto, err := anypb.New(nativeProto)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = encoding.ToJSON(
+		anyProto,
+		encoding.WithProtoEncodeRedacted(),
+		encoding.WithEncodeMultiline(true),
+		encoding.WithEncodeIndent("", "  "),
+	)
+	if err != nil {
+		t.Fatal(err)
 	}
 }

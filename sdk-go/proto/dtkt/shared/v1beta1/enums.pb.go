@@ -383,6 +383,8 @@ const (
 	PackageType_PACKAGE_TYPE_GO PackageType = 1
 	// Node package type.
 	PackageType_PACKAGE_TYPE_NODE PackageType = 2
+	// Python package type.
+	PackageType_PACKAGE_TYPE_PYTHON PackageType = 3
 )
 
 // Enum value maps for PackageType.
@@ -391,11 +393,13 @@ var (
 		0: "PACKAGE_TYPE_UNSPECIFIED",
 		1: "PACKAGE_TYPE_GO",
 		2: "PACKAGE_TYPE_NODE",
+		3: "PACKAGE_TYPE_PYTHON",
 	}
 	PackageType_value = map[string]int32{
 		"PACKAGE_TYPE_UNSPECIFIED": 0,
 		"PACKAGE_TYPE_GO":          1,
 		"PACKAGE_TYPE_NODE":        2,
+		"PACKAGE_TYPE_PYTHON":      3,
 	}
 )
 
@@ -676,11 +680,12 @@ const file_dtkt_shared_v1beta1_enums_proto_rawDesc = "" +
 	"\x14GEO_TYPE_UNSPECIFIED\x10\x00\x12\x11\n" +
 	"\rGEO_TYPE_JSON\x10\x01\x12\x10\n" +
 	"\fGEO_TYPE_WKT\x10\x02\x12\x10\n" +
-	"\fGEO_TYPE_WKB\x10\x03*W\n" +
+	"\fGEO_TYPE_WKB\x10\x03*p\n" +
 	"\vPackageType\x12\x1c\n" +
 	"\x18PACKAGE_TYPE_UNSPECIFIED\x10\x00\x12\x13\n" +
 	"\x0fPACKAGE_TYPE_GO\x10\x01\x12\x15\n" +
-	"\x11PACKAGE_TYPE_NODE\x10\x02*J\n" +
+	"\x11PACKAGE_TYPE_NODE\x10\x02\x12\x17\n" +
+	"\x13PACKAGE_TYPE_PYTHON\x10\x03*J\n" +
 	"\aRuntime\x12\x17\n" +
 	"\x13RUNTIME_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eRUNTIME_NATIVE\x10\x01\x12\x12\n" +

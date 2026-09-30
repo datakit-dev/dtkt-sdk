@@ -7,13 +7,12 @@ import (
 	"strings"
 	"unicode"
 
-	"buf.build/go/protovalidate"
+	"cel.dev/cel-go/cel"
+	"cel.dev/cel-go/common/types"
+	"cel.dev/cel-go/common/types/ref"
+	"cel.dev/cel-go/common/types/traits"
 	"cel.dev/expr"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
-	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/common/types"
-	"github.com/google/cel-go/common/types/ref"
-	"github.com/google/cel-go/common/types/traits"
 	"github.com/jhump/protoreflect/v2/protoresolve"
 	spb "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
@@ -40,7 +39,6 @@ type (
 		RangeMethods(func(protoreflect.MethodDescriptor) bool)
 		FindMethodByName(protoreflect.FullName) (protoreflect.MethodDescriptor, error)
 		RangeFiles(func(protoreflect.FileDescriptor) bool)
-		GetValidator() (protovalidate.Validator, error)
 	}
 )
 

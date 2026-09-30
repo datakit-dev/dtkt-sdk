@@ -105,6 +105,7 @@ message Type {
     EnumType enum_type = 11;
     MessageType message_type = 12;
     ListType list_type = 13;
+    MapType map_type = 14;
   }
 }
 
@@ -205,8 +206,17 @@ message MessageType {
 }
 
 message ListType {
-  Type item_type = 1;
+  Type item_type = 1 [(buf.validate.field).required = true];
   repeated TypeAttribute attrs = 2;
+}
+
+message MapType {
+  option (buf.validate.message).cel_expression = "has(this.key_type.bool_type) || has(this.key_type.integer_type) || has(this.key_type.string_type)";
+
+  Type key_type = 1 [(buf.validate.field).required = true];
+  Type val_type = 2 [(buf.validate.field).required = true];
+
+  repeated TypeAttribute attrs = 3;
 }
 
 message TypeAttribute {

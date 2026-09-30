@@ -10,14 +10,14 @@ import (
 type requestCtxKey struct{}
 
 func NewRequestContext(ctx context.Context, req *Request) context.Context {
-	return AddRequestToContext(ctx, req)
-}
-
-func AddRequestToContext(ctx context.Context, req *Request) context.Context {
 	return metadata.AppendToOutgoingContext(
 		context.WithValue(ctx, requestCtxKey{}, req),
 		RequestToGRPCPairs(req)...,
 	)
+}
+
+func NewResourceContext(ctx context.Context, res Resource) context.Context {
+	return NewRequestContext(ctx, ResourceRequest(res))
 }
 
 func RequestFromContext(ctx context.Context) (*Request, error) {

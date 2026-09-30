@@ -336,7 +336,7 @@ func (m *OrderedMap[K, V]) MarshalJSONTo(enc *jsontext.Encoder) error {
 			return err
 		}
 
-		val, err := encoding.ToJSONV2(m.vals[idx], encoding.WithEncodeJSONOptions(enc.Options()))
+		val, err := encoding.ToJSON(m.vals[idx], encoding.WithJSONEncoderOptions(enc.Options()))
 		if err != nil {
 			return err
 		}
@@ -390,8 +390,8 @@ func (m *OrderedMap[K, V]) UnmarshalJSONFrom(dec *jsontext.Decoder) error {
 		}
 
 		var val V
-		err = encoding.FromJSONV2(raw, &val,
-			encoding.WithDecodeJSONOptions(dec.Options()),
+		err = encoding.FromJSON(raw, &val,
+			encoding.WithJSONDecoderOptions(dec.Options()),
 		)
 		if err != nil {
 			return err

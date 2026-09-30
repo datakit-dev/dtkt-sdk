@@ -274,7 +274,7 @@ func (w ProtoOptions) Wrap(value any) (proto.Message, error) {
 		}
 	case json.RawMessage:
 		msg := new(structpb.Value)
-		if err := encoding.FromJSONV2(value, msg); err != nil {
+		if err := encoding.FromJSON(value, msg); err != nil {
 			return nil, err
 		}
 		return msg, nil
@@ -282,8 +282,8 @@ func (w ProtoOptions) Wrap(value any) (proto.Message, error) {
 		return value, nil
 	}
 
-	b, err := encoding.ToJSONV2(value,
-		encoding.WithEncodeProtoJSONOptions(protojson.MarshalOptions{
+	b, err := encoding.ToJSON(value,
+		encoding.WithProtoEncodeOptions(protojson.MarshalOptions{
 			Resolver: w.Resolver,
 		}),
 	)
@@ -292,8 +292,8 @@ func (w ProtoOptions) Wrap(value any) (proto.Message, error) {
 	}
 
 	var val any
-	if err = encoding.FromJSONV2(b, &val,
-		encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
+	if err = encoding.FromJSON(b, &val,
+		encoding.WithProtoDecodeOptions(protojson.UnmarshalOptions{
 			Resolver: w.Resolver,
 		}),
 	); err != nil {
@@ -381,17 +381,17 @@ func UnwrapProtoAnyAsOptions[T any](from *anypb.Any, opts ProtoOptions) (to T, e
 
 	switch value := unwrap.(type) {
 	case []byte:
-		err = encoding.FromJSONV2(value, &to)
+		err = encoding.FromJSON(value, &to)
 		return
 	case string:
-		err = encoding.FromJSONV2([]byte(value), &to)
+		err = encoding.FromJSON([]byte(value), &to)
 		return
 	case proto.Message:
 		msg, ok := isMessage(to)
 		if ok {
 			var b []byte
-			b, err = encoding.ToJSONV2(value,
-				encoding.WithEncodeProtoJSONOptions(protojson.MarshalOptions{
+			b, err = encoding.ToJSON(value,
+				encoding.WithProtoEncodeOptions(protojson.MarshalOptions{
 					Resolver: opts.Resolver,
 				}),
 			)
@@ -400,8 +400,8 @@ func UnwrapProtoAnyAsOptions[T any](from *anypb.Any, opts ProtoOptions) (to T, e
 			}
 
 			msg = msg.ProtoReflect().New().Interface()
-			err = encoding.FromJSONV2(b, msg,
-				encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
+			err = encoding.FromJSON(b, msg,
+				encoding.WithProtoDecodeOptions(protojson.UnmarshalOptions{
 					Resolver: opts.Resolver,
 				}),
 			)
@@ -414,8 +414,8 @@ func UnwrapProtoAnyAsOptions[T any](from *anypb.Any, opts ProtoOptions) (to T, e
 		}
 	default:
 		var b []byte
-		b, err = encoding.ToJSONV2(value,
-			encoding.WithEncodeProtoJSONOptions(protojson.MarshalOptions{
+		b, err = encoding.ToJSON(value,
+			encoding.WithProtoEncodeOptions(protojson.MarshalOptions{
 				Resolver: opts.Resolver,
 			}),
 		)
@@ -424,14 +424,14 @@ func UnwrapProtoAnyAsOptions[T any](from *anypb.Any, opts ProtoOptions) (to T, e
 		}
 
 		if msg, ok := isMessage(to); ok {
-			err = encoding.FromJSONV2(b, msg,
-				encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
+			err = encoding.FromJSON(b, msg,
+				encoding.WithProtoDecodeOptions(protojson.UnmarshalOptions{
 					Resolver: opts.Resolver,
 				}),
 			)
 		} else {
-			err = encoding.FromJSONV2(b, &to,
-				encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
+			err = encoding.FromJSON(b, &to,
+				encoding.WithProtoDecodeOptions(protojson.UnmarshalOptions{
 					Resolver: opts.Resolver,
 				}),
 			)

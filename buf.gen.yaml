@@ -27,10 +27,10 @@ plugins:
   - remote: buf.build/protocolbuffers/go:v1.36.10
     out: sdk-go/proto
     opt: paths=source_relative
-  - remote: buf.build/grpc/go:v1.5.1
+  - remote: buf.build/grpc/go:v1.6.2
     out: sdk-go/proto
     opt: paths=source_relative
-  - remote: buf.build/connectrpc/go:v1.19.1
+  - remote: buf.build/connectrpc/go:v1.21.0
     out: sdk-go/proto
     opt: paths=source_relative
     # Only generate Connect for googleapis longrunning
@@ -40,32 +40,22 @@ plugins:
     opt: paths=source_relative
 
   # TypeScript
-  - remote: buf.build/bufbuild/es:v2.10.1
+  - remote: buf.build/bufbuild/es:v2.15.0
     opt:
       - target=ts
       - valid_types=protovalidate_required
     out: sdk-ts/src/proto
     include_imports: true
     include_wkt: true
-  - remote: buf.build/connectrpc/query-es:v2.2.0
+  - remote: buf.build/connectrpc/query-es:v2.3.1
     out: sdk-ts/src/proto
     opt:
       - target=ts
 
-  # JSON Schemas
-  # - remote: buf.build/bufbuild/protoschema-jsonschema
-  #   out: schemas
-  #   opt:
-  #     - target=json
-
   # Python
-  # - remote: buf.build/protocolbuffers/python
-  #   out: sdk-py/proto
-  # - remote: buf.build/grpc/python
-  #   out: sdk-py/proto
-
-  # Java
-  # - remote: buf.build/grpc/java
-  #   out: sdk-java/src/main
-  # - remote: buf.build/protocolbuffers/java
-  #   out: sdk-java/src/main
+  - remote: buf.build/bufbuild/py
+    out: sdk-py/dtkt_sdk/gen
+    opt: init_files=false
+    include_imports: true
+  - remote: buf.build/connectrpc/py
+    out: sdk-py/dtkt_sdk/gen

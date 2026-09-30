@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/lib/env"
 	corev1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 	"google.golang.org/protobuf/proto"
@@ -50,7 +49,7 @@ func ParseAddr(uriStr string) (addr Address, err error) {
 	}
 
 	// For SSH types, delegate to specialized parser
-	if netType == SSHSocket || netType == SSHTCP {
+	if netType == SSH_Socket || netType == SSH_TCP {
 		var sshURI *SSHRemoteURI
 		sshURI, err = ParseSSHRemoteURI(uriStr)
 		if err != nil {
@@ -152,33 +151,13 @@ func AddrFromProto(addr AddressProto) Address {
 	return Address{addr.GetNetwork(), addr.GetTarget()}
 }
 
-func AddrToEnv(addr net.Addr) (vars []string) {
-	vars = append(vars,
-		fmt.Sprintf("%s=%s", env.Network, addr.Network()),
-		fmt.Sprintf("%s=%s", env.Address, addr.String()),
-	)
-	return
-}
-
-func AddrFromEnv() Address {
-	return Addr(Type(NetworkFromEnv()), AddressFromEnv())
-}
-
-func NetworkFromEnv() string {
-	return os.Getenv(env.Network)
-}
-
-func AddressFromEnv() string {
-	return os.Getenv(env.Address)
-}
-
 func (a Address) Network() string {
 	return a[0]
 }
 
 func (a Address) String() string {
 	switch a.Type() {
-	case Cloud, TCP, SSHSocket, SSHTCP:
+	case Cloud, TCP, SSH_Socket, SSH_TCP:
 		if idx := strings.Index(a[1], "/"); idx > 0 {
 			return a[1][:idx]
 		}
@@ -192,7 +171,7 @@ func (a Address) String() string {
 
 func (a Address) IsAvailable() bool {
 	switch a.Type() {
-	case SSHSocket, SSHTCP:
+	case SSH_Socket, SSH_TCP:
 		// SSH types always return false as they are dial-only.
 		return false
 	case Cloud:
@@ -255,8 +234,8 @@ func (a Address) IsCloud() bool {
 	return a.Type().IsCloud()
 }
 
-func (a Address) ToEnv() []string {
-	return AddrToEnv(a)
+func (a Address) ToEnv() map[string]string {
+	return AddressToEnv(a)
 }
 
 func (a Address) ToProto() *corev1.Address {
@@ -306,6 +285,12 @@ func (a Address) HTTP() *url.URL {
 	return &url.URL{Scheme: "http", Host: fmt.Sprintf("%s-%s", util.Slugify(a.Network()), util.HashShort(a.String()))}
 }
 
+func (a Address) HTTPS() *url.URL {
+	url := a.HTTP()
+	url.Scheme = "https"
+	return url
+}
+
 func (a Address) HostPort() (string, string, error) {
 	addr, err := a.Resolve()
 	if err != nil {
@@ -340,7 +325,7 @@ func (a Address) Resolve() (net.Addr, error) {
 	case TCP:
 		return net.ResolveTCPAddr("tcp", addrStr)
 
-	case SSHSocket, SSHTCP:
+	case SSH_Socket, SSH_TCP:
 		// For SSH types, we need to parse the full URI to get the SSH endpoint
 		uri := a.URL()
 		sshURI, err := ParseSSHRemoteURI(uri.String())

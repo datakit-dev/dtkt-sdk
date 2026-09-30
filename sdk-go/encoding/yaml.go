@@ -1,86 +1,68 @@
 package encoding
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
+	"io"
 
-	"buf.build/go/protoyaml"
-	"google.golang.org/protobuf/proto"
 	"sigs.k8s.io/yaml"
 )
 
 var _ Encoder = (*YAMLEncoder)(nil)
 var _ Decoder = (*YAMLDecoder)(nil)
 
+const DefaultYAMLDelim = "---\n"
+
 type (
 	YAMLEncoder struct {
 		json  *JSONEncoder
-		proto protoyaml.MarshalOptions
+		delim string
 	}
 	YAMLDecoder struct {
 		json  *JSONDecoder
-		proto protoyaml.UnmarshalOptions
+		delim string
 	}
-	YAMLEncoderOption func(*YAMLEncoder)
-	YAMLDecoderOption func(*YAMLDecoder)
 )
 
-func ToYAML(v any, opts ...YAMLEncoderOption) ([]byte, error) {
+func NewYAMLEncoder(opts ...EncoderOption) *YAMLEncoder {
+	enc := &YAMLEncoder{
+		json: NewJSONEncoder(opts...),
+	}
+	enc.applyOptions(opts...)
+
+	if enc.delim == "" {
+		enc.delim = DefaultYAMLDelim
+	}
+
+	return enc
+}
+
+func NewYAMLDecoder(opts ...DecoderOption) *YAMLDecoder {
+	dec := &YAMLDecoder{
+		json: NewJSONDecoder(opts...),
+	}
+	dec.applyOptions(opts...)
+
+	if dec.delim == "" {
+		dec.delim = DefaultYAMLDelim
+	}
+
+	return dec
+}
+
+func ToYAML(v any, opts ...EncoderOption) ([]byte, error) {
 	return NewYAMLEncoder(opts...).Encode(v)
 }
 
-func FromYAML(b []byte, v any, opts ...YAMLDecoderOption) error {
+func FromYAML(b []byte, v any, opts ...DecoderOption) error {
 	return NewYAMLDecoder(opts...).Decode(b, v)
 }
 
-func NewYAMLEncoder(opts ...YAMLEncoderOption) *YAMLEncoder {
-	return (&YAMLEncoder{
-		json: NewJSONEncoder(),
-	}).WithOptions(opts...)
-}
-
-func NewYAMLDecoder(opts ...YAMLDecoderOption) *YAMLDecoder {
-	return (&YAMLDecoder{
-		json: NewJSONDecoder(),
-	}).WithOptions(opts...)
-}
-
-func WithProtoYAMLMarshalOptions(opts protoyaml.MarshalOptions) YAMLEncoderOption {
-	return func(e *YAMLEncoder) {
-		e.proto = opts
-	}
-}
-
-func WithProtoYAMLUnmarshalOptions(opts protoyaml.UnmarshalOptions) YAMLDecoderOption {
-	return func(d *YAMLDecoder) {
-		d.proto = opts
-	}
-}
-
-func (e *YAMLEncoder) WithOptions(opts ...YAMLEncoderOption) *YAMLEncoder {
-	for _, opt := range opts {
-		if opt != nil {
-			opt(e)
-		}
-	}
-	return e
-}
-
-func (d *YAMLDecoder) WithOptions(opts ...YAMLDecoderOption) *YAMLDecoder {
-	for _, opt := range opts {
-		if opt != nil {
-			opt(d)
-		}
-	}
-	return d
-}
-
 func (e *YAMLEncoder) Encode(v any) ([]byte, error) {
-	if p, ok := v.(proto.Message); ok {
-		if p == nil {
-			return nil, fmt.Errorf("proto message cannot be nil")
-		}
-		return e.proto.Marshal(p)
-	}
+	// if msg, ok := v.(proto.Message); ok {
+	// 	return e.protoOpts.Marshal(msg)
+	// }
 
 	b, err := e.json.Encode(v)
 	if err != nil {
@@ -90,15 +72,43 @@ func (e *YAMLEncoder) Encode(v any) ([]byte, error) {
 	return yaml.JSONToYAML(b)
 }
 
-func (d *YAMLDecoder) Decode(b []byte, v any) error {
-	if p, ok := v.(proto.Message); ok {
-		if p == nil {
-			return fmt.Errorf("proto message cannot be nil")
-		} else if !p.ProtoReflect().IsValid() {
-			return fmt.Errorf("proto message must be mutable")
+func (e *YAMLEncoder) applyOptions(opts ...EncoderOption) {
+	for _, opt := range opts {
+		if opt != nil {
+			opt(e)
 		}
-		return d.proto.Unmarshal(b, p)
 	}
+}
+
+func (e *YAMLDecoder) applyOptions(opts ...DecoderOption) {
+	for _, opt := range opts {
+		if opt != nil {
+			opt(e)
+		}
+	}
+}
+
+func (e *YAMLEncoder) StreamEncode(w io.Writer) func(any) error {
+	return func(v any) error {
+		b, err := e.Encode(v)
+		if err != nil {
+			return err
+		}
+
+		b, err = yaml.JSONToYAML(b)
+		if err != nil {
+			return err
+		}
+
+		_, err = fmt.Fprintf(w, "%s%s", e.delim, b)
+		return err
+	}
+}
+
+func (d *YAMLDecoder) Decode(b []byte, v any) error {
+	// if msg, ok := v.(proto.Message); ok {
+	// 	return d.protoOpts.Unmarshal(b, msg)
+	// }
 
 	b, err := yaml.YAMLToJSON(b)
 	if err != nil {
@@ -106,4 +116,27 @@ func (d *YAMLDecoder) Decode(b []byte, v any) error {
 	}
 
 	return d.json.Decode(b, v)
+}
+
+func (d *YAMLDecoder) StreamDecode(r io.Reader) func(any) error {
+	scan := bufio.NewScanner(r)
+	scan.Split(DelimSplitFunc(d.delim))
+
+	return func(v any) error {
+		if scan.Scan() {
+			b := scan.Bytes()
+			if len(bytes.TrimSpace(b)) == 0 {
+				return nil
+			}
+
+			err := d.Decode(b, v)
+			return err
+		}
+
+		if err := scan.Err(); err != nil {
+			return err
+		}
+
+		return io.EOF
+	}
 }

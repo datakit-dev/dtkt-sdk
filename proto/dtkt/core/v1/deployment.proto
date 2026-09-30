@@ -9,7 +9,6 @@ import "dtkt/protoform/v1beta1/protoform.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/longrunning/operations.proto";
-import "google/protobuf/descriptor.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -82,7 +81,7 @@ message Deployment {
   ];
 
   enum State {
-    STATE_UNSPECIFIED = 0;
+    UNSPECIFIED = 0;
     PENDING = 1;
     RUNNING = 2;
     STOPPING = 3;
@@ -149,22 +148,10 @@ message Deployment {
   // and only present when address's network is "cloud".
   Cloud cloud = 8;
 
-  // Package config metadata fetched at runtime from server.
-  TypeSchema config_schema = 9 [
-    (buf.validate.field).required = true,
-    (google.api.field_behavior) = OUTPUT_ONLY
-  ];
-
-  // Package spec metadata fetched at runtime from server.
-  PackageSpecMetadata package_spec = 10 [
-    (buf.validate.field).required = true,
-    (google.api.field_behavior) = OUTPUT_ONLY
-  ];
-
-  message RuntimeMetadata {
+  message Runtime {
     message Native {
-      // PID file path of native process.
-      string pid_file_path = 1 [(buf.validate.field).required = true];
+      // PID file of native process.
+      string pid_file = 1 [(buf.validate.field).required = true];
     }
 
     message Docker {
@@ -178,10 +165,17 @@ message Deployment {
       Native native = 1;
       Docker docker = 2;
     }
+
+    // Package config metadata fetched at runtime from server.
+    TypeSchema config_schema = 10 [(buf.validate.field).required = true];
+
+    // Package spec metadata fetched at runtime from server.
+    PackageSpecMetadata package_spec = 11 [(buf.validate.field).required = true];
   }
 
-  // Runtime metadata of deployment, including runtime-specific information such as process ID or container ID.
-  RuntimeMetadata runtime = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
+  // Runtime of deployment, including type-specific information such as process
+  // ID or container ID.
+  Runtime runtime = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Etag for concurrency control of deployment updates (must match current etag
   // to update or delete).

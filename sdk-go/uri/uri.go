@@ -44,6 +44,15 @@ func TrimScheme(uri string) string {
 	return uri
 }
 
+func GetPath(uri string) (string, error) {
+	url, err := Parse(uri)
+	if err != nil {
+		return "", err
+	}
+
+	return url.Path, nil
+}
+
 // IsGlob checks if a string is a valid file glob pattern.
 func IsGlob(pattern string) bool {
 	// 1. Validate the syntax using the standard library.
@@ -128,7 +137,7 @@ func Exists(ctx context.Context, uri *url.URL) (bool, error) {
 	case "file":
 		path := filepath.FromSlash(uri.Path)
 		if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-			return false, nil
+			return false, err
 		} else {
 			return true, nil
 		}

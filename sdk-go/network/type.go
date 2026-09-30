@@ -21,15 +21,15 @@ const (
 	// which supports HTTP/1.X and HTTP/2 protocols over H2C (HTTP/2 w/o TLS).
 	// Example: unix:///path/to/file.sock
 	Socket Type = "unix"
-	// SSHSocket combines a secure shell (SSH) connection with a Unix domain socket
+	// SSH_Socket combines a secure shell (SSH) connection with a Unix domain socket
 	// on the server which must meet the same requirements as the socket network
 	// described above.
 	// Example: ssh+unix://[user[:password]@]host[:port]/server/file.sock[?[ssh_config=local/file]]
-	SSHSocket Type = "ssh+unix"
-	// SSHTCP combines a secure shell (SSH) connection with a TCP connection
+	SSH_Socket Type = "ssh+unix"
+	// SSH_TCP combines a secure shell (SSH) connection with a TCP connection
 	// on the remote server, allowing tunneling to remote TCP services.
 	// Example: ssh+tcp://[user[:password]@]host[:port]/remote-host:remote-port[?[ssh_config=local/file]]
-	SSHTCP Type = "ssh+tcp"
+	SSH_TCP Type = "ssh+tcp"
 	// TCP is the default network type on platforms that do not support
 	// Unix domain sockets. Its address must resolve using DNS to a server which
 	// supports HTTP/1.X and HTTP/2 protocols over H2C (HTTP/2 w/o TLS).
@@ -43,15 +43,15 @@ func Types() []Type {
 	return []Type{
 		Cloud,
 		Socket,
-		SSHSocket,
-		SSHTCP,
+		SSH_Socket,
+		SSH_TCP,
 		TCP,
 	}
 }
 
 func (t Type) DefaultAddress() (addr Address, err error) {
 	switch t {
-	case SSHSocket, SSHTCP:
+	case SSH_Socket, SSH_TCP:
 		err = fmt.Errorf("%s network is dial-only", t)
 		return
 	case Cloud:
@@ -83,7 +83,7 @@ func (t Type) DefaultAddress() (addr Address, err error) {
 }
 
 func (t Type) IsSocket() bool {
-	return t == Socket || t == SSHSocket
+	return t == Socket || t == SSH_Socket
 }
 
 func (t Type) IsCloud() bool {
@@ -96,9 +96,9 @@ func (t Type) Format() string {
 		return DefaultCloudHost
 	case Socket:
 		return "[localhost]/path/to/socket"
-	case SSHSocket:
+	case SSH_Socket:
 		return SSHUnixAddrFormat
-	case SSHTCP:
+	case SSH_TCP:
 		return SSHTCPAddrFormat
 	case TCP:
 		return "[host]:port"

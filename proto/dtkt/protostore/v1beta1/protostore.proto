@@ -17,13 +17,12 @@ extend google.protobuf.FieldOptions {
 
 message Field {
   optional string name = 1;
-  optional bool optional = 2;
-  optional bool nillable = 3;
-  optional bool unique = 4;
-  optional bool sensitive = 5;
-  optional bool immutable = 6;
-  optional bool skip = 7;
-  optional bool primary = 8;
+  optional bool nullable = 2;
+  optional bool unique = 3;
+  optional bool sensitive = 4;
+  optional bool immutable = 5;
+  optional bool skip = 6;
+  optional bool primary = 7;
 }
 
 message Edge {

@@ -3,8 +3,8 @@ package common
 import (
 	"reflect"
 
-	"github.com/google/cel-go/common/types/ref"
-	"github.com/google/cel-go/common/types/traits"
+	"cel.dev/cel-go/common/types/ref"
+	"cel.dev/cel-go/common/types/traits"
 )
 
 type celIterator struct {

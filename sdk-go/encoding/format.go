@@ -43,8 +43,8 @@ var formatters = map[Format]Formatter{
 	JSON: {
 		mime:    "application/json",
 		ext:     ".json",
-		encoder: NewJSONEncoderV2(),
-		decoder: NewJSONDecoderV2(),
+		encoder: NewJSONEncoder(),
+		decoder: NewJSONDecoder(),
 	},
 	JSONL: {
 		mime: "application/jsonl",
@@ -52,8 +52,8 @@ var formatters = map[Format]Formatter{
 		altExts: []string{
 			".ndjson",
 		},
-		encoder: NewJSONEncoderV2(),
-		decoder: NewJSONDecoderV2(),
+		encoder: NewJSONEncoder(),
+		decoder: NewJSONDecoder(),
 	},
 	YAML: {
 		mime: "application/yaml",
@@ -61,8 +61,8 @@ var formatters = map[Format]Formatter{
 		altExts: []string{
 			".yml",
 		},
-		encoder: NewYAMLEncoderV2(),
-		decoder: NewYAMLDecoderV2(),
+		encoder: NewYAMLEncoder(),
+		decoder: NewYAMLDecoder(),
 	},
 }
 
@@ -72,8 +72,8 @@ type (
 		mime    string
 		ext     string
 		altExts []string
-		encoder EncoderV2
-		decoder DecoderV2
+		encoder Encoder
+		decoder Decoder
 	}
 )
 
@@ -90,7 +90,7 @@ func init() {
 	}
 }
 
-func FormatByExt(ext string) (Format, bool) {
+func FormatOfExt(ext string) (Format, bool) {
 	for format := range formatters {
 		if format.IsExt(ext) {
 			return format, true
@@ -99,7 +99,7 @@ func FormatByExt(ext string) (Format, bool) {
 	return "", false
 }
 
-func FormatByMimeType(mime string) (Format, bool) {
+func FormatOfMimeType(mime string) (Format, bool) {
 	for format := range formatters {
 		if format.IsMimeType(mime) {
 			return format, true
@@ -142,7 +142,7 @@ func (f Format) String() string {
 	return string(f)
 }
 
-func (f Format) Encoder() (EncoderV2, bool) {
+func (f Format) Encoder() (Encoder, bool) {
 	formatter, ok := formatters[f]
 	if !ok || formatter.encoder == nil {
 		return nil, false
@@ -159,14 +159,16 @@ func (f Format) Encode(v any) ([]byte, error) {
 
 func (f Format) StreamEncode(w io.Writer) func(any) error {
 	if enc, ok := f.Encoder(); ok {
-		return enc.StreamEncode(w)
+		if enc, ok := enc.(StreamEncoder); ok {
+			return enc.StreamEncode(w)
+		}
 	}
 	return func(any) error {
 		return fmt.Errorf("unknown format: %s", f)
 	}
 }
 
-func (f Format) Decoder() (DecoderV2, bool) {
+func (f Format) Decoder() (Decoder, bool) {
 	formatter, ok := formatters[f]
 	if !ok || formatter.decoder == nil {
 		return nil, false
@@ -183,7 +185,9 @@ func (f Format) Decode(b []byte, v any) error {
 
 func (f Format) StreamDecode(r io.Reader) func(any) error {
 	if dec, ok := f.Decoder(); ok {
-		return dec.StreamDecode(r)
+		if dec, ok := dec.(StreamDecoder); ok {
+			return dec.StreamDecode(r)
+		}
 	}
 	return func(any) error {
 		return fmt.Errorf("unknown format: %s", f)

@@ -12,10 +12,20 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
-type validator struct {
-	resolver  Resolver
-	validator func() (protovalidate.Validator, error)
-}
+var _ protovalidate.Validator = (ValidateFunc)(nil)
+
+type (
+	Validator interface {
+		protovalidate.Validator
+		ValidateInput(proto.Message, ...protovalidate.ValidationOption) error
+		ValidateOutput(proto.Message, ...protovalidate.ValidationOption) error
+	}
+	ValidateFunc func(proto.Message, ...protovalidate.ValidationOption) error
+	validator    struct {
+		resolver  Resolver
+		validator func() (protovalidate.Validator, error)
+	}
+)
 
 func NewValidator(resolver Resolver) *validator {
 	return &validator{
@@ -28,15 +38,12 @@ func NewValidator(resolver Resolver) *validator {
 	}
 }
 
-func ValidatorFilter(root proto.Message) protovalidate.Filter {
+func ValidateInputFilter() protovalidate.Filter {
 	return protovalidate.FilterFunc(func(msg protoreflect.Message, desc protoreflect.Descriptor) bool {
 		if opts, ok := desc.Options().(*descriptorpb.FieldOptions); ok && opts != nil {
 			if proto.HasExtension(opts, annotations.E_FieldBehavior) {
 				if ext, ok := proto.GetExtension(opts, annotations.E_FieldBehavior).([]annotations.FieldBehavior); ok && len(ext) > 0 {
-					if (strings.HasPrefix(string(root.ProtoReflect().Descriptor().Name()), "Create") &&
-						slices.Contains(ext, annotations.FieldBehavior_IDENTIFIER)) ||
-						(strings.HasSuffix(string(root.ProtoReflect().Descriptor().Name()), "Request") &&
-							slices.Contains(ext, annotations.FieldBehavior_OUTPUT_ONLY)) {
+					if slices.Contains(ext, annotations.FieldBehavior_IDENTIFIER) || slices.Contains(ext, annotations.FieldBehavior_OUTPUT_ONLY) {
 						return false
 					}
 				}
@@ -46,15 +53,65 @@ func ValidatorFilter(root proto.Message) protovalidate.Filter {
 	})
 }
 
-func (f *validator) Validate(root proto.Message, opts ...protovalidate.ValidationOption) error {
+func ValidateOutputFilter() protovalidate.Filter {
+	return protovalidate.FilterFunc(func(msg protoreflect.Message, desc protoreflect.Descriptor) bool {
+		if opts, ok := desc.Options().(*descriptorpb.FieldOptions); ok && opts != nil {
+			if proto.HasExtension(opts, annotations.E_FieldBehavior) {
+				if ext, ok := proto.GetExtension(opts, annotations.E_FieldBehavior).([]annotations.FieldBehavior); ok && len(ext) > 0 {
+					if slices.Contains(ext, annotations.FieldBehavior_INPUT_ONLY) {
+						return false
+					}
+				}
+			}
+		}
+		return true
+	})
+}
+
+func ValidateFilter(msg proto.Message) protovalidate.Filter {
+	if strings.HasSuffix(string(msg.ProtoReflect().Descriptor().Name()), "Request") {
+		return ValidateInputFilter()
+	} else if strings.HasSuffix(string(msg.ProtoReflect().Descriptor().Name()), "Response") {
+		return ValidateOutputFilter()
+	}
+	return protovalidate.FilterFunc(func(protoreflect.Message, protoreflect.Descriptor) bool {
+		return true
+	})
+}
+
+func (f *validator) Validate(msg proto.Message, opts ...protovalidate.ValidationOption) error {
 	validator, err := f.validator()
 	if err != nil {
 		return err
 	}
 
-	opts = append([]protovalidate.ValidationOption{
-		protovalidate.WithFilter(ValidatorFilter(root)),
-	}, opts...)
+	return validator.Validate(msg, append([]protovalidate.ValidationOption{
+		protovalidate.WithFilter(ValidateFilter(msg)),
+	}, opts...)...)
+}
 
-	return validator.Validate(root, opts...)
+func (f *validator) ValidateInput(input proto.Message, opts ...protovalidate.ValidationOption) error {
+	validator, err := f.validator()
+	if err != nil {
+		return err
+	}
+
+	return validator.Validate(input, append([]protovalidate.ValidationOption{
+		protovalidate.WithFilter(ValidateInputFilter()),
+	}, opts...)...)
+}
+
+func (f *validator) ValidateOutput(output proto.Message, opts ...protovalidate.ValidationOption) error {
+	validator, err := f.validator()
+	if err != nil {
+		return err
+	}
+
+	return validator.Validate(output, append([]protovalidate.ValidationOption{
+		protovalidate.WithFilter(ValidateOutputFilter()),
+	}, opts...)...)
+}
+
+func (f ValidateFunc) Validate(msg proto.Message, opts ...protovalidate.ValidationOption) error {
+	return f(msg, opts...)
 }

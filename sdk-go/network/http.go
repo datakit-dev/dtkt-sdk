@@ -10,96 +10,82 @@ import (
 type (
 	HTTPClient struct {
 		*http.Client
-		address    Address
-		dialer     Dialer
-		protocols  *http.Protocols
-		transport  *http.Transport
-		dialerOpts []ConnectorOption
+		transport *http.Transport
+
+		addr    Address
+		dialer  Dialer
+		dialTLS bool
 	}
-	HTTPClientOption     func(*HTTPClient)
 	HTTPRoundTripperFunc func(*http.Request) (*http.Response, error)
 )
 
-func NewHTTPClient(address Address, opts ...HTTPClientOption) (*HTTPClient, string) {
-	client := &HTTPClient{
-		address: address,
+func NewHTTPClient(address Address, opts ...Option) *HTTPClient {
+	c := &HTTPClient{
+		addr: address,
 	}
+	c.applyOptions(opts...)
 
-	client.applyOptions(opts...)
-
-	return client, address.HTTP().String()
-}
-
-func NewHTTPClientWithDialer(dialer Dialer, opts ...HTTPClientOption) (*HTTPClient, string) {
-	client, baseURL := NewHTTPClient(Address{dialer.Address().Network(), dialer.Address().String()}, opts...)
-	client.dialer = dialer
-	return client, baseURL
-}
-
-func WithHTTPProtocols(protocols *http.Protocols) HTTPClientOption {
-	return func(c *HTTPClient) {
-		c.protocols = protocols
-	}
-}
-
-func WithHTTPTransport(transport *http.Transport) HTTPClientOption {
-	return func(c *HTTPClient) {
-		c.transport = transport
-	}
-}
-
-func WithHTTPDialerOptions(opts ...ConnectorOption) HTTPClientOption {
-	return func(c *HTTPClient) {
-		c.dialerOpts = append(c.dialerOpts, opts...)
-	}
-}
-
-func (c *HTTPClient) DialContext(ctx context.Context, _ string, _ string) (net.Conn, error) {
-	if c.dialer == nil {
-		dialer, err := NewConnector(c.address, c.dialerOpts...)
-		if err != nil {
-			return nil, err
+	if c.transport == nil {
+		c.transport = &http.Transport{
+			ForceAttemptHTTP2: true,
+			MaxIdleConns:      100,
+			IdleConnTimeout:   90 * time.Second,
 		}
-		c.dialer = dialer
-	}
-	return c.dialer.DialContext(ctx)
-}
 
-func (c *HTTPClient) Address() Address {
-	return c.address
-}
+		if c.transport.Protocols == nil {
+			c.transport.Protocols = new(http.Protocols)
+		}
 
-func (c *HTTPClient) BaseURL() string {
-	return c.address.HTTP().String()
-}
+		dialContext := func(ctx context.Context, _, _ string) (net.Conn, error) {
+			if c.dialer != nil {
+				return c.dialer.DialContext(ctx)
+			}
 
-func (c *HTTPClient) applyOptions(opts ...HTTPClientOption) {
-	for _, opt := range opts {
-		if opt != nil {
-			opt(c)
+			dialer := &net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+			}
+
+			return dialer.DialContext(ctx, c.addr.Network(), c.addr.String())
+		}
+
+		if c.dialTLS {
+			c.transport.Protocols.SetHTTP2(true)
+			c.transport.DialTLSContext = dialContext
+		} else {
+			// HTTP1 must stay unset: Transport only uses prior-knowledge h2c
+			// for http:// URLs when UnencryptedHTTP2 is set without HTTP1.
+			c.transport.Protocols.SetUnencryptedHTTP2(true)
+			c.transport.DialContext = dialContext
 		}
 	}
 
 	if c.Client == nil {
-		if c.transport == nil {
-			if c.protocols == nil {
-				c.protocols = new(http.Protocols)
-				c.protocols.SetUnencryptedHTTP2(true)
-			}
+		c.Client = &http.Client{}
+	}
 
-			c.transport = &http.Transport{
-				DialContext:           c.DialContext,
-				ForceAttemptHTTP2:     true,
-				Protocols:             c.protocols,
-				MaxIdleConns:          100,
-				IdleConnTimeout:       90 * time.Second,
-				TLSHandshakeTimeout:   10 * time.Second,
-				ExpectContinueTimeout: 1 * time.Second,
-			}
-		}
+	if c.Client.Transport == nil {
+		c.Client.Transport = c.transport
+	}
 
-		c.Client = &http.Client{
-			Transport: c.transport,
+	return c
+}
+
+func (c *HTTPClient) Address() Address {
+	return c.addr
+}
+
+func (c *HTTPClient) BaseUrl() string {
+	if c.dialTLS {
+		return c.addr.HTTPS().String()
+	}
+	return c.addr.HTTP().String()
+}
+
+func (c *HTTPClient) applyOptions(opts ...Option) {
+	for _, opt := range opts {
+		if opt != nil {
+			opt(c)
 		}
 	}
 }

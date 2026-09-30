@@ -7,7 +7,6 @@ import "dtkt/shared/v1beta1/enums.proto";
 import "dtkt/shared/v1beta1/messages.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/any.proto";
-import "google/protobuf/descriptor.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1";
@@ -153,4 +152,27 @@ message PackageBuildMetadata {
     (buf.validate.field).required = true,
     (google.api.field_behavior) = OUTPUT_ONLY
   ];
+}
+
+// -----------------------------------------------------------------------------
+// mTLS
+// -----------------------------------------------------------------------------
+
+// TLSCertBundle holds a leaf certificate/key pair signed by a Root CA, along
+// with the metadata needed to know when it must be regenerated. Meant to be
+// persisted encrypted at rest (key_pem is sensitive) and rebuilt into a
+// tls.Config on load rather than serializing the config itself.
+message TLSCertBundle {
+  // PEM-encoded X.509 leaf certificate.
+  bytes cert_pem = 1 [(buf.validate.field).required = true];
+
+  // PEM-encoded PKCS8 private key; sensitive, must be encrypted at rest.
+  bytes key_pem = 2 [(buf.validate.field).required = true];
+
+  // SHA-256 fingerprint (hex) of the Root CA certificate that signed cert_pem;
+  // regenerate the bundle if this no longer matches the current Root CA.
+  string ca_fingerprint = 3 [(buf.validate.field).required = true];
+
+  // Certificate NotAfter; regenerate the bundle once this has passed.
+  google.protobuf.Timestamp not_after = 4 [(buf.validate.field).required = true];
 }

@@ -1,7 +1,6 @@
 version: "3"
 
 env:
-  GOEXPERIMENT: jsonv2
 
 includes:
   go:

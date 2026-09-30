@@ -25,13 +25,12 @@ const (
 type Field struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          *string                `protobuf:"bytes,1,opt,name=name,proto3,oneof" json:"name,omitempty"`
-	Optional      *bool                  `protobuf:"varint,2,opt,name=optional,proto3,oneof" json:"optional,omitempty"`
-	Nillable      *bool                  `protobuf:"varint,3,opt,name=nillable,proto3,oneof" json:"nillable,omitempty"`
-	Unique        *bool                  `protobuf:"varint,4,opt,name=unique,proto3,oneof" json:"unique,omitempty"`
-	Sensitive     *bool                  `protobuf:"varint,5,opt,name=sensitive,proto3,oneof" json:"sensitive,omitempty"`
-	Immutable     *bool                  `protobuf:"varint,6,opt,name=immutable,proto3,oneof" json:"immutable,omitempty"`
-	Skip          *bool                  `protobuf:"varint,7,opt,name=skip,proto3,oneof" json:"skip,omitempty"`
-	Primary       *bool                  `protobuf:"varint,8,opt,name=primary,proto3,oneof" json:"primary,omitempty"`
+	Nullable      *bool                  `protobuf:"varint,2,opt,name=nullable,proto3,oneof" json:"nullable,omitempty"`
+	Unique        *bool                  `protobuf:"varint,3,opt,name=unique,proto3,oneof" json:"unique,omitempty"`
+	Sensitive     *bool                  `protobuf:"varint,4,opt,name=sensitive,proto3,oneof" json:"sensitive,omitempty"`
+	Immutable     *bool                  `protobuf:"varint,5,opt,name=immutable,proto3,oneof" json:"immutable,omitempty"`
+	Skip          *bool                  `protobuf:"varint,6,opt,name=skip,proto3,oneof" json:"skip,omitempty"`
+	Primary       *bool                  `protobuf:"varint,7,opt,name=primary,proto3,oneof" json:"primary,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -73,16 +72,9 @@ func (x *Field) GetName() string {
 	return ""
 }
 
-func (x *Field) GetOptional() bool {
-	if x != nil && x.Optional != nil {
-		return *x.Optional
-	}
-	return false
-}
-
-func (x *Field) GetNillable() bool {
-	if x != nil && x.Nillable != nil {
-		return *x.Nillable
+func (x *Field) GetNullable() bool {
+	if x != nil && x.Nullable != nil {
+		return *x.Nullable
 	}
 	return false
 }
@@ -283,19 +275,17 @@ var File_dtkt_protostore_v1beta1_protostore_proto protoreflect.FileDescriptor
 
 const file_dtkt_protostore_v1beta1_protostore_proto_rawDesc = "" +
 	"\n" +
-	"(dtkt/protostore/v1beta1/protostore.proto\x12\x17dtkt.protostore.v1beta1\x1a google/protobuf/descriptor.proto\"\xdc\x02\n" +
+	"(dtkt/protostore/v1beta1/protostore.proto\x12\x17dtkt.protostore.v1beta1\x1a google/protobuf/descriptor.proto\"\xae\x02\n" +
 	"\x05Field\x12\x17\n" +
 	"\x04name\x18\x01 \x01(\tH\x00R\x04name\x88\x01\x01\x12\x1f\n" +
-	"\boptional\x18\x02 \x01(\bH\x01R\boptional\x88\x01\x01\x12\x1f\n" +
-	"\bnillable\x18\x03 \x01(\bH\x02R\bnillable\x88\x01\x01\x12\x1b\n" +
-	"\x06unique\x18\x04 \x01(\bH\x03R\x06unique\x88\x01\x01\x12!\n" +
-	"\tsensitive\x18\x05 \x01(\bH\x04R\tsensitive\x88\x01\x01\x12!\n" +
-	"\timmutable\x18\x06 \x01(\bH\x05R\timmutable\x88\x01\x01\x12\x17\n" +
-	"\x04skip\x18\a \x01(\bH\x06R\x04skip\x88\x01\x01\x12\x1d\n" +
-	"\aprimary\x18\b \x01(\bH\aR\aprimary\x88\x01\x01B\a\n" +
+	"\bnullable\x18\x02 \x01(\bH\x01R\bnullable\x88\x01\x01\x12\x1b\n" +
+	"\x06unique\x18\x03 \x01(\bH\x02R\x06unique\x88\x01\x01\x12!\n" +
+	"\tsensitive\x18\x04 \x01(\bH\x03R\tsensitive\x88\x01\x01\x12!\n" +
+	"\timmutable\x18\x05 \x01(\bH\x04R\timmutable\x88\x01\x01\x12\x17\n" +
+	"\x04skip\x18\x06 \x01(\bH\x05R\x04skip\x88\x01\x01\x12\x1d\n" +
+	"\aprimary\x18\a \x01(\bH\x06R\aprimary\x88\x01\x01B\a\n" +
 	"\x05_nameB\v\n" +
-	"\t_optionalB\v\n" +
-	"\t_nillableB\t\n" +
+	"\t_nullableB\t\n" +
 	"\a_uniqueB\f\n" +
 	"\n" +
 	"_sensitiveB\f\n" +

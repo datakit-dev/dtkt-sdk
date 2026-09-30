@@ -13,7 +13,6 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/descriptorpb"
 	fieldmaskpb "google.golang.org/protobuf/types/known/fieldmaskpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
@@ -31,18 +30,18 @@ const (
 type Deployment_State int32
 
 const (
-	Deployment_STATE_UNSPECIFIED Deployment_State = 0
-	Deployment_PENDING           Deployment_State = 1
-	Deployment_RUNNING           Deployment_State = 2
-	Deployment_STOPPING          Deployment_State = 3
-	Deployment_STOPPED           Deployment_State = 4
-	Deployment_FAILED            Deployment_State = 5
+	Deployment_UNSPECIFIED Deployment_State = 0
+	Deployment_PENDING     Deployment_State = 1
+	Deployment_RUNNING     Deployment_State = 2
+	Deployment_STOPPING    Deployment_State = 3
+	Deployment_STOPPED     Deployment_State = 4
+	Deployment_FAILED      Deployment_State = 5
 )
 
 // Enum value maps for Deployment_State.
 var (
 	Deployment_State_name = map[int32]string{
-		0: "STATE_UNSPECIFIED",
+		0: "UNSPECIFIED",
 		1: "PENDING",
 		2: "RUNNING",
 		3: "STOPPING",
@@ -50,12 +49,12 @@ var (
 		5: "FAILED",
 	}
 	Deployment_State_value = map[string]int32{
-		"STATE_UNSPECIFIED": 0,
-		"PENDING":           1,
-		"RUNNING":           2,
-		"STOPPING":          3,
-		"STOPPED":           4,
-		"FAILED":            5,
+		"UNSPECIFIED": 0,
+		"PENDING":     1,
+		"RUNNING":     2,
+		"STOPPING":    3,
+		"STOPPED":     4,
+		"FAILED":      5,
 	}
 )
 
@@ -115,12 +114,9 @@ type Deployment struct {
 	// Cloud context with encrypted config for binding deployment to DataKit Cloud
 	// and only present when address's network is "cloud".
 	Cloud *Deployment_Cloud `protobuf:"bytes,8,opt,name=cloud,proto3" json:"cloud,omitempty"`
-	// Package config metadata fetched at runtime from server.
-	ConfigSchema *TypeSchema `protobuf:"bytes,9,opt,name=config_schema,json=configSchema,proto3" json:"config_schema,omitempty"`
-	// Package spec metadata fetched at runtime from server.
-	PackageSpec *PackageSpecMetadata `protobuf:"bytes,10,opt,name=package_spec,json=packageSpec,proto3" json:"package_spec,omitempty"`
-	// Runtime metadata of deployment, including runtime-specific information such as process ID or container ID.
-	Runtime *Deployment_RuntimeMetadata `protobuf:"bytes,11,opt,name=runtime,proto3" json:"runtime,omitempty"`
+	// Runtime of deployment, including type-specific information such as process
+	// ID or container ID.
+	Runtime *Deployment_Runtime `protobuf:"bytes,11,opt,name=runtime,proto3" json:"runtime,omitempty"`
 	// Etag for concurrency control of deployment updates (must match current etag
 	// to update or delete).
 	Etag string `protobuf:"bytes,18,opt,name=etag,proto3" json:"etag,omitempty"`
@@ -180,7 +176,7 @@ func (x *Deployment) GetState() Deployment_State {
 	if x != nil {
 		return x.State
 	}
-	return Deployment_STATE_UNSPECIFIED
+	return Deployment_UNSPECIFIED
 }
 
 func (x *Deployment) GetAddress() *Address {
@@ -218,21 +214,7 @@ func (x *Deployment) GetCloud() *Deployment_Cloud {
 	return nil
 }
 
-func (x *Deployment) GetConfigSchema() *TypeSchema {
-	if x != nil {
-		return x.ConfigSchema
-	}
-	return nil
-}
-
-func (x *Deployment) GetPackageSpec() *PackageSpecMetadata {
-	if x != nil {
-		return x.PackageSpec
-	}
-	return nil
-}
-
-func (x *Deployment) GetRuntime() *Deployment_RuntimeMetadata {
+func (x *Deployment) GetRuntime() *Deployment_Runtime {
 	if x != nil {
 		return x.Runtime
 	}
@@ -663,7 +645,7 @@ func (x *UpdateDeploymentRequest) GetDesiredState() Deployment_State {
 	if x != nil && x.DesiredState != nil {
 		return *x.DesiredState
 	}
-	return Deployment_STATE_UNSPECIFIED
+	return Deployment_UNSPECIFIED
 }
 
 type DeleteDeploymentRequest struct {
@@ -837,31 +819,35 @@ func (x *Deployment_Cloud) GetConfig() *EncryptedAny {
 	return nil
 }
 
-type Deployment_RuntimeMetadata struct {
+type Deployment_Runtime struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Type:
 	//
-	//	*Deployment_RuntimeMetadata_Native_
-	//	*Deployment_RuntimeMetadata_Docker_
-	Type          isDeployment_RuntimeMetadata_Type `protobuf_oneof:"type"`
+	//	*Deployment_Runtime_Native_
+	//	*Deployment_Runtime_Docker_
+	Type isDeployment_Runtime_Type `protobuf_oneof:"type"`
+	// Package config metadata fetched at runtime from server.
+	ConfigSchema *TypeSchema `protobuf:"bytes,10,opt,name=config_schema,json=configSchema,proto3" json:"config_schema,omitempty"`
+	// Package spec metadata fetched at runtime from server.
+	PackageSpec   *PackageSpecMetadata `protobuf:"bytes,11,opt,name=package_spec,json=packageSpec,proto3" json:"package_spec,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Deployment_RuntimeMetadata) Reset() {
-	*x = Deployment_RuntimeMetadata{}
+func (x *Deployment_Runtime) Reset() {
+	*x = Deployment_Runtime{}
 	mi := &file_dtkt_core_v1_deployment_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Deployment_RuntimeMetadata) String() string {
+func (x *Deployment_Runtime) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Deployment_RuntimeMetadata) ProtoMessage() {}
+func (*Deployment_Runtime) ProtoMessage() {}
 
-func (x *Deployment_RuntimeMetadata) ProtoReflect() protoreflect.Message {
+func (x *Deployment_Runtime) ProtoReflect() protoreflect.Message {
 	mi := &file_dtkt_core_v1_deployment_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -873,74 +859,88 @@ func (x *Deployment_RuntimeMetadata) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Deployment_RuntimeMetadata.ProtoReflect.Descriptor instead.
-func (*Deployment_RuntimeMetadata) Descriptor() ([]byte, []int) {
+// Deprecated: Use Deployment_Runtime.ProtoReflect.Descriptor instead.
+func (*Deployment_Runtime) Descriptor() ([]byte, []int) {
 	return file_dtkt_core_v1_deployment_proto_rawDescGZIP(), []int{0, 4}
 }
 
-func (x *Deployment_RuntimeMetadata) GetType() isDeployment_RuntimeMetadata_Type {
+func (x *Deployment_Runtime) GetType() isDeployment_Runtime_Type {
 	if x != nil {
 		return x.Type
 	}
 	return nil
 }
 
-func (x *Deployment_RuntimeMetadata) GetNative() *Deployment_RuntimeMetadata_Native {
+func (x *Deployment_Runtime) GetNative() *Deployment_Runtime_Native {
 	if x != nil {
-		if x, ok := x.Type.(*Deployment_RuntimeMetadata_Native_); ok {
+		if x, ok := x.Type.(*Deployment_Runtime_Native_); ok {
 			return x.Native
 		}
 	}
 	return nil
 }
 
-func (x *Deployment_RuntimeMetadata) GetDocker() *Deployment_RuntimeMetadata_Docker {
+func (x *Deployment_Runtime) GetDocker() *Deployment_Runtime_Docker {
 	if x != nil {
-		if x, ok := x.Type.(*Deployment_RuntimeMetadata_Docker_); ok {
+		if x, ok := x.Type.(*Deployment_Runtime_Docker_); ok {
 			return x.Docker
 		}
 	}
 	return nil
 }
 
-type isDeployment_RuntimeMetadata_Type interface {
-	isDeployment_RuntimeMetadata_Type()
+func (x *Deployment_Runtime) GetConfigSchema() *TypeSchema {
+	if x != nil {
+		return x.ConfigSchema
+	}
+	return nil
 }
 
-type Deployment_RuntimeMetadata_Native_ struct {
-	Native *Deployment_RuntimeMetadata_Native `protobuf:"bytes,1,opt,name=native,proto3,oneof"`
+func (x *Deployment_Runtime) GetPackageSpec() *PackageSpecMetadata {
+	if x != nil {
+		return x.PackageSpec
+	}
+	return nil
 }
 
-type Deployment_RuntimeMetadata_Docker_ struct {
-	Docker *Deployment_RuntimeMetadata_Docker `protobuf:"bytes,2,opt,name=docker,proto3,oneof"`
+type isDeployment_Runtime_Type interface {
+	isDeployment_Runtime_Type()
 }
 
-func (*Deployment_RuntimeMetadata_Native_) isDeployment_RuntimeMetadata_Type() {}
+type Deployment_Runtime_Native_ struct {
+	Native *Deployment_Runtime_Native `protobuf:"bytes,1,opt,name=native,proto3,oneof"`
+}
 
-func (*Deployment_RuntimeMetadata_Docker_) isDeployment_RuntimeMetadata_Type() {}
+type Deployment_Runtime_Docker_ struct {
+	Docker *Deployment_Runtime_Docker `protobuf:"bytes,2,opt,name=docker,proto3,oneof"`
+}
 
-type Deployment_RuntimeMetadata_Native struct {
+func (*Deployment_Runtime_Native_) isDeployment_Runtime_Type() {}
+
+func (*Deployment_Runtime_Docker_) isDeployment_Runtime_Type() {}
+
+type Deployment_Runtime_Native struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// PID file path of native process.
-	PidFilePath   string `protobuf:"bytes,1,opt,name=pid_file_path,json=pidFilePath,proto3" json:"pid_file_path,omitempty"`
+	// PID file of native process.
+	PidFile       string `protobuf:"bytes,1,opt,name=pid_file,json=pidFile,proto3" json:"pid_file,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Deployment_RuntimeMetadata_Native) Reset() {
-	*x = Deployment_RuntimeMetadata_Native{}
+func (x *Deployment_Runtime_Native) Reset() {
+	*x = Deployment_Runtime_Native{}
 	mi := &file_dtkt_core_v1_deployment_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Deployment_RuntimeMetadata_Native) String() string {
+func (x *Deployment_Runtime_Native) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Deployment_RuntimeMetadata_Native) ProtoMessage() {}
+func (*Deployment_Runtime_Native) ProtoMessage() {}
 
-func (x *Deployment_RuntimeMetadata_Native) ProtoReflect() protoreflect.Message {
+func (x *Deployment_Runtime_Native) ProtoReflect() protoreflect.Message {
 	mi := &file_dtkt_core_v1_deployment_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -952,19 +952,19 @@ func (x *Deployment_RuntimeMetadata_Native) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Deployment_RuntimeMetadata_Native.ProtoReflect.Descriptor instead.
-func (*Deployment_RuntimeMetadata_Native) Descriptor() ([]byte, []int) {
+// Deprecated: Use Deployment_Runtime_Native.ProtoReflect.Descriptor instead.
+func (*Deployment_Runtime_Native) Descriptor() ([]byte, []int) {
 	return file_dtkt_core_v1_deployment_proto_rawDescGZIP(), []int{0, 4, 0}
 }
 
-func (x *Deployment_RuntimeMetadata_Native) GetPidFilePath() string {
+func (x *Deployment_Runtime_Native) GetPidFile() string {
 	if x != nil {
-		return x.PidFilePath
+		return x.PidFile
 	}
 	return ""
 }
 
-type Deployment_RuntimeMetadata_Docker struct {
+type Deployment_Runtime_Docker struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Container ID of docker container.
 	ContainerId   string `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
@@ -972,20 +972,20 @@ type Deployment_RuntimeMetadata_Docker struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Deployment_RuntimeMetadata_Docker) Reset() {
-	*x = Deployment_RuntimeMetadata_Docker{}
+func (x *Deployment_Runtime_Docker) Reset() {
+	*x = Deployment_Runtime_Docker{}
 	mi := &file_dtkt_core_v1_deployment_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Deployment_RuntimeMetadata_Docker) String() string {
+func (x *Deployment_Runtime_Docker) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Deployment_RuntimeMetadata_Docker) ProtoMessage() {}
+func (*Deployment_Runtime_Docker) ProtoMessage() {}
 
-func (x *Deployment_RuntimeMetadata_Docker) ProtoReflect() protoreflect.Message {
+func (x *Deployment_Runtime_Docker) ProtoReflect() protoreflect.Message {
 	mi := &file_dtkt_core_v1_deployment_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -997,12 +997,12 @@ func (x *Deployment_RuntimeMetadata_Docker) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Deployment_RuntimeMetadata_Docker.ProtoReflect.Descriptor instead.
-func (*Deployment_RuntimeMetadata_Docker) Descriptor() ([]byte, []int) {
+// Deprecated: Use Deployment_Runtime_Docker.ProtoReflect.Descriptor instead.
+func (*Deployment_Runtime_Docker) Descriptor() ([]byte, []int) {
 	return file_dtkt_core_v1_deployment_proto_rawDescGZIP(), []int{0, 4, 1}
 }
 
-func (x *Deployment_RuntimeMetadata_Docker) GetContainerId() string {
+func (x *Deployment_Runtime_Docker) GetContainerId() string {
 	if x != nil {
 		return x.ContainerId
 	}
@@ -1013,7 +1013,7 @@ var File_dtkt_core_v1_deployment_proto protoreflect.FileDescriptor
 
 const file_dtkt_core_v1_deployment_proto_rawDesc = "" +
 	"\n" +
-	"\x1ddtkt/core/v1/deployment.proto\x12\fdtkt.core.v1\x1a\x1bbuf/validate/validate.proto\x1a\x19dtkt/core/v1/common.proto\x1a\x1adtkt/core/v1/reflect.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/descriptor.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xcc\x0f\n" +
+	"\x1ddtkt/core/v1/deployment.proto\x12\fdtkt.core.v1\x1a\x1bbuf/validate/validate.proto\x1a\x19dtkt/core/v1/common.proto\x1a\x1adtkt/core/v1/reflect.proto\x1a&dtkt/protoform/v1beta1/protoform.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x97\x0f\n" +
 	"\n" +
 	"Deployment\x12#\n" +
 	"\x04name\x18\x01 \x01(\tB\x0f\xe0A\b\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\x04name\x12&\n" +
@@ -1023,11 +1023,8 @@ const file_dtkt_core_v1_deployment_proto_rawDesc = "" +
 	"\x03env\x18\x05 \x03(\v2!.dtkt.core.v1.Deployment.EnvEntryB\x03\x80\x01\x01R\x03env\x129\n" +
 	"\x05ports\x18\x06 \x03(\v2#.dtkt.core.v1.Deployment.PortsEntryR\x05ports\x12<\n" +
 	"\x05build\x18\a \x01(\v2\x1e.dtkt.core.v1.Deployment.BuildB\x06\xbaH\x03\xc8\x01\x01R\x05build\x124\n" +
-	"\x05cloud\x18\b \x01(\v2\x1e.dtkt.core.v1.Deployment.CloudR\x05cloud\x12H\n" +
-	"\rconfig_schema\x18\t \x01(\v2\x18.dtkt.core.v1.TypeSchemaB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\fconfigSchema\x12O\n" +
-	"\fpackage_spec\x18\n" +
-	" \x01(\v2!.dtkt.core.v1.PackageSpecMetadataB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\vpackageSpec\x12G\n" +
-	"\aruntime\x18\v \x01(\v2(.dtkt.core.v1.Deployment.RuntimeMetadataB\x03\xe0A\x03R\aruntime\x12&\n" +
+	"\x05cloud\x18\b \x01(\v2\x1e.dtkt.core.v1.Deployment.CloudR\x05cloud\x12?\n" +
+	"\aruntime\x18\v \x01(\v2 .dtkt.core.v1.Deployment.RuntimeB\x03\xe0A\x03R\aruntime\x12&\n" +
 	"\x04etag\x18\x12 \x01(\tB\x12\xe0A\x03\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01\x80\x01\x01R\x04etag\x12F\n" +
 	"\vcreate_time\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x03\xbaH\x03\xc8\x01\x01R\n" +
 	"createTime\x12F\n" +
@@ -1047,17 +1044,20 @@ const file_dtkt_core_v1_deployment_proto_rawDesc = "" +
 	"\acontext\x18\x03 \x01(\v2\x15.dtkt.core.v1.ContextR\acontext:J\xbaHG*Ehas(this.metadata.artifact_etag) && this.metadata.artifact_etag != ''\x1a\xe2\x01\n" +
 	"\x05Cloud\x12@\n" +
 	"\acontext\x18\x01 \x01(\v2\x15.dtkt.core.v1.ContextB\x0f\xe0A\x04\xbaH\x03\xc8\x01\x01\x82\xb5\x18\x02\x18\x01R\acontext\x12@\n" +
-	"\x06config\x18\x03 \x01(\v2\x1a.dtkt.core.v1.EncryptedAnyB\f\xe0A\x03\xbaH\x03\xc8\x01\x01\x80\x01\x01R\x06config:U\xbaHR*Phas(this.config) && this.config.type_url.endsWith('/google.protobuf.BytesValue')\x1a\xa1\x02\n" +
-	"\x0fRuntimeMetadata\x12I\n" +
-	"\x06native\x18\x01 \x01(\v2/.dtkt.core.v1.Deployment.RuntimeMetadata.NativeH\x00R\x06native\x12I\n" +
-	"\x06docker\x18\x02 \x01(\v2/.dtkt.core.v1.Deployment.RuntimeMetadata.DockerH\x00R\x06docker\x1a4\n" +
-	"\x06Native\x12*\n" +
-	"\rpid_file_path\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vpidFilePath\x1a3\n" +
+	"\x06config\x18\x03 \x01(\v2\x1a.dtkt.core.v1.EncryptedAnyB\f\xe0A\x03\xbaH\x03\xc8\x01\x01\x80\x01\x01R\x06config:U\xbaHR*Phas(this.config) && this.config.type_url.endsWith('/google.protobuf.BytesValue')\x1a\x95\x03\n" +
+	"\aRuntime\x12A\n" +
+	"\x06native\x18\x01 \x01(\v2'.dtkt.core.v1.Deployment.Runtime.NativeH\x00R\x06native\x12A\n" +
+	"\x06docker\x18\x02 \x01(\v2'.dtkt.core.v1.Deployment.Runtime.DockerH\x00R\x06docker\x12E\n" +
+	"\rconfig_schema\x18\n" +
+	" \x01(\v2\x18.dtkt.core.v1.TypeSchemaB\x06\xbaH\x03\xc8\x01\x01R\fconfigSchema\x12L\n" +
+	"\fpackage_spec\x18\v \x01(\v2!.dtkt.core.v1.PackageSpecMetadataB\x06\xbaH\x03\xc8\x01\x01R\vpackageSpec\x1a+\n" +
+	"\x06Native\x12!\n" +
+	"\bpid_file\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\apidFile\x1a3\n" +
 	"\x06Docker\x12)\n" +
 	"\fcontainer_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vcontainerIdB\r\n" +
-	"\x04type\x12\x05\xbaH\x02\b\x01\"_\n" +
-	"\x05State\x12\x15\n" +
-	"\x11STATE_UNSPECIFIED\x10\x00\x12\v\n" +
+	"\x04type\x12\x05\xbaH\x02\b\x01\"Y\n" +
+	"\x05State\x12\x0f\n" +
+	"\vUNSPECIFIED\x10\x00\x12\v\n" +
 	"\aPENDING\x10\x01\x12\v\n" +
 	"\aRUNNING\x10\x02\x12\f\n" +
 	"\bSTOPPING\x10\x03\x12\v\n" +
@@ -1136,32 +1136,32 @@ func file_dtkt_core_v1_deployment_proto_rawDescGZIP() []byte {
 var file_dtkt_core_v1_deployment_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_dtkt_core_v1_deployment_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_dtkt_core_v1_deployment_proto_goTypes = []any{
-	(Deployment_State)(0),                     // 0: dtkt.core.v1.Deployment.State
-	(*Deployment)(nil),                        // 1: dtkt.core.v1.Deployment
-	(*DeploymentMetadata)(nil),                // 2: dtkt.core.v1.DeploymentMetadata
-	(*ListDeploymentsRequest)(nil),            // 3: dtkt.core.v1.ListDeploymentsRequest
-	(*ListDeploymentsResponse)(nil),           // 4: dtkt.core.v1.ListDeploymentsResponse
-	(*GetDeploymentRequest)(nil),              // 5: dtkt.core.v1.GetDeploymentRequest
-	(*GetDeploymentResponse)(nil),             // 6: dtkt.core.v1.GetDeploymentResponse
-	(*CreateDeploymentRequest)(nil),           // 7: dtkt.core.v1.CreateDeploymentRequest
-	(*UpdateDeploymentRequest)(nil),           // 8: dtkt.core.v1.UpdateDeploymentRequest
-	(*DeleteDeploymentRequest)(nil),           // 9: dtkt.core.v1.DeleteDeploymentRequest
-	nil,                                       // 10: dtkt.core.v1.Deployment.EnvEntry
-	nil,                                       // 11: dtkt.core.v1.Deployment.PortsEntry
-	(*Deployment_Build)(nil),                  // 12: dtkt.core.v1.Deployment.Build
-	(*Deployment_Cloud)(nil),                  // 13: dtkt.core.v1.Deployment.Cloud
-	(*Deployment_RuntimeMetadata)(nil),        // 14: dtkt.core.v1.Deployment.RuntimeMetadata
-	(*Deployment_RuntimeMetadata_Native)(nil), // 15: dtkt.core.v1.Deployment.RuntimeMetadata.Native
-	(*Deployment_RuntimeMetadata_Docker)(nil), // 16: dtkt.core.v1.Deployment.RuntimeMetadata.Docker
-	(*Address)(nil),                           // 17: dtkt.core.v1.Address
-	(*TypeSchema)(nil),                        // 18: dtkt.core.v1.TypeSchema
-	(*PackageSpecMetadata)(nil),               // 19: dtkt.core.v1.PackageSpecMetadata
-	(*timestamppb.Timestamp)(nil),             // 20: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil),             // 21: google.protobuf.FieldMask
-	(*PackageBuildMetadata)(nil),              // 22: dtkt.core.v1.PackageBuildMetadata
-	(*Context)(nil),                           // 23: dtkt.core.v1.Context
-	(*EncryptedAny)(nil),                      // 24: dtkt.core.v1.EncryptedAny
-	(*longrunningpb.Operation)(nil),           // 25: google.longrunning.Operation
+	(Deployment_State)(0),             // 0: dtkt.core.v1.Deployment.State
+	(*Deployment)(nil),                // 1: dtkt.core.v1.Deployment
+	(*DeploymentMetadata)(nil),        // 2: dtkt.core.v1.DeploymentMetadata
+	(*ListDeploymentsRequest)(nil),    // 3: dtkt.core.v1.ListDeploymentsRequest
+	(*ListDeploymentsResponse)(nil),   // 4: dtkt.core.v1.ListDeploymentsResponse
+	(*GetDeploymentRequest)(nil),      // 5: dtkt.core.v1.GetDeploymentRequest
+	(*GetDeploymentResponse)(nil),     // 6: dtkt.core.v1.GetDeploymentResponse
+	(*CreateDeploymentRequest)(nil),   // 7: dtkt.core.v1.CreateDeploymentRequest
+	(*UpdateDeploymentRequest)(nil),   // 8: dtkt.core.v1.UpdateDeploymentRequest
+	(*DeleteDeploymentRequest)(nil),   // 9: dtkt.core.v1.DeleteDeploymentRequest
+	nil,                               // 10: dtkt.core.v1.Deployment.EnvEntry
+	nil,                               // 11: dtkt.core.v1.Deployment.PortsEntry
+	(*Deployment_Build)(nil),          // 12: dtkt.core.v1.Deployment.Build
+	(*Deployment_Cloud)(nil),          // 13: dtkt.core.v1.Deployment.Cloud
+	(*Deployment_Runtime)(nil),        // 14: dtkt.core.v1.Deployment.Runtime
+	(*Deployment_Runtime_Native)(nil), // 15: dtkt.core.v1.Deployment.Runtime.Native
+	(*Deployment_Runtime_Docker)(nil), // 16: dtkt.core.v1.Deployment.Runtime.Docker
+	(*Address)(nil),                   // 17: dtkt.core.v1.Address
+	(*timestamppb.Timestamp)(nil),     // 18: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),     // 19: google.protobuf.FieldMask
+	(*PackageBuildMetadata)(nil),      // 20: dtkt.core.v1.PackageBuildMetadata
+	(*Context)(nil),                   // 21: dtkt.core.v1.Context
+	(*EncryptedAny)(nil),              // 22: dtkt.core.v1.EncryptedAny
+	(*TypeSchema)(nil),                // 23: dtkt.core.v1.TypeSchema
+	(*PackageSpecMetadata)(nil),       // 24: dtkt.core.v1.PackageSpecMetadata
+	(*longrunningpb.Operation)(nil),   // 25: google.longrunning.Operation
 }
 var file_dtkt_core_v1_deployment_proto_depIdxs = []int32{
 	0,  // 0: dtkt.core.v1.Deployment.state:type_name -> dtkt.core.v1.Deployment.State
@@ -1170,25 +1170,25 @@ var file_dtkt_core_v1_deployment_proto_depIdxs = []int32{
 	11, // 3: dtkt.core.v1.Deployment.ports:type_name -> dtkt.core.v1.Deployment.PortsEntry
 	12, // 4: dtkt.core.v1.Deployment.build:type_name -> dtkt.core.v1.Deployment.Build
 	13, // 5: dtkt.core.v1.Deployment.cloud:type_name -> dtkt.core.v1.Deployment.Cloud
-	18, // 6: dtkt.core.v1.Deployment.config_schema:type_name -> dtkt.core.v1.TypeSchema
-	19, // 7: dtkt.core.v1.Deployment.package_spec:type_name -> dtkt.core.v1.PackageSpecMetadata
-	14, // 8: dtkt.core.v1.Deployment.runtime:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata
-	20, // 9: dtkt.core.v1.Deployment.create_time:type_name -> google.protobuf.Timestamp
-	20, // 10: dtkt.core.v1.Deployment.update_time:type_name -> google.protobuf.Timestamp
-	20, // 11: dtkt.core.v1.DeploymentMetadata.start_time:type_name -> google.protobuf.Timestamp
-	20, // 12: dtkt.core.v1.DeploymentMetadata.stop_time:type_name -> google.protobuf.Timestamp
-	1,  // 13: dtkt.core.v1.ListDeploymentsResponse.deployments:type_name -> dtkt.core.v1.Deployment
-	1,  // 14: dtkt.core.v1.GetDeploymentResponse.deployment:type_name -> dtkt.core.v1.Deployment
-	1,  // 15: dtkt.core.v1.CreateDeploymentRequest.deployment:type_name -> dtkt.core.v1.Deployment
-	1,  // 16: dtkt.core.v1.UpdateDeploymentRequest.deployment:type_name -> dtkt.core.v1.Deployment
-	21, // 17: dtkt.core.v1.UpdateDeploymentRequest.update_mask:type_name -> google.protobuf.FieldMask
-	0,  // 18: dtkt.core.v1.UpdateDeploymentRequest.desired_state:type_name -> dtkt.core.v1.Deployment.State
-	22, // 19: dtkt.core.v1.Deployment.Build.metadata:type_name -> dtkt.core.v1.PackageBuildMetadata
-	23, // 20: dtkt.core.v1.Deployment.Build.context:type_name -> dtkt.core.v1.Context
-	23, // 21: dtkt.core.v1.Deployment.Cloud.context:type_name -> dtkt.core.v1.Context
-	24, // 22: dtkt.core.v1.Deployment.Cloud.config:type_name -> dtkt.core.v1.EncryptedAny
-	15, // 23: dtkt.core.v1.Deployment.RuntimeMetadata.native:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata.Native
-	16, // 24: dtkt.core.v1.Deployment.RuntimeMetadata.docker:type_name -> dtkt.core.v1.Deployment.RuntimeMetadata.Docker
+	14, // 6: dtkt.core.v1.Deployment.runtime:type_name -> dtkt.core.v1.Deployment.Runtime
+	18, // 7: dtkt.core.v1.Deployment.create_time:type_name -> google.protobuf.Timestamp
+	18, // 8: dtkt.core.v1.Deployment.update_time:type_name -> google.protobuf.Timestamp
+	18, // 9: dtkt.core.v1.DeploymentMetadata.start_time:type_name -> google.protobuf.Timestamp
+	18, // 10: dtkt.core.v1.DeploymentMetadata.stop_time:type_name -> google.protobuf.Timestamp
+	1,  // 11: dtkt.core.v1.ListDeploymentsResponse.deployments:type_name -> dtkt.core.v1.Deployment
+	1,  // 12: dtkt.core.v1.GetDeploymentResponse.deployment:type_name -> dtkt.core.v1.Deployment
+	1,  // 13: dtkt.core.v1.CreateDeploymentRequest.deployment:type_name -> dtkt.core.v1.Deployment
+	1,  // 14: dtkt.core.v1.UpdateDeploymentRequest.deployment:type_name -> dtkt.core.v1.Deployment
+	19, // 15: dtkt.core.v1.UpdateDeploymentRequest.update_mask:type_name -> google.protobuf.FieldMask
+	0,  // 16: dtkt.core.v1.UpdateDeploymentRequest.desired_state:type_name -> dtkt.core.v1.Deployment.State
+	20, // 17: dtkt.core.v1.Deployment.Build.metadata:type_name -> dtkt.core.v1.PackageBuildMetadata
+	21, // 18: dtkt.core.v1.Deployment.Build.context:type_name -> dtkt.core.v1.Context
+	21, // 19: dtkt.core.v1.Deployment.Cloud.context:type_name -> dtkt.core.v1.Context
+	22, // 20: dtkt.core.v1.Deployment.Cloud.config:type_name -> dtkt.core.v1.EncryptedAny
+	15, // 21: dtkt.core.v1.Deployment.Runtime.native:type_name -> dtkt.core.v1.Deployment.Runtime.Native
+	16, // 22: dtkt.core.v1.Deployment.Runtime.docker:type_name -> dtkt.core.v1.Deployment.Runtime.Docker
+	23, // 23: dtkt.core.v1.Deployment.Runtime.config_schema:type_name -> dtkt.core.v1.TypeSchema
+	24, // 24: dtkt.core.v1.Deployment.Runtime.package_spec:type_name -> dtkt.core.v1.PackageSpecMetadata
 	3,  // 25: dtkt.core.v1.DeploymentService.ListDeployments:input_type -> dtkt.core.v1.ListDeploymentsRequest
 	5,  // 26: dtkt.core.v1.DeploymentService.GetDeployment:input_type -> dtkt.core.v1.GetDeploymentRequest
 	7,  // 27: dtkt.core.v1.DeploymentService.CreateDeployment:input_type -> dtkt.core.v1.CreateDeploymentRequest
@@ -1216,8 +1216,8 @@ func file_dtkt_core_v1_deployment_proto_init() {
 	file_dtkt_core_v1_deployment_proto_msgTypes[2].OneofWrappers = []any{}
 	file_dtkt_core_v1_deployment_proto_msgTypes[7].OneofWrappers = []any{}
 	file_dtkt_core_v1_deployment_proto_msgTypes[13].OneofWrappers = []any{
-		(*Deployment_RuntimeMetadata_Native_)(nil),
-		(*Deployment_RuntimeMetadata_Docker_)(nil),
+		(*Deployment_Runtime_Native_)(nil),
+		(*Deployment_Runtime_Docker_)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
