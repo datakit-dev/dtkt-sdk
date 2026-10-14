@@ -25,39 +25,30 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type ListResult struct {
+type Bucket struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Key for this blob result.
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	// ModTime is the time the blob was last modified.
-	ModTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=mod_time,json=modTime,proto3" json:"mod_time,omitempty"`
-	// Size is the size of the blob's content in bytes.
-	Size int64 `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty"`
-	// MD5 is an MD5 hash of the blob contents or nil if not available.
-	Md5 string `protobuf:"bytes,4,opt,name=md5,proto3" json:"md5,omitempty"`
-	// IsDir indicates that this result represents a "directory" in the
-	// hierarchical namespace, ending in ListOptions.Delimiter. Key can be
-	// passed as ListOptions.Prefix to list items in the "directory".
-	// Fields other than Key and IsDir will not be set if IsDir is true.
-	IsDir         bool `protobuf:"varint,5,opt,name=is_dir,json=isDir,proto3" json:"is_dir,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// Name of this bucket.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Provider-specific metadata.
+	ProviderMetadata *structpb.Struct `protobuf:"bytes,2,opt,name=provider_metadata,json=providerMetadata,proto3" json:"provider_metadata,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
-func (x *ListResult) Reset() {
-	*x = ListResult{}
+func (x *Bucket) Reset() {
+	*x = Bucket{}
 	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ListResult) String() string {
+func (x *Bucket) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListResult) ProtoMessage() {}
+func (*Bucket) ProtoMessage() {}
 
-func (x *ListResult) ProtoReflect() protoreflect.Message {
+func (x *Bucket) ProtoReflect() protoreflect.Message {
 	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -69,71 +60,634 @@ func (x *ListResult) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListResult.ProtoReflect.Descriptor instead.
-func (*ListResult) Descriptor() ([]byte, []int) {
+// Deprecated: Use Bucket.ProtoReflect.Descriptor instead.
+func (*Bucket) Descriptor() ([]byte, []int) {
 	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ListResult) GetKey() string {
+func (x *Bucket) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Bucket) GetProviderMetadata() *structpb.Struct {
+	if x != nil {
+		return x.ProviderMetadata
+	}
+	return nil
+}
+
+type Blob struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Key of this blob.
+	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	// Bucket containing this blob.
+	Bucket string `protobuf:"bytes,2,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	// Size of the blob's content in number of bytes.
+	Size uint64 `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty"`
+	// MD5 hash of the blob contents, if available.
+	Md5 string `protobuf:"bytes,4,opt,name=md5,proto3" json:"md5,omitempty"`
+	// ETag of the blob contents, if available; see https://en.wikipedia.org/wiki/HTTP_ETag.
+	Etag string `protobuf:"bytes,5,opt,name=etag,proto3" json:"etag,omitempty"`
+	// Metadata of the blob contents, if available.
+	Metadata *BlobMetadata `protobuf:"bytes,6,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	// Time blob was last modified, if available.
+	ModTime *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=mod_time,json=modTime,proto3" json:"mod_time,omitempty"`
+	// Time blob was created, if available.
+	CreateTime    *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Blob) Reset() {
+	*x = Blob{}
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Blob) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Blob) ProtoMessage() {}
+
+func (x *Blob) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Blob.ProtoReflect.Descriptor instead.
+func (*Blob) Descriptor() ([]byte, []int) {
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Blob) GetKey() string {
 	if x != nil {
 		return x.Key
 	}
 	return ""
 }
 
-func (x *ListResult) GetModTime() *timestamppb.Timestamp {
+func (x *Blob) GetBucket() string {
 	if x != nil {
-		return x.ModTime
+		return x.Bucket
 	}
-	return nil
+	return ""
 }
 
-func (x *ListResult) GetSize() int64 {
+func (x *Blob) GetSize() uint64 {
 	if x != nil {
 		return x.Size
 	}
 	return 0
 }
 
-func (x *ListResult) GetMd5() string {
+func (x *Blob) GetMd5() string {
 	if x != nil {
 		return x.Md5
 	}
 	return ""
 }
 
-func (x *ListResult) GetIsDir() bool {
+func (x *Blob) GetEtag() string {
 	if x != nil {
-		return x.IsDir
+		return x.Etag
+	}
+	return ""
+}
+
+func (x *Blob) GetMetadata() *BlobMetadata {
+	if x != nil {
+		return x.Metadata
+	}
+	return nil
+}
+
+func (x *Blob) GetModTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ModTime
+	}
+	return nil
+}
+
+func (x *Blob) GetCreateTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreateTime
+	}
+	return nil
+}
+
+type BlobMetadata struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The MIME type of the blob contents.
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type
+	ContentType string `protobuf:"bytes,1,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
+	// The disposition specifies whether the blob contents is expected to be
+	// displayed inline or as an attachment.
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
+	ContentDisposition string `protobuf:"bytes,2,opt,name=content_disposition,json=contentDisposition,proto3" json:"content_disposition,omitempty"`
+	// The encoding used for the blob's content, if any.
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding
+	ContentEncoding string `protobuf:"bytes,3,opt,name=content_encoding,json=contentEncoding,proto3" json:"content_encoding,omitempty"`
+	// The language used in the blob's content, if any.
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Language
+	ContentLanguage string `protobuf:"bytes,4,opt,name=content_language,json=contentLanguage,proto3" json:"content_language,omitempty"`
+	// The caching attributes that services may use when serving the blob.
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
+	CacheControl string `protobuf:"bytes,5,opt,name=cache_control,json=cacheControl,proto3" json:"cache_control,omitempty"`
+	// Provider-specific metadata.
+	ProviderMetadata *structpb.Struct `protobuf:"bytes,10,opt,name=provider_metadata,json=providerMetadata,proto3" json:"provider_metadata,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *BlobMetadata) Reset() {
+	*x = BlobMetadata{}
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BlobMetadata) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BlobMetadata) ProtoMessage() {}
+
+func (x *BlobMetadata) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BlobMetadata.ProtoReflect.Descriptor instead.
+func (*BlobMetadata) Descriptor() ([]byte, []int) {
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *BlobMetadata) GetContentType() string {
+	if x != nil {
+		return x.ContentType
+	}
+	return ""
+}
+
+func (x *BlobMetadata) GetContentDisposition() string {
+	if x != nil {
+		return x.ContentDisposition
+	}
+	return ""
+}
+
+func (x *BlobMetadata) GetContentEncoding() string {
+	if x != nil {
+		return x.ContentEncoding
+	}
+	return ""
+}
+
+func (x *BlobMetadata) GetContentLanguage() string {
+	if x != nil {
+		return x.ContentLanguage
+	}
+	return ""
+}
+
+func (x *BlobMetadata) GetCacheControl() string {
+	if x != nil {
+		return x.CacheControl
+	}
+	return ""
+}
+
+func (x *BlobMetadata) GetProviderMetadata() *structpb.Struct {
+	if x != nil {
+		return x.ProviderMetadata
+	}
+	return nil
+}
+
+type BlobRules struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Require the blob does not already exist.
+	IfNotExist bool `protobuf:"varint,1,opt,name=if_not_exist,json=ifNotExist,proto3" json:"if_not_exist,omitempty"`
+	// Require the blob to match the provided ETag.
+	IfEtagMatch string `protobuf:"bytes,2,opt,name=if_etag_match,json=ifEtagMatch,proto3" json:"if_etag_match,omitempty"`
+	// Require the blob to *not* match the provided ETag.
+	UnlessEtagMatch string `protobuf:"bytes,3,opt,name=unless_etag_match,json=unlessEtagMatch,proto3" json:"unless_etag_match,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *BlobRules) Reset() {
+	*x = BlobRules{}
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BlobRules) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BlobRules) ProtoMessage() {}
+
+func (x *BlobRules) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BlobRules.ProtoReflect.Descriptor instead.
+func (*BlobRules) Descriptor() ([]byte, []int) {
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *BlobRules) GetIfNotExist() bool {
+	if x != nil {
+		return x.IfNotExist
 	}
 	return false
 }
 
+func (x *BlobRules) GetIfEtagMatch() string {
+	if x != nil {
+		return x.IfEtagMatch
+	}
+	return ""
+}
+
+func (x *BlobRules) GetUnlessEtagMatch() string {
+	if x != nil {
+		return x.UnlessEtagMatch
+	}
+	return ""
+}
+
+type LineFormat struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Type:
+	//
+	//	*LineFormat_LineDelimiter
+	//	*LineFormat_Json
+	//	*LineFormat_Csv
+	Type          isLineFormat_Type `protobuf_oneof:"type"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LineFormat) Reset() {
+	*x = LineFormat{}
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LineFormat) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LineFormat) ProtoMessage() {}
+
+func (x *LineFormat) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LineFormat.ProtoReflect.Descriptor instead.
+func (*LineFormat) Descriptor() ([]byte, []int) {
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *LineFormat) GetType() isLineFormat_Type {
+	if x != nil {
+		return x.Type
+	}
+	return nil
+}
+
+func (x *LineFormat) GetLineDelimiter() string {
+	if x != nil {
+		if x, ok := x.Type.(*LineFormat_LineDelimiter); ok {
+			return x.LineDelimiter
+		}
+	}
+	return ""
+}
+
+func (x *LineFormat) GetJson() *LineFormat_JSON {
+	if x != nil {
+		if x, ok := x.Type.(*LineFormat_Json); ok {
+			return x.Json
+		}
+	}
+	return nil
+}
+
+func (x *LineFormat) GetCsv() *LineFormat_CSV {
+	if x != nil {
+		if x, ok := x.Type.(*LineFormat_Csv); ok {
+			return x.Csv
+		}
+	}
+	return nil
+}
+
+type isLineFormat_Type interface {
+	isLineFormat_Type()
+}
+
+type LineFormat_LineDelimiter struct {
+	// Expects lines of raw data separated by given delimiter.
+	// Default: "\n"
+	LineDelimiter string `protobuf:"bytes,2,opt,name=line_delimiter,json=lineDelimiter,proto3,oneof"`
+}
+
+type LineFormat_Json struct {
+	// Expects lines of JSON encoded values.
+	Json *LineFormat_JSON `protobuf:"bytes,3,opt,name=json,proto3,oneof"`
+}
+
+type LineFormat_Csv struct {
+	// Expects lines of CSV encoded records.
+	Csv *LineFormat_CSV `protobuf:"bytes,4,opt,name=csv,proto3,oneof"`
+}
+
+func (*LineFormat_LineDelimiter) isLineFormat_Type() {}
+
+func (*LineFormat_Json) isLineFormat_Type() {}
+
+func (*LineFormat_Csv) isLineFormat_Type() {}
+
+type LineData struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Type:
+	//
+	//	*LineData_Raw
+	//	*LineData_Json
+	//	*LineData_Csv
+	Type          isLineData_Type `protobuf_oneof:"type"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LineData) Reset() {
+	*x = LineData{}
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LineData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LineData) ProtoMessage() {}
+
+func (x *LineData) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LineData.ProtoReflect.Descriptor instead.
+func (*LineData) Descriptor() ([]byte, []int) {
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *LineData) GetType() isLineData_Type {
+	if x != nil {
+		return x.Type
+	}
+	return nil
+}
+
+func (x *LineData) GetRaw() []byte {
+	if x != nil {
+		if x, ok := x.Type.(*LineData_Raw); ok {
+			return x.Raw
+		}
+	}
+	return nil
+}
+
+func (x *LineData) GetJson() *structpb.Value {
+	if x != nil {
+		if x, ok := x.Type.(*LineData_Json); ok {
+			return x.Json
+		}
+	}
+	return nil
+}
+
+func (x *LineData) GetCsv() *LineData_CSV {
+	if x != nil {
+		if x, ok := x.Type.(*LineData_Csv); ok {
+			return x.Csv
+		}
+	}
+	return nil
+}
+
+type isLineData_Type interface {
+	isLineData_Type()
+}
+
+type LineData_Raw struct {
+	// Raw data.
+	Raw []byte `protobuf:"bytes,1,opt,name=raw,proto3,oneof"`
+}
+
+type LineData_Json struct {
+	// JSON encoded value.
+	Json *structpb.Value `protobuf:"bytes,2,opt,name=json,proto3,oneof"`
+}
+
+type LineData_Csv struct {
+	// CSV encoded record.
+	Csv *LineData_CSV `protobuf:"bytes,3,opt,name=csv,proto3,oneof"`
+}
+
+func (*LineData_Raw) isLineData_Type() {}
+
+func (*LineData_Json) isLineData_Type() {}
+
+func (*LineData_Csv) isLineData_Type() {}
+
+type ListBucketsRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The maximum number of results to return.
+	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	// A page token received from a previous response. All other parameters
+	// provided must match the call that provided this page token.
+	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	// Optional filter expression to narrow results.
+	Filter        string `protobuf:"bytes,3,opt,name=filter,proto3" json:"filter,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListBucketsRequest) Reset() {
+	*x = ListBucketsRequest{}
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListBucketsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListBucketsRequest) ProtoMessage() {}
+
+func (x *ListBucketsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListBucketsRequest.ProtoReflect.Descriptor instead.
+func (*ListBucketsRequest) Descriptor() ([]byte, []int) {
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ListBucketsRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListBucketsRequest) GetPageToken() string {
+	if x != nil {
+		return x.PageToken
+	}
+	return ""
+}
+
+func (x *ListBucketsRequest) GetFilter() string {
+	if x != nil {
+		return x.Filter
+	}
+	return ""
+}
+
+type ListBucketsResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// List of bucket results.
+	Buckets []*Bucket `protobuf:"bytes,1,rep,name=buckets,proto3" json:"buckets,omitempty"`
+	// A token that can be sent as `page_token` to retrieve the next page.
+	// If this field is empty, there are no subsequent pages.
+	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListBucketsResponse) Reset() {
+	*x = ListBucketsResponse{}
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListBucketsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListBucketsResponse) ProtoMessage() {}
+
+func (x *ListBucketsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListBucketsResponse.ProtoReflect.Descriptor instead.
+func (*ListBucketsResponse) Descriptor() ([]byte, []int) {
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ListBucketsResponse) GetBuckets() []*Bucket {
+	if x != nil {
+		return x.Buckets
+	}
+	return nil
+}
+
+func (x *ListBucketsResponse) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
+}
+
 type ListBlobsRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
+	// The maximum number of results to return.
+	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	// A page token received from a previous call. Provide this to retrieve the
+	// subsequent page. All other parameters provided must match the call that
+	// provided this page token.
+	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	// Bucket containing blob results (may be optional).
+	Bucket string `protobuf:"bytes,3,opt,name=bucket,proto3" json:"bucket,omitempty"`
 	// Prefix indicates that only blobs with a key starting with this prefix
 	// should be returned.
-	Prefix string `protobuf:"bytes,1,opt,name=prefix,proto3" json:"prefix,omitempty"`
-	// The maximum number of blobs to return. The service may return fewer than
-	// this value.
-	// If unspecified, at most 50 blobs will be returned.
-	// The maximum value is 1000; values above 1000 will be coerced to 1000.
-	PageSize int32 `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	// A page token, received from a previous `ListBlobs` call.
-	// Provide this to retrieve the subsequent page.
-	//
-	// When paginating, all other parameters provided to `ListBlobs` must match
-	// the call that provided the page token.
-	PageToken string `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	// Bucket to write blob (may be optional).
-	Bucket        string `protobuf:"bytes,4,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	Prefix        string `protobuf:"bytes,4,opt,name=prefix,proto3" json:"prefix,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ListBlobsRequest) Reset() {
 	*x = ListBlobsRequest{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[1]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -145,7 +699,7 @@ func (x *ListBlobsRequest) String() string {
 func (*ListBlobsRequest) ProtoMessage() {}
 
 func (x *ListBlobsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[1]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -158,14 +712,7 @@ func (x *ListBlobsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBlobsRequest.ProtoReflect.Descriptor instead.
 func (*ListBlobsRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *ListBlobsRequest) GetPrefix() string {
-	if x != nil {
-		return x.Prefix
-	}
-	return ""
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ListBlobsRequest) GetPageSize() int32 {
@@ -189,12 +736,19 @@ func (x *ListBlobsRequest) GetBucket() string {
 	return ""
 }
 
+func (x *ListBlobsRequest) GetPrefix() string {
+	if x != nil {
+		return x.Prefix
+	}
+	return ""
+}
+
 type ListBlobsResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The results from the specified prefix.
-	Results []*ListResult `protobuf:"bytes,1,rep,name=results,proto3" json:"results,omitempty"`
+	// List of blob results.
+	Blobs []*Blob `protobuf:"bytes,1,rep,name=blobs,proto3" json:"blobs,omitempty"`
 	// A token that can be sent as `page_token` to retrieve the next page.
-	// If this field is omitted, there are no subsequent pages.
+	// If this field is empty, there are no subsequent pages.
 	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -202,7 +756,7 @@ type ListBlobsResponse struct {
 
 func (x *ListBlobsResponse) Reset() {
 	*x = ListBlobsResponse{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[2]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -214,7 +768,7 @@ func (x *ListBlobsResponse) String() string {
 func (*ListBlobsResponse) ProtoMessage() {}
 
 func (x *ListBlobsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[2]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -227,12 +781,12 @@ func (x *ListBlobsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBlobsResponse.ProtoReflect.Descriptor instead.
 func (*ListBlobsResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{2}
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *ListBlobsResponse) GetResults() []*ListResult {
+func (x *ListBlobsResponse) GetBlobs() []*Blob {
 	if x != nil {
-		return x.Results
+		return x.Blobs
 	}
 	return nil
 }
@@ -246,17 +800,18 @@ func (x *ListBlobsResponse) GetNextPageToken() string {
 
 type GetBlobRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Key of blob to retrieve attributes.
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	// Bucket to write blob (may be optional).
-	Bucket        string `protobuf:"bytes,2,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	// Name of the bucket containing blob. The service may not require this to
+	// be specified.
+	Bucket string `protobuf:"bytes,1,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	// Key of the blob to retrieve.
+	Key           string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetBlobRequest) Reset() {
 	*x = GetBlobRequest{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[3]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -268,7 +823,7 @@ func (x *GetBlobRequest) String() string {
 func (*GetBlobRequest) ProtoMessage() {}
 
 func (x *GetBlobRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[3]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -281,14 +836,7 @@ func (x *GetBlobRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBlobRequest.ProtoReflect.Descriptor instead.
 func (*GetBlobRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *GetBlobRequest) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	return ""
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *GetBlobRequest) GetBucket() string {
@@ -298,52 +846,23 @@ func (x *GetBlobRequest) GetBucket() string {
 	return ""
 }
 
+func (x *GetBlobRequest) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
 type GetBlobResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Key of blob of retrieved attributes.
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	// CacheControl specifies caching attributes that services may use
-	// when serving the blob.
-	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
-	CacheControl string `protobuf:"bytes,2,opt,name=cache_control,json=cacheControl,proto3" json:"cache_control,omitempty"`
-	// ContentDisposition specifies whether the blob content is expected to be
-	// displayed inline or as an attachment.
-	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
-	ContentDisposition string `protobuf:"bytes,3,opt,name=content_disposition,json=contentDisposition,proto3" json:"content_disposition,omitempty"`
-	// ContentEncoding specifies the encoding used for the blob's content, if any.
-	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding
-	ContentEncoding string `protobuf:"bytes,4,opt,name=content_encoding,json=contentEncoding,proto3" json:"content_encoding,omitempty"`
-	// ContentLanguage specifies the language used in the blob's content, if any.
-	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Language
-	ContentLanguage string `protobuf:"bytes,5,opt,name=content_language,json=contentLanguage,proto3" json:"content_language,omitempty"`
-	// ContentType is the MIME type of the blob. It will not be empty.
-	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type
-	ContentType string `protobuf:"bytes,6,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
-	// Metadata holds key/value pairs associated with the blob.
-	// Keys are guaranteed to be in lowercase, even if the backend service
-	// has case-sensitive keys (although note that Metadata written via
-	// this package will always be lowercased). If there are duplicate
-	// case-insensitive keys (e.g., "foo" and "FOO"), only one value
-	// will be kept, and it is undefined which one.
-	Metadata map[string]string `protobuf:"bytes,7,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// CreateTime is the time the blob was created, if available. If not available,
-	// CreateTime will be the zero time.
-	CreateTime *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
-	// ModTime is the time the blob was last modified.
-	ModTime *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=mod_time,json=modTime,proto3" json:"mod_time,omitempty"`
-	// Size is the size of the blob's content in bytes.
-	Size int64 `protobuf:"varint,10,opt,name=size,proto3" json:"size,omitempty"`
-	// MD5 is an MD5 hash of the blob contents or nil if not available.
-	Md5 string `protobuf:"bytes,11,opt,name=md5,proto3" json:"md5,omitempty"`
-	// ETag for the blob; see https://en.wikipedia.org/wiki/HTTP_ETag.
-	Etag          string `protobuf:"bytes,12,opt,name=etag,proto3" json:"etag,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Blob          *Blob                  `protobuf:"bytes,1,opt,name=blob,proto3" json:"blob,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetBlobResponse) Reset() {
 	*x = GetBlobResponse{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[4]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -355,7 +874,7 @@ func (x *GetBlobResponse) String() string {
 func (*GetBlobResponse) ProtoMessage() {}
 
 func (x *GetBlobResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[4]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -368,305 +887,48 @@ func (x *GetBlobResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBlobResponse.ProtoReflect.Descriptor instead.
 func (*GetBlobResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{4}
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *GetBlobResponse) GetKey() string {
+func (x *GetBlobResponse) GetBlob() *Blob {
 	if x != nil {
-		return x.Key
-	}
-	return ""
-}
-
-func (x *GetBlobResponse) GetCacheControl() string {
-	if x != nil {
-		return x.CacheControl
-	}
-	return ""
-}
-
-func (x *GetBlobResponse) GetContentDisposition() string {
-	if x != nil {
-		return x.ContentDisposition
-	}
-	return ""
-}
-
-func (x *GetBlobResponse) GetContentEncoding() string {
-	if x != nil {
-		return x.ContentEncoding
-	}
-	return ""
-}
-
-func (x *GetBlobResponse) GetContentLanguage() string {
-	if x != nil {
-		return x.ContentLanguage
-	}
-	return ""
-}
-
-func (x *GetBlobResponse) GetContentType() string {
-	if x != nil {
-		return x.ContentType
-	}
-	return ""
-}
-
-func (x *GetBlobResponse) GetMetadata() map[string]string {
-	if x != nil {
-		return x.Metadata
+		return x.Blob
 	}
 	return nil
 }
 
-func (x *GetBlobResponse) GetCreateTime() *timestamppb.Timestamp {
-	if x != nil {
-		return x.CreateTime
-	}
-	return nil
-}
-
-func (x *GetBlobResponse) GetModTime() *timestamppb.Timestamp {
-	if x != nil {
-		return x.ModTime
-	}
-	return nil
-}
-
-func (x *GetBlobResponse) GetSize() int64 {
-	if x != nil {
-		return x.Size
-	}
-	return 0
-}
-
-func (x *GetBlobResponse) GetMd5() string {
-	if x != nil {
-		return x.Md5
-	}
-	return ""
-}
-
-func (x *GetBlobResponse) GetEtag() string {
-	if x != nil {
-		return x.Etag
-	}
-	return ""
-}
-
-type ReadBlobLinesRequest struct {
+type ReadBlobRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Key of blob to read.
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	// Line delimiter; default: \n.
-	Delimiter string `protobuf:"bytes,2,opt,name=delimiter,proto3" json:"delimiter,omitempty"`
-	// Max size (in bytes) of individual line.
-	MaxSize int64 `protobuf:"varint,3,opt,name=max_size,json=maxSize,proto3" json:"max_size,omitempty"`
-	// Bucket to read blob (may be optional).
-	Bucket string `protobuf:"bytes,4,opt,name=bucket,proto3" json:"bucket,omitempty"`
-	// Format of lines to read (default: LINE_FORMAT_RAW if unspecified).
-	LineFormat LineFormat `protobuf:"varint,5,opt,name=line_format,json=lineFormat,proto3,enum=dtkt.blob.v1beta1.LineFormat" json:"line_format,omitempty"`
-	// JSON array mode: if true (when line_format is JSON), expects root JSON array; if false, expects newline-delimited JSON (default).
-	JsonArrayMode bool `protobuf:"varint,6,opt,name=json_array_mode,json=jsonArrayMode,proto3" json:"json_array_mode,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ReadBlobLinesRequest) Reset() {
-	*x = ReadBlobLinesRequest{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ReadBlobLinesRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ReadBlobLinesRequest) ProtoMessage() {}
-
-func (x *ReadBlobLinesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ReadBlobLinesRequest.ProtoReflect.Descriptor instead.
-func (*ReadBlobLinesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *ReadBlobLinesRequest) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	return ""
-}
-
-func (x *ReadBlobLinesRequest) GetDelimiter() string {
-	if x != nil {
-		return x.Delimiter
-	}
-	return ""
-}
-
-func (x *ReadBlobLinesRequest) GetMaxSize() int64 {
-	if x != nil {
-		return x.MaxSize
-	}
-	return 0
-}
-
-func (x *ReadBlobLinesRequest) GetBucket() string {
-	if x != nil {
-		return x.Bucket
-	}
-	return ""
-}
-
-func (x *ReadBlobLinesRequest) GetLineFormat() LineFormat {
-	if x != nil {
-		return x.LineFormat
-	}
-	return LineFormat_LINE_FORMAT_UNSPECIFIED
-}
-
-func (x *ReadBlobLinesRequest) GetJsonArrayMode() bool {
-	if x != nil {
-		return x.JsonArrayMode
-	}
-	return false
-}
-
-type ReadBlobLinesResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Key of blob read.
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	// Types that are valid to be assigned to Line:
-	//
-	//	*ReadBlobLinesResponse_Data
-	//	*ReadBlobLinesResponse_Json
-	Line          isReadBlobLinesResponse_Line `protobuf_oneof:"line"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ReadBlobLinesResponse) Reset() {
-	*x = ReadBlobLinesResponse{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ReadBlobLinesResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ReadBlobLinesResponse) ProtoMessage() {}
-
-func (x *ReadBlobLinesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ReadBlobLinesResponse.ProtoReflect.Descriptor instead.
-func (*ReadBlobLinesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *ReadBlobLinesResponse) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	return ""
-}
-
-func (x *ReadBlobLinesResponse) GetLine() isReadBlobLinesResponse_Line {
-	if x != nil {
-		return x.Line
-	}
-	return nil
-}
-
-func (x *ReadBlobLinesResponse) GetData() []byte {
-	if x != nil {
-		if x, ok := x.Line.(*ReadBlobLinesResponse_Data); ok {
-			return x.Data
-		}
-	}
-	return nil
-}
-
-func (x *ReadBlobLinesResponse) GetJson() *structpb.Value {
-	if x != nil {
-		if x, ok := x.Line.(*ReadBlobLinesResponse_Json); ok {
-			return x.Json
-		}
-	}
-	return nil
-}
-
-type isReadBlobLinesResponse_Line interface {
-	isReadBlobLinesResponse_Line()
-}
-
-type ReadBlobLinesResponse_Data struct {
-	// Raw line data.
-	Data []byte `protobuf:"bytes,2,opt,name=data,proto3,oneof"`
-}
-
-type ReadBlobLinesResponse_Json struct {
-	// JSON parsed line data.
-	Json *structpb.Value `protobuf:"bytes,3,opt,name=json,proto3,oneof"`
-}
-
-func (*ReadBlobLinesResponse_Data) isReadBlobLinesResponse_Line() {}
-
-func (*ReadBlobLinesResponse_Json) isReadBlobLinesResponse_Line() {}
-
-type ReadBlobRangeRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Key of blob to read.
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	// Bucket to write blob (may be optional).
-	Bucket string `protobuf:"bytes,2,opt,name=bucket,proto3" json:"bucket,omitempty"`
-	// Read starting at offset.
-	Offset uint64 `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`
-	// Read at most length bytes if greater than 0. If less than 0, reads the whole blob.
+	// Name of the bucket containing blob. The service may not require this to
+	// be specified.
+	Bucket string `protobuf:"bytes,1,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	// Key of the blob to read contents.
+	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+	// Offset for the first byte to read, relative to the start of the contents.
+	Offset int64 `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`
+	// Maximum number of bytes to read relative to the offset:
+	//   - if <= 0, reads remaining bytes.
+	//   - if > 0, reads at most this number bytes;
 	Length        int64 `protobuf:"varint,4,opt,name=length,proto3" json:"length,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ReadBlobRangeRequest) Reset() {
-	*x = ReadBlobRangeRequest{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[7]
+func (x *ReadBlobRequest) Reset() {
+	*x = ReadBlobRequest{}
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ReadBlobRangeRequest) String() string {
+func (x *ReadBlobRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ReadBlobRangeRequest) ProtoMessage() {}
+func (*ReadBlobRequest) ProtoMessage() {}
 
-func (x *ReadBlobRangeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[7]
+func (x *ReadBlobRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -677,64 +939,62 @@ func (x *ReadBlobRangeRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ReadBlobRangeRequest.ProtoReflect.Descriptor instead.
-func (*ReadBlobRangeRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{7}
+// Deprecated: Use ReadBlobRequest.ProtoReflect.Descriptor instead.
+func (*ReadBlobRequest) Descriptor() ([]byte, []int) {
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *ReadBlobRangeRequest) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	return ""
-}
-
-func (x *ReadBlobRangeRequest) GetBucket() string {
+func (x *ReadBlobRequest) GetBucket() string {
 	if x != nil {
 		return x.Bucket
 	}
 	return ""
 }
 
-func (x *ReadBlobRangeRequest) GetOffset() uint64 {
+func (x *ReadBlobRequest) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *ReadBlobRequest) GetOffset() int64 {
 	if x != nil {
 		return x.Offset
 	}
 	return 0
 }
 
-func (x *ReadBlobRangeRequest) GetLength() int64 {
+func (x *ReadBlobRequest) GetLength() int64 {
 	if x != nil {
 		return x.Length
 	}
 	return 0
 }
 
-type ReadBlobRangeResponse struct {
+type ReadBlobResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Key of blob read.
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	// Data of blob range.
-	Data          []byte `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+	// A portion of the contents read from the blob.
+	Data          []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ReadBlobRangeResponse) Reset() {
-	*x = ReadBlobRangeResponse{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[8]
+func (x *ReadBlobResponse) Reset() {
+	*x = ReadBlobResponse{}
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ReadBlobRangeResponse) String() string {
+func (x *ReadBlobResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ReadBlobRangeResponse) ProtoMessage() {}
+func (*ReadBlobResponse) ProtoMessage() {}
 
-func (x *ReadBlobRangeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[8]
+func (x *ReadBlobResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -745,19 +1005,12 @@ func (x *ReadBlobRangeResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ReadBlobRangeResponse.ProtoReflect.Descriptor instead.
-func (*ReadBlobRangeResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{8}
+// Deprecated: Use ReadBlobResponse.ProtoReflect.Descriptor instead.
+func (*ReadBlobResponse) Descriptor() ([]byte, []int) {
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *ReadBlobRangeResponse) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	return ""
-}
-
-func (x *ReadBlobRangeResponse) GetData() []byte {
+func (x *ReadBlobResponse) GetData() []byte {
 	if x != nil {
 		return x.Data
 	}
@@ -766,37 +1019,38 @@ func (x *ReadBlobRangeResponse) GetData() []byte {
 
 type WriteBlobRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Key of blob to write.
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	// Bucket to write blob (may be optional).
-	Bucket string `protobuf:"bytes,2,opt,name=bucket,proto3" json:"bucket,omitempty"`
-	// Raw blob payload.
-	Data []byte `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
-	// MIME type for the blob payload.
-	ContentType string `protobuf:"bytes,4,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
-	// Language for the blob payload.
-	ContentLanguage string `protobuf:"bytes,5,opt,name=content_language,json=contentLanguage,proto3" json:"content_language,omitempty"`
-	// Content encoding for the blob payload.
-	ContentEncoding string `protobuf:"bytes,6,opt,name=content_encoding,json=contentEncoding,proto3" json:"content_encoding,omitempty"`
-	// Cache control directives.
-	CacheControl string `protobuf:"bytes,7,opt,name=cache_control,json=cacheControl,proto3" json:"cache_control,omitempty"`
-	// Content disposition for the blob payload.
-	ContentDisposition string `protobuf:"bytes,8,opt,name=content_disposition,json=contentDisposition,proto3" json:"content_disposition,omitempty"`
-	// Blob metadata (all keys lower-case).
-	Metadata map[string]string `protobuf:"bytes,9,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// Require the blob to match the provided ETag before writing.
-	IfMatch string `protobuf:"bytes,10,opt,name=if_match,json=ifMatch,proto3" json:"if_match,omitempty"`
-	// Require the blob to *not* match the provided ETag before writing.
-	IfNoneMatch string `protobuf:"bytes,11,opt,name=if_none_match,json=ifNoneMatch,proto3" json:"if_none_match,omitempty"`
-	// Require the blob does not already exist before writing.
-	IfNotExist    bool `protobuf:"varint,12,opt,name=if_not_exist,json=ifNotExist,proto3" json:"if_not_exist,omitempty"`
+	// Name of the bucket containing blob. The service may not require this to
+	// be specified. If required, this **must** be set on the first request. If it
+	// is set on any subsequent requests it must match the value of the first
+	// request.
+	Bucket string `protobuf:"bytes,1,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	// Key of the blob to write contents. This **must** be set on the first
+	// request. If it is set on any subsequent requests it must match the value of
+	// the first request.
+	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+	// Metadata of the blob contents to be written. This **may** be set on the
+	// first request and **must not** be set on any subsequent request.
+	Metadata *BlobMetadata `protobuf:"bytes,3,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	// Rules assert the state of the blob and its contents (if it exists) which
+	// must be valid before writing to the blob. This **may** be set on the first
+	// request and **must not** be set on any subsequent request.
+	Rules *BlobRules `protobuf:"bytes,4,opt,name=rules,proto3" json:"rules,omitempty"`
+	// Offset of the contents at which the data should be written.
+	// This **may** be set on the first request and **must not** be set on any
+	// subsequent request.
+	// Default: 0
+	//   - if < 0, offset relative to the end (e.g.: -1 appends to contents);
+	//   - if >= 0, offset relative to the start of contents.
+	Offset int64 `protobuf:"varint,6,opt,name=offset,proto3" json:"offset,omitempty"`
+	// Raw data to write to contents (relative to offset).
+	Data          []byte `protobuf:"bytes,7,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *WriteBlobRequest) Reset() {
 	*x = WriteBlobRequest{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[9]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -808,7 +1062,7 @@ func (x *WriteBlobRequest) String() string {
 func (*WriteBlobRequest) ProtoMessage() {}
 
 func (x *WriteBlobRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[9]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -821,14 +1075,7 @@ func (x *WriteBlobRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WriteBlobRequest.ProtoReflect.Descriptor instead.
 func (*WriteBlobRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *WriteBlobRequest) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	return ""
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *WriteBlobRequest) GetBucket() string {
@@ -838,6 +1085,34 @@ func (x *WriteBlobRequest) GetBucket() string {
 	return ""
 }
 
+func (x *WriteBlobRequest) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *WriteBlobRequest) GetMetadata() *BlobMetadata {
+	if x != nil {
+		return x.Metadata
+	}
+	return nil
+}
+
+func (x *WriteBlobRequest) GetRules() *BlobRules {
+	if x != nil {
+		return x.Rules
+	}
+	return nil
+}
+
+func (x *WriteBlobRequest) GetOffset() int64 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
 func (x *WriteBlobRequest) GetData() []byte {
 	if x != nil {
 		return x.Data
@@ -845,86 +1120,17 @@ func (x *WriteBlobRequest) GetData() []byte {
 	return nil
 }
 
-func (x *WriteBlobRequest) GetContentType() string {
-	if x != nil {
-		return x.ContentType
-	}
-	return ""
-}
-
-func (x *WriteBlobRequest) GetContentLanguage() string {
-	if x != nil {
-		return x.ContentLanguage
-	}
-	return ""
-}
-
-func (x *WriteBlobRequest) GetContentEncoding() string {
-	if x != nil {
-		return x.ContentEncoding
-	}
-	return ""
-}
-
-func (x *WriteBlobRequest) GetCacheControl() string {
-	if x != nil {
-		return x.CacheControl
-	}
-	return ""
-}
-
-func (x *WriteBlobRequest) GetContentDisposition() string {
-	if x != nil {
-		return x.ContentDisposition
-	}
-	return ""
-}
-
-func (x *WriteBlobRequest) GetMetadata() map[string]string {
-	if x != nil {
-		return x.Metadata
-	}
-	return nil
-}
-
-func (x *WriteBlobRequest) GetIfMatch() string {
-	if x != nil {
-		return x.IfMatch
-	}
-	return ""
-}
-
-func (x *WriteBlobRequest) GetIfNoneMatch() string {
-	if x != nil {
-		return x.IfNoneMatch
-	}
-	return ""
-}
-
-func (x *WriteBlobRequest) GetIfNotExist() bool {
-	if x != nil {
-		return x.IfNotExist
-	}
-	return false
-}
-
 type WriteBlobResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Key of the written blob.
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	// Size of the stored blob.
-	Size int64 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
-	// Modification time reported by the provider.
-	ModTime *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=mod_time,json=modTime,proto3" json:"mod_time,omitempty"`
-	// ETag assigned by the provider.
-	Etag          string `protobuf:"bytes,4,opt,name=etag,proto3" json:"etag,omitempty"`
+	// Total number of bytes written to blob contents.
+	WrittenSize   int64 `protobuf:"varint,2,opt,name=written_size,json=writtenSize,proto3" json:"written_size,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *WriteBlobResponse) Reset() {
 	*x = WriteBlobResponse{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[10]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -936,7 +1142,7 @@ func (x *WriteBlobResponse) String() string {
 func (*WriteBlobResponse) ProtoMessage() {}
 
 func (x *WriteBlobResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[10]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -949,52 +1155,191 @@ func (x *WriteBlobResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WriteBlobResponse.ProtoReflect.Descriptor instead.
 func (*WriteBlobResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{10}
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{15}
 }
 
-func (x *WriteBlobResponse) GetKey() string {
+func (x *WriteBlobResponse) GetWrittenSize() int64 {
+	if x != nil {
+		return x.WrittenSize
+	}
+	return 0
+}
+
+type ReadBlobLinesRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Name of the bucket containing blob. The service may not require this to
+	// be specified.
+	Bucket string `protobuf:"bytes,1,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	// Key of the blob to read contents.
+	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+	// Specifies the expected format of each line of data read from contents.
+	Format *LineFormat `protobuf:"bytes,3,opt,name=format,proto3" json:"format,omitempty"`
+	// Offset determines the index of the first line to read from blob contents.
+	Offset int64 `protobuf:"varint,4,opt,name=offset,proto3" json:"offset,omitempty"`
+	// Maximum number of lines to read relative to the offset:
+	//   - if <= 0, read remaining lines;
+	//   - if > 0, read at most this number lines.
+	Limit         int64 `protobuf:"varint,5,opt,name=limit,proto3" json:"limit,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReadBlobLinesRequest) Reset() {
+	*x = ReadBlobLinesRequest{}
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReadBlobLinesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReadBlobLinesRequest) ProtoMessage() {}
+
+func (x *ReadBlobLinesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReadBlobLinesRequest.ProtoReflect.Descriptor instead.
+func (*ReadBlobLinesRequest) Descriptor() ([]byte, []int) {
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ReadBlobLinesRequest) GetBucket() string {
+	if x != nil {
+		return x.Bucket
+	}
+	return ""
+}
+
+func (x *ReadBlobLinesRequest) GetKey() string {
 	if x != nil {
 		return x.Key
 	}
 	return ""
 }
 
-func (x *WriteBlobResponse) GetSize() int64 {
+func (x *ReadBlobLinesRequest) GetFormat() *LineFormat {
 	if x != nil {
-		return x.Size
-	}
-	return 0
-}
-
-func (x *WriteBlobResponse) GetModTime() *timestamppb.Timestamp {
-	if x != nil {
-		return x.ModTime
+		return x.Format
 	}
 	return nil
 }
 
-func (x *WriteBlobResponse) GetEtag() string {
+func (x *ReadBlobLinesRequest) GetOffset() int64 {
 	if x != nil {
-		return x.Etag
+		return x.Offset
 	}
-	return ""
+	return 0
+}
+
+func (x *ReadBlobLinesRequest) GetLimit() int64 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+type ReadBlobLinesResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Line data read from blob content in the requested format.
+	Data *LineData `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	// Line offset relative to start of blob content.
+	Offset        int64 `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReadBlobLinesResponse) Reset() {
+	*x = ReadBlobLinesResponse{}
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReadBlobLinesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReadBlobLinesResponse) ProtoMessage() {}
+
+func (x *ReadBlobLinesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReadBlobLinesResponse.ProtoReflect.Descriptor instead.
+func (*ReadBlobLinesResponse) Descriptor() ([]byte, []int) {
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *ReadBlobLinesResponse) GetData() *LineData {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *ReadBlobLinesResponse) GetOffset() int64 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
 }
 
 type WriteBlobLinesRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Key of blob to write.
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	// Bucket to write blob (may be optional).
-	Bucket string `protobuf:"bytes,2,opt,name=bucket,proto3" json:"bucket,omitempty"`
-	// Data of blob line.
-	Data          []byte `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	// Name of the bucket containing blob. The service may not require this to
+	// be specified. If required, this **must** be set on the first request. If it
+	// is set on any subsequent requests it must match the value of the first
+	// request.
+	Bucket string `protobuf:"bytes,1,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	// Key of the blob to write contents. This **must** be set on the first
+	// request. If it is set on any subsequent requests it must match the value of
+	// the first request.
+	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+	// Metadata of the blob contents to be written. This **may** be set on the
+	// first request and **must not** be set on any subsequent request.
+	Metadata *BlobMetadata `protobuf:"bytes,3,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	// Rules assert the state of the blob and its contents (if it exists) which
+	// must be valid before writing to the blob. This **may** be set on the first
+	// request and **must not** be set on any subsequent request.
+	Rules *BlobRules `protobuf:"bytes,4,opt,name=rules,proto3" json:"rules,omitempty"`
+	// Specifies the format to expect for each line of data.
+	// This **may** be set on the first request and **must not** be set on any
+	// subsequent request.
+	Format *LineFormat `protobuf:"bytes,5,opt,name=format,proto3" json:"format,omitempty"`
+	// Specifies whether contents should be overwritten when blob already exists.
+	// When false and blob exists lines will be appended to existing contents.
+	// Default: false
+	Overwrite bool `protobuf:"varint,6,opt,name=overwrite,proto3" json:"overwrite,omitempty"`
+	// Line data to write to contents.
+	// This **must** be set on every request and in the format corresponding with
+	// the `format` set on the first request.
+	Data          *LineData `protobuf:"bytes,7,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *WriteBlobLinesRequest) Reset() {
 	*x = WriteBlobLinesRequest{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[11]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1006,7 +1351,7 @@ func (x *WriteBlobLinesRequest) String() string {
 func (*WriteBlobLinesRequest) ProtoMessage() {}
 
 func (x *WriteBlobLinesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[11]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1019,14 +1364,7 @@ func (x *WriteBlobLinesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WriteBlobLinesRequest.ProtoReflect.Descriptor instead.
 func (*WriteBlobLinesRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{11}
-}
-
-func (x *WriteBlobLinesRequest) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	return ""
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *WriteBlobLinesRequest) GetBucket() string {
@@ -1036,7 +1374,42 @@ func (x *WriteBlobLinesRequest) GetBucket() string {
 	return ""
 }
 
-func (x *WriteBlobLinesRequest) GetData() []byte {
+func (x *WriteBlobLinesRequest) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *WriteBlobLinesRequest) GetMetadata() *BlobMetadata {
+	if x != nil {
+		return x.Metadata
+	}
+	return nil
+}
+
+func (x *WriteBlobLinesRequest) GetRules() *BlobRules {
+	if x != nil {
+		return x.Rules
+	}
+	return nil
+}
+
+func (x *WriteBlobLinesRequest) GetFormat() *LineFormat {
+	if x != nil {
+		return x.Format
+	}
+	return nil
+}
+
+func (x *WriteBlobLinesRequest) GetOverwrite() bool {
+	if x != nil {
+		return x.Overwrite
+	}
+	return false
+}
+
+func (x *WriteBlobLinesRequest) GetData() *LineData {
 	if x != nil {
 		return x.Data
 	}
@@ -1044,15 +1417,16 @@ func (x *WriteBlobLinesRequest) GetData() []byte {
 }
 
 type WriteBlobLinesResponse struct {
-	state         protoimpl.MessageState              `protogen:"open.v1"`
-	Results       []*WriteBlobLinesResponse_KeyResult `protobuf:"bytes,1,rep,name=results,proto3" json:"results,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Total number of lines written to blob contents.
+	WrittenLines  int64 `protobuf:"varint,1,opt,name=written_lines,json=writtenLines,proto3" json:"written_lines,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *WriteBlobLinesResponse) Reset() {
 	*x = WriteBlobLinesResponse{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[12]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1064,7 +1438,7 @@ func (x *WriteBlobLinesResponse) String() string {
 func (*WriteBlobLinesResponse) ProtoMessage() {}
 
 func (x *WriteBlobLinesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[12]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1077,14 +1451,14 @@ func (x *WriteBlobLinesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WriteBlobLinesResponse.ProtoReflect.Descriptor instead.
 func (*WriteBlobLinesResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{12}
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{19}
 }
 
-func (x *WriteBlobLinesResponse) GetResults() []*WriteBlobLinesResponse_KeyResult {
+func (x *WriteBlobLinesResponse) GetWrittenLines() int64 {
 	if x != nil {
-		return x.Results
+		return x.WrittenLines
 	}
-	return nil
+	return 0
 }
 
 type DeleteBlobRequest struct {
@@ -1099,7 +1473,7 @@ type DeleteBlobRequest struct {
 
 func (x *DeleteBlobRequest) Reset() {
 	*x = DeleteBlobRequest{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[13]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1111,7 +1485,7 @@ func (x *DeleteBlobRequest) String() string {
 func (*DeleteBlobRequest) ProtoMessage() {}
 
 func (x *DeleteBlobRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[13]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1124,7 +1498,7 @@ func (x *DeleteBlobRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteBlobRequest.ProtoReflect.Descriptor instead.
 func (*DeleteBlobRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{13}
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *DeleteBlobRequest) GetKey() string {
@@ -1153,7 +1527,7 @@ type DeleteBlobResponse struct {
 
 func (x *DeleteBlobResponse) Reset() {
 	*x = DeleteBlobResponse{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[14]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1165,7 +1539,7 @@ func (x *DeleteBlobResponse) String() string {
 func (*DeleteBlobResponse) ProtoMessage() {}
 
 func (x *DeleteBlobResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[14]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1178,7 +1552,7 @@ func (x *DeleteBlobResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteBlobResponse.ProtoReflect.Descriptor instead.
 func (*DeleteBlobResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{14}
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *DeleteBlobResponse) GetDeleted() bool {
@@ -1215,7 +1589,7 @@ type CopyBlobRequest struct {
 
 func (x *CopyBlobRequest) Reset() {
 	*x = CopyBlobRequest{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[15]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1227,7 +1601,7 @@ func (x *CopyBlobRequest) String() string {
 func (*CopyBlobRequest) ProtoMessage() {}
 
 func (x *CopyBlobRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[15]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1240,7 +1614,7 @@ func (x *CopyBlobRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CopyBlobRequest.ProtoReflect.Descriptor instead.
 func (*CopyBlobRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{15}
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *CopyBlobRequest) GetSourceBucket() string {
@@ -1301,7 +1675,7 @@ type CopyBlobResponse struct {
 
 func (x *CopyBlobResponse) Reset() {
 	*x = CopyBlobResponse{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[16]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1313,7 +1687,7 @@ func (x *CopyBlobResponse) String() string {
 func (*CopyBlobResponse) ProtoMessage() {}
 
 func (x *CopyBlobResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[16]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1326,7 +1700,7 @@ func (x *CopyBlobResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CopyBlobResponse.ProtoReflect.Descriptor instead.
 func (*CopyBlobResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{16}
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *CopyBlobResponse) GetDestinationKey() string {
@@ -1379,7 +1753,7 @@ type GenerateSignedURLRequest struct {
 
 func (x *GenerateSignedURLRequest) Reset() {
 	*x = GenerateSignedURLRequest{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[17]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1391,7 +1765,7 @@ func (x *GenerateSignedURLRequest) String() string {
 func (*GenerateSignedURLRequest) ProtoMessage() {}
 
 func (x *GenerateSignedURLRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[17]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1404,7 +1778,7 @@ func (x *GenerateSignedURLRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateSignedURLRequest.ProtoReflect.Descriptor instead.
 func (*GenerateSignedURLRequest) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{17}
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *GenerateSignedURLRequest) GetKey() string {
@@ -1468,7 +1842,7 @@ type GenerateSignedURLResponse struct {
 
 func (x *GenerateSignedURLResponse) Reset() {
 	*x = GenerateSignedURLResponse{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[18]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1480,7 +1854,7 @@ func (x *GenerateSignedURLResponse) String() string {
 func (*GenerateSignedURLResponse) ProtoMessage() {}
 
 func (x *GenerateSignedURLResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[18]
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1493,7 +1867,7 @@ func (x *GenerateSignedURLResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateSignedURLResponse.ProtoReflect.Descriptor instead.
 func (*GenerateSignedURLResponse) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{18}
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *GenerateSignedURLResponse) GetUrl() string {
@@ -1510,37 +1884,30 @@ func (x *GenerateSignedURLResponse) GetExpiresAt() *timestamppb.Timestamp {
 	return nil
 }
 
-type WriteBlobLinesResponse_KeyResult struct {
+type LineFormat_JSON struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Key of blob to write.
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	// Size of the stored blob.
-	Size int64 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
-	// Modification time reported by the provider.
-	ModTime *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=mod_time,json=modTime,proto3" json:"mod_time,omitempty"`
-	// ETag assigned by the provider.
-	Etag string `protobuf:"bytes,4,opt,name=etag,proto3" json:"etag,omitempty"`
-	// Total lines written.
-	LinesWritten  int64 `protobuf:"varint,5,opt,name=lines_written,json=linesWritten,proto3" json:"lines_written,omitempty"`
+	// If true, expects line values to be nested within a JSON array at root of
+	// blob contents.
+	ArrayMode     bool `protobuf:"varint,1,opt,name=array_mode,json=arrayMode,proto3" json:"array_mode,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *WriteBlobLinesResponse_KeyResult) Reset() {
-	*x = WriteBlobLinesResponse_KeyResult{}
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[21]
+func (x *LineFormat_JSON) Reset() {
+	*x = LineFormat_JSON{}
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *WriteBlobLinesResponse_KeyResult) String() string {
+func (x *LineFormat_JSON) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*WriteBlobLinesResponse_KeyResult) ProtoMessage() {}
+func (*LineFormat_JSON) ProtoMessage() {}
 
-func (x *WriteBlobLinesResponse_KeyResult) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[21]
+func (x *LineFormat_JSON) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1551,145 +1918,234 @@ func (x *WriteBlobLinesResponse_KeyResult) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WriteBlobLinesResponse_KeyResult.ProtoReflect.Descriptor instead.
-func (*WriteBlobLinesResponse_KeyResult) Descriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{12, 0}
+// Deprecated: Use LineFormat_JSON.ProtoReflect.Descriptor instead.
+func (*LineFormat_JSON) Descriptor() ([]byte, []int) {
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{4, 0}
 }
 
-func (x *WriteBlobLinesResponse_KeyResult) GetKey() string {
+func (x *LineFormat_JSON) GetArrayMode() bool {
 	if x != nil {
-		return x.Key
+		return x.ArrayMode
 	}
-	return ""
+	return false
 }
 
-func (x *WriteBlobLinesResponse_KeyResult) GetSize() int64 {
+type LineFormat_CSV struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Fields specify CSV headers (first line) and cardinality of records.
+	Fields []string `protobuf:"bytes,1,rep,name=fields,proto3" json:"fields,omitempty"`
+	// Expects fields to be separated with given delimiter.
+	// Default: ","
+	FieldDelimiter string `protobuf:"bytes,2,opt,name=field_delimiter,json=fieldDelimiter,proto3" json:"field_delimiter,omitempty"`
+	// If true, expects "\r\n" as the line terminator.
+	UseCrlf       bool `protobuf:"varint,3,opt,name=use_crlf,json=useCrlf,proto3" json:"use_crlf,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LineFormat_CSV) Reset() {
+	*x = LineFormat_CSV{}
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LineFormat_CSV) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LineFormat_CSV) ProtoMessage() {}
+
+func (x *LineFormat_CSV) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[27]
 	if x != nil {
-		return x.Size
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
 	}
-	return 0
+	return mi.MessageOf(x)
 }
 
-func (x *WriteBlobLinesResponse_KeyResult) GetModTime() *timestamppb.Timestamp {
+// Deprecated: Use LineFormat_CSV.ProtoReflect.Descriptor instead.
+func (*LineFormat_CSV) Descriptor() ([]byte, []int) {
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{4, 1}
+}
+
+func (x *LineFormat_CSV) GetFields() []string {
 	if x != nil {
-		return x.ModTime
+		return x.Fields
 	}
 	return nil
 }
 
-func (x *WriteBlobLinesResponse_KeyResult) GetEtag() string {
+func (x *LineFormat_CSV) GetFieldDelimiter() string {
 	if x != nil {
-		return x.Etag
+		return x.FieldDelimiter
 	}
 	return ""
 }
 
-func (x *WriteBlobLinesResponse_KeyResult) GetLinesWritten() int64 {
+func (x *LineFormat_CSV) GetUseCrlf() bool {
 	if x != nil {
-		return x.LinesWritten
+		return x.UseCrlf
 	}
-	return 0
+	return false
+}
+
+type LineData_CSV struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Values        []string               `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LineData_CSV) Reset() {
+	*x = LineData_CSV{}
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LineData_CSV) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LineData_CSV) ProtoMessage() {}
+
+func (x *LineData_CSV) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_blob_v1beta1_messages_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LineData_CSV.ProtoReflect.Descriptor instead.
+func (*LineData_CSV) Descriptor() ([]byte, []int) {
+	return file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP(), []int{5, 0}
+}
+
+func (x *LineData_CSV) GetValues() []string {
+	if x != nil {
+		return x.Values
+	}
+	return nil
 }
 
 var File_dtkt_blob_v1beta1_messages_proto protoreflect.FileDescriptor
 
 const file_dtkt_blob_v1beta1_messages_proto_rawDesc = "" +
 	"\n" +
-	" dtkt/blob/v1beta1/messages.proto\x12\x11dtkt.blob.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1ddtkt/blob/v1beta1/enums.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x92\x01\n" +
-	"\n" +
-	"ListResult\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x125\n" +
-	"\bmod_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\amodTime\x12\x12\n" +
-	"\x04size\x18\x03 \x01(\x03R\x04size\x12\x10\n" +
-	"\x03md5\x18\x04 \x01(\tR\x03md5\x12\x15\n" +
-	"\x06is_dir\x18\x05 \x01(\bR\x05isDir\"\x8a\x01\n" +
-	"\x10ListBlobsRequest\x12\x16\n" +
-	"\x06prefix\x18\x01 \x01(\tR\x06prefix\x12'\n" +
-	"\tpage_size\x18\x02 \x01(\x05B\n" +
-	"\xbaH\a\x1a\x05\x18\xe8\a \x00R\bpageSize\x12\x1d\n" +
-	"\n" +
-	"page_token\x18\x03 \x01(\tR\tpageToken\x12\x16\n" +
-	"\x06bucket\x18\x04 \x01(\tR\x06bucket\"t\n" +
-	"\x11ListBlobsResponse\x127\n" +
-	"\aresults\x18\x01 \x03(\v2\x1d.dtkt.blob.v1beta1.ListResultR\aresults\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"B\n" +
-	"\x0eGetBlobRequest\x12\x18\n" +
+	" dtkt/blob/v1beta1/messages.proto\x12\x11dtkt.blob.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1ddtkt/blob/v1beta1/enums.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"j\n" +
+	"\x06Bucket\x12\x1a\n" +
+	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12D\n" +
+	"\x11provider_metadata\x18\x02 \x01(\v2\x17.google.protobuf.StructR\x10providerMetadata\"\xa3\x02\n" +
+	"\x04Blob\x12\x18\n" +
 	"\x03key\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x03key\x12\x16\n" +
-	"\x06bucket\x18\x02 \x01(\tR\x06bucket\"\xab\x04\n" +
-	"\x0fGetBlobResponse\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12#\n" +
-	"\rcache_control\x18\x02 \x01(\tR\fcacheControl\x12/\n" +
-	"\x13content_disposition\x18\x03 \x01(\tR\x12contentDisposition\x12)\n" +
-	"\x10content_encoding\x18\x04 \x01(\tR\x0fcontentEncoding\x12)\n" +
-	"\x10content_language\x18\x05 \x01(\tR\x0fcontentLanguage\x12!\n" +
-	"\fcontent_type\x18\x06 \x01(\tR\vcontentType\x12L\n" +
-	"\bmetadata\x18\a \x03(\v20.dtkt.blob.v1beta1.GetBlobResponse.MetadataEntryR\bmetadata\x12;\n" +
+	"\x06bucket\x18\x02 \x01(\tR\x06bucket\x12\x12\n" +
+	"\x04size\x18\x03 \x01(\x04R\x04size\x12\x10\n" +
+	"\x03md5\x18\x04 \x01(\tR\x03md5\x12\x12\n" +
+	"\x04etag\x18\x05 \x01(\tR\x04etag\x12;\n" +
+	"\bmetadata\x18\x06 \x01(\v2\x1f.dtkt.blob.v1beta1.BlobMetadataR\bmetadata\x125\n" +
+	"\bmod_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\amodTime\x12;\n" +
 	"\vcreate_time\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"createTime\x125\n" +
-	"\bmod_time\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\amodTime\x12\x12\n" +
-	"\x04size\x18\n" +
-	" \x01(\x03R\x04size\x12\x10\n" +
-	"\x03md5\x18\v \x01(\tR\x03md5\x12\x12\n" +
-	"\x04etag\x18\f \x01(\tR\x04etag\x1a;\n" +
-	"\rMetadataEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xe9\x01\n" +
-	"\x14ReadBlobLinesRequest\x12\x18\n" +
-	"\x03key\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x03key\x12\x1c\n" +
-	"\tdelimiter\x18\x02 \x01(\tR\tdelimiter\x12\x19\n" +
-	"\bmax_size\x18\x03 \x01(\x03R\amaxSize\x12\x16\n" +
-	"\x06bucket\x18\x04 \x01(\tR\x06bucket\x12>\n" +
-	"\vline_format\x18\x05 \x01(\x0e2\x1d.dtkt.blob.v1beta1.LineFormatR\n" +
-	"lineFormat\x12&\n" +
-	"\x0fjson_array_mode\x18\x06 \x01(\bR\rjsonArrayMode\"u\n" +
-	"\x15ReadBlobLinesResponse\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x04data\x18\x02 \x01(\fH\x00R\x04data\x12,\n" +
-	"\x04json\x18\x03 \x01(\v2\x16.google.protobuf.ValueH\x00R\x04jsonB\x06\n" +
-	"\x04line\"x\n" +
-	"\x14ReadBlobRangeRequest\x12\x18\n" +
-	"\x03key\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x03key\x12\x16\n" +
-	"\x06bucket\x18\x02 \x01(\tR\x06bucket\x12\x16\n" +
-	"\x06offset\x18\x03 \x01(\x04R\x06offset\x12\x16\n" +
-	"\x06length\x18\x04 \x01(\x03R\x06length\"=\n" +
-	"\x15ReadBlobRangeResponse\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x12\n" +
-	"\x04data\x18\x02 \x01(\fR\x04data\"\x94\x04\n" +
-	"\x10WriteBlobRequest\x12\x18\n" +
-	"\x03key\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x03key\x12\x16\n" +
-	"\x06bucket\x18\x02 \x01(\tR\x06bucket\x12\x12\n" +
-	"\x04data\x18\x03 \x01(\fR\x04data\x12!\n" +
-	"\fcontent_type\x18\x04 \x01(\tR\vcontentType\x12)\n" +
-	"\x10content_language\x18\x05 \x01(\tR\x0fcontentLanguage\x12)\n" +
-	"\x10content_encoding\x18\x06 \x01(\tR\x0fcontentEncoding\x12#\n" +
-	"\rcache_control\x18\a \x01(\tR\fcacheControl\x12/\n" +
-	"\x13content_disposition\x18\b \x01(\tR\x12contentDisposition\x12M\n" +
-	"\bmetadata\x18\t \x03(\v21.dtkt.blob.v1beta1.WriteBlobRequest.MetadataEntryR\bmetadata\x12\x19\n" +
-	"\bif_match\x18\n" +
-	" \x01(\tR\aifMatch\x12\"\n" +
-	"\rif_none_match\x18\v \x01(\tR\vifNoneMatch\x12 \n" +
-	"\fif_not_exist\x18\f \x01(\bR\n" +
-	"ifNotExist\x1a;\n" +
-	"\rMetadataEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x84\x01\n" +
-	"\x11WriteBlobResponse\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x12\n" +
-	"\x04size\x18\x02 \x01(\x03R\x04size\x125\n" +
-	"\bmod_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\amodTime\x12\x12\n" +
-	"\x04etag\x18\x04 \x01(\tR\x04etag\"]\n" +
-	"\x15WriteBlobLinesRequest\x12\x18\n" +
-	"\x03key\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x03key\x12\x16\n" +
-	"\x06bucket\x18\x02 \x01(\tR\x06bucket\x12\x12\n" +
-	"\x04data\x18\x03 \x01(\fR\x04data\"\x8b\x02\n" +
-	"\x16WriteBlobLinesResponse\x12M\n" +
-	"\aresults\x18\x01 \x03(\v23.dtkt.blob.v1beta1.WriteBlobLinesResponse.KeyResultR\aresults\x1a\xa1\x01\n" +
-	"\tKeyResult\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x12\n" +
-	"\x04size\x18\x02 \x01(\x03R\x04size\x125\n" +
-	"\bmod_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\amodTime\x12\x12\n" +
-	"\x04etag\x18\x04 \x01(\tR\x04etag\x12#\n" +
-	"\rlines_written\x18\x05 \x01(\x03R\flinesWritten\"E\n" +
+	"createTime\"\xa3\x02\n" +
+	"\fBlobMetadata\x12!\n" +
+	"\fcontent_type\x18\x01 \x01(\tR\vcontentType\x12/\n" +
+	"\x13content_disposition\x18\x02 \x01(\tR\x12contentDisposition\x12)\n" +
+	"\x10content_encoding\x18\x03 \x01(\tR\x0fcontentEncoding\x12)\n" +
+	"\x10content_language\x18\x04 \x01(\tR\x0fcontentLanguage\x12#\n" +
+	"\rcache_control\x18\x05 \x01(\tR\fcacheControl\x12D\n" +
+	"\x11provider_metadata\x18\n" +
+	" \x01(\v2\x17.google.protobuf.StructR\x10providerMetadata\"}\n" +
+	"\tBlobRules\x12 \n" +
+	"\fif_not_exist\x18\x01 \x01(\bR\n" +
+	"ifNotExist\x12\"\n" +
+	"\rif_etag_match\x18\x02 \x01(\tR\vifEtagMatch\x12*\n" +
+	"\x11unless_etag_match\x18\x03 \x01(\tR\x0funlessEtagMatch\"\xc1\x02\n" +
+	"\n" +
+	"LineFormat\x12'\n" +
+	"\x0eline_delimiter\x18\x02 \x01(\tH\x00R\rlineDelimiter\x128\n" +
+	"\x04json\x18\x03 \x01(\v2\".dtkt.blob.v1beta1.LineFormat.JSONH\x00R\x04json\x125\n" +
+	"\x03csv\x18\x04 \x01(\v2!.dtkt.blob.v1beta1.LineFormat.CSVH\x00R\x03csv\x1a%\n" +
+	"\x04JSON\x12\x1d\n" +
+	"\n" +
+	"array_mode\x18\x01 \x01(\bR\tarrayMode\x1aj\n" +
+	"\x03CSV\x12\x16\n" +
+	"\x06fields\x18\x01 \x03(\tR\x06fields\x120\n" +
+	"\x0ffield_delimiter\x18\x02 \x01(\tB\a\xbaH\x04r\x02\x18\x01R\x0efieldDelimiter\x12\x19\n" +
+	"\buse_crlf\x18\x03 \x01(\bR\auseCrlfB\x06\n" +
+	"\x04type\"\xa8\x01\n" +
+	"\bLineData\x12\x12\n" +
+	"\x03raw\x18\x01 \x01(\fH\x00R\x03raw\x12,\n" +
+	"\x04json\x18\x02 \x01(\v2\x16.google.protobuf.ValueH\x00R\x04json\x123\n" +
+	"\x03csv\x18\x03 \x01(\v2\x1f.dtkt.blob.v1beta1.LineData.CSVH\x00R\x03csv\x1a\x1d\n" +
+	"\x03CSV\x12\x16\n" +
+	"\x06values\x18\x01 \x03(\tR\x06valuesB\x06\n" +
+	"\x04type\"h\n" +
+	"\x12ListBucketsRequest\x12\x1b\n" +
+	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x16\n" +
+	"\x06filter\x18\x03 \x01(\tR\x06filter\"r\n" +
+	"\x13ListBucketsResponse\x123\n" +
+	"\abuckets\x18\x01 \x03(\v2\x19.dtkt.blob.v1beta1.BucketR\abuckets\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"~\n" +
+	"\x10ListBlobsRequest\x12\x1b\n" +
+	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x16\n" +
+	"\x06bucket\x18\x03 \x01(\tR\x06bucket\x12\x16\n" +
+	"\x06prefix\x18\x04 \x01(\tR\x06prefix\"j\n" +
+	"\x11ListBlobsResponse\x12-\n" +
+	"\x05blobs\x18\x01 \x03(\v2\x17.dtkt.blob.v1beta1.BlobR\x05blobs\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"B\n" +
+	"\x0eGetBlobRequest\x12\x16\n" +
+	"\x06bucket\x18\x01 \x01(\tR\x06bucket\x12\x18\n" +
+	"\x03key\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x03key\">\n" +
+	"\x0fGetBlobResponse\x12+\n" +
+	"\x04blob\x18\x01 \x01(\v2\x17.dtkt.blob.v1beta1.BlobR\x04blob\"s\n" +
+	"\x0fReadBlobRequest\x12\x16\n" +
+	"\x06bucket\x18\x01 \x01(\tR\x06bucket\x12\x18\n" +
+	"\x03key\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x03key\x12\x16\n" +
+	"\x06offset\x18\x03 \x01(\x03R\x06offset\x12\x16\n" +
+	"\x06length\x18\x04 \x01(\x03R\x06length\"&\n" +
+	"\x10ReadBlobResponse\x12\x12\n" +
+	"\x04data\x18\x01 \x01(\fR\x04data\"\xe1\x01\n" +
+	"\x10WriteBlobRequest\x12\x16\n" +
+	"\x06bucket\x18\x01 \x01(\tR\x06bucket\x12\x18\n" +
+	"\x03key\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x03key\x12;\n" +
+	"\bmetadata\x18\x03 \x01(\v2\x1f.dtkt.blob.v1beta1.BlobMetadataR\bmetadata\x122\n" +
+	"\x05rules\x18\x04 \x01(\v2\x1c.dtkt.blob.v1beta1.BlobRulesR\x05rules\x12\x16\n" +
+	"\x06offset\x18\x06 \x01(\x03R\x06offset\x12\x12\n" +
+	"\x04data\x18\a \x01(\fR\x04data\"6\n" +
+	"\x11WriteBlobResponse\x12!\n" +
+	"\fwritten_size\x18\x02 \x01(\x03R\vwrittenSize\"\xb6\x01\n" +
+	"\x14ReadBlobLinesRequest\x12\x16\n" +
+	"\x06bucket\x18\x01 \x01(\tR\x06bucket\x12\x18\n" +
+	"\x03key\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x03key\x125\n" +
+	"\x06format\x18\x03 \x01(\v2\x1d.dtkt.blob.v1beta1.LineFormatR\x06format\x12\x1f\n" +
+	"\x06offset\x18\x04 \x01(\x03B\a\xbaH\x04\"\x02(\x00R\x06offset\x12\x14\n" +
+	"\x05limit\x18\x05 \x01(\x03R\x05limit\"`\n" +
+	"\x15ReadBlobLinesResponse\x12/\n" +
+	"\x04data\x18\x01 \x01(\v2\x1b.dtkt.blob.v1beta1.LineDataR\x04data\x12\x16\n" +
+	"\x06offset\x18\x02 \x01(\x03R\x06offset\"\xc8\x02\n" +
+	"\x15WriteBlobLinesRequest\x12\x16\n" +
+	"\x06bucket\x18\x01 \x01(\tR\x06bucket\x12\x18\n" +
+	"\x03key\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x03key\x12;\n" +
+	"\bmetadata\x18\x03 \x01(\v2\x1f.dtkt.blob.v1beta1.BlobMetadataR\bmetadata\x122\n" +
+	"\x05rules\x18\x04 \x01(\v2\x1c.dtkt.blob.v1beta1.BlobRulesR\x05rules\x125\n" +
+	"\x06format\x18\x05 \x01(\v2\x1d.dtkt.blob.v1beta1.LineFormatR\x06format\x12\x1c\n" +
+	"\toverwrite\x18\x06 \x01(\bR\toverwrite\x127\n" +
+	"\x04data\x18\a \x01(\v2\x1b.dtkt.blob.v1beta1.LineDataB\x06\xbaH\x03\xc8\x01\x01R\x04data\"=\n" +
+	"\x16WriteBlobLinesResponse\x12#\n" +
+	"\rwritten_lines\x18\x01 \x01(\x03R\fwrittenLines\"E\n" +
 	"\x11DeleteBlobRequest\x12\x18\n" +
 	"\x03key\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x03key\x12\x16\n" +
 	"\x06bucket\x18\x02 \x01(\tR\x06bucket\"B\n" +
@@ -1745,63 +2201,79 @@ func file_dtkt_blob_v1beta1_messages_proto_rawDescGZIP() []byte {
 	return file_dtkt_blob_v1beta1_messages_proto_rawDescData
 }
 
-var file_dtkt_blob_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
+var file_dtkt_blob_v1beta1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
 var file_dtkt_blob_v1beta1_messages_proto_goTypes = []any{
-	(*ListResult)(nil),                       // 0: dtkt.blob.v1beta1.ListResult
-	(*ListBlobsRequest)(nil),                 // 1: dtkt.blob.v1beta1.ListBlobsRequest
-	(*ListBlobsResponse)(nil),                // 2: dtkt.blob.v1beta1.ListBlobsResponse
-	(*GetBlobRequest)(nil),                   // 3: dtkt.blob.v1beta1.GetBlobRequest
-	(*GetBlobResponse)(nil),                  // 4: dtkt.blob.v1beta1.GetBlobResponse
-	(*ReadBlobLinesRequest)(nil),             // 5: dtkt.blob.v1beta1.ReadBlobLinesRequest
-	(*ReadBlobLinesResponse)(nil),            // 6: dtkt.blob.v1beta1.ReadBlobLinesResponse
-	(*ReadBlobRangeRequest)(nil),             // 7: dtkt.blob.v1beta1.ReadBlobRangeRequest
-	(*ReadBlobRangeResponse)(nil),            // 8: dtkt.blob.v1beta1.ReadBlobRangeResponse
-	(*WriteBlobRequest)(nil),                 // 9: dtkt.blob.v1beta1.WriteBlobRequest
-	(*WriteBlobResponse)(nil),                // 10: dtkt.blob.v1beta1.WriteBlobResponse
-	(*WriteBlobLinesRequest)(nil),            // 11: dtkt.blob.v1beta1.WriteBlobLinesRequest
-	(*WriteBlobLinesResponse)(nil),           // 12: dtkt.blob.v1beta1.WriteBlobLinesResponse
-	(*DeleteBlobRequest)(nil),                // 13: dtkt.blob.v1beta1.DeleteBlobRequest
-	(*DeleteBlobResponse)(nil),               // 14: dtkt.blob.v1beta1.DeleteBlobResponse
-	(*CopyBlobRequest)(nil),                  // 15: dtkt.blob.v1beta1.CopyBlobRequest
-	(*CopyBlobResponse)(nil),                 // 16: dtkt.blob.v1beta1.CopyBlobResponse
-	(*GenerateSignedURLRequest)(nil),         // 17: dtkt.blob.v1beta1.GenerateSignedURLRequest
-	(*GenerateSignedURLResponse)(nil),        // 18: dtkt.blob.v1beta1.GenerateSignedURLResponse
-	nil,                                      // 19: dtkt.blob.v1beta1.GetBlobResponse.MetadataEntry
-	nil,                                      // 20: dtkt.blob.v1beta1.WriteBlobRequest.MetadataEntry
-	(*WriteBlobLinesResponse_KeyResult)(nil), // 21: dtkt.blob.v1beta1.WriteBlobLinesResponse.KeyResult
-	nil,                                      // 22: dtkt.blob.v1beta1.CopyBlobRequest.MetadataEntry
-	nil,                                      // 23: dtkt.blob.v1beta1.GenerateSignedURLRequest.QueryParametersEntry
-	nil,                                      // 24: dtkt.blob.v1beta1.GenerateSignedURLRequest.HeadersEntry
-	(*timestamppb.Timestamp)(nil),            // 25: google.protobuf.Timestamp
-	(LineFormat)(0),                          // 26: dtkt.blob.v1beta1.LineFormat
-	(*structpb.Value)(nil),                   // 27: google.protobuf.Value
-	(SignedURLMethod)(0),                     // 28: dtkt.blob.v1beta1.SignedURLMethod
-	(*durationpb.Duration)(nil),              // 29: google.protobuf.Duration
+	(*Bucket)(nil),                    // 0: dtkt.blob.v1beta1.Bucket
+	(*Blob)(nil),                      // 1: dtkt.blob.v1beta1.Blob
+	(*BlobMetadata)(nil),              // 2: dtkt.blob.v1beta1.BlobMetadata
+	(*BlobRules)(nil),                 // 3: dtkt.blob.v1beta1.BlobRules
+	(*LineFormat)(nil),                // 4: dtkt.blob.v1beta1.LineFormat
+	(*LineData)(nil),                  // 5: dtkt.blob.v1beta1.LineData
+	(*ListBucketsRequest)(nil),        // 6: dtkt.blob.v1beta1.ListBucketsRequest
+	(*ListBucketsResponse)(nil),       // 7: dtkt.blob.v1beta1.ListBucketsResponse
+	(*ListBlobsRequest)(nil),          // 8: dtkt.blob.v1beta1.ListBlobsRequest
+	(*ListBlobsResponse)(nil),         // 9: dtkt.blob.v1beta1.ListBlobsResponse
+	(*GetBlobRequest)(nil),            // 10: dtkt.blob.v1beta1.GetBlobRequest
+	(*GetBlobResponse)(nil),           // 11: dtkt.blob.v1beta1.GetBlobResponse
+	(*ReadBlobRequest)(nil),           // 12: dtkt.blob.v1beta1.ReadBlobRequest
+	(*ReadBlobResponse)(nil),          // 13: dtkt.blob.v1beta1.ReadBlobResponse
+	(*WriteBlobRequest)(nil),          // 14: dtkt.blob.v1beta1.WriteBlobRequest
+	(*WriteBlobResponse)(nil),         // 15: dtkt.blob.v1beta1.WriteBlobResponse
+	(*ReadBlobLinesRequest)(nil),      // 16: dtkt.blob.v1beta1.ReadBlobLinesRequest
+	(*ReadBlobLinesResponse)(nil),     // 17: dtkt.blob.v1beta1.ReadBlobLinesResponse
+	(*WriteBlobLinesRequest)(nil),     // 18: dtkt.blob.v1beta1.WriteBlobLinesRequest
+	(*WriteBlobLinesResponse)(nil),    // 19: dtkt.blob.v1beta1.WriteBlobLinesResponse
+	(*DeleteBlobRequest)(nil),         // 20: dtkt.blob.v1beta1.DeleteBlobRequest
+	(*DeleteBlobResponse)(nil),        // 21: dtkt.blob.v1beta1.DeleteBlobResponse
+	(*CopyBlobRequest)(nil),           // 22: dtkt.blob.v1beta1.CopyBlobRequest
+	(*CopyBlobResponse)(nil),          // 23: dtkt.blob.v1beta1.CopyBlobResponse
+	(*GenerateSignedURLRequest)(nil),  // 24: dtkt.blob.v1beta1.GenerateSignedURLRequest
+	(*GenerateSignedURLResponse)(nil), // 25: dtkt.blob.v1beta1.GenerateSignedURLResponse
+	(*LineFormat_JSON)(nil),           // 26: dtkt.blob.v1beta1.LineFormat.JSON
+	(*LineFormat_CSV)(nil),            // 27: dtkt.blob.v1beta1.LineFormat.CSV
+	(*LineData_CSV)(nil),              // 28: dtkt.blob.v1beta1.LineData.CSV
+	nil,                               // 29: dtkt.blob.v1beta1.CopyBlobRequest.MetadataEntry
+	nil,                               // 30: dtkt.blob.v1beta1.GenerateSignedURLRequest.QueryParametersEntry
+	nil,                               // 31: dtkt.blob.v1beta1.GenerateSignedURLRequest.HeadersEntry
+	(*structpb.Struct)(nil),           // 32: google.protobuf.Struct
+	(*timestamppb.Timestamp)(nil),     // 33: google.protobuf.Timestamp
+	(*structpb.Value)(nil),            // 34: google.protobuf.Value
+	(SignedURLMethod)(0),              // 35: dtkt.blob.v1beta1.SignedURLMethod
+	(*durationpb.Duration)(nil),       // 36: google.protobuf.Duration
 }
 var file_dtkt_blob_v1beta1_messages_proto_depIdxs = []int32{
-	25, // 0: dtkt.blob.v1beta1.ListResult.mod_time:type_name -> google.protobuf.Timestamp
-	0,  // 1: dtkt.blob.v1beta1.ListBlobsResponse.results:type_name -> dtkt.blob.v1beta1.ListResult
-	19, // 2: dtkt.blob.v1beta1.GetBlobResponse.metadata:type_name -> dtkt.blob.v1beta1.GetBlobResponse.MetadataEntry
-	25, // 3: dtkt.blob.v1beta1.GetBlobResponse.create_time:type_name -> google.protobuf.Timestamp
-	25, // 4: dtkt.blob.v1beta1.GetBlobResponse.mod_time:type_name -> google.protobuf.Timestamp
-	26, // 5: dtkt.blob.v1beta1.ReadBlobLinesRequest.line_format:type_name -> dtkt.blob.v1beta1.LineFormat
-	27, // 6: dtkt.blob.v1beta1.ReadBlobLinesResponse.json:type_name -> google.protobuf.Value
-	20, // 7: dtkt.blob.v1beta1.WriteBlobRequest.metadata:type_name -> dtkt.blob.v1beta1.WriteBlobRequest.MetadataEntry
-	25, // 8: dtkt.blob.v1beta1.WriteBlobResponse.mod_time:type_name -> google.protobuf.Timestamp
-	21, // 9: dtkt.blob.v1beta1.WriteBlobLinesResponse.results:type_name -> dtkt.blob.v1beta1.WriteBlobLinesResponse.KeyResult
-	22, // 10: dtkt.blob.v1beta1.CopyBlobRequest.metadata:type_name -> dtkt.blob.v1beta1.CopyBlobRequest.MetadataEntry
-	25, // 11: dtkt.blob.v1beta1.CopyBlobResponse.mod_time:type_name -> google.protobuf.Timestamp
-	28, // 12: dtkt.blob.v1beta1.GenerateSignedURLRequest.method:type_name -> dtkt.blob.v1beta1.SignedURLMethod
-	29, // 13: dtkt.blob.v1beta1.GenerateSignedURLRequest.expires_in:type_name -> google.protobuf.Duration
-	23, // 14: dtkt.blob.v1beta1.GenerateSignedURLRequest.query_parameters:type_name -> dtkt.blob.v1beta1.GenerateSignedURLRequest.QueryParametersEntry
-	24, // 15: dtkt.blob.v1beta1.GenerateSignedURLRequest.headers:type_name -> dtkt.blob.v1beta1.GenerateSignedURLRequest.HeadersEntry
-	25, // 16: dtkt.blob.v1beta1.GenerateSignedURLResponse.expires_at:type_name -> google.protobuf.Timestamp
-	25, // 17: dtkt.blob.v1beta1.WriteBlobLinesResponse.KeyResult.mod_time:type_name -> google.protobuf.Timestamp
-	18, // [18:18] is the sub-list for method output_type
-	18, // [18:18] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	32, // 0: dtkt.blob.v1beta1.Bucket.provider_metadata:type_name -> google.protobuf.Struct
+	2,  // 1: dtkt.blob.v1beta1.Blob.metadata:type_name -> dtkt.blob.v1beta1.BlobMetadata
+	33, // 2: dtkt.blob.v1beta1.Blob.mod_time:type_name -> google.protobuf.Timestamp
+	33, // 3: dtkt.blob.v1beta1.Blob.create_time:type_name -> google.protobuf.Timestamp
+	32, // 4: dtkt.blob.v1beta1.BlobMetadata.provider_metadata:type_name -> google.protobuf.Struct
+	26, // 5: dtkt.blob.v1beta1.LineFormat.json:type_name -> dtkt.blob.v1beta1.LineFormat.JSON
+	27, // 6: dtkt.blob.v1beta1.LineFormat.csv:type_name -> dtkt.blob.v1beta1.LineFormat.CSV
+	34, // 7: dtkt.blob.v1beta1.LineData.json:type_name -> google.protobuf.Value
+	28, // 8: dtkt.blob.v1beta1.LineData.csv:type_name -> dtkt.blob.v1beta1.LineData.CSV
+	0,  // 9: dtkt.blob.v1beta1.ListBucketsResponse.buckets:type_name -> dtkt.blob.v1beta1.Bucket
+	1,  // 10: dtkt.blob.v1beta1.ListBlobsResponse.blobs:type_name -> dtkt.blob.v1beta1.Blob
+	1,  // 11: dtkt.blob.v1beta1.GetBlobResponse.blob:type_name -> dtkt.blob.v1beta1.Blob
+	2,  // 12: dtkt.blob.v1beta1.WriteBlobRequest.metadata:type_name -> dtkt.blob.v1beta1.BlobMetadata
+	3,  // 13: dtkt.blob.v1beta1.WriteBlobRequest.rules:type_name -> dtkt.blob.v1beta1.BlobRules
+	4,  // 14: dtkt.blob.v1beta1.ReadBlobLinesRequest.format:type_name -> dtkt.blob.v1beta1.LineFormat
+	5,  // 15: dtkt.blob.v1beta1.ReadBlobLinesResponse.data:type_name -> dtkt.blob.v1beta1.LineData
+	2,  // 16: dtkt.blob.v1beta1.WriteBlobLinesRequest.metadata:type_name -> dtkt.blob.v1beta1.BlobMetadata
+	3,  // 17: dtkt.blob.v1beta1.WriteBlobLinesRequest.rules:type_name -> dtkt.blob.v1beta1.BlobRules
+	4,  // 18: dtkt.blob.v1beta1.WriteBlobLinesRequest.format:type_name -> dtkt.blob.v1beta1.LineFormat
+	5,  // 19: dtkt.blob.v1beta1.WriteBlobLinesRequest.data:type_name -> dtkt.blob.v1beta1.LineData
+	29, // 20: dtkt.blob.v1beta1.CopyBlobRequest.metadata:type_name -> dtkt.blob.v1beta1.CopyBlobRequest.MetadataEntry
+	33, // 21: dtkt.blob.v1beta1.CopyBlobResponse.mod_time:type_name -> google.protobuf.Timestamp
+	35, // 22: dtkt.blob.v1beta1.GenerateSignedURLRequest.method:type_name -> dtkt.blob.v1beta1.SignedURLMethod
+	36, // 23: dtkt.blob.v1beta1.GenerateSignedURLRequest.expires_in:type_name -> google.protobuf.Duration
+	30, // 24: dtkt.blob.v1beta1.GenerateSignedURLRequest.query_parameters:type_name -> dtkt.blob.v1beta1.GenerateSignedURLRequest.QueryParametersEntry
+	31, // 25: dtkt.blob.v1beta1.GenerateSignedURLRequest.headers:type_name -> dtkt.blob.v1beta1.GenerateSignedURLRequest.HeadersEntry
+	33, // 26: dtkt.blob.v1beta1.GenerateSignedURLResponse.expires_at:type_name -> google.protobuf.Timestamp
+	27, // [27:27] is the sub-list for method output_type
+	27, // [27:27] is the sub-list for method input_type
+	27, // [27:27] is the sub-list for extension type_name
+	27, // [27:27] is the sub-list for extension extendee
+	0,  // [0:27] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_blob_v1beta1_messages_proto_init() }
@@ -1810,9 +2282,15 @@ func file_dtkt_blob_v1beta1_messages_proto_init() {
 		return
 	}
 	file_dtkt_blob_v1beta1_enums_proto_init()
-	file_dtkt_blob_v1beta1_messages_proto_msgTypes[6].OneofWrappers = []any{
-		(*ReadBlobLinesResponse_Data)(nil),
-		(*ReadBlobLinesResponse_Json)(nil),
+	file_dtkt_blob_v1beta1_messages_proto_msgTypes[4].OneofWrappers = []any{
+		(*LineFormat_LineDelimiter)(nil),
+		(*LineFormat_Json)(nil),
+		(*LineFormat_Csv)(nil),
+	}
+	file_dtkt_blob_v1beta1_messages_proto_msgTypes[5].OneofWrappers = []any{
+		(*LineData_Raw)(nil),
+		(*LineData_Json)(nil),
+		(*LineData_Csv)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1820,7 +2298,7 @@ func file_dtkt_blob_v1beta1_messages_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_blob_v1beta1_messages_proto_rawDesc), len(file_dtkt_blob_v1beta1_messages_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   25,
+			NumMessages:   32,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

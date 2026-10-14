@@ -21,6 +21,8 @@ import (
 const _ = connect.IsAtLeastVersion1_13_0
 
 const (
+	// BucketServiceName is the fully-qualified name of the BucketService service.
+	BucketServiceName = "dtkt.blob.v1beta1.BucketService"
 	// BlobServiceName is the fully-qualified name of the BlobService service.
 	BlobServiceName = "dtkt.blob.v1beta1.BlobService"
 )
@@ -33,12 +35,13 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
+	// BucketServiceListBucketsProcedure is the fully-qualified name of the BucketService's ListBuckets
+	// RPC.
+	BucketServiceListBucketsProcedure = "/dtkt.blob.v1beta1.BucketService/ListBuckets"
 	// BlobServiceListBlobsProcedure is the fully-qualified name of the BlobService's ListBlobs RPC.
 	BlobServiceListBlobsProcedure = "/dtkt.blob.v1beta1.BlobService/ListBlobs"
 	// BlobServiceGetBlobProcedure is the fully-qualified name of the BlobService's GetBlob RPC.
 	BlobServiceGetBlobProcedure = "/dtkt.blob.v1beta1.BlobService/GetBlob"
-	// BlobServiceWriteBlobProcedure is the fully-qualified name of the BlobService's WriteBlob RPC.
-	BlobServiceWriteBlobProcedure = "/dtkt.blob.v1beta1.BlobService/WriteBlob"
 	// BlobServiceDeleteBlobProcedure is the fully-qualified name of the BlobService's DeleteBlob RPC.
 	BlobServiceDeleteBlobProcedure = "/dtkt.blob.v1beta1.BlobService/DeleteBlob"
 	// BlobServiceCopyBlobProcedure is the fully-qualified name of the BlobService's CopyBlob RPC.
@@ -46,35 +49,112 @@ const (
 	// BlobServiceGenerateSignedURLProcedure is the fully-qualified name of the BlobService's
 	// GenerateSignedURL RPC.
 	BlobServiceGenerateSignedURLProcedure = "/dtkt.blob.v1beta1.BlobService/GenerateSignedURL"
+	// BlobServiceReadBlobProcedure is the fully-qualified name of the BlobService's ReadBlob RPC.
+	BlobServiceReadBlobProcedure = "/dtkt.blob.v1beta1.BlobService/ReadBlob"
+	// BlobServiceWriteBlobProcedure is the fully-qualified name of the BlobService's WriteBlob RPC.
+	BlobServiceWriteBlobProcedure = "/dtkt.blob.v1beta1.BlobService/WriteBlob"
 	// BlobServiceReadBlobLinesProcedure is the fully-qualified name of the BlobService's ReadBlobLines
 	// RPC.
 	BlobServiceReadBlobLinesProcedure = "/dtkt.blob.v1beta1.BlobService/ReadBlobLines"
-	// BlobServiceReadBlobRangeProcedure is the fully-qualified name of the BlobService's ReadBlobRange
-	// RPC.
-	BlobServiceReadBlobRangeProcedure = "/dtkt.blob.v1beta1.BlobService/ReadBlobRange"
 	// BlobServiceWriteBlobLinesProcedure is the fully-qualified name of the BlobService's
 	// WriteBlobLines RPC.
 	BlobServiceWriteBlobLinesProcedure = "/dtkt.blob.v1beta1.BlobService/WriteBlobLines"
 )
 
+// BucketServiceClient is a client for the dtkt.blob.v1beta1.BucketService service.
+type BucketServiceClient interface {
+	// Retrieves a list of buckets.
+	ListBuckets(context.Context, *connect.Request[v1beta1.ListBucketsRequest]) (*connect.Response[v1beta1.ListBucketsResponse], error)
+}
+
+// NewBucketServiceClient constructs a client for the dtkt.blob.v1beta1.BucketService service. By
+// default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
+// and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
+// connect.WithGRPC() or connect.WithGRPCWeb() options.
+//
+// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
+// http://api.acme.com or https://acme.com/grpc).
+func NewBucketServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) BucketServiceClient {
+	baseURL = strings.TrimRight(baseURL, "/")
+	bucketServiceMethods := v1beta1.File_dtkt_blob_v1beta1_services_proto.Services().ByName("BucketService").Methods()
+	return &bucketServiceClient{
+		listBuckets: connect.NewClient[v1beta1.ListBucketsRequest, v1beta1.ListBucketsResponse](
+			httpClient,
+			baseURL+BucketServiceListBucketsProcedure,
+			connect.WithSchema(bucketServiceMethods.ByName("ListBuckets")),
+			connect.WithClientOptions(opts...),
+		),
+	}
+}
+
+// bucketServiceClient implements BucketServiceClient.
+type bucketServiceClient struct {
+	listBuckets *connect.Client[v1beta1.ListBucketsRequest, v1beta1.ListBucketsResponse]
+}
+
+// ListBuckets calls dtkt.blob.v1beta1.BucketService.ListBuckets.
+func (c *bucketServiceClient) ListBuckets(ctx context.Context, req *connect.Request[v1beta1.ListBucketsRequest]) (*connect.Response[v1beta1.ListBucketsResponse], error) {
+	return c.listBuckets.CallUnary(ctx, req)
+}
+
+// BucketServiceHandler is an implementation of the dtkt.blob.v1beta1.BucketService service.
+type BucketServiceHandler interface {
+	// Retrieves a list of buckets.
+	ListBuckets(context.Context, *connect.Request[v1beta1.ListBucketsRequest]) (*connect.Response[v1beta1.ListBucketsResponse], error)
+}
+
+// NewBucketServiceHandler builds an HTTP handler from the service implementation. It returns the
+// path on which to mount the handler and the handler itself.
+//
+// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
+// and JSON codecs. They also support gzip compression.
+func NewBucketServiceHandler(svc BucketServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	bucketServiceMethods := v1beta1.File_dtkt_blob_v1beta1_services_proto.Services().ByName("BucketService").Methods()
+	bucketServiceListBucketsHandler := connect.NewUnaryHandler(
+		BucketServiceListBucketsProcedure,
+		svc.ListBuckets,
+		connect.WithSchema(bucketServiceMethods.ByName("ListBuckets")),
+		connect.WithHandlerOptions(opts...),
+	)
+	return "/dtkt.blob.v1beta1.BucketService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case BucketServiceListBucketsProcedure:
+			bucketServiceListBucketsHandler.ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
+}
+
+// UnimplementedBucketServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedBucketServiceHandler struct{}
+
+func (UnimplementedBucketServiceHandler) ListBuckets(context.Context, *connect.Request[v1beta1.ListBucketsRequest]) (*connect.Response[v1beta1.ListBucketsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.blob.v1beta1.BucketService.ListBuckets is not implemented"))
+}
+
 // BlobServiceClient is a client for the dtkt.blob.v1beta1.BlobService service.
 type BlobServiceClient interface {
-	// Retrieves a list of files provided by service.
+	// Retrieves a list of blobs.
 	ListBlobs(context.Context, *connect.Request[v1beta1.ListBlobsRequest]) (*connect.Response[v1beta1.ListBlobsResponse], error)
 	// Retrieves attributes for the blob stored at key.
 	GetBlob(context.Context, *connect.Request[v1beta1.GetBlobRequest]) (*connect.Response[v1beta1.GetBlobResponse], error)
-	// Writes or overwrites the blob stored at key.
-	WriteBlob(context.Context, *connect.Request[v1beta1.WriteBlobRequest]) (*connect.Response[v1beta1.WriteBlobResponse], error)
 	// Deletes the blob stored at key.
 	DeleteBlob(context.Context, *connect.Request[v1beta1.DeleteBlobRequest]) (*connect.Response[v1beta1.DeleteBlobResponse], error)
 	// Copies a blob from source to destination key.
 	CopyBlob(context.Context, *connect.Request[v1beta1.CopyBlobRequest]) (*connect.Response[v1beta1.CopyBlobResponse], error)
 	// Generates a signed URL for accessing the blob.
 	GenerateSignedURL(context.Context, *connect.Request[v1beta1.GenerateSignedURLRequest]) (*connect.Response[v1beta1.GenerateSignedURLResponse], error)
-	// ReadBlobLines streams lines of blob with requested key and options.
+	// Retrieves the contents of a blob as a stream of responses containing a
+	// portion of the requested bytes. The stream ends when all data has been
+	// sent or the end of contents has been reached (may be less than requested).
+	ReadBlob(context.Context, *connect.Request[v1beta1.ReadBlobRequest]) (*connect.ServerStreamForClient[v1beta1.ReadBlobResponse], error)
+	// Writes the contents of a blob as a stream of requests containing a portion
+	// of bytes to be written. The stream ends when the request specifies it has
+	// finished sending.
+	WriteBlob(context.Context) *connect.ClientStreamForClient[v1beta1.WriteBlobRequest, v1beta1.WriteBlobResponse]
+	// Streams lines of data format and mode of blob content.
 	ReadBlobLines(context.Context, *connect.Request[v1beta1.ReadBlobLinesRequest]) (*connect.ServerStreamForClient[v1beta1.ReadBlobLinesResponse], error)
-	// ReadBlobRange streams chunks of blob with requested key and options.
-	ReadBlobRange(context.Context, *connect.Request[v1beta1.ReadBlobRangeRequest]) (*connect.ServerStreamForClient[v1beta1.ReadBlobRangeResponse], error)
 	// WriteBlobLines streams lines into blob with requested key and options.
 	WriteBlobLines(context.Context) *connect.ClientStreamForClient[v1beta1.WriteBlobLinesRequest, v1beta1.WriteBlobLinesResponse]
 }
@@ -102,12 +182,6 @@ func NewBlobServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(blobServiceMethods.ByName("GetBlob")),
 			connect.WithClientOptions(opts...),
 		),
-		writeBlob: connect.NewClient[v1beta1.WriteBlobRequest, v1beta1.WriteBlobResponse](
-			httpClient,
-			baseURL+BlobServiceWriteBlobProcedure,
-			connect.WithSchema(blobServiceMethods.ByName("WriteBlob")),
-			connect.WithClientOptions(opts...),
-		),
 		deleteBlob: connect.NewClient[v1beta1.DeleteBlobRequest, v1beta1.DeleteBlobResponse](
 			httpClient,
 			baseURL+BlobServiceDeleteBlobProcedure,
@@ -126,16 +200,22 @@ func NewBlobServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(blobServiceMethods.ByName("GenerateSignedURL")),
 			connect.WithClientOptions(opts...),
 		),
+		readBlob: connect.NewClient[v1beta1.ReadBlobRequest, v1beta1.ReadBlobResponse](
+			httpClient,
+			baseURL+BlobServiceReadBlobProcedure,
+			connect.WithSchema(blobServiceMethods.ByName("ReadBlob")),
+			connect.WithClientOptions(opts...),
+		),
+		writeBlob: connect.NewClient[v1beta1.WriteBlobRequest, v1beta1.WriteBlobResponse](
+			httpClient,
+			baseURL+BlobServiceWriteBlobProcedure,
+			connect.WithSchema(blobServiceMethods.ByName("WriteBlob")),
+			connect.WithClientOptions(opts...),
+		),
 		readBlobLines: connect.NewClient[v1beta1.ReadBlobLinesRequest, v1beta1.ReadBlobLinesResponse](
 			httpClient,
 			baseURL+BlobServiceReadBlobLinesProcedure,
 			connect.WithSchema(blobServiceMethods.ByName("ReadBlobLines")),
-			connect.WithClientOptions(opts...),
-		),
-		readBlobRange: connect.NewClient[v1beta1.ReadBlobRangeRequest, v1beta1.ReadBlobRangeResponse](
-			httpClient,
-			baseURL+BlobServiceReadBlobRangeProcedure,
-			connect.WithSchema(blobServiceMethods.ByName("ReadBlobRange")),
 			connect.WithClientOptions(opts...),
 		),
 		writeBlobLines: connect.NewClient[v1beta1.WriteBlobLinesRequest, v1beta1.WriteBlobLinesResponse](
@@ -151,12 +231,12 @@ func NewBlobServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 type blobServiceClient struct {
 	listBlobs         *connect.Client[v1beta1.ListBlobsRequest, v1beta1.ListBlobsResponse]
 	getBlob           *connect.Client[v1beta1.GetBlobRequest, v1beta1.GetBlobResponse]
-	writeBlob         *connect.Client[v1beta1.WriteBlobRequest, v1beta1.WriteBlobResponse]
 	deleteBlob        *connect.Client[v1beta1.DeleteBlobRequest, v1beta1.DeleteBlobResponse]
 	copyBlob          *connect.Client[v1beta1.CopyBlobRequest, v1beta1.CopyBlobResponse]
 	generateSignedURL *connect.Client[v1beta1.GenerateSignedURLRequest, v1beta1.GenerateSignedURLResponse]
+	readBlob          *connect.Client[v1beta1.ReadBlobRequest, v1beta1.ReadBlobResponse]
+	writeBlob         *connect.Client[v1beta1.WriteBlobRequest, v1beta1.WriteBlobResponse]
 	readBlobLines     *connect.Client[v1beta1.ReadBlobLinesRequest, v1beta1.ReadBlobLinesResponse]
-	readBlobRange     *connect.Client[v1beta1.ReadBlobRangeRequest, v1beta1.ReadBlobRangeResponse]
 	writeBlobLines    *connect.Client[v1beta1.WriteBlobLinesRequest, v1beta1.WriteBlobLinesResponse]
 }
 
@@ -168,11 +248,6 @@ func (c *blobServiceClient) ListBlobs(ctx context.Context, req *connect.Request[
 // GetBlob calls dtkt.blob.v1beta1.BlobService.GetBlob.
 func (c *blobServiceClient) GetBlob(ctx context.Context, req *connect.Request[v1beta1.GetBlobRequest]) (*connect.Response[v1beta1.GetBlobResponse], error) {
 	return c.getBlob.CallUnary(ctx, req)
-}
-
-// WriteBlob calls dtkt.blob.v1beta1.BlobService.WriteBlob.
-func (c *blobServiceClient) WriteBlob(ctx context.Context, req *connect.Request[v1beta1.WriteBlobRequest]) (*connect.Response[v1beta1.WriteBlobResponse], error) {
-	return c.writeBlob.CallUnary(ctx, req)
 }
 
 // DeleteBlob calls dtkt.blob.v1beta1.BlobService.DeleteBlob.
@@ -190,14 +265,19 @@ func (c *blobServiceClient) GenerateSignedURL(ctx context.Context, req *connect.
 	return c.generateSignedURL.CallUnary(ctx, req)
 }
 
+// ReadBlob calls dtkt.blob.v1beta1.BlobService.ReadBlob.
+func (c *blobServiceClient) ReadBlob(ctx context.Context, req *connect.Request[v1beta1.ReadBlobRequest]) (*connect.ServerStreamForClient[v1beta1.ReadBlobResponse], error) {
+	return c.readBlob.CallServerStream(ctx, req)
+}
+
+// WriteBlob calls dtkt.blob.v1beta1.BlobService.WriteBlob.
+func (c *blobServiceClient) WriteBlob(ctx context.Context) *connect.ClientStreamForClient[v1beta1.WriteBlobRequest, v1beta1.WriteBlobResponse] {
+	return c.writeBlob.CallClientStream(ctx)
+}
+
 // ReadBlobLines calls dtkt.blob.v1beta1.BlobService.ReadBlobLines.
 func (c *blobServiceClient) ReadBlobLines(ctx context.Context, req *connect.Request[v1beta1.ReadBlobLinesRequest]) (*connect.ServerStreamForClient[v1beta1.ReadBlobLinesResponse], error) {
 	return c.readBlobLines.CallServerStream(ctx, req)
-}
-
-// ReadBlobRange calls dtkt.blob.v1beta1.BlobService.ReadBlobRange.
-func (c *blobServiceClient) ReadBlobRange(ctx context.Context, req *connect.Request[v1beta1.ReadBlobRangeRequest]) (*connect.ServerStreamForClient[v1beta1.ReadBlobRangeResponse], error) {
-	return c.readBlobRange.CallServerStream(ctx, req)
 }
 
 // WriteBlobLines calls dtkt.blob.v1beta1.BlobService.WriteBlobLines.
@@ -207,22 +287,26 @@ func (c *blobServiceClient) WriteBlobLines(ctx context.Context) *connect.ClientS
 
 // BlobServiceHandler is an implementation of the dtkt.blob.v1beta1.BlobService service.
 type BlobServiceHandler interface {
-	// Retrieves a list of files provided by service.
+	// Retrieves a list of blobs.
 	ListBlobs(context.Context, *connect.Request[v1beta1.ListBlobsRequest]) (*connect.Response[v1beta1.ListBlobsResponse], error)
 	// Retrieves attributes for the blob stored at key.
 	GetBlob(context.Context, *connect.Request[v1beta1.GetBlobRequest]) (*connect.Response[v1beta1.GetBlobResponse], error)
-	// Writes or overwrites the blob stored at key.
-	WriteBlob(context.Context, *connect.Request[v1beta1.WriteBlobRequest]) (*connect.Response[v1beta1.WriteBlobResponse], error)
 	// Deletes the blob stored at key.
 	DeleteBlob(context.Context, *connect.Request[v1beta1.DeleteBlobRequest]) (*connect.Response[v1beta1.DeleteBlobResponse], error)
 	// Copies a blob from source to destination key.
 	CopyBlob(context.Context, *connect.Request[v1beta1.CopyBlobRequest]) (*connect.Response[v1beta1.CopyBlobResponse], error)
 	// Generates a signed URL for accessing the blob.
 	GenerateSignedURL(context.Context, *connect.Request[v1beta1.GenerateSignedURLRequest]) (*connect.Response[v1beta1.GenerateSignedURLResponse], error)
-	// ReadBlobLines streams lines of blob with requested key and options.
+	// Retrieves the contents of a blob as a stream of responses containing a
+	// portion of the requested bytes. The stream ends when all data has been
+	// sent or the end of contents has been reached (may be less than requested).
+	ReadBlob(context.Context, *connect.Request[v1beta1.ReadBlobRequest], *connect.ServerStream[v1beta1.ReadBlobResponse]) error
+	// Writes the contents of a blob as a stream of requests containing a portion
+	// of bytes to be written. The stream ends when the request specifies it has
+	// finished sending.
+	WriteBlob(context.Context, *connect.ClientStream[v1beta1.WriteBlobRequest]) (*connect.Response[v1beta1.WriteBlobResponse], error)
+	// Streams lines of data format and mode of blob content.
 	ReadBlobLines(context.Context, *connect.Request[v1beta1.ReadBlobLinesRequest], *connect.ServerStream[v1beta1.ReadBlobLinesResponse]) error
-	// ReadBlobRange streams chunks of blob with requested key and options.
-	ReadBlobRange(context.Context, *connect.Request[v1beta1.ReadBlobRangeRequest], *connect.ServerStream[v1beta1.ReadBlobRangeResponse]) error
 	// WriteBlobLines streams lines into blob with requested key and options.
 	WriteBlobLines(context.Context, *connect.ClientStream[v1beta1.WriteBlobLinesRequest]) (*connect.Response[v1beta1.WriteBlobLinesResponse], error)
 }
@@ -246,12 +330,6 @@ func NewBlobServiceHandler(svc BlobServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(blobServiceMethods.ByName("GetBlob")),
 		connect.WithHandlerOptions(opts...),
 	)
-	blobServiceWriteBlobHandler := connect.NewUnaryHandler(
-		BlobServiceWriteBlobProcedure,
-		svc.WriteBlob,
-		connect.WithSchema(blobServiceMethods.ByName("WriteBlob")),
-		connect.WithHandlerOptions(opts...),
-	)
 	blobServiceDeleteBlobHandler := connect.NewUnaryHandler(
 		BlobServiceDeleteBlobProcedure,
 		svc.DeleteBlob,
@@ -270,16 +348,22 @@ func NewBlobServiceHandler(svc BlobServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(blobServiceMethods.ByName("GenerateSignedURL")),
 		connect.WithHandlerOptions(opts...),
 	)
+	blobServiceReadBlobHandler := connect.NewServerStreamHandler(
+		BlobServiceReadBlobProcedure,
+		svc.ReadBlob,
+		connect.WithSchema(blobServiceMethods.ByName("ReadBlob")),
+		connect.WithHandlerOptions(opts...),
+	)
+	blobServiceWriteBlobHandler := connect.NewClientStreamHandler(
+		BlobServiceWriteBlobProcedure,
+		svc.WriteBlob,
+		connect.WithSchema(blobServiceMethods.ByName("WriteBlob")),
+		connect.WithHandlerOptions(opts...),
+	)
 	blobServiceReadBlobLinesHandler := connect.NewServerStreamHandler(
 		BlobServiceReadBlobLinesProcedure,
 		svc.ReadBlobLines,
 		connect.WithSchema(blobServiceMethods.ByName("ReadBlobLines")),
-		connect.WithHandlerOptions(opts...),
-	)
-	blobServiceReadBlobRangeHandler := connect.NewServerStreamHandler(
-		BlobServiceReadBlobRangeProcedure,
-		svc.ReadBlobRange,
-		connect.WithSchema(blobServiceMethods.ByName("ReadBlobRange")),
 		connect.WithHandlerOptions(opts...),
 	)
 	blobServiceWriteBlobLinesHandler := connect.NewClientStreamHandler(
@@ -294,18 +378,18 @@ func NewBlobServiceHandler(svc BlobServiceHandler, opts ...connect.HandlerOption
 			blobServiceListBlobsHandler.ServeHTTP(w, r)
 		case BlobServiceGetBlobProcedure:
 			blobServiceGetBlobHandler.ServeHTTP(w, r)
-		case BlobServiceWriteBlobProcedure:
-			blobServiceWriteBlobHandler.ServeHTTP(w, r)
 		case BlobServiceDeleteBlobProcedure:
 			blobServiceDeleteBlobHandler.ServeHTTP(w, r)
 		case BlobServiceCopyBlobProcedure:
 			blobServiceCopyBlobHandler.ServeHTTP(w, r)
 		case BlobServiceGenerateSignedURLProcedure:
 			blobServiceGenerateSignedURLHandler.ServeHTTP(w, r)
+		case BlobServiceReadBlobProcedure:
+			blobServiceReadBlobHandler.ServeHTTP(w, r)
+		case BlobServiceWriteBlobProcedure:
+			blobServiceWriteBlobHandler.ServeHTTP(w, r)
 		case BlobServiceReadBlobLinesProcedure:
 			blobServiceReadBlobLinesHandler.ServeHTTP(w, r)
-		case BlobServiceReadBlobRangeProcedure:
-			blobServiceReadBlobRangeHandler.ServeHTTP(w, r)
 		case BlobServiceWriteBlobLinesProcedure:
 			blobServiceWriteBlobLinesHandler.ServeHTTP(w, r)
 		default:
@@ -325,10 +409,6 @@ func (UnimplementedBlobServiceHandler) GetBlob(context.Context, *connect.Request
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.blob.v1beta1.BlobService.GetBlob is not implemented"))
 }
 
-func (UnimplementedBlobServiceHandler) WriteBlob(context.Context, *connect.Request[v1beta1.WriteBlobRequest]) (*connect.Response[v1beta1.WriteBlobResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.blob.v1beta1.BlobService.WriteBlob is not implemented"))
-}
-
 func (UnimplementedBlobServiceHandler) DeleteBlob(context.Context, *connect.Request[v1beta1.DeleteBlobRequest]) (*connect.Response[v1beta1.DeleteBlobResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.blob.v1beta1.BlobService.DeleteBlob is not implemented"))
 }
@@ -341,12 +421,16 @@ func (UnimplementedBlobServiceHandler) GenerateSignedURL(context.Context, *conne
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.blob.v1beta1.BlobService.GenerateSignedURL is not implemented"))
 }
 
-func (UnimplementedBlobServiceHandler) ReadBlobLines(context.Context, *connect.Request[v1beta1.ReadBlobLinesRequest], *connect.ServerStream[v1beta1.ReadBlobLinesResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.blob.v1beta1.BlobService.ReadBlobLines is not implemented"))
+func (UnimplementedBlobServiceHandler) ReadBlob(context.Context, *connect.Request[v1beta1.ReadBlobRequest], *connect.ServerStream[v1beta1.ReadBlobResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.blob.v1beta1.BlobService.ReadBlob is not implemented"))
 }
 
-func (UnimplementedBlobServiceHandler) ReadBlobRange(context.Context, *connect.Request[v1beta1.ReadBlobRangeRequest], *connect.ServerStream[v1beta1.ReadBlobRangeResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.blob.v1beta1.BlobService.ReadBlobRange is not implemented"))
+func (UnimplementedBlobServiceHandler) WriteBlob(context.Context, *connect.ClientStream[v1beta1.WriteBlobRequest]) (*connect.Response[v1beta1.WriteBlobResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.blob.v1beta1.BlobService.WriteBlob is not implemented"))
+}
+
+func (UnimplementedBlobServiceHandler) ReadBlobLines(context.Context, *connect.Request[v1beta1.ReadBlobLinesRequest], *connect.ServerStream[v1beta1.ReadBlobLinesResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.blob.v1beta1.BlobService.ReadBlobLines is not implemented"))
 }
 
 func (UnimplementedBlobServiceHandler) WriteBlobLines(context.Context, *connect.ClientStream[v1beta1.WriteBlobLinesRequest]) (*connect.Response[v1beta1.WriteBlobLinesResponse], error) {

@@ -9,6 +9,13 @@ func TestEmptyName(t *testing.T) {
 	}
 }
 
+func TestEmptyParent(t *testing.T) {
+	name := Type.New("some.TypeName")
+	if name.Parent().String() != "" {
+		t.Fatalf("expected parent to be empty string, got: %s", name.Parent().String())
+	}
+}
+
 func TestNameType(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -235,7 +242,7 @@ func TestGetName_API(t *testing.T) {
 		typ       NameType
 		input     string
 		want      string
-		wantPairs []Pair
+		wantPairs []Segment
 		wantError bool
 	}{
 		{
@@ -243,98 +250,98 @@ func TestGetName_API(t *testing.T) {
 			typ:       User,
 			input:     "users/alice",
 			want:      "users/alice",
-			wantPairs: []Pair{{"users", "alice"}},
+			wantPairs: []Segment{{"users", "alice"}},
 		},
 		{
 			name:      "Organization",
 			typ:       Organization,
 			input:     "organizations/acme",
 			want:      "organizations/acme",
-			wantPairs: []Pair{{"organizations", "acme"}},
+			wantPairs: []Segment{{"organizations", "acme"}},
 		},
 		{
 			name:      "Connection - with user",
 			typ:       Connection,
 			input:     "users/alice/connections/postgres",
 			want:      "users/alice/connections/postgres",
-			wantPairs: []Pair{{"users", "alice"}, {"connections", "postgres"}},
+			wantPairs: []Segment{{"users", "alice"}, {"connections", "postgres"}},
 		},
 		{
 			name:      "Connection - with org",
 			typ:       Connection,
 			input:     "organizations/acme/connections/postgres",
 			want:      "organizations/acme/connections/postgres",
-			wantPairs: []Pair{{"organizations", "acme"}, {"connections", "postgres"}},
+			wantPairs: []Segment{{"organizations", "acme"}, {"connections", "postgres"}},
 		},
 		{
 			name:      "Integration - with user",
 			typ:       Integration,
 			input:     "users/bob/integrations/bigquery",
 			want:      "users/bob/integrations/bigquery",
-			wantPairs: []Pair{{"users", "bob"}, {"integrations", "bigquery"}},
+			wantPairs: []Segment{{"users", "bob"}, {"integrations", "bigquery"}},
 		},
 		{
 			name:      "Type - system level",
 			typ:       Type,
 			input:     "types/dtkt.protoui.v1beta1.Label",
 			want:      "types/dtkt.protoui.v1beta1.Label",
-			wantPairs: []Pair{{"types", "dtkt.protoui.v1beta1.Label"}},
+			wantPairs: []Segment{{"types", "dtkt.protoui.v1beta1.Label"}},
 		},
 		{
 			name:      "Type - nested in connection",
 			typ:       Type,
 			input:     "users/alice/connections/postgres/types/Record",
 			want:      "users/alice/connections/postgres/types/Record",
-			wantPairs: []Pair{{"users", "alice"}, {"connections", "postgres"}, {"types", "Record"}},
+			wantPairs: []Segment{{"users", "alice"}, {"connections", "postgres"}, {"types", "Record"}},
 		},
 		{
 			name:      "Service - system level",
 			typ:       Service,
 			input:     "services/MyService",
 			want:      "services/MyService",
-			wantPairs: []Pair{{"services", "MyService"}},
+			wantPairs: []Segment{{"services", "MyService"}},
 		},
 		{
 			name:      "Service - nested in deployment",
 			typ:       Service,
 			input:     "users/bob/deployments/prod/services/api.v1.UserService",
 			want:      "users/bob/deployments/prod/services/api.v1.UserService",
-			wantPairs: []Pair{{"users", "bob"}, {"deployments", "prod"}, {"services", "api.v1.UserService"}},
+			wantPairs: []Segment{{"users", "bob"}, {"deployments", "prod"}, {"services", "api.v1.UserService"}},
 		},
 		{
 			name:      "Method - system level",
 			typ:       Method,
 			input:     "methods/GetUser",
 			want:      "methods/GetUser",
-			wantPairs: []Pair{{"methods", "GetUser"}},
+			wantPairs: []Segment{{"methods", "GetUser"}},
 		},
 		{
 			name:      "Method - nested in connection",
 			typ:       Method,
 			input:     "organizations/acme/connections/postgres/methods/query",
 			want:      "organizations/acme/connections/postgres/methods/query",
-			wantPairs: []Pair{{"organizations", "acme"}, {"connections", "postgres"}, {"methods", "query"}},
+			wantPairs: []Segment{{"organizations", "acme"}, {"connections", "postgres"}, {"methods", "query"}},
 		},
 		{
 			name:      "Operation - under automation",
 			typ:       Operation,
 			input:     "users/alice/automations/daily-sync/operations/transform",
 			want:      "users/alice/automations/daily-sync/operations/transform",
-			wantPairs: []Pair{{"users", "alice"}, {"automations", "daily-sync"}, {"operations", "transform"}},
+			wantPairs: []Segment{{"users", "alice"}, {"automations", "daily-sync"}, {"operations", "transform"}},
 		},
 		{
 			name:      "Operation - under deployment",
 			typ:       Operation,
 			input:     "organizations/acme/deployments/prod/operations/init",
 			want:      "organizations/acme/deployments/prod/operations/init",
-			wantPairs: []Pair{{"organizations", "acme"}, {"deployments", "prod"}, {"operations", "init"}},
+			wantPairs: []Segment{{"organizations", "acme"}, {"deployments", "prod"}, {"operations", "init"}},
 		},
 		{
 			name:      "Operation - under integration",
 			typ:       Operation,
 			input:     "users/bob/integrations/bigquery/operations/sync",
 			want:      "users/bob/integrations/bigquery/operations/sync",
-			wantPairs: []Pair{{"users", "bob"}, {"integrations", "bigquery"}, {"operations", "sync"}},
+			wantPairs: []Segment{{"users", "bob"}, {"integrations", "bigquery"}, {"operations", "sync"}},
 		},
 		{
 			name:      "Invalid format",

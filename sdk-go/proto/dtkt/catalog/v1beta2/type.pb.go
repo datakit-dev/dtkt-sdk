@@ -238,8 +238,8 @@ func (GeoType) EnumDescriptor() ([]byte, []int) {
 	return file_dtkt_catalog_v1beta2_type_proto_rawDescGZIP(), []int{2}
 }
 
-// Type encodes a catalog implementation's native data type with a corresponding
-// kind and additional JSON, Geospatial, and type parameters.
+// Type encodes an implementation's native data type with a corresponding kind
+// and additional JSON, Geospatial, and type parameters.
 type Type struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Name of the implementation's native type: (e.g. VARCHAR, BIGINT, etc.).

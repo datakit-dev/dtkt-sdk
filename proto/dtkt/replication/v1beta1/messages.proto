@@ -99,7 +99,7 @@ message CheckSourceAuthRequest {
   string source_id = 1;
 
   // The auth check type.
-  dtkt.shared.v1beta1.AuthCheck type = 2;
+  // dtkt.shared.v1beta1.AuthCheck type = 2;
 
   // If auth type response is OAuth.
   oneof oauth {

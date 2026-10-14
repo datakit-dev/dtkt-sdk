@@ -62,7 +62,7 @@ func SlugifyWithSeparator(sep rune, input string) string {
 	return strings.ToLower(
 		strings.Trim(regex.ReplaceAllString(
 			strings.Join(
-				SliceMap(parts, func(s string) string {
+				SliceOfFunc(parts, func(s string) string {
 					return strings.Trim(ToKebabCase(strings.TrimSpace(s)), string(sep))
 				}), string(sep),
 			), string(sep),
@@ -76,10 +76,16 @@ func StringFormatAny(val any) string {
 	}
 
 	switch val := val.(type) {
+	case protoreflect.Enum:
+		return fmt.Sprintf("%s", val)
+	case protoreflect.Value:
+		return StringFormatAny(val.Interface())
 	case protoreflect.Message:
-		return prototext.Format(val.Interface())
+		return StringFormatAny(val.Interface())
 	case proto.Message:
-		return prototext.Format(val)
+		return prototext.MarshalOptions{
+			Multiline: false,
+		}.Format(val)
 	case fmt.Stringer:
 		return val.String()
 	case string:
@@ -96,6 +102,6 @@ func StringFormatAny(val any) string {
 	return fmt.Sprintf("%v", val)
 }
 
-func StringSplit(s string) []string {
-	return strings.Split(strings.ReplaceAll(s, "\r\n", "\n"), "\n")
+func StringSplit[T ~string](s T) []string {
+	return strings.Split(strings.ReplaceAll(string(s), "\r\n", "\n"), "\n")
 }

@@ -3,12 +3,12 @@ syntax = "proto3";
 package dtkt.catalog.v1beta2;
 
 import "buf/validate/validate.proto";
-import "dtkt/catalog/v1beta2/type.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
 import "google/protobuf/field_mask.proto";
 
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta2";
 
-// CatalogService provides operations for managing catalogs, schemas, tables, and query validation.
 service CatalogService {
   // Create a catalog.
   rpc CreateCatalog(CreateCatalogRequest) returns (CreateCatalogResponse);
@@ -26,26 +26,29 @@ service CatalogService {
   rpc UpdateCatalog(UpdateCatalogRequest) returns (UpdateCatalogResponse);
 }
 
-// Represents a catalog resource specifying a query dialect, supported data types
-// and additional metadata (if any).
+// Represents a catalog resource.
 message Catalog {
-  // Catalog resource name, format: `catalogs/{catalog}` (e.g. catalogs/google-project-id, catalogs/postgres_database, etc.)
-  string name = 1;
+  option (google.api.resource) = {
+    type: "Catalog"
+    singular: "catalog"
+    plural: "catalogs"
+    pattern: "catalogs/{catalog}"
+  };
 
-  // Catalog identifier.
-  string catalog_id = 2;
+  // Catalog resource name, format: `catalogs/{catalog}` (e.g. catalogs/google-project-id, catalogs/postgres_database, etc.)
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER
+  ];
+
+  // Catalog identifier for use within a Query.
+  string ident = 2;
 
   // Description of the catalog.
   string description = 3;
 
-  // Supported query dialect (e.g., Trino, GoogleSQL, Postgres, etc.).
-  string query_dialect = 4;
-
-  // List of supported data types.
-  repeated Type data_types = 5;
-
   // Additional metadata, if any.
-  map<string, string> metadata = 10;
+  map<string, string> metadata = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // Create catalog request.
@@ -77,9 +80,14 @@ message GetCatalogResponse {
 
 // List catalogs request.
 message ListCatalogsRequest {
+  // Number of results to return per page. Leave empty for the server default.
   int32 page_size = 1;
+
+  // Token from a previous response to retrieve the next page.
   string page_token = 2;
-  string filter = 4;
+
+  // Optional filter expression to narrow results.
+  string filter = 3;
 }
 
 // List catalogs response.

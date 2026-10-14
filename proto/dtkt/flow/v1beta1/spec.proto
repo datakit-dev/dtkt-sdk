@@ -12,16 +12,73 @@ import "google/protobuf/struct.proto";
 
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1";
 
+// Flow is a declarative workflow spec for a directed acyclic graph of typed
+// nodes and edges formed by parsing CEL expressions refer to (source) nodes.
 message Flow {
+  // Name of flow.
   string name = 1 [(buf.validate.field).required = true];
+
+  // Description of flow.
   string description = 2 [(dtkt.protoform.v1beta1.field).input.multiline_text = true];
 
-  repeated Connection connections = 3;
-  repeated Input inputs = 4;
-  repeated Var vars = 5;
-  repeated Action actions = 7;
-  repeated Output outputs = 9;
-  repeated Stream streams = 10;
+  // Control declares flow, execution, and lifecycle configuration.
+  Control control = 3;
+
+  // Metrics report analytics at runtime without impacting execution.
+  // Note: metrics are not represented as a node in the DAG and therefore not
+  // referenceable by CEL expressions within typed nodes below.
+  map<string, Metric> metrics = 4 [(buf.validate.field).map = {
+    keys: {
+      string: {pattern: "^[a-zA-Z][a-zA-Z0-9_]+$"}
+    }
+  }];
+
+  // Connections declare dependent packages and services used by gRPC method
+  // calls in actions and streams.
+  repeated Connection connections = 5;
+
+  // Inputs declare named and typed values that can be injected at runtime.
+  repeated Input inputs = 6;
+
+  // Vars declare intermediate and transformed values in flow execution.
+  repeated Var vars = 7;
+
+  // Actions declare unary gRPC method calls and user elicitation interactions.
+  repeated Action actions = 8;
+
+  // Streams declare streaming gRPC method calls and value generators.
+  repeated Stream streams = 9;
+
+  // Outputs declare named values evaluated and emitted at runtime.
+  repeated Output outputs = 10;
+}
+
+message Control {
+  // Start flow execution when expression evaluates to true.
+  optional string start_when = 1 [(buf.validate.field).string.pattern = "^\\s?=\\s?"];
+
+  // Stop flow execution when expression evaluates to true.
+  optional string stop_when = 2 [(buf.validate.field).string.pattern = "^\\s?=\\s?"];
+}
+
+message Metric {
+  // Interval declares the frequency this metric will produce a value.
+  google.protobuf.Duration interval = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).duration.gt = {
+      seconds: 0
+      nanos: 0
+    },
+    (buf.validate.field).duration.example = {seconds: 5}
+  ];
+
+  // Value expression to be evaluated.
+  string value = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^\\s?=\\s?",
+    (buf.validate.field).string.example = "= streams.reader.count",
+    (buf.validate.field).string.example = "= streams.writer.count"
+  ];
 }
 
 message Connection {
@@ -37,7 +94,11 @@ message Connection {
     (buf.validate.field).required = true,
     (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
   ];
+
+  // Declares connection is an integration with given package name and version.
   dtkt.shared.v1beta1.Package.Identity package = 2;
+
+  // Declares connection implements the given gRPC services.
   repeated string services = 3;
 }
 
@@ -46,6 +107,9 @@ message Input {
     (buf.validate.field).required = true,
     (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
   ];
+
+  // When true input always returns its first non-null memoized value.
+  optional bool cache = 2;
 
   oneof type {
     option (buf.validate.oneof).required = true;
@@ -63,113 +127,135 @@ message Input {
     Map map = 13;
     Message message = 14;
   }
-
-  bool cache = 20;
-}
-
-// Var is an intermediate value in a Flow used to transform and/or memoize the result of a computation for reuse.
-message Var {
-  string id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
-  ];
-
-  // When cache is true var always returns its first non-null memoized value.
-  bool cache = 2;
-
-  oneof type {
-    option (buf.validate.oneof).required = true;
-    // Given expression evaluates to var's memoized value, example: "= inputs.foo.getValue()"
-    string value = 3 [
-      (buf.validate.field).string.pattern = "^\\s?=\\s?",
-      (buf.validate.field).string.example = " = inputs.foo.getValue()"
-    ];
-
-    // Given switch statement's first matching case (otherwise default) evaluates to var's memoized value.
-    Switch switch = 4;
-  }
 }
 
 message Action {
-  string id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
-  ];
+  option (buf.validate.message).oneof = {
+    fields: [
+      "call",
+      "user"
+    ]
+    required: true
+  };
 
-  string run_if = 2 [
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
-  ];
+  message MethodCall {
+    string connection = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
+    ];
 
-  string on_error = 3 [
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
-  ];
+    string method = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "[a-zA-Z._/]+"
+    ];
 
-  // When cache is true action always returns its first non-null memoized value.
-  bool cache = 10;
+    google.protobuf.Value request = 3;
 
-  oneof type {
-    option (buf.validate.oneof).required = true;
-    MethodCall call = 4;
-    UserAction user = 5;
+    // Invoke method when given expression evaluates to true; optional.
+    optional string invoke_when = 4 [(buf.validate.field).string.pattern = "^\\s?=\\s?"];
+
+    // If method invocation results in an error return the evaluated result of
+    // given expression; optional.
+    optional string on_error = 5 [(buf.validate.field).string.pattern = "^\\s?=\\s?"];
   }
-}
 
-message Output {
   string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
   ];
 
-  string value = 2 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
-  ];
+  // When true action always returns its first non-null memoized value.
+  optional bool cache = 2;
+
+  MethodCall call = 5;
+  UserAction user = 6;
 }
 
 message Stream {
+  option (buf.validate.message).oneof = {
+    fields: [
+      "call",
+      "generate",
+      "window"
+    ]
+    required: true
+  };
+
+  message MethodCall {
+    string connection = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
+    ];
+
+    string method = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "[a-zA-Z._/]+"
+    ];
+
+    google.protobuf.Value request = 3;
+
+    // Stream sends request when given expression evaluates to true; optional.
+    optional string send_when = 4 [(buf.validate.field).string.pattern = "^\\s?=\\s?"];
+
+    // Stream receives response when given expression evaluates to true; optional.
+    optional string recv_when = 5 [(buf.validate.field).string.pattern = "^\\s?=\\s?"];
+  }
+
+  message Generator {
+    google.protobuf.Duration every = 1 [(buf.validate.field).required = true];
+    google.protobuf.Duration initial = 2;
+    string value = 3 [
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+      (buf.validate.field).string.pattern = "^\\s?=\\s?"
+    ];
+  }
+
+  message Window {
+    option (buf.validate.message).oneof = {
+      fields: [
+        "tumbling",
+        "sliding"
+      ]
+      required: true
+    };
+
+    message Tumbling {
+      // Number of elements buffered before the window is emitted.
+      uint32 size = 1 [(buf.validate.field).uint32.gt = 0];
+    }
+
+    message Sliding {
+      // Number of elements buffered before the window is emitted.
+      uint32 size = 1 [(buf.validate.field).uint32.gt = 0];
+
+      // Number of elements to advance between successive window emissions.
+      uint32 step = 2 [(buf.validate.field).uint32.gt = 0];
+    }
+
+    Tumbling tumbling = 1;
+    Sliding sliding = 2;
+
+    // CEL expression selecting the element to buffer on each round.
+    string source = 3 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^\\s?=\\s?"
+    ];
+  }
+
   string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
   ];
 
-  // Start stream when expression evaluates to true; optional.
-  string start_if = 10 [
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
-  ];
+  // Stream starts when expression evaluates to true; optional.
+  optional string start_when = 2 [(buf.validate.field).string.pattern = "^\\s?=\\s?"];
 
-  // Stop stream when expression evaluates to true; optional.
-  string stop_if = 11 [
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
-  ];
+  // Stream stops when expression evaluates to true; optional.
+  optional string stop_when = 3 [(buf.validate.field).string.pattern = "^\\s?=\\s?"];
 
-  oneof type {
-    option (buf.validate.oneof).required = true;
-    MethodCall call = 2;
-    Ticker generate = 3;
-  }
-}
-
-message MethodCall {
-  string connection = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
-  ];
-
-  string method = 2 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "[a-zA-Z._/]+"
-  ];
-
-  google.protobuf.Value request = 3;
-
-  string response = 4 [
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
-  ];
+  MethodCall call = 4;
+  Generator generate = 5;
+  Window window = 7;
 }
 
 message UserAction {
@@ -222,34 +308,68 @@ message UserAction {
   repeated Input inputs = 1;
 }
 
-message Switch {
-  message Case {
+// Var is an intermediate value in a Flow used to transform and/or memoize the result of a computation for reuse.
+message Var {
+  option (buf.validate.message).oneof = {
+    fields: [
+      "value",
+      "switch"
+    ]
+    required: true
+  };
+
+  message Switch {
+    message Case {
+      string value = 1 [
+        (buf.validate.field).required = true,
+        (buf.validate.field).string.pattern = "^\\s?=\\s?"
+      ];
+      string return = 2 [
+        (buf.validate.field).required = true,
+        (buf.validate.field).string.pattern = "^\\s?=\\s?"
+      ];
+    }
+
     string value = 1 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.pattern = "^\\s?=\\s?"
     ];
-    string return = 2 [
+
+    repeated Case case = 2;
+
+    string default = 3 [
       (buf.validate.field).required = true,
       (buf.validate.field).string.pattern = "^\\s?=\\s?"
     ];
   }
 
-  string value = 1 [
+  string id = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
   ];
-  repeated Case case = 2;
-  string default = 3 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.pattern = "^\\s?=\\s?"
+
+  // When true var always returns its first non-null memoized value.
+  optional bool cache = 2;
+
+  // Var evaluates given expression.
+  string value = 3 [
+    (buf.validate.field).string.pattern = "^\\s?=\\s?",
+    (buf.validate.field).string.example = " = inputs.foo.getValue()"
   ];
+
+  // Var evaluates to given switch statement's first matching case (otherwise default).
+  Switch switch = 4;
 }
 
-message Ticker {
-  google.protobuf.Duration every = 1 [(buf.validate.field).required = true];
-  google.protobuf.Duration initial = 2;
-  string value = 3 [
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+message Output {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-zA-Z][a-zA-Z0-9_]+$"
+  ];
+
+  // Output evaluates given expression.
+  string value = 2 [
+    (buf.validate.field).required = true,
     (buf.validate.field).string.pattern = "^\\s?=\\s?"
   ];
 }

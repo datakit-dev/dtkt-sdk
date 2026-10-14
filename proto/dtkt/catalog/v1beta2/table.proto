@@ -32,21 +32,21 @@ service TableService {
   rpc ReadRows(ReadRowsRequest) returns (stream ReadRowsResponse);
 }
 
-// Represents a table within a table.
+// Represents a table within a schema.
 message Table {
   // Table resource name, format: `catalogs/{catalog}/schemas/{schema}/tables/{table}`.
   string name = 1;
 
-  // Table identifier.
-  string table_id = 2;
+  // Table identifier for use within a query.
+  string ident = 2;
 
   // Description of the table.
   string description = 3;
 
   // List of fields defined by the table.
-  repeated Field fields = 34;
+  repeated Field fields = 4;
 
-  // Statistics about the table (e.g., row count), if any.
+  // Statistics about the table, if any.
   TableStats stats = 5;
 
   // Additional metadata, if any.
@@ -64,9 +64,16 @@ message TableStats {
 
 // Request message for listing Tables.
 message ListTablesRequest {
+  // Number of results to return per page. Leave empty for the server default.
   int32 page_size = 1;
+
+  // Token from a previous response to retrieve the next page.
   string page_token = 2;
+
+  // Parent resource name.
   string parent = 3;
+
+  // Optional filter expression to narrow results.
   string filter = 4;
 }
 
@@ -93,7 +100,7 @@ message GetTableResponse {
 
 // Create Table request.
 message CreateTableRequest {
-  // Parent catalog resource name.
+  // Parent schema resource name.
   string parent = 1 [(buf.validate.field).required = true];
 
   // Table identifier, e.g. final segment in resource name: `.../tables/{table}`

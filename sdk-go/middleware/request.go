@@ -9,60 +9,63 @@ import (
 
 type (
 	Request struct {
-		addrName   string // addressable resource name (Deployment or Connection)
-		configHash string // sha256 hash of config
-		configGen  uint64 // bumps on config/auth changes
-
-		reqHash string // hash of request (server only)
+		resourceName string // name of resource associated with config
+		configHash   string // sha256 hash of config
+		configGen    uint64 // bumps on config/auth changes
 	}
-	Connection interface {
+	Resource interface {
 		GetName() string
 		GetConfigGen() uint64
 		GetConfigHash() string
 	}
 )
 
-func NewRequest(addrName, configHash string, configGen uint64) *Request {
-	return &Request{addrName: addrName, configHash: configHash, configGen: configGen}
+func NewRequest(resourceName, configHash string, configGen uint64) *Request {
+	return &Request{
+		resourceName: resourceName,
+		configHash:   configHash,
+		configGen:    configGen,
+	}
 }
 
-func NewConnectionRequest(conn Connection) *Request {
+func ResourceRequest(res Resource) *Request {
 	return NewRequest(
-		conn.GetName(),
-		conn.GetConfigHash(),
-		conn.GetConfigGen(),
+		res.GetName(),
+		res.GetConfigHash(),
+		res.GetConfigGen(),
 	)
 }
+
+func (r *Request) ResourceName() string { return r.resourceName }
+func (r *Request) ConfigHash() string   { return r.configHash }
+func (r *Request) ConfigGen() uint64    { return r.configGen }
 
 func (r *Request) IsValid() error {
 	if r == nil {
 		return fmt.Errorf("invalid request: nil")
-	}
-	if r.addrName == "" {
-		return fmt.Errorf("addressable name required")
-	}
-	if r.configHash == "" {
+	} else if r.resourceName == "" {
+		return fmt.Errorf("resource name required")
+	} else if r.configHash == "" {
 		return fmt.Errorf("config hash required")
 	}
 	return nil
 }
 
-func (r Request) Prev() string {
-	prev := r
-	prev.configGen -= 1
-	return prev.String()
+func (r *Request) HashSHA256() string {
+	return util.HashSHA256(r.String())
+}
+
+func (r *Request) PrevSHA256() string {
+	configGen := r.configGen
+	if configGen > 0 {
+		configGen--
+	}
+	return util.HashSHA256(configGenSignature(r.resourceName, configGen))
 }
 
 func (r *Request) String() string {
-	if r.reqHash == "" {
-		r.reqHash = util.HashSHA256(fmt.Sprintf("%s|gen=%d", r.addrName, r.configGen))
-	}
-	return r.reqHash
+	return configGenSignature(r.resourceName, r.configGen)
 }
-
-func (r *Request) AddrName() string   { return r.addrName }
-func (r *Request) ConfigHash() string { return r.configHash }
-func (r *Request) ConfigGen() uint64  { return r.configGen }
 
 func (r *Request) SetHeader(req *http.Request) {
 	for key, vals := range RequestToHeader(r) {
@@ -70,4 +73,8 @@ func (r *Request) SetHeader(req *http.Request) {
 			req.Header.Set(key, val)
 		}
 	}
+}
+
+func configGenSignature(resourceName string, configGen uint64) string {
+	return fmt.Sprintf("resource=%q|gen=%d", resourceName, configGen)
 }

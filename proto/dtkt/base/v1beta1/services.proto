@@ -15,7 +15,7 @@ service BaseService {
     option (google.api.http) = {get: "/v1beta1/package"};
   }
 
-  // Validates config, allocates instances, and .
+  // Validates config and allocates instance.
   // NOTE: CheckConfig is implemented by the Integration SDK (not by authors).
   rpc CheckConfig(CheckConfigRequest) returns (CheckConfigResponse) {
     option (google.api.http) = {
@@ -57,4 +57,9 @@ service BaseService {
   rpc GetType(GetTypeRequest) returns (GetTypeResponse) {
     option (google.api.http) = {get: "/v1beta1/types/{name}"};
   }
+
+  // Close releases resources associated with an instance identified by headers
+  // in the request and (if valid) atomically removes it from the integration.
+  // NOTE: Close is implemented by the Integration SDK (not by authors).
+  rpc Close(CloseRequest) returns (CloseResponse);
 }

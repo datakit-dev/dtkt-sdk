@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk/v1beta1/geojsonwrapperpb"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/integration/v1beta1/geojsonwrapperpb"
 	catalogv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta1"
 	geojsonv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/geojson/v1beta1"
 	"google.golang.org/protobuf/proto"

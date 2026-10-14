@@ -20,6 +20,7 @@ tasks:
 
   generate:
     cmds:
+      - buf lint
       - buf generate
       - task: go:generate
       - task: ts:generate

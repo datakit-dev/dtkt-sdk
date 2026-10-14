@@ -9,7 +9,7 @@ import (
 
 	"buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
-	"github.com/invopop/jsonschema"
+	"github.com/google/jsonschema-go/jsonschema"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -101,8 +101,8 @@ func (p *Parser) Parse(schemaJSON []byte) (*descriptorpb.FileDescriptorProto, er
 	}
 
 	// Process $defs first if present
-	if schema.Definitions != nil {
-		for defName, defSchema := range schema.Definitions {
+	if schema.Defs != nil {
+		for defName, defSchema := range schema.Defs {
 			if defSchema != nil {
 				_, err := p.parseMessage(SanitizeMessageName(defName), defSchema)
 				if err != nil {
@@ -232,14 +232,14 @@ func (p *Parser) unmarshalSchema(data []byte) (*jsonschema.Schema, error) {
 // populateExtras recursively populates Extras fields for a schema and its nested schemas.
 func (p *Parser) populateExtras(schema *jsonschema.Schema, rawMap map[string]any) {
 	// Populate Extras for the current schema
-	schema.Extras = p.extractExtras(rawMap)
+	schema.Extra = p.extractExtras(rawMap)
 
 	// Recursively process nested schemas in properties
 	if schema.Properties != nil {
 		if propData, ok := rawMap["properties"].(map[string]any); ok {
-			for pair := schema.Properties.Oldest(); pair != nil; pair = pair.Next() {
-				if propMap, ok := propData[pair.Key].(map[string]any); ok {
-					p.populateExtras(pair.Value, propMap)
+			for key, val := range schema.Properties {
+				if propMap, ok := propData[key].(map[string]any); ok {
+					p.populateExtras(val, propMap)
 				}
 			}
 		}
@@ -299,9 +299,9 @@ func (p *Parser) populateExtras(schema *jsonschema.Schema, rawMap map[string]any
 	}
 
 	// Process definitions
-	if schema.Definitions != nil {
+	if schema.Defs != nil {
 		if defs, ok := rawMap["$defs"].(map[string]any); ok {
-			for defName, defSchema := range schema.Definitions {
+			for defName, defSchema := range schema.Defs {
 				if defMap, ok := defs[defName].(map[string]any); ok {
 					p.populateExtras(defSchema, defMap)
 				}
@@ -340,7 +340,7 @@ func (p *Parser) parseMessage(name string, schema *jsonschema.Schema) (*descript
 	p.messages[name] = msg
 	p.messageNames[name] = true
 
-	if schema.Properties == nil || schema.Properties.Len() == 0 {
+	if schema.Properties == nil || len(schema.Properties) == 0 {
 		// TODO: handle scalars using wrapperspb types
 		// No properties, return empty message
 		return msg, nil
@@ -350,16 +350,16 @@ func (p *Parser) parseMessage(name string, schema *jsonschema.Schema) (*descript
 	required := schema.Required
 
 	// Sort property names for stable field numbers
-	propNames := make([]string, 0, schema.Properties.Len())
-	for pair := schema.Properties.Oldest(); pair != nil; pair = pair.Next() {
-		propNames = append(propNames, pair.Key)
+	propNames := make([]string, 0, len(schema.Properties))
+	for key := range schema.Properties {
+		propNames = append(propNames, key)
 	}
 	sort.Strings(propNames)
 
 	// Parse each field
 	fieldNum := int32(1)
 	for _, propName := range propNames {
-		propSchema, _ := schema.Properties.Get(propName)
+		propSchema, _ := schema.Properties[propName]
 		if propSchema == nil {
 			continue
 		}
@@ -516,12 +516,12 @@ func (p *Parser) inferIntegerType(schema *jsonschema.Schema) descriptorpb.FieldD
 	}
 
 	// Check minimum to determine signed vs unsigned
-	if schema.Minimum != "" {
-		min, _ := schema.Minimum.Float64()
+	if schema.Minimum != nil {
+		min := *schema.Minimum
 		if min >= 0 {
 			// Check maximum to determine size
-			if schema.Maximum != "" {
-				max, _ := schema.Maximum.Float64()
+			if schema.Maximum != nil {
+				max := *schema.Maximum
 				if max <= 4294967295 { // 2^32 - 1
 					return descriptorpb.FieldDescriptorProto_TYPE_UINT32
 				}
@@ -559,8 +559,8 @@ func (p *Parser) inferNumberType(schema *jsonschema.Schema) descriptorpb.FieldDe
 // getExtension retrieves a custom extension field from the schema.
 // Extensions like x-dtkt-format preserve additional type information.
 func (p *Parser) getExtension(schema *jsonschema.Schema, key string) any {
-	if schema.Extras != nil {
-		if val, ok := schema.Extras[key]; ok {
+	if schema.Extra != nil {
+		if val, ok := schema.Extra[key]; ok {
 			return val
 		}
 	}
@@ -775,7 +775,7 @@ func (p *Parser) extractNullableSchema(schema *jsonschema.Schema) *jsonschema.Sc
 // no properties or only explicitly marked as a map container.
 func (p *Parser) isMapType(schema *jsonschema.Schema) bool {
 	return schema.Type == "object" &&
-		(schema.Properties == nil || schema.Properties.Len() == 0) &&
+		(schema.Properties == nil || len(schema.Properties) == 0) &&
 		schema.AdditionalProperties != nil
 }
 
@@ -949,14 +949,14 @@ func (p *Parser) extractStringRules(schema *jsonschema.Schema) *validate.StringR
 	hasRules := false
 
 	// MinLength
-	if schema.MinLength != nil {
-		rules.MinLen = schema.MinLength
+	if schema.MinLength != nil && *schema.MinLength >= 0 {
+		rules.MinLen = new(uint64(*schema.MinLength))
 		hasRules = true
 	}
 
 	// MaxLength
-	if schema.MaxLength != nil {
-		rules.MaxLen = schema.MaxLength
+	if schema.MaxLength != nil && *schema.MaxLength >= 0 {
+		rules.MaxLen = new(uint64(*schema.MaxLength))
 		hasRules = true
 	}
 
@@ -967,9 +967,11 @@ func (p *Parser) extractStringRules(schema *jsonschema.Schema) *validate.StringR
 	}
 
 	// Const
-	if constVal, ok := schema.Const.(string); ok {
-		rules.Const = &constVal
-		hasRules = true
+	if schema.Const != nil {
+		if constVal, ok := (*schema.Const).(string); ok {
+			rules.Const = &constVal
+			hasRules = true
+		}
 	}
 
 	// Enum becomes In
@@ -1024,50 +1026,43 @@ func (p *Parser) extractInt32Rules(schema *jsonschema.Schema) *validate.Int32Rul
 	rules := &validate.Int32Rules{}
 	hasRules := false
 
-	if constVal, ok := schema.Const.(float64); ok {
-		val := int32(constVal)
-		rules.Const = &val
+	if schema.Const != nil {
+		if constVal, ok := (*schema.Const).(int32); ok {
+			rules.Const = &constVal
+			hasRules = true
+		}
+	}
+
+	if schema.Minimum != nil {
+		val := int32(*schema.Minimum)
+		rules.GreaterThan = &validate.Int32Rules_Gte{
+			Gte: val,
+		}
 		hasRules = true
 	}
 
-	if schema.Minimum != "" {
-		if min, err := schema.Minimum.Float64(); err == nil {
-			val := int32(min)
-			rules.GreaterThan = &validate.Int32Rules_Gte{
-				Gte: val,
-			}
-			hasRules = true
+	if schema.Maximum != nil {
+		val := int32(*schema.Maximum)
+		rules.LessThan = &validate.Int32Rules_Lte{
+			Lte: val,
 		}
+		hasRules = true
 	}
 
-	if schema.Maximum != "" {
-		if max, err := schema.Maximum.Float64(); err == nil {
-			val := int32(max)
-			rules.LessThan = &validate.Int32Rules_Lte{
-				Lte: val,
-			}
-			hasRules = true
+	if schema.ExclusiveMinimum != nil {
+		val := int32(*schema.ExclusiveMinimum)
+		rules.GreaterThan = &validate.Int32Rules_Gt{
+			Gt: val,
 		}
+		hasRules = true
 	}
 
-	if schema.ExclusiveMinimum != "" {
-		if exclusiveMin, err := schema.ExclusiveMinimum.Float64(); err == nil {
-			val := int32(exclusiveMin)
-			rules.GreaterThan = &validate.Int32Rules_Gt{
-				Gt: val,
-			}
-			hasRules = true
+	if schema.ExclusiveMaximum != nil {
+		val := int32(*schema.ExclusiveMaximum)
+		rules.LessThan = &validate.Int32Rules_Lt{
+			Lt: val,
 		}
-	}
-
-	if schema.ExclusiveMaximum != "" {
-		if exclusiveMax, err := schema.ExclusiveMaximum.Float64(); err == nil {
-			val := int32(exclusiveMax)
-			rules.LessThan = &validate.Int32Rules_Lt{
-				Lt: val,
-			}
-			hasRules = true
-		}
+		hasRules = true
 	}
 
 	if !hasRules {
@@ -1081,30 +1076,28 @@ func (p *Parser) extractInt64Rules(schema *jsonschema.Schema) *validate.Int64Rul
 	rules := &validate.Int64Rules{}
 	hasRules := false
 
-	if constVal, ok := schema.Const.(float64); ok {
-		val := int64(constVal)
-		rules.Const = &val
+	if schema.Const != nil {
+		if constVal, ok := (*schema.Const).(float64); ok {
+			val := int64(constVal)
+			rules.Const = &val
+			hasRules = true
+		}
+	}
+
+	if schema.Minimum != nil {
+		val := int64(*schema.Minimum)
+		rules.GreaterThan = &validate.Int64Rules_Gte{
+			Gte: val,
+		}
 		hasRules = true
 	}
 
-	if schema.Minimum != "" {
-		if min, err := schema.Minimum.Float64(); err == nil {
-			val := int64(min)
-			rules.GreaterThan = &validate.Int64Rules_Gte{
-				Gte: val,
-			}
-			hasRules = true
+	if schema.Maximum != nil {
+		val := int64(*schema.Maximum)
+		rules.LessThan = &validate.Int64Rules_Lte{
+			Lte: val,
 		}
-	}
-
-	if schema.Maximum != "" {
-		if max, err := schema.Maximum.Float64(); err == nil {
-			val := int64(max)
-			rules.LessThan = &validate.Int64Rules_Lte{
-				Lte: val,
-			}
-			hasRules = true
-		}
+		hasRules = true
 	}
 
 	if !hasRules {
@@ -1118,30 +1111,28 @@ func (p *Parser) extractUint32Rules(schema *jsonschema.Schema) *validate.UInt32R
 	rules := &validate.UInt32Rules{}
 	hasRules := false
 
-	if constVal, ok := schema.Const.(float64); ok {
-		val := uint32(constVal)
-		rules.Const = &val
+	if schema.Const != nil {
+		if constVal, ok := (*schema.Const).(float64); ok {
+			val := uint32(constVal)
+			rules.Const = &val
+			hasRules = true
+		}
+	}
+
+	if schema.Minimum != nil && *schema.Minimum > 0 {
+		val := uint32(*schema.Minimum)
+		rules.GreaterThan = &validate.UInt32Rules_Gte{
+			Gte: val,
+		}
 		hasRules = true
 	}
 
-	if schema.Minimum != "" {
-		if min, err := schema.Minimum.Float64(); err == nil {
-			val := uint32(min)
-			rules.GreaterThan = &validate.UInt32Rules_Gte{
-				Gte: val,
-			}
-			hasRules = true
+	if schema.Maximum != nil {
+		val := uint32(*schema.Maximum)
+		rules.LessThan = &validate.UInt32Rules_Lte{
+			Lte: val,
 		}
-	}
-
-	if schema.Maximum != "" {
-		if max, err := schema.Maximum.Float64(); err == nil {
-			val := uint32(max)
-			rules.LessThan = &validate.UInt32Rules_Lte{
-				Lte: val,
-			}
-			hasRules = true
-		}
+		hasRules = true
 	}
 
 	if !hasRules {
@@ -1155,30 +1146,28 @@ func (p *Parser) extractUint64Rules(schema *jsonschema.Schema) *validate.UInt64R
 	rules := &validate.UInt64Rules{}
 	hasRules := false
 
-	if constVal, ok := schema.Const.(float64); ok {
-		val := uint64(constVal)
-		rules.Const = &val
+	if schema.Const != nil {
+		if constVal, ok := (*schema.Const).(float64); ok {
+			val := uint64(constVal)
+			rules.Const = &val
+			hasRules = true
+		}
+	}
+
+	if schema.Minimum != nil {
+		val := uint64(*schema.Minimum)
+		rules.GreaterThan = &validate.UInt64Rules_Gte{
+			Gte: val,
+		}
 		hasRules = true
 	}
 
-	if schema.Minimum != "" {
-		if min, err := schema.Minimum.Float64(); err == nil {
-			val := uint64(min)
-			rules.GreaterThan = &validate.UInt64Rules_Gte{
-				Gte: val,
-			}
-			hasRules = true
+	if schema.Maximum != nil {
+		val := uint64(*schema.Maximum)
+		rules.LessThan = &validate.UInt64Rules_Lte{
+			Lte: val,
 		}
-	}
-
-	if schema.Maximum != "" {
-		if max, err := schema.Maximum.Float64(); err == nil {
-			val := uint64(max)
-			rules.LessThan = &validate.UInt64Rules_Lte{
-				Lte: val,
-			}
-			hasRules = true
-		}
+		hasRules = true
 	}
 
 	if !hasRules {
@@ -1192,30 +1181,28 @@ func (p *Parser) extractFloatRules(schema *jsonschema.Schema) *validate.FloatRul
 	rules := &validate.FloatRules{}
 	hasRules := false
 
-	if constVal, ok := schema.Const.(float64); ok {
-		val := float32(constVal)
-		rules.Const = &val
+	if schema.Const != nil {
+		if constVal, ok := (*schema.Const).(float64); ok {
+			val := float32(constVal)
+			rules.Const = &val
+			hasRules = true
+		}
+	}
+
+	if schema.Minimum != nil {
+		val := float32(*schema.Minimum)
+		rules.GreaterThan = &validate.FloatRules_Gte{
+			Gte: val,
+		}
 		hasRules = true
 	}
 
-	if schema.Minimum != "" {
-		if min, err := schema.Minimum.Float64(); err == nil {
-			val := float32(min)
-			rules.GreaterThan = &validate.FloatRules_Gte{
-				Gte: val,
-			}
-			hasRules = true
+	if schema.Maximum != nil {
+		val := float32(*schema.Maximum)
+		rules.LessThan = &validate.FloatRules_Lte{
+			Lte: val,
 		}
-	}
-
-	if schema.Maximum != "" {
-		if max, err := schema.Maximum.Float64(); err == nil {
-			val := float32(max)
-			rules.LessThan = &validate.FloatRules_Lte{
-				Lte: val,
-			}
-			hasRules = true
-		}
+		hasRules = true
 	}
 
 	if !hasRules {
@@ -1229,27 +1216,25 @@ func (p *Parser) extractDoubleRules(schema *jsonschema.Schema) *validate.DoubleR
 	rules := &validate.DoubleRules{}
 	hasRules := false
 
-	if constVal, ok := schema.Const.(float64); ok {
-		rules.Const = &constVal
+	if schema.Const != nil {
+		if constVal, ok := (*schema.Const).(float64); ok {
+			rules.Const = &constVal
+			hasRules = true
+		}
+	}
+
+	if schema.Minimum != nil {
+		rules.GreaterThan = &validate.DoubleRules_Gte{
+			Gte: *schema.Minimum,
+		}
 		hasRules = true
 	}
 
-	if schema.Minimum != "" {
-		if min, err := schema.Minimum.Float64(); err == nil {
-			rules.GreaterThan = &validate.DoubleRules_Gte{
-				Gte: min,
-			}
-			hasRules = true
+	if schema.Maximum != nil {
+		rules.LessThan = &validate.DoubleRules_Lte{
+			Lte: *schema.Maximum,
 		}
-	}
-
-	if schema.Maximum != "" {
-		if max, err := schema.Maximum.Float64(); err == nil {
-			rules.LessThan = &validate.DoubleRules_Lte{
-				Lte: max,
-			}
-			hasRules = true
-		}
+		hasRules = true
 	}
 
 	if !hasRules {

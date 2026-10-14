@@ -1,0 +1,421 @@
+syntax = "proto3";
+
+package dtkt.core.v1;
+
+import "buf/validate/validate.proto";
+import "dtkt/core/v1/common.proto";
+import "dtkt/flow/v1beta1/runtime.proto";
+import "dtkt/flow/v1beta1/spec.proto";
+import "dtkt/protoform/v1beta1/protoform.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/longrunning/operations.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "google/rpc/status.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1";
+
+// AutomationService provides operations for managing and running automations.
+service AutomationService {
+  // List automations with filtering options.
+  rpc ListAutomations(ListAutomationsRequest) returns (ListAutomationsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Get an automation by name.
+  rpc GetAutomation(GetAutomationRequest) returns (GetAutomationResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Create a new automation.
+  rpc CreateAutomation(CreateAutomationRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      metadata_type: "AutomationRuntime"
+      response_type: "Automation"
+    };
+  }
+
+  // Update an automation.
+  rpc UpdateAutomation(UpdateAutomationRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      metadata_type: "AutomationRuntime"
+      response_type: "Automation"
+    };
+  }
+
+  // Delete an automation.
+  rpc DeleteAutomation(DeleteAutomationRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      metadata_type: "AutomationRuntime"
+      response_type: "google.protobuf.Empty"
+    };
+  }
+
+  // Receive a stream of output/user action events (for environments with server streaming but not client streaming, e.g. web browsers).
+  rpc ReceiveAutomationEvents(ReceiveAutomationEventsRequest) returns (stream ReceiveAutomationEventsResponse);
+
+  // Send an input/user action event (for environments without client streaming, e.g. web browsers).
+  rpc SendAutomationEvent(SendAutomationEventRequest) returns (google.protobuf.Empty);
+
+  // Send input/user action events and receive output/user action events bi-directionally.
+  rpc StreamAutomationEvents(stream StreamAutomationEventsRequest) returns (stream StreamAutomationEventsResponse);
+}
+
+// Automation is a runnable instance of a Flow with a tagged spec version and
+// runtime configuration.
+message Automation {
+  option (google.api.resource) = {
+    type: "Automation"
+    singular: "automation"
+    plural: "automations"
+    pattern: "organizations/{organization}/automations/{automation}"
+    pattern: "users/{user}/automations/{automation}"
+  };
+
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Name of flow resource to resolve spec.
+  string flow = 3 [
+    (buf.validate.field).required = true,
+    (google.api.resource_reference).type = "Flow",
+    (dtkt.protoform.v1beta1.field).title = "Flow",
+    (dtkt.protoform.v1beta1.field).description = "Select a flow.",
+    (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.core.v1.FlowService.ListFlows",
+    (dtkt.protoform.v1beta1.field).select.response_field = "flows",
+    (dtkt.protoform.v1beta1.field).select.label_expr = "has(this.spec.v1beta1) ? this.spec.v1beta1.name : this.name",
+    (dtkt.protoform.v1beta1.field).select.value_expr = "this.name"
+  ];
+
+  // Checksum of flow spec must match flow when resolving spec (concurrency control).
+  string spec_etag = 4 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = INPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // ConnectionConfig with connection resource name and optional context.
+  message ConnectionConfig {
+    // Name of connection resource.
+    string name = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.contains = "/connections/",
+      (dtkt.protoform.v1beta1.field).title = "Connection",
+      (dtkt.protoform.v1beta1.field).description = "Select a connection.",
+      (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.core.v1.ConnectionService.ListConnections",
+      (dtkt.protoform.v1beta1.field).select.response_field = "connections",
+      (dtkt.protoform.v1beta1.field).select.label_expr = "this.name",
+      (dtkt.protoform.v1beta1.field).select.value_expr = "this.name"
+    ];
+
+    // Context to resolve connection resource by name.
+    // If unspecified, defaults to the context of the automation execution.
+    Context context = 2;
+  }
+
+  // Map of connection node ID (found in flow spec) and configuration.
+  // Example:
+  // ```
+  // - "storage": {
+  //      "name": "users/bob/connections/localblob",
+  //      "context": {
+  //        "name": "users/bob",
+  //        ...
+  //      },
+  //    }
+  // ```
+  map<string, ConnectionConfig> connections = 5;
+
+  // Initial inputs configuration as map of input node ID to valid data of input
+  // node's declared type (well-known type wrappers used for scalar values).
+  // Format:
+  // ```
+  // - "bucketName": "my-storage-bucket"
+  // - "adSettings": { "bid": 100 }
+  // ```
+  map<string, google.protobuf.Any> inputs = 6;
+
+  // Execution is stopped if total time exceeds given duration.
+  // Default: 0 (no timeout).
+  google.protobuf.Duration timeout = 7;
+
+  // Automation runtime.
+  AutomationRuntime runtime = 8 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Etag for concurrency control of automation updates (must match current etag
+  // to update or delete).
+  string etag = 10 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true,
+    debug_redact = true
+  ];
+
+  // Server-assigned batch name if created within a batch (optional).
+  optional string batch = 11 [(dtkt.protoform.v1beta1.field).hidden = true];
+
+  // Automation create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Automation update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+}
+
+// AutomationRuntime contains execution state, environment, and final result.
+message AutomationRuntime {
+  enum State {
+    STATE_UNSPECIFIED = 0;
+    PENDING = 1;
+    RUNNING = 2;
+    STOPPED = 3;
+    FAILED = 4;
+  }
+
+  // Execution state.
+  State state = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+
+  message Env {
+    oneof version {
+      option (buf.validate.oneof).required = true;
+      dtkt.flow.v1beta1.Env v1beta1 = 1;
+    }
+  }
+
+  // Versioned environment.
+  Env env = 2 [(buf.validate.field).required = true];
+
+  // Start time.
+  google.protobuf.Timestamp start_time = 3;
+
+  // Stop time.
+  google.protobuf.Timestamp stop_time = 4;
+
+  message Result {
+    option (buf.validate.message).oneof = {
+      fields: [
+        "error",
+        "values"
+      ]
+      required: true
+    };
+
+    google.rpc.Status error = 1;
+    map<string, google.protobuf.Any> values = 2;
+  }
+
+  // Result of execution (error or values).
+  Result result = 5;
+}
+
+message GetAutomationRequest {
+  // Name of Automation resource to get.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetAutomationResponse {
+  // The requested automation.
+  Automation automation = 1 [(buf.validate.field).required = true];
+}
+
+message CreateAutomationRequest {
+  // Parent resource name.
+  string parent = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  string automation_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-z0-9-]+$",
+    (dtkt.protoform.v1beta1.field).description = "Automation ID"
+  ];
+
+  // Automation to create.
+  Automation automation = 3 [(buf.validate.field).required = true];
+}
+
+message CreateAutomationResponse {
+  // The created automation.
+  Automation automation = 1 [(buf.validate.field).required = true];
+}
+
+message UpdateAutomationRequest {
+  // Automation with updated fields. Must include `name`.
+  Automation automation = 1 [(buf.validate.field).required = true];
+
+  // Fields to update (e.g., "config,address").
+  google.protobuf.FieldMask update_mask = 2;
+
+  // Desired state of automation runtime after update.
+  optional AutomationRuntime.State desired_state = 3 [(buf.validate.field).enum = {
+    in: [
+      2,
+      3
+    ]
+  } /* RUNNING or STOPPED */];
+}
+
+message DeleteAutomationRequest {
+  // Name of automation to delete.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Etag must match current automation etag for delete to succeed (ensures
+  // automation is up-to-date and prevents lost deletes).
+  string etag = 2 [(buf.validate.field).required = true];
+}
+
+message BatchCreateAutomationsRequest {
+  option (buf.validate.message).cel = {
+    id: "batch_create_automations.requests"
+    message: "requests must use the same parent"
+    expression: "size(this.requests.filter(r, r.parent == this.parent)) == size(this.requests)"
+  };
+
+  // Parent resource name shared by all automations this batch.
+  string parent = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  repeated CreateAutomationRequest requests = 2 [(buf.validate.field).repeated.min_items = 2];
+}
+
+message BatchCreateAutomationsResponse {
+  // The created automations.
+  repeated Automation automations = 1 [(buf.validate.field).required = true];
+}
+
+message ListAutomationsRequest {
+  // Maximum number of automations to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name: `organizations/{organization}` or `users/{user}`.
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListAutomationsResponse {
+  // The list of automations.
+  repeated Automation automations = 1 [(buf.validate.field).required = true];
+
+  // Token for retrieving the next page.
+  string next_page_token = 2;
+}
+
+// SendAutomationEvent represents an event sent to an automation.
+message SendAutomationEvent {
+  // InputsEvent provides initial input values for a flow.
+  message InputsEvent {
+    // Map of flow input node id => any proto wrapper (e.g., "ping" => Any("pong")).
+    map<string, google.protobuf.Any> values = 1;
+  }
+
+  // UserResponseEvent is received upon a fulfilled user elicitation.
+  message UserResponseEvent {
+    // Flow action node id containing user action.
+    string id = 1 [(buf.validate.field).required = true];
+
+    // Map of user action input id => any proto wrapper (e.g., "ping" => Any("pong")).
+    map<string, google.protobuf.Any> values = 2 [(buf.validate.field).required = true];
+  }
+
+  oneof type {
+    InputsEvent inputs_event = 1;
+    UserResponseEvent user_response_event = 2;
+  }
+}
+
+// ReceiveAutomationEvent represents an event received from an automation.
+message ReceiveAutomationEvent {
+  // OutputsEvent provides output values from a running flow.
+  message OutputsEvent {
+    // Map of output node id => any proto wrapper.
+    map<string, google.protobuf.Any> values = 1 [(buf.validate.field).required = true];
+  }
+
+  // UserRequestEvent is emitted upon execution requiring elicitation from a user.
+  message UserRequestEvent {
+    // Flow action node id containing user action.
+    string id = 1 [(buf.validate.field).required = true];
+
+    // User action node which defines the data being requested.
+    dtkt.flow.v1beta1.UserAction user_action = 2 [(buf.validate.field).required = true];
+  }
+
+  // MetricsEvent provides metrics from a running flow.
+  message MetricsEvent {
+    // Map of output metrics id => any proto wrapper.
+    map<string, google.protobuf.Any> values = 1 [(buf.validate.field).required = true];
+  }
+
+  oneof type {
+    OutputsEvent outputs_event = 1;
+    UserRequestEvent user_request_event = 2;
+    MetricsEvent metrics_event = 3;
+  }
+}
+
+message SendAutomationEventRequest {
+  // Name of Automation resource to send event.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Event to send.
+  SendAutomationEvent event = 2;
+}
+
+message ReceiveAutomationEventsRequest {
+  // Name of Automation resource to receive events.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message ReceiveAutomationEventsResponse {
+  // The received event.
+  ReceiveAutomationEvent event = 2 [(buf.validate.field).required = true];
+}
+
+message StreamAutomationEventsRequest {
+  // Name of Automation resource to send event.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Event to send.
+  SendAutomationEvent event = 2;
+}
+
+message StreamAutomationEventsResponse {
+  // The received event.
+  ReceiveAutomationEvent event = 1 [(buf.validate.field).required = true];
+}

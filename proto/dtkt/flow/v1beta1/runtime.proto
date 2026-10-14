@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package dtkt.flow.v1beta1;
+
+import "buf/validate/validate.proto";
+import "dtkt/flow/v1beta1/spec.proto";
+import "google/api/expr/v1alpha1/checked.proto";
+import "google/api/expr/v1alpha1/syntax.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+import "google/rpc/code.proto";
+import "google/rpc/status.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/flow/v1beta1";
+
+// Env represents the runtime state (snapshot) of a Flow execution.
+message Env {
+  // Result represents the runtime state (snapshot) emitted by a Node.
+  message Result {
+    google.protobuf.Timestamp start_time = 1;
+    google.protobuf.Timestamp finish_time = 2;
+    map<string, google.protobuf.Any> metadata = 3;
+
+    oneof type {
+      option (buf.validate.oneof).required = true;
+      google.rpc.Status error = 5;
+      google.protobuf.Any value = 6;
+    }
+  }
+
+  // Node contains its total number of results emitted, its previous, and
+  // current value.
+  message Node {
+    string ident = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+$"
+    ];
+    uint64 result_count = 3;
+    Result result_prev = 4;
+    Result result_curr = 5;
+  }
+
+  // All nodes within Env.
+  repeated Node nodes = 1;
+}
+
+// Graph represents a fully parsed and/or checked (executable) Flow spec:
+//  - Parsed when all node expressions (if any) are parsed;
+//  - Checked (executable) when all node expressions (if any) are checked.
+message Graph {
+  message Edge {
+    // Source identifier of an Edge is a fully qualified Node identifier + field
+    // selection (if any).
+    string source = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+"
+    ];
+
+    // Target identifier of an Edge is a fully qualified Node + Expr identifier:
+    // "{node.ident}.{expr.id}".
+    string target = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+"
+    ];
+  }
+
+  message Expr {
+    // Parsed expression (required to produce a valid edge).
+    google.api.expr.v1alpha1.ParsedExpr parsed = 2 [(buf.validate.field).required = true];
+
+    // Checked expression (required to be executable).
+    google.api.expr.v1alpha1.CheckedExpr checked = 3;
+  }
+
+  message Node {
+    // Node identifier as a concatenation of a Flow spec node's type + id, e.g.:
+    // "inputs.foo" or "vars.name". Constitutes an Edge's source prefix when
+    // referenced within an expression.
+    string ident = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.pattern = "^(connections|inputs|vars|streams|actions|outputs|metrics)\\.[a-zA-Z][a-zA-Z0-9_]+$"
+    ];
+
+    // Map containing unique expression ID to Expr.
+    map<string, Expr> exprs = 3;
+  }
+
+  Flow spec = 1 [(buf.validate.field).required = true];
+  repeated Node nodes = 2;
+  repeated Edge edges = 3;
+}
+
+// Done is a sentinel value used for control flow and internal error wrapping.
+message Done {
+  // The status code:
+  //  - OK/EOF: treated as non-error;
+  //  - All others treated as error.
+  google.rpc.Code code = 1;
+
+  // A developer-facing status message.
+  string message = 2;
+
+  // Node identifier for tracing, if any.
+  optional string ident = 3;
+}
+
+message Skip {}

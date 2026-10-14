@@ -21,17 +21,18 @@ var ErrSSHBind = errors.New("bind not supported: SSH connections are dial-only (
 
 // SSHConnector is a dialer to a remote address (Unix socket or TCP) on a remote machine over SSH.
 type SSHConnector struct {
-	uri *SSHRemoteURI
+	uri        *SSHRemoteURI
+	httpClient *HTTPClient
 
 	// SSH client management
-	mu        sync.RWMutex
 	sshClient *ssh.Client
 	connected bool
+	mu        sync.RWMutex
 }
 
 // NewSSHConnector creates a new SSH connector from a parsed URI.
 // Supports both ssh+unix:// and ssh+tcp:// schemes.
-func NewSSHConnector(addr net.Addr) (_ *SSHConnector, err error) {
+func NewSSHConnector(addr net.Addr, opts ...Option) (_ *SSHConnector, err error) {
 	uri, ok := addr.(*SSHRemoteURI)
 	if !ok {
 		uri, err = ParseSSHRemoteURI(fmt.Sprintf("%s://%s", addr.Network(), addr))
@@ -40,24 +41,21 @@ func NewSSHConnector(addr net.Addr) (_ *SSHConnector, err error) {
 		}
 	}
 
-	return &SSHConnector{
+	c := &SSHConnector{
 		uri: uri,
-	}, nil
+	}
+	c.applyOptions(opts...)
+
+	return c, nil
 }
 
 // Address returns the remote address (net.Addr interface).
-func (c *SSHConnector) Address() net.Addr {
-	return c.uri
+func (c *SSHConnector) Address() Address {
+	return c.uri.RemoteAddr
 }
 
-// GRPCTarget returns the target string for dialing (e.g., for gRPC).
-// Uses the standard GRPCTarget function to format based on remote network type.
-func (c *SSHConnector) GRPCTarget() string {
-	return GRPCTarget(c.uri.RemoteAddr)
-}
-
-// DialGRPC creates a gRPC client connection over SSH to the remote address.
-func (c *SSHConnector) DialGRPC(opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+// GRPCClient creates a gRPC client connection over SSH to the remote address.
+func (c *SSHConnector) GRPCClient(opts ...grpc.DialOption) (*grpc.ClientConn, error) {
 	// Ensure SSH connection is established
 	if err := c.ensureSSHConnected(); err != nil {
 		return nil, err
@@ -70,7 +68,16 @@ func (c *SSHConnector) DialGRPC(opts ...grpc.DialOption) (*grpc.ClientConn, erro
 		}),
 	}, opts...)
 
-	return grpc.NewClient(c.GRPCTarget(), opts...)
+	return grpc.NewClient(GRPCTarget(c.uri.RemoteAddr), opts...)
+}
+
+func (c *SSHConnector) HTTPClient() (*HTTPClient, string) {
+	if c.httpClient == nil {
+		client := NewHTTPClient(c.uri.RemoteAddr)
+		client.dialer = c
+		c.httpClient = client
+	}
+	return c.httpClient, c.httpClient.BaseUrl()
 }
 
 // DialContext creates a connection to the remote address with context support.
@@ -136,10 +143,10 @@ func (c *SSHConnector) DialContext(ctx context.Context) (net.Conn, error) {
 	}
 }
 
-// Bind is not supported for SSH connections as they are client-only.
+// Listener is not supported for SSH connections as they are client-only.
 // SSH connections cannot listen/bind - they can only dial remote addresses.
-// For bidirectional connectivity with Bind support, use Cloud Connection.
-func (c *SSHConnector) Bind(context.Context) (net.Listener, error) {
+// For bidirectional connectivity with Listener support, use Cloud Connection.
+func (c *SSHConnector) Listener(context.Context) (net.Listener, error) {
 	return nil, ErrSSHBind
 }
 
@@ -368,4 +375,12 @@ func (a *proxyCommandAddr) Network() string {
 
 func (a *proxyCommandAddr) String() string {
 	return a.addr
+}
+
+func (c *SSHConnector) applyOptions(opts ...Option) {
+	for _, opt := range opts {
+		if opt != nil {
+			opt(c)
+		}
+	}
 }

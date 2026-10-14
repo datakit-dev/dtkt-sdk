@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
@@ -41,6 +42,37 @@ func TrimScheme(uri string) string {
 		return strings.TrimPrefix(uri, scheme+"://")
 	}
 	return uri
+}
+
+func GetPath(uri string) (string, error) {
+	url, err := Parse(uri)
+	if err != nil {
+		return "", err
+	}
+
+	return url.Path, nil
+}
+
+// IsGlob checks if a string is a valid file glob pattern.
+func IsGlob(pattern string) bool {
+	// 1. Validate the syntax using the standard library.
+	// We pass an empty string because we only care if the pattern itself is malformed.
+	_, err := filepath.Match(pattern, "")
+	if err != nil {
+		// Returns filepath.ErrBadPattern if syntax is invalid
+		return false
+	}
+
+	// 2. Define standard glob magic characters.
+	// On Windows, the backslash (\) is a path separator, not an escape character.
+	// On Unix systems, a backslash can escape a glob character.
+	globChars := `*?[`
+	if runtime.GOOS != "windows" {
+		globChars = `*?[\`
+	}
+
+	// 3. If syntax is valid and it contains magic characters, it's a glob pattern.
+	return strings.ContainsAny(pattern, globChars)
 }
 
 func Parse(uriStr string) (*url.URL, error) {
@@ -76,6 +108,8 @@ func Parse(uriStr string) (*url.URL, error) {
 }
 
 func ParseWithScheme(uri string, scheme string) (*url.URL, error) {
+	scheme = strings.ToLower(scheme)
+
 	if !HasScheme(uri) {
 		uri = scheme + `://` + uri
 	}
@@ -85,8 +119,10 @@ func ParseWithScheme(uri string, scheme string) (*url.URL, error) {
 		return nil, err
 	}
 
+	url.Scheme = strings.ToLower(url.Scheme)
+
 	if url.Scheme != scheme {
-		url.Scheme = scheme
+		return nil, fmt.Errorf("uri scheme invalid: %q, expected: %q", url.Scheme, scheme)
 	}
 
 	return url, nil
@@ -101,7 +137,7 @@ func Exists(ctx context.Context, uri *url.URL) (bool, error) {
 	case "file":
 		path := filepath.FromSlash(uri.Path)
 		if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-			return false, nil
+			return false, err
 		} else {
 			return true, nil
 		}

@@ -23,14 +23,10 @@ enum TypeKind {
   TYPE_KIND_OBJECT = 12;
   TYPE_KIND_DURATION = 13;
   TYPE_KIND_TIMESTAMP = 14;
-  // TYPE_KIND_SFIXED32 = 12;
-  // TYPE_KIND_SFIXED64 = 13;
-  // TYPE_KIND_SINT32 = 14;
-  // TYPE_KIND_SINT64 = 15;
 }
 
-// Type encodes a catalog implementation's native data type with a corresponding
-// kind and additional JSON, Geospatial, and type parameters.
+// Type encodes an implementation's native data type with a corresponding kind
+// and additional JSON, Geospatial, and type parameters.
 message Type {
   // Name of the implementation's native type: (e.g. VARCHAR, BIGINT, etc.).
   string name = 1;

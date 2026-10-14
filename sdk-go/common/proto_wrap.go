@@ -46,6 +46,18 @@ var protoWrapperNames = []string{
 	"google.protobuf.UInt64Value",
 }
 
+func AnyTypeURL[T ~string](name T) string {
+	return fmt.Sprintf("type.googleapis.com/%s", name)
+}
+
+func IsWellKnownName[T ~string](name T) bool {
+	return strings.HasPrefix(string(name), "google.protobuf.")
+}
+
+func IsWellKnownWrapperName[T ~string](name T) bool {
+	return slices.Contains(protoWrapperNames, string(name))
+}
+
 func ProtoMapKeyFrom[K ProtoMapKey](key string) (toKey K, err error) {
 	switch any(toKey).(type) {
 	case string:
@@ -58,10 +70,9 @@ func ProtoMapKeyFrom[K ProtoMapKey](key string) (toKey K, err error) {
 		}
 		toKey = any(b).(K)
 	default:
-		cast, ok := isNumber(toKey)
-		if ok {
+		if castNum, ok := isNumber(toKey); ok {
 			var n any
-			n, err = cast(key)
+			n, err = castNum(key)
 			if err != nil {
 				return
 			}
@@ -73,18 +84,6 @@ func ProtoMapKeyFrom[K ProtoMapKey](key string) (toKey K, err error) {
 
 func ProtoMapKeyFor[K ProtoMapKey](key K) string {
 	return util.StringFormatAny(key)
-}
-
-func AnyTypeURL[T ~string](name T) string {
-	return fmt.Sprintf("type.googleapis.com/%s", name)
-}
-
-func IsWellKnownName[T ~string](name T) bool {
-	return strings.HasPrefix(string(name), "google.protobuf.")
-}
-
-func IsWellKnownWrapperName[T ~string](name T) bool {
-	return slices.Contains(protoWrapperNames, string(name))
 }
 
 func (w ProtoOptions) UnwrapMap(from map[string]proto.Message) (to map[string]any, err error) {
@@ -102,7 +101,7 @@ func (w ProtoOptions) UnwrapMap(from map[string]proto.Message) (to map[string]an
 }
 
 func (w ProtoOptions) UnwrapAnyMap(from map[string]*anypb.Any) (to map[string]any, err error) {
-	to = make(map[string]any, len(from))
+	to = map[string]any{}
 	if len(from) > 0 {
 		for key, proto := range from {
 			val, err := w.UnwrapAny(proto)
@@ -201,12 +200,9 @@ func (w ProtoOptions) WrapAny(value any) (*anypb.Any, error) {
 	msg, err := w.Wrap(value)
 	if err != nil {
 		return nil, err
+	} else if msg, ok := msg.(*anypb.Any); ok {
+		return msg, nil
 	}
-
-	if value, ok := msg.(*anypb.Any); ok {
-		return value, nil
-	}
-
 	return anypb.New(msg)
 }
 
@@ -236,16 +232,6 @@ func (w ProtoOptions) Wrap(value any) (proto.Message, error) {
 		return timestamppb.New(value), nil
 	case string:
 		return wrapperspb.String(value), nil
-	case json.Number:
-		if i64Val, i64Err := value.Int64(); i64Err != nil {
-			if f64Val, f64Err := value.Float64(); f64Err != nil {
-				return nil, errors.Join(i64Err, f64Err)
-			} else {
-				return wrapperspb.Double(f64Val), nil
-			}
-		} else {
-			return wrapperspb.Int64(i64Val), nil
-		}
 	case int32:
 		return wrapperspb.Int32(value), nil
 	case int64:
@@ -272,12 +258,28 @@ func (w ProtoOptions) Wrap(value any) (proto.Message, error) {
 		if err == nil {
 			return msg, nil
 		}
+	case json.Number:
+		if i64Val, i64Err := value.Int64(); i64Err != nil {
+			if f64Val, f64Err := value.Float64(); f64Err != nil {
+				return nil, errors.Join(i64Err, f64Err)
+			} else {
+				return wrapperspb.Double(f64Val), nil
+			}
+		} else {
+			return wrapperspb.Int64(i64Val), nil
+		}
+	case json.RawMessage:
+		msg := new(structpb.Value)
+		if err := encoding.FromJSON(value, msg); err != nil {
+			return nil, err
+		}
+		return msg, nil
 	case proto.Message:
 		return value, nil
 	}
 
-	b, err := encoding.ToJSONV2(value,
-		encoding.WithEncodeProtoJSONOptions(protojson.MarshalOptions{
+	b, err := encoding.ToJSON(value,
+		encoding.WithProtoEncodeOptions(protojson.MarshalOptions{
 			Resolver: w.Resolver,
 		}),
 	)
@@ -285,16 +287,16 @@ func (w ProtoOptions) Wrap(value any) (proto.Message, error) {
 		return nil, err
 	}
 
-	var a any
-	if err = encoding.FromJSONV2(b, &a,
-		encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
+	var val any
+	if err = encoding.FromJSON(b, &val,
+		encoding.WithProtoDecodeOptions(protojson.UnmarshalOptions{
 			Resolver: w.Resolver,
 		}),
 	); err != nil {
 		return nil, err
 	}
 
-	return w.Wrap(a)
+	return w.Wrap(val)
 }
 
 func (w ProtoOptions) UnwrapAny(from *anypb.Any) (any, error) {
@@ -303,7 +305,6 @@ func (w ProtoOptions) UnwrapAny(from *anypb.Any) (any, error) {
 	} else if from.TypeUrl == "" {
 		return nil, fmt.Errorf("invalid type url")
 	}
-
 	return w.Unwrap(from)
 }
 
@@ -364,9 +365,8 @@ func UnwrapProtoAnyAsOptions[T any](from *anypb.Any, opts ProtoOptions) (to T, e
 		return to, nil
 	}
 
-	castFunc, ok := isNumber(to)
-	if ok {
-		unwrap, err = castFunc(unwrap)
+	if castNum, ok := isNumber(to); ok {
+		unwrap, err = castNum(unwrap)
 		if err != nil {
 			return
 		}
@@ -375,17 +375,17 @@ func UnwrapProtoAnyAsOptions[T any](from *anypb.Any, opts ProtoOptions) (to T, e
 
 	switch value := unwrap.(type) {
 	case []byte:
-		err = encoding.FromJSONV2(value, &to)
+		err = encoding.FromJSON(value, &to)
 		return
 	case string:
-		err = encoding.FromJSONV2([]byte(value), &to)
+		err = encoding.FromJSON([]byte(value), &to)
 		return
 	case proto.Message:
-		msg, ok := isMessage(to)
+		msg, ok := any(to).(proto.Message)
 		if ok {
 			var b []byte
-			b, err = encoding.ToJSONV2(value,
-				encoding.WithEncodeProtoJSONOptions(protojson.MarshalOptions{
+			b, err = encoding.ToJSON(value,
+				encoding.WithProtoEncodeOptions(protojson.MarshalOptions{
 					Resolver: opts.Resolver,
 				}),
 			)
@@ -394,8 +394,8 @@ func UnwrapProtoAnyAsOptions[T any](from *anypb.Any, opts ProtoOptions) (to T, e
 			}
 
 			msg = msg.ProtoReflect().New().Interface()
-			err = encoding.FromJSONV2(b, msg,
-				encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
+			err = encoding.FromJSON(b, msg,
+				encoding.WithProtoDecodeOptions(protojson.UnmarshalOptions{
 					Resolver: opts.Resolver,
 				}),
 			)
@@ -408,8 +408,8 @@ func UnwrapProtoAnyAsOptions[T any](from *anypb.Any, opts ProtoOptions) (to T, e
 		}
 	default:
 		var b []byte
-		b, err = encoding.ToJSONV2(value,
-			encoding.WithEncodeProtoJSONOptions(protojson.MarshalOptions{
+		b, err = encoding.ToJSON(value,
+			encoding.WithProtoEncodeOptions(protojson.MarshalOptions{
 				Resolver: opts.Resolver,
 			}),
 		)
@@ -417,15 +417,15 @@ func UnwrapProtoAnyAsOptions[T any](from *anypb.Any, opts ProtoOptions) (to T, e
 			return
 		}
 
-		if msg, ok := isMessage(to); ok {
-			err = encoding.FromJSONV2(b, msg,
-				encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
+		if msg, ok := any(to).(proto.Message); ok {
+			err = encoding.FromJSON(b, msg,
+				encoding.WithProtoDecodeOptions(protojson.UnmarshalOptions{
 					Resolver: opts.Resolver,
 				}),
 			)
 		} else {
-			err = encoding.FromJSONV2(b, &to,
-				encoding.WithDecodeProtoJSONOptions(protojson.UnmarshalOptions{
+			err = encoding.FromJSON(b, &to,
+				encoding.WithProtoDecodeOptions(protojson.UnmarshalOptions{
 					Resolver: opts.Resolver,
 				}),
 			)
@@ -523,7 +523,7 @@ func WrapProtoAnyMap[K ProtoMapKey, V any](from map[K]V) (map[string]*anypb.Any,
 }
 
 func WrapProtoAnySliceOptions[V any](from []V, opts ProtoOptions) ([]*anypb.Any, error) {
-	return opts.WrapAnySlice(util.AnySlice(from))
+	return opts.WrapAnySlice(util.SliceOfAny(from))
 }
 
 func WrapProtoAnySlice[V any](from []V) ([]*anypb.Any, error) {
@@ -549,18 +549,13 @@ func UnwrapProtoAnySlice[V any](from []*anypb.Any) ([]V, error) {
 }
 
 func UnwrapProtoSliceOptions[V proto.Message](from []V, opts ProtoOptions) ([]any, error) {
-	return opts.UnwrapSlice(util.SliceMap(from, func(m V) proto.Message {
+	return opts.UnwrapSlice(util.SliceOfFunc(from, func(m V) proto.Message {
 		return m
 	}))
 }
 
 func UnwrapProtoSlice[V proto.Message](from []V) ([]any, error) {
 	return UnwrapProtoSliceOptions(from, ProtoOptions{})
-}
-
-func isMessage(val any) (msg proto.Message, isMsg bool) {
-	msg, isMsg = val.(proto.Message)
-	return
 }
 
 func isNumber(to any) (func(any) (any, error), bool) {

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package dtkt.ai.v1beta1;
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/ai/v1beta1";
+
+// Enum representing capabilities of a model.
+enum ModelCapability {
+  MODEL_CAPABILITY_UNSPECIFIED = 0;
+  MODEL_CAPABILITY_COMPLETION = 1;
+  MODEL_CAPABILITY_TOOLS = 2;
+  MODEL_CAPABILITY_INSERT = 3;
+  MODEL_CAPABILITY_VISION = 4;
+  MODEL_CAPABILITY_EMBEDDING = 5;
+  MODEL_CAPABILITY_THINKING = 6;
+  MODEL_CAPABILITY_IMAGE = 7;
+  MODEL_CAPABILITY_AUDIO = 8;
+}

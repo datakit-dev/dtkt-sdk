@@ -24,7 +24,7 @@ func TestOrderedMap_MarshalJSON(t *testing.T) {
 		util.NewMapPair("bool", testStruct{Bool: true}),
 	)
 
-	b1, err := encoding.ToJSONV2(m1)
+	b1, err := encoding.ToJSON(m1)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,12 +35,12 @@ func TestOrderedMap_MarshalJSON(t *testing.T) {
 		util.NewMapPair("num", testStruct{}),
 		util.NewMapPair("bool", testStruct{}),
 	)
-	err = encoding.FromJSONV2(b1, m2)
+	err = encoding.FromJSON(b1, m2)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	b2, err := encoding.ToJSONV2(m2)
+	b2, err := encoding.ToJSON(m2)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,7 +86,7 @@ func TestOrderedMap_NonStringKeys_MarshalJSON(t *testing.T) {
 		mapType[uint64, string]{util.NewOrderedMap(util.NewMapPair(uint64(4), "uint64"))},
 		mapType[string, time.Duration]{util.NewOrderedMap(util.NewMapPair("dur", time.Minute))},
 	} {
-		b, err := encoding.ToJSONV2(m1)
+		b, err := encoding.ToJSON(m1)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -100,7 +100,7 @@ func TestOrderedMap_NonStringKeys_MarshalJSON(t *testing.T) {
 			t.Fatal("expected empty map")
 		}
 
-		err = encoding.FromJSONV2(b, &m2)
+		err = encoding.FromJSON(b, &m2)
 		if err != nil {
 			t.Fatal(err)
 		}

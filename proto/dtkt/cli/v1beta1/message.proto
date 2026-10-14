@@ -3,7 +3,7 @@ syntax = "proto3";
 package dtkt.cli.v1beta1;
 
 import "buf/validate/validate.proto";
-import "dtkt/core/v1/messages.proto";
+import "dtkt/core/v1/common.proto";
 import "dtkt/protoui/v1beta1/protoui.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -22,6 +22,48 @@ message Legal {
   optional google.protobuf.Timestamp bsl_accepted_at = 1;
 }
 
+// Models configuration
+message Models {
+  message Agent {
+    option (buf.validate.message).cel_expression = "this.disable || size(this.model) > 0";
+
+    bool disable = 1;
+    string model = 2;
+    Provider provider = 3;
+  }
+
+  message Embedding {
+    option (buf.validate.message).cel_expression = "this.disable || (size(this.model) > 0 && this.dimensions > 0)";
+
+    bool disable = 1;
+    string model = 2;
+    uint32 dimensions = 3;
+    Provider provider = 4 [(buf.validate.field).cel_expression = "this.name != 'anthropic'"];
+  }
+
+  message Provider {
+    // Name of provider
+    string name = 2 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.in = "ollama",
+      (buf.validate.field).string.in = "openai",
+      (buf.validate.field).string.in = "anthropic"
+    ];
+
+    // API base url (default: provider-specific)
+    optional string api_base_url = 3 [(buf.validate.field).string.uri = true];
+
+    // API key (may be required by provider)
+    optional string api_key = 4;
+
+    // Custom headers to include in each request
+    map<string, string> custom_headers = 5;
+  }
+
+  Embedding embedding = 1;
+  Agent agent = 2;
+}
+
 // Daemon configuration
 message DaemonConfigFile {
   // Daemon TCP address
@@ -35,6 +77,9 @@ message DaemonConfigFile {
 
   // Docker registry for pushing/pulling integration images (e.g. "us-docker.pkg.dev/datakit-prd/us-docker-virtual")
   string docker_registry = 3;
+
+  // Model configuration for agents and embeddings
+  Models models = 4;
 }
 
 message DaemonConfig {

@@ -4,15 +4,14 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"sync"
 	"time"
 
 	"connectrpc.com/connect"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
 	corev1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1/corev1connect"
-	"github.com/openziti/sdk-golang/ziti"
+
+	// "github.com/openziti/sdk-golang/ziti"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 const (
@@ -25,19 +24,21 @@ var _ Connector = (*CloudConnector)(nil)
 
 type (
 	CloudConnector struct {
-		addr net.Addr
-		opts *connectorOptions
+		addr       Address
+		resource   *corev1.Resource
+		httpClient *HTTPClient
+
+		close func() error
+		mu    sync.Mutex // protects close
 	}
 )
 
-func NewCloudConnector(addr net.Addr, opts ...ConnectorOption) (*CloudConnector, error) {
-	o := &connectorOptions{}
-	o.apply(opts...)
-
-	return &CloudConnector{
+func NewCloudConnector(addr Address, opts ...Option) (*CloudConnector, error) {
+	conn := &CloudConnector{
 		addr: addr,
-		opts: o,
-	}, nil
+	}
+	conn.applyOptions(opts...)
+	return conn, nil
 }
 
 func CloudAuthInterceptor(auth *corev1.Auth) connect.UnaryInterceptorFunc {
@@ -55,21 +56,12 @@ func CloudAuthInterceptor(auth *corev1.Auth) connect.UnaryInterceptorFunc {
 	}
 }
 
-func (c *CloudConnector) Address() net.Addr {
+func (c *CloudConnector) Address() Address {
 	return c.addr
 }
 
-func (c *CloudConnector) GRPCTarget() string {
-	// NOTE: For dialing an integration outside of cloud, c.opts.cloud is always nil
-	// and c.addr must be a valid cloud proxy endpoint.
-	if c.opts.cloud == nil {
-		return GRPCTarget(c.addr)
-	}
-	return fmt.Sprintf("passthrough:%s", c.opts.cloud.GetName())
-}
-
 func (c *CloudConnector) DialContext(ctx context.Context) (_ net.Conn, err error) {
-	if c.opts.cloud == nil {
+	if c.resource == nil {
 		dialer := &net.Dialer{
 			Timeout: 30 * time.Second,
 		}
@@ -93,144 +85,160 @@ func (c *CloudConnector) DialContext(ctx context.Context) (_ net.Conn, err error
 			port = "443"
 		}
 
-		conn, err := dialer.DialContext(ctx, network, net.JoinHostPort(host, port))
-		if err != nil {
-			return nil, err
-		}
-		c.opts.close = conn.Close
-
-		return conn, nil
+		return dialer.DialContext(ctx, network, net.JoinHostPort(host, port))
 	}
 
 	// NOTE: This can only be done by cloud as client dial config must never be
 	// exposed to end-users.
-	ztx, err := c.getZitiContext(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// ztx, err := c.getZitiContext(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	conn, err := ztx.DialWithOptions(c.opts.cloud.GetName(), &ziti.DialOptions{
-		ConnectTimeout: 30 * time.Second,
-	})
-	if err != nil {
-		return nil, err
-	}
-	c.opts.close = conn.Close
+	// return ztx.DialWithOptions(c.resource.GetName(), &ziti.DialOptions{
+	// 	ConnectTimeout: 30 * time.Second,
+	// })
 
-	return conn, nil
+	return
 }
 
-func (c *CloudConnector) DialGRPC(opts ...grpc.DialOption) (*grpc.ClientConn, error) {
-	opts = append(c.opts.grpc, opts...)
+func (c *CloudConnector) HTTPClient() (*HTTPClient, string) {
+	if c.httpClient == nil {
+		client := NewHTTPClient(c.addr)
+		client.dialer = c
+		c.httpClient = client
+	}
+	return c.httpClient, c.httpClient.BaseUrl()
+}
 
-	// NOTE: For dialing an integration outside of cloud, c.opts.cloud is always nil
-	// and requests are made through cloud proxy with the same connection name
-	// as bind (passthrough identifier)
-	if c.opts.cloud != nil {
-		opts = append([]grpc.DialOption{
-			grpc.WithContextDialer(func(ctx context.Context, target string) (net.Conn, error) {
+func (c *CloudConnector) GRPCClient(opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+	var target string
+
+	// NOTE: For dialing an integration outside of cloud, c.resource is always nil
+	// and requests are made through cloud proxy with the same resource name
+	// as bind (passthrough identifier).
+	if c.resource != nil {
+		opts = append(opts,
+			grpc.WithContextDialer(func(ctx context.Context, _ string) (net.Conn, error) {
 				return c.DialContext(ctx)
 			}),
-		}, opts...)
+		)
+		target = fmt.Sprintf("passthrough:%s", c.resource.GetName())
+	} else {
+		target = GRPCTarget(c.addr)
 	}
 
-	conn, err := grpc.NewClient(c.GRPCTarget(), opts...)
-	if err != nil {
-		return nil, err
-	}
-	c.opts.close = conn.Close
-
-	return conn, nil
+	return grpc.NewClient(target, opts...)
 }
 
-func (c *CloudConnector) Bind(ctx context.Context) (net.Listener, error) {
-	// NOTE: For binding an integration to cloud network, c.opts.cloud must be non-nil
-	// in order to bind listener on edge network.
-	if c.opts.cloud == nil {
+func (c *CloudConnector) Listener(ctx context.Context) (_ net.Listener, _ error) {
+	// NOTE: For binding an integration to cloud network, c.resource must be
+	// non-nil in order to bind listener on edge network.
+	if c.resource == nil {
 		return nil, fmt.Errorf("cloud config cannot be nil")
 	}
 
-	ztx, err := c.getZitiContext(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// ztx, err := c.getZitiContext(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	lis, err := ztx.Listen(c.opts.cloud.GetName())
-	if err != nil {
-		return nil, err
-	}
+	// lis, err := ztx.Listen(c.resource.GetName())
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	c.opts.close = lis.Close
+	// c.mu.Lock()
+	// c.close = lis.Close
+	// c.mu.Unlock()
 
-	return lis, nil
+	// return lis, nil
+
+	return
 }
 
 func (c *CloudConnector) Close() error {
-	return c.opts.Close()
+	c.mu.Lock()
+	close := c.close
+	c.mu.Unlock()
+
+	if close != nil {
+		return close()
+	}
+
+	return nil
 }
 
-func (c *CloudConnector) getZitiContext(ctx context.Context) (ziti.Context, error) {
-	config, err := c.getZitiConfig(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("get network config: %w", err)
-	}
+// func (c *CloudConnector) getZitiContext(ctx context.Context) (ziti.Context, error) {
+// 	config, err := c.getZitiConfig(ctx)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("get network config: %w", err)
+// 	}
 
-	ztx, err := ziti.NewContext(config)
-	if err != nil {
-		return nil, fmt.Errorf("create network context: %w", err)
-	}
+// 	ztx, err := ziti.NewContext(config)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("create network context: %w", err)
+// 	}
 
-	err = ztx.Authenticate()
-	if err != nil {
-		return nil, fmt.Errorf("authenticate network context: %w", err)
-	}
+// 	err = ztx.Authenticate()
+// 	if err != nil {
+// 		return nil, fmt.Errorf("authenticate network context: %w", err)
+// 	}
 
-	return ztx, nil
-}
+// 	return ztx, nil
+// }
 
-func (c *CloudConnector) getZitiConfig(ctx context.Context) (*ziti.Config, error) {
-	resource := c.opts.cloud
-	if resource == nil || resource.GetData() == nil {
-		return nil, fmt.Errorf("cloud config missing data")
-	}
+// func (c *CloudConnector) getZitiConfig(ctx context.Context) (*ziti.Config, error) {
+// 	resource := c.resource
+// 	if resource == nil || resource.GetData() == nil {
+// 		return nil, fmt.Errorf("cloud config missing data")
+// 	}
 
-	decrypted := &wrapperspb.BytesValue{}
-	if resource.GetDecrypted() != nil {
-		err := resource.GetDecrypted().UnmarshalTo(decrypted)
-		if err != nil {
-			return nil, fmt.Errorf("unmarshal cloud config: %w", err)
+// 	decrypted := &wrapperspb.BytesValue{}
+// 	if resource.GetDecrypted() != nil {
+// 		err := resource.GetDecrypted().UnmarshalTo(decrypted)
+// 		if err != nil {
+// 			return nil, fmt.Errorf("unmarshal cloud config: %w", err)
+// 		}
+// 	} else if resource.GetContext() == nil {
+// 		return nil, fmt.Errorf("cloud config context cannot be nil")
+// 	} else if resource.GetContext().GetAuth() == nil {
+// 		return nil, fmt.Errorf("cloud config auth cannot be nil")
+// 	} else {
+// 		var (
+// 			auth = resource.GetContext().GetAuth()
+// 			addr = AddrFromProto(resource.GetContext().GetAddress())
+// 		)
+
+// 		client := NewHTTPClient(addr)
+// 		resp, err := corev1connect.NewEncryptionServiceClient(client, client.BaseUrl(),
+// 			connect.WithInterceptors(CloudAuthInterceptor(auth)),
+// 		).Decrypt(ctx, connect.NewRequest(&corev1.DecryptRequest{Resource: resource}))
+// 		if err != nil {
+// 			return nil, fmt.Errorf("failed to decrypt cloud config: %w", err)
+// 		} else if resp.Msg.GetResource() == nil || resp.Msg.GetResource().GetDecrypted() == nil {
+// 			return nil, fmt.Errorf("failed to decrypt cloud config")
+// 		}
+
+// 		err = resp.Msg.GetResource().GetDecrypted().UnmarshalTo(decrypted)
+// 		if err != nil {
+// 			return nil, fmt.Errorf("decrypt network config: %w", err)
+// 		}
+// 	}
+
+// 	var config ziti.Config
+// 	err := encoding.FromJSON(decrypted.Value, &config)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("unmarshal network config: %w", err)
+// 	}
+
+// 	return &config, nil
+// }
+
+func (c *CloudConnector) applyOptions(opts ...Option) {
+	for _, opt := range opts {
+		if opt != nil {
+			opt(c)
 		}
-	} else if resource.GetContext() == nil {
-		return nil, fmt.Errorf("cloud config context cannot be nil")
-	} else if resource.GetContext().GetAuth() == nil {
-		return nil, fmt.Errorf("cloud config auth cannot be nil")
-	} else {
-		var (
-			auth           = resource.GetContext().GetAuth()
-			addr           = AddrFromProto(resource.GetContext().GetAddress())
-			client, apiURL = NewHTTPClient(addr)
-		)
-
-		resp, err := corev1connect.NewEncryptionServiceClient(client, apiURL,
-			connect.WithInterceptors(CloudAuthInterceptor(auth)),
-		).Decrypt(ctx, connect.NewRequest(&corev1.DecryptRequest{Resource: resource}))
-		if err != nil {
-			return nil, fmt.Errorf("failed to decrypt cloud config: %w", err)
-		} else if resp.Msg.GetResource() == nil || resp.Msg.GetResource().GetDecrypted() == nil {
-			return nil, fmt.Errorf("failed to decrypt cloud config")
-		}
-
-		err = resp.Msg.GetResource().GetDecrypted().UnmarshalTo(decrypted)
-		if err != nil {
-			return nil, fmt.Errorf("decrypt network config: %w", err)
-		}
 	}
-
-	var config ziti.Config
-	err := encoding.FromJSONV2(decrypted.Value, &config)
-	if err != nil {
-		return nil, fmt.Errorf("unmarshal network config: %w", err)
-	}
-
-	return &config, nil
 }

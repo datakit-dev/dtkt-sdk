@@ -1,29 +1,83 @@
 package protoschema
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
 
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
 	"github.com/google/jsonschema-go/jsonschema"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
+
+func NewJSONSchema(desc protoreflect.MessageDescriptor) (*jsonschema.Schema, error) {
+	b, err := JSONSchemaBytes(desc)
+	if err != nil {
+		return nil, err
+	}
+
+	var schema jsonschema.Schema
+	err = json.Unmarshal(b, &schema)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schema, nil
+}
+
+func NewJSONSchemaMap(desc protoreflect.MessageDescriptor) (map[string]any, error) {
+	gen := NewGenerator(
+		WithJSONNames(),
+	)
+
+	err := gen.Add(desc)
+	if err != nil {
+		return nil, err
+	}
+
+	genSchemas := gen.Generate()
+
+	schemaMap, ok := genSchemas[desc.FullName()]
+	if !ok {
+		return nil, fmt.Errorf("failed to generate schema for: %s", desc.FullName())
+	}
+
+	return schemaMap, nil
+}
+
+func JSONSchemaBytes(desc protoreflect.MessageDescriptor) ([]byte, error) {
+	schemaMap, err := NewJSONSchemaMap(desc)
+	if err != nil {
+		return nil, err
+	}
+
+	return json.Marshal(schemaMap)
+}
+
+func ResolvedJSONSchema(desc protoreflect.MessageDescriptor) (*jsonschema.Resolved, error) {
+	return ResolvedJSONSchemaWithOptions(desc, &jsonschema.ResolveOptions{})
+}
 
 func ResolvedJSONSchemaWithOptions(desc protoreflect.MessageDescriptor, opts *jsonschema.ResolveOptions) (*jsonschema.Resolved, error) {
 	gen := NewGenerator(
 		WithJSONNames(),
 		WithBundle(),
 	)
+
 	err := gen.Add(desc)
 	if err != nil {
 		return nil, err
 	}
 
 	schemaMap := gen.Generate()
+
 	descSchema, ok := schemaMap[desc.FullName()]
 	if !ok {
 		return nil, fmt.Errorf("failed to generate schema for: %s", desc.FullName())
+	}
+
+	if opts == nil {
+		opts = &jsonschema.ResolveOptions{}
 	}
 
 	if opts.BaseURI == "" {
@@ -31,7 +85,7 @@ func ResolvedJSONSchemaWithOptions(desc protoreflect.MessageDescriptor, opts *js
 	}
 
 	if ref, ok := descSchema["$ref"].(string); ok {
-		ref = strings.TrimPrefix(ref, "#/$defs/")
+		ref = strings.TrimPrefix(ref, defsPrefix)
 		if defs, ok := descSchema["$defs"].(map[string]any); ok {
 			for name, def := range defs {
 				if name == ref {
@@ -55,20 +109,16 @@ func ResolvedJSONSchemaWithOptions(desc protoreflect.MessageDescriptor, opts *js
 		}
 	}
 
-	b, err := encoding.ToJSONV2(descSchema)
+	b, err := json.Marshal(descSchema)
 	if err != nil {
 		return nil, err
 	}
 
 	var schema jsonschema.Schema
-	err = encoding.FromJSONV2(b, &schema)
+	err = json.Unmarshal(b, &schema)
 	if err != nil {
 		return nil, err
 	}
 
 	return schema.Resolve(opts)
-}
-
-func ResolvedJSONSchema(desc protoreflect.MessageDescriptor) (*jsonschema.Resolved, error) {
-	return ResolvedJSONSchemaWithOptions(desc, &jsonschema.ResolveOptions{})
 }

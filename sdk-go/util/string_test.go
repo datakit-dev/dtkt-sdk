@@ -3,7 +3,9 @@ package util_test
 import (
 	"testing"
 
+	sharedv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestSlugify(t *testing.T) {
@@ -130,5 +132,12 @@ func TestToKebabCase(t *testing.T) {
 				t.Log(result)
 			}
 		})
+	}
+}
+
+func TestStringFormatAny(t *testing.T) {
+	var enum protoreflect.Enum = sharedv1beta1.PackageType_PACKAGE_TYPE_GO
+	if util.StringFormatAny(enum) != sharedv1beta1.PackageType_PACKAGE_TYPE_GO.String() {
+		t.Fatalf("%v != %v", enum, sharedv1beta1.PackageType_PACKAGE_TYPE_GO)
 	}
 }

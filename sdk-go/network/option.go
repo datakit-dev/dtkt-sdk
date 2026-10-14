@@ -1,49 +1,34 @@
 package network
 
 import (
+	"crypto/tls"
+
 	corev1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1"
-	"google.golang.org/grpc"
 )
 
 type (
-	ConnectorOption  func(*connectorOptions)
-	connectorOptions struct {
-		cloud *corev1.Resource
-		grpc  []grpc.DialOption
-		close func() error
+	Option   func(Optionee)
+	Optionee interface {
+		applyOptions(...Option)
 	}
 )
 
-func WithGRPCDialOpts(grpcOpts ...grpc.DialOption) ConnectorOption {
-	return func(opts *connectorOptions) {
-		opts.grpc = append(opts.grpc, grpcOpts...)
-	}
-}
-
-func WithCloser(close func() error) ConnectorOption {
-	return func(opts *connectorOptions) {
-		opts.close = close
-	}
-}
-
-func WithCloudConfig(cloud *corev1.Resource) ConnectorOption {
-	return func(opts *connectorOptions) {
-		opts.cloud = cloud
-	}
-}
-
-func (o *connectorOptions) apply(opts ...ConnectorOption) {
-	for _, opt := range opts {
-		if opt != nil {
-			opt(o)
+func WithCloudResource(resource *corev1.Resource) Option {
+	return func(o Optionee) {
+		switch o := o.(type) {
+		case *CloudConnector:
+			o.resource = resource
 		}
 	}
-	o.grpc = append([]grpc.DialOption{grpcInsecure}, o.grpc...)
 }
 
-func (o *connectorOptions) Close() error {
-	if o.close != nil {
-		return o.close()
+func WithTLSConfig(tlsConfig *tls.Config) Option {
+	return func(r Optionee) {
+		switch c := r.(type) {
+		case *defaultConnector:
+			c.tlsConfig = tlsConfig
+		case *HTTPClient:
+			c.dialTLS = tlsConfig != nil
+		}
 	}
-	return nil
 }

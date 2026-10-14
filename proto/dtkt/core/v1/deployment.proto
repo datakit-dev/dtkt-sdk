@@ -1,0 +1,286 @@
+syntax = "proto3";
+
+package dtkt.core.v1;
+
+import "buf/validate/validate.proto";
+import "dtkt/core/v1/common.proto";
+import "dtkt/core/v1/reflect.proto";
+import "dtkt/protoform/v1beta1/protoform.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/longrunning/operations.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1";
+
+// DeploymentService provides operations for managing deployments.
+service DeploymentService {
+  // List deployments.
+  rpc ListDeployments(ListDeploymentsRequest) returns (ListDeploymentsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Get a deployment by name.
+  rpc GetDeployment(GetDeploymentRequest) returns (GetDeploymentResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Create a new deployment.
+  rpc CreateDeployment(CreateDeploymentRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      metadata_type: "DeploymentMetadata"
+      response_type: "Deployment"
+    };
+  }
+
+  // Update an existing deployment.
+  rpc UpdateDeployment(UpdateDeploymentRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      metadata_type: "DeploymentMetadata"
+      response_type: "Deployment"
+    };
+  }
+
+  // Delete a deployment.
+  rpc DeleteDeployment(DeleteDeploymentRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      metadata_type: "DeploymentMetadata"
+      response_type: "google.protobuf.Empty"
+    };
+  }
+}
+
+// Deployment is a running instance of an Integration with context aware build
+// and runtime configuration. Deployments provide a way to run and manage software
+// packages represented by Integrations in compatible runtime environments, enabling
+// users to easily deploy and run their software packages in a consistent and
+// traceable manner within the DataKit ecosystem.
+message Deployment {
+  option (google.api.resource) = {
+    type: "Deployment"
+    singular: "deployment"
+    plural: "deployments"
+    pattern: "organizations/{organization}/deployments/{deployment}"
+    pattern: "users/{user}/deployments/{deployment}"
+  };
+
+  // Name of deployment resource.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Server-assigned unique ID (UUID).
+  string uid = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  enum State {
+    UNSPECIFIED = 0;
+    PENDING = 1;
+    RUNNING = 2;
+    STOPPING = 3;
+    STOPPED = 4;
+    FAILED = 5;
+  }
+
+  // Deployment state.
+  State state = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Bind address of deployment gRPC server.
+  Address address = 4 [(buf.validate.field).required = true];
+
+  // Env vars applied at runtime.
+  map<string, string> env = 5 [debug_redact = true];
+
+  // Port mappings applied at runtime.
+  map<string, string> ports = 6;
+
+  message Build {
+    // Name of integration resource this build belongs to.
+    string integration = 1 [
+      (buf.validate.field).required = true,
+      (google.api.resource_reference).type = "Integration"
+    ];
+
+    // Build metadata including artifact, platform, and runtime information.
+    PackageBuildMetadata metadata = 2 [(buf.validate.field).required = true];
+    option (buf.validate.message).cel_expression = "has(this.metadata.artifact_etag) && this.metadata.artifact_etag != ''";
+
+    // Context of where the build was performed (optional if build performed
+    // within the same control plane as deployment).
+    Context context = 3;
+  }
+
+  // Build context for deployment, including reference to integration and build
+  // metadata (must include artifact etag for a successful build). This enables
+  // cross-control plane deployments where the integration resource is defined
+  // in a different control plane than where it is deployed (e.g. integration
+  // defined in shared cloud control plane and deployed to a user control plane,
+  // or vice versa).
+  Build build = 7 [(buf.validate.field).required = true];
+
+  message Cloud {
+    Context context = 1 [
+      (buf.validate.field).required = true,
+      (google.api.field_behavior) = INPUT_ONLY,
+      (dtkt.protoform.v1beta1.field).hidden = true
+    ];
+
+    EncryptedAny config = 3 [
+      (buf.validate.field).required = true,
+      (google.api.field_behavior) = OUTPUT_ONLY,
+      debug_redact = true
+    ];
+    option (buf.validate.message).cel_expression = "has(this.config) && this.config.type_url.endsWith('/google.protobuf.BytesValue')";
+  }
+
+  // Cloud context with encrypted config for binding deployment to DataKit Cloud
+  // and only present when address's network is "cloud".
+  Cloud cloud = 8;
+
+  message Runtime {
+    message Native {
+      // PID file of native process.
+      string pid_file = 1 [(buf.validate.field).required = true];
+    }
+
+    message Docker {
+      // Container ID of docker container.
+      string container_id = 1 [(buf.validate.field).required = true];
+    }
+
+    oneof type {
+      option (buf.validate.oneof).required = true;
+
+      Native native = 1;
+      Docker docker = 2;
+    }
+
+    // Package config metadata fetched at runtime from server.
+    TypeSchema config_schema = 10 [(buf.validate.field).required = true];
+
+    // Package spec metadata fetched at runtime from server.
+    PackageSpecMetadata package_spec = 11 [(buf.validate.field).required = true];
+  }
+
+  // Runtime of deployment, including type-specific information such as process
+  // ID or container ID.
+  Runtime runtime = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Etag for concurrency control of deployment updates (must match current etag
+  // to update or delete).
+  string etag = 18 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (dtkt.protoform.v1beta1.field).hidden = true,
+    debug_redact = true
+  ];
+
+  // Deployment create time.
+  google.protobuf.Timestamp create_time = 20 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Deployment update time.
+  google.protobuf.Timestamp update_time = 21 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+}
+
+// DeploymentMetadata contains metadata for deployment operations.
+message DeploymentMetadata {
+  // Status message.
+  string message = 10;
+
+  // Start time.
+  google.protobuf.Timestamp start_time = 20;
+
+  // Stop time.
+  google.protobuf.Timestamp stop_time = 21;
+}
+
+message ListDeploymentsRequest {
+  // Maximum number of deployments to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  string page_token = 2;
+
+  // Parent resource name.
+  optional string parent = 3;
+
+  // Filter expression.
+  optional string filter = 4;
+}
+
+message ListDeploymentsResponse {
+  // The list of deployments.
+  repeated Deployment deployments = 1;
+
+  // Token for retrieving the next page.
+  string next_page_token = 2;
+}
+
+message GetDeploymentRequest {
+  // Name of deployment to get.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message GetDeploymentResponse {
+  // The requested deployment.
+  Deployment deployment = 1 [(buf.validate.field).required = true];
+}
+
+message CreateDeploymentRequest {
+  // Parent resource name.
+  string parent = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).hidden = true
+  ];
+
+  // Client-provided ID for deployment resource.
+  string deployment_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[a-z0-9-]+$"
+  ];
+
+  // Deployment to create (name ignored; server sets it).
+  Deployment deployment = 3 [(buf.validate.field).required = true];
+}
+
+message UpdateDeploymentRequest {
+  // Deployment with updated fields. Must include `name`.
+  Deployment deployment = 1 [(buf.validate.field).required = true];
+
+  // Fields to update (e.g., "config,address").
+  google.protobuf.FieldMask update_mask = 2;
+
+  // Desired state of deployment after update.
+  optional Deployment.State desired_state = 3 [(buf.validate.field).enum = {
+    in: [
+      2,
+      4
+    ]
+  } /* RUNNING or STOPPED */];
+}
+
+message DeleteDeploymentRequest {
+  // Name of deployment to delete.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Etag must match current deployment etag for delete to succeed (ensures
+  // deployment is up-to-date and prevents lost deletes).
+  string etag = 2 [(buf.validate.field).required = true];
+}

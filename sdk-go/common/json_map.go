@@ -124,5 +124,5 @@ func (j JSONMap) IsTrue(expr string) (bool, error) {
 }
 
 func (j JSONMap) Merge(other JSONMap) JSONMap {
-	return util.MergeMaps(j, other)
+	return util.MapMerge(j, other)
 }

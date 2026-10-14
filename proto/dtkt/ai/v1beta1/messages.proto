@@ -3,171 +3,228 @@ syntax = "proto3";
 package dtkt.ai.v1beta1;
 
 import "buf/validate/validate.proto";
+import "dtkt/ai/v1beta1/enums.proto";
 import "dtkt/protoform/v1beta1/protoform.proto";
+import "dtkt/shared/v1beta1/messages.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "google/rpc/status.proto";
 
 option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/ai/v1beta1";
 
-// Represents an embedding model, including its ID, name, and supported dimensions.
-message EmbeddingModel {
-  // Unique identifier for the embedding model.
+// Represents a model with id, name, capabilities, and provider metadata.
+message Model {
+  // ID of the model.
+  string id = 1 [(buf.validate.field).required = true];
+
+  // Name of the model.
+  string name = 2 [(buf.validate.field).required = true];
+
+  // Capabilities of the model.
+  repeated ModelCapability capabilities = 3;
+
+  // Provider-specific metadata.
+  google.protobuf.Struct provider_metadata = 10;
+}
+
+// Request to retrieve a list of models from a provider.
+message ListModelsRequest {
+  // Maximum number of models to return (default: server-assigned).
+  optional int32 page_size = 1;
+
+  // Token for retrieving the next page.
+  optional string page_token = 2;
+
+  // Filter expression.
+  optional string filter = 3;
+}
+
+// Response containing a list of models from a provider.
+message ListModelsResponse {
+  // List of models.
+  repeated Model models = 1;
+
+  // Token for retrieving the next page.
+  string next_page_token = 2;
+}
+
+// Request to retrieve details of a model from a provider.
+message GetModelRequest {
+  // ID of the model to retrieve.
   string id = 1;
+}
 
-  // Name of the embedding model.
-  string name = 2;
-
-  // Minimum number of dimensions supported by the model.
-  uint32 min_dimensions = 3;
-
-  // Maximum number of dimensions supported by the model.
-  uint32 max_dimensions = 4;
+// Response containing details of a model from a provider.
+message GetModelResponse {
+  // Details of the requested model.
+  Model model = 1;
 }
 
 // Represents an input for generating embeddings.
 message EmbeddingInput {
-  // Unique identifier for the input.
-  string id = 1;
-
   // Text data to generate embeddings for.
-  string text = 2;
+  string text = 1 [(buf.validate.field).required = true];
+
+  // Unique identifier for the input (optional).
+  string id = 2;
 }
 
 // Represents the output of an embedding operation.
 message EmbeddingOutput {
   // The input data for which the embedding was generated.
-  EmbeddingInput input = 1;
+  EmbeddingInput input = 1 [(buf.validate.field).required = true];
 
-  // The generated embedding vector.
-  repeated double vector = 2;
-
-  // Indicates if the embedding generation was successful.
-  bool success = 3;
-
-  // Error message, if any.
-  string error = 4;
-}
-
-// Request to retrieve a list of available embedding models.
-message ListEmbeddingModelsRequest {}
-
-// Response containing a list of available embedding models.
-message ListEmbeddingModelsResponse {
-  // List of embedding models.
-  repeated EmbeddingModel models = 1;
-}
-
-// Request to retrieve details of a specific embedding model.
-message GetEmbeddingModelRequest {
-  // ID of the embedding model to retrieve.
-  string id = 1;
-}
-
-// Response containing details of a specific embedding model.
-message GetEmbeddingModelResponse {
-  // Details of the requested embedding model.
-  EmbeddingModel model = 1;
+  // The generated embedding result (error or embedding).
+  oneof result {
+    option (buf.validate.oneof).required = true;
+    google.rpc.Status error = 2;
+    Embedding embedding = 3;
+  }
 }
 
 // Request to generate embeddings for input text using a specified model.
 message GenerateEmbeddingsRequest {
-  // ID of the embedding model to use.
-  string model_id = 1 [
+  // Model to use for generating embeddings.
+  string model = 1 [
+    (buf.validate.field).required = true,
     (dtkt.protoform.v1beta1.field).title = "Select an embedding model",
-    (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.ai.v1beta1.EmbeddingService.ListEmbeddingModels",
-    (dtkt.protoform.v1beta1.field).select.key_expr = "this.models.map(i, i.name)",
-    (dtkt.protoform.v1beta1.field).select.val_expr = "this.models.map(i, i.id)"
+    (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.ai.v1beta1.ModelService.ListModels",
+    (dtkt.protoform.v1beta1.field).select.response_field = "models",
+    (dtkt.protoform.v1beta1.field).select.label_expr = "this.name",
+    (dtkt.protoform.v1beta1.field).select.value_expr = "this.id",
+    (dtkt.protoform.v1beta1.field).select.filter_expr = "'EMBEDDING' in this.capabilities.map(c, enumName(c, true))"
   ];
 
   // Desired number of dimensions for the embedding.
-  uint32 dimensions = 2;
+  uint32 dimensions = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).uint32.gt = 0
+  ];
 
   // List of text inputs to generate embeddings for.
-  repeated EmbeddingInput inputs = 3;
+  repeated EmbeddingInput inputs = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).repeated.min_items = 1
+  ];
 }
 
 // Response containing the generated embeddings for the input text.
 message GenerateEmbeddingsResponse {
-  // List of embedding outputs corresponding to the inputs.
+  // List of embedding outputs corresponding to the request inputs.
   repeated EmbeddingOutput outputs = 1;
 }
 
 // ---------------------------------------------------------
 
+message Embedding {
+  repeated double values = 1;
+}
+
 message Blob {
-  // Media Type type/subtype or with parameters type/subtype;parameter=value;parameter2=value2
-  string media_type = 1 [(buf.validate.field).string.pattern = "^[a-zA-Z0-9]+/[a-zA-Z0-9.+-]+( ?;[a-zA-Z0-9.+-]+=.+)*$"];
+  // Media type/subtype optionally with parameters: "type "/" subtype [ ";" parameter=value ]"
+  string media_type = 1 [(buf.validate.field).string = {
+    // Prevents empty submissions and sets a sensible upper limit
+    min_len: 3
+    max_len: 255
+
+    // Strict RFC-compliant regex for: type "/" subtype [ ";" parameter=value ]
+    pattern: "^[a-zA-Z0-9!#$%^&\\-_+{}|'.~]+/[a-zA-Z0-9!#$%^&\\-_+{}|'.~]+(?:\\s*;\\s*[a-zA-Z0-9!#$%^&\\-_+{}|'.~]+=[a-zA-Z0-9!#$%^&\\-_+{}|'.~]+)*$"
+  }];
+
   bytes data = 2;
+
   optional string name = 3;
 }
 
+// Tool metadata.
+message Tool {
+  // Tool name.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // Tool description.
+  string description = 2;
+
+  // Input type schema.
+  dtkt.shared.v1beta1.TypeSchema input = 3 [(buf.validate.field).required = true];
+
+  // Output type schema.
+  dtkt.shared.v1beta1.TypeSchema output = 4 [(buf.validate.field).required = true];
+}
+
 message Message {
-  message Content {
-    message Text {
-      string text = 1 [(buf.validate.field).required = true];
-    }
-
-    message Reasoning {
-      string text = 1 [(buf.validate.field).required = true];
-    }
-
-    message Source {
-      oneof type {
-        string url = 1;
-        Blob blob = 2;
-      }
-    }
-
-    message ToolCall {
-      string tool_call_id = 1;
-      string tool_name = 2;
-
-      oneof input {
-        google.protobuf.Struct json = 3;
-        google.protobuf.Any proto = 4;
-      }
-
-      // If the tool is executed by the provider or the client
-      // TODO: This is if ChatGPT calls our tool or if we call it for ChatGPT.
-      bool provider_executed = 5;
-    }
-
-    message ToolResult {
-      string tool_call_id = 1;
-      string tool_name = 2;
-
-      oneof result {
-        google.protobuf.Struct json = 3;
-        google.protobuf.Any proto = 4;
-      }
-
-      bool is_error = 5;
-    }
-
-    google.protobuf.Struct provider_options = 10;
-
+  message Source {
     oneof type {
-      Text text = 2;
-      Blob blob = 3;
-      Source source = 4;
-      ToolCall tool_call = 5;
-      ToolResult tool_result = 6;
+      string url = 1;
+      Blob blob = 2;
     }
   }
 
+  message ToolCall {
+    string tool_call_id = 1;
+    string tool_name = 2;
+
+    // If the tool is executed by the provider or the client
+    // TODO: This is if ChatGPT calls our tool or if we call it for ChatGPT.
+    bool provider_executed = 3;
+
+    google.protobuf.Value input = 4;
+  }
+
+  message ToolResult {
+    string tool_call_id = 1;
+    string tool_name = 2;
+
+    oneof result {
+      option (buf.validate.oneof).required = true;
+      google.rpc.Status error = 3;
+      google.protobuf.Value json = 4;
+      google.protobuf.Any proto = 5;
+    }
+  }
+
+  string role = 1;
+
+  oneof content {
+    option (buf.validate.oneof).required = true;
+    string text = 2;
+    string thinking = 3;
+    Blob blob = 4;
+    Source source = 5;
+    ToolCall tool_call = 6;
+    ToolResult tool_result = 7;
+  }
+
   google.protobuf.Struct provider_options = 10;
-  string role = 2;
-  repeated Content content = 3;
 }
 
 message GenerateTextRequest {
-  repeated Message messages = 1;
+  // ID of the embedding model to use.
+  string model_id = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).title = "Select an embedding model",
+    (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.ai.v1beta1.ModelService.ListModels",
+    (dtkt.protoform.v1beta1.field).select.response_field = "models",
+    (dtkt.protoform.v1beta1.field).select.label_expr = "this.name",
+    (dtkt.protoform.v1beta1.field).select.value_expr = "this.id",
+    (dtkt.protoform.v1beta1.field).select.filter_expr = "'EMBEDDING' in this.capabilities.map(c, enumName(c, true))"
+  ];
+
+  // Prompt is the textual message/prompt to send to the model.
+  string prompt = 2 [(buf.validate.field).required = true];
+
+  // System overrides the model's default system message/prompt.
+  string system = 3;
+
+  // Format specifies a schema for structured output; optional.
+  dtkt.shared.v1beta1.TypeSchema format = 4;
+
   google.protobuf.Struct provider_options = 10;
 }
 
 message GenerateTextResponse {
+  repeated Message messages = 1;
   google.protobuf.Struct provider_metadata = 10;
 }
 
@@ -236,6 +293,7 @@ message TranscribeRequest {
   ];
   google.protobuf.Struct provider_options = 10;
 }
+
 message TranscribeResponse {
   message Segment {
     string text = 1;

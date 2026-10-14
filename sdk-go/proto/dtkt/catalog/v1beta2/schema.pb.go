@@ -28,8 +28,8 @@ type Schema struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Schema resource name, format: `catalogs/{catalog}/schemas/{schema}`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Schema identifier.
-	SchemaId string `protobuf:"bytes,2,opt,name=schema_id,json=schemaId,proto3" json:"schema_id,omitempty"`
+	// Schema identifier for use within a query.
+	Ident string `protobuf:"bytes,2,opt,name=ident,proto3" json:"ident,omitempty"`
 	// Description of the schema.
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	// Additional metadata, if any.
@@ -75,9 +75,9 @@ func (x *Schema) GetName() string {
 	return ""
 }
 
-func (x *Schema) GetSchemaId() string {
+func (x *Schema) GetIdent() string {
 	if x != nil {
-		return x.SchemaId
+		return x.Ident
 	}
 	return ""
 }
@@ -98,11 +98,15 @@ func (x *Schema) GetMetadata() map[string]string {
 
 // Request message for listing schemas.
 type ListSchemasRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	Parent        string                 `protobuf:"bytes,3,opt,name=parent,proto3" json:"parent,omitempty"`
-	Filter        string                 `protobuf:"bytes,4,opt,name=filter,proto3" json:"filter,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Number of results to return per page. Leave empty for the server default.
+	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	// Token from a previous response to retrieve the next page.
+	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	// Parent resource name.
+	Parent string `protobuf:"bytes,3,opt,name=parent,proto3" json:"parent,omitempty"`
+	// Optional filter expression to narrow results.
+	Filter        string `protobuf:"bytes,4,opt,name=filter,proto3" json:"filter,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -322,9 +326,9 @@ func (x *GetSchemaResponse) GetSchema() *Schema {
 // Create schema request.
 type CreateSchemaRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Parent catalog resource name.
+	// Parent catalog resource name, format: `catalogs/{catalog}`.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
-	// Schema identifier, e.g. final segment in resource name: `.../schemas/{schema}`
+	// Schema identifier, e.g. "prod", "test", etc.
 	SchemaId string `protobuf:"bytes,2,opt,name=schema_id,json=schemaId,proto3" json:"schema_id,omitempty"`
 	// Schema to create.
 	Schema        *Schema `protobuf:"bytes,3,opt,name=schema,proto3" json:"schema,omitempty"`
@@ -627,10 +631,10 @@ var File_dtkt_catalog_v1beta2_schema_proto protoreflect.FileDescriptor
 
 const file_dtkt_catalog_v1beta2_schema_proto_rawDesc = "" +
 	"\n" +
-	"!dtkt/catalog/v1beta2/schema.proto\x12\x14dtkt.catalog.v1beta2\x1a\x1bbuf/validate/validate.proto\x1a google/protobuf/field_mask.proto\"\xe0\x01\n" +
+	"!dtkt/catalog/v1beta2/schema.proto\x12\x14dtkt.catalog.v1beta2\x1a\x1bbuf/validate/validate.proto\x1a google/protobuf/field_mask.proto\"\xd9\x01\n" +
 	"\x06Schema\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1b\n" +
-	"\tschema_id\x18\x02 \x01(\tR\bschemaId\x12 \n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
+	"\x05ident\x18\x02 \x01(\tR\x05ident\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12F\n" +
 	"\bmetadata\x18\x04 \x03(\v2*.dtkt.catalog.v1beta2.Schema.MetadataEntryR\bmetadata\x1a;\n" +
 	"\rMetadataEntry\x12\x10\n" +

@@ -8,7 +8,7 @@ import (
 
 var (
 	dtktTypePattern      = regexp.MustCompile(`^dtkt\.([^\.]+)\.([^\.]+)\.?(.*)`)
-	wellKnownTypePattern = regexp.MustCompile(`^(google|buf)\.(validate|protobuf|api|type|geo|rpc)\.`)
+	wellKnownTypePattern = regexp.MustCompile(`^(google|buf|cel)\.(validate|protobuf|api|type|geo|rpc|grpc|longrunning|expr)\.`)
 )
 
 const AnyTypeUrlPrefix = "type.googleapis.com/"
@@ -29,13 +29,29 @@ func IsKnownName[T ~string](name T) bool {
 
 func VersionContainsName[T ~string](version Version, name T) bool {
 	matches := dtktTypePattern.FindStringSubmatch(string(name))
+
 	if len(matches) < 3 {
 		return false
 	}
-	return version.String() == matches[2]
+
+	switch version {
+	case CoreV1:
+		return matches[1] == "core" && matches[2] == "v1"
+	}
+
+	return version.GetName() == matches[2]
 }
 
-func VersionContainsType(version Version, desc protoreflect.Descriptor) bool {
+func VersionFromName[T ~string](name T) (Version, bool) {
+	for _, version := range validVersions {
+		if VersionContainsName(version, name) {
+			return version, true
+		}
+	}
+	return nil, false
+}
+
+func VersionContainsDescriptor(version Version, desc protoreflect.Descriptor) bool {
 	return VersionContainsName(version, desc.FullName())
 }
 

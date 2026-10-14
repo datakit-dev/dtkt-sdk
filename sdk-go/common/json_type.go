@@ -5,7 +5,7 @@ import (
 
 	sharedv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
-	"github.com/invopop/jsonschema"
+	"github.com/google/jsonschema-go/jsonschema"
 )
 
 const (
@@ -107,7 +107,7 @@ func (JSONType) JSONSchema() *jsonschema.Schema {
 		Type:        "string",
 		Title:       "JSON Type",
 		Description: "JSON data type",
-		Enum:        util.AnySlice(JSONTypes),
+		Enum:        util.SliceOfAny(JSONTypes),
 	}
 }
 

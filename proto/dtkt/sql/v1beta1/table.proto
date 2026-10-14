@@ -1,0 +1,241 @@
+edition = "2023";
+
+package dtkt.sql.v1beta1;
+
+import "buf/validate/validate.proto";
+import "dtkt/protoform/v1beta1/protoform.proto";
+import "dtkt/sql/v1beta1/column.proto";
+import "dtkt/sql/v1beta1/value.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/go_features.proto";
+import "google/protobuf/struct.proto";
+
+option features.(pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/sql/v1beta1";
+
+service TableService {
+  // List tables.
+  rpc ListTables(ListTablesRequest) returns (ListTablesResponse);
+
+  // Get a table.
+  rpc GetTable(GetTableRequest) returns (GetTableResponse);
+
+  // Create a table.
+  rpc CreateTable(CreateTableRequest) returns (CreateTableResponse);
+
+  // Update a table.
+  rpc UpdateTable(UpdateTableRequest) returns (UpdateTableResponse);
+
+  // Delete a table.
+  rpc DeleteTable(DeleteTableRequest) returns (DeleteTableResponse);
+
+  // Read data from a table as a stream.
+  rpc ReadTable(ReadTableRequest) returns (stream ReadTableResponse);
+
+  // Write data to a table as a stream.
+  rpc WriteTable(stream WriteTableRequest) returns (WriteTableResponse);
+}
+
+// A table within a schema.
+message Table {
+  // Fully qualified table name, format: `[{catalog}.]{db/schema}.{table}`.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER
+  ];
+
+  // List of columns within the table.
+  repeated Column columns = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).repeated.min_items = 1
+  ];
+
+  // List of indexes within the table.
+  repeated Index indexes = 5;
+
+  // List of foreign keys within the table.
+  repeated ForeignKey foreign_keys = 6;
+
+  message Stats {
+    // The total number of rows in the table.
+    int64 total_rows = 1;
+
+    // The total size of the table in bytes.
+    int64 total_bytes = 2;
+  }
+
+  // Stats contains statistics about a table.
+  Stats stats = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Additional metadata, if any.
+  map<string, string> metadata = 10;
+}
+
+// List tables request.
+message ListTablesRequest {
+  // Number of results to return per page. Leave empty for the server default.
+  int32 page_size = 1;
+
+  // Token from a previous response to retrieve the next page.
+  string page_token = 2;
+
+  // Optional fully qualified schema name, format: `[{catalog}.]{db/schema}`.
+  // When not set, returns all tables across schemas.
+  string parent = 3;
+
+  // Optional filter expression to narrow results.
+  string filter = 4;
+}
+
+// List tables response.
+message ListTablesResponse {
+  repeated Table tables = 1;
+
+  // Token to retrieve the next page of tables, if any.
+  string next_page_token = 2;
+}
+
+// Get table request.
+message GetTableRequest {
+  // Fully qualified table name, format: `[{catalog}.]{db/schema}.{table}`.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+// Get table response.
+message GetTableResponse {
+  // The retrieved table.
+  Table table = 1;
+}
+
+// Create table request.
+message CreateTableRequest {
+  // Fully qualified parent schema name, format: `[{catalog}.]{db/schema}`.
+  string parent = 1 [(buf.validate.field).required = true];
+
+  // Table identifier (unqualified), example: "sales".
+  string table_id = 2 [(buf.validate.field).required = true];
+
+  // Table to create.
+  Table table = 3 [(buf.validate.field).required = true];
+}
+
+// Create table response.
+message CreateTableResponse {
+  // The created table.
+  Table table = 1;
+}
+
+// Update table request.
+message UpdateTableRequest {
+  // The table containing updates.
+  Table table = 1 [
+    (buf.validate.field).required = true,
+    (dtkt.protoform.v1beta1.field).title = "Table",
+    (dtkt.protoform.v1beta1.field).description = "Select a table to update.",
+    (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.sql.v1beta1.TableService.ListTables",
+    (dtkt.protoform.v1beta1.field).select.response_field = "tables",
+    (dtkt.protoform.v1beta1.field).select.label_expr = "this.name"
+  ];
+
+  // Fields to update.
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+// Update table response.
+message UpdateTableResponse {
+  // The updated table.
+  Table table = 1;
+}
+
+// Delete table request.
+message DeleteTableRequest {
+  // Fully qualified table name, format: `[{catalog}.]{db/schema}.{table}`.
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+// Delete table response.
+message DeleteTableResponse {}
+
+// Read table request.
+message ReadTableRequest {
+  // Fully qualified table name, format: `[{catalog}.]{db/schema}.{table}`.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // The columns to include in the returned payload:
+  //  - If not specified all columns are included.
+  repeated string columns = 2;
+
+  // The total number of rows to read from the table:
+  //  - if unset or 0, reads all rows relative to offset;
+  //  - if > 0, reads at most this number of rows relative to offset.
+  uint64 limit = 4;
+
+  // The index of the first row to read.
+  uint64 offset = 5;
+
+  // The sort order of rows to read from the table.
+  repeated OrderBy order_by = 7;
+
+  // Format of data returned in responses.
+  DataFormat format = 6 [
+    (buf.validate.field).enum.defined_only = true,
+    default = DATA_FORMAT_STRUCT_BATCH
+  ];
+}
+
+// Read table response.
+message ReadTableResponse {
+  option (buf.validate.message).oneof = {
+    fields: [
+      "arrow_batch",
+      "struct_batch",
+      "json_batch"
+    ]
+    required: true
+  };
+
+  bytes arrow_batch = 1;
+  repeated Struct struct_batch = 2;
+  repeated google.protobuf.Struct json_batch = 3;
+}
+
+// Write table request.
+message WriteTableRequest {
+  // Fully qualified table name, format: `[{catalog}.]{db/schema}.{table}`.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // When set to true errors are ignored, otherwise stream is closed when an
+  // error is encountered while attempting to write row.
+  bool ignore_errors = 2;
+
+  option (buf.validate.message).oneof = {
+    fields: [
+      "arrow_batch",
+      "struct_batch",
+      "json_batch"
+    ]
+    required: true
+  };
+
+  bytes arrow_batch = 3;
+  repeated Struct struct_batch = 4;
+  repeated google.protobuf.Struct json_batch = 5;
+}
+
+// Write table response.
+message WriteTableResponse {
+  // Map of fully-qualified table name to total number of rows written.
+  map<string, int64> rows_written = 1;
+}
+
+message OrderBy {
+  enum Direction {
+    UNSPECIFIED = 0;
+    ASC = 1;
+    DESC = 2;
+  }
+
+  string column = 1 [(buf.validate.field).required = true];
+  Direction direction = 2 [default = ASC];
+}

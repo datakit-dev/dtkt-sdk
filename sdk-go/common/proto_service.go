@@ -26,7 +26,7 @@ func (st ProtoServices) Names() []string {
 }
 
 func (st ProtoServices) Strings() []string {
-	return util.SliceSet(util.SliceMap(st, func(s ProtoService) string {
+	return util.SliceSet(util.SliceOfFunc(st, func(s ProtoService) string {
 		return s.String()
 	}))
 }

@@ -6,8 +6,8 @@ import (
 )
 
 type (
-	Name []Pair
-	Pair [2]string
+	Name    []Segment
+	Segment [2]string
 )
 
 func EmptyName() Name {
@@ -23,7 +23,7 @@ func NewName(input string) Name {
 	name := make(Name, 0, (len(parts)+1)/2)
 	for i := 0; i < len(parts); i++ {
 		if i+1 < len(parts) {
-			name = append(name, Pair{parts[i], parts[i+1]})
+			name = append(name, Segment{parts[i], parts[i+1]})
 			i++
 		}
 	}
@@ -85,7 +85,7 @@ func (n Name) Last() Name {
 }
 
 func (n Name) Parent() Name {
-	if len(n) == 0 {
+	if len(n) <= 1 {
 		return Name{}
 	}
 	return n[:len(n)-1]
@@ -121,6 +121,6 @@ func (n Name) Split() []string {
 	return parts
 }
 
-func (n Pair) String() string {
+func (n Segment) String() string {
 	return strings.Join(n[:], "/")
 }

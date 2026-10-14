@@ -1,0 +1,91 @@
+edition = "2023";
+
+package dtkt.sql.v1beta1;
+
+import "buf/validate/validate.proto";
+import "dtkt/sql/v1beta1/type.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/go_features.proto";
+
+option features.(pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/sql/v1beta1";
+
+// A column within a table.
+message Column {
+  // Name of the column.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = IDENTIFIER
+  ];
+
+  // Type of the column.
+  Type type = 2;
+
+  // Specifies the column value's nullability.
+  bool nullable = 3;
+
+  oneof default {
+    // Specifies the column's default value as an expression such as: "uuid()".
+    string expr = 4;
+
+    // Specifies the column's default value as a literal such as: 1 or 'foobar'.
+    // Note: Strings are usually single or double quoted (depending on db).
+    string literal = 5;
+  }
+
+  oneof index {
+    // Specifies column as the primary key (shortcut for defining a separate
+    // index, unique is implied).
+    bool primary = 6;
+
+    // Specifies column must be unique (shortcut for defining a sepate index).
+    bool unique = 7;
+  }
+}
+
+// An index defined within a table.
+message Index {
+  // Name of the index.
+  string name = 1;
+
+  // List of columns comprising the index.
+  repeated string columns = 2;
+
+  oneof type {
+    // Specifies if index is the primary key.
+    bool primary = 3;
+
+    // Specifies if index must be unique.
+    bool unique = 4;
+  }
+}
+
+// An foreign key defined within a table.
+message ForeignKey {
+  enum RefAction {
+    REF_ACTION_UNSPECIFIED = 0;
+    REF_ACTION_NO_ACTION = 1;
+    REF_ACTION_RESTRICT = 2;
+    REF_ACTION_CASCADE = 3;
+    REF_ACTION_SET_NULL = 4;
+    REF_ACTION_SET_DEFAULT = 5;
+  }
+
+  // Name of the foreign key.
+  string name = 1;
+
+  // List of columns comprising the foreign key.
+  repeated string columns = 2;
+
+  // Fully-qualified table name this foreign key references.
+  string ref_table = 3;
+
+  // List of columns in referenced table.
+  repeated string ref_columns = 4;
+
+  // Optional on delete action of the foreign key.
+  RefAction on_delete = 5;
+
+  // Optional on update action of the foreign key.
+  RefAction on_update = 6;
+}

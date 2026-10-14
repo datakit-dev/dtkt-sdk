@@ -77,56 +77,6 @@ func (SignedURLMethod) EnumDescriptor() ([]byte, []int) {
 	return file_dtkt_blob_v1beta1_enums_proto_rawDescGZIP(), []int{0}
 }
 
-// LineFormat specifies the format of lines read from a blob.
-type LineFormat int32
-
-const (
-	LineFormat_LINE_FORMAT_UNSPECIFIED LineFormat = 0
-	LineFormat_LINE_FORMAT_RAW         LineFormat = 1
-	LineFormat_LINE_FORMAT_JSON        LineFormat = 2
-)
-
-// Enum value maps for LineFormat.
-var (
-	LineFormat_name = map[int32]string{
-		0: "LINE_FORMAT_UNSPECIFIED",
-		1: "LINE_FORMAT_RAW",
-		2: "LINE_FORMAT_JSON",
-	}
-	LineFormat_value = map[string]int32{
-		"LINE_FORMAT_UNSPECIFIED": 0,
-		"LINE_FORMAT_RAW":         1,
-		"LINE_FORMAT_JSON":        2,
-	}
-)
-
-func (x LineFormat) Enum() *LineFormat {
-	p := new(LineFormat)
-	*p = x
-	return p
-}
-
-func (x LineFormat) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (LineFormat) Descriptor() protoreflect.EnumDescriptor {
-	return file_dtkt_blob_v1beta1_enums_proto_enumTypes[1].Descriptor()
-}
-
-func (LineFormat) Type() protoreflect.EnumType {
-	return &file_dtkt_blob_v1beta1_enums_proto_enumTypes[1]
-}
-
-func (x LineFormat) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use LineFormat.Descriptor instead.
-func (LineFormat) EnumDescriptor() ([]byte, []int) {
-	return file_dtkt_blob_v1beta1_enums_proto_rawDescGZIP(), []int{1}
-}
-
 var File_dtkt_blob_v1beta1_enums_proto protoreflect.FileDescriptor
 
 const file_dtkt_blob_v1beta1_enums_proto_rawDesc = "" +
@@ -137,12 +87,7 @@ const file_dtkt_blob_v1beta1_enums_proto_rawDesc = "" +
 	"\x15SIGNED_URL_METHOD_GET\x10\x01\x12\x19\n" +
 	"\x15SIGNED_URL_METHOD_PUT\x10\x02\x12\x1a\n" +
 	"\x16SIGNED_URL_METHOD_POST\x10\x03\x12\x1c\n" +
-	"\x18SIGNED_URL_METHOD_DELETE\x10\x04*T\n" +
-	"\n" +
-	"LineFormat\x12\x1b\n" +
-	"\x17LINE_FORMAT_UNSPECIFIED\x10\x00\x12\x13\n" +
-	"\x0fLINE_FORMAT_RAW\x10\x01\x12\x14\n" +
-	"\x10LINE_FORMAT_JSON\x10\x02B\xd7\x01\n" +
+	"\x18SIGNED_URL_METHOD_DELETE\x10\x04B\xd7\x01\n" +
 	"\x17proto.dtkt.blob.v1beta1B\n" +
 	"EnumsProtoP\x01ZJgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/blob/v1beta1;blobv1beta1\xa2\x02\x03DBX\xaa\x02\x11Dtkt.Blob.V1beta1\xca\x02\x11Dtkt\\Blob\\V1beta1\xe2\x02\x1dDtkt\\Blob\\V1beta1\\GPBMetadata\xea\x02\x13Dtkt::Blob::V1beta1b\x06proto3"
 
@@ -158,10 +103,9 @@ func file_dtkt_blob_v1beta1_enums_proto_rawDescGZIP() []byte {
 	return file_dtkt_blob_v1beta1_enums_proto_rawDescData
 }
 
-var file_dtkt_blob_v1beta1_enums_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_dtkt_blob_v1beta1_enums_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_dtkt_blob_v1beta1_enums_proto_goTypes = []any{
 	(SignedURLMethod)(0), // 0: dtkt.blob.v1beta1.SignedURLMethod
-	(LineFormat)(0),      // 1: dtkt.blob.v1beta1.LineFormat
 }
 var file_dtkt_blob_v1beta1_enums_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -181,7 +125,7 @@ func file_dtkt_blob_v1beta1_enums_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_blob_v1beta1_enums_proto_rawDesc), len(file_dtkt_blob_v1beta1_enums_proto_rawDesc)),
-			NumEnums:      2,
+			NumEnums:      1,
 			NumMessages:   0,
 			NumExtensions: 0,
 			NumServices:   0,

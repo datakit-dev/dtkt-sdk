@@ -15,15 +15,16 @@ import (
 	"text/template"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/api"
+	"github.com/datakit-dev/dtkt-sdk/sdk-go/integration"
 	actionv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/action/v1beta1"
 	basev1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/base/v1beta1"
+	corev1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1"
 	eventv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/event/v1beta1"
 	sharedv1beta1 "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/shared/v1beta1"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/common"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/encoding"
-	"github.com/datakit-dev/dtkt-sdk/sdk-go/integrationsdk"
 	"github.com/datakit-dev/dtkt-sdk/sdk-go/util"
 )
 
@@ -60,7 +61,7 @@ var (
 )
 
 type GeneratePackageConfig struct {
-	Spec     *integrationsdk.Spec
+	Spec     *corev1.PackageSpec
 	Services []string
 	Tmpls    []fs.DirEntry
 	Path     string
@@ -69,19 +70,17 @@ type GeneratePackageConfig struct {
 }
 
 func GeneratePackage(config *GeneratePackageConfig) error {
-	if err := config.Spec.Validate(); err != nil {
-		return err
-	}
-
 	slices.Sort(config.Services)
 
-	ident := common.GetPackageIdentity(config.Spec.GetPackage())
+	spec := config.Spec.GetV1Beta1()
+	ident := common.GetPackageIdentity(spec)
 	svcPkgs := common.ProtoPackages{}
 	for _, svcName := range config.Services {
 		svcName := common.ProtoService(svcName)
-		if api.VersionContainsName(config.Spec.APIVersion(), svcName) {
+		apiVersion, ok := api.VersionFromName(svcName)
+		if ok {
 			svcPkg := svcName.ProtoPkg()
-			config.Spec.APIVersion().RangeFilesByPackage(protoreflect.FullName(svcPkg), func(fd protoreflect.FileDescriptor) bool {
+			apiVersion.RangeFilesByPackage(protoreflect.FullName(svcPkg), func(fd protoreflect.FileDescriptor) bool {
 				if !slices.Contains(svcPkgs[svcPkg], fd) {
 					svcPkgs[svcPkg] = append(svcPkgs[svcPkg], fd)
 				}
@@ -118,7 +117,7 @@ func GeneratePackage(config *GeneratePackageConfig) error {
 		return fmt.Errorf("failed to create package directory: %v", err)
 	}
 
-	fmt.Printf("Generating %s %s package in %s\n", ident.Slug(), config.Spec.GetPackage().GetType(), config.Path)
+	fmt.Printf("Generating %s %s package in %s\n", ident.Slug(), spec.GetType(), config.Path)
 
 	pkgFile, err := os.Create(config.SpecPath())
 	if err != nil {
@@ -126,7 +125,7 @@ func GeneratePackage(config *GeneratePackageConfig) error {
 	}
 	defer pkgFile.Close()
 
-	_, err = integrationsdk.WriteSpec(config.Spec, encoding.YAML, pkgFile)
+	err = integration.WriteSpec(pkgFile, encoding.YAML, config.Spec)
 	if err != nil {
 		return err
 	}
@@ -269,7 +268,7 @@ func WriteTemplate(tmpl *template.Template, path string, data map[string]any) er
 }
 
 func InitPackage(config *GeneratePackageConfig) error {
-	ident := common.GetPackageIdentity(config.Spec.GetPackage())
+	ident := common.GetPackageIdentity(config.Spec.GetV1Beta1())
 
 	switch config.Type() {
 	case "GO":
@@ -384,16 +383,16 @@ func InitPackage(config *GeneratePackageConfig) error {
 }
 
 func (c *GeneratePackageConfig) SpecPath() string {
-	return path.Join(c.Path, integrationsdk.SpecFile)
+	return path.Join(c.Path, integration.SpecFile)
 }
 
 func (c *GeneratePackageConfig) Type() string {
-	return common.TrimProtoEnumPrefixFor[sharedv1beta1.PackageType](c.Spec.GetPackage().GetType().String())
+	return common.TrimProtoEnumPrefixFor[sharedv1beta1.PackageType](c.Spec.GetV1Beta1().GetType().String())
 }
 
 func (c *GeneratePackageConfig) SkipFile(path string, svcPkgs *common.ProtoPackages) bool {
 	path = strings.TrimPrefix(path, c.Path+"/")
-	pkgType := c.Spec.GetPackage().GetType()
+	pkgType := c.Spec.GetV1Beta1().GetType()
 
 	if c.Lib {
 		if skipTmpls, ok := skipLibFiles[pkgType]; ok {
@@ -412,7 +411,7 @@ func (c *GeneratePackageConfig) SkipFile(path string, svcPkgs *common.ProtoPacka
 	}
 
 	hasDocker := false
-	for _, r := range c.Spec.GetPackage().GetRuntimes() {
+	for _, r := range c.Spec.GetV1Beta1().GetRuntimes() {
 		if r == sharedv1beta1.Runtime_RUNTIME_DOCKER {
 			hasDocker = true
 			break

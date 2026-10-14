@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package dtkt.core.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/any.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1";
+
+service SearchService {
+  // List search results.
+  rpc ListSearchResults(ListSearchResultsRequest) returns (ListSearchResultsResponse);
+}
+
+message ListSearchResultsRequest {
+  // Maximum number of search results to return.
+  int32 page_size = 1;
+
+  // Token for retrieving the next page of search results.
+  string page_token = 2;
+
+  // Search query text.
+  string query = 3 [(buf.validate.field).required = true];
+
+  // Filter results to only include these resource types
+  // When empty, all resource types are included
+  repeated string resource_types = 6;
+
+  // RRFK is the constant used in Reciprocal Rank Fusion algorithm
+  // Typical value is 60
+  // RRFK float64
+
+  // WeightFTS is the weight given to full-text search results
+  // Default: 1.0
+  // WeightFTS float64
+
+  // WeightVector is the weight given to vector search results
+  // Default: 1.0
+  // WeightVector float64
+}
+
+message ListSearchResultsResponse {
+  message SearchResult {
+    // Search result text contents.
+    string contents = 1;
+
+    // Search result resource message.
+    google.protobuf.Any resource = 2;
+  }
+
+  // The list of search results.
+  repeated SearchResult results = 1;
+
+  // Token for retrieving the next page.
+  string next_page_token = 2;
+}

@@ -43,6 +43,8 @@ const (
 	BaseServiceListTypesProcedure = "/dtkt.base.v1beta1.BaseService/ListTypes"
 	// BaseServiceGetTypeProcedure is the fully-qualified name of the BaseService's GetType RPC.
 	BaseServiceGetTypeProcedure = "/dtkt.base.v1beta1.BaseService/GetType"
+	// BaseServiceCloseProcedure is the fully-qualified name of the BaseService's Close RPC.
+	BaseServiceCloseProcedure = "/dtkt.base.v1beta1.BaseService/Close"
 )
 
 // BaseServiceClient is a client for the dtkt.base.v1beta1.BaseService service.
@@ -50,7 +52,7 @@ type BaseServiceClient interface {
 	// Returns the embedded package manifest (package.dtkt.yaml) and metadata.
 	// NOTE: GetPackage is implemented by the Integration SDK (not by authors).
 	GetPackage(context.Context, *connect.Request[v1beta1.GetPackageRequest]) (*connect.Response[v1beta1.GetPackageResponse], error)
-	// Validates config, allocates instances, and .
+	// Validates config and allocates instance.
 	// NOTE: CheckConfig is implemented by the Integration SDK (not by authors).
 	CheckConfig(context.Context, *connect.Request[v1beta1.CheckConfigRequest]) (*connect.Response[v1beta1.CheckConfigResponse], error)
 	// Orchestrates OAuth checks/exchanges (3-legged).
@@ -62,6 +64,10 @@ type BaseServiceClient interface {
 	// Returns type registered to integration.
 	// NOTE: GetType is implemented by the Integration SDK (not by authors).
 	GetType(context.Context, *connect.Request[v1beta1.GetTypeRequest]) (*connect.Response[v1beta1.GetTypeResponse], error)
+	// Close releases resources associated with an instance identified by headers
+	// in the request and (if valid) atomically removes it from the integration.
+	// NOTE: Close is implemented by the Integration SDK (not by authors).
+	Close(context.Context, *connect.Request[v1beta1.CloseRequest]) (*connect.Response[v1beta1.CloseResponse], error)
 }
 
 // NewBaseServiceClient constructs a client for the dtkt.base.v1beta1.BaseService service. By
@@ -105,6 +111,12 @@ func NewBaseServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(baseServiceMethods.ByName("GetType")),
 			connect.WithClientOptions(opts...),
 		),
+		close: connect.NewClient[v1beta1.CloseRequest, v1beta1.CloseResponse](
+			httpClient,
+			baseURL+BaseServiceCloseProcedure,
+			connect.WithSchema(baseServiceMethods.ByName("Close")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -115,6 +127,7 @@ type baseServiceClient struct {
 	checkAuth   *connect.Client[v1beta1.CheckAuthRequest, v1beta1.CheckAuthResponse]
 	listTypes   *connect.Client[v1beta1.ListTypesRequest, v1beta1.ListTypesResponse]
 	getType     *connect.Client[v1beta1.GetTypeRequest, v1beta1.GetTypeResponse]
+	close       *connect.Client[v1beta1.CloseRequest, v1beta1.CloseResponse]
 }
 
 // GetPackage calls dtkt.base.v1beta1.BaseService.GetPackage.
@@ -142,12 +155,17 @@ func (c *baseServiceClient) GetType(ctx context.Context, req *connect.Request[v1
 	return c.getType.CallUnary(ctx, req)
 }
 
+// Close calls dtkt.base.v1beta1.BaseService.Close.
+func (c *baseServiceClient) Close(ctx context.Context, req *connect.Request[v1beta1.CloseRequest]) (*connect.Response[v1beta1.CloseResponse], error) {
+	return c.close.CallUnary(ctx, req)
+}
+
 // BaseServiceHandler is an implementation of the dtkt.base.v1beta1.BaseService service.
 type BaseServiceHandler interface {
 	// Returns the embedded package manifest (package.dtkt.yaml) and metadata.
 	// NOTE: GetPackage is implemented by the Integration SDK (not by authors).
 	GetPackage(context.Context, *connect.Request[v1beta1.GetPackageRequest]) (*connect.Response[v1beta1.GetPackageResponse], error)
-	// Validates config, allocates instances, and .
+	// Validates config and allocates instance.
 	// NOTE: CheckConfig is implemented by the Integration SDK (not by authors).
 	CheckConfig(context.Context, *connect.Request[v1beta1.CheckConfigRequest]) (*connect.Response[v1beta1.CheckConfigResponse], error)
 	// Orchestrates OAuth checks/exchanges (3-legged).
@@ -159,6 +177,10 @@ type BaseServiceHandler interface {
 	// Returns type registered to integration.
 	// NOTE: GetType is implemented by the Integration SDK (not by authors).
 	GetType(context.Context, *connect.Request[v1beta1.GetTypeRequest]) (*connect.Response[v1beta1.GetTypeResponse], error)
+	// Close releases resources associated with an instance identified by headers
+	// in the request and (if valid) atomically removes it from the integration.
+	// NOTE: Close is implemented by the Integration SDK (not by authors).
+	Close(context.Context, *connect.Request[v1beta1.CloseRequest]) (*connect.Response[v1beta1.CloseResponse], error)
 }
 
 // NewBaseServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -198,6 +220,12 @@ func NewBaseServiceHandler(svc BaseServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(baseServiceMethods.ByName("GetType")),
 		connect.WithHandlerOptions(opts...),
 	)
+	baseServiceCloseHandler := connect.NewUnaryHandler(
+		BaseServiceCloseProcedure,
+		svc.Close,
+		connect.WithSchema(baseServiceMethods.ByName("Close")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/dtkt.base.v1beta1.BaseService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case BaseServiceGetPackageProcedure:
@@ -210,6 +238,8 @@ func NewBaseServiceHandler(svc BaseServiceHandler, opts ...connect.HandlerOption
 			baseServiceListTypesHandler.ServeHTTP(w, r)
 		case BaseServiceGetTypeProcedure:
 			baseServiceGetTypeHandler.ServeHTTP(w, r)
+		case BaseServiceCloseProcedure:
+			baseServiceCloseHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -237,4 +267,8 @@ func (UnimplementedBaseServiceHandler) ListTypes(context.Context, *connect.Reque
 
 func (UnimplementedBaseServiceHandler) GetType(context.Context, *connect.Request[v1beta1.GetTypeRequest]) (*connect.Response[v1beta1.GetTypeResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.base.v1beta1.BaseService.GetType is not implemented"))
+}
+
+func (UnimplementedBaseServiceHandler) Close(context.Context, *connect.Request[v1beta1.CloseRequest]) (*connect.Response[v1beta1.CloseResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dtkt.base.v1beta1.BaseService.Close is not implemented"))
 }

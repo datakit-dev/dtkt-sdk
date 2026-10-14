@@ -29,24 +29,27 @@ func OAuthTokenFromProto(token *sharedv1beta1.OAuthToken) *oauth2.Token {
 	}
 }
 
-func OAuthConfigFromProto(protoConfig *sharedv1beta1.OAuthConfig) (*oauth2.Config, []oauth2.AuthCodeOption) {
+func OAuthConfigFromProto(proto *sharedv1beta1.OAuthConfig) (*oauth2.Config, []oauth2.AuthCodeOption) {
 	var config = &oauth2.Config{
-		ClientID:     protoConfig.ClientId,
-		ClientSecret: protoConfig.ClientSecret,
+		ClientID:     proto.ClientId,
+		ClientSecret: proto.ClientSecret,
 		Endpoint: oauth2.Endpoint{
-			AuthURL:       protoConfig.Endpoint.AuthUrl,
-			TokenURL:      protoConfig.Endpoint.TokenUrl,
-			DeviceAuthURL: protoConfig.Endpoint.DeviceAuthUrl,
+			AuthURL:  proto.Endpoint.AuthUrl,
+			TokenURL: proto.Endpoint.TokenUrl,
 		},
 	}
 
-	if len(protoConfig.Scopes) > 0 {
-		config.Scopes = protoConfig.Scopes
+	if proto.Endpoint.DeviceAuthUrl != nil {
+		config.Endpoint.DeviceAuthURL = proto.Endpoint.GetDeviceAuthUrl()
+	}
+
+	if len(proto.Scopes) > 0 {
+		config.Scopes = proto.Scopes
 	}
 
 	var opts []oauth2.AuthCodeOption
-	if len(protoConfig.Params) > 0 {
-		for key, val := range protoConfig.Params {
+	if len(proto.Params) > 0 {
+		for key, val := range proto.Params {
 			opts = append(opts, oauth2.SetAuthURLParam(key, val))
 		}
 	}

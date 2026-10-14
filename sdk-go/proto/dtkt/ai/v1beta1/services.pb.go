@@ -24,18 +24,20 @@ var File_dtkt_ai_v1beta1_services_proto protoreflect.FileDescriptor
 
 const file_dtkt_ai_v1beta1_services_proto_rawDesc = "" +
 	"\n" +
-	"\x1edtkt/ai/v1beta1/services.proto\x12\x0fdtkt.ai.v1beta1\x1a\x1edtkt/ai/v1beta1/messages.proto2\xc3\x01\n" +
+	"\x1edtkt/ai/v1beta1/services.proto\x12\x0fdtkt.ai.v1beta1\x1a\x1edtkt/ai/v1beta1/messages.proto2\xb6\x01\n" +
+	"\fModelService\x12U\n" +
+	"\n" +
+	"ListModels\x12\".dtkt.ai.v1beta1.ListModelsRequest\x1a#.dtkt.ai.v1beta1.ListModelsResponse\x12O\n" +
+	"\bGetModel\x12 .dtkt.ai.v1beta1.GetModelRequest\x1a!.dtkt.ai.v1beta1.GetModelResponse2\x81\x01\n" +
+	"\x10EmbeddingService\x12m\n" +
+	"\x12GenerateEmbeddings\x12*.dtkt.ai.v1beta1.GenerateEmbeddingsRequest\x1a+.dtkt.ai.v1beta1.GenerateEmbeddingsResponse2\xc3\x01\n" +
 	"\vTextService\x12[\n" +
 	"\fGenerateText\x12$.dtkt.ai.v1beta1.GenerateTextRequest\x1a%.dtkt.ai.v1beta1.GenerateTextResponse\x12W\n" +
 	"\n" +
 	"StreamText\x12\".dtkt.ai.v1beta1.StreamTextRequest\x1a#.dtkt.ai.v1beta1.StreamTextResponse0\x012\xd4\x01\n" +
 	"\rObjectService\x12a\n" +
 	"\x0eGenerateObject\x12&.dtkt.ai.v1beta1.GenerateObjectRequest\x1a'.dtkt.ai.v1beta1.GenerateObjectResponse\x12`\n" +
-	"\rStreamObjects\x12%.dtkt.ai.v1beta1.StreamObjectsRequest\x1a&.dtkt.ai.v1beta1.StreamObjectsResponse0\x012\xdf\x02\n" +
-	"\x10EmbeddingService\x12p\n" +
-	"\x13ListEmbeddingModels\x12+.dtkt.ai.v1beta1.ListEmbeddingModelsRequest\x1a,.dtkt.ai.v1beta1.ListEmbeddingModelsResponse\x12j\n" +
-	"\x11GetEmbeddingModel\x12).dtkt.ai.v1beta1.GetEmbeddingModelRequest\x1a*.dtkt.ai.v1beta1.GetEmbeddingModelResponse\x12m\n" +
-	"\x12GenerateEmbeddings\x12*.dtkt.ai.v1beta1.GenerateEmbeddingsRequest\x1a+.dtkt.ai.v1beta1.GenerateEmbeddingsResponse2\xc3\x02\n" +
+	"\rStreamObjects\x12%.dtkt.ai.v1beta1.StreamObjectsRequest\x1a&.dtkt.ai.v1beta1.StreamObjectsResponse0\x012\xc3\x02\n" +
 	"\fImageService\x12^\n" +
 	"\rGenerateImage\x12%.dtkt.ai.v1beta1.GenerateImageRequest\x1a&.dtkt.ai.v1beta1.GenerateImageResponse\x12a\n" +
 	"\x0eGenerateImages\x12&.dtkt.ai.v1beta1.GenerateImagesRequest\x1a'.dtkt.ai.v1beta1.GenerateImagesResponse\x12p\n" +
@@ -49,26 +51,26 @@ const file_dtkt_ai_v1beta1_services_proto_rawDesc = "" +
 	"\x15proto.dtkt.ai.v1beta1B\rServicesProtoP\x01ZFgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/ai/v1beta1;aiv1beta1\xa2\x02\x03DAX\xaa\x02\x0fDtkt.Ai.V1beta1\xca\x02\x0fDtkt\\Ai\\V1beta1\xe2\x02\x1bDtkt\\Ai\\V1beta1\\GPBMetadata\xea\x02\x11Dtkt::Ai::V1beta1b\x06proto3"
 
 var file_dtkt_ai_v1beta1_services_proto_goTypes = []any{
-	(*GenerateTextRequest)(nil),         // 0: dtkt.ai.v1beta1.GenerateTextRequest
-	(*StreamTextRequest)(nil),           // 1: dtkt.ai.v1beta1.StreamTextRequest
-	(*GenerateObjectRequest)(nil),       // 2: dtkt.ai.v1beta1.GenerateObjectRequest
-	(*StreamObjectsRequest)(nil),        // 3: dtkt.ai.v1beta1.StreamObjectsRequest
-	(*ListEmbeddingModelsRequest)(nil),  // 4: dtkt.ai.v1beta1.ListEmbeddingModelsRequest
-	(*GetEmbeddingModelRequest)(nil),    // 5: dtkt.ai.v1beta1.GetEmbeddingModelRequest
-	(*GenerateEmbeddingsRequest)(nil),   // 6: dtkt.ai.v1beta1.GenerateEmbeddingsRequest
+	(*ListModelsRequest)(nil),           // 0: dtkt.ai.v1beta1.ListModelsRequest
+	(*GetModelRequest)(nil),             // 1: dtkt.ai.v1beta1.GetModelRequest
+	(*GenerateEmbeddingsRequest)(nil),   // 2: dtkt.ai.v1beta1.GenerateEmbeddingsRequest
+	(*GenerateTextRequest)(nil),         // 3: dtkt.ai.v1beta1.GenerateTextRequest
+	(*StreamTextRequest)(nil),           // 4: dtkt.ai.v1beta1.StreamTextRequest
+	(*GenerateObjectRequest)(nil),       // 5: dtkt.ai.v1beta1.GenerateObjectRequest
+	(*StreamObjectsRequest)(nil),        // 6: dtkt.ai.v1beta1.StreamObjectsRequest
 	(*GenerateImageRequest)(nil),        // 7: dtkt.ai.v1beta1.GenerateImageRequest
 	(*GenerateImagesRequest)(nil),       // 8: dtkt.ai.v1beta1.GenerateImagesRequest
 	(*GenerateBatchImagesRequest)(nil),  // 9: dtkt.ai.v1beta1.GenerateBatchImagesRequest
 	(*TranscribeRequest)(nil),           // 10: dtkt.ai.v1beta1.TranscribeRequest
 	(*GenerateSpeechRequest)(nil),       // 11: dtkt.ai.v1beta1.GenerateSpeechRequest
 	(*StreamSpeechRequest)(nil),         // 12: dtkt.ai.v1beta1.StreamSpeechRequest
-	(*GenerateTextResponse)(nil),        // 13: dtkt.ai.v1beta1.GenerateTextResponse
-	(*StreamTextResponse)(nil),          // 14: dtkt.ai.v1beta1.StreamTextResponse
-	(*GenerateObjectResponse)(nil),      // 15: dtkt.ai.v1beta1.GenerateObjectResponse
-	(*StreamObjectsResponse)(nil),       // 16: dtkt.ai.v1beta1.StreamObjectsResponse
-	(*ListEmbeddingModelsResponse)(nil), // 17: dtkt.ai.v1beta1.ListEmbeddingModelsResponse
-	(*GetEmbeddingModelResponse)(nil),   // 18: dtkt.ai.v1beta1.GetEmbeddingModelResponse
-	(*GenerateEmbeddingsResponse)(nil),  // 19: dtkt.ai.v1beta1.GenerateEmbeddingsResponse
+	(*ListModelsResponse)(nil),          // 13: dtkt.ai.v1beta1.ListModelsResponse
+	(*GetModelResponse)(nil),            // 14: dtkt.ai.v1beta1.GetModelResponse
+	(*GenerateEmbeddingsResponse)(nil),  // 15: dtkt.ai.v1beta1.GenerateEmbeddingsResponse
+	(*GenerateTextResponse)(nil),        // 16: dtkt.ai.v1beta1.GenerateTextResponse
+	(*StreamTextResponse)(nil),          // 17: dtkt.ai.v1beta1.StreamTextResponse
+	(*GenerateObjectResponse)(nil),      // 18: dtkt.ai.v1beta1.GenerateObjectResponse
+	(*StreamObjectsResponse)(nil),       // 19: dtkt.ai.v1beta1.StreamObjectsResponse
 	(*GenerateImageResponse)(nil),       // 20: dtkt.ai.v1beta1.GenerateImageResponse
 	(*GenerateImagesResponse)(nil),      // 21: dtkt.ai.v1beta1.GenerateImagesResponse
 	(*GenerateBatchImagesResponse)(nil), // 22: dtkt.ai.v1beta1.GenerateBatchImagesResponse
@@ -77,26 +79,26 @@ var file_dtkt_ai_v1beta1_services_proto_goTypes = []any{
 	(*StreamSpeechResponse)(nil),        // 25: dtkt.ai.v1beta1.StreamSpeechResponse
 }
 var file_dtkt_ai_v1beta1_services_proto_depIdxs = []int32{
-	0,  // 0: dtkt.ai.v1beta1.TextService.GenerateText:input_type -> dtkt.ai.v1beta1.GenerateTextRequest
-	1,  // 1: dtkt.ai.v1beta1.TextService.StreamText:input_type -> dtkt.ai.v1beta1.StreamTextRequest
-	2,  // 2: dtkt.ai.v1beta1.ObjectService.GenerateObject:input_type -> dtkt.ai.v1beta1.GenerateObjectRequest
-	3,  // 3: dtkt.ai.v1beta1.ObjectService.StreamObjects:input_type -> dtkt.ai.v1beta1.StreamObjectsRequest
-	4,  // 4: dtkt.ai.v1beta1.EmbeddingService.ListEmbeddingModels:input_type -> dtkt.ai.v1beta1.ListEmbeddingModelsRequest
-	5,  // 5: dtkt.ai.v1beta1.EmbeddingService.GetEmbeddingModel:input_type -> dtkt.ai.v1beta1.GetEmbeddingModelRequest
-	6,  // 6: dtkt.ai.v1beta1.EmbeddingService.GenerateEmbeddings:input_type -> dtkt.ai.v1beta1.GenerateEmbeddingsRequest
+	0,  // 0: dtkt.ai.v1beta1.ModelService.ListModels:input_type -> dtkt.ai.v1beta1.ListModelsRequest
+	1,  // 1: dtkt.ai.v1beta1.ModelService.GetModel:input_type -> dtkt.ai.v1beta1.GetModelRequest
+	2,  // 2: dtkt.ai.v1beta1.EmbeddingService.GenerateEmbeddings:input_type -> dtkt.ai.v1beta1.GenerateEmbeddingsRequest
+	3,  // 3: dtkt.ai.v1beta1.TextService.GenerateText:input_type -> dtkt.ai.v1beta1.GenerateTextRequest
+	4,  // 4: dtkt.ai.v1beta1.TextService.StreamText:input_type -> dtkt.ai.v1beta1.StreamTextRequest
+	5,  // 5: dtkt.ai.v1beta1.ObjectService.GenerateObject:input_type -> dtkt.ai.v1beta1.GenerateObjectRequest
+	6,  // 6: dtkt.ai.v1beta1.ObjectService.StreamObjects:input_type -> dtkt.ai.v1beta1.StreamObjectsRequest
 	7,  // 7: dtkt.ai.v1beta1.ImageService.GenerateImage:input_type -> dtkt.ai.v1beta1.GenerateImageRequest
 	8,  // 8: dtkt.ai.v1beta1.ImageService.GenerateImages:input_type -> dtkt.ai.v1beta1.GenerateImagesRequest
 	9,  // 9: dtkt.ai.v1beta1.ImageService.GenerateBatchImages:input_type -> dtkt.ai.v1beta1.GenerateBatchImagesRequest
 	10, // 10: dtkt.ai.v1beta1.TranscriptionService.Transcribe:input_type -> dtkt.ai.v1beta1.TranscribeRequest
 	11, // 11: dtkt.ai.v1beta1.SpeechService.GenerateSpeech:input_type -> dtkt.ai.v1beta1.GenerateSpeechRequest
 	12, // 12: dtkt.ai.v1beta1.SpeechService.StreamSpeech:input_type -> dtkt.ai.v1beta1.StreamSpeechRequest
-	13, // 13: dtkt.ai.v1beta1.TextService.GenerateText:output_type -> dtkt.ai.v1beta1.GenerateTextResponse
-	14, // 14: dtkt.ai.v1beta1.TextService.StreamText:output_type -> dtkt.ai.v1beta1.StreamTextResponse
-	15, // 15: dtkt.ai.v1beta1.ObjectService.GenerateObject:output_type -> dtkt.ai.v1beta1.GenerateObjectResponse
-	16, // 16: dtkt.ai.v1beta1.ObjectService.StreamObjects:output_type -> dtkt.ai.v1beta1.StreamObjectsResponse
-	17, // 17: dtkt.ai.v1beta1.EmbeddingService.ListEmbeddingModels:output_type -> dtkt.ai.v1beta1.ListEmbeddingModelsResponse
-	18, // 18: dtkt.ai.v1beta1.EmbeddingService.GetEmbeddingModel:output_type -> dtkt.ai.v1beta1.GetEmbeddingModelResponse
-	19, // 19: dtkt.ai.v1beta1.EmbeddingService.GenerateEmbeddings:output_type -> dtkt.ai.v1beta1.GenerateEmbeddingsResponse
+	13, // 13: dtkt.ai.v1beta1.ModelService.ListModels:output_type -> dtkt.ai.v1beta1.ListModelsResponse
+	14, // 14: dtkt.ai.v1beta1.ModelService.GetModel:output_type -> dtkt.ai.v1beta1.GetModelResponse
+	15, // 15: dtkt.ai.v1beta1.EmbeddingService.GenerateEmbeddings:output_type -> dtkt.ai.v1beta1.GenerateEmbeddingsResponse
+	16, // 16: dtkt.ai.v1beta1.TextService.GenerateText:output_type -> dtkt.ai.v1beta1.GenerateTextResponse
+	17, // 17: dtkt.ai.v1beta1.TextService.StreamText:output_type -> dtkt.ai.v1beta1.StreamTextResponse
+	18, // 18: dtkt.ai.v1beta1.ObjectService.GenerateObject:output_type -> dtkt.ai.v1beta1.GenerateObjectResponse
+	19, // 19: dtkt.ai.v1beta1.ObjectService.StreamObjects:output_type -> dtkt.ai.v1beta1.StreamObjectsResponse
 	20, // 20: dtkt.ai.v1beta1.ImageService.GenerateImage:output_type -> dtkt.ai.v1beta1.GenerateImageResponse
 	21, // 21: dtkt.ai.v1beta1.ImageService.GenerateImages:output_type -> dtkt.ai.v1beta1.GenerateImagesResponse
 	22, // 22: dtkt.ai.v1beta1.ImageService.GenerateBatchImages:output_type -> dtkt.ai.v1beta1.GenerateBatchImagesResponse
@@ -124,7 +126,7 @@ func file_dtkt_ai_v1beta1_services_proto_init() {
 			NumEnums:      0,
 			NumMessages:   0,
 			NumExtensions: 0,
-			NumServices:   6,
+			NumServices:   7,
 		},
 		GoTypes:           file_dtkt_ai_v1beta1_services_proto_goTypes,
 		DependencyIndexes: file_dtkt_ai_v1beta1_services_proto_depIdxs,

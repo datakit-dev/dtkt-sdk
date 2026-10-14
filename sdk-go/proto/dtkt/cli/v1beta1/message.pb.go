@@ -121,6 +121,59 @@ func (x *Legal) GetBslAcceptedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+// Models configuration
+type Models struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Embedding     *Models_Embedding      `protobuf:"bytes,1,opt,name=embedding,proto3" json:"embedding,omitempty"`
+	Agent         *Models_Agent          `protobuf:"bytes,2,opt,name=agent,proto3" json:"agent,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Models) Reset() {
+	*x = Models{}
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Models) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Models) ProtoMessage() {}
+
+func (x *Models) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Models.ProtoReflect.Descriptor instead.
+func (*Models) Descriptor() ([]byte, []int) {
+	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Models) GetEmbedding() *Models_Embedding {
+	if x != nil {
+		return x.Embedding
+	}
+	return nil
+}
+
+func (x *Models) GetAgent() *Models_Agent {
+	if x != nil {
+		return x.Agent
+	}
+	return nil
+}
+
 // Daemon configuration
 type DaemonConfigFile struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -130,13 +183,15 @@ type DaemonConfigFile struct {
 	Telemetry Telemetry `protobuf:"varint,2,opt,name=telemetry,proto3,enum=dtkt.cli.v1beta1.Telemetry" json:"telemetry,omitempty"`
 	// Docker registry for pushing/pulling integration images (e.g. "us-docker.pkg.dev/datakit-prd/us-docker-virtual")
 	DockerRegistry string `protobuf:"bytes,3,opt,name=docker_registry,json=dockerRegistry,proto3" json:"docker_registry,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Model configuration for agents and embeddings
+	Models        *Models `protobuf:"bytes,4,opt,name=models,proto3" json:"models,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DaemonConfigFile) Reset() {
 	*x = DaemonConfigFile{}
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[1]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -148,7 +203,7 @@ func (x *DaemonConfigFile) String() string {
 func (*DaemonConfigFile) ProtoMessage() {}
 
 func (x *DaemonConfigFile) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[1]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -161,7 +216,7 @@ func (x *DaemonConfigFile) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DaemonConfigFile.ProtoReflect.Descriptor instead.
 func (*DaemonConfigFile) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{1}
+	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *DaemonConfigFile) GetTcpAddress() string {
@@ -183,6 +238,13 @@ func (x *DaemonConfigFile) GetDockerRegistry() string {
 		return x.DockerRegistry
 	}
 	return ""
+}
+
+func (x *DaemonConfigFile) GetModels() *Models {
+	if x != nil {
+		return x.Models
+	}
+	return nil
 }
 
 type DaemonConfig struct {
@@ -208,7 +270,7 @@ type DaemonConfig struct {
 
 func (x *DaemonConfig) Reset() {
 	*x = DaemonConfig{}
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[2]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -220,7 +282,7 @@ func (x *DaemonConfig) String() string {
 func (*DaemonConfig) ProtoMessage() {}
 
 func (x *DaemonConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[2]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -233,7 +295,7 @@ func (x *DaemonConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DaemonConfig.ProtoReflect.Descriptor instead.
 func (*DaemonConfig) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{2}
+	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *DaemonConfig) GetConfigFile() *DaemonConfigFile {
@@ -307,7 +369,7 @@ type DaemonStatus struct {
 
 func (x *DaemonStatus) Reset() {
 	*x = DaemonStatus{}
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[3]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -319,7 +381,7 @@ func (x *DaemonStatus) String() string {
 func (*DaemonStatus) ProtoMessage() {}
 
 func (x *DaemonStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[3]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -332,7 +394,7 @@ func (x *DaemonStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DaemonStatus.ProtoReflect.Descriptor instead.
 func (*DaemonStatus) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{3}
+	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *DaemonStatus) GetRunning() bool {
@@ -392,7 +454,7 @@ type DaemonPaths struct {
 
 func (x *DaemonPaths) Reset() {
 	*x = DaemonPaths{}
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[4]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -404,7 +466,7 @@ func (x *DaemonPaths) String() string {
 func (*DaemonPaths) ProtoMessage() {}
 
 func (x *DaemonPaths) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[4]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -417,7 +479,7 @@ func (x *DaemonPaths) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DaemonPaths.ProtoReflect.Descriptor instead.
 func (*DaemonPaths) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{4}
+	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *DaemonPaths) GetMode() string {
@@ -506,7 +568,7 @@ type ConfigFile struct {
 
 func (x *ConfigFile) Reset() {
 	*x = ConfigFile{}
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[5]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -518,7 +580,7 @@ func (x *ConfigFile) String() string {
 func (*ConfigFile) ProtoMessage() {}
 
 func (x *ConfigFile) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[5]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -531,7 +593,7 @@ func (x *ConfigFile) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConfigFile.ProtoReflect.Descriptor instead.
 func (*ConfigFile) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{5}
+	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ConfigFile) GetContexts() map[string]*v1.Context {
@@ -577,7 +639,7 @@ type Config struct {
 
 func (x *Config) Reset() {
 	*x = Config{}
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[6]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -589,7 +651,7 @@ func (x *Config) String() string {
 func (*Config) ProtoMessage() {}
 
 func (x *Config) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[6]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -602,7 +664,7 @@ func (x *Config) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Config.ProtoReflect.Descriptor instead.
 func (*Config) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{6}
+	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *Config) GetName() string {
@@ -636,7 +698,7 @@ type Configs struct {
 
 func (x *Configs) Reset() {
 	*x = Configs{}
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[7]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -648,7 +710,7 @@ func (x *Configs) String() string {
 func (*Configs) ProtoMessage() {}
 
 func (x *Configs) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[7]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -661,7 +723,7 @@ func (x *Configs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Configs.ProtoReflect.Descriptor instead.
 func (*Configs) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{7}
+	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *Configs) GetConfigs() []*Config {
@@ -688,7 +750,7 @@ type ConfigPaths struct {
 
 func (x *ConfigPaths) Reset() {
 	*x = ConfigPaths{}
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[8]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -700,7 +762,7 @@ func (x *ConfigPaths) String() string {
 func (*ConfigPaths) ProtoMessage() {}
 
 func (x *ConfigPaths) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[8]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -713,7 +775,7 @@ func (x *ConfigPaths) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConfigPaths.ProtoReflect.Descriptor instead.
 func (*ConfigPaths) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{8}
+	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ConfigPaths) GetName() string {
@@ -754,7 +816,7 @@ type Context struct {
 
 func (x *Context) Reset() {
 	*x = Context{}
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[9]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -766,7 +828,7 @@ func (x *Context) String() string {
 func (*Context) ProtoMessage() {}
 
 func (x *Context) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[9]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -779,7 +841,7 @@ func (x *Context) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Context.ProtoReflect.Descriptor instead.
 func (*Context) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{9}
+	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *Context) GetLabel() string {
@@ -809,7 +871,7 @@ type Plugin struct {
 
 func (x *Plugin) Reset() {
 	*x = Plugin{}
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[10]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -821,7 +883,7 @@ func (x *Plugin) String() string {
 func (*Plugin) ProtoMessage() {}
 
 func (x *Plugin) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[10]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -834,7 +896,7 @@ func (x *Plugin) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Plugin.ProtoReflect.Descriptor instead.
 func (*Plugin) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{10}
+	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *Plugin) GetName() string {
@@ -867,7 +929,7 @@ type PluginInfo struct {
 
 func (x *PluginInfo) Reset() {
 	*x = PluginInfo{}
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[11]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -879,7 +941,7 @@ func (x *PluginInfo) String() string {
 func (*PluginInfo) ProtoMessage() {}
 
 func (x *PluginInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[11]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -892,7 +954,7 @@ func (x *PluginInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PluginInfo.ProtoReflect.Descriptor instead.
 func (*PluginInfo) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{11}
+	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *PluginInfo) GetName() string {
@@ -933,7 +995,7 @@ type Plugins struct {
 
 func (x *Plugins) Reset() {
 	*x = Plugins{}
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[12]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -945,7 +1007,7 @@ func (x *Plugins) String() string {
 func (*Plugins) ProtoMessage() {}
 
 func (x *Plugins) ProtoReflect() protoreflect.Message {
-	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[12]
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -958,7 +1020,7 @@ func (x *Plugins) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Plugins.ProtoReflect.Descriptor instead.
 func (*Plugins) Descriptor() ([]byte, []int) {
-	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{12}
+	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *Plugins) GetPlugins() []*Plugin {
@@ -968,19 +1030,246 @@ func (x *Plugins) GetPlugins() []*Plugin {
 	return nil
 }
 
+type Models_Agent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Disable       bool                   `protobuf:"varint,1,opt,name=disable,proto3" json:"disable,omitempty"`
+	Model         string                 `protobuf:"bytes,2,opt,name=model,proto3" json:"model,omitempty"`
+	Provider      *Models_Provider       `protobuf:"bytes,3,opt,name=provider,proto3" json:"provider,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Models_Agent) Reset() {
+	*x = Models_Agent{}
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Models_Agent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Models_Agent) ProtoMessage() {}
+
+func (x *Models_Agent) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Models_Agent.ProtoReflect.Descriptor instead.
+func (*Models_Agent) Descriptor() ([]byte, []int) {
+	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{1, 0}
+}
+
+func (x *Models_Agent) GetDisable() bool {
+	if x != nil {
+		return x.Disable
+	}
+	return false
+}
+
+func (x *Models_Agent) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *Models_Agent) GetProvider() *Models_Provider {
+	if x != nil {
+		return x.Provider
+	}
+	return nil
+}
+
+type Models_Embedding struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Disable       bool                   `protobuf:"varint,1,opt,name=disable,proto3" json:"disable,omitempty"`
+	Model         string                 `protobuf:"bytes,2,opt,name=model,proto3" json:"model,omitempty"`
+	Dimensions    uint32                 `protobuf:"varint,3,opt,name=dimensions,proto3" json:"dimensions,omitempty"`
+	Provider      *Models_Provider       `protobuf:"bytes,4,opt,name=provider,proto3" json:"provider,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Models_Embedding) Reset() {
+	*x = Models_Embedding{}
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Models_Embedding) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Models_Embedding) ProtoMessage() {}
+
+func (x *Models_Embedding) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Models_Embedding.ProtoReflect.Descriptor instead.
+func (*Models_Embedding) Descriptor() ([]byte, []int) {
+	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{1, 1}
+}
+
+func (x *Models_Embedding) GetDisable() bool {
+	if x != nil {
+		return x.Disable
+	}
+	return false
+}
+
+func (x *Models_Embedding) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *Models_Embedding) GetDimensions() uint32 {
+	if x != nil {
+		return x.Dimensions
+	}
+	return 0
+}
+
+func (x *Models_Embedding) GetProvider() *Models_Provider {
+	if x != nil {
+		return x.Provider
+	}
+	return nil
+}
+
+type Models_Provider struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Name of provider
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// API base url (default: provider-specific)
+	ApiBaseUrl *string `protobuf:"bytes,3,opt,name=api_base_url,json=apiBaseUrl,proto3,oneof" json:"api_base_url,omitempty"`
+	// API key (may be required by provider)
+	ApiKey *string `protobuf:"bytes,4,opt,name=api_key,json=apiKey,proto3,oneof" json:"api_key,omitempty"`
+	// Custom headers to include in each request
+	CustomHeaders map[string]string `protobuf:"bytes,5,rep,name=custom_headers,json=customHeaders,proto3" json:"custom_headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Models_Provider) Reset() {
+	*x = Models_Provider{}
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Models_Provider) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Models_Provider) ProtoMessage() {}
+
+func (x *Models_Provider) ProtoReflect() protoreflect.Message {
+	mi := &file_dtkt_cli_v1beta1_message_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Models_Provider.ProtoReflect.Descriptor instead.
+func (*Models_Provider) Descriptor() ([]byte, []int) {
+	return file_dtkt_cli_v1beta1_message_proto_rawDescGZIP(), []int{1, 2}
+}
+
+func (x *Models_Provider) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Models_Provider) GetApiBaseUrl() string {
+	if x != nil && x.ApiBaseUrl != nil {
+		return *x.ApiBaseUrl
+	}
+	return ""
+}
+
+func (x *Models_Provider) GetApiKey() string {
+	if x != nil && x.ApiKey != nil {
+		return *x.ApiKey
+	}
+	return ""
+}
+
+func (x *Models_Provider) GetCustomHeaders() map[string]string {
+	if x != nil {
+		return x.CustomHeaders
+	}
+	return nil
+}
+
 var File_dtkt_cli_v1beta1_message_proto protoreflect.FileDescriptor
 
 const file_dtkt_cli_v1beta1_message_proto_rawDesc = "" +
 	"\n" +
-	"\x1edtkt/cli/v1beta1/message.proto\x12\x10dtkt.cli.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1bdtkt/core/v1/messages.proto\x1a\"dtkt/protoui/v1beta1/protoui.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"d\n" +
+	"\x1edtkt/cli/v1beta1/message.proto\x12\x10dtkt.cli.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x19dtkt/core/v1/common.proto\x1a\"dtkt/protoui/v1beta1/protoui.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"d\n" +
 	"\x05Legal\x12G\n" +
 	"\x0fbsl_accepted_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\rbslAcceptedAt\x88\x01\x01B\x12\n" +
-	"\x10_bsl_accepted_at\"\xae\x01\n" +
+	"\x10_bsl_accepted_at\"\xf6\x06\n" +
+	"\x06Models\x12@\n" +
+	"\tembedding\x18\x01 \x01(\v2\".dtkt.cli.v1beta1.Models.EmbeddingR\tembedding\x124\n" +
+	"\x05agent\x18\x02 \x01(\v2\x1e.dtkt.cli.v1beta1.Models.AgentR\x05agent\x1a\xa1\x01\n" +
+	"\x05Agent\x12\x18\n" +
+	"\adisable\x18\x01 \x01(\bR\adisable\x12\x14\n" +
+	"\x05model\x18\x02 \x01(\tR\x05model\x12=\n" +
+	"\bprovider\x18\x03 \x01(\v2!.dtkt.cli.v1beta1.Models.ProviderR\bprovider:)\xbaH&*$this.disable || size(this.model) > 0\x1a\xfe\x01\n" +
+	"\tEmbedding\x12\x18\n" +
+	"\adisable\x18\x01 \x01(\bR\adisable\x12\x14\n" +
+	"\x05model\x18\x02 \x01(\tR\x05model\x12\x1e\n" +
+	"\n" +
+	"dimensions\x18\x03 \x01(\rR\n" +
+	"dimensions\x12]\n" +
+	"\bprovider\x18\x04 \x01(\v2!.dtkt.cli.v1beta1.Models.ProviderB\x1e\xbaH\x1b\xea\x01\x18this.name != 'anthropic'R\bprovider:B\xbaH?*=this.disable || (size(this.model) > 0 && this.dimensions > 0)\x1a\xce\x02\n" +
+	"\bProvider\x127\n" +
+	"\x04name\x18\x02 \x01(\tB#\xbaH \xc8\x01\x01r\x1bR\x06ollamaR\x06openaiR\tanthropicR\x04name\x12/\n" +
+	"\fapi_base_url\x18\x03 \x01(\tB\b\xbaH\x05r\x03\x88\x01\x01H\x00R\n" +
+	"apiBaseUrl\x88\x01\x01\x12\x1c\n" +
+	"\aapi_key\x18\x04 \x01(\tH\x01R\x06apiKey\x88\x01\x01\x12[\n" +
+	"\x0ecustom_headers\x18\x05 \x03(\v24.dtkt.cli.v1beta1.Models.Provider.CustomHeadersEntryR\rcustomHeaders\x1a@\n" +
+	"\x12CustomHeadersEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0f\n" +
+	"\r_api_base_urlB\n" +
+	"\n" +
+	"\b_api_key\"\xe0\x01\n" +
 	"\x10DaemonConfigFile\x12,\n" +
 	"\vtcp_address\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x80\x02\x01R\n" +
 	"tcpAddress\x12C\n" +
 	"\ttelemetry\x18\x02 \x01(\x0e2\x1b.dtkt.cli.v1beta1.TelemetryB\b\xbaH\x05\x82\x01\x02\x10\x01R\ttelemetry\x12'\n" +
-	"\x0fdocker_registry\x18\x03 \x01(\tR\x0edockerRegistry\"\xdd\x02\n" +
+	"\x0fdocker_registry\x18\x03 \x01(\tR\x0edockerRegistry\x120\n" +
+	"\x06models\x18\x04 \x01(\v2\x18.dtkt.cli.v1beta1.ModelsR\x06models\"\xdd\x02\n" +
 	"\fDaemonConfig\x12C\n" +
 	"\vconfig_file\x18\x01 \x01(\v2\".dtkt.cli.v1beta1.DaemonConfigFileR\n" +
 	"configFile\x12\"\n" +
@@ -1074,44 +1363,55 @@ func file_dtkt_cli_v1beta1_message_proto_rawDescGZIP() []byte {
 }
 
 var file_dtkt_cli_v1beta1_message_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_dtkt_cli_v1beta1_message_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_dtkt_cli_v1beta1_message_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_dtkt_cli_v1beta1_message_proto_goTypes = []any{
 	(Telemetry)(0),                // 0: dtkt.cli.v1beta1.Telemetry
 	(*Legal)(nil),                 // 1: dtkt.cli.v1beta1.Legal
-	(*DaemonConfigFile)(nil),      // 2: dtkt.cli.v1beta1.DaemonConfigFile
-	(*DaemonConfig)(nil),          // 3: dtkt.cli.v1beta1.DaemonConfig
-	(*DaemonStatus)(nil),          // 4: dtkt.cli.v1beta1.DaemonStatus
-	(*DaemonPaths)(nil),           // 5: dtkt.cli.v1beta1.DaemonPaths
-	(*ConfigFile)(nil),            // 6: dtkt.cli.v1beta1.ConfigFile
-	(*Config)(nil),                // 7: dtkt.cli.v1beta1.Config
-	(*Configs)(nil),               // 8: dtkt.cli.v1beta1.Configs
-	(*ConfigPaths)(nil),           // 9: dtkt.cli.v1beta1.ConfigPaths
-	(*Context)(nil),               // 10: dtkt.cli.v1beta1.Context
-	(*Plugin)(nil),                // 11: dtkt.cli.v1beta1.Plugin
-	(*PluginInfo)(nil),            // 12: dtkt.cli.v1beta1.PluginInfo
-	(*Plugins)(nil),               // 13: dtkt.cli.v1beta1.Plugins
-	nil,                           // 14: dtkt.cli.v1beta1.ConfigFile.ContextsEntry
-	(*timestamppb.Timestamp)(nil), // 15: google.protobuf.Timestamp
-	(*v1.Context)(nil),            // 16: dtkt.core.v1.Context
+	(*Models)(nil),                // 2: dtkt.cli.v1beta1.Models
+	(*DaemonConfigFile)(nil),      // 3: dtkt.cli.v1beta1.DaemonConfigFile
+	(*DaemonConfig)(nil),          // 4: dtkt.cli.v1beta1.DaemonConfig
+	(*DaemonStatus)(nil),          // 5: dtkt.cli.v1beta1.DaemonStatus
+	(*DaemonPaths)(nil),           // 6: dtkt.cli.v1beta1.DaemonPaths
+	(*ConfigFile)(nil),            // 7: dtkt.cli.v1beta1.ConfigFile
+	(*Config)(nil),                // 8: dtkt.cli.v1beta1.Config
+	(*Configs)(nil),               // 9: dtkt.cli.v1beta1.Configs
+	(*ConfigPaths)(nil),           // 10: dtkt.cli.v1beta1.ConfigPaths
+	(*Context)(nil),               // 11: dtkt.cli.v1beta1.Context
+	(*Plugin)(nil),                // 12: dtkt.cli.v1beta1.Plugin
+	(*PluginInfo)(nil),            // 13: dtkt.cli.v1beta1.PluginInfo
+	(*Plugins)(nil),               // 14: dtkt.cli.v1beta1.Plugins
+	(*Models_Agent)(nil),          // 15: dtkt.cli.v1beta1.Models.Agent
+	(*Models_Embedding)(nil),      // 16: dtkt.cli.v1beta1.Models.Embedding
+	(*Models_Provider)(nil),       // 17: dtkt.cli.v1beta1.Models.Provider
+	nil,                           // 18: dtkt.cli.v1beta1.Models.Provider.CustomHeadersEntry
+	nil,                           // 19: dtkt.cli.v1beta1.ConfigFile.ContextsEntry
+	(*timestamppb.Timestamp)(nil), // 20: google.protobuf.Timestamp
+	(*v1.Context)(nil),            // 21: dtkt.core.v1.Context
 }
 var file_dtkt_cli_v1beta1_message_proto_depIdxs = []int32{
-	15, // 0: dtkt.cli.v1beta1.Legal.bsl_accepted_at:type_name -> google.protobuf.Timestamp
-	0,  // 1: dtkt.cli.v1beta1.DaemonConfigFile.telemetry:type_name -> dtkt.cli.v1beta1.Telemetry
-	2,  // 2: dtkt.cli.v1beta1.DaemonConfig.config_file:type_name -> dtkt.cli.v1beta1.DaemonConfigFile
-	3,  // 3: dtkt.cli.v1beta1.DaemonStatus.daemon:type_name -> dtkt.cli.v1beta1.DaemonConfig
-	14, // 4: dtkt.cli.v1beta1.ConfigFile.contexts:type_name -> dtkt.cli.v1beta1.ConfigFile.ContextsEntry
-	1,  // 5: dtkt.cli.v1beta1.ConfigFile.legal:type_name -> dtkt.cli.v1beta1.Legal
-	0,  // 6: dtkt.cli.v1beta1.ConfigFile.telemetry:type_name -> dtkt.cli.v1beta1.Telemetry
-	6,  // 7: dtkt.cli.v1beta1.Config.config_file:type_name -> dtkt.cli.v1beta1.ConfigFile
-	7,  // 8: dtkt.cli.v1beta1.Configs.configs:type_name -> dtkt.cli.v1beta1.Config
-	16, // 9: dtkt.cli.v1beta1.Context.context:type_name -> dtkt.core.v1.Context
-	11, // 10: dtkt.cli.v1beta1.Plugins.plugins:type_name -> dtkt.cli.v1beta1.Plugin
-	16, // 11: dtkt.cli.v1beta1.ConfigFile.ContextsEntry.value:type_name -> dtkt.core.v1.Context
-	12, // [12:12] is the sub-list for method output_type
-	12, // [12:12] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	20, // 0: dtkt.cli.v1beta1.Legal.bsl_accepted_at:type_name -> google.protobuf.Timestamp
+	16, // 1: dtkt.cli.v1beta1.Models.embedding:type_name -> dtkt.cli.v1beta1.Models.Embedding
+	15, // 2: dtkt.cli.v1beta1.Models.agent:type_name -> dtkt.cli.v1beta1.Models.Agent
+	0,  // 3: dtkt.cli.v1beta1.DaemonConfigFile.telemetry:type_name -> dtkt.cli.v1beta1.Telemetry
+	2,  // 4: dtkt.cli.v1beta1.DaemonConfigFile.models:type_name -> dtkt.cli.v1beta1.Models
+	3,  // 5: dtkt.cli.v1beta1.DaemonConfig.config_file:type_name -> dtkt.cli.v1beta1.DaemonConfigFile
+	4,  // 6: dtkt.cli.v1beta1.DaemonStatus.daemon:type_name -> dtkt.cli.v1beta1.DaemonConfig
+	19, // 7: dtkt.cli.v1beta1.ConfigFile.contexts:type_name -> dtkt.cli.v1beta1.ConfigFile.ContextsEntry
+	1,  // 8: dtkt.cli.v1beta1.ConfigFile.legal:type_name -> dtkt.cli.v1beta1.Legal
+	0,  // 9: dtkt.cli.v1beta1.ConfigFile.telemetry:type_name -> dtkt.cli.v1beta1.Telemetry
+	7,  // 10: dtkt.cli.v1beta1.Config.config_file:type_name -> dtkt.cli.v1beta1.ConfigFile
+	8,  // 11: dtkt.cli.v1beta1.Configs.configs:type_name -> dtkt.cli.v1beta1.Config
+	21, // 12: dtkt.cli.v1beta1.Context.context:type_name -> dtkt.core.v1.Context
+	12, // 13: dtkt.cli.v1beta1.Plugins.plugins:type_name -> dtkt.cli.v1beta1.Plugin
+	17, // 14: dtkt.cli.v1beta1.Models.Agent.provider:type_name -> dtkt.cli.v1beta1.Models.Provider
+	17, // 15: dtkt.cli.v1beta1.Models.Embedding.provider:type_name -> dtkt.cli.v1beta1.Models.Provider
+	18, // 16: dtkt.cli.v1beta1.Models.Provider.custom_headers:type_name -> dtkt.cli.v1beta1.Models.Provider.CustomHeadersEntry
+	21, // 17: dtkt.cli.v1beta1.ConfigFile.ContextsEntry.value:type_name -> dtkt.core.v1.Context
+	18, // [18:18] is the sub-list for method output_type
+	18, // [18:18] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_dtkt_cli_v1beta1_message_proto_init() }
@@ -1120,13 +1420,14 @@ func file_dtkt_cli_v1beta1_message_proto_init() {
 		return
 	}
 	file_dtkt_cli_v1beta1_message_proto_msgTypes[0].OneofWrappers = []any{}
+	file_dtkt_cli_v1beta1_message_proto_msgTypes[16].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dtkt_cli_v1beta1_message_proto_rawDesc), len(file_dtkt_cli_v1beta1_message_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   14,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

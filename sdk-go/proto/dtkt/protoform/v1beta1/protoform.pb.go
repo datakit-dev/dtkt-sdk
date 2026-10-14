@@ -335,18 +335,30 @@ type SelectElement struct {
 	// this select element. The method must return a message containing a repeated
 	// field to be used as the options for this select element.
 	MethodName string `protobuf:"bytes,1,opt,name=method_name,json=methodName,proto3" json:"method_name,omitempty"`
-	// CEL expression to extract the key for each option from the method response.
-	// The method response will be available as `this` in the CEL expression context.
-	// Example key_expr: "this.options.map(i, i.name)" if the method response has a repeated
-	// field `options` with a `name` field to be used as the option key.
-	KeyExpr string `protobuf:"bytes,2,opt,name=key_expr,json=keyExpr,proto3" json:"key_expr,omitempty"`
-	// CEL expression to extract the value for each option from the method response.
-	// The method response will be available as `this` in the CEL expression context.
-	// Example val_expr: "this.options.map(i, i.display_name)" if the method response has a repeated
-	// field `options` with a `display_name` field to be used as the option value.
-	ValExpr       string `protobuf:"bytes,3,opt,name=val_expr,json=valExpr,proto3" json:"val_expr,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// Name of a repeated field within the method's response whose value defines
+	// the select element's options.
+	ResponseField string `protobuf:"bytes,2,opt,name=response_field,json=responseField,proto3" json:"response_field,omitempty"`
+	// CEL expression to extract the label for each select element option.
+	// Each list item within the resolved `response_field` of the method's response
+	// will be available as `this` in the CEL expression context.
+	LabelExpr string `protobuf:"bytes,3,opt,name=label_expr,json=labelExpr,proto3" json:"label_expr,omitempty"`
+	// Optional CEL expression to extract the value for each select element option.
+	// The resolved expression value must match the field type this option is
+	// applied to.
+	// Each list item within the resolved `response_field` of the method's response
+	// will be available as `this` in the CEL expression context.
+	// Default: resolved list item value (dynamic).
+	ValueExpr *string `protobuf:"bytes,4,opt,name=value_expr,json=valueExpr,proto3,oneof" json:"value_expr,omitempty"`
+	// Optional CEL expression to filter options returned by method response by
+	// only including options for which `filter_expr` returns `true`.
+	// Each list item within the resolved `response_field` of the method's response
+	// will be available as `this` in the CEL expression context.
+	FilterExpr *string `protobuf:"bytes,5,opt,name=filter_expr,json=filterExpr,proto3,oneof" json:"filter_expr,omitempty"`
+	// When defined, `filter_expr` is defined, and the method request contains a
+	// `filter (string)` field, set its value to `filter_expr`.
+	UseFilterField *bool `protobuf:"varint,6,opt,name=use_filter_field,json=useFilterField,proto3,oneof" json:"use_filter_field,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *SelectElement) Reset() {
@@ -386,18 +398,39 @@ func (x *SelectElement) GetMethodName() string {
 	return ""
 }
 
-func (x *SelectElement) GetKeyExpr() string {
+func (x *SelectElement) GetResponseField() string {
 	if x != nil {
-		return x.KeyExpr
+		return x.ResponseField
 	}
 	return ""
 }
 
-func (x *SelectElement) GetValExpr() string {
+func (x *SelectElement) GetLabelExpr() string {
 	if x != nil {
-		return x.ValExpr
+		return x.LabelExpr
 	}
 	return ""
+}
+
+func (x *SelectElement) GetValueExpr() string {
+	if x != nil && x.ValueExpr != nil {
+		return *x.ValueExpr
+	}
+	return ""
+}
+
+func (x *SelectElement) GetFilterExpr() string {
+	if x != nil && x.FilterExpr != nil {
+		return *x.FilterExpr
+	}
+	return ""
+}
+
+func (x *SelectElement) GetUseFilterField() bool {
+	if x != nil && x.UseFilterField != nil {
+		return *x.UseFilterField
+	}
+	return false
 }
 
 // Multi-select element
@@ -407,18 +440,30 @@ type MultiSelectElement struct {
 	// this select element. The method must return a message containing a repeated
 	// field to be used as the options for this select element.
 	MethodName string `protobuf:"bytes,1,opt,name=method_name,json=methodName,proto3" json:"method_name,omitempty"`
-	// CEL expression to extract the key for each option from the method response.
-	// The method response will be available as `this` in the CEL expression context.
-	// Example key_expr: "this.options.map(i, i.name)" if the method response has a repeated
-	// field `options` with a `name` field to be used as the option key.
-	KeyExpr string `protobuf:"bytes,2,opt,name=key_expr,json=keyExpr,proto3" json:"key_expr,omitempty"`
-	// CEL expression to extract the value for each option from the method response.
-	// The method response will be available as `this` in the CEL expression context.
-	// Example val_expr: "this.options.map(i, i.display_name)" if the method response has a repeated
-	// field `options` with a `display_name` field to be used as the option value.
-	ValExpr       string `protobuf:"bytes,3,opt,name=val_expr,json=valExpr,proto3" json:"val_expr,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// Name of a repeated field within the method's response whose value defines
+	// the select element's options.
+	ResponseField string `protobuf:"bytes,2,opt,name=response_field,json=responseField,proto3" json:"response_field,omitempty"`
+	// CEL expression to extract the label for each select element option.
+	// Each list item within the resolved `response_field` of the method's response
+	// will be available as `this` in the CEL expression context.
+	LabelExpr string `protobuf:"bytes,3,opt,name=label_expr,json=labelExpr,proto3" json:"label_expr,omitempty"`
+	// Optional CEL expression to extract the value for each select element option.
+	// The resolved expression value must match the field type this option is
+	// applied to.
+	// Each list item within the resolved `response_field` of the method's response
+	// will be available as `this` in the CEL expression context.
+	// Default: resolved list item value (dynamic).
+	ValueExpr *string `protobuf:"bytes,4,opt,name=value_expr,json=valueExpr,proto3,oneof" json:"value_expr,omitempty"`
+	// Optional CEL expression to filter options returned by method response by
+	// only including options for which `filter_expr` returns `true`.
+	// Each list item within the resolved `response_field` of the method's response
+	// will be available as `this` in the CEL expression context.
+	FilterExpr *string `protobuf:"bytes,5,opt,name=filter_expr,json=filterExpr,proto3,oneof" json:"filter_expr,omitempty"`
+	// When defined, `filter_expr` is defined, and the method request contains a
+	// `filter (string)` field, set its value to `filter_expr`.
+	UseFilterField *bool `protobuf:"varint,6,opt,name=use_filter_field,json=useFilterField,proto3,oneof" json:"use_filter_field,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *MultiSelectElement) Reset() {
@@ -458,18 +503,39 @@ func (x *MultiSelectElement) GetMethodName() string {
 	return ""
 }
 
-func (x *MultiSelectElement) GetKeyExpr() string {
+func (x *MultiSelectElement) GetResponseField() string {
 	if x != nil {
-		return x.KeyExpr
+		return x.ResponseField
 	}
 	return ""
 }
 
-func (x *MultiSelectElement) GetValExpr() string {
+func (x *MultiSelectElement) GetLabelExpr() string {
 	if x != nil {
-		return x.ValExpr
+		return x.LabelExpr
 	}
 	return ""
+}
+
+func (x *MultiSelectElement) GetValueExpr() string {
+	if x != nil && x.ValueExpr != nil {
+		return *x.ValueExpr
+	}
+	return ""
+}
+
+func (x *MultiSelectElement) GetFilterExpr() string {
+	if x != nil && x.FilterExpr != nil {
+		return *x.FilterExpr
+	}
+	return ""
+}
+
+func (x *MultiSelectElement) GetUseFilterField() bool {
+	if x != nil && x.UseFilterField != nil {
+		return *x.UseFilterField
+	}
+	return false
 }
 
 var file_dtkt_protoform_v1beta1_protoform_proto_extTypes = []protoimpl.ExtensionInfo{
@@ -515,17 +581,37 @@ const file_dtkt_protoform_v1beta1_protoform_proto_rawDesc = "" +
 	"\x0emultiline_text\x18\x01 \x01(\bH\x00R\rmultilineText\x88\x01\x01B\x11\n" +
 	"\x0f_multiline_text\"2\n" +
 	"\vFileElement\x12#\n" +
-	"\rallowed_types\x18\x02 \x03(\tR\fallowedTypes\"n\n" +
-	"\rSelectElement\x12'\n" +
-	"\vmethod_name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\n" +
-	"methodName\x12\x19\n" +
-	"\bkey_expr\x18\x02 \x01(\tR\akeyExpr\x12\x19\n" +
-	"\bval_expr\x18\x03 \x01(\tR\avalExpr\"s\n" +
-	"\x12MultiSelectElement\x12'\n" +
-	"\vmethod_name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\n" +
-	"methodName\x12\x19\n" +
-	"\bkey_expr\x18\x02 \x01(\tR\akeyExpr\x12\x19\n" +
-	"\bval_expr\x18\x03 \x01(\tR\avalExpr:^\n" +
+	"\rallowed_types\x18\x02 \x03(\tR\fallowedTypes\"\xa8\x03\n" +
+	"\rSelectElement\x12K\n" +
+	"\vmethod_name\x18\x01 \x01(\tB*\xbaH'\xc8\x01\x01r\"\x92\x02\x1fdtkt.example.GreetService.GreetR\n" +
+	"methodName\x12:\n" +
+	"\x0eresponse_field\x18\x02 \x01(\tB\x13\xbaH\x10\xc8\x01\x01r\v\x92\x02\bmessagesR\rresponseField\x123\n" +
+	"\n" +
+	"label_expr\x18\x03 \x01(\tB\x14\xbaH\x11\xc8\x01\x01r\f\x92\x02\tthis.textR\tlabelExpr\x123\n" +
+	"\n" +
+	"value_expr\x18\x04 \x01(\tB\x0f\xbaH\fr\n" +
+	"\x92\x02\athis.idH\x00R\tvalueExpr\x88\x01\x01\x12A\n" +
+	"\vfilter_expr\x18\x05 \x01(\tB\x1b\xbaH\x18r\x16\x92\x02\x13size(this.text) > 0H\x01R\n" +
+	"filterExpr\x88\x01\x01\x12-\n" +
+	"\x10use_filter_field\x18\x06 \x01(\bH\x02R\x0euseFilterField\x88\x01\x01B\r\n" +
+	"\v_value_exprB\x0e\n" +
+	"\f_filter_exprB\x13\n" +
+	"\x11_use_filter_field\"\xad\x03\n" +
+	"\x12MultiSelectElement\x12K\n" +
+	"\vmethod_name\x18\x01 \x01(\tB*\xbaH'\xc8\x01\x01r\"\x92\x02\x1fdtkt.example.GreetService.GreetR\n" +
+	"methodName\x12:\n" +
+	"\x0eresponse_field\x18\x02 \x01(\tB\x13\xbaH\x10\xc8\x01\x01r\v\x92\x02\bmessagesR\rresponseField\x123\n" +
+	"\n" +
+	"label_expr\x18\x03 \x01(\tB\x14\xbaH\x11\xc8\x01\x01r\f\x92\x02\tthis.textR\tlabelExpr\x123\n" +
+	"\n" +
+	"value_expr\x18\x04 \x01(\tB\x0f\xbaH\fr\n" +
+	"\x92\x02\athis.idH\x00R\tvalueExpr\x88\x01\x01\x12A\n" +
+	"\vfilter_expr\x18\x05 \x01(\tB\x1b\xbaH\x18r\x16\x92\x02\x13size(this.text) > 0H\x01R\n" +
+	"filterExpr\x88\x01\x01\x12-\n" +
+	"\x10use_filter_field\x18\x06 \x01(\bH\x02R\x0euseFilterField\x88\x01\x01B\r\n" +
+	"\v_value_exprB\x0e\n" +
+	"\f_filter_exprB\x13\n" +
+	"\x11_use_filter_field:^\n" +
 	"\x05field\x12\x1d.google.protobuf.FieldOptions\x18І\x03 \x01(\v2$.dtkt.protoform.v1beta1.FieldElementR\x05field\x88\x01\x01B\xfe\x01\n" +
 	"\x1cproto.dtkt.protoform.v1beta1B\x0eProtoformProtoP\x01ZTgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/protoform/v1beta1;protoformv1beta1\xa2\x02\x03DPX\xaa\x02\x16Dtkt.Protoform.V1beta1\xca\x02\x16Dtkt\\Protoform\\V1beta1\xe2\x02\"Dtkt\\Protoform\\V1beta1\\GPBMetadata\xea\x02\x18Dtkt::Protoform::V1beta1b\x06proto3"
 
@@ -579,6 +665,8 @@ func file_dtkt_protoform_v1beta1_protoform_proto_init() {
 		(*FieldElement_MultiSelect)(nil),
 	}
 	file_dtkt_protoform_v1beta1_protoform_proto_msgTypes[2].OneofWrappers = []any{}
+	file_dtkt_protoform_v1beta1_protoform_proto_msgTypes[4].OneofWrappers = []any{}
+	file_dtkt_protoform_v1beta1_protoform_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

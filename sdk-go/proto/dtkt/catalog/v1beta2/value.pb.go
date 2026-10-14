@@ -414,7 +414,7 @@ func (x *Row) GetValues() []*Value {
 type DoubleValue struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The double value.
-	Value float64 `protobuf:"fixed64,1,opt,name=value,proto3" json:"value,omitempty"`
+	Value *float64 `protobuf:"fixed64,1,opt,name=value,proto3,oneof" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
 	Valid         bool `protobuf:"varint,2,opt,name=valid,proto3" json:"valid,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -452,8 +452,8 @@ func (*DoubleValue) Descriptor() ([]byte, []int) {
 }
 
 func (x *DoubleValue) GetValue() float64 {
-	if x != nil {
-		return x.Value
+	if x != nil && x.Value != nil {
+		return *x.Value
 	}
 	return 0
 }
@@ -469,7 +469,7 @@ func (x *DoubleValue) GetValid() bool {
 type FloatValue struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The float value.
-	Value float32 `protobuf:"fixed32,1,opt,name=value,proto3" json:"value,omitempty"`
+	Value *float32 `protobuf:"fixed32,1,opt,name=value,proto3,oneof" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
 	Valid         bool `protobuf:"varint,2,opt,name=valid,proto3" json:"valid,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -507,8 +507,8 @@ func (*FloatValue) Descriptor() ([]byte, []int) {
 }
 
 func (x *FloatValue) GetValue() float32 {
-	if x != nil {
-		return x.Value
+	if x != nil && x.Value != nil {
+		return *x.Value
 	}
 	return 0
 }
@@ -524,7 +524,7 @@ func (x *FloatValue) GetValid() bool {
 type Int64Value struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The int64 value.
-	Value int64 `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
+	Value *int64 `protobuf:"varint,1,opt,name=value,proto3,oneof" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
 	Valid         bool `protobuf:"varint,2,opt,name=valid,proto3" json:"valid,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -562,8 +562,8 @@ func (*Int64Value) Descriptor() ([]byte, []int) {
 }
 
 func (x *Int64Value) GetValue() int64 {
-	if x != nil {
-		return x.Value
+	if x != nil && x.Value != nil {
+		return *x.Value
 	}
 	return 0
 }
@@ -579,7 +579,7 @@ func (x *Int64Value) GetValid() bool {
 type UInt64Value struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The uint64 value.
-	Value uint64 `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
+	Value *uint64 `protobuf:"varint,1,opt,name=value,proto3,oneof" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
 	Valid         bool `protobuf:"varint,2,opt,name=valid,proto3" json:"valid,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -617,8 +617,8 @@ func (*UInt64Value) Descriptor() ([]byte, []int) {
 }
 
 func (x *UInt64Value) GetValue() uint64 {
-	if x != nil {
-		return x.Value
+	if x != nil && x.Value != nil {
+		return *x.Value
 	}
 	return 0
 }
@@ -634,7 +634,7 @@ func (x *UInt64Value) GetValid() bool {
 type Int32Value struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The int32 value.
-	Value int32 `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
+	Value *int32 `protobuf:"varint,1,opt,name=value,proto3,oneof" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
 	Valid         bool `protobuf:"varint,2,opt,name=valid,proto3" json:"valid,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -672,8 +672,8 @@ func (*Int32Value) Descriptor() ([]byte, []int) {
 }
 
 func (x *Int32Value) GetValue() int32 {
-	if x != nil {
-		return x.Value
+	if x != nil && x.Value != nil {
+		return *x.Value
 	}
 	return 0
 }
@@ -689,7 +689,7 @@ func (x *Int32Value) GetValid() bool {
 type UInt32Value struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The uint32 value.
-	Value uint32 `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
+	Value *uint32 `protobuf:"varint,1,opt,name=value,proto3,oneof" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
 	Valid         bool `protobuf:"varint,2,opt,name=valid,proto3" json:"valid,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -727,8 +727,8 @@ func (*UInt32Value) Descriptor() ([]byte, []int) {
 }
 
 func (x *UInt32Value) GetValue() uint32 {
-	if x != nil {
-		return x.Value
+	if x != nil && x.Value != nil {
+		return *x.Value
 	}
 	return 0
 }
@@ -744,7 +744,7 @@ func (x *UInt32Value) GetValid() bool {
 type BoolValue struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The bool value.
-	Value bool `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
+	Value *bool `protobuf:"varint,1,opt,name=value,proto3,oneof" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
 	Valid         bool `protobuf:"varint,2,opt,name=valid,proto3" json:"valid,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -782,8 +782,8 @@ func (*BoolValue) Descriptor() ([]byte, []int) {
 }
 
 func (x *BoolValue) GetValue() bool {
-	if x != nil {
-		return x.Value
+	if x != nil && x.Value != nil {
+		return *x.Value
 	}
 	return false
 }
@@ -799,7 +799,7 @@ func (x *BoolValue) GetValid() bool {
 type StringValue struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The string value.
-	Value string `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	Value *string `protobuf:"bytes,1,opt,name=value,proto3,oneof" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
 	Valid         bool `protobuf:"varint,2,opt,name=valid,proto3" json:"valid,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -837,8 +837,8 @@ func (*StringValue) Descriptor() ([]byte, []int) {
 }
 
 func (x *StringValue) GetValue() string {
-	if x != nil {
-		return x.Value
+	if x != nil && x.Value != nil {
+		return *x.Value
 	}
 	return ""
 }
@@ -854,7 +854,7 @@ func (x *StringValue) GetValid() bool {
 type BytesValue struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The bytes value.
-	Value []byte `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	Value []byte `protobuf:"bytes,1,opt,name=value,proto3,oneof" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
 	Valid         bool `protobuf:"varint,2,opt,name=valid,proto3" json:"valid,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -909,7 +909,7 @@ func (x *BytesValue) GetValid() bool {
 type EnumValue struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The string representation of the ENUM value.
-	Value string `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	Value *string `protobuf:"bytes,1,opt,name=value,proto3,oneof" json:"value,omitempty"`
 	// Valid is true if value is not NULL.
 	Valid         bool `protobuf:"varint,2,opt,name=valid,proto3" json:"valid,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -947,8 +947,8 @@ func (*EnumValue) Descriptor() ([]byte, []int) {
 }
 
 func (x *EnumValue) GetValue() string {
-	if x != nil {
-		return x.Value
+	if x != nil && x.Value != nil {
+		return *x.Value
 	}
 	return ""
 }
@@ -994,41 +994,51 @@ const file_dtkt_catalog_v1beta2_value_proto_rawDesc = "" +
 	"\tListValue\x123\n" +
 	"\x06values\x18\x01 \x03(\v2\x1b.dtkt.catalog.v1beta2.ValueR\x06values\":\n" +
 	"\x03Row\x123\n" +
-	"\x06values\x18\x01 \x03(\v2\x1b.dtkt.catalog.v1beta2.ValueR\x06values\"9\n" +
-	"\vDoubleValue\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\x01R\x05value\x12\x14\n" +
-	"\x05valid\x18\x02 \x01(\bR\x05valid\"8\n" +
+	"\x06values\x18\x01 \x03(\v2\x1b.dtkt.catalog.v1beta2.ValueR\x06values\"H\n" +
+	"\vDoubleValue\x12\x19\n" +
+	"\x05value\x18\x01 \x01(\x01H\x00R\x05value\x88\x01\x01\x12\x14\n" +
+	"\x05valid\x18\x02 \x01(\bR\x05validB\b\n" +
+	"\x06_value\"G\n" +
 	"\n" +
-	"FloatValue\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\x02R\x05value\x12\x14\n" +
-	"\x05valid\x18\x02 \x01(\bR\x05valid\"8\n" +
+	"FloatValue\x12\x19\n" +
+	"\x05value\x18\x01 \x01(\x02H\x00R\x05value\x88\x01\x01\x12\x14\n" +
+	"\x05valid\x18\x02 \x01(\bR\x05validB\b\n" +
+	"\x06_value\"G\n" +
 	"\n" +
-	"Int64Value\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\x03R\x05value\x12\x14\n" +
-	"\x05valid\x18\x02 \x01(\bR\x05valid\"9\n" +
-	"\vUInt64Value\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\x04R\x05value\x12\x14\n" +
-	"\x05valid\x18\x02 \x01(\bR\x05valid\"8\n" +
+	"Int64Value\x12\x19\n" +
+	"\x05value\x18\x01 \x01(\x03H\x00R\x05value\x88\x01\x01\x12\x14\n" +
+	"\x05valid\x18\x02 \x01(\bR\x05validB\b\n" +
+	"\x06_value\"H\n" +
+	"\vUInt64Value\x12\x19\n" +
+	"\x05value\x18\x01 \x01(\x04H\x00R\x05value\x88\x01\x01\x12\x14\n" +
+	"\x05valid\x18\x02 \x01(\bR\x05validB\b\n" +
+	"\x06_value\"G\n" +
 	"\n" +
-	"Int32Value\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\x05R\x05value\x12\x14\n" +
-	"\x05valid\x18\x02 \x01(\bR\x05valid\"9\n" +
-	"\vUInt32Value\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\rR\x05value\x12\x14\n" +
-	"\x05valid\x18\x02 \x01(\bR\x05valid\"7\n" +
-	"\tBoolValue\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\bR\x05value\x12\x14\n" +
-	"\x05valid\x18\x02 \x01(\bR\x05valid\"9\n" +
-	"\vStringValue\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\tR\x05value\x12\x14\n" +
-	"\x05valid\x18\x02 \x01(\bR\x05valid\"8\n" +
+	"Int32Value\x12\x19\n" +
+	"\x05value\x18\x01 \x01(\x05H\x00R\x05value\x88\x01\x01\x12\x14\n" +
+	"\x05valid\x18\x02 \x01(\bR\x05validB\b\n" +
+	"\x06_value\"H\n" +
+	"\vUInt32Value\x12\x19\n" +
+	"\x05value\x18\x01 \x01(\rH\x00R\x05value\x88\x01\x01\x12\x14\n" +
+	"\x05valid\x18\x02 \x01(\bR\x05validB\b\n" +
+	"\x06_value\"F\n" +
+	"\tBoolValue\x12\x19\n" +
+	"\x05value\x18\x01 \x01(\bH\x00R\x05value\x88\x01\x01\x12\x14\n" +
+	"\x05valid\x18\x02 \x01(\bR\x05validB\b\n" +
+	"\x06_value\"H\n" +
+	"\vStringValue\x12\x19\n" +
+	"\x05value\x18\x01 \x01(\tH\x00R\x05value\x88\x01\x01\x12\x14\n" +
+	"\x05valid\x18\x02 \x01(\bR\x05validB\b\n" +
+	"\x06_value\"G\n" +
 	"\n" +
-	"BytesValue\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\fR\x05value\x12\x14\n" +
-	"\x05valid\x18\x02 \x01(\bR\x05valid\"7\n" +
-	"\tEnumValue\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\tR\x05value\x12\x14\n" +
-	"\x05valid\x18\x02 \x01(\bR\x05validB\xec\x01\n" +
+	"BytesValue\x12\x19\n" +
+	"\x05value\x18\x01 \x01(\fH\x00R\x05value\x88\x01\x01\x12\x14\n" +
+	"\x05valid\x18\x02 \x01(\bR\x05validB\b\n" +
+	"\x06_value\"F\n" +
+	"\tEnumValue\x12\x19\n" +
+	"\x05value\x18\x01 \x01(\tH\x00R\x05value\x88\x01\x01\x12\x14\n" +
+	"\x05valid\x18\x02 \x01(\bR\x05validB\b\n" +
+	"\x06_valueB\xec\x01\n" +
 	"\x1aproto.dtkt.catalog.v1beta2B\n" +
 	"ValueProtoP\x01ZPgithub.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/catalog/v1beta2;catalogv1beta2\xa2\x02\x03DCX\xaa\x02\x14Dtkt.Catalog.V1beta2\xca\x02\x14Dtkt\\Catalog\\V1beta2\xe2\x02 Dtkt\\Catalog\\V1beta2\\GPBMetadata\xea\x02\x16Dtkt::Catalog::V1beta2b\x06proto3"
 
@@ -1111,6 +1121,16 @@ func file_dtkt_catalog_v1beta2_value_proto_init() {
 		(*Value_TimestampValue)(nil),
 		(*Value_ListValue)(nil),
 	}
+	file_dtkt_catalog_v1beta2_value_proto_msgTypes[3].OneofWrappers = []any{}
+	file_dtkt_catalog_v1beta2_value_proto_msgTypes[4].OneofWrappers = []any{}
+	file_dtkt_catalog_v1beta2_value_proto_msgTypes[5].OneofWrappers = []any{}
+	file_dtkt_catalog_v1beta2_value_proto_msgTypes[6].OneofWrappers = []any{}
+	file_dtkt_catalog_v1beta2_value_proto_msgTypes[7].OneofWrappers = []any{}
+	file_dtkt_catalog_v1beta2_value_proto_msgTypes[8].OneofWrappers = []any{}
+	file_dtkt_catalog_v1beta2_value_proto_msgTypes[9].OneofWrappers = []any{}
+	file_dtkt_catalog_v1beta2_value_proto_msgTypes[10].OneofWrappers = []any{}
+	file_dtkt_catalog_v1beta2_value_proto_msgTypes[11].OneofWrappers = []any{}
+	file_dtkt_catalog_v1beta2_value_proto_msgTypes[12].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package dtkt.core.v1;
+
+import "buf/validate/validate.proto";
+import "dtkt/core/v1/common.proto";
+
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/core/v1;corev1";
+
+// EncryptionService provides resource encryption and decryption operations.
+service EncryptionService {
+  // Encrypt resource.
+  rpc Encrypt(EncryptRequest) returns (EncryptResponse);
+
+  // Decrypt resource.
+  rpc Decrypt(DecryptRequest) returns (DecryptResponse);
+}
+
+// EncryptRequest requests encryption of a resource with decrypted data.
+message EncryptRequest {
+  // Resource with decrypted data to encrypt.
+  Resource resource = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel_expression = "has(this.decrypted)"
+  ];
+}
+
+// EncryptResponse returns the encrypted resource.
+message EncryptResponse {
+  // Resource with encrypted data.
+  Resource resource = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel_expression = "has(this.encrypted)"
+  ];
+}
+
+// DecryptRequest requests decryption of a resource with encrypted data.
+message DecryptRequest {
+  // Resource with encrypted data to decrypt.
+  Resource resource = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel_expression = "has(this.encrypted)"
+  ];
+}
+
+// DecryptResponse returns the decrypted resource.
+message DecryptResponse {
+  // Resource with decrypted data.
+  Resource resource = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel_expression = "has(this.decrypted)"
+  ];
+}

@@ -92,15 +92,12 @@ message EventSource {
 // Request for retrieving events.
 message ListEventsRequest {
   // Number of events to return per page. Leave empty for the server default.
-  int32 page_size = 1 [
-    (buf.validate.field).int32.gte = 0,
-    (buf.validate.field).int32.lte = 1000
-  ];
+  int32 page_size = 1;
 
   // Token from a previous response's `next_page_token` to retrieve the next page of results.
   string page_token = 2;
 
-  // Optional filter expression to narrow results..
+  // Optional filter expression to narrow results.
   string filter = 3;
 }
 
@@ -116,15 +113,12 @@ message ListEventsResponse {
 // Request for retrieving event source types supported by this service.
 message ListEventSourcesRequest {
   // Number of event sources to return per page. Leave empty for the server default.
-  int32 page_size = 1 [
-    (buf.validate.field).int32.gte = 0,
-    (buf.validate.field).int32.lte = 1000
-  ];
+  int32 page_size = 1;
 
   // Token from a previous response's `next_page_token` to retrieve the next page of results.
   string page_token = 2;
 
-  // Optional filter expression to narrow results..
+  // Optional filter expression to narrow results.
   string filter = 3;
 }
 
@@ -144,8 +138,9 @@ message StreamPullEventsRequest {
     (buf.validate.field).required = true,
     (dtkt.protoform.v1beta1.field).title = "Select a pull event source",
     (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.event.v1beta1.EventService.ListEventSources",
-    (dtkt.protoform.v1beta1.field).select.key_expr = "this.event_sources.map(i, i.display_name)",
-    (dtkt.protoform.v1beta1.field).select.val_expr = "this.event_sources.map(i, i.name)"
+    (dtkt.protoform.v1beta1.field).select.response_field = "event_sources",
+    (dtkt.protoform.v1beta1.field).select.label_expr = "this.display_name",
+    (dtkt.protoform.v1beta1.field).select.value_expr = "this.name"
   ];
 
   // Configuration of the event source.
@@ -177,8 +172,9 @@ message StreamPushEventsRequest {
     (buf.validate.field).required = true,
     (dtkt.protoform.v1beta1.field).title = "Select a push event source",
     (dtkt.protoform.v1beta1.field).select.method_name = "dtkt.event.v1beta1.EventService.ListEventSources",
-    (dtkt.protoform.v1beta1.field).select.key_expr = "this.event_sources.map(i, i.display_name)",
-    (dtkt.protoform.v1beta1.field).select.val_expr = "this.event_sources.map(i, i.name)"
+    (dtkt.protoform.v1beta1.field).select.response_field = "event_sources",
+    (dtkt.protoform.v1beta1.field).select.label_expr = "this.display_name",
+    (dtkt.protoform.v1beta1.field).select.value_expr = "this.name"
   ];
 
   // Headers of the event (if any).

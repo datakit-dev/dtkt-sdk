@@ -23,7 +23,6 @@ COPY --link ${PKG_DIR}/pkg ${PKG_DIR}/pkg
 RUN --mount=type=cache,target="/root/.cache/go-build" \
   --mount=type=cache,target="/root/go/pkg/mod" \
   CGO_ENABLED=0 \
-  GOEXPERIMENT=jsonv2 \
   go build -C ${PKG_DIR} \
   -o ../../../bin/pkg \
   -ldflags="-s" .

@@ -1,0 +1,245 @@
+edition = "2023";
+
+package dtkt.sql.v1beta1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/go_features.proto";
+
+option features.(pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/datakit-dev/dtkt-sdk/sdk-go/proto/dtkt/sql/v1beta1";
+
+// Type is a union of common data types found in SQL databases as well as native
+// support for protocol buffer message types.
+message Type {
+  oneof kind {
+    option (buf.validate.oneof).required = true;
+
+    BoolType bool_type = 1;
+    BinaryType binary_type = 2;
+    DecimalType decimal_type = 3;
+    FloatType float_type = 4;
+    IntegerType integer_type = 5;
+    JSONType json_type = 6;
+    SpatialType spatial_type = 7;
+    StringType string_type = 8;
+    UUIDType uuid_type = 9;
+    TimeType time_type = 10;
+    EnumType enum_type = 11;
+    MessageType message_type = 12;
+    ListType list_type = 13;
+    MapType map_type = 14;
+    DateType date_type = 15;
+    TimestampType timestamp_type = 16;
+    IntervalType interval_type = 17;
+    StructType struct_type = 18;
+  }
+}
+
+message BoolType {
+  repeated TypeAttribute attrs = 2;
+}
+
+message BinaryType {
+  uint32 size = 1;
+  repeated TypeAttribute attrs = 2;
+}
+
+message DecimalType {
+  uint32 precision = 1;
+  uint32 scale = 2;
+  bool unsigned = 3;
+  repeated TypeAttribute attrs = 4;
+}
+
+message FloatType {
+  uint32 precision = 1;
+  bool unsigned = 2;
+  repeated TypeAttribute attrs = 3;
+}
+
+message IntegerType {
+  // Canonical, cross-engine bit width (e.g. 8, 16, 24, 32, 64, 128). This is
+  // the authoritative width -- unlike Atlas's schema.IntegerType, we can't
+  // rely on a dialect-native type name (e.g. "tinyint") to recover this,
+  // because the consumer of this message may be a completely different
+  // engine's driver with no shared vocabulary for that name. 24 is included
+  // deliberately (not just powers of two) to cover engines like MySQL's
+  // MEDIUMINT. Unset (0) defaults to 32, matching standard SQL INTEGER.
+  //
+  // The original dialect-native name (e.g. "tinyint", "int4") can still be
+  // preserved via attrs' native_type for fidelity in DDL round-tripping.
+  uint32 bits = 1;
+
+  bool unsigned = 2;
+
+  repeated TypeAttribute attrs = 3;
+}
+
+message JSONType {
+  repeated TypeAttribute attrs = 1;
+}
+
+message SpatialType {
+  repeated TypeAttribute attrs = 1;
+}
+
+message StringType {
+  uint32 size = 1;
+
+  repeated TypeAttribute attrs = 2;
+}
+
+message UUIDType {
+  repeated TypeAttribute attrs = 1;
+}
+
+// ==========================================
+// Temporal types
+//
+// Split into four distinct kinds (rather than one generic TimeType) because
+// they have materially different semantics that a single {precision, scale}
+// pair can't capture: a DATE has no time-of-day; an INTERVAL is a calendar
+// span (months/days are not constant-length) rather than a point in time;
+// and only some engines' timestamps carry a UTC offset/zone (SQL Server's
+// DATETIMEOFFSET vs DATETIME2, Postgres's TIMESTAMPTZ vs TIMESTAMP, DuckDB's
+// TIMESTAMP WITH TIME ZONE vs TIMESTAMP) -- collapsing all of these into one
+// kind silently drops information a migration tool needs to get right.
+// ==========================================
+
+// A calendar date with no time-of-day or time zone component.
+message DateType {
+  repeated TypeAttribute attrs = 1;
+}
+
+// A time-of-day value with no date component (SQL TIME).
+message TimeType {
+  // Fractional-second precision: number of digits after the decimal point.
+  // 0 means whole-second resolution.
+  uint32 precision = 1;
+
+  // Whether values carry a UTC offset (SQL `TIME WITH TIME ZONE`).
+  bool with_timezone = 2;
+
+  repeated TypeAttribute attrs = 3;
+}
+
+// A calendar date combined with a time-of-day (SQL TIMESTAMP/DATETIME).
+message TimestampType {
+  // Fractional-second precision: number of digits after the decimal point.
+  uint32 precision = 1;
+
+  // Whether values carry a UTC offset/zone, e.g. Postgres/DuckDB
+  // TIMESTAMPTZ or SQL Server DATETIMEOFFSET. When false, values are
+  // "naive" timestamps with no attached offset.
+  bool with_timezone = 2;
+
+  repeated TypeAttribute attrs = 3;
+}
+
+// A calendar interval/duration, e.g. "1 year 2 months 3 days". Distinct
+// from a fixed-length duration: calendar units (months, days) aren't
+// constant-length, so an interval isn't reducible to a single scalar
+// without a reference point to measure against.
+message IntervalType {
+  repeated TypeAttribute attrs = 1;
+}
+
+message EnumType {
+  // Fully-qualified name of this enum type.
+  string name = 1 [(buf.validate.field).required = true];
+
+  // String values of this enum type.
+  repeated string values = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).repeated.min_items = 1
+  ];
+
+  repeated TypeAttribute attrs = 3;
+}
+
+message MessageType {
+  enum Encoding {
+    ENCODING_UNSPECIFIED = 0;
+    // Stores the message using protocol buffer binary encoding.
+    ENCODING_PROTO = 1;
+    // Stores the message using canonical ProtoJSON encoding.
+    ENCODING_JSON = 2;
+  }
+
+  // Fully-qualified name of this message type.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.protobuf_fqn = true
+  ];
+
+  // Specifies the encoding format to use when storing the message.
+  Encoding encoding = 2 [
+    default = ENCODING_PROTO,
+    (buf.validate.field).enum.defined_only = true
+  ];
+
+  oneof descriptor {
+    option (buf.validate.oneof).required = true;
+
+    // URI resolving to a google.protobuf.FileDescriptorSet or google.protobuf.FileDescriptorProto
+    // containing the named message descriptor.
+    string proto_uri = 3 [(buf.validate.field).string.uri = true];
+
+    // A resolved google.protobuf.FileDescriptorSet or google.protobuf.FileDescriptorProto
+    // containing the named message descriptor.
+    google.protobuf.Any proto_files = 4 [(buf.validate.field).any = {
+      in: [
+        "type.googleapis.com/google.protobuf.FileDescriptorSet",
+        "type.googleapis.com/google.protobuf.FileDescriptorProto"
+      ]
+    }];
+  }
+
+  repeated TypeAttribute attrs = 10;
+}
+
+message ListType {
+  Type item_type = 1 [(buf.validate.field).required = true];
+
+  repeated TypeAttribute attrs = 2;
+}
+
+message MapType {
+  Type key_type = 1 [(buf.validate.field).required = true];
+  Type val_type = 2 [(buf.validate.field).required = true];
+
+  repeated TypeAttribute attrs = 3;
+}
+
+message FieldType {
+  Type type = 1 [(buf.validate.field).required = true];
+  string name = 2;
+}
+
+message StructType {
+  option (buf.validate.message).cel_expression = "this.fields.all(f, size(f.name) > 0)";
+
+  repeated FieldType fields = 1 [(buf.validate.field).repeated.min_items = 1];
+  repeated TypeAttribute attrs = 2;
+}
+
+message TypeAttribute {
+  message Check {
+    string expr = 1;
+    string name = 2;
+  }
+
+  message Generated {
+    string expr = 1;
+    string name = 2;
+  }
+
+  oneof kind {
+    string charset = 1;
+    string collation = 2;
+    Check check = 3;
+    Generated generated = 4;
+    string native_type = 5;
+  }
+}
